@@ -43,7 +43,7 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'permission', 'evaltype', 'tags'
+				'width', 'height', 'viewtype', 'use_iconmap', 'permission', 'evaltype', 'tags', 'zindex'
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
 				'permission'
@@ -251,7 +251,7 @@ class CMapHelper {
 		unset($element);
 
 		$labels = getMapLabels($sysmap, $map_info);
-		$highlights = getMapHighligts($sysmap, $map_info);
+		$highlights = getMapHighlights($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
 		$link_triggers_info = getMapLinkTriggerInfo($sysmap, $options);
 
@@ -590,13 +590,13 @@ class CMapHelper {
 				]);
 			}
 
-			$new_selementid = (count($sysmap['selements']) > 0)
+			$new_selementid = count($sysmap['selements']) > 0
 				? (int) max(array_column($sysmap['selements'], 'selementid'))
 				: 0;
 
-			$new_linkid = (count($sysmap['links']) > 0) ? (int) max(array_keys($sysmap['links'])) : 0;
+			$new_linkid = count($sysmap['links']) > 0 ? (int) max(array_column($sysmap['links'], 'linkid')) : 0;
 
-			foreach ($sysmap['selements'] as $selement_key => &$selement) {
+			foreach ($sysmap['selements'] as &$selement) {
 				if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
 						|| $selement['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 					continue;
@@ -652,6 +652,7 @@ class CMapHelper {
 				// Add selected hosts as map selements.
 				foreach ($group['hosts'] as $host) {
 					$new_selementid++;
+					$new_selementid = (string) $new_selementid;
 
 					$area['selementids'][] = $new_selementid;
 					$sysmap['selements'][$new_selementid] = [
@@ -681,10 +682,10 @@ class CMapHelper {
 						continue;
 					}
 
-					if ($id1 == $original_selement['selementid']) {
+					if (bccomp($id1, $original_selement['selementid']) == 0) {
 						$id_number = 'selementid1';
 					}
-					elseif ($id2 == $original_selement['selementid']) {
+					elseif (bccomp($id2, $original_selement['selementid']) == 0) {
 						$id_number = 'selementid2';
 					}
 					else {
@@ -693,7 +694,8 @@ class CMapHelper {
 
 					foreach ($area['selementids'] as $selement_id) {
 						$new_linkid++;
-						$link['linkid'] = -$new_linkid;
+						$new_linkid = (string) $new_linkid;
+						$link['linkid'] = $new_linkid;
 						$link[$id_number] = $selement_id;
 						$sysmap['links'][$new_linkid] = $link;
 					}

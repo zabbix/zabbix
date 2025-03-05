@@ -23,36 +23,33 @@ ZABBIX.classes.Observer = (function() {
 	Observer.prototype = {
 		constructor: ZABBIX.classes.Observer,
 
-		bind: function(event, callback) {
-			var i;
-
+		bind: function(e, callback) {
 			if (typeof callback === 'function') {
-				event = ('' + event).toLowerCase().split(/\s+/);
+				e = ('' + e).toLowerCase().split(/\s+/);
 
-				for (i = 0; i < event.length; i++) {
-					if (this.listeners[event[i]] === void(0)) {
-						this.listeners[event[i]] = [];
+				for (let i = 0; i < e.length; i++) {
+					if (this.listeners[e[i]] === void(0)) {
+						this.listeners[e[i]] = [];
 					}
 
-					this.listeners[event[i]].push(callback);
+					this.listeners[e[i]].push(callback);
 				}
 			}
 
 			return this;
 		},
 
-		trigger: function(event, target) {
-			event = event.toLowerCase();
+		trigger: function(e, target) {
+			e = e.toLowerCase();
 
-			var handlers = this.listeners[event] || [],
-				i;
+			const handlers = this.listeners[e] || [];
 
 			if (handlers.length) {
-				event = jQuery.Event(event);
+				e = jQuery.Event(e);
 
-				for (i = 0; i < handlers.length; i++) {
+				for (let i = 0; i < handlers.length; i++) {
 					try {
-						if (handlers[i](event, target) === false || event.isDefaultPrevented()) {
+						if (handlers[i](e, target) === false || e.isDefaultPrevented()) {
 							break;
 						}
 					}
@@ -67,11 +64,9 @@ ZABBIX.classes.Observer = (function() {
 	};
 
 	Observer.makeObserver = function(object) {
-		var i;
-
-		for (i in Observer.prototype) {
-			if (Observer.prototype.hasOwnProperty(i) && typeof Observer.prototype[i] === 'function') {
-				object[i] = Observer.prototype[i];
+		for (const key in Observer.prototype) {
+			if (Observer.prototype.hasOwnProperty(key) && typeof Observer.prototype[key] === 'function') {
+				object[key] = Observer.prototype[key];
 			}
 		}
 
@@ -86,16 +81,9 @@ ZABBIX.namespace('apps.map');
 ZABBIX.apps.map = (function($) {
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
-	const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
 
-	function createMap(containerId, mapData) {
-		var CMap = function(containerId, mapData) {
-			var selementid,
-				shapeid,
-				linkid;
-
-			this.reupdateImage = false; // if image should be updated again after last update is finished
-			this.imageUpdating = false; // if ajax request for image updating is processing
+	function createMap(containerid, mapData) {
+		var CMap = function(containerid, mapData) {
 			this.selements = {}; // element objects
 			this.shapes = {}; // shape objects
 			this.links = {}; // map links array
@@ -107,7 +95,7 @@ ZABBIX.apps.map = (function($) {
 				selements: {}, // selected elements
 				shapes: {} // selected shapes
 			};
-			this.currentLinkId = '0'; // linkid of currently edited link
+			this.current_linkid = '0'; // linkid of currently edited link
 			this.allLinkTriggerIds = {};
 			this.sysmapid = mapData.sysmap.sysmapid;
 			this.data = mapData.sysmap;
@@ -117,17 +105,14 @@ ZABBIX.apps.map = (function($) {
 			this.defaultIconId = mapData.defaultIconId;
 			this.defaultIconName = mapData.defaultIconName;
 			this.csrf_token = mapData.csrf_token;
-			this.container = $('#' + containerId);
+			this.container = $(`#${containerid}`);
 
-			if (this.container.length === 0) {
+			if (this.container.length == 0) {
 				this.container = $(document.body);
 			}
 
 			this.images = {};
-			Object.keys(this.iconList).forEach(function (id) {
-				var item = this.iconList[id];
-				this.images[item.imageid] = item;
-			}, this);
+			Object.values(this.iconList).forEach((item) => this.images[item.imageid] = item);
 
 			this.map = new SVGMap({
 				theme: mapData.theme,
@@ -140,8 +125,8 @@ ZABBIX.apps.map = (function($) {
 			});
 
 			this.container.css({
-				width: this.data.width + 'px',
-				height: this.data.height + 'px',
+				width: `${this.data.width}px`,
+				height: `${this.data.height}px`,
 				overflow: 'hidden'
 			});
 
@@ -149,35 +134,21 @@ ZABBIX.apps.map = (function($) {
 			this.base64image = true;
 			$('#sysmap_img').remove();
 
-			for (selementid in this.data.selements) {
-				if (this.data.selements.hasOwnProperty(selementid)) {
-					this.selements[selementid] = new Selement(this, this.data.selements[selementid]);
+			const processItems = (key, target, Class, field_id, sort = false) => {
+				const items = Object.values(this.data[key]);
+
+				if (sort) {
+					items.sort((a, b) => a.zindex - b.zindex);
 				}
-			}
 
-			var shapes = [];
+				items.forEach((item) => target[item[field_id]] = new Class(this, item));
+			};
 
-			for (shapeid in this.data.shapes) {
-				if (this.data.shapes.hasOwnProperty(shapeid)) {
-					shapes.push(this.data.shapes[shapeid]);
-				}
-			}
+			processItems('selements', this.selements, Selement, 'selementid', true);
+			processItems('shapes', this.shapes, Shape, 'sysmap_shapeid', true);
+			processItems('links', this.links, Link, 'linkid');
 
-			shapes = shapes.sort(function (a,b) {
-				return a.zindex - b.zindex;
-			});
-
-			shapes.forEach(function (shape) {
-				this.shapes[shape.sysmap_shapeid] = new Shape(this, shape);
-			}, this);
-
-			for (linkid in this.data.links) {
-				if (this.data.selements.hasOwnProperty(selementid)) {
-					this.links[linkid] = new Link(this, this.data.links[linkid]);
-				}
-			}
-
-			// create container for forms
+			// Create container for forms.
 			this.formContainer = $('<div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
@@ -194,42 +165,36 @@ ZABBIX.apps.map = (function($) {
 			this.linkForm = new LinkForm(this.formContainer, this);
 			this.shapeForm = new ShapeForm(this.formContainer, this);
 			this.massShapeForm = new MassShapeForm(this.formContainer, this);
-			this.bindActions();
 
-			// initialize selectable
+			this.addMapActionsEventListeners();
+			this.addMapElementEventListeners();
+			this.addFormEventListeners();
+
+			// Initialize selectable.
 			this.container.selectable({
-				start: $.proxy(function(event) {
-					if (!event.ctrlKey && !event.metaKey) {
+				start: (e) => {
+					if (!e.ctrlKey && !e.metaKey) {
 						this.clearSelection();
 					}
-				}, this),
-				stop: $.proxy(function(event) {
-					var selected = this.container.children('.ui-selected'),
-						ids = [],
-						i,
-						ln;
+				},
+				stop: (e) => {
+					const selected = this.container[0].querySelectorAll('.ui-selected'),
+						ids = [];
 
-					for (i = 0, ln = selected.length; i < ln; i++) {
+					selected.forEach((element) => {
 						ids.push({
-							id: $(selected[i]).data('id'),
-							type: $(selected[i]).data('type')
+							id: element.dataset.id,
+							type: element.dataset.type
 						});
 
-						// remove ui-selected class, to not confuse next selection
-						selected.removeClass('ui-selected');
-					}
+						// Remove ui-selected class, to not confuse next selection.
+						element.classList.remove('ui-selected');
+					});
 
-					this.selectElements(ids, event.ctrlKey || event.metaKey);
-				}, this)
+					this.selectElements(ids, e.ctrlKey || e.metaKey);
+				}
 			});
 		};
-
-		CMap.LABEL_TYPE_LABEL	= 0; // MAP_LABEL_TYPE_LABEL
-		CMap.LABEL_TYPE_IP		= 1; // MAP_LABEL_TYPE_IP
-		CMap.LABEL_TYPE_NAME	= 2; // MAP_LABEL_TYPE_NAME
-		CMap.LABEL_TYPE_STATUS	= 3; // MAP_LABEL_TYPE_STATUS
-		CMap.LABEL_TYPE_NOTHING	= 4; // MAP_LABEL_TYPE_NOTHING
-		CMap.LABEL_TYPE_CUSTOM	= 5; // MAP_LABEL_TYPE_CUSTOM
 
 		CMap.prototype = {
 			copypaste_buffer: [],
@@ -237,7 +202,9 @@ ZABBIX.apps.map = (function($) {
 			expand_sources: [],
 
 			save: function() {
-				var url = new Curl();
+				const url = new Curl();
+
+				this.correctSelementZIndexes();
 
 				$.ajax({
 					url: url.getPath() + '?output=ajax',
@@ -255,15 +222,40 @@ ZABBIX.apps.map = (function($) {
 				});
 			},
 
-			setExpandedLabels: function (elements, labels) {
-				for (var i = 0, ln = elements.length; i < ln; i++) {
-					if (labels !== null) {
-						elements[i].expanded = labels[i];
-					}
-					else {
-						elements[i].expanded = null;
-					}
+			/**
+			 * Automatically correct element z-index values. Useful if map was imported from older version where all
+			 * z-index values are 0. Or map was added in API where "zindex" could be set to any numeric value like -3,
+			 * for example. Firstly sort elements by "zindex" and secondly sort by "selementid". Since "selementid"
+			 * can also be a new element "new0", "new1" etc., compare those as strings. The resulting
+			 * this.data.selements will yield corrected "zindex" values for elements.
+			 */
+			correctSelementZIndexes: function() {
+				if (!this.data.selements) {
+					return;
 				}
+
+				const selements = this.data.selements,
+					keys = Object.keys(selements);
+
+				// Sort by numeric "zindex", then by "selementid" (as string).
+				keys.sort((a, b) => {
+					const zA = Number(selements[a].zindex),
+						zB = Number(selements[b].zindex);
+
+					if (zA == zB) {
+						// Compare "selementid" as strings in case two zindex values were identical.
+						return selements[a].selementid.localeCompare(selements[b].selementid);
+					}
+
+					return zA - zB;
+				});
+
+				// Reassign sequential "zindex" values based on sorted order.
+				keys.forEach((key, index) => selements[key].zindex = index.toString());
+			},
+
+			setExpandedLabels: function (elements, labels) {
+				elements.forEach((element, i) => element.expanded = labels ? labels[i] : null);
 
 				this.updateImage();
 
@@ -273,7 +265,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			expandMacros: function(source) {
-				var url = new Curl();
+				const url = new Curl();
 
 				if (source !== null) {
 					if (/\{.+\}/.test(source.getLabel(false))) {
@@ -285,15 +277,11 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				if (this.buffered_expand === false && this.expand_sources.length > 0) {
-					var sources = this.expand_sources,
-						post = [],
-						map = this;
+					const sources = this.expand_sources;
 
 					this.expand_sources = [];
 
-					for (var i = 0, ln = sources.length; i < ln; i++) {
-						post.push(sources[i].data);
-					}
+					const post = sources.map((source) => source.data);
 
 					$.ajax({
 						url: url.getPath() + '?output=ajax',
@@ -307,7 +295,7 @@ ZABBIX.apps.map = (function($) {
 							name: this.data.name,
 							source: JSON.stringify(post)
 						},
-						success: function(data) {
+						success: (data) => {
 							try {
 								data = JSON.parse(data);
 							}
@@ -315,11 +303,9 @@ ZABBIX.apps.map = (function($) {
 								data = null;
 							}
 
-							map.setExpandedLabels(sources, data);
+							this.setExpandedLabels(sources, data);
 						},
-						error: function() {
-							map.setExpandedLabels(sources, null);
-						}
+						error: () => this.setExpandedLabels(sources, null)
 					});
 				}
 				else if (this.buffered_expand === false) {
@@ -328,35 +314,34 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			updateImage: function() {
-				var shapes = [],
+				const shapes = [],
 					links = [],
 					elements = [],
-					grid_size = (this.data.grid_show === '1') ? parseInt(this.data.grid_size, 10) : 0;
+					grid_size = this.data.grid_show == SYSMAP_GRID_SHOW_ON ? parseInt(this.data.grid_size, 10) : 0;
 
 				if (grid_size !== this.data.last_grid_size) {
 					this.map.setGrid(grid_size);
 					this.data.last_grid_size = grid_size;
 				}
 
-				Object.keys(this.selements).forEach(function(key) {
-					var element = {},
+				Object.keys(this.selements).forEach((key) => {
+					const element = {},
 						data = this.selements[key].data;
 
-					['selementid', 'x', 'y', 'label_location'].forEach(function (name) {
-						element[name] = data[name];
-					}, this);
+					['selementid', 'x', 'y', 'label_location', 'zindex'].forEach((name) => element[name] = data[name]);
 
 					element['label'] = this.selements[key].getLabel();
 
-					// host group elements
-					if (data.elementtype === '3' && data.elementsubtype === '1') {
-						element.width = (data.areatype === '0') ? this.data.width : data.width;
-						element.height = (data.areatype === '0') ? this.data.height : data.height;
+					if (data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+							&& data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS) {
+						element.width = data.areatype == SVGMapElement.AREA_TYPE_FIT ? this.data.width : data.width;
+						element.height = data.areatype == SVGMapElement.AREA_TYPE_FIT ? this.data.height : data.height;
 					}
 
-					if ((data.use_iconmap === '1' && this.data.iconmapid !== '0')
-							&& (data.elementtype === '0'
-								|| (data.elementtype === '3' && data.elementsubtype === '1'))) {
+					if ((data.use_iconmap == SYSMAP_ELEMENT_USE_ICONMAP_ON && this.data.iconmapid != 0)
+							&& (data.elementtype == SVGMapElement.TYPE_HOST
+								|| (data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+										&& data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS))) {
 						element.icon = this.defaultAutoIconId;
 					}
 					else {
@@ -364,60 +349,50 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					elements.push(element);
-				}, this);
+				});
 
-				Object.keys(this.links).forEach(function(key) {
-					var link = {};
-					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color'].forEach(function (name) {
-						link[name] = this.links[key].data[name];
-					}, this);
+				Object.keys(this.links).forEach((key) => {
+					const link = {};
+
+					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color']
+						.forEach((name) => link[name] = this.links[key].data[name]);
 
 					link['label'] = this.links[key].getLabel();
 					links.push(link);
-				}, this);
+				});
 
-				Object.keys(this.shapes).forEach(function(key) {
-					var shape = {};
-					Object.keys(this.shapes[key].data).forEach(function (name) {
-						shape[name] = this.shapes[key].data[name];
-					}, this);
+				Object.keys(this.shapes).forEach((key) => {
+					const shape = {};
 
+					Object.keys(this.shapes[key].data).forEach((name) => shape[name] = this.shapes[key].data[name]);
 					shape['text'] = this.shapes[key].getLabel();
 					shapes.push(shape);
-				}, this);
+				});
 
 				this.map.update({
-					'background': this.data.backgroundid,
-					'elements': elements,
-					'links': links,
-					'shapes': shapes,
-					'label_location': this.data.label_location
+					background: this.data.backgroundid,
+					elements,
+					links,
+					shapes,
+					label_location: this.data.label_location
 				});
 			},
 
-			// elements
 			deleteSelectedElements: function() {
-				var selementid;
-
 				if (this.selection.count.selements && confirm(t('S_DELETE_SELECTED_ELEMENTS_Q'))) {
-					for (selementid in this.selection.selements) {
-						this.selements[selementid].remove();
-						this.removeLinksBySelementId(selementid);
-					}
+					Object.keys(this.selection.selements).forEach((id) => {
+						this.selements[id].remove();
+						this.removeLinksBySelementId(id);
+					});
 
 					this.toggleForm();
 					this.updateImage();
 				}
 			},
 
-			// shapes
 			deleteSelectedShapes: function() {
-				var shapeid;
-
 				if (this.selection.count.shapes && confirm(t('S_DELETE_SELECTED_SHAPES_Q'))) {
-					for (shapeid in this.selection.shapes) {
-						this.shapes[shapeid].remove();
-					}
+					Object.keys(this.selection.shapes).forEach((id) => this.shapes[id].remove());
 
 					this.toggleForm();
 					this.updateImage();
@@ -425,201 +400,201 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			removeLinksBySelementId: function(selementid) {
-				var selementIds = {},
-					linkids,
-					i,
-					ln;
+				const linkids = this.getLinksBySelementIds({[selementid]: selementid});
 
-				selementIds[selementid] = selementid;
-				linkids = this.getLinksBySelementIds(selementIds);
-
-				for (i = 0, ln = linkids.length; i < ln; i++) {
-					this.links[linkids[i]].remove();
-				}
+				linkids.forEach((id) => this.links[id].remove());
 			},
 
 			/**
 			 * Returns the links between the given elements.
 			 *
-			 * @param selementIds
+			 * @param {array} selementids  Map element IDs (key and value pairs).
 			 *
-			 * @return {Array} an array of link ids
+			 * @return {array}
 			 */
-			getLinksBySelementIds: function(selementIds) {
-				var linkIds = [],
-					link,
-					linkid;
+			getLinksBySelementIds: function(selementids) {
+				const selements_count = Object.keys(selementids).length;
 
-				for (linkid in this.data.links) {
-					link = this.data.links[linkid];
+				return Object.entries(this.data.links)
+					.filter(([linkid, link]) => {
+						const has_both = selementids[link.selementid1] && selementids[link.selementid2],
+							has_one = selements_count == 1
+								&& (selementids[link.selementid1] || selementids[link.selementid2]);
 
-					if (!!selementIds[link.selementid1] && !!selementIds[link.selementid2]
-							|| (objectSize(selementIds) === 1 && (!!selementIds[link.selementid1] || !!selementIds[link.selementid2]))) {
-						linkIds.push(linkid);
-					}
-				}
-
-				return linkIds;
+						return has_both || has_one;
+					})
+					.map(([linkid]) => linkid);
 			},
 
-			bindActions: function() {
-				var that = this;
-
-				/*
-				 * Map panel events
-				 */
-				// toggle expand macros
-				$('#expand_macros').click(function() {
-					that.data.expand_macros = (that.data.expand_macros === '1') ? '0' : '1';
-					$(this).html((that.data.expand_macros === '1') ? t('S_ON') : t('S_OFF'));
-					that.updateImage();
-				});
-
-				// change grid size
-				$('#gridsize').change(function() {
-					var value = $(this).val();
-
-					if (that.data.grid_size !== value) {
-						that.data.grid_size = value;
-						that.updateImage();
-					}
-				});
-
-				// toggle autoalign
-				$('#gridautoalign').click(function() {
-					that.data.grid_align = (that.data.grid_align === '1') ? '0' : '1';
-					$(this).html((that.data.grid_align === '1') ? t('S_ON') : t('S_OFF'));
-				});
-
-				// toggle grid visibility
-				$('#gridshow').click(function() {
-					that.data.grid_show = (that.data.grid_show === '1') ? '0' : '1';
-					$(this).html((that.data.grid_show === '1') ? t('S_SHOWN') : t('S_HIDDEN'));
-					that.updateImage();
-				});
-
-				// perform align all
-				$('#gridalignall').click(function() {
-					var selementid;
-
-					for (selementid in that.selements) {
-						that.selements[selementid].align(true);
-					}
-
-					that.updateImage();
-				});
-
-				// save map
-				$('#sysmap_update').click(function() {
-					that.save();
-				});
-
-				// add element
-				$('#selementAdd').click(function() {
-					if (typeof(that.iconList[0]) === 'undefined') {
+			/**
+			 * Add map panel event listeners.
+			 */
+			addMapActionsEventListeners: function() {
+				// Add a map element.
+				document.getElementById('selementAdd').addEventListener('click', () => {
+					if (this.iconList[0] === undefined) {
 						alert(t('S_NO_IMAGES'));
 
 						return;
 					}
 
-					var selement = new Selement(that);
+					const selement = new Selement(this);
 
-					that.selements[selement.id] = selement;
-					that.updateImage();
+					this.selements[selement.id] = selement;
+					this.updateImage();
 				});
 
-				// remove element
-				$('#selementRemove').click($.proxy(this.deleteSelectedElements, this));
+				// Remove single map element.
+				document.getElementById('selementRemove')
+					.addEventListener('click', this.deleteSelectedElements.bind(this));
 
-				// add shape
-				$('#shapeAdd').click(function() {
-					var shape = new Shape(that);
+				// Add shape.
+				document.getElementById('shapeAdd').addEventListener('click', () => {
+					const shape = new Shape(this);
 
-					that.shapes[shape.id] = shape;
-					that.updateImage();
+					this.shapes[shape.id] = shape;
+					this.updateImage();
 				});
 
-				// remove shapes
-				$('#shapeRemove, #shapesRemove, #shapeMassRemove').click($.proxy(this.deleteSelectedShapes, this));
+				// Remove shapes.
+				document.querySelectorAll('#shapeRemove, #shapesRemove, #shapeMassRemove').forEach((element) => {
+					element.addEventListener('click', this.deleteSelectedShapes.bind(this));
+				});
 
-				// add link
-				$('#linkAdd').click(function() {
-					var link;
-
-					if (that.selection.count.selements !== 2) {
+				// Add link.
+				document.getElementById('linkAdd').addEventListener('click', () => {
+					if (this.selection.count.selements != 2) {
 						alert(t('S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED'));
 
 						return false;
 					}
 
-					link = new Link(that);
-					that.links[link.id] = link;
-					that.updateImage();
-					that.linkForm.updateList(that.selection.selements);
+					const link = new Link(this);
+
+					this.links[link.id] = link;
+					this.map.invalidate('selements');
+					this.updateImage();
+					this.linkForm.updateList(this.selection.selements);
 				});
 
-				// removes all of the links between the selected elements
-				$('#linkRemove').click(function() {
-					var linkids;
+				// Removes all of the links between the selected elements.
+				document.getElementById('linkRemove').addEventListener('click', () => {
+					const linkids = this.getLinksBySelementIds(this.selection.selements);
 
-					if (that.selection.count.selements !== 2) {
+					// This check must be removed in future releases as it is not necessary to limit the user.
+					if (this.selection.count.selements != 2) {
 						alert(t('S_PLEASE_SELECT_TWO_ELEMENTS'));
 
 						return false;
 					}
 
-					linkids = that.getLinksBySelementIds(that.selection.selements);
-
 					if (linkids.length && confirm(t('S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'))) {
-						for (var i = 0, ln = linkids.length; i < ln; i++) {
-							that.links[linkids[i]].remove();
+						for (let i = 0, ln = linkids.length; i < ln; i++) {
+							this.links[linkids[i]].remove();
 						}
 
-						that.linkForm.hide();
-						that.linkForm.updateList({});
-						that.updateImage();
+						this.linkForm.hide();
+						this.linkForm.updateList({});
+						this.updateImage();
 					}
 				});
 
-				/*
-				 * Selements events
-				 */
-				// Delegate selements icons clicks.
-				$(this.container).on('click', '.sysmap_element, .sysmap_shape', function(event) {
-					that.selectElements([{
-						id: $(this).attr('data-id'),
-						type: $(this).attr('data-type')
-					}], event.ctrlKey || event.metaKey);
+				// Toggle expand macros.
+				document.getElementById('expand_macros').addEventListener('click', (e) => {
+					this.data.expand_macros = this.data.expand_macros == SYSMAP_EXPAND_MACROS_ON
+						? SYSMAP_EXPAND_MACROS_OFF
+						: SYSMAP_EXPAND_MACROS_ON;
+					e.currentTarget.innerHTML = this.data.expand_macros == SYSMAP_EXPAND_MACROS_ON
+						? t('S_ON')
+						: t('S_OFF');
+					this.updateImage();
 				});
 
-				$(this.container).on('contextmenu', function(event) {
-					var target = $(event.target),
-						item_data = {
-							id: target.attr('data-id'),
-							type: target.attr('data-type')
-						},
-						can_copy = false,
-						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
+				// Toggle grid visibility.
+				document.getElementById('gridshow').addEventListener('click', (e) => {
+					this.data.grid_show = this.data.grid_show == SYSMAP_GRID_SHOW_ON
+						? SYSMAP_GRID_SHOW_OFF
+						: SYSMAP_GRID_SHOW_ON;
+					e.currentTarget.innerHTML = this.data.grid_show == SYSMAP_GRID_SHOW_ON
+						? t('S_SHOWN')
+						: t('S_HIDDEN');
+					this.updateImage();
+				});
+
+				// Toggle auto align.
+				document.getElementById('gridautoalign').addEventListener('click', (e) => {
+					this.data.grid_align = this.data.grid_align == SYSMAP_GRID_ALIGN_ON
+						? SYSMAP_GRID_ALIGN_OFF
+						: SYSMAP_GRID_ALIGN_ON;
+					e.currentTarget.innerHTML = this.data.grid_align == SYSMAP_GRID_ALIGN_ON ? t('S_ON') : t('S_OFF');
+				});
+
+				// Change grid size.
+				document.getElementById('gridsize').addEventListener('change', (e) => {
+					const value = e.currentTarget.value;
+
+					if (this.data.grid_size != value) {
+						this.data.grid_size = value;
+						this.updateImage();
+					}
+				});
+
+				// Perform "Align map elements" button press.
+				document.getElementById('gridalignall').addEventListener('click', () => {
+					for (const selementid in this.selements) {
+						this.selements[selementid].align(true);
+					}
+
+					this.updateImage();
+				});
+
+				// Save map.
+				document.getElementById('sysmap_update').addEventListener('click', () => this.save());
+			},
+
+			/**
+			 * Add map element event listeners. Creates even listeners for map element and shape clicks as well as
+			 * context menu.
+			 */
+			addMapElementEventListeners: function() {
+				// Click map element or shape.
+				this.container[0].addEventListener('click', (e) => {
+					const element = e.target.closest('.sysmap_element, .sysmap_shape');
+
+					if (!element || !this.container[0].contains(element)) {
+						return;
+					}
+
+					this.selectElements([{...element.dataset}], e.ctrlKey || e.metaKey);
+				});
+
+				// Open context menu for map element or shape.
+				this.container[0].addEventListener('contextmenu', (e) => {
+					const element = e.target,
+						item_data = {...element.dataset},
+						can_paste = this.copypaste_buffer.items && this.copypaste_buffer.items.length > 0;
+
+					let can_copy = false,
 						can_remove = false,
 						can_reorder = false;
 
-					if (typeof item_data.id === 'undefined') {
-						that.clearSelection();
+					if (item_data.id === undefined) {
+						this.clearSelection();
 					}
-					else if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
-						that.selectElements([item_data], false, true);
+					else if (item_data.type && this.selection[item_data.type][item_data.id] === undefined) {
+						this.selectElements([item_data], false, true);
 					}
 
-					can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0);
+					can_copy = this.selection.count.shapes > 0 || this.selection.count.selements > 0;
 					can_remove = can_copy;
-					can_reorder = (that.selection.count.shapes > 0);
+					can_reorder = can_copy;
 
-					event.preventDefault();
-					event.stopPropagation();
+					e.preventDefault();
+					e.stopPropagation();
 
 					const overlay = overlays_stack.end();
 
-					if (typeof overlay !== 'undefined' && 'element' in overlay && overlay.element !== event.target) {
+					if (overlay !== undefined && 'element' in overlay && overlay.element !== element) {
 						$('.menu-popup-top').menuPopup('close', null, false);
 					}
 
@@ -627,123 +602,108 @@ ZABBIX.apps.map = (function($) {
 						return false;
 					}
 
-					var items = [
+					/**
+					 * Callback function to execute upon pressing one of menu entries "Bring to front", "Bring forward",
+					 * "Send backward", "Send to back".
+					 *
+					 * @param {string} position  Where to position the selected shape or map element.
+					 *                           Possible values: 'last', 'next', 'previous', 'first'.
+					 */
+					const reorderSelection = (position) => {
+						['shapes', 'selements'].forEach((type) => {
+							if (this.selection[type] && Object.keys(this.selection[type]).length > 0) {
+								this.reorderItems(type, this[type], this.selection[type], position);
+							}
+						});
+					};
+
+					const order_actions = [
+						{label: t('S_BRING_TO_FRONT'), action: 'last'},
+						{label: t('S_BRING_FORWARD'), action: 'next'},
+						{label: t('S_SEND_BACKWARD'), action: 'previous'},
+						{label: t('S_SEND_TO_BACK'), action: 'first'}
+					].map(({label, action}) => ({
+						label,
+						disabled: !can_reorder,
+						clickCallback: () => reorderSelection(action),
+					}));
+
+					/**
+					 * Callback function to execute upon pressing one of menu entries "Paste" or
+					 * "Paste without external links".
+					 *
+					 * @param {boolean} simple  True if paste is performed with links. False - links not included.
+					 */
+					const pasteSelection = (simple) => {
+						const offset = $(this.container).offset();
+
+						let delta_x = e.pageX - offset.left - this.copypaste_buffer.left,
+							delta_y = e.pageY - offset.top - this.copypaste_buffer.top;
+
+						delta_x = Math.min(delta_x, parseInt(this.data.width, 10) - this.copypaste_buffer.right);
+						delta_y = Math.min(delta_y, parseInt(this.data.height, 10) - this.copypaste_buffer.bottom);
+
+						const selectedids = this.pasteSelectionBuffer(delta_x, delta_y, this, simple);
+
+						this.selectElements(selectedids, false);
+
+						if (simple) {
+							this.map.invalidate('selements');
+						}
+
+						this.updateImage();
+						this.linkForm.updateList(this.selection.selements);
+					};
+
+					const copy_actions = [
 						{
-							'items': [
-								{
-									label: t('S_BRING_TO_FRONT'),
-									disabled: !can_reorder,
-									clickCallback: function() {
-										that.reorderShapes(that.selection.shapes, 'last');
-									}
-								},
-								{
-									label: t('S_BRING_FORWARD'),
-									disabled: !can_reorder,
-									clickCallback: function() {
-										that.reorderShapes(that.selection.shapes, 'next');
-									}
-								},
-								{
-									label: t('S_SEND_BACKWARD'),
-									disabled: !can_reorder,
-									clickCallback: function() {
-										that.reorderShapes(that.selection.shapes, 'previous');
-									}
-								},
-								{
-									label: t('S_SEND_TO_BACK'),
-									disabled: !can_reorder,
-									clickCallback: function() {
-										that.reorderShapes(that.selection.shapes, 'first');
-									}
-								}
-							]
+							label: t('S_COPY'),
+							disabled: !can_copy,
+							action: () => this.copypaste_buffer = this.getSelectionBuffer(this)
 						},
 						{
-							'items': [
-								{
-									label: t('S_COPY'),
-									disabled: !can_copy,
-									clickCallback: function() {
-										that.copypaste_buffer = that.getSelectionBuffer(that);
-									}
-								},
-								{
-									label: t('S_PASTE'),
-									disabled: !can_paste,
-									clickCallback: function() {
-										var offset = $(that.container).offset(),
-											delta_x = event.pageX - offset.left - that.copypaste_buffer.left,
-											delta_y = event.pageY - offset.top - that.copypaste_buffer.top,
-											selectedids;
+							label: t('S_PASTE'),
+							disabled: !can_paste,
+							action: () => pasteSelection(true)
+						},
+						{
+							label: t('S_PASTE_SIMPLE'),
+							disabled: !can_paste,
+							action: () => pasteSelection(false)
+						},
+						{
+							label: t('S_REMOVE'),
+							disabled: !can_remove,
+							action: () => {
+								if (this.selection.count.selements || this.selection.count.shapes) {
+									Object.keys(this.selection.selements).forEach(selementid => {
+										this.selements[selementid].remove();
+										this.removeLinksBySelementId(selementid);
+									});
 
-										delta_x = Math.min(delta_x,
-											parseInt(that.data.width, 10) - that.copypaste_buffer.right
-										);
-										delta_y = Math.min(delta_y,
-											parseInt(that.data.height, 10) - that.copypaste_buffer.bottom
-										);
-										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, true);
-										that.selectElements(selectedids, false);
-										that.updateImage();
-										that.linkForm.updateList(that.selection.selements);
-									}
-								},
-								{
-									label: t('S_PASTE_SIMPLE'),
-									disabled: !can_paste,
-									clickCallback: function() {
-										var offset = $(that.container).offset(),
-											delta_x = event.pageX - offset.left - that.copypaste_buffer.left,
-											delta_y = event.pageY - offset.top - that.copypaste_buffer.top,
-											selectedids;
-
-										delta_x = Math.min(delta_x,
-											parseInt(that.data.width, 10) - that.copypaste_buffer.right
-										);
-										delta_y = Math.min(delta_y,
-											parseInt(that.data.height, 10) - that.copypaste_buffer.bottom
-										);
-										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, false);
-										that.selectElements(selectedids, false);
-										that.updateImage();
-										that.linkForm.updateList(that.selection.selements);
-									}
-								},
-								{
-									label: t('S_REMOVE'),
-									disabled: !can_remove,
-									clickCallback: function() {
-										if (that.selection.count.selements || that.selection.count.shapes) {
-											for (selementid in that.selection.selements) {
-												that.selements[selementid].remove();
-												that.removeLinksBySelementId(selementid);
-											}
-
-											for (shapeid in that.selection.shapes) {
-												that.shapes[shapeid].remove();
-											}
-
-										}
-
-										that.toggleForm();
-										that.updateImage();
-									}
+									Object.keys(this.selection.shapes).forEach(shapeid => {
+										this.shapes[shapeid].remove();
+									});
 								}
-							]
-						}
-					];
 
-					$(event.target).menuPopup(items, event, {
+								this.toggleForm();
+								this.updateImage();
+							}
+						},
+					].map(({label, disabled, action}) => ({label, disabled, clickCallback: action}));
+
+					// Add both menu entry blocks to the context menu.
+					const items = [order_actions, copy_actions].map((items) => ({items}));
+
+					$(element).menuPopup(items, e, {
 						position: {
-							of: event,
+							of: e,
 							my: 'left top',
 							at: 'left bottom',
 							using: (pos, data) => {
-								let max_left = (data.horizontal === 'left')
-									? document.getElementById(containerId).clientWidth
-									: document.getElementById(containerId).clientWidth - data.element.width;
+								let max_left = data.horizontal === 'left'
+									? document.getElementById(containerid).clientWidth
+									: document.getElementById(containerid).clientWidth - data.element.width;
 
 								pos.top = Math.max(0, pos.top);
 								pos.left = Math.max(0, Math.min(max_left, pos.left));
@@ -755,266 +715,301 @@ ZABBIX.apps.map = (function($) {
 						background_layer: false
 					});
 				});
+			},
 
-				/*
-				 * Form events
-				 */
-				$('#elementType').change(function() {
-					var obj = $(this);
+			/*
+			 * Add map form event listeners.
+			 */
+			addFormEventListeners: function() {
+				document.getElementById('elementType').addEventListener('change', (e) => {
+					const value = +e.currentTarget.value;
 
-					switch (obj.val()) {
-						// host
-						case '0':
+					switch (value) {
+						case SVGMapElement.TYPE_HOST:
 							$('#elementNameHost').multiSelect('clean');
-							$('#triggerContainer tbody').html('');
 							break;
 
-						// map
-						case '1':
+						case SVGMapElement.TYPE_MAP:
 							$('#elementNameMap').multiSelect('clean');
-							$('#triggerContainer tbody').html('');
 							break;
 
-						// triggers
-						case '2':
+						case SVGMapElement.TYPE_TRIGGER:
 							$('#elementNameTriggers').multiSelect('clean');
-							$('#triggerContainer tbody').html('');
 							break;
 
-						// host group
-						case '3':
+						case SVGMapElement.TYPE_HOST_GROUP:
 							$('#elementNameHostGroup').multiSelect('clean');
-							$('#triggerContainer tbody').html('');
 							break;
-
-						// others types
-						default:
-							$('input[name=elementName]').val('');
-							$('#triggerContainer tbody').html('');
 					}
+
+					document.querySelector('#triggerContainer tbody').innerHTML = '';
 				});
 
-				$('#map-window .btn-overlay-close, #elementClose').click(function() {
-					that.clearSelection();
-					that.toggleForm();
+				// Close any form via [X] or "Close" button.
+				document.querySelectorAll('#map-window .btn-overlay-close, #elementClose, #shapeClose, #shapeMassClose,'
+						+ ' #massClose').forEach((element) => {
+					element.addEventListener('click', () => {
+						this.clearSelection();
+						this.toggleForm();
+					});
 				});
 
-				$('#elementRemove').click($.proxy(this.deleteSelectedElements, this));
+				// Remove map element via form "Remove" button.
+				document.querySelectorAll('#elementRemove, #massRemove').forEach((element) => {
+					element.addEventListener('click', this.deleteSelectedElements.bind(this));
+				});
 
-				$('#elementApply').click($.proxy(function() {
-					if (this.selection.count.selements !== 1) {
+				// Update map element via form "Apply" button.
+				document.getElementById('elementApply').addEventListener('click', () => {
+					if (this.selection.count.selements != 1) {
 						throw 'Try to single update element, when more than one selected.';
 					}
 
-					var values = this.form.getValues();
+					const values = this.form.getValues();
 
 					if (values) {
-						for (var selementid in this.selection.selements) {
-							this.selements[selementid].update(values, true);
+						for (const id in this.selection.selements) {
+							this.selements[id].update(values, true);
 						}
 					}
-				}, this));
+				});
 
-				$('#shapeApply').click($.proxy(function() {
-					if (this.selection.count.shapes !== 1) {
+				// Update shape via form "Apply" button.
+				document.getElementById('shapeApply').addEventListener('click', () => {
+					if (this.selection.count.shapes != 1) {
 						throw 'Trying to single update shape, when more than one selected.';
 					}
 
-					var values = this.shapeForm.getValues();
+					const values = this.shapeForm.getValues();
 
 					if (values) {
-						for (var id in this.selection.shapes) {
+						for (const id in this.selection.shapes) {
 							this.shapes[id].update(values);
 						}
 					}
-				}, this));
-
-				$('#shapeClose, #shapeMassClose').click(function() {
-					that.clearSelection();
-					that.toggleForm();
 				});
 
-				$('#shapeMassApply').click($.proxy(function() {
-					var values = this.massShapeForm.getValues();
+				// All URL to map element.
+				document.getElementById('newSelementUrl').addEventListener('click', () => this.form.addUrls());
 
-					if (values) {
-						this.buffered_expand = true;
+				// Add chosen triggers to map trigger type element.
+				document.getElementById('newSelementTriggers').addEventListener('click', () => this.form.addTriggers());
 
-						for (var shapeid in this.selection.shapes) {
-							this.shapes[shapeid].update(values);
-						}
+				// Add event listeners on numeric input fields "X", "Y" and area size "Width" and "Height".
+				Array.from(this.form.domNode).forEach((container) => {
+					if (container.nodeType == Node.ELEMENT_NODE) {
+						// Set a default value of 0 for "X" and "Y" if value was invalid integer.
+						container.querySelectorAll('#x, #y').forEach((element) => {
+							element.addEventListener('change', (e) => {
+								const value = parseInt(e.target.value, 10);
 
-						this.buffered_expand = false;
-						this.expandMacros(null);
+								e.target.value = isNaN(value) || value < 0 ? 0 : value;
+							});
+						});
+
+						// Set a default value of 10 for area size "Width" and "Height" if value was invalid integer.
+						container.querySelectorAll('#areaSizeWidth, #areaSizeHeight').forEach((element) => {
+							element.addEventListener('change', (e) => {
+								const value = parseInt(e.target.value, 10);
+
+								e.target.value = isNaN(value) || value < 10 ? 10 : value;
+							});
+						});
 					}
-				}, this));
-
-				$('#newSelementUrl').click($.proxy(function() {
-					this.form.addUrls();
-				}, this));
-
-				$('#newSelementTriggers').click($.proxy(function() {
-					this.form.addTriggers();
-				}, this));
-
-				$('#x, #y', this.form.domNode).change(function() {
-					var value = parseInt(this.value, 10);
-
-					this.value = isNaN(value) || (value < 0) ? 0 : value;
 				});
 
-				$('#areaSizeWidth, #areaSizeHeight', this.form.domNode).change(function() {
-					var value = parseInt(this.value, 10);
-
-					this.value = isNaN(value) || (value < 10) ? 10 : value;
-				});
-
-				const sortable_triggers = new CSortable(document.querySelector('#triggerContainer tbody'), {
-					selector_handle: 'div.drag-icon'
-				});
+				const sortable_triggers = new CSortable(document.querySelector('#triggerContainer tbody'),
+					{selector_handle: 'div.drag-icon'}
+				);
 
 				sortable_triggers.on(CSortable.EVENT_SORT, SelementForm.prototype.recalculateTriggerSortOrder);
 
 				// Init tag fields.
 				$('#selement-tags')
 					.dynamicRows({template: '#tag-row-tmpl', counter: 0, allow_empty: true})
-					.on('beforeadd.dynamicRows', function() {
-						var options = $('#selement-tags').data('dynamicRows');
+					.on('beforeadd.dynamicRows', () => {
+						let options = $('#selement-tags').data('dynamicRows');
+
 						options.counter = ++options.counter;
 					})
-					.on('afteradd.dynamicRows', function() {
-						var rows = this.querySelectorAll('.form_row');
+					.on('afteradd.dynamicRows', (e) => {
+						const rows = e.target.querySelectorAll('.form_row');
+
 						new CTagFilterItem(rows[rows.length - 1]);
 					});
 
-				// mass update form
-				$('#massClose').click(function() {
-					that.clearSelection();
-					that.toggleForm();
-				});
+				/**
+				 * Helper function to attach event listeners for "Apply" button in mass element and shape forms.
+				 *
+				 * @param {string} buttonid    HTML ID of the "Apply" button.
+				 * @param {object} form        Form element.
+				 * @param {object} ids         Selected element or shape IDs (key and value pairs).
+				 * @param {object} collection  Elements or shapes collection to update.
+				 */
+				const attachMassApply = (buttonid, form, ids, collection) => {
+					document.getElementById(buttonid).addEventListener('click', () => {
+						const values = form.getValues();
 
-				$('#massRemove').click($.proxy(this.deleteSelectedElements, this));
+						if (values) {
+							this.buffered_expand = true;
 
-				$('#massApply').click($.proxy(function() {
-					var values = this.massForm.getValues();
+							for (const id in ids) {
+								collection[id].update(values);
+							}
 
-					if (values) {
-						this.buffered_expand = true;
-
-						for (var selementid in this.selection.selements) {
-							this.selements[selementid].update(values);
+							this.buffered_expand = false;
+							this.expandMacros(null);
 						}
+					});
+				};
 
-						this.buffered_expand = false;
-						this.expandMacros(null);
-					}
-				}, this));
+				attachMassApply('massApply', this.massForm, this.selection.selements, this.selements);
+				attachMassApply('shapeMassApply', this.massShapeForm, this.selection.shapes, this.shapes);
 
-				// open link form
-				$('.element-links').on('click', '.openlink', function() {
-					that.currentLinkId = $(this).attr('data-linkid');
+				// Open link form.
+				document.querySelectorAll('.element-links').forEach((container) => {
+					container.addEventListener('click', (e) => {
+						const openlink = e.target.closest('.openlink');
 
-					var linkData = that.links[that.currentLinkId].getData();
+						if (openlink && container.contains(openlink)) {
+							this.current_linkid = openlink.dataset.linkid;
 
-					that.linkForm.setValues(linkData);
-					that.linkForm.show();
+							const link_data = this.links[this.current_linkid].getData();
+
+							this.linkForm.setValues(link_data);
+							this.linkForm.show();
+						}
+					});
 				});
 
-				// link form
-				$('#formLinkRemove').click(function() {
-					that.links[that.currentLinkId].remove();
-					that.linkForm.updateList(that.selection.selements);
-					that.linkForm.hide();
-					that.updateImage();
+				// Remove link via link form.
+				document.getElementById('formLinkRemove').addEventListener('click', () => {
+					this.links[this.current_linkid].remove();
+					this.linkForm.updateList(this.selection.selements);
+					this.linkForm.hide();
+					this.updateImage();
 				});
 
-				$('#formLinkApply').click(function() {
+				// Apply link changes via link form.
+				document.getElementById('formLinkApply').addEventListener('click', () => {
 					try {
-						var linkData = that.linkForm.getValues();
-						that.links[that.currentLinkId].update(linkData);
-						that.linkForm.updateList(that.selection.selements);
+						const link_data = this.linkForm.getValues();
+
+						this.map.invalidate('selements');
+						this.links[this.current_linkid].update(link_data);
+						this.linkForm.updateList(this.selection.selements);
 					}
 					catch (err) {
 						alert(err);
 					}
 				});
 
-				$('#formLinkClose').click(function() {
-					that.linkForm.hide();
-				});
+				// Close link form.
+				document.getElementById('formLinkClose').addEventListener('click', () => this.linkForm.hide());
 
-				this.linkForm.domNode.on('click', '.triggerRemove', function() {
-					var triggerid,
-						tid = $(this).attr('data-linktriggerid').toString();
+				// Add event listener on link indicator "Remove" button.
+				Array.from(this.linkForm.domNode).forEach((container) => {
+					if (container.nodeType == Node.ELEMENT_NODE) {
+						container.addEventListener('click', (e) => {
+							const element = e.target.closest('.triggerRemove');
 
-					$('#linktrigger_' + tid).remove();
+							if (element && container.contains(element)) {
+								const linktriggerid = e.target.dataset.linktriggerid,
+									triggerid = document.getElementById(`linktrigger_${linktriggerid}_triggerid`).value;
 
-					for (triggerid in that.linkForm.triggerids) {
-						if (that.linkForm.triggerids[triggerid] === tid) {
-							delete that.linkForm.triggerids[triggerid];
-						}
+								document.getElementById(`linktrigger_${linktriggerid}`).remove();
+
+								for (const _triggerid in this.linkForm.triggerids) {
+									if (_triggerid === triggerid) {
+										delete this.linkForm.triggerids[_triggerid];
+									}
+								}
+							}
+						});
 					}
 				});
 
-				$('#border_type').on('change', function() {
-					$(this).parent().find('input').prop("disabled", this.value === '0');
+				// Add event listener on shape border type change in single shape form.
+				document.getElementById('border_type').addEventListener('change', (e) => {
+					const disable = e.target.value == SVGMapShape.BORDER_TYPE_NONE;
+
+					document.getElementById('border_width').disabled = disable;
+					document.getElementById('border_color').disabled = disable;
 				});
 
-				$('#mass_border_type, #chkboxBorderType').on('change', function() {
-					var disable = ($('#mass_border_type').val() === '0' && $('#chkboxBorderType').is(":checked"));
+				// Add event listeners on border type and width in shape mass update form.
+				document.querySelectorAll('#mass_border_type, #chkboxBorderType').forEach((element) =>
+					element.addEventListener('change', () => {
+						const mass_border_type = document.getElementById('mass_border_type'),
+							chkbox_border_type = document.getElementById('chkboxBorderType'),
+							chkbox_border_width = document.getElementById('chkboxBorderWidth'),
+							chkbox_border_color = document.getElementById('chkboxBorderColor'),
+							disable = mass_border_type.value == SVGMapShape.BORDER_TYPE_NONE
+									&& chkbox_border_type.checked;
 
-					$('#chkboxBorderWidth, #chkboxBorderColor').prop("disabled", disable);
-					$('#mass_border_width').prop("disabled", disable || !$('#chkboxBorderWidth').is(":checked"));
-					$('#mass_border_color').prop("disabled", disable || !$('#chkboxBorderColor').is(":checked"));
-				});
+						chkbox_border_width.disabled = disable;
+						chkbox_border_color.disabled = disable;
+						document.getElementById('mass_border_width').disabled = disable || !chkbox_border_width.checked;
+						document.getElementById('mass_border_color').disabled = disable || !chkbox_border_color.checked;
+					})
+				);
 
-				$('#shapeForm input[type=radio][name=type]').on('change', function() {
-					var value = parseInt(this.value, 10),
-						last_value = parseInt($('#shapeForm #last_shape_type').val(), 10);
+				// Add change event listener to each radio input in #shapeForm.
+				document.querySelectorAll('#shapeForm input[type=radio][name=type]').forEach((radio) => {
+					radio.addEventListener('change', (e) => {
+						const value = parseInt(e.target.value, 10),
+							last_shape_type = document.querySelector('#shapeForm #last_shape_type'),
+							last_value = parseInt(last_shape_type.value, 10);
 
-					$('#shape-text-row, #shape-background-row').toggle(value !== SVGMapShape.TYPE_LINE);
-					$('.switchable-content').each(function (i, element) {
-						element.textContent = element.hasAttribute('data-value-' + value) ?
-								element.getAttribute('data-value-' + value) :
-								element.getAttribute('data-value');
+						document.querySelectorAll('#shape-text-row, #shape-background-row').forEach((element) => {
+							element.style.display = value !== SVGMapShape.TYPE_LINE ? '' : 'none';
+						});
+
+						document.querySelectorAll('.switchable-content').forEach((element) => {
+							const data_attr = `data-value-${value}`;
+
+							element.textContent = element.hasAttribute(data_attr)
+								? element.getAttribute(data_attr)
+								: element.dataset.value;
+							});
+
+							if ((last_value == SVGMapShape.TYPE_LINE) != (value == SVGMapShape.TYPE_LINE)) {
+								const shape_x = document.getElementById('shapeX'),
+									shape_y = document.getElementById('shapeY'),
+									shape_area_size_width = document.getElementById('shapeAreaSizeWidth'),
+									shape_area_size_height = document.getElementById('shapeAreaSizeHeight'),
+									x = parseInt(shape_x.value, 10),
+									y = parseInt(shape_y.value, 10),
+									width = parseInt(shape_area_size_width.value, 10),
+									height = parseInt(shape_area_size_height.value, 10);
+
+								if (value == SVGMapShape.TYPE_LINE) {
+									shape_area_size_width.value = x + width;
+									shape_area_size_height.value = y + height;
+								}
+								else {
+									const mx = Math.min(x, width),
+										my = Math.min(y, height);
+
+									shape_x.value = mx;
+									shape_y.value = my;
+									shape_area_size_width.value = Math.max(x, width) - mx;
+									shape_area_size_height.value = Math.max(y, height) - my;
+								}
+							}
+
+							last_shape_type.value = value;
 					});
+				});
 
-					if ((last_value === SVGMapShape.TYPE_LINE) !== (value === SVGMapShape.TYPE_LINE)) {
-						var x = parseInt($('#shapeX').val(), 10),
-							y = parseInt($('#shapeY').val(), 10),
-							width = parseInt($('#shapeAreaSizeWidth').val(), 10),
-							height = parseInt($('#shapeAreaSizeHeight').val(), 10);
+				// Close context menu popup on horizontal scroll.
+				document.querySelector('.sysmap-scroll-container').addEventListener('scroll', (e) => {
+					if (!e.target.dataset.last_scroll_at || Date.now() - e.target.dataset.last_scroll_at > 1000) {
+						$('.menu-popup-top').menuPopup('close', null, false);
 
-						if (value === SVGMapShape.TYPE_LINE) {
-							// Switching from figures to line.
-							$('#shapeAreaSizeWidth').val(x + width);
-							$('#shapeAreaSizeHeight').val(y + height);
-						}
-						else {
-							// Switching from line to figures.
-							var mx = Math.min(x, width),
-								my = Math.min(y, height);
-
-							$('#shapeX').val(mx);
-							$('#shapeY').val(my);
-							$('#shapeAreaSizeWidth').val(Math.max(x, width) - mx);
-							$('#shapeAreaSizeHeight').val(Math.max(y, height) - my);
-						}
+						e.target.dataset.last_scroll_at = Date.now();
 					}
-
-					$('#last_shape_type').val(value);
 				});
-
-				$(this.container).parents('.sysmap-scroll-container').eq(0)
-					.on('scroll', (e) => {
-						if (!e.target.dataset.last_scroll_at || Date.now() - e.target.dataset.last_scroll_at > 1000) {
-							$('.menu-popup-top').menuPopup('close', null, false);
-
-							e.target.dataset.last_scroll_at = Date.now();
-						}
-					});
-
-				$('input[type=radio][name=type]:checked').change();
 			},
 
 			/**
@@ -1037,19 +1032,20 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Recalculate x and y position of moved elements.
 			 *
-			 * @param {int} delta_x						Shift between old and new x position.
-			 * @param {int} delta_y						Shift between old and new y position.
+			 * @param {object} cmap     Map object.
+			 * @param {number} delta_x  Shift between old and new x position.
+			 * @param {number} delta_y  Shift between old and new y position.
 			 *
-			 * @return {object}							Object of elements with recalculated positions.
+			 * @return {object}         Object of elements with recalculated positions.
 			 */
 			dragGroupRecalculate: function(cmap, delta_x, delta_y) {
-				var dragged = cmap.draggable_buffer;
+				const dragged = cmap.draggable_buffer;
 
-				dragged.items.forEach(function(item) {
-					var node = cmap[item.type][item.id];
+				dragged.items.forEach((item) => {
+					const node = cmap[item.type][item.id];
 
 					if ('updatePosition' in node) {
-						var dimensions = node.getDimensions();
+						const dimensions = node.getDimensions();
 
 						node.updatePosition({
 							x: dimensions.x + delta_x,
@@ -1062,28 +1058,29 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Initializes multiple elements dragging.
 			 *
-			 * @param {object} draggable				Draggable DOM element where drag event was started.
+			 * @param {object} draggable  Draggable DOM element where drag event was started.
 			 */
 			dragGroupInit: function(draggable) {
-				var buffer,
-					draggable_node = $(draggable.domNode),
-					dimensions = draggable.getDimensions();
+				let buffer;
+
+				const dimensions = draggable.getDimensions();
 
 				if (draggable.selected) {
 					buffer = draggable.sysmap.getSelectionBuffer(draggable.sysmap);
 				}
 				else {
-					draggable_node = $(draggable.domNode);
+					const $draggable_node = $(draggable.domNode);
+
 					// Create getSelectionBuffer structure if drag event was started on unselected element.
 					buffer = {
 						items: [{
-							type: draggable_node.attr('data-type'),
+							type: $draggable_node.attr('data-type'),
 							id: draggable.id
 						}],
 						left: dimensions.x,
-						right: dimensions.x + draggable_node.width(),
+						right: dimensions.x + $draggable_node.width(),
 						top: dimensions.y,
-						bottom: dimensions.y + draggable_node.height()
+						bottom: dimensions.y + $draggable_node.height()
 					};
 				}
 
@@ -1103,13 +1100,14 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Handler for drag event.
 			 *
-			 * @param {object} data						jQuery UI draggable data.
-			 * @param {object} draggable				Element where drag event occurred.
+			 * @param {object} data       jQuery UI draggable data.
+			 * @param {object} draggable  Element where drag event occurred.
 			 */
 			dragGroupDrag: function(data, draggable) {
-				var cmap = draggable.sysmap,
-					dimensions = draggable.getDimensions(),
-					delta_x = data.position.left - dimensions.x,
+				const cmap = draggable.sysmap,
+					dimensions = draggable.getDimensions();
+
+				let delta_x = data.position.left - dimensions.x,
 					delta_y = data.position.top - dimensions.y;
 
 				if (data.position.left < cmap.draggable_buffer.xaxis.min) {
@@ -1143,18 +1141,18 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Final tasks for dragged element on drag stop event.
 			 *
-			 * @param {object} draggable				Element where drag stop event occurred.
+			 * @param {object} draggable  Element where drag stop event occurred.
 			 */
 			dragGroupStop: function(draggable) {
-				var cmap = draggable.sysmap,
-					should_align = (cmap.data.grid_align === '1');
+				const cmap = draggable.sysmap,
+					should_align = cmap.data.grid_align == SYSMAP_GRID_ALIGN_ON;
 
 				if (should_align) {
 					cmap.draggable_buffer.items.forEach(function(item) {
-						var node = cmap[item.type][item.id];
+						const node = cmap[item.type][item.id];
 
 						if ('updatePosition' in node) {
-							var dimensions = node.getDimensions();
+							const dimensions = node.getDimensions();
 
 							node.updatePosition({
 								x: dimensions.x,
@@ -1168,21 +1166,22 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Paste that.copypaste_buffer content at new location.
 			 *
-			 * @param	{number}	delta_x					Shift between desired and actual x position.
-			 * @param	{number}	delta_y					Shift between desired and actual y position.
-			 * @param	{object}	that					CMap object
-			 * @param	{bool}		keep_external_links		Should be links to non selected elements copied or not.
+			 * @param {number}  delta_x              Shift between desired and actual x position.
+			 * @param {number}  delta_y              Shift between desired and actual y position.
+			 * @param {object}  that                 CMap object.
+			 * @param {boolean} keep_external_links  Should be links to non selected elements copied or not.
 			 *
-			 * @return	{array}
+			 * @return {array}
 			 */
 			pasteSelectionBuffer: function(delta_x, delta_y, that, keep_external_links) {
-				var selectedids = [],
+				const selectedids = [],
 					source_cloneids = {};
 
-				that.copypaste_buffer.items.forEach(function(element_data) {
-					var data = $.extend({}, element_data.data, false),
-						type = element_data.type,
-						element;
+				that.copypaste_buffer.items.forEach((element_data) => {
+					const data = $.extend({}, element_data.data, false),
+						type = element_data.type;
+
+					let element;
 
 					switch (type) {
 						case 'selements':
@@ -1212,37 +1211,34 @@ ZABBIX.apps.map = (function($) {
 
 						element.update(data);
 						that[type][element.id] = element;
-						selectedids.push({
-							id: element.id,
-							type: type
-						});
+						selectedids.push({id: element.id, type});
 						source_cloneids[element_data.id] = element.id;
 
-						if (that.data.grid_align === '1') {
+						if (that.data.grid_align == SYSMAP_GRID_ALIGN_ON) {
 							element.align(true);
 						}
 					}
 				});
 
-				var link,
-					fromid,
-					toid,
-					data;
-
-				that.copypaste_buffer.links.forEach(function(link_data) {
-					data = $.extend({}, link_data.data, false);
+				that.copypaste_buffer.links.forEach((link_data) => {
+					const data = $.extend({}, link_data.data, false);
 
 					if (!keep_external_links && (data.selementid1 in source_cloneids === false
 							|| data.selementid2 in source_cloneids === false)) {
 						return;
 					}
 
-					link = new Link(that);
+					const link = new Link(that);
+
 					delete data.linkid;
-					fromid = (data.selementid1 in source_cloneids)
-						? source_cloneids[data.selementid1]
-						: data.selementid1;
-					toid = (data.selementid2 in source_cloneids) ? source_cloneids[data.selementid2] : data.selementid2;
+
+					const fromid = (data.selementid1 in source_cloneids)
+							? source_cloneids[data.selementid1]
+							: data.selementid1,
+						toid = (data.selementid2 in source_cloneids)
+							? source_cloneids[data.selementid2]
+							: data.selementid2;
+
 					data.selementid1 = fromid;
 					data.selementid2 = toid;
 					link.update(data);
@@ -1255,171 +1251,147 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Return object with selected elements data and links.
 			 *
-			 * @param  {object}	that		CMap object
+			 * @param  {object}	that CMap object.
 			 *
 			 * @return {object}
 			 */
 			getSelectionBuffer: function(that) {
-				var items = [],
-					left = null,
+				const items = [];
+
+				let left = null,
 					top = null,
 					right = null,
 					bottom = null;
 
-				for (var type in that.selection) {
+				for (const type in that.selection) {
 					if (type in that === false || typeof that[type] !== 'object') {
 						continue;
 					}
 
-					var data,
-						dimensions,
-						dom_node,
-						x,
-						y;
-
-					for (var id in that.selection[type]) {
+					for (const id in that.selection[type]) {
 						if ('getData' in that[type][id] === false) {
 							continue;
 						}
 
 						// Get current data without observers.
-						data = $.extend({}, that[type][id].getData(), false);
-						dimensions = that[type][id].getDimensions();
-						dom_node = that[type][id].domNode;
-						x = dimensions.x;
-						y = dimensions.y;
-						left = Math.min(x, (left === null) ? x : left);
-						top = Math.min(y, (top === null) ? y : top);
-						right = Math.max(x + dom_node.outerWidth(true), (right === null) ? 0 : right);
-						bottom = Math.max(y + dom_node.outerHeight(true), (bottom === null) ? 0 : bottom);
-						items.push({
-							id: id,
-							type: type,
-							data: data
-						});
+						const data = $.extend({}, that[type][id].getData(), false),
+							dimensions = that[type][id].getDimensions(),
+							dom_node = that[type][id].domNode,
+							x = dimensions.x;
+							y = dimensions.y;
+
+						left = Math.min(x, left === null ? x : left);
+						top = Math.min(y, top === null ? y : top);
+						right = Math.max(x + dom_node.outerWidth(true), right === null ? 0 : right);
+						bottom = Math.max(y + dom_node.outerHeight(true), bottom === null ? 0 : bottom);
+
+						items.push({id, type, data});
 					}
 				}
 
 				// Sort items array according to item.data.zindex value.
-				items = items.sort(function(a, b) {
-					var aindex = parseInt(a.data.zindex, 10) || 0,
+				items.sort((a, b) => {
+					const aindex = parseInt(a.data.zindex, 10) || 0,
 						bindex = parseInt(b.data.zindex, 10) || 0;
 
 					return aindex - bindex;
 				});
 
-				var links = [];
+				const links = [];
 
-				for (var id in that.links) {
+				for (const id in that.links) {
 					// Get current data without observers.
-					var data = $.extend({}, that.links[id].getData(), false);
+					const data = $.extend({}, that.links[id].getData(), false);
 
 					if (data.selementid1 in that.selection.selements || data.selementid2 in that.selection.selements) {
-						links.push({
-							id: id,
-							data: data
-						})
+						links.push({id, data});
 					}
 				}
 
-				return {
-					items: items,
-					links: links,
-					top: top,
-					left: left,
-					right: right,
-					bottom: bottom
-				};
+				return {items, links, top, left, right, bottom};
 			},
 
 			clearSelection: function() {
-				var id;
-
-				['selements', 'shapes'].forEach(function (type) {
-					for (id in this.selection[type]) {
+				['selements', 'shapes'].forEach((type) => {
+					for (const id in this.selection[type]) {
 						this.selection.count[type]--;
 						this[type][id].toggleSelect(false);
 						delete this.selection[type][id];
 					}
-				}, this);
+				});
 
 				// Clean trigger selement.
-				if ($('#elementType').val() == 2) {
+				if (document.getElementById('elementType').value == SVGMapElement.TYPE_TRIGGER) {
 					$('#elementNameTriggers').multiSelect('clean');
-					$('#triggerContainer tbody').html('');
+					document.querySelector('#triggerContainer tbody').innerHTML = '';
 				}
 
 				this.form.cleanTagsField();
 			},
 
-			reorderShapes: function(ids, position) {
-				var shapes = [],
-					target,
-					temp,
-					ignore = [],
+			/**
+			 * Re-order elements and shapes.
+			 *
+			 * @param {string} type      Element type. Currently supported types 'shapes' and 'elements'.
+			 * @param {object} items     Shapes or map elements with their attributes.
+			 * @param {object} ids       IDs (key and value pairs) of shapes or map elements.
+			 * @param {string} position  Where to position the selected shape or map element.
+			 *                           Possible values: 'last', 'next', 'previous', 'first'.
+			 */
+			reorderItems: function(type, items, ids, position) {
+				const ignore = [],
 					selection = [];
 
-				Object.keys(this.shapes).forEach(function(key) {
-					shapes.push(this.shapes[key]);
-				}, this);
+				let elements = [],
+					target,
+					temp;
 
-				shapes = shapes.sort(function (a,b) {
-					return a.data.zindex - b.data.zindex;
-				});
-
-				shapes.forEach(function(value, index) {
-					if (typeof ids[value.id] !== 'undefined') {
+				Object.keys(items).forEach((key) => elements.push(items[key]));
+				elements = elements.sort((a, b) => a.data.zindex - b.data.zindex);
+				elements.forEach((value, index) => {
+					if (ids[value.id] !== undefined) {
 						selection.push(index);
 					}
 				});
 
-				// All shapes are selected, no need to update order.
-				if (shapes.length === selection.length)
-				{
+				// All shapes or elements are selected, no need to update order.
+				if (elements.length == selection.length) {
 					return;
 				}
 
-				switch (position.toLowerCase()) {
+				switch (position) {
 					case 'first':
 						target = [];
 
-						for (var i = selection.length - 1; i >= 0; i--) {
-							target.unshift(shapes.splice(selection[i], 1)[0]);
+						for (let i = selection.length - 1; i >= 0; i--) {
+							target.unshift(elements.splice(selection[i], 1)[0]);
+						}
+						for (let i = 0; i < target.length; i++) {
+							$(target[i].domNode).insertBefore(elements[0].domNode);
 						}
 
-						for (var i = 0; i < target.length; i++) {
-							$(target[i].domNode).insertBefore(shapes[0].domNode);
-						}
-
-						shapes = target.concat(shapes);
-
-						shapes.forEach(function(shape, index) {
-							shape.data.zindex = index;
-						});
+						elements = target.concat(elements);
+						elements.forEach((element, index) => element.data.zindex = index);
 						break;
 
 					case 'last':
 						target = [];
 
-						for (var i = selection.length - 1; i >= 0; i--) {
-							target.unshift(shapes.splice(selection[i], 1)[0]);
+						for (let i = selection.length - 1; i >= 0; i--) {
+							target.unshift(elements.splice(selection[i], 1)[0]);
+						}
+						for (let i = target.length - 1; i >= 0 ; i--) {
+							$(target[i].domNode).insertAfter(elements[elements.length-1].domNode);
 						}
 
-						for (var i = target.length - 1; i >= 0 ; i--) {
-							$(target[i].domNode).insertAfter(shapes[shapes.length-1].domNode);
-						}
-
-						shapes = shapes.concat(target);
-
-						shapes.forEach(function(shape, index) {
-							shape.data.zindex = index;
-						});
+						elements = elements.concat(target);
+						elements.forEach((element, index) => element.data.zindex = index);
 						break;
 
 					case 'next':
-						ignore.push(shapes.length - 1);
+						ignore.push(elements.length - 1);
 
-						for (var i = selection.length - 1; i >= 0; i--) {
+						for (let i = selection.length - 1; i >= 0; i--) {
 							target = selection[i];
 
 							// No need to update.
@@ -1428,20 +1400,20 @@ ZABBIX.apps.map = (function($) {
 								continue;
 							}
 
-							$(shapes[target].domNode).insertAfter(shapes[target + 1].domNode);
-							shapes[target + 1].data.zindex--;
-							shapes[target].data.zindex++;
+							$(elements[target].domNode).insertAfter(elements[target + 1].domNode);
+							elements[target + 1].data.zindex--;
+							elements[target].data.zindex++;
 
-							temp = shapes[target + 1];
-							shapes[target + 1] = shapes[target];
-							shapes[target] = temp;
+							temp = elements[target + 1];
+							elements[target + 1] = elements[target];
+							elements[target] = temp;
 						}
 						break;
 
 					case 'previous':
 						ignore.push(0);
 
-						for (var i = 0; i < selection.length; i++) {
+						for (let i = 0; i < selection.length; i++) {
 							target = selection[i];
 
 							// No need to update.
@@ -1450,69 +1422,58 @@ ZABBIX.apps.map = (function($) {
 								continue;
 							}
 
-							$(shapes[target].domNode).insertBefore(shapes[target - 1].domNode);
-							shapes[target - 1].data.zindex++;
-							shapes[target].data.zindex--;
+							$(elements[target].domNode).insertBefore(elements[target - 1].domNode);
+							elements[target - 1].data.zindex++;
+							elements[target].data.zindex--;
 
-							temp = shapes[target - 1];
-							shapes[target - 1] = shapes[target];
-							shapes[target] = temp;
+							temp = elements[target - 1];
+							elements[target - 1] = elements[target];
+							elements[target] = temp;
 						}
 						break;
 				}
 
-				this.map.invalidate('shapes');
+				this.map.invalidate(type);
 				this.updateImage();
 			},
 
 			selectElements: function(ids, addSelection, prevent_form_open) {
-				var i, ln;
-
 				$('.menu-popup-top').menuPopup('close', null, false);
 
 				if (!addSelection) {
 					this.clearSelection();
 				}
 
-				for (i = 0, ln = ids.length; i < ln; i++) {
-					var id = ids[i].id,
-						type = ids[i].type;
-
-					if (typeof id === 'undefined' || typeof type === 'undefined') {
+				for (const {id, type} of ids) {
+					if (id === undefined || type === undefined) {
 						continue;
 					}
 
-					if (this[type][id].toggleSelect()) {
-						this.selection.count[type]++;
-						this.selection[type][id] = id;
-					}
-					else {
-						this.selection.count[type]--;
-						delete this.selection[type][id];
-					}
+					const selected = this[type][id].toggleSelect();
+
+					this.selection.count[type] += selected ? 1 : -1;
+					selected ? this.selection[type][id] = id : delete this.selection[type][id];
 				}
 
-				if (typeof prevent_form_open === 'undefined' || !prevent_form_open) {
+				if (prevent_form_open === undefined || !prevent_form_open) {
 					this.toggleForm();
 				}
 			},
 
 			toggleForm: function() {
-				var id;
-
 				this.shapeForm.hide();
 				this.linkForm.hide();
 
-				if (this.selection.count.selements + this.selection.count.shapes === 0
+				if (this.selection.count.selements + this.selection.count.shapes == 0
 						|| (this.selection.count.selements > 0 && this.selection.count.shapes > 0)) {
 					$('#map-window').hide();
 				}
 				else {
 					this.linkForm.updateList(this.selection.selements);
 
-					// only one element selected
-					if (this.selection.count.selements === 1) {
-						for (id in this.selection.selements) {
+					// Only one element selected.
+					if (this.selection.count.selements == 1) {
+						for (const id in this.selection.selements) {
 							this.form.setValues(this.selements[id].getData());
 						}
 
@@ -1522,39 +1483,38 @@ ZABBIX.apps.map = (function($) {
 						$('#link-connect-to').show();
 						this.form.show();
 					}
-
-					// only one shape is selected
-					else if (this.selection.count.shapes === 1) {
+					// Only one shape is selected.
+					else if (this.selection.count.shapes == 1) {
 						this.form.hide();
 						this.massForm.hide();
 						this.massShapeForm.hide();
 
-						for (id in this.selection.shapes) {
+						for (const id in this.selection.shapes) {
 							this.shapeForm.setValues(this.shapes[id].getData());
 						}
 
 						this.shapeForm.show();
 					}
-
-					// multiple elements selected
+					// Multiple elements selected.
 					else if (this.selection.count.selements > 1) {
 						this.form.hide();
 						this.massShapeForm.hide();
 						$('#link-connect-to').hide();
 						this.massForm.show();
 					}
-
-					// multiple shapes selected
+					// Multiple shapes selected.
 					else {
-						var figures = null;
-						for (id in this.selection.shapes) {
+						let figures = null;
+
+						for (const id in this.selection.shapes) {
 							if (figures === null) {
-								figures = (this.shapes[id].data.type != SVGMapShape.TYPE_LINE);
+								figures = this.shapes[id].data.type != SVGMapShape.TYPE_LINE;
 							}
 							else if (figures !== (this.shapes[id].data.type != SVGMapShape.TYPE_LINE)) {
 								// Different shape types are selected (lines and figures).
 								$('#map-window').hide();
 								this.massShapeForm.hide();
+
 								return;
 							}
 						}
@@ -1562,7 +1522,6 @@ ZABBIX.apps.map = (function($) {
 						this.form.hide();
 						this.massForm.hide();
 						$('#link-connect-to').hide();
-
 						this.massShapeForm.show(figures);
 					}
 				}
@@ -1574,16 +1533,14 @@ ZABBIX.apps.map = (function($) {
 		 *
 		 * @class represents connector between two Elements
 		 *
-		 * @property {object} sysmap		Reference to Map object.
-		 * @property {object} data			Link db values.
-		 * @property {string} id			Link ID (linkid).
+		 * @property {object} sysmap  Reference to Map object.
+		 * @property {object} data    Link db values.
+		 * @property {string} id      Link ID (linkid).
 		 *
-		 * @param {object} sysmap			Map object.
-		 * @param {object} linkData			Link data from DB.
+		 * @param {object} sysmap     Map object.
+		 * @param {object} linkData   Link data from DB.
 		 */
 		function Link(sysmap, linkData) {
-			var selementid;
-
 			this.sysmap = sysmap;
 
 			if (!linkData) {
@@ -1596,7 +1553,7 @@ ZABBIX.apps.map = (function($) {
 					color: '00CC00'
 				};
 
-				for (selementid in this.sysmap.selection.selements) {
+				for (const selementid in this.sysmap.selection.selements) {
 					if (linkData.selementid1 === null) {
 						linkData.selementid1 = selementid;
 					}
@@ -1605,7 +1562,7 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
-				// generate unique linkid
+				// Generate unique linkid.
 				linkData.linkid =  getUniqueId();
 			}
 			else {
@@ -1619,11 +1576,11 @@ ZABBIX.apps.map = (function($) {
 			this.expanded = this.data.expanded;
 			delete this.data.expanded;
 
-			for (var linktrigger in this.data.linktriggers) {
+			for (const linktrigger in this.data.linktriggers) {
 				this.sysmap.allLinkTriggerIds[linktrigger.triggerid] = true;
 			}
 
-			// assign by reference
+			// Assign by reference.
 			this.sysmap.data.links[this.id] = this.data;
 		}
 
@@ -1631,18 +1588,19 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Return label based on map constructor configuration.
 			 *
-			 * @param {boolean} return label with expanded macros.
+			 * @param {boolean}
 			 *
-			 * @returns {string}
+			 * @return {string} Label with expanded macros.
 			 */
 			getLabel: function (expand) {
-				var label = this.data.label;
+				let label = this.data.label;
 
-				if (typeof(expand) === 'undefined') {
+				if (expand === undefined) {
 					expand = true;
 				}
 
-				if (expand && typeof(this.expanded) === 'string' && this.sysmap.data.expand_macros === '1') {
+				if (expand && typeof(this.expanded) === 'string'
+						&& this.sysmap.data.expand_macros == SYSMAP_EXPAND_MACROS_ON) {
 					label = this.expanded;
 				}
 
@@ -1655,23 +1613,15 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} data
 			 */
 			update: function(data) {
-				var key,
-					invalidate = (this.data.label !== data.label);
+				const invalidate = this.data.label !== data.label;
 
-				for (key in data) {
-					this.data[key] = data[key];
-				}
+				Object.assign(this.data, data);
 
-				if (invalidate) {
-					sysmap.expandMacros(this);
-				}
-				else {
-					sysmap.updateImage();
-				}
+				sysmap[invalidate ? 'expandMacros' : 'updateImage'](this);
 			},
 
 			/**
-			 * Removes Link object, delete all reference to it.
+			 * Removes Link object and delete all references to it.
 			 */
 			remove: function() {
 				delete this.sysmap.data.links[this.id];
@@ -1687,7 +1637,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Gets Link data.
 			 *
-			 * @returns {Object}
+			 * @return {object}
 			 */
 			getData: function() {
 				return this.data;
@@ -1701,15 +1651,15 @@ ZABBIX.apps.map = (function($) {
 		 *
 		 * @class represents shape (static) element
 		 *
-		 * @property {object} sysmap	Reference to Map object
-		 * @property {object} data		Shape values from DB.
-		 * @property {string} id		Shape ID (shapeid).
+		 * @property {object} sysmap     Reference to Map object
+		 * @property {object} data       Shape values from DB.
+		 * @property {string} id         Shape ID (shapeid).
 		 *
-		 * @param {object} sysmap Map object
-		 * @param {object} [shape_data] shape data from db
+		 * @param {object} sysmap        Map object
+		 * @param {object} [shape_data]  shape data from db
 		 */
 		function Shape(sysmap, shape_data) {
-			var default_data = {
+			const default_data = {
 				type: SVGMapShape.TYPE_RECTANGLE,
 				x: 10,
 				y: 10,
@@ -1724,7 +1674,7 @@ ZABBIX.apps.map = (function($) {
 				text_valign: 0,
 				text_halign: 0,
 				text: '',
-				border_type: 1
+				border_type: SVGMapShape.BORDER_TYPE_SOLID
 			};
 
 			this.sysmap = sysmap;
@@ -1732,16 +1682,16 @@ ZABBIX.apps.map = (function($) {
 			if (!shape_data) {
 				shape_data = default_data;
 
-				// generate unique sysmap_shapeid
+				// Generate unique sysmap_shapeid.
 				shape_data.sysmap_shapeid = getUniqueId();
 				shape_data.zindex = Object.keys(sysmap.shapes).length;
 			}
 			else {
-				for (var field in default_data) {
-					if (typeof shape_data[field] === 'undefined') {
+				Object.keys(default_data).forEach((field) => {
+					if (shape_data[field] === undefined) {
 						shape_data[field] = default_data[field];
 					}
-				}
+				});
 			}
 
 			this.data = shape_data;
@@ -1749,10 +1699,10 @@ ZABBIX.apps.map = (function($) {
 			this.expanded = this.data.expanded;
 			delete this.data.expanded;
 
-			// assign by reference
+			// Assign by reference.
 			this.sysmap.data.shapes[this.id] = this.data;
 
-			// create dom
+			// Create dom.
 			this.domNode = $('<div>', {
 					style: 'position: absolute; z-index: 1; background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
@@ -1764,12 +1714,13 @@ ZABBIX.apps.map = (function($) {
 			this.makeDraggable(true);
 			this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
 
-			var dimensions = this.getDimensions();
-			this.domNode.css({
-				top: dimensions.y + 'px',
-				left: dimensions.x + 'px',
-				width: dimensions.width + 'px',
-				height: dimensions.height + 'px'
+			const dimensions = this.getDimensions();
+
+			Object.assign(this.domNode[0].style, {
+				top: `${dimensions.y}px`,
+				left: `${dimensions.x}px`,
+				width: `${dimensions.width}px`,
+				height: `${dimensions.height}px`
 			});
 		}
 
@@ -1780,32 +1731,25 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} data
 			 */
 			update: function(data) {
-				var key,
-					dimensions,
-					invalidate = (data.type != SVGMapShape.TYPE_LINE && typeof(data.text) !== 'undefined'
+				const invalidate = (data.type != SVGMapShape.TYPE_LINE && data.text !== undefined
 							&& this.data.text !== data.text);
 
-				if (typeof data['type'] !== 'undefined' && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
-						&& (data['type'] == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
-					delete data['sysmap_shapeid'];
+				if (data.type !== undefined && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
+						&& (data.type == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
+					delete data.sysmap_shapeid;
 					this.data.sysmap_shapeid = getUniqueId();
 				}
 
-				for (key in data) {
-					this.data[key] = data[key];
-				}
+				Object.assign(this.data, data);
 
-				['x', 'y', 'width', 'height'].forEach(function(name) {
-					this[name] = parseInt(this[name], 10);
-				}, this.data);
+				['x', 'y', 'width', 'height'].forEach((name) => this.data[name] = parseInt(this.data[name], 10));
 
-				dimensions = this.getDimensions();
+				const dimensions = this.getDimensions();
 
-				this.domNode
-					.css({
-						width: dimensions.width + 'px',
-						height: dimensions.height + 'px'
-					});
+				Object.assign(this.domNode[0].style, {
+					width: `${dimensions.width}px`,
+					height: `${dimensions.height}px`
+				});
 
 				this.makeDraggable(true);
 				this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
@@ -1813,16 +1757,9 @@ ZABBIX.apps.map = (function($) {
 				this.align(false);
 				this.trigger('afterMove', this);
 
-				for (key in data) {
-					this.data[key] = data[key];
-				}
+				Object.assign(this.data, data);
 
-				if (invalidate) {
-					sysmap.expandMacros(this);
-				}
-				else {
-					sysmap.updateImage();
-				}
+				sysmap[invalidate ? 'expandMacros' : 'updateImage'](this);
 			},
 
 			/**
@@ -1830,16 +1767,17 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @param {boolean} return label with expanded macros.
 			 *
-			 * @returns {string}
+			 * @return {string}
 			 */
 			getLabel: function (expand) {
-				var label = this.data.text;
+				let label = this.data.text;
 
-				if (typeof(expand) === 'undefined') {
+				if (expand === undefined) {
 					expand = true;
 				}
 
-				if (expand && typeof(this.expanded) === 'string' && this.sysmap.data.expand_macros === '1') {
+				if (expand && typeof(this.expanded) === 'string'
+						&& this.sysmap.data.expand_macros == SYSMAP_EXPAND_MACROS_ON) {
 					label = this.expanded;
 				}
 
@@ -1850,7 +1788,7 @@ ZABBIX.apps.map = (function($) {
 			 * Gets shape dimensions.
 			 */
 			getDimensions: function () {
-				var dimensions = {
+				let dimensions = {
 					x: parseInt(this.data.x, 10),
 					y: parseInt(this.data.y, 10),
 					width: parseInt(this.data.width, 10),
@@ -1858,7 +1796,7 @@ ZABBIX.apps.map = (function($) {
 				};
 
 				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
-					var width = parseInt(this.sysmap.data.width),
+					const width = parseInt(this.sysmap.data.width),
 						height = parseInt(this.sysmap.data.height),
 						x = Math.min(Math.max(0, Math.min(dimensions.x, dimensions.width)), width),
 						y = Math.min(Math.max(0, Math.min(dimensions.y, dimensions.height)), height),
@@ -1877,7 +1815,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			updateHandles: function() {
-				if (typeof this.handles === 'undefined') {
+				if (this.handles === undefined) {
 					this.handles = [
 						$('<div>', {'class': 'ui-resize-dot cursor-move'}),
 						$('<div>', {'class': 'ui-resize-dot cursor-move'})
@@ -1885,12 +1823,11 @@ ZABBIX.apps.map = (function($) {
 
 					this.domNode.parent().append(this.handles);
 
-					for (var i = 0; i < 2; i++) {
+					for (let i = 0; i < 2; i++) {
 						this.handles[i].data('id', i);
 						this.handles[i].draggable({
 							containment: 'parent',
-							drag: $.proxy(function(event, data) {
-								var dimensions;
+							drag: (e, data) => {
 								if (data.helper.data('id') === 0) {
 									this.data.x = parseInt(data.position.left, 10) + 4;
 									this.data.y = parseInt(data.position.top, 10) + 4;
@@ -1900,16 +1837,17 @@ ZABBIX.apps.map = (function($) {
 									this.data.height = parseInt(data.position.top, 10) + 4;
 								}
 
-								dimensions = this.getDimensions();
-								this.domNode.css({
-									top: dimensions.y + 'px',
-									left: dimensions.x + 'px',
-									width: dimensions.width + 'px',
-									height: dimensions.height + 'px'
+								const dimensions = this.getDimensions();
+
+								Object.assign(this.domNode[0].style, {
+									top: `${dimensions.y}px`,
+									left: `${dimensions.x}px`,
+									width: `${dimensions.width}px`,
+									height: `${dimensions.height}px`
 								});
 
 								this.trigger('afterMove', this);
-							}, this)
+							}
 						});
 					}
 				}
@@ -1929,55 +1867,46 @@ ZABBIX.apps.map = (function($) {
 			 * Allow dragging of shape.
 			 */
 			makeDraggable: function(enable) {
-				var node = this.domNode;
+				const node = this.domNode,
+					enabled = node[0].classList.contains('ui-draggable');
 
 				if (enable) {
 					if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
 						this.updateHandles();
 					}
 					else {
-						if (typeof this.handles !== 'undefined') {
-							this.handles.forEach(function (handle) {
-								handle.remove();
-							});
+						if (this.handles !== undefined) {
+							this.handles.forEach((handle) => handle.remove());
 							delete this.handles;
 						}
 					}
 
-					if (!node.hasClass('ui-draggable')) {
+					if (!enabled) {
 						node.draggable({
 							containment: 'parent',
-							helper: $.proxy(function() {
-								return this.sysmap.dragGroupPlaceholder();
-							}, this),
-							start: $.proxy(function() {
-								this.domNode
-									.addClass('cursor-dragging')
-									.removeClass('cursor-pointer');
+							helper: () => this.sysmap.dragGroupPlaceholder(),
+							start: () => {
+								node[0].classList.add('cursor-dragging');
+								node[0].classList.remove('cursor-pointer');
 								this.sysmap.dragGroupInit(this);
-							}, this),
-							drag: $.proxy(function(event, data) {
-								this.sysmap.dragGroupDrag(data, this);
-							}, this),
-							stop: $.proxy(function() {
-								this.domNode
-									.addClass('cursor-pointer')
-									.removeClass('cursor-dragging');
+							},
+							drag: (e, data) => this.sysmap.dragGroupDrag(data, this),
+							stop: () => {
+								node[0].classList.add('cursor-pointer');
+								node[0].classList.remove('cursor-dragging');
 								this.sysmap.dragGroupStop(this);
-							}, this)
+							}
 						});
 					}
 				}
 				else {
-					if (typeof this.handles !== 'undefined') {
-						this.handles.forEach(function (handle) {
-							handle.remove();
-						});
+					if (this.handles !== undefined) {
+						this.handles.forEach((handle) => handle.remove());
 						delete this.handles;
 					}
 
-					if (node.hasClass('ui-draggable')) {
-						node.draggable("destroy");
+					if (enabled) {
+						node.draggable('destroy');
 					}
 				}
 			},
@@ -1986,44 +1915,49 @@ ZABBIX.apps.map = (function($) {
 			 * Allow resizing of shape.
 			 */
 			makeResizable: function(enable) {
-				var node = this.domNode,
-					enabled = node.hasClass('ui-resizable');
+				const node = this.domNode,
+					enabled = node[0].classList.contains('ui-resizable');
 
-				if (enable === enabled) {
-					return;
-				}
+				if (enable && !enabled) {
+					const handles = {};
 
-				if (enable) {
-					var handles = {};
+					['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'].forEach((key) => {
+						const handle = document.createElement('div');
 
-					$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
-						var handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
+						handle.classList.add('ui-resizable-handle', `ui-resizable-${key}`);
 
-						if ($.inArray(key, ['n', 'e', 's', 'w']) >= 0) {
-							handle
-								.append($('<div>', {'class': 'ui-resize-dot'}))
-								.append($('<div>', {'class': 'ui-resizable-border-' + key}));
+						if (['n', 'e', 's', 'w'].indexOf(key) >= 0) {
+							const dot = document.createElement('div'),
+								border = document.createElement('div');
+
+							dot.className = 'ui-resize-dot';
+							border.className = `ui-resizable-border-${key}`;
+
+							handle.appendChild(dot);
+							handle.appendChild(border);
 						}
 
-						node.append(handle);
+						node[0].appendChild(handle);
 						handles[key] = handle;
 					});
 
-					node.addClass('ui-inner-handles');
+					node[0].classList.add('ui-inner-handles');
+
 					node.resizable({
 						handles: handles,
 						autoHide: true,
-						stop: $.proxy(function(event, data) {
+						stop: (e, data) => {
 							this.updatePosition({
 								x: parseInt(data.position.left, 10),
 								y: parseInt(data.position.top, 10)
 							});
-						}, this)
+						}
 					});
 				}
-				else {
-					node.removeClass('ui-inner-handles');
-					node.resizable("destroy");
+				else if (!enable && enabled) {
+					node[0].classList.remove('ui-inner-handles', 'ui-resizable', 'ui-resizable-autohide');
+					Object.values(this.domNode[0].childNodes).forEach((child) => child.remove());
+					node.resizable('destroy');
 				}
 			},
 
@@ -2037,10 +1971,10 @@ ZABBIX.apps.map = (function($) {
 				this.selected = state;
 
 				if (this.selected) {
-					this.domNode.addClass('map-element-selected');
+					this.domNode[0].classList.add('map-element-selected');
 				}
 				else {
-					this.domNode.removeClass('map-element-selected');
+					this.domNode[0].classList.remove('map-element-selected');
 				}
 
 				return this.selected;
@@ -2052,7 +1986,7 @@ ZABBIX.apps.map = (function($) {
 			 * @param {bool} doAutoAlign if we should align element to grid
 			 */
 			align: function(doAutoAlign) {
-				var dims = {
+				const dims = {
 						height: this.domNode.height(),
 						width: this.domNode.width()
 					},
@@ -2061,34 +1995,35 @@ ZABBIX.apps.map = (function($) {
 					y = dimensions.y,
 					shiftX = Math.round(dims.width / 2),
 					shiftY = Math.round(dims.height / 2),
-					newX = x,
-					newY = y,
-					newWidth = Math.round(dims.width),
-					newHeight = Math.round(dims.height),
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
-				// Lines should not be aligned
+					let newX = x,
+						newY = y,
+						newWidth = Math.round(dims.width),
+						newHeight = Math.round(dims.height);
+
+				// Lines should not be aligned.
 				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
-					this.domNode.css({
-						top: dimensions.y + 'px',
-						left: dimensions.x + 'px',
-						width: dimensions.width + 'px',
-						height: dimensions.height + 'px'
+					Object.assign(this.domNode[0].style, {
+						top: `${dimensions.y}px`,
+						left: `${dimensions.x}px`,
+						width: `${dimensions.width}px`,
+						height: `${dimensions.height}px`
 					});
 
 					return;
 				}
 
-				// if 'fit to map' area coords are 0 always
-				if (this.data.elementsubtype === '1' && this.data.areatype === '0'
-						&& this.data.elementtype === '3') {
+				// If 'fit to map' area coords are 0 always.
+				if (this.data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+						&& this.data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS
+						&& this.data.areatype == SVGMapElement.AREA_TYPE_FIT) {
 					newX = 0;
 					newY = 0;
 				}
-
-				// if autoalign is off
+				// If autoalign is off.
 				else if (doAutoAlign === false
-						|| (typeof doAutoAlign === 'undefined' && this.sysmap.data.grid_align == '0')) {
+						|| (doAutoAlign === undefined && this.sysmap.data.grid_align == SYSMAP_GRID_ALIGN_OFF)) {
 					if ((x + dims.width) > this.sysmap.data.width) {
 						newX = this.sysmap.data.width - dims.width;
 					}
@@ -2131,14 +2066,14 @@ ZABBIX.apps.map = (function($) {
 				this.data.y = newY;
 				this.data.x = newX;
 
-				if (this instanceof Shape || this.data.elementsubtype === '1') {
+				if (this instanceof Shape || this.data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS) {
 					this.data.width = newWidth;
 					this.data.height = newHeight;
 				}
 
-				this.domNode.css({
-					top: this.data.y + 'px',
-					left: this.data.x + 'px',
+				Object.assign(this.domNode[0].style, {
+					top: `${this.data.y}px`,
+					left: `${this.data.x}px`,
 					width: newWidth,
 					height: newHeight
 				});
@@ -2148,10 +2083,11 @@ ZABBIX.apps.map = (function($) {
 			 * Updates element position.
 			 *
 			 * @param {object} coords
+			 *
 			 */
 			updatePosition: function(coords, invalidate) {
 				if (this instanceof Shape && this.data.type == SVGMapShape.TYPE_LINE) {
-					var dx = coords.x - Math.min(parseInt(this.data.x, 10), parseInt(this.data.width, 10)),
+					const dx = coords.x - Math.min(parseInt(this.data.x, 10), parseInt(this.data.width, 10)),
 						dy = coords.y - Math.min(parseInt(this.data.y, 10), parseInt(this.data.height, 10));
 
 					this.data.x = parseInt(this.data.x, 10) + dx;
@@ -2171,11 +2107,11 @@ ZABBIX.apps.map = (function($) {
 					this.trigger('afterMove', this);
 				}
 				else {
-					var dimensions = this.getDimensions();
+					const dimensions = this.getDimensions();
 
-					this.domNode.css({
-						top: dimensions.y + 'px',
-						left: dimensions.x + 'px'
+					Object.assign(this.domNode[0].style, {
+						top: `${dimensions.y}px`,
+						left: `${dimensions.x}px`
 					});
 				}
 			},
@@ -2189,7 +2125,7 @@ ZABBIX.apps.map = (function($) {
 				delete this.sysmap.data.shapes[this.id];
 				delete this.sysmap.shapes[this.id];
 
-				if (typeof this.sysmap.selection.shapes[this.id] !== 'undefined') {
+				if (this.sysmap.selection.shapes[this.id] !== undefined) {
 					this.sysmap.selection.count.shapes--;
 				}
 
@@ -2199,7 +2135,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Gets Shape data.
 			 *
-			 * @returns {Object}
+			 * @return {object}
 			 */
 			getData: function() {
 				return this.data;
@@ -2211,14 +2147,14 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * @class Creates a new Selement.
 		 *
-		 * @property {object} sysmap reference to Map object
-		 * @property {object} data selement db values
-		 * @property {bool} selected if element is now selected by user
-		 * @property {string} id elementid
-		 * @property {object} domNode reference to related DOM element
+		 * @property {object} sysmap     Reference to Map object.
+		 * @property {object} data       Selement DB values.
+		 * @property {bool}   selected   If element is now selected by user.
+		 * @property {string} id         Element ID.
+		 * @property {object} domNode    Reference to related DOM element.
 		 *
-		 * @param {object} sysmap reference to Map object
-		 * @param {object} selementData element db values
+		 * @param {object} sysmap        Reference to Map object.
+		 * @param {object} selementData  Element DB values.
 		 */
 		function Selement(sysmap, selementData) {
 			this.sysmap = sysmap;
@@ -2227,7 +2163,7 @@ ZABBIX.apps.map = (function($) {
 			if (!selementData) {
 				selementData = {
 					selementid: getUniqueId(),
-					elementtype: '4', // image
+					elementtype: SVGMapElement.TYPE_IMAGE,
 					elements: {},
 					iconid_off: this.sysmap.defaultIconId, // first imageid
 					label: t('S_NEW_ELEMENT'),
@@ -2236,10 +2172,11 @@ ZABBIX.apps.map = (function($) {
 					y: 0,
 					urls: {},
 					elementName: this.sysmap.defaultIconName, // first image name
-					use_iconmap: '1',
-					evaltype: 0, // TAG_EVAL_TYPE_AND_OR
+					use_iconmap: SYSMAP_ELEMENT_USE_ICONMAP_ON,
+					evaltype: TAG_EVAL_TYPE_AND_OR,
 					tags: [],
-					inherited_label: null
+					inherited_label: null,
+					zindex: Object.keys(sysmap.selements).length
 				};
 			}
 			else {
@@ -2254,10 +2191,10 @@ ZABBIX.apps.map = (function($) {
 			this.expanded = this.data.expanded;
 			delete this.data.expanded;
 
-			// assign by reference
+			// Assign by reference.
 			this.sysmap.data.selements[this.id] = this.data;
 
-			// create dom
+			// Create dom.
 			this.domNode = $('<div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_element')
@@ -2265,21 +2202,18 @@ ZABBIX.apps.map = (function($) {
 				.attr('data-type', 'selements');
 
 			this.makeDraggable(true);
-			this.makeResizable(this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1);
+			this.makeResizable(this.data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+					&& this.data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS
+					&& this.data.areatype == SVGMapElement.AREA_TYPE_CUSTOM
+			);
 
 			this.updateIcon();
 
-			this.domNode.css({
-				top: this.data.y + 'px',
-				left: this.data.x + 'px'
+			Object.assign(this.domNode[0].style, {
+				top: `${this.data.y}px`,
+				left: `${this.data.x}px`
 			});
 		}
-
-		Selement.TYPE_HOST			= 0; // SYSMAP_ELEMENT_TYPE_HOST
-		Selement.TYPE_MAP			= 1; // SYSMAP_ELEMENT_TYPE_MAP
-		Selement.TYPE_TRIGGER		= 2; // SYSMAP_ELEMENT_TYPE_TRIGGER
-		Selement.TYPE_HOST_GROUP	= 3; // SYSMAP_ELEMENT_TYPE_HOST_GROUP
-		Selement.TYPE_IMAGE			= 4; // SYSMAP_ELEMENT_TYPE_IMAGE
 
 		Selement.prototype = {
 			/**
@@ -2288,12 +2222,12 @@ ZABBIX.apps.map = (function($) {
 			getData: Shape.prototype.getData,
 
 			/**
-			 * Allows dragging of element
+			 * Allows dragging of element.
 			 */
 			makeDraggable: Shape.prototype.makeDraggable,
 
 			/**
-			 * Allows resizing of element
+			 * Allows resizing of element.
 			 */
 			makeResizable: Shape.prototype.makeResizable,
 
@@ -2303,37 +2237,42 @@ ZABBIX.apps.map = (function($) {
 			updateLabel: function () {
 				if (this.sysmap.data.label_format != 0) {
 					switch (parseInt(this.data.elementtype, 10)) {
-						case Selement.TYPE_HOST_GROUP:
+						case SVGMapElement.TYPE_HOST_GROUP:
 							this.data.label_type = this.sysmap.data.label_type_hostgroup;
-							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+
+							if (this.data.label_type == SVGMap.LABEL_TYPE_CUSTOM) {
 								this.data.inherited_label = this.sysmap.data.label_string_hostgroup;
 							}
 							break;
 
-						case Selement.TYPE_HOST:
+						case SVGMapElement.TYPE_HOST:
 							this.data.label_type = this.sysmap.data.label_type_host;
-							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+
+							if (this.data.label_type == SVGMap.LABEL_TYPE_CUSTOM) {
 								this.data.inherited_label = this.sysmap.data.label_string_host;
 							}
 							break;
 
-						case Selement.TYPE_TRIGGER:
+						case SVGMapElement.TYPE_TRIGGER:
 							this.data.label_type = this.sysmap.data.label_type_trigger;
-							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+
+							if (this.data.label_type == SVGMap.LABEL_TYPE_CUSTOM) {
 								this.data.inherited_label = this.sysmap.data.label_string_trigger;
 							}
 							break;
 
-						case Selement.TYPE_MAP:
+						case SVGMapElement.TYPE_MAP:
 							this.data.label_type = this.sysmap.data.label_type_map;
-							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+
+							if (this.data.label_type == SVGMap.LABEL_TYPE_CUSTOM) {
 								this.data.inherited_label = this.sysmap.data.label_string_map;
 							}
 							break;
 
-						case Selement.TYPE_IMAGE:
+						case SVGMapElement.TYPE_IMAGE:
 							this.data.label_type = this.sysmap.data.label_type_image;
-							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+
+							if (this.data.label_type == SVGMap.LABEL_TYPE_CUSTOM) {
 								this.data.inherited_label = this.sysmap.data.label_string_image;
 							}
 							break;
@@ -2344,11 +2283,11 @@ ZABBIX.apps.map = (function($) {
 					this.data.inherited_label = null;
 				}
 
-				if (this.data.label_type == CMap.LABEL_TYPE_LABEL) {
+				if (this.data.label_type == SVGMap.LABEL_TYPE_LABEL) {
 					this.data.inherited_label = this.data.label;
 				}
-				else if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
-					if (this.data.elementtype != Selement.TYPE_IMAGE) {
+				else if (this.data.label_type == SVGMap.LABEL_TYPE_NAME) {
+					if (this.data.elementtype != SVGMapElement.TYPE_IMAGE) {
 						this.data.inherited_label = this.data.elements[0].elementName;
 					}
 					else {
@@ -2356,11 +2295,12 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
-				if (this.data.label_type != CMap.LABEL_TYPE_CUSTOM && this.data.label_type != CMap.LABEL_TYPE_LABEL
-						&& this.data.label_type != CMap.LABEL_TYPE_IP) {
+				if (this.data.label_type != SVGMap.LABEL_TYPE_CUSTOM && this.data.label_type != SVGMap.LABEL_TYPE_LABEL
+						&& this.data.label_type != SVGMap.LABEL_TYPE_IP) {
 					this.data.expanded = null;
 				}
-				else if (this.data.label_type == CMap.LABEL_TYPE_IP && this.data.elementtype == Selement.TYPE_HOST) {
+				else if (this.data.label_type == SVGMap.LABEL_TYPE_IP
+						&& this.data.elementtype == SVGMapElement.TYPE_HOST) {
 					this.data.inherited_label = '{HOST.IP}';
 				}
 			},
@@ -2368,21 +2308,23 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Return label based on map constructor configuration.
 			 *
-			 * @param {boolean} return label with expanded macros.
+			 * @param {boolean}
 			 *
-			 * @returns {string} or null
+			 * @return {string|null}  Label with expanded macros.
 			 */
 			getLabel: function (expand) {
-				var label = this.data.label;
+				let label = this.data.label;
 
-				if (typeof(expand) === 'undefined') {
+				if (expand === undefined) {
 					expand = true;
 				}
 
-				if (this.data.label_type != CMap.LABEL_TYPE_NOTHING && this.data.label_type != CMap.LABEL_TYPE_STATUS) {
-					if (expand && typeof(this.expanded) === 'string' && (this.sysmap.data.expand_macros === '1'
-							|| (this.data.label_type == CMap.LABEL_TYPE_IP
-							&& this.data.elementtype == Selement.TYPE_HOST))) {
+				if (this.data.label_type != SVGMap.LABEL_TYPE_NOTHING
+						&& this.data.label_type != SVGMap.LABEL_TYPE_STATUS) {
+					if (expand && typeof(this.expanded) === 'string'
+							&& (this.sysmap.data.expand_macros == SYSMAP_EXPAND_MACROS_ON
+								|| (this.data.label_type == SVGMap.LABEL_TYPE_IP
+								&& this.data.elementtype == SVGMapElement.TYPE_HOST))) {
 						label = this.expanded;
 					}
 					else if (typeof this.data.inherited_label === 'string') {
@@ -2390,7 +2332,7 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 				else {
-					label = null;
+					label = '';
 				}
 
 				return label;
@@ -2399,85 +2341,63 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Updates element fields.
 			 *
-			 * @param {object} data
-			 * @param {bool} unsetUndefined			If true, all fields that are not in data parameter will be removed
-			 *										from element.
+			 * @param {object}  data
+			 * @param {boolean} unset_undefined  If true, all fields that are not in data parameter will be removed
+			 *                                   from element.
 			 */
-			update: function(data, unsetUndefined) {
-				var fieldName,
-					dataFelds = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
+			update: function(data, unset_undefined = false) {
+				const data_fields = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
 						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'evaltype', 'tags'
 					],
-					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
-					i,
-					ln,
-					invalidate = ((typeof(data.label) !== 'undefined' && this.data.label !== data.label)
-							|| (typeof(data.elementtype) !== 'undefined' && this.data.elementtype !== data.elementtype)
-							|| (typeof(data.elements) !== 'undefined'
-							&& Object.keys(this.data.elements).length !== Object.keys(data.elements).length));
+					fields_unsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'];
 
-				unsetUndefined = unsetUndefined || false;
+				let invalidate = ((data.label !== undefined && this.data.label !== data.label)
+							|| (data.elementtype !== undefined && this.data.elementtype != data.elementtype)
+							|| (data.elements !== undefined
+							&& Object.keys(this.data.elements).length != Object.keys(data.elements).length));
 
-				if (!invalidate && typeof(data.elements) !== 'undefined') {
-					var k,
-						id,
-						key,
-						kln,
-						keys,
-						ids = Object.keys(this.data.elements);
-
-					for (i = 0, ln = ids.length; i < ln && !invalidate; i++) {
-						id = ids[i];
-						keys = Object.keys(this.data.elements[id]);
-
-						for (k = 0, kln = keys.length; k < kln; k++) {
-							key = keys[k];
-							if (this.data.elements[id][key] !== data.elements[id][key]) {
-								invalidate = true;
-								break;
-							}
-						}
-					}
+				if (!invalidate && data.elements) {
+					invalidate = Object.keys(this.data.elements).some((id) =>
+						Object.keys(this.data.elements[id]).some((key) =>
+							this.data.elements[id][key] !== data.elements[id][key]
+						)
+					);
 				}
 
-				// update elements fields, if not massupdate, remove fields that are not in new values
-				for (i = 0, ln = dataFelds.length; i < ln; i++) {
-					fieldName = dataFelds[i];
-
-					if (typeof data[fieldName] !== 'undefined') {
-						this.data[fieldName] = data[fieldName];
+				data_fields.forEach((field) => {
+					if (data[field] !== undefined) {
+						this.data[field] = data[field];
 					}
-					else if (unsetUndefined && (fieldsUnsettable.indexOf(fieldName) === -1)) {
-						delete this.data[fieldName];
+					else if (unset_undefined && !fields_unsettable.includes(field)) {
+						delete this.data[field];
 					}
-				}
+				});
 
-				// if elementsubtype is not set, it should be 0
-				if (unsetUndefined && typeof this.data.elementsubtype === 'undefined') {
-					this.data.elementsubtype = '0';
-				}
-
-				if (unsetUndefined && typeof this.data.use_iconmap === 'undefined') {
-					this.data.use_iconmap = '0';
+				if (unset_undefined) {
+					// If elementsubtype is not set, it should be 0.
+					if (this.data.elementsubtype === undefined) {
+						this.data.elementsubtype = SVGMapElement.SUBTYPE_HOST_GROUP;
+					}
+					if (this.data.use_iconmap === undefined) {
+						this.data.use_iconmap = SYSMAP_ELEMENT_USE_ICONMAP_OFF;
+					}
 				}
 
 				this.makeResizable(
-						this.data.elementtype == 3 && this.data.elementsubtype == 1 && this.data.areatype == 1
+					this.data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+						&& this.data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS
+						&& this.data.areatype == SVGMapElement.AREA_TYPE_CUSTOM
 				);
 
-				if (this.data.elementtype === '2') {
-					// For element type trigger not exist single element name.
-					delete this.data['elementName'];
-				}
-				else if (this.data.elementtype === '4') {
+				if (this.data.elementtype == SVGMapElement.TYPE_IMAGE) {
 					// If element is image, unset advanced icons.
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
 
 					// If image element, set elementName to image name.
-					for (i in this.sysmap.iconList) {
+					for (const i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
 						}
@@ -2512,7 +2432,7 @@ ZABBIX.apps.map = (function($) {
 				delete this.sysmap.data.selements[this.id];
 				delete this.sysmap.selements[this.id];
 
-				if (typeof this.sysmap.selection.selements[this.id] !== 'undefined') {
+				if (this.sysmap.selection.selements[this.id] !== undefined) {
 					this.sysmap.selection.count.selements--;
 				}
 
@@ -2542,53 +2462,53 @@ ZABBIX.apps.map = (function($) {
 			 * Updates element icon and height/width in case element is area type.
 			 */
 			updateIcon: function() {
-				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
+				const old_icon_class = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
 
-				if (oldIconClass !== null) {
-					this.domNode.removeClass(oldIconClass[0]);
+				if (old_icon_class !== null) {
+					this.domNode[0].classList.remove(old_icon_class[0]);
 				}
 
-				if ((this.data.use_iconmap === '1' && this.sysmap.data.iconmapid !== '0')
-						&& (this.data.elementtype === '0'
-							|| (this.data.elementtype === '3' && this.data.elementsubtype === '1'))) {
-					this.domNode.addClass('sysmap_iconid_' + this.sysmap.defaultAutoIconId);
+				if ((this.data.use_iconmap == SYSMAP_ELEMENT_USE_ICONMAP_ON && this.sysmap.data.iconmapid != 0)
+						&& (this.data.elementtype == SVGMapElement.TYPE_HOST
+							|| (this.data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+									&& this.data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS))) {
+					this.domNode[0].classList.add('sysmap_iconid_' + this.sysmap.defaultAutoIconId);
 				}
 				else {
-					this.domNode.addClass('sysmap_iconid_' + this.data.iconid_off);
+					this.domNode[0].classList.add('sysmap_iconid_' + this.data.iconid_off);
 				}
 
-				if (this.data.elementtype === '3' && this.data.elementsubtype === '1') {
-					if (this.data.areatype === '1') {
-						this.domNode
-							.css({
-								width: this.data.width + 'px',
-								height: this.data.height + 'px'
-							})
-							.addClass('map-element-area-bg');
+				if (this.data.elementtype == SVGMapElement.TYPE_HOST_GROUP
+						&& this.data.elementsubtype == SVGMapElement.SUBTYPE_HOST_GROUP_ELEMENTS) {
+					if (this.data.areatype == SVGMapElement.AREA_TYPE_CUSTOM) {
+						Object.assign(this.domNode[0].style, {
+							width: `${this.data.width}px`,
+							height: `${this.data.height}px`
+						});
 					}
 					else {
-						this.domNode
-							.css({
-								width: this.sysmap.data.width + 'px',
-								height: this.sysmap.data.height + 'px'
-							})
-							.addClass('map-element-area-bg');
+						Object.assign(this.domNode[0].style, {
+							width: `${this.sysmap.data.width}px`,
+							height: `${this.sysmap.data.height}px`
+						});
 					}
+
+					this.domNode[0].classList.add('map-element-area-bg');
 				}
 				else {
-					this.domNode
-						.css({
-							width: '',
-							height: ''
-						})
-						.removeClass('map-element-area-bg');
+					Object.assign(this.domNode[0].style, {
+						width: '',
+						height: ''
+					});
+
+					this.domNode[0].classList.remove('map-element-area-bg');
 				}
 			},
 
 			getName: function () {
-				var name;
+				let name;
 
-				if (typeof this.data.elementName === 'undefined') {
+				if (this.data.elementName === undefined) {
 					name = this.data.elements[0].elementName;
 
 					if (Object.keys(this.data.elements).length > 1) {
@@ -2608,50 +2528,46 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for elements.
 		 *
-		 * @param {object} formContainer jQuery object
+		 * @param {object} formContainer  jQuery object.
 		 * @param {object} sysmap
 		 */
 		function SelementForm(formContainer, sysmap) {
-			var formTplData = {
-					sysmapid: sysmap.sysmapid
-				},
-				tpl = new Template($('#mapElementFormTpl').html()),
-				i,
-				icon,
+			const formTplData = {sysmapid: sysmap.sysmapid},
+				tpl = new Template(document.getElementById('mapElementFormTpl').innerHTML),
 				formActions = [
 					{
 						action: 'show',
 						value: '#subtypeRow, #hostGroupSelectRow',
 						cond: [{
-							elementType: '3'
+							elementType: SVGMapElement.TYPE_HOST_GROUP
 						}]
 					},
 					{
 						action: 'show',
 						value: '#hostSelectRow',
 						cond: [{
-							elementType: '0'
+							elementType: SVGMapElement.TYPE_HOST
 						}]
 					},
 					{
 						action: 'show',
 						value: '#triggerSelectRow, #triggerListRow',
 						cond: [{
-							elementType: '2'
+							elementType: SVGMapElement.TYPE_TRIGGER
 						}]
 					},
 					{
 						action: 'show',
 						value: '#mapSelectRow',
 						cond: [{
-							elementType: '1'
+							elementType: SVGMapElement.TYPE_MAP
 						}]
 					},
 					{
 						action: 'show',
 						value: '#areaTypeRow, #areaPlacingRow',
 						cond: [{
-							elementType: '3',
+							elementType: SVGMapElement.TYPE_HOST_GROUP,
 							subtypeHostGroupElements: 'checked'
 						}]
 					},
@@ -2659,7 +2575,7 @@ ZABBIX.apps.map = (function($) {
 						action: 'show',
 						value: '#areaSizeRow',
 						cond: [{
-							elementType: '3',
+							elementType: SVGMapElement.TYPE_HOST_GROUP,
 							subtypeHostGroupElements: 'checked',
 							areaTypeCustom: 'checked'
 						}]
@@ -2668,7 +2584,7 @@ ZABBIX.apps.map = (function($) {
 						action: 'hide',
 						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
 						cond: [{
-							elementType: '4'
+							elementType: SVGMapElement.TYPE_IMAGE
 						}]
 					},
 					{
@@ -2677,11 +2593,11 @@ ZABBIX.apps.map = (function($) {
 						cond: [
 							{
 								use_iconmap: 'checked',
-								elementType: '0'
+								elementType: SVGMapElement.TYPE_HOST
 							},
 							{
 								use_iconmap: 'checked',
-								elementType: '3',
+								elementType: SVGMapElement.TYPE_HOST_GROUP,
 								subtypeHostGroupElements: 'checked'
 							}
 						]
@@ -2691,10 +2607,10 @@ ZABBIX.apps.map = (function($) {
 						value: '#useIconMapRow',
 						cond: [
 							{
-								elementType: '0'
+								elementType: SVGMapElement.TYPE_HOST
 							},
 							{
-								elementType: '3',
+								elementType: SVGMapElement.TYPE_HOST_GROUP,
 								subtypeHostGroupElements: 'checked'
 							}
 						]
@@ -2704,10 +2620,10 @@ ZABBIX.apps.map = (function($) {
 						value: '#tags-select-row',
 						cond: [
 							{
-								elementType: '0'
+								elementType: SVGMapElement.TYPE_HOST
 							},
 							{
-								elementType: '3'
+								elementType: SVGMapElement.TYPE_HOST_GROUP
 							}
 						]
 					}
@@ -2721,24 +2637,26 @@ ZABBIX.apps.map = (function($) {
 			this.domNode = $(tpl.evaluate(formTplData)).appendTo(formContainer);
 
 			// populate icons selects
-			const select_icon_off = document.getElementById('iconid_off');
-			const select_icon_on = document.getElementById('iconid_on');
-			const select_icon_maintenance = document.getElementById('iconid_maintenance');
-			const select_icon_disabled = document.getElementById('iconid_disabled');
+			const select_icon_off = document.getElementById('iconid_off'),
+				select_icon_on = document.getElementById('iconid_on'),
+				select_icon_maintenance = document.getElementById('iconid_maintenance'),
+				select_icon_disabled = document.getElementById('iconid_disabled'),
+				default_option = {
+					label: t('S_DEFAULT'),
+					value: '0',
+					class_name: ZBX_STYLE_DEFAULT_OPTION,
+				};
 
-			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
-			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
-			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
+			[select_icon_on, select_icon_maintenance, select_icon_disabled]
+				.forEach((select) => select.addOption(default_option));
 
-			for (i in this.sysmap.iconList) {
-				icon = this.sysmap.iconList[i];
-				select_icon_off.addOption({label: icon.name, value: icon.imageid});
-				select_icon_on.addOption({label: icon.name, value: icon.imageid});
-				select_icon_maintenance.addOption({label: icon.name, value: icon.imageid});
-				select_icon_disabled.addOption({label: icon.name, value: icon.imageid});
-			}
+			Object.values(this.sysmap.iconList).forEach((icon) => {
+				const option = {label: icon.name, value: icon.imageid};
 
-			// hosts
+				[select_icon_off, select_icon_on, select_icon_maintenance, select_icon_disabled]
+					.forEach((select) => select.addOption(option));
+			});
+
 			$('#elementNameHost').multiSelectHelper({
 				id: 'elementNameHost',
 				object_name: 'hosts',
@@ -2754,7 +2672,6 @@ ZABBIX.apps.map = (function($) {
 				}
 			});
 
-			// map
 			$('#elementNameMap').multiSelectHelper({
 				id: 'elementNameMap',
 				object_name: 'sysmaps',
@@ -2770,7 +2687,6 @@ ZABBIX.apps.map = (function($) {
 				}
 			});
 
-			// triggers
 			$('#elementNameTriggers').multiSelectHelper({
 				id: 'elementNameTriggers',
 				object_name: 'triggers',
@@ -2791,7 +2707,6 @@ ZABBIX.apps.map = (function($) {
 				}
 			});
 
-			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
 				object_name: 'hostGroup',
@@ -2844,24 +2759,22 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} urls
 			 */
 			addUrls: function(urls) {
-				var tpl = new Template($('#selementFormUrls').html()),
-					i,
-					url;
+				const tpl = new Template(document.getElementById('selementFormUrls').innerHTML),
+					tbody = document.querySelector('#urlContainer tbody');
 
-				if (typeof urls === 'undefined' || $.isEmptyObject(urls)) {
+				let urlid = tbody.querySelectorAll('tr[id^="urlrow"]').length;
+
+				if (urls === undefined || Object.keys(urls).length == 0) {
 					urls = {empty: {}};
 				}
 
-				for (i in urls) {
-					url = urls[i];
-
-					// generate unique urlid
-					url.selementurlid = $('#urlContainer tbody tr[id^=urlrow]').length;
-					while ($('#urlrow_' + url.selementurlid).length) {
-						url.selementurlid++;
+				Object.values(urls).forEach((url) => {
+					while (document.getElementById(`urlrow_${urlid}`)) {
+						urlid++;
 					}
-					$(tpl.evaluate(url)).appendTo('#urlContainer tbody');
-				}
+					url.selementurlid = urlid;
+					tbody.insertAdjacentHTML('beforeend', tpl.evaluate(url));
+				});
 			},
 
 			/**
@@ -2870,88 +2783,74 @@ ZABBIX.apps.map = (function($) {
 			 * @param {array} tags
 			 */
 			addTags: function(tags) {
-				var tpl = new Template($('#tag-row-tmpl').html()),
-					$add_btn_row = $('#selement-tags .element-table-add').closest('tr'),
-					counter = $('#selement-tags').data('dynamicRows').counter;
+				const tpl = new Template(document.getElementById('tag-row-tmpl').innerHTML),
+					add_btn_row = document.querySelector('#selement-tags .element-table-add').closest('tr');
+
+				let counter = $('#selement-tags').data('dynamicRows').counter;
 
 				for (const i in tags) {
-					var tag = jQuery.extend({tag: '', operator: 0, value: '', rowNum: ++counter}, tags[i]),
-						row = $(tpl.evaluate(tag));
+					const tag = jQuery.extend({tag: '', operator: 0, value: '', rowNum: ++counter}, tags[i]),
+						$row = $(tpl.evaluate(tag));
 
-					row.insertBefore($add_btn_row);
-					row
-						.find('[name="tags[' + tag.rowNum + '][tag]"]')
-						.val(tag.tag);
+					$row.insertBefore(add_btn_row);
 
-					row
-						.find('[name="tags[' + tag.rowNum + '][operator]"]')
-						.val(tag.operator);
+					['tag', 'operator', 'value'].forEach((field) =>
+						$row
+							.find(`[name="tags[${tag.rowNum}][${field}]"]`)
+							.val(tag[field])
+					);
 
-					row
-						.find('[name="tags[' + tag.rowNum + '][value]"]')
-						.val(tag.value);
-
-					new CTagFilterItem(row[0]);
+					new CTagFilterItem($row[0]);
 				}
 
 				$('#selement-tags').data('dynamicRows').counter = counter;
 			},
 
 			/**
-			 * Set evaltype field value.
-			 *
-			 * @param {integer} value
-			 */
-			setEvaltype: function(value) {
-				$('#operator [name="evaltype"][value='+value+']').prop('checked', true);
-			},
-
-			/**
 			 * Add triggers to the list.
 			 */
 			addTriggers: function(triggers) {
-				var tpl = new Template($('#selementFormTriggers').html()),
+				const tpl = new Template(document.getElementById('selementFormTriggers').innerHTML),
 					selected_triggers = $('#elementNameTriggers').multiSelect('getData'),
 					triggerids = [],
 					triggers_to_insert = [];
 
-				if (typeof triggers === 'undefined' || $.isEmptyObject(triggers)) {
+				if (triggers === undefined || $.isEmptyObject(triggers)) {
 					triggers = [];
 				}
 
 				triggers = triggers.concat(selected_triggers);
 
 				if (triggers) {
-					triggers.forEach(function(trigger) {
-						if ($('input[name^="element_id[' + trigger.id + ']"]').length == 0) {
+					triggers.forEach((trigger) => {
+						if ($(`input[name^="element_id[${trigger.id}]"]`).length == 0) {
 							triggerids.push(trigger.id);
 							triggers_to_insert[trigger.id] = {
 								id: trigger.id,
-								name: typeof trigger.prefix == 'undefined'
-									? trigger.name
-									: trigger.prefix + trigger.name
+								name: trigger.prefix === undefined ? trigger.name : trigger.prefix + trigger.name
 							};
 						}
 					});
 
 					if (triggerids.length != 0) {
-						// get priority
-						var ajaxUrl = new Curl('jsrpc.php');
-						ajaxUrl.setArgument('type', 11);
+						const url = new Curl('jsrpc.php');
+
+						url.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
+
 						$.ajax({
-							url: ajaxUrl.getUrl(),
+							url: url.getUrl(),
 							type: 'post',
 							dataType: 'html',
 							data: {
 								method: 'trigger.get',
-								triggerids: triggerids
+								triggerids
 							},
 							success: function(data) {
 								data = JSON.parse(data);
-								triggers.forEach(function(sorted_trigger) {
-									data.result.forEach(function(trigger) {
-										if (sorted_trigger.id == trigger.triggerid) {
-											if ($('input[name^="element_id[' + trigger.triggerid + ']"]').length == 0) {
+								triggers.forEach((sorted_trigger) => {
+									data.result.forEach((trigger) => {
+										if (sorted_trigger.id === trigger.triggerid) {
+											if ($(`input[name^="element_id[${trigger.triggerid}]"]`).length == 0) {
 												trigger.name = triggers_to_insert[trigger.triggerid].name;
 												$(tpl.evaluate(trigger)).appendTo('#triggerContainer tbody');
 
@@ -2976,74 +2875,66 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} selement
 			 */
 			setValues: function(selement) {
-				for (var elementName in selement) {
-					$('[name=' + elementName + ']', this.domNode).val([selement[elementName]]);
+				// jQuery left here for convenience purposes.
+				for (const name in selement) {
+					$(`[name=${name}]`, this.domNode).val([selement[name]]);
 				}
 
-				// set default icon state
-				if (empty(selement.iconid_on)) {
-					$('[name=iconid_on]', this.domNode).val(0);
-				}
-				if (empty(selement.iconid_disabled)) {
-					$('[name=iconid_disabled]', this.domNode).val(0);
-				}
-				if (empty(selement.iconid_maintenance)) {
-					$('[name=iconid_maintenance]', this.domNode).val(0);
-				}
+				['iconid_on', 'iconid_disabled', 'iconid_maintenance'].forEach((name) => {
+					$(`[name=${name}]`, this.domNode).val(0);
+				});
 
-				// clear urls
-				$('#urlContainer tbody tr').remove();
+				// Clear urls.
+				document.querySelectorAll('#urlContainer tbody tr').forEach((tr) => tr.remove());
 				this.addUrls(selement.urls);
 
 				// Set tag properties.
-				var tags = selement.tags;
+				let tags = selement.tags;
+
 				if (!tags || Object.getOwnPropertyNames(tags).length == 0) {
 					tags = {0: {}};
 				}
+
 				this.cleanTagsField();
 				this.addTags(tags);
-				this.setEvaltype(selement.evaltype);
 
 				// Iconmap.
-				if (this.sysmap.data.iconmapid === '0') {
-					$('#use_iconmap').prop({
-						checked: false,
-						disabled: true
-					});
+				if (this.sysmap.data.iconmapid == 0) {
+					const use_iconmap = document.getElementById('use_iconmap');
+
+					if (use_iconmap) {
+						use_iconmap.checked = false;
+						use_iconmap.disabled = true;
+					}
 				}
 
 				this.actionProcessor.process();
 
-				switch (selement.elementtype) {
-					// host
-					case '0':
+				switch (+selement.elementtype) {
+					case SVGMapElement.TYPE_HOST:
 						$('#elementNameHost').multiSelect('addData', [{
 							'id': selement.elements[0].hostid,
 							'name': selement.elements[0].elementName
 						}]);
 						break;
 
-					// map
-					case '1':
+					case SVGMapElement.TYPE_MAP:
 						$('#elementNameMap').multiSelect('addData', [{
 							'id': selement.elements[0].sysmapid,
 							'name': selement.elements[0].elementName
 						}]);
 						break;
 
-					// trigger
-					case '2':
-						var triggers = [];
-
-						for (i in selement.elements) {
-							triggers[i] = {'id': selement.elements[i].triggerid, 'name': selement.elements[i].elementName};
-						}
+					case SVGMapElement.TYPE_TRIGGER:
+						const triggers = Object.values(selement.elements).map((element) => ({
+							id: element.triggerid,
+							name: element.elementName
+						}));
 
 						this.addTriggers(triggers);
 						break;
 
-					// host group
-					case '3':
+					case SVGMapElement.TYPE_HOST_GROUP:
 						$('#elementNameHostGroup').multiSelect('addData', [{
 							'id': selement.elements[0].groupid,
 							'name': selement.elements[0].elementName
@@ -3056,147 +2947,149 @@ ZABBIX.apps.map = (function($) {
 			 * Remove tag filter rows from DOM.
 			 */
 			cleanTagsField: function() {
-				$('#selement-tags .form_row').remove();
+				document.querySelectorAll('#selement-tags .form_row').forEach((element) => element.remove());
 			},
 
 			/**
 			 * Gets form values for element fields.
 			 *
-			 * @returns {Object|Boolean}
+			 * @return {object|boolean}
 			 */
 			getValues: function() {
-				var values = $(':input', '#selementForm')
+				const values = $(':input', '#selementForm')
 						.not(this.actionProcessor.hidden)
 						.not('[name^="tags"]')
 						.serializeArray(),
 					data = {
 						urls: {}
 					},
-					i,
-					urlPattern = /^url_(\d+)_(name|url)$/,
-					url,
-					urlNames = {},
-					elementsData = {};
+					url_pattern = /^url_(\d+)_(name|url)$/,
+					url_names = {};
 
-				for (i = 0; i < values.length; i++) {
-					url = urlPattern.exec(values[i].name);
+				let elements_data = {};
 
-					if (url !== null) {
-						if (typeof data.urls[url[1]] === 'undefined') {
-							data.urls[url[1]] = {};
-						}
+				values.forEach(({name, value}) => {
+					const match = url_pattern.exec(name);
 
-						data.urls[url[1]][url[2]] = values[i].value.toString();
+					if (match) {
+						data.urls[match[1]] = data.urls[match[1]] || {};
+						data.urls[match[1]][match[2]] = value;
 					}
 					else {
-						data[values[i].name] = values[i].value.toString();
+						data[name] = value;
 					}
-				}
+				});
 
-				if (data.elementtype == '0' || data.elementtype == '3') {
+				if (data.elementtype == SVGMapElement.TYPE_HOST
+						|| data.elementtype == SVGMapElement.TYPE_HOST_GROUP) {
 					data.tags = {};
-					$('input, z-select', '#selementForm').filter(function() {
-						return this.name.match(/tags\[\d+\]\[tag\]/);
-					}).each(function() {
-						if (this.value !== '') {
-							var nr = parseInt(this.name.match(/^tags\[(\d+)\]\[tag\]$/)[1]);
-							data.tags[Object.getOwnPropertyNames(data.tags).length] = {
-								tag: this.value,
-								operator: $('[name="tags['+nr+'][operator]"]').val(),
-								value: $('[name="tags['+nr+'][value]"]').val()
-							};
-						}
+
+					$('input, z-select', '#selementForm')
+						.filter(function() {
+							return this.name.match(/tags\[\d+\]\[tag\]/);
+						})
+						.each(function() {
+							if (this.value !== '') {
+								const num = parseInt(this.name.match(/^tags\[(\d+)\]\[tag\]$/)[1]);
+
+								data.tags[Object.getOwnPropertyNames(data.tags).length] = {
+									tag: this.value,
+									operator: $(`[name="tags[${num}][operator]"]`).val(),
+									value: $(`[name="tags[${num}][value]"]`).val()
+								};
+							}
 					});
 				}
 
 				data.elements = {};
 
-				// set element id and name
-				switch (data.elementtype) {
-					// host
-					case '0':
-						elementsData = $('#elementNameHost').multiSelect('getData');
+				// Set element ID and name.
+				switch (+data.elementtype) {
+					case SVGMapElement.TYPE_HOST:
+						elements_data = $('#elementNameHost').multiSelect('getData');
 
-						if (elementsData.length != 0) {
+						if (elements_data.length != 0) {
 							data.elements[0] = {
-								hostid: elementsData[0].id,
-								elementName: elementsData[0].name
+								hostid: elements_data[0].id,
+								elementName: elements_data[0].name
 							};
 						}
 						break;
 
-					// map
-					case '1':
-						elementsData = $('#elementNameMap').multiSelect('getData');
+					case SVGMapElement.TYPE_MAP:
+						elements_data = $('#elementNameMap').multiSelect('getData');
 
-						if (elementsData.length != 0) {
+						if (elements_data.length != 0) {
 							data.elements[0] = {
-								sysmapid: elementsData[0].id,
-								elementName: elementsData[0].name
+								sysmapid: elements_data[0].id,
+								elementName: elements_data[0].name
 							};
 						}
 						break;
 
-					// triggers
-					case '2':
-						i = 0;
-						$('input[name^="element_id"]').each(function() {
-							data.elements[i] = {
-								triggerid: $(this).val(),
-								elementName: $('input[name^="element_name[' + $(this).val() + ']"]').val(),
-								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val()
-							};
-							i++;
+					case SVGMapElement.TYPE_TRIGGER:
+						let i = 0;
+
+						const triggers_list = document.querySelectorAll('input[name^="element_id"]');
+
+						triggers_list.forEach((input) => {
+							const triggerid = input.value,
+								elementName = document.querySelector(`input[name^="element_name[${triggerid}]"]`).value,
+								priority = document
+									.querySelector(`input[name^="element_priority[${triggerid}]"]`).value;
+
+							data.elements[i++] = {triggerid, elementName, priority};
 						});
 						break;
 
-					// host group
-					case '3':
-						elementsData = $('#elementNameHostGroup').multiSelect('getData');
+					case SVGMapElement.TYPE_HOST_GROUP:
+						elements_data = $('#elementNameHostGroup').multiSelect('getData');
 
-						if (elementsData.length != 0) {
+						if (elements_data.length != 0) {
 							data.elements[0] = {
-								groupid: elementsData[0].id,
-								elementName: elementsData[0].name
+								groupid: elements_data[0].id,
+								elementName: elements_data[0].name
 							};
 						}
 						break;
 				}
 
-				// validate urls
-				for (i in data.urls) {
-					if (data.urls[i].name === '' && data.urls[i].url === '') {
-						delete data.urls[i];
+				// Validate URLs.
+				for (const key in data.urls) {
+					const {name, url} = data.urls[key];
+
+					if (name === '' && url === '') {
+						delete data.urls[key];
 						continue;
 					}
 
-					if (data.urls[i].name === '' || data.urls[i].url === '') {
+					if (name === '' || url === '') {
 						alert(t('S_INCORRECT_ELEMENT_MAP_LINK'));
 
 						return false;
 					}
 
-					if (typeof urlNames[data.urls[i].name] !== 'undefined') {
-						alert(t('S_EACH_URL_SHOULD_HAVE_UNIQUE') + " '" + data.urls[i].name + "'.");
+					if (url_names[name] !== undefined) {
+						alert(t('S_EACH_URL_SHOULD_HAVE_UNIQUE') + " '" + name + "'.");
 
 						return false;
 					}
 
-					urlNames[data.urls[i].name] = 1;
+					url_names[name] = 1;
 				}
 
-				// validate element id
-				if ($.isEmptyObject(data.elements) && data.elementtype !== '4') {
-					switch (data.elementtype) {
-						case '0': alert(t('Host is not selected.'));
-							return false;
-						case '1': alert(t('Map is not selected.'));
-							return false;
-						case '2': alert(t('Trigger is not selected.'));
-							return false;
-						case '3': alert(t('Host group is not selected.'));
-							return false;
-					}
+				// Validate element ID.
+				if ($.isEmptyObject(data.elements) && data.elementtype != SVGMapElement.TYPE_IMAGE) {
+					const messages = {
+						[SVGMapElement.TYPE_HOST]: t('Host is not selected.'),
+						[SVGMapElement.TYPE_MAP]: t('Map is not selected.'),
+						[SVGMapElement.TYPE_TRIGGER]: t('Trigger is not selected.'),
+						[SVGMapElement.TYPE_HOST_GROUP]: t('Host group is not selected.')
+					};
+
+					alert(messages[+data.elementtype]);
+
+					return false;
 				}
 
 				return data;
@@ -3206,30 +3099,32 @@ ZABBIX.apps.map = (function($) {
 			 * Sorting triggers by severity.
 			 */
 			recalculateTriggerSortOrder: function() {
-				if ($('input[name^="element_id"]').length != 0) {
-					var triggers = [],
-						priority;
-					$('input[name^="element_id"]').each(function() {
-						priority = $('input[name^="element_priority[' + $(this).val() + ']"]').val()
+				const triggers_list = document.querySelectorAll('input[name^="element_id"]');
+
+				if (triggers_list.length != 0) {
+					const triggers = [];
+
+					triggers_list.forEach((input) => {
+						const triggerid = input.value,
+							priority = document.querySelector(`input[name^="element_priority[${triggerid}]"]`).value,
+							html = document.getElementById(`triggerrow_${triggerid}`).outerHTML;
+
 						if (!triggers[priority]) {
-							triggers[priority] = {
-								'priority': priority,
-								'html':	$('#triggerrow_' + $(this).val())[0].outerHTML
-							}
+							triggers[priority] = {priority, html};
 						}
 						else {
-							triggers[priority].html += $('#triggerrow_' + $(this).val())[0].outerHTML;
+							triggers[priority].html += html;
 						}
 					});
 
-					triggers.sort(function (a, b) {
-						return b.priority - a.priority;
-					});
+					triggers.sort((a, b) => b.priority - a.priority);
 
-					$('#triggerContainer tbody').html('');
-					triggers.forEach(function(trigger) {
-						$('#triggerContainer tbody').append(trigger.html);
-					});
+					const container = document.querySelector('#triggerContainer tbody');
+
+					if (container) {
+						container.innerHTML = '';
+						triggers.forEach((trigger) => container.insertAdjacentHTML('beforeend', trigger.html));
+					}
 				}
 			}
 		};
@@ -3241,8 +3136,7 @@ ZABBIX.apps.map = (function($) {
 		 * @param {object} sysmap
 		 */
 		function MassForm(formContainer, sysmap) {
-			var i,
-				icon,
+			const tpl = new Template(document.getElementById('mapMassFormTpl').innerHTML),
 				formActions = [
 					{
 						action: 'enable',
@@ -3299,32 +3193,35 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = formContainer;
 
 			// create form
-			var tpl = new Template($('#mapMassFormTpl').html());
 			this.domNode = $(tpl.evaluate()).appendTo(formContainer);
 
 			// populate icons selects
-			const select_icon_off = document.getElementById('massIconidOff');
-			const select_icon_on = document.getElementById('massIconidOn');
-			const select_icon_maintenance = document.getElementById('massIconidMaintenance');
-			const select_icon_disabled = document.getElementById('massIconidDisabled');
+			const select_icon_off = document.getElementById('massIconidOff'),
+				select_icon_on = document.getElementById('massIconidOn'),
+				select_icon_maintenance = document.getElementById('massIconidMaintenance'),
+				select_icon_disabled = document.getElementById('massIconidDisabled'),
+				default_option = {
+					label: t('S_DEFAULT'),
+					value: '0',
+					class_name: ZBX_STYLE_DEFAULT_OPTION,
+				};
 
-			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
-			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
-			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
+			[select_icon_on, select_icon_maintenance, select_icon_disabled]
+				.forEach((select) => select.addOption(default_option));
 
-			for (i in this.sysmap.iconList) {
-				icon = this.sysmap.iconList[i];
-				select_icon_off.addOption({label: icon.name, value: icon.imageid});
-				select_icon_on.addOption({label: icon.name, value: icon.imageid});
-				select_icon_maintenance.addOption({label: icon.name, value: icon.imageid});
-				select_icon_disabled.addOption({label: icon.name, value: icon.imageid});
-			}
+			Object.values(this.sysmap.iconList).forEach((icon) => {
+				const option = {label: icon.name, value: icon.imageid};
+
+				[select_icon_off, select_icon_on, select_icon_maintenance, select_icon_disabled]
+					.forEach((select) => select.addOption(option));
+			});
 
 			document.getElementById('massLabelLocation').selectedIndex = 0;
-			select_icon_off.selectedIndex = 0
-			select_icon_on.selectedIndex = 0
-			select_icon_maintenance.selectedIndex = 0
-			select_icon_disabled.selectedIndex = 0
+
+			select_icon_off.selectedIndex = 0;
+			select_icon_on.selectedIndex = 0;
+			select_icon_maintenance.selectedIndex = 0;
+			select_icon_disabled.selectedIndex = 0;
 
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
@@ -3368,21 +3265,20 @@ ZABBIX.apps.map = (function($) {
 			 * @return array
 			 */
 			getValues: function() {
-				var values = $('#massForm').serializeArray(),
-					data = {},
-					i,
-					ln;
+				const values = $('#massForm').serializeArray(),
+					data = {};
 
-				for (i = 0, ln = values.length; i < ln; i++) {
-					// special case for use iconmap checkbox, because unchecked checkbox is not submitted with form
-					if (values[i].name === 'chkbox_use_iconmap') {
-						data['use_iconmap'] = '0';
+				for (const {name, value} of values) {
+					// Special case for use iconmap checkbox, because unchecked checkbox is not submitted with form.
+					if (name === 'chkbox_use_iconmap') {
+						data.use_iconmap = SYSMAP_ELEMENT_USE_ICONMAP_OFF;
 					}
-					if (values[i].name.match(/^chkbox_/) !== null) {
+
+					if (/^chkbox_/.test(name)) {
 						continue;
 					}
 
-					data[values[i].name] = values[i].value.toString();
+					data[name] = value;
 				}
 
 				return data;
@@ -3392,79 +3288,71 @@ ZABBIX.apps.map = (function($) {
 			 * Updates list of selected elements in mass update form.
 			 */
 			updateList: function() {
-				var tpl = new Template($('#mapMassFormListRow').html()),
-					id,
-					list = [],
-					element,
-					elementTypeText,
-					i,
-					ln;
+				const tpl = new Template(document.getElementById('mapMassFormListRow').innerHTML);
 
 				$('#massList tbody').empty();
 
-				for (id in this.sysmap.selection.selements) {
-					element = this.sysmap.selements[id];
+				const list = Object.values(this.sysmap.selection.selements).map((id) => {
+					const element = this.sysmap.selements[id],
+						type = +element.data.elementtype;
 
-					switch (element.data.elementtype) {
-						case '0': elementTypeText = t('S_HOST'); break;
-						case '1': elementTypeText = t('S_MAP'); break;
-						case '2': elementTypeText = t('S_TRIGGER'); break;
-						case '3': elementTypeText = t('S_HOST_GROUP'); break;
-						case '4': elementTypeText = t('S_IMAGE'); break;
+					let text;
+
+					switch (type) {
+						case SVGMapElement.TYPE_HOST:
+							text = t('S_HOST');
+							break;
+
+						case SVGMapElement.TYPE_MAP:
+							text = t('S_MAP');
+							break;
+
+						case SVGMapElement.TYPE_TRIGGER:
+							text = t('S_TRIGGER');
+							break;
+
+						case SVGMapElement.TYPE_HOST_GROUP:
+							text = t('S_HOST_GROUP');
+							break;
+
+						case SVGMapElement.TYPE_IMAGE:
+							text = t('S_IMAGE');
+							break;
 					}
 
-					list.push({
-						elementType: elementTypeText,
-						elementName: element.getName().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-								.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;')
-					});
-				}
-
-				// sort by element type and then by element name
-				list.sort(function(a, b) {
-					var elementTypeA = a.elementType.toLowerCase(),
-						elementTypeB = b.elementType.toLowerCase(),
-						elementNameA,
-						elementNameB;
-
-					if (elementTypeA < elementTypeB) {
-						return -1;
-					}
-					if (elementTypeA > elementTypeB) {
-						return 1;
-					}
-
-					elementNameA = a.elementName.toLowerCase();
-					elementNameB = b.elementName.toLowerCase();
-
-					if (elementNameA < elementNameB) {
-						return -1;
-					}
-					if (elementNameA > elementNameB) {
-						return 1;
-					}
-
-					return 0;
+					return {
+						elementType: text,
+						elementName: element.getName()
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&apos;')
+					};
 				});
 
-				for (i = 0, ln = list.length; i < ln; i++) {
-					$(tpl.evaluate(list[i])).appendTo('#massList tbody');
-				}
+				// Sort by element type and then by element name.
+				list.sort((a, b) =>
+					a.elementType.toLowerCase().localeCompare(b.elementType.toLowerCase())
+						|| a.elementName.toLowerCase().localeCompare(b.elementName.toLowerCase())
+				);
+
+				list.forEach((item) => $(tpl.evaluate(item)).appendTo('#massList tbody'));
 			}
 		};
 
 		/**
 		 * Form for shape editing.
 		 *
-		 * @param {object} formContainer jQuery object
+		 * @param {object} formContainer jQuery object.
 		 * @param {object} sysmap
 		 */
 		function ShapeForm(formContainer, sysmap) {
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
 			this.triggerids = {};
-			this.domNode = $(new Template($('#mapShapeFormTpl').html()).evaluate()).appendTo(formContainer);
-
+			this.domNode = $(new Template(document.getElementById('mapShapeFormTpl').innerHTML).evaluate())
+				.appendTo(formContainer);
 			this.domNode.find('.color-picker input').colorpicker();
 		}
 
@@ -3501,51 +3389,46 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} shape
 			 */
 			setValues: function(shape) {
-				for (var field in shape) {
-					$('[name=' + field + ']', this.domNode).val([shape[field]]);
+				for (const field in shape) {
+					$(`[name=${field}]`, this.domNode).val([shape[field]]);
 				}
 
 				$('.color-picker input', this.domNode).change();
-				$('#border_type').change();
 
-				$('#last_shape_type').val(shape.type);
-				$('input[type=radio][name=type]:checked').change();
+				document.getElementById('border_type').dispatchEvent(new Event('change'));
+				document.getElementById('last_shape_type').value = shape.type;
+
+				document.querySelectorAll('input[type=radio][name=type]:checked')
+					.forEach((input) => input.dispatchEvent(new Event('change')));
 			},
 
 			/**
 			 * Get values from shape update form that should be updated
 			 *
-			 * @return array
+			 * @return {object}
 			 */
 			getValues: function() {
-				var values = $('#shapeForm').serializeArray(),
-					data = {},
-					i,
-					ln,
-					min_size,
+				const values = $('#shapeForm').serializeArray(),
 					width = parseInt(this.sysmap.data.width),
-					height = parseInt(this.sysmap.data.height);
+					height = parseInt(this.sysmap.data.height),
+					data = values.reduce((acc, {name, value}) => {
+						acc[name] = value.toString();
 
-				for (i = 0, ln = values.length; i < ln; i++) {
-					data[values[i].name] = values[i].value.toString();
-				}
+						return acc;
+					}, {});
 
 				data.x = parseInt(data.x, 10);
 				data.y = parseInt(data.y, 10);
 				data.width = parseInt(data.width, 10);
 				data.height = parseInt(data.height, 10);
 
-				data.x = isNaN(data.x) || (data.x < 0) ? 0 : data.x;
-				data.y = isNaN(data.y) || (data.y < 0) ? 0 : data.y;
+				data.x = isNaN(data.x) ? 0 : Math.min(Math.max(0, data.x), width);
+				data.y = isNaN(data.y) ? 0 : Math.min(Math.max(0, data.y), height);
 
-				min_size = (data.type != SVGMapShape.TYPE_LINE) ? 1 : 0;
-				data.width = isNaN(data.width) || (data.width < min_size) ? min_size : data.width;
-				data.height = isNaN(data.height) || (data.height < min_size) ? min_size : data.height;
+				const min_size = data.type != SVGMapShape.TYPE_LINE ? 1 : 0;
 
-				data.x = (data.x >= width) ? width : data.x;
-				data.y = (data.y >= height) ? height : data.y;
-				data.width = (data.width >= width) ? width : data.width;
-				data.height = (data.height >= height) ? height : data.height;
+				data.width = isNaN(data.width) ? min_size : Math.min(Math.max(min_size, data.width), width);
+				data.height = isNaN(data.height) ? min_size : Math.min(Math.max(min_size, data.height), height);
 
 				return data;
 			}
@@ -3558,40 +3441,35 @@ ZABBIX.apps.map = (function($) {
 		 * @param {object} sysmap
 		 */
 		function MassShapeForm(formContainer, sysmap) {
-			var formActions = [];
+			const form_actions = [],
+				mapping = {
+					chkboxType: '[name="mass_type"]',
+					chkboxText: '#mass_text',
+					chkboxFont: '#mass_font',
+					chkboxFontSize: '#mass_font_size',
+					chkboxFontColor: '#mass_font_color',
+					chkboxTextHalign: '#mass_text_halign',
+					chkboxTextValign: '#mass_text_valign',
+					chkboxBackground: '#mass_background_color',
+					chkboxBorderType: '#mass_border_type',
+					chkboxBorderWidth: '#mass_border_width',
+					chkboxBorderColor: '#mass_border_color'
+				};
 
-			var mapping = {
-				chkboxType: '[name="mass_type"]',
-				chkboxText: '#mass_text',
-				chkboxFont: '#mass_font',
-				chkboxFontSize: '#mass_font_size',
-				chkboxFontColor: '#mass_font_color',
-				chkboxTextHalign: '#mass_text_halign',
-				chkboxTextValign: '#mass_text_valign',
-				chkboxBackground: '#mass_background_color',
-				chkboxBorderType: '#mass_border_type',
-				chkboxBorderWidth: '#mass_border_width',
-				chkboxBorderColor: '#mass_border_color'
-			};
-
-			Object.keys(mapping).forEach(function (key) {
-				var condition = {};
-				condition[key] = 'checked';
-
-				formActions.push({
-					action: 'enable',
-					value: mapping[key],
-					cond: [condition]
-				});
-			});
+			Object.keys(mapping).forEach((key) => form_actions.push({
+				action: 'enable',
+				value: mapping[key],
+				cond: [{[key]: 'checked'}]
+			}));
 
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
 			this.triggerids = {};
-			this.domNode = $(new Template($('#mapMassShapeFormTpl').html()).evaluate()).appendTo(formContainer);
+			this.domNode = $(new Template(document.getElementById('mapMassShapeFormTpl').innerHTML).evaluate())
+				.appendTo(formContainer);
 
 			this.domNode.find('.color-picker input').colorpicker();
-			this.actionProcessor = new ActionProcessor(formActions);
+			this.actionProcessor = new ActionProcessor(form_actions);
 			this.actionProcessor.process();
 		}
 
@@ -3600,13 +3478,13 @@ ZABBIX.apps.map = (function($) {
 			 * Show form.
 			 */
 			show: function(figures) {
-				var value = figures ? 0 : 2;
+				const value = figures ? 0 : 2;
 
 				$('.shape_figure_row', this.domNode).toggle(figures);
-				$('.switchable-content', this.domNode).each(function (i, element) {
-					element.textContent = element.hasAttribute('data-value-' + value) ?
-							element.getAttribute('data-value-' + value) :
-							element.getAttribute('data-value');
+				$('.switchable-content', this.domNode).each((i, element) => {
+					element.textContent = element.hasAttribute(`data-value-${value}`)
+						? element.getAttribute(`data-value-${value}`)
+						: element.dataset.value;
 				});
 
 				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
@@ -3638,35 +3516,27 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Get values from mass update form that should be updated in all selected shapes.
 			 *
-			 * @return array
+			 * @return {object}
 			 */
 			getValues: function() {
-				var values = $('#massShapeForm').serializeArray(),
-					data = {},
-					i,
-					ln;
-
-				for (i = 0, ln = values.length; i < ln; i++) {
-					if (values[i].name.match(/^mass_/) !== null) {
-						data[values[i].name.substring("mass_".length)] = values[i].value.toString();
-					}
-				}
-
-				return data;
+				return Object.fromEntries($('#massShapeForm').serializeArray()
+					.filter((v) => v.name.startsWith('mass_'))
+					.map((v) => [v.name.slice(5), v.value.toString()]));
 			}
 		};
 
 		/**
 		 * Form for editing links.
 		 *
-		 * @param {object} formContainer jQuesry object
+		 * @param {object} formContainer jQuery object.
 		 * @param {object} sysmap
 		 */
 		function LinkForm(formContainer, sysmap) {
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
 			this.triggerids = {};
-			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
+			this.domNode = $(new Template(document.getElementById('linkFormTpl').innerHTML).evaluate())
+				.appendTo(formContainer);
 
 			this.domNode.find('.color-picker input').colorpicker();
 		}
@@ -3677,7 +3547,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			show: function() {
 				this.domNode.show();
-				$('.element-edit-control').prop('disabled', true);
+				document.querySelectorAll('.element-edit-control').forEach((element) => element.disabled = true);
 			},
 
 			/**
@@ -3685,44 +3555,35 @@ ZABBIX.apps.map = (function($) {
 			 */
 			hide: function() {
 				$('#linkForm').hide();
-				$('.element-edit-control').prop('disabled', false);
+				document.querySelectorAll('.element-edit-control').forEach((element) =>
+					element.removeAttribute('disabled')
+				);
 			},
 
 			/**
 			 * Get form values for link fields.
 			 */
 			getValues: function() {
-				var values = $('#linkForm').serializeArray(),
-					data = {
-						linktriggers: {}
-					},
-					i,
-					ln,
-					linkTriggerPattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
-					linkTrigger;
+				const data = {linktriggers: {}},
+					link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/;
 
-				for (i = 0, ln = values.length; i < ln; i++) {
-					linkTrigger = linkTriggerPattern.exec(values[i].name);
+				$('#linkForm').serializeArray().forEach(({name, value}) => {
+					const link_trigger = link_trigger_pattern.exec(name);
 
-					if (linkTrigger !== null) {
-						if (linkTrigger[2] == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
-						}
+					value = value.toString();
 
-						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
-							data.linktriggers[linkTrigger[1]] = {};
-						}
+					if ((name === 'color' || link_trigger?.[2] === 'color') && !isColorHex(`#${value}`)) {
+						throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), value);
+					}
 
-						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
+					if (link_trigger) {
+						data.linktriggers[link_trigger[1]] ??= {};
+						data.linktriggers[link_trigger[1]][link_trigger[2]] = value;
 					}
 					else {
-						if (values[i].name == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
-						}
-
-						data[values[i].name] = values[i].value.toString();
+						data[name] = value;
 					}
-				}
+				});
 
 				return data;
 			},
@@ -3733,101 +3594,75 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} link
 			 */
 			setValues: function(link) {
-				var selement1,
-					tmp,
-					selementid,
-					selement,
-					elementName,
-					optgroups = {},
-					optgroupType,
-					optgroupLabel,
-					optgroup,
-					i,
-					ln;
-
-				/*
-				 * If only one element is selected, make sure that element1 is equal to the selected element and
-				 * element2 - to the connected.
-				 */
-				if (this.sysmap.selection.count.selements === 1 && this.sysmap.selection.count.shapes === 0) {
-					// get currently selected element
-					for (selementid in this.sysmap.selection.selements) {
-						selement1 = this.sysmap.selements[selementid];
-					}
+				// If only one element is selected and no shapes, swap link IDs if needed.
+				if (this.sysmap.selection.count.selements == 1 && this.sysmap.selection.count.shapes == 0) {
+					const selement1 = this.sysmap.selements[Object.keys(this.sysmap.selection.selements)[0]];
 
 					if (selement1.id !== link.selementid1) {
-						tmp = link.selementid1;
-						link.selementid1 = selement1.id;
-						link.selementid2 = tmp;
+						[link.selementid1, link.selementid2] = [selement1.id, link.selementid1];
 					}
 				}
 
-				// populate list of elements to connect with
 				const connect_to_select = document.createElement('z-select');
+
 				connect_to_select._button.id = 'label-selementid2';
 				connect_to_select.id = 'selementid2';
 				connect_to_select.name = 'selementid2';
 
-				// sort by type
-				for (selementid in this.sysmap.selements) {
-					selement = this.sysmap.selements[selementid];
+				// Sort by type.
+				const optgroups = {};
 
-					if (selement.id == link.selementid1) {
-						continue;
+				Object.values(this.sysmap.selements).forEach((selement) => {
+				if (selement.id === link.selementid1) {
+						return;
 					}
 
-					if (optgroups[selement.data.elementtype] === void(0)) {
-						optgroups[selement.data.elementtype] = [];
+					const type = selement.data.elementtype;
+
+					(optgroups[type] = optgroups[type] || []).push(selement);
+				});
+
+				Object.keys(optgroups).forEach((type) => {
+					let label;
+
+					switch (+type) {
+						case SVGMapElement.TYPE_HOST:
+							label = t('S_HOST');
+							break;
+
+						case SVGMapElement.TYPE_MAP:
+							label = t('S_MAP');
+							break;
+
+						case SVGMapElement.TYPE_TRIGGER:
+							label = t('S_TRIGGER');
+							break;
+
+						case SVGMapElement.TYPE_HOST_GROUP:
+							label = t('S_HOST_GROUP');
+							break;
+
+						case SVGMapElement.TYPE_IMAGE:
+							label = t('S_IMAGE');
+							break;
 					}
 
-					optgroups[selement.data.elementtype].push(selement);
-				}
-
-				for (optgroupType in optgroups) {
-					switch (optgroupType) {
-						case '0':
-							optgroupLabel = t('S_HOST');
-							break;
-
-						case '1':
-							optgroupLabel = t('S_MAP');
-							break;
-
-						case '2':
-							optgroupLabel = t('S_TRIGGER');
-							break;
-
-						case '3':
-							optgroupLabel = t('S_HOST_GROUP');
-							break;
-
-						case '4':
-							optgroupLabel = t('S_IMAGE');
-							break;
-					}
-
-					optgroup = {label: optgroupLabel, options: []};
-
-					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
-						optgroup.options.push({
-							value: optgroups[optgroupType][i].id,
-							label: optgroups[optgroupType][i].getName()
-						});
-					}
+					const optgroup = {
+						label,
+						options: optgroups[type].map((element) => ({value: element.id, label: element.getName()}))
+					};
 
 					connect_to_select.addOptionGroup(optgroup);
-				}
+				});
 
 				$('#selementid2').replaceWith(connect_to_select);
 
-				// set values for form elements
-				for (elementName in link) {
-					$('[name=' + elementName + ']', this.domNode).val(link[elementName]);
-				}
+				// Set values for form elements.
+				Object.keys(link).forEach((name) => $(`[name=${name}]`, this.domNode).val(link[name]));
 
-				// clear triggers
+				// Clear triggers.
 				this.triggerids = {};
-				$('#linkTriggerscontainer tbody tr').remove();
+				document.querySelectorAll('#linkTriggerscontainer tbody tr').forEach((tr) => tr.remove());
 				this.addLinkTriggers(link.linktriggers);
 			},
 
@@ -3837,18 +3672,16 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} triggers
 			 */
 			addLinkTriggers: function(triggers) {
-				var tpl = new Template($('#linkTriggerRow').html()),
-					linkTrigger,
-					table = $('#linkTriggerscontainer tbody');
+				const tpl = new Template(document.getElementById('linkTriggerRow').innerHTML),
+					$table = $('#linkTriggerscontainer tbody');
 
-				for (linkTrigger in triggers) {
-					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
-					$(tpl.evaluate(triggers[linkTrigger])).appendTo(table);
-					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype')
-						.val(triggers[linkTrigger].drawtype);
-				}
+				Object.values(triggers).forEach((trigger) => {
+					this.triggerids[trigger.triggerid] = true;
+					$(tpl.evaluate(trigger)).appendTo($table);
+					$(`#linktrigger_${trigger.linktriggerid}_drawtype`).val(trigger.drawtype);
+				});
 
-				table.find('.color-picker input').colorpicker();
+				$table.find('.color-picker input').colorpicker();
 				$('.color-picker input', this.domNode).change();
 			},
 
@@ -3858,55 +3691,44 @@ ZABBIX.apps.map = (function($) {
 			 * @param {object} triggers
 			 */
 			addNewTriggers: function(triggers) {
-				var tpl = new Template($('#linkTriggerRow').html()),
-					linkTrigger = {
-						color: 'DD0000'
-					},
-					linktriggerid,
-					i,
-					ln,
-					table = $('#linkTriggerscontainer tbody');
+				const tpl = new Template(document.getElementById('linkTriggerRow').innerHTML),
+					linkTrigger = {color: 'DD0000'},
+					$table = $('#linkTriggerscontainer tbody');
 
-				for (i = 0, ln = triggers.length; i < ln; i++) {
-					if (typeof this.triggerids[triggers[i].triggerid] !== 'undefined') {
+				for (let i = 0, ln = triggers.length; i < ln; i++) {
+					if (this.triggerids[triggers[i].triggerid] !== undefined) {
 						continue;
 					}
 
-					linktriggerid = getUniqueId();
+					const linktriggerid = getUniqueId();
 
-					// store linktriggerid to generate every time unique one
+					// Store linktriggerid to generate every time unique one.
 					this.sysmap.allLinkTriggerIds[linktriggerid] = true;
 
-					// store triggerid to forbid selecting same trigger twice
+					// Store triggerid to forbid selecting same trigger twice.
 					this.triggerids[triggers[i].triggerid] = linktriggerid;
 					linkTrigger.linktriggerid = linktriggerid;
 					linkTrigger.desc_exp = triggers[i].description;
 					linkTrigger.triggerid = triggers[i].triggerid;
-					$(tpl.evaluate(linkTrigger)).appendTo(table);
+
+					$(tpl.evaluate(linkTrigger)).appendTo($table);
 				}
 
-				table.find('.color-picker input').colorpicker();
+				$table.find('.color-picker input').colorpicker();
 				$('.color-picker input', this.domNode).change();
 			},
 
 			/**
 			 * Updates links list for element.
 			 *
-			 * @param {string} selementIds
+			 * @param {string} selementids
 			 */
-			updateList: function(selementIds) {
-				var links = this.sysmap.getLinksBySelementIds(selementIds),
-					linkTable,
-					rowTpl,
-					list,
-					i, j,
-					selement,
-					tmp,
-					ln,
-					link,
-					linktriggers,
-					fromElementName,
-					toElementName;
+			updateList: function(selementids) {
+				const links = this.sysmap.getLinksBySelementIds(selementids),
+					list = [];
+
+				let	$link_table,
+					row_tpl;
 
 				$('.element-links').hide();
 				$('.element-links tbody').empty();
@@ -3914,103 +3736,61 @@ ZABBIX.apps.map = (function($) {
 				if (links.length) {
 					$('#mapLinksContainer').show();
 
-					if (objectSize(selementIds) > 1) {
-						rowTpl = '#massElementLinkTableRowTpl';
-						linkTable = $('#mass-element-links');
+					if (objectSize(selementids) > 1) {
+						row_tpl = 'massElementLinkTableRowTpl';
+						$link_table = $('#mass-element-links');
 					}
 					else {
-						rowTpl = '#elementLinkTableRowTpl';
-						linkTable = $('#element-links');
+						row_tpl = 'elementLinkTableRowTpl';
+						$link_table = $('#element-links');
 					}
 
-					rowTpl = new Template($(rowTpl).html());
+					row_tpl = new Template(document.getElementById(row_tpl).innerHTML);
 
-					list = [];
-					for (i = 0, ln = links.length; i < ln; i++) {
-						link = this.sysmap.links[links[i]].data;
+					links.forEach((linkid) => {
+						const link = this.sysmap.links[linkid].data;
 
 						/*
 						 * If one element selected and it's not link.selementid1, we need to swap link.selementid1
 						 * and link.selementid2 in order that sorting works correctly.
 						 */
-						if (objectSize(selementIds) == 1 && !selementIds[link.selementid1]) {
-							// Get currently selected element.
-							for (var selementId in this.sysmap.selection.selements) {
-								selement = this.sysmap.selements[selementId];
-							}
+						if (objectSize(selementids) == 1 && !selementids[link.selementid1]) {
+							const selected = this.sysmap.selements[Object.keys(this.sysmap.selection.selements)[0]];
 
-							if (selement.id !== link.selementid1) {
-								tmp = link.selementid1;
-								link.selementid1 = selement.id;
-								link.selementid2 = tmp;
+							if (selected.id !== link.selementid1) {
+								[link.selementid1, link.selementid2] = [selected.id, link.selementid1];
 							}
 						}
 
-						linktriggers = [];
+						const linktriggers = Object.values(link.linktriggers).map((trigger) => trigger.desc_exp),
+							fromElementName = this.sysmap.selements[link.selementid1].getName(),
+							toElementName = this.sysmap.selements[link.selementid2].getName();
 
-						for (var linktrigger in link.linktriggers) {
-							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
-						}
-
-						fromElementName = this.sysmap.selements[link.selementid1].getName();
-						toElementName = this.sysmap.selements[link.selementid2].getName();
-
-						list.push({
-							fromElementName: fromElementName,
-							toElementName: toElementName,
-							linkid: link.linkid,
-							linktriggers: linktriggers
-						});
-					}
-
-					// Sort by "from" element and then by "to" element.
-					list.sort(function(a, b) {
-						var fromElementA = a.fromElementName.toLowerCase(),
-							fromElementB = b.fromElementName.toLowerCase(),
-							toElementA = a.toElementName.toLowerCase(),
-							toElementB = b.toElementName.toLowerCase(),
-							linkIdA = a.linkid,
-							linkIdB = b.linkid;
-
-						if (fromElementA < fromElementB) {
-							return -1;
-						}
-						else if (fromElementA > fromElementB) {
-							return 1;
-						}
-
-						if (toElementA < toElementB) {
-							return -1;
-						}
-						else if (toElementA > toElementB) {
-							return 1;
-						}
-
-						if (linkIdA < linkIdB) {
-							return -1;
-						}
-						else if (linkIdA > linkIdB) {
-							return 1;
-						}
-
-						return 0;
+						list.push({fromElementName, toElementName, linkid: link.linkid, linktriggers});
 					});
 
-					for (i = 0, ln = list.length; i < ln; i++) {
-						var row = $(rowTpl.evaluate(list[i])),
+					// Sort by "From" element, then by "To" element and then by "linkid".
+					list.sort((a, b) => a.fromElementName.toLowerCase().localeCompare(b.fromElementName.toLowerCase())
+							|| a.toElementName.toLowerCase().localeCompare(b.toElementName.toLowerCase())
+							|| a.linkid.localeCompare(b.linkid)
+					);
+
+					list.forEach((item) => {
+						const row = $(row_tpl.evaluate(item)),
 							row_urls = $('.element-urls', row);
 
-						for (j = 0; j < list[i].linktriggers.length; j++) {
-							if (j != 0) {
+						item.linktriggers.forEach((trigger, index) => {
+							if (index != 0) {
 								row_urls.append($('<br>'));
 							}
-							row_urls.append($('<span>').text(list[i].linktriggers[j]));
-						}
 
-						row.appendTo(linkTable.find('tbody'));
-					}
+							row_urls.append($('<span>').text(trigger));
+						});
 
-					linkTable.closest('.element-links').show();
+						row.appendTo($link_table.find('tbody'));
+					});
+
+					$link_table.closest('.element-links').show();
 				}
 				else {
 					$('#mapLinksContainer').hide();
@@ -4018,36 +3798,36 @@ ZABBIX.apps.map = (function($) {
 			}
 		};
 
-		var sysmap = new CMap(containerId, mapData);
+		const sysmap = new CMap(containerid, mapData);
 
-		Shape.prototype.bind('afterMove', function(event, element) {
-			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0
-					&& sysmap.selection.shapes[element.id] !== void(0)) {
-				$('#shapeX').val(element.data.x);
-				$('#shapeY').val(element.data.y);
+		Shape.prototype.bind('afterMove', function(e, element) {
+			if (sysmap.selection.count.shapes == 1 && sysmap.selection.count.selements == 0
+					&& sysmap.selection.shapes[element.id] !== undefined) {
+				document.getElementById('shapeX').value = element.data.x;
+				document.getElementById('shapeY').value = element.data.y;
 
-				if (typeof element.data.width !== 'undefined') {
-					$('#shapeForm input[name=width]').val(element.data.width);
+				if (element.data.width !== undefined) {
+					document.querySelector('#shapeForm input[name=width]').value = element.data.width;
 				}
-				if (typeof element.data.height !== 'undefined') {
-					$('#shapeForm input[name=height]').val(element.data.height);
+				if (element.data.height !== undefined) {
+					document.querySelector('#shapeForm input[name=height]').value = element.data.height;
 				}
 			}
 
 			sysmap.updateImage();
 		});
 
-		Selement.prototype.bind('afterMove', function(event, element) {
-			if (sysmap.selection.count.selements === 1 && sysmap.selection.count.shapes === 0
-					&& sysmap.selection.selements[element.id] !== void(0)) {
-				$('#x').val(element.data.x);
-				$('#y').val(element.data.y);
+		Selement.prototype.bind('afterMove', function(e, element) {
+			if (sysmap.selection.count.selements == 1 && sysmap.selection.count.shapes == 0
+					&& sysmap.selection.selements[element.id] !== undefined) {
+				document.getElementById('x').value = element.data.x;
+				document.getElementById('y').value = element.data.y;
 
-				if (typeof element.data.width !== 'undefined') {
-					$('#areaSizeWidth').val(element.data.width);
+				if (element.data.width !== undefined) {
+					document.getElementById('areaSizeWidth').value = element.data.width;
 				}
-				if (typeof element.data.height !== 'undefined') {
-					$('#areaSizeHeight').val(element.data.height);
+				if (element.data.height !== undefined) {
+					document.getElementById('areaSizeHeight').value = element.data.height;
 				}
 			}
 
@@ -4061,12 +3841,12 @@ ZABBIX.apps.map = (function($) {
 
 	return {
 		object: null,
-		run: function(containerId, mapData) {
+		run: function(containerid, mapData) {
 			if (this.object !== null) {
 				throw new Error('Map has already been run.');
 			}
 
-			this.object = createMap(containerId, mapData);
+			this.object = createMap(containerid, mapData);
 		}
 	};
 }(jQuery));

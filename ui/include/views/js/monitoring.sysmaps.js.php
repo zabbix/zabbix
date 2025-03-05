@@ -413,7 +413,8 @@ function createFontSelect(string $name): CSelect {
 							_('Type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CSelect('border_type'))
-								->addOptions(CSelect::createOptionsFromArray($shape_border_types)),
+								->addOptions(CSelect::createOptionsFromArray($shape_border_types))
+								->setId('border_type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
