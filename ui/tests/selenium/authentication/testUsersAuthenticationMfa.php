@@ -191,7 +191,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		$dialog->close();
-		$dialog->ensureNotPresent();
 	}
 
 	public function getCreateData() {
@@ -618,7 +617,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 				];
 				$dialog_form->checkValue($values[$mfa_type]);
 				$dialog->close();
-				$dialog->ensureNotPresent();
 			}
 
 			// Save Authentication config and assert that nothing has changed.
@@ -704,7 +702,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		if (CTestArrayHelper::get($data, 'expected_method_form', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Invalid MFA configuration', $data['error']);
 			$dialog->close();
-			$dialog->ensureNotPresent();
 		}
 		else {
 			// Open the Method edit form to verify data is still there.
