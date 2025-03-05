@@ -45,7 +45,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Assert subtitle.
 		$subtitle = 'Please scan and get your verification code displayed in your authenticator app.';
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($subtitle).']')
-			->one()->isVisible()
+				->one()->isVisible()
 		);
 
 		// Assert the QR code and get the secret.
@@ -264,8 +264,8 @@ class testFormTotpEnroll extends testFormTotp {
 		 * &algorithm={algo}&digits={code_length}&period=30
 		 */
 		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.'\?secret=(['.
-				CMfaTotpHelper::VALID_BASE32_CHARS.']{32})&issuer='.preg_quote($method_name).'&algorithm='.
-				self::$algo_ui_map[$algorithm].'&digits='.$code_length.'&period=30$@';
+			CMfaTotpHelper::VALID_BASE32_CHARS.']{32})&issuer='.preg_quote($method_name).'&algorithm='.
+			self::$algo_ui_map[$algorithm].'&digits='.$code_length.'&period=30$@';
 
 		$qr_title = urldecode($qr_code->getAttribute('title'));
 		$this->assertEquals(1, preg_match($regex, $qr_title, $matches),
@@ -300,14 +300,14 @@ class testFormTotpEnroll extends testFormTotp {
 	 */
 	protected function assertEnrollDescription($container, $algorithm, $secret) {
 		$description = 'Unable to scan? You can use '.self::$algo_ui_map[$algorithm].
-				' secret key to manually configure your authenticator app:';
+			' secret key to manually configure your authenticator app:';
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).']')
-			->one()->isVisible()
+				->one()->isVisible()
 		);
 
 		// Assert that the secret is visible.
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')
-			->one()->isVisible()
+				->one()->isVisible()
 		);
 	}
 }
