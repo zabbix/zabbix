@@ -562,9 +562,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		// Open the create/edit form.
 		$update = CTestArrayHelper::get($data, 'update', false);
 		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
-		$update_action = ($mfa_type === 'TOTP') ? 'link:Pre-existing TOTP' : 'link:Pre-existing Duo';
-		$create_update_action = $update ? $update_action : 'button:Add';
-		$mfa_form->getFieldContainer('Methods')->query($create_update_action)->waitUntilClickable()->one()->click();
+		$update_link = ($mfa_type === 'TOTP') ? 'link:Pre-existing TOTP' : 'link:Pre-existing Duo';
+		$create_update_element = $update ? $update_link : 'button:Add';
+		$mfa_form->getFieldContainer('Methods')->query($create_update_element)->waitUntilClickable()->one()->click();
 
 		// Fill in data.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -596,7 +596,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 			// In the update scenario reopen the create/edit form and check that the values have not been updated.
 			if ($update) {
-				$mfa_form->getFieldContainer('Methods')->query($create_update_action)->waitUntilClickable()
+				$mfa_form->getFieldContainer('Methods')->query($create_update_element)->waitUntilClickable()
 						->one()->click();
 				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$dialog_form->invalidate();
@@ -670,8 +670,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		// Open the correct MFA method form.
 		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
-		$update_action = ($mfa_type === 'TOTP') ? 'link:TOTP for editing' : 'link:Duo for editing';
-		$action = $update ? $update_action : 'button:Add';
+		$update_link = ($mfa_type === 'TOTP') ? 'link:TOTP for editing' : 'link:Duo for editing';
+		$action = $update ? $update_link : 'button:Add';
 		$mfa_form->getFieldContainer('Methods')->query($action)->waitUntilClickable()->one()->click();
 
 		// Fill in data.
