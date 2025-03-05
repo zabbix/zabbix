@@ -387,7 +387,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => 'text',
 						// Storage of secrets.
 						'Vault provider' => 'CyberArk Vault',
-						'Resolve secret vault macros by' => 'Zabbix server and proxy',
+						'Resolve secret vault macros by' => 'Zabbix server and proxy'
 					],
 					'details' => [
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
