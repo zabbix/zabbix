@@ -421,7 +421,15 @@ class CUser extends CApiService {
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []];
+
+		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::canEditMedia($users);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['username']], 'fields' => [
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
@@ -471,6 +479,36 @@ class CUser extends CApiService {
 		self::checkMediaRecipients($users, $db_mediatypes);
 	}
 
+	private static function canEditMedia(array $users, bool $is_update = false): void {
+		$can_edit_own_media = self::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA);
+		$can_edit_user_media = self::checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA);
+
+		if ($can_edit_own_media && $can_edit_user_media) {
+			return;
+		}
+
+		foreach ($users as $i => $user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
+			}
+
+			$path = '/'.($i + 1).'/medias';
+
+			if ($is_update && bccomp($user['userid'], self::$userData['userid']) == 0) {
+				if (!$can_edit_own_media) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $path, _('no permissions to create and edit own media'))
+					);
+				}
+			}
+			elseif (!$can_edit_user_media) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('no permissions to create and edit user media'))
+				);
+			}
+		}
+	}
+
 	/**
 	 * @param array $users
 	 *
@@ -494,8 +532,18 @@ class CUser extends CApiService {
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['username']], 'fields' => [
-			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['userid']], 'fields' => [
+			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::canEditMedia($users, true);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['username']], 'fields' => [
+			'userid' =>			['type' => API_ANY],
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
