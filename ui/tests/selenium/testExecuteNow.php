@@ -441,6 +441,9 @@ class testExecuteNow extends CWebTest {
 	 * Check "Execute now" button on Item page.
 	 *
 	 * @dataProvider getItemPageData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testExecuteNow_ItemPage($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');

@@ -596,14 +596,15 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		int itemids_num, int *inserts_num, int *upserts_num, unsigned char value_type, const char *table_name,
 		int clock)
 {
-	int		i, num, upsert = 0;
+	int		i, num;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_uint64_t	itemid;
 	ZBX_DC_TREND	*trend;
 	size_t		sql_offset;
-
 #ifdef HAVE_POSTGRESQL
+	int		upsert = 0;
+
 	if (0 != zbx_tsdb_get_version())
 		upsert = 1;
 #endif
@@ -616,10 +617,14 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
+#ifdef HAVE_POSTGRESQL
 	if (1 == upsert)
 		result = zbx_db_select("%s", sql);
 	else
 		result = zbx_db_select("%s order by itemid,clock", sql);
+#else
+	result = zbx_db_select("%s order by itemid,clock", sql);
+#endif
 
 	sql_offset = 0;
 
@@ -653,12 +658,15 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		else
 			dc_trends_update_uint(trend, row, num);
 
+#ifdef HAVE_POSTGRESQL
 		if (1 == upsert)
 		{
 			(*upserts_num)++;
 			continue;
 		}
-
+#else
+		ZBX_UNUSED(upserts_num);
+#endif
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
 			db_trends_update_float(trend, &sql_offset);
 		else
@@ -1850,7 +1858,6 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
  ******************************************************************************/
 static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
-	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
 	zbx_binary_heap_t	tmp_history_queue;
@@ -1891,15 +1898,16 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int co
 
 	if (0 != zbx_hc_queue_get_size())
 	{
+		zbx_history_sync_stats_t	stats = {0};
+
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
 		do
 		{
-			sync_history_cache_cb(&values_num, &triggers_num, events_cbs, NULL,
-					config_history_storage_pipelines, &more);
+			sync_history_cache_cb(events_cbs, NULL, config_history_storage_pipelines, &stats);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-					(double)values_num / (cache->history_num + values_num) * 100);
+					(double)stats.values_num / (cache->history_num + stats.values_num) * 100);
 		}
 		while (0 != zbx_hc_queue_get_size());
 
@@ -1977,14 +1985,11 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                                                                     *
  ***************************************************************************************/
 void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, int *values_num, int *triggers_num, int *more)
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
-	*values_num = 0;
-	*triggers_num = 0;
-
-	sync_history_cache_cb(values_num, triggers_num, events_cbs, rtc, config_history_storage_pipelines, more);
+	sync_history_cache_cb(events_cbs, rtc, config_history_storage_pipelines, stats);
 }
 
 /******************************************************************************
