@@ -360,6 +360,35 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 	}
 
+	/**
+	 * Deletes all MFA methods with API.
+	 */
+	public function prepareSaveEmpty() {
+		// Disable MFA before deleting all methods.
+		CDataHelper::call('authentication.update', ["mfa_status" => MFA_DISABLED]);
+
+		// Get all MFA methods for deletion.
+		$methods = CDataHelper::call('mfa.get', []);
+
+		// Delete all MFA methods.
+		$mfaids = array_column($methods, 'mfaid');
+		CDataHelper::call('mfa.delete', $mfaids);
+	}
+
+	/**
+	 * Try to save the MFA configuration when MFA is enabled, but no methods are defined.
+	 *
+	 * @backup mfa
+	 *
+	 * @onBefore prepareSaveEmpty
+	 */
+	public function testUsersAuthenticationMfa_SaveEmpty() {
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->fill(['Enable multi-factor authentication' => true]);
+		$mfa_form->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Default MFA method must be specified.');
+	}
+
 	public function getUpdateData() {
 		$update_data = [
 			'TOTP name whitespace' => [
