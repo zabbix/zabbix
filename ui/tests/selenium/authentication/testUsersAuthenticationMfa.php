@@ -474,7 +474,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$sql_total = 'SELECT NULL FROM mfa';
 		$method_count_before = CDBHelper::getCount($sql_total);
 
-		$sql_specific = "SELECT NULL FROM mfa WHERE name in ('TOTP for deletion', 'Duo for deletion')";
+		$sql_specific = "SELECT NULL FROM mfa WHERE name IN ('TOTP for deletion', 'Duo for deletion')";
 		$this->assertEquals(2, CDBHelper::getCount($sql_specific));
 
 		$mfa_form = $this->openMfaForm();
