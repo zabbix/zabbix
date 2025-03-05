@@ -397,7 +397,7 @@ if (count($data['steps']) > 0) {
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result'),
 			(new CCol(
-				(new CButton('copy_button'))
+				(new CButton('copy_button-'.$i))
 					->addClass(ZBX_ICON_COPY)
 					->addClass(ZBX_STYLE_BTN_GREY_ICON)
 					->addClass('js-copy-button')
