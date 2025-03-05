@@ -668,8 +668,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form = $this->openMfaForm();
 
 		// Open the correct MFA method form.
-		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
-		$update_link = ($mfa_type === 'TOTP') ? 'link:TOTP for editing' : 'link:Duo for editing';
+		$update_link = (CTestArrayHelper::get($data, 'fields.Type', 'TOTP') === 'TOTP')
+			? 'link:TOTP for editing'
+			: 'link:Duo for editing';
 		$action = $update ? $update_link : 'button:Add';
 		$mfa_form->getFieldContainer('Methods')->query($action)->waitUntilClickable()->one()->click();
 
