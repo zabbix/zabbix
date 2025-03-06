@@ -1435,6 +1435,9 @@ static int	zbx_check_db(void)
 	struct zbx_json	db_version_json;
 	int		ret;
 
+const char *z = 	zbx_strdup(NULL, "alpha2");
+int * q = malloc(100000 * sizeof(int));
+
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	ret = zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type);
 
