@@ -147,6 +147,7 @@ func ParseServerActive() ([][]string, error) {
 	return addrs, nil
 }
 
+//nolint:gocognit,gocyclo,cyclop,maintidx
 func (c *Connector) refreshActiveChecks() bool {
 	var err error
 
