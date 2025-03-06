@@ -111,13 +111,6 @@ function SVGMap(options) {
 	['background', 'grid', 'shapes', 'elements', 'marks']
 		.forEach((attribute, index) => this.layers[attribute] = layers[index]);
 
-	this.layers.background.add('rect', {
-		x: 0,
-		y: 0,
-		width: this.options.canvas.width,
-		height: this.options.canvas.height
-	});
-
 	// Render goes first as it is needed for getBBox to work.
 	if (this.options.container) {
 		this.render(this.options.container);
@@ -906,7 +899,7 @@ SVGMapElement.prototype.updateLabel = function() {
 		vertical: 'top'
 	};
 
-	switch (+this.options.label_location) {
+	switch (this.options.label_location) {
 		case SVGMapElement.LABEL_POSITION_BOTTOM:
 			y = this.y + this.height + this.map.canvas.textPadding;
 			anchor.horizontal = 'center';
@@ -930,7 +923,7 @@ SVGMapElement.prototype.updateLabel = function() {
 			break;
 	}
 
-	if (this.options.label !== '') {
+	if (this.options.label !== '' && +this.options.label_type != SVGMap.LABEL_TYPE_NOTHING) {
 		const element = this.map.layers.elements.add('textarea', {
 			x,
 			y,
