@@ -122,6 +122,7 @@ zbx_lld_hgsets_test_SOURCES = \
 	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld_macro.c \
 	../../../src/zabbix_server/lld/lld_entry.c \
+	../../../src/zabbix_server/lld/lld_rule.c \
 	../../../src/zabbix_server/lld/lld.c \
 	zbx_lld_hgsets_test.c \
 	../../zbxmockexit.c \
@@ -147,6 +148,7 @@ lld_entry_create_SOURCES = \
 	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld_macro.c \
 	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld_rule.c \
 	../../../src/zabbix_server/lld/lld.c \
 	../../zbxmockexit.c \
 	../../zbxmockdb.c \
@@ -171,6 +173,7 @@ lld_compare_entries_SOURCES = \
 	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld_macro.c \
 	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld_rule.c \
 	../../../src/zabbix_server/lld/lld.c \
 	../../zbxmockexit.c \
 	../../zbxmockdb.c \
@@ -194,6 +197,7 @@ zbx_substitute_lld_macros_SOURCES = \
 	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld_macro.c \
 	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld_rule.c \
 	../../../src/zabbix_server/lld/lld.c \
 	zbx_substitute_lld_macros.c \
 	../../zbxmockexit.c \
@@ -212,12 +216,22 @@ zbx_substitute_lld_macros_CFLAGS = \
 
 
 lld_rule_merge_exported_macros_SOURCES = \
+	../../../src/zabbix_server/lld/lld_common.c \
+	../../../src/zabbix_server/lld/lld_graph.c \
+	../../../src/zabbix_server/lld/lld_audit.c \
+	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_trigger.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld_entry.c \
+	../../../src/zabbix_server/lld/lld.c \
 	lld_rule_merge_exported_macros.c 
 
 lld_rule_merge_exported_macros_CFLAGS = \
 	-I@top_srcdir@ \
 	-I@top_srcdir@/tests \
-	$(COMMON_COMPILER_FLAGS)
+	$(COMMON_COMPILER_FLAGS) \
+	@LIBXML2_CFLAGS@
 
 lld_rule_merge_exported_macros_LDADD = $(LLD_LIBS) @SERVER_LIBS@ $(TEST_LIBS) $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS) 
 

@@ -1,9 +1,11 @@
 ---
 test case: Test single match
 in:
-  entry: 
-  - macro: 'one'
-    value: '1'
+  entry:
+    macros:
+    - macro: 'one'
+      value: '1'
+    exported_macros: []
   db: 
   - lld_macroid: 1
     name: 'one'
@@ -13,7 +15,9 @@ out:
 ---
 test case: Test empty data
 in:
-  entry: []
+  entry: 
+    macros: []
+    exported_macros: []
   db: []
 out: 
   macros: []
@@ -21,8 +25,10 @@ out:
 test case: Test one macro added to empty list
 in:
   entry:
-  - macro: 'one'
-    value: '1'
+    macros:
+    - macro: 'one'
+      value: '1'
+    exported_macros: []
   db: []
 out: 
   macros:
@@ -33,10 +39,12 @@ out:
 test case: Test two macros added to empty list
 in:
   entry:
-  - macro: 'one'
-    value: '1'
-  - macro: 'two'
-    value: '2'
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'two'
+      value: '2'
+    exported_macros: []
   db: []
 out: 
   macros:
@@ -49,7 +57,9 @@ out:
 ---
 test case: Test only macro removed
 in:
-  entry: []
+  entry: 
+    macros: []
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -60,7 +70,9 @@ out:
 ---
 test case: Test all macros removed
 in:
-  entry: []
+  entry: 
+    macros: []
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -80,12 +92,14 @@ out:
 test case: Test first half matching macro updated
 in:
   entry:
-  - macro: 'one'
-    value: '11'
-  - macro: 'three'
-    value: '3'
-  - macro: 'two'
-    value: '2'
+    macros:
+    - macro: 'one'
+      value: '11'
+    - macro: 'three'
+      value: '3'
+    - macro: 'two'
+      value: '2'
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -105,12 +119,14 @@ out:
 test case: Test first macro updated
 in:
   entry:
-  - macro: 'one-four'
-    value: '4'
-  - macro: 'three'
-    value: '3'
-  - macro: 'two'
-    value: '2'
+    macros:
+    - macro: 'one-four'
+      value: '4'
+    - macro: 'three'
+      value: '3'
+    - macro: 'two'
+      value: '2'
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -130,12 +146,14 @@ out:
 test case: Test middle half matching macro updated
 in:
   entry:
-  - macro: 'one'
-    value: '1'
-  - macro: 'three'
-    value: '33'
-  - macro: 'two'
-    value: '2'
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'three'
+      value: '33'
+    - macro: 'two'
+      value: '2'
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -155,12 +173,14 @@ out:
 test case: Test middle macro updated
 in:
   entry:
-  - macro: 'one'
-    value: '1'
-  - macro: 'three-four'
-    value: '4'
-  - macro: 'two'
-    value: '2'
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'three-four'
+      value: '4'
+    - macro: 'two'
+      value: '2'
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -180,12 +200,14 @@ out:
 test case: Test last half matching macro updated
 in:
   entry:
-  - macro: 'one'
-    value: '1'
-  - macro: 'three'
-    value: '3'
-  - macro: 'two'
-    value: '22'
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'three'
+      value: '3'
+    - macro: 'two'
+      value: '22'
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -205,12 +227,14 @@ out:
 test case: Test last macro updated
 in:
   entry:
-  - macro: 'one'
-    value: '1'
-  - macro: 'three'
-    value: '3'
-  - macro: 'two-four'
-    value: '4'
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'three'
+      value: '3'
+    - macro: 'two-four'
+      value: '4'
+    exported_macros: []
   db:
   - lld_macroid: 1
     name: 'one'
@@ -226,4 +250,49 @@ out:
   - lld_macroid: 2
     name: 'two-four'
     value: '4'
+---
+test case: Test new exported macros
+in:
+  entry:
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'two'
+      value: '2'
+    exported_macros:
+    - macro: 'three'
+      value: '3'
+  db: []
+out: 
+  macros:
+  - lld_macroid: 0
+    name: 'one'
+    value: '1'
+  - lld_macroid: 0
+    name: 'three'
+    value: '3'
+  - lld_macroid: 0
+    name: 'two'
+    value: '2'
+---
+test case: Test overlapping exported macros
+in:
+  entry:
+    macros:
+    - macro: 'one'
+      value: '1'
+    - macro: 'two'
+      value: '2'
+    exported_macros:
+    - macro: 'one'
+      value: '1111'
+  db: []
+out: 
+  macros:
+  - lld_macroid: 0
+    name: 'one'
+    value: '1'
+  - lld_macroid: 0
+    name: 'two'
+    value: '2'
 ...

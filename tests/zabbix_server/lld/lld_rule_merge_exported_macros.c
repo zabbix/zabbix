@@ -21,9 +21,6 @@
 
 #include "src/zabbix_server/lld/lld_rule.c"
 
-/* re-implement lld_macro vector to cut linking deps */
-ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t)
-
 #define MOCK_INDENT	"                                                                        "
 
 static zbx_vector_lld_ext_macro_t	mock_read_zbx_vector_lld_ext_macro(zbx_mock_handle_t handle);
@@ -218,23 +215,34 @@ static void	mock_dump_zbx_lld_macro(const char *name, zbx_lld_macro_t *v, int in
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_vector_lld_ext_macro_t	in, out;
-	zbx_vector_lld_macro_t		entry;
+	zbx_vector_lld_macro_t		macros, exported_macros;
+	zbx_lld_entry_t			entry;
+	zbx_lld_rule_macros_t		rule_macros;
 
 	ZBX_UNUSED(state);
 
-	entry = mock_read_zbx_vector_lld_macro(zbx_mock_get_parameter_handle("in.entry"));
+	macros = mock_read_zbx_vector_lld_macro(zbx_mock_get_parameter_handle("in.entry.macros"));
+	exported_macros = mock_read_zbx_vector_lld_macro(zbx_mock_get_parameter_handle("in.entry.exported_macros"));
 	in = mock_read_zbx_vector_lld_ext_macro(zbx_mock_get_parameter_handle("in.db"));
 	out = mock_read_zbx_vector_lld_ext_macro(zbx_mock_get_parameter_handle("out.macros"));
 
-	mock_dump_zbx_vector_lld_ext_macro("IN", &in, 0);
-	mock_dump_zbx_vector_lld_macro("ENTRY", &entry, 0);
+	entry.macros = macros;
+	entry.exported_macros = &exported_macros;
 
-	lld_rule_merge_exported_macros(&in, &entry);
+	rule_macros.itemid = 0;
+	rule_macros.macros = in;
 
-	mock_dump_zbx_vector_lld_ext_macro("OUT", &in, 0);
-	mock_assert_eq_zbx_vector_lld_ext_macro("out.macros", &out, &in);
+	mock_dump_zbx_vector_lld_ext_macro("Macros in database", &in, 0);
+	mock_dump_zbx_vector_lld_macro("LLD macros", &macros, 0);
+	mock_dump_zbx_vector_lld_macro("Exported LLD macros", &exported_macros, 0);
 
-	mock_clear_zbx_vector_lld_macro(&entry);
-	mock_clear_zbx_vector_lld_ext_macro(&in);
+	lld_rule_merge_exported_macros(&rule_macros, &entry);
+
+	mock_dump_zbx_vector_lld_ext_macro("Merged macros", &rule_macros.macros, 0);
+	mock_assert_eq_zbx_vector_lld_ext_macro("out.macros", &out, &rule_macros.macros);
+
+	mock_clear_zbx_vector_lld_macro(&macros);
+	mock_clear_zbx_vector_lld_macro(&exported_macros);
+	mock_clear_zbx_vector_lld_ext_macro(&rule_macros.macros);
 	mock_clear_zbx_vector_lld_ext_macro(&out);
 }
