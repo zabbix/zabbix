@@ -229,10 +229,8 @@ button {
 
 .btn-grey-icon {
 	@extend %button;
-	@extend %button-icon-colors;
+	@extend %button-form-colors;
 	@extend %button-disabled;
-
-	background: $form-bg-color;
 
 	&::before {
 		color: $icon-color;
@@ -240,14 +238,6 @@ button {
 
 	&[disabled]::before {
 		color: $btn-icon-disabled-color;
-	}
-
-	&:not(:focus) {
-		border: 1px solid $form-border-color;
-	}
-
-	&:hover {
-		background-color: $btn-form-hover-bg-color;
 	}
 }
 

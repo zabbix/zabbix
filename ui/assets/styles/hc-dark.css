@@ -1255,32 +1255,32 @@ button, .btn {
     background-color: #d3d3d3;
     border-color: #d3d3d3; }
 
-.btn-grey, .btn-debug {
+.btn-grey, .btn-grey-icon, .btn-debug {
   color: #f2f2f2;
   background-color: #383838;
   border-color: #666666; }
-  .btn-grey:hover, .btn-debug:hover {
+  .btn-grey:hover, .btn-grey-icon:hover, .btn-debug:hover {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #666666; }
-  .btn-grey:active, .btn-debug:active, .btn-grey:focus, .btn-debug:focus {
+  .btn-grey:active, .btn-grey-icon:active, .btn-debug:active, .btn-grey:focus, .btn-grey-icon:focus, .btn-debug:focus {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #bbbbbb; }
 
-.btn-icon, .btn-grey-icon, .btn-overlay-close {
+.btn-icon, .btn-overlay-close {
   color: #7d7d7d;
   background: transparent;
   border: none; }
-  .btn-icon:hover, .btn-grey-icon:hover, .btn-overlay-close:hover {
+  .btn-icon:hover, .btn-overlay-close:hover {
     color: #ffffff;
     background: transparent;
     border: none; }
-  .btn-icon:active, .btn-grey-icon:active, .btn-overlay-close:active, .btn-icon:focus, .btn-grey-icon:focus, .btn-overlay-close:focus {
+  .btn-icon:active, .btn-overlay-close:active, .btn-icon:focus, .btn-overlay-close:focus {
     color: #dddddd;
     background: transparent;
     border: none; }
-  [disabled].btn-icon, [disabled].btn-grey-icon, [disabled].btn-overlay-close {
+  [disabled].btn-icon, [disabled].btn-overlay-close {
     color: #555555;
     background-color: transparent; }
 
@@ -1322,16 +1322,10 @@ button {
   .btn-icon.btn-small {
     line-height: 16px; }
 
-.btn-grey-icon {
-  background: #383838; }
-  .btn-grey-icon::before {
-    color: #dddddd; }
-  .btn-grey-icon[disabled]::before {
-    color: #555555; }
-  .btn-grey-icon:not(:focus) {
-    border: 1px solid #666666; }
-  .btn-grey-icon:hover {
-    background-color: #414141; }
+.btn-grey-icon::before {
+  color: #dddddd; }
+.btn-grey-icon[disabled]::before {
+  color: #555555; }
 
 .btn-link {
   box-sizing: content-box;
