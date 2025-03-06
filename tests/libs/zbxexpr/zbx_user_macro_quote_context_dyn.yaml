@@ -13,16 +13,16 @@ in:
 out:
   exp_result: '" "'
 ---
-test case: "Double quotes"
+test case: 'end with \'
 in:
-  context: '"'
+  context: 'macro_name\'
   force_quote: 1
 out:
-  exp_result: '"\""'
+  exp_result: 'macro_name\'
 ---
-test case: 'end with \\'
+test case: 'end with \ and contain }'
 in:
-  context: "macro_name\\"
+  context: 'macro}name\'
   force_quote: 1
 out:
   exp_result: " "
