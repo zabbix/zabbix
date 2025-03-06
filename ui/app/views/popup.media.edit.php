@@ -22,6 +22,7 @@
 $form = (new CForm())
 	->setId('media-form')
 	->setName('media_form')
+	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
 	->addVar('userid', $data['userid'])
 	->addStyle('display: none;')
@@ -140,11 +141,11 @@ $form
 	);
 
 $output = [
-	'header' => $data['mediaid'] !== null ? _('Media') : _('New media'),
+	'header' => $data['is_edit'] ? _('Media') : _('New media'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => $data['mediaid'] !== null ? _('Update') : _('Add'),
+			'title' => $data['is_edit'] ? _('Update') : _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'media_edit_popup.submit();'

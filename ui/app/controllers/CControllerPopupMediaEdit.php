@@ -67,6 +67,7 @@ class CControllerPopupMediaEdit extends CController {
 		CArrayHelper::sort($db_mediatypes, ['name']);
 
 		$data = [
+			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
 			'userid' => $this->getInput('userid'),
 			'mediaid' => $this->hasInput('mediaid') ? $this->getInput('mediaid') : null,
