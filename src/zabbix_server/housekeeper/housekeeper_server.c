@@ -69,7 +69,7 @@ typedef struct
 	int		min_clock;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	unsigned char	*poption_mode;
+	int		*poption_mode;
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
@@ -85,10 +85,10 @@ typedef struct
 	const char	*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	unsigned char	*poption_mode;
+	int		*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	unsigned char	*poption_global;
+	int		*poption_global;
 }
 zbx_hk_cleanup_table_t;
 
@@ -124,10 +124,10 @@ typedef struct
 	const char				*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	unsigned char				*poption_mode;
+	int					*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	unsigned char				*poption_global;
+	int					*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
 	int					*poption;
@@ -151,8 +151,8 @@ static int	tsdb_version = 0;
 
 static int	hk_period;
 
-static unsigned char poption_mode_regular	= ZBX_HK_MODE_REGULAR;
-static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
+static int	poption_mode_regular	= ZBX_HK_MODE_REGULAR;
+static int	poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* global configuration data containing housekeeping configuration */
 static zbx_config_t	cfg;

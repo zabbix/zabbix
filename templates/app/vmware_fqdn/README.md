@@ -124,19 +124,19 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Average read IOPS of the datastore [{#DATASTORE}]|<p>IOPS for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},rps]|
-|Average write IOPS of the datastore [{#DATASTORE}]|<p>IOPS for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},rps]|
-|Average read latency of the datastore [{#DATASTORE}]|<p>Amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]|
-|Free space on datastore [{#DATASTORE}] (percentage)|<p>VMware datastore free space (percentage from the total).</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
-|Total size of datastore [{#DATASTORE}]|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Average write latency of the datastore [{#DATASTORE}]|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]|
+|Average read IOPS of the datastore [{#DATASTORE}]|<p>IOPS for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE.UUID},rps]|
+|Average write IOPS of the datastore [{#DATASTORE}]|<p>IOPS for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE.UUID},rps]|
+|Average read latency of the datastore [{#DATASTORE}]|<p>Amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE.UUID},latency]|
+|Free space on datastore [{#DATASTORE}] (percentage)|<p>VMware datastore free space (percentage from the total).</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE.UUID},pfree]|
+|Total size of datastore [{#DATASTORE}]|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Average write latency of the datastore [{#DATASTORE}]|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE.UUID},latency]|
 
 ### Trigger prototypes for VMware datastore discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware FQDN: [{#DATASTORE}]: Free space is critically low|<p>Datastore free space has fallen below the critical threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}`|High||
-|VMware FQDN: [{#DATASTORE}]: Free space is low|<p>Datastore free space has fallen below the warning threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware FQDN: [{#DATASTORE}]: Free space is critically low</li></ul>|
+|VMware FQDN: [{#DATASTORE}]: Free space is critically low|<p>Datastore free space has fallen below the critical threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE.UUID},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}`|High||
+|VMware FQDN: [{#DATASTORE}]: Free space is low|<p>Datastore free space has fallen below the warning threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE.UUID},pfree])<{$VMWARE.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware FQDN: [{#DATASTORE}]: Free space is critically low</li></ul>|
 
 ### LLD rule VMware hypervisor discovery
 
@@ -228,7 +228,7 @@ Additional resources:
 |Number of packets received on interface [{#IFBACKINGDEVICE}]/[{#IFDESC}]|<p>VMware virtual machine network interface input statistics (packets per second).</p>|Simple check|vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]|
 |Number of bytes transmitted on interface [{#IFBACKINGDEVICE}]/[{#IFDESC}]|<p>VMware virtual machine network interface output statistics (bytes per second).</p>|Simple check|vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]|
 |Number of packets transmitted on interface [{#IFBACKINGDEVICE}]/[{#IFDESC}]|<p>VMware virtual machine network interface output statistics (packets per second).</p>|Simple check|vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]|
-|Network utilization on interface [{#IFBACKINGDEVICE}]/[{#IFDESC}]|<p>VMware virtual machine network utilization (combined transmit and receive rates) during the interval.</p>|Simple check|vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Network utilization on interface [{#IFBACKINGDEVICE}]/[{#IFDESC}]|<p>VMware virtual machine network utilization (combined transmit and receive rates) during the interval.</p>|Simple check|vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]|
 
 ### LLD rule Disk device discovery
 
@@ -253,7 +253,7 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>Discovery of all guest file systems.</p>|Simple check|vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
+|Mounted filesystem discovery|<p>Discovery of all guest file systems.</p>|Simple check|vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Mounted filesystem discovery
 
@@ -399,21 +399,21 @@ To use this template as manually linked to a host:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Average read IOPS of the datastore [{#DATASTORE}]|<p>Average IOPS for a read operation from the datastore.</p>|Simple check|vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},rps]|
-|Average write IOPS of the datastore [{#DATASTORE}]|<p>Average IOPS for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},rps]|
-|Average read latency of the datastore [{#DATASTORE}]|<p>Average amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]|
-|Free space on datastore [{#DATASTORE}] (percentage)|<p>VMware datastore free space (percentage from the total).</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]|
-|Total size of datastore [{#DATASTORE}]|<p>VMware datastore space in bytes.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Average write latency of the datastore [{#DATASTORE}]|<p>Average amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]|
-|Multipath count for datastore [{#DATASTORE}]|<p>Number of available datastore paths.</p>|Simple check|vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]|
+|Average read IOPS of the datastore [{#DATASTORE}]|<p>Average IOPS for a read operation from the datastore.</p>|Simple check|vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},rps]|
+|Average write IOPS of the datastore [{#DATASTORE}]|<p>Average IOPS for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},rps]|
+|Average read latency of the datastore [{#DATASTORE}]|<p>Average amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},latency]|
+|Free space on datastore [{#DATASTORE}] (percentage)|<p>VMware datastore free space (percentage from the total).</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},pfree]|
+|Total size of datastore [{#DATASTORE}]|<p>VMware datastore space in bytes.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Average write latency of the datastore [{#DATASTORE}]|<p>Average amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},latency]|
+|Multipath count for datastore [{#DATASTORE}]|<p>Number of available datastore paths.</p>|Simple check|vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID}]|
 
 ### Trigger prototypes for Datastore discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware Hypervisor: [{#DATASTORE}]: Free space is critically low|<p>Datastore free space has fallen below the critical threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}`|High||
-|VMware Hypervisor: [{#DATASTORE}]: Free space is low|<p>Datastore free space has fallen below the warning threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware Hypervisor: [{#DATASTORE}]: Free space is critically low</li></ul>|
-|VMware Hypervisor: The multipath count has been changed|<p>The number of available datastore paths is less than registered (`{#MULTIPATH.COUNT}`).</p>|`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}`|Average|**Manual close**: Yes|
+|VMware Hypervisor: [{#DATASTORE}]: Free space is critically low|<p>Datastore free space has fallen below the critical threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}`|High||
+|VMware Hypervisor: [{#DATASTORE}]: Free space is low|<p>Datastore free space has fallen below the warning threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID},pfree])<{$VMWARE.HV.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware Hypervisor: [{#DATASTORE}]: Free space is critically low</li></ul>|
+|VMware Hypervisor: The multipath count has been changed|<p>The number of available datastore paths is less than registered (`{#MULTIPATH.COUNT}`).</p>|`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE.UUID}])<{#MULTIPATH.COUNT}`|Average|**Manual close**: Yes|
 
 ### LLD rule Serial number discovery
 

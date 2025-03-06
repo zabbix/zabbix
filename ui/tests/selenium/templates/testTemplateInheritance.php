@@ -106,6 +106,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider dataCreate
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testTemplateInheritance_Create($result, $template, $itemName, $keyName, $errorMsgs) {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$template.'&filter_set=1');
@@ -337,6 +340,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 * Creates a new item prototype on the template and checks that the inherited item prototype matches
 	 * the original.
 	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testTemplateInheritance_CreateItemPrototype() {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');

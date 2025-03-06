@@ -210,6 +210,8 @@ class testFormUserPermissions extends CWebTest {
 	 * Check displayed rules for every standard role on permission page.
 	 *
 	 * @dataProvider getDisplayData
+	 *
+	 * @depends testFormUserPermissions_UpdateRole
 	 */
 	public function testFormUserPermissions_Display($data) {
 		$this->page->login()->open('zabbix.php?action=user.list');

@@ -62,6 +62,7 @@ class TabIndicators {
 		const TRIGGER = document.querySelector('#trigger-form');
 		const TRIGGER_PROTOTYPE = document.querySelector('#trigger-prototype-form');
 		const USER = document.querySelector('#user-form');
+		const USERPROFILE_NOTIFICATION = document.querySelector('#userprofile-notification-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
 		const WEB_SCENARIO = document.querySelector('#webscenario-form');
 
@@ -104,6 +105,8 @@ class TabIndicators {
 				return TRIGGER_PROTOTYPE;
 			case !!USER:
 				return USER;
+			case !!USERPROFILE_NOTIFICATION:
+				return USERPROFILE_NOTIFICATION;
 			case !!USER_GROUP:
 				return USER_GROUP;
 			case !!WEB_SCENARIO:

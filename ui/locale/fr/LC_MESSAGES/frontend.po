@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-01 12:40+0000\n"
+"PO-Revision-Date: 2025-02-21 20:53+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2696,12 +2696,22 @@ msgstr "Impossible de supprimer la méthode d'authentification multi-facteur par
 msgid "Cannot delete default user directory."
 msgstr "Impossible de supprimer l'annuaire des utilisateurs par défaut."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "Impossible de supprimer la vérification de découverte \"%1$s\" de la règle de découverte \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Impossible de supprimer la règle de découverte"
 msgstr[1] "Impossible de supprimer les règles de découverte"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "Impossible de supprimer la règle de découverte \"%1$s\" : %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2727,6 +2737,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "Impossible de supprimer l'hôte"
 msgstr[1] "Impossible de supprimer les hôtes"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "Impossible de supprimer l'hôte \"%1$s\" : %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2739,6 +2754,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "Impossible de supprimer le groupe d'hôtes"
 msgstr[1] "Impossible de supprimer les groupes d'hôtes"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le groupe d'hôtes \"%1$s\" : %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2882,6 +2902,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "Impossible de supprimer le modèle"
 msgstr[1] "Impossible de supprimer les modèles"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le modèle \"%1$s\" : %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2916,6 +2941,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Impossible de supprimer le déclencheur"
 msgstr[1] "Impossible de supprimer les déclencheurs"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le déclencheur \"%1$s\" : %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -3937,6 +3967,11 @@ msgstr "Impossible de mettre à jour \"%1$s\" pour le déclencheur de modèle \"
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Impossible de mettre à jour \"%1$s\" pour le prototype de déclencheur de modèle \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr "Impossible de mettre à jour le paramètre « %1$s » car il est actuellement en lecture seule. Envisagez de mettre à niveau Zabbix pour supprimer cette limitation."
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4433,6 +4468,10 @@ msgstr "Vérifie si le service DNS est actif. Retourne 0 - le DNS est inactif (l
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Vérifie si le fichier existe. Retourne 0 - introuvable ; 1 - le fichier du type spécifié existe"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr "Vérifie si l'hôte est accessible par ping ICMP avec ré-essais. 0 - Le ping ICMP échoue. 1 - Le ping ICMP réussi."
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6628,6 +6667,22 @@ msgstr "Supprimer le scénario web ?"
 msgid "Deleted"
 msgstr "Supprimé"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Groupe d'hôtes supprimé"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Groupe(s) d'hôtes supprimé(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Déclencheur supprimé"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Délimiteur"
@@ -7245,7 +7300,7 @@ msgstr "Afficher les déclencheurs OK pendant"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Afficher les actions"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7261,7 +7316,7 @@ msgstr "Afficher l'heure locale"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Afficher l'heure du journal"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7281,7 +7336,7 @@ msgstr "Afficher le graphique empilé"
 
 #: widgets/topitems/views/column.edit.php:90
 msgid "Display value as"
-msgstr ""
+msgstr "Afficher la valeur comme"
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -13527,6 +13582,10 @@ msgstr "Le nom de l'entrée du menu est utilisé comme étiquette pour l'URL du 
 msgid "Menu path"
 msgstr "Chemin du menu"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr "Fusionner les secteurs plus petits que"
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "Fusionner les secteurs plus petits que"
@@ -17888,6 +17947,11 @@ msgstr "Exécutez le script \"%1$s\" sur le serveur Zabbix"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Exécuter le script \"%1$s\" sur l'hôte actuel"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Exécuter le script \"%1$s\" sur le(s) objet(s) supprimé(s)"
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -18630,7 +18694,7 @@ msgstr "Envoyer à l'arrière"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Envoyer au type de média"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -20555,6 +20619,14 @@ msgstr "Thème"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne de commande dans l'ordre spécifié."
+
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Cette action comporte des conditions ou des opérations référençant des objets supprimés."
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "Cette action comporte des conditions ou des opérations manquantes en raison d'objets précédemment supprimés."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -24092,6 +24164,41 @@ msgstr "abs() - Valeur absolue"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - L'arccosinus d'une valeur sous forme d'angle, exprimé en radians"
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "l'action \"%1$s\" utilise cette vérification de découverte"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "l'action \"%1$s\" utilise cette règle de découverte"
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "l'action \"%1$s\" utilise cet hôte"
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "l'action \"%1$s\" utilise ce groupe d'hôtes"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "l'action \"%1$s\" utilise ce service"
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "l'action \"%1$s\" utilise ce modèle"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "l'action \"%1$s\" utilise ce déclencheur"
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24865,7 +24972,7 @@ msgstr "first() - La valeur la plus ancienne dans l'intervalle de temps spécifi
 
 #: app/controllers/CControllerPopupTriggerExpr.php:626
 msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
-msgstr ""
+msgstr "firstclock() - Horodatage de la valeur la plus ancienne dans l'intervalle de temps spécifié"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -25266,7 +25373,7 @@ msgstr "last () - Dernière valeur T la plus récente"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:733
 msgid "lastclock() - Timestamp of the last (most recent) T value"
-msgstr ""
+msgstr "lastclock() - Horodatage de la dernière valeur (la plus récente)"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
@@ -25306,7 +25413,7 @@ msgstr "logsource() - Source du dernier paramètre de correspondance de l'entré
 
 #: app/controllers/CControllerPopupTriggerExpr.php:795
 msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
-msgstr ""
+msgstr "logtimestamp() - Horodatage du dernier message (le plus récent) du journal"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

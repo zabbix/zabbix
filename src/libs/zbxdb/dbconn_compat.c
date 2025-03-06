@@ -516,7 +516,7 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 		return ZBX_DB_FAIL;
 	}
 
-	return zbx_dbconn_execute_overflowed_sql(dbconn, sql, sql_alloc, sql_offset);
+	return zbx_dbconn_execute_overflowed_sql(dbconn, sql, sql_alloc, sql_offset, NULL);
 }
 
 /******************************************************************************
