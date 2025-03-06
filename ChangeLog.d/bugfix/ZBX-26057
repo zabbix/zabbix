@@ -1,0 +1,1 @@
+A......... [ZBX-26057] returned the presence of missing "message_format" field in the output of mediatype.get API method (wczerneha)
