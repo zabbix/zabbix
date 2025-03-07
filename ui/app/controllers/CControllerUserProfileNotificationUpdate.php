@@ -71,7 +71,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
+			$response = new CControllerResponseRedirect(new CUrl(CMenuHelper::getFirstUrl()));
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {

@@ -20,6 +20,9 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup items,users
  * @onBefore setRowsPerPage
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
 

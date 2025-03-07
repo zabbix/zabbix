@@ -98,7 +98,7 @@ class testSystemInformation extends CWebTest {
 
 	// Change failover delay not to wait too long for server to update its status.
 	public static function changeFailoverDelay() {
-		DBexecute('UPDATE config SET ha_failover_delay='.self::FAILOVER_DELAY);
+		DBexecute('UPDATE settings SET value_str='.self::FAILOVER_DELAY.' WHERE name=\'ha_failover_delay\'');
 	}
 
 	/**
@@ -177,8 +177,10 @@ class testSystemInformation extends CWebTest {
 			self::$skip_fields[] = $this->query('xpath://footer')->one();
 		}
 
-		// Hide frontend version.
-		self::$skip_fields[] = $this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one();
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+		);
 
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
 		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".

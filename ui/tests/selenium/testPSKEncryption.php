@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * @backup config, config_autoreg_tls
+ * @backup settings, config_autoreg_tls
  *
  * @onBefore prepareHostProxyData
  *

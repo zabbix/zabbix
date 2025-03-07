@@ -1,3 +1,24 @@
+Changes for 7.4.0beta1
+
+New features:
+A.F.I..PS. [ZBXNEXT-7048] converted the settings table to a key-value format (askolmeisters, jfreibergs, vmaksimovs)
+
+Bug fixes:
+........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
+.........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
+.......PS. [ZBX-26014] added c-ares support for agent poller and snmp poller (vso)
+A......... [ZBX-25670] restored audit logging of host group links to hosts (jfreibergs)
+..F....... [ZBX-25911] fixed correlation form popup opening on event details page (rgontarski)
+.........T [ZBX-26070] fixed macro in HashiCorp Consul Cluster by HTTP template (abrosimovs)
+....I..... [ZBX-25868] fixed missing permissions for built-in templates (asestakovs)
+..F....... [ZBX-25744] fixed column width in the Top Hosts widget's Sparkline chart when configured with a single column (isharha)
+..F....... [ZBX-22952] made matching of headers to be performed in case-insensitive way (agriscenko)
+A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
+..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
+
+--------------------------------------------------------------------------------
 Changes for 7.4.0alpha1
 
 New features:
@@ -11,6 +32,30 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+Changes for 7.2.5rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
+.........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
+.......PS. [ZBX-26014] added c-ares support for agent poller and snmp poller (vso)
+A......... [ZBX-25670] restored audit logging of host group links to hosts (jfreibergs)
+..F....... [ZBX-25911] fixed correlation form popup opening on event details page (rgontarski)
+.........T [ZBX-26070] fixed macro in HashiCorp Consul Cluster by HTTP template (abrosimovs)
+....I..... [ZBX-25868] fixed missing permissions for built-in templates (asestakovs)
+..F....... [ZBX-22952] made matching of headers to be performed in case-insensitive way (agriscenko)
+..F....... [ZBX-25744] fixed column width in the Top Hosts widget's Sparkline chart when configured with a single column (isharha)
+A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
+..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.4
+
+7.2.4rc1 was released as 7.2.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.4rc1
@@ -316,6 +361,32 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.11rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
+.........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
+.......PS. [ZBX-26014] added c-ares support for agent poller and snmp poller (vso)
+A......... [ZBX-25670] restored audit logging of host group links to hosts (jfreibergs)
+..F....... [ZBX-25911] fixed correlation form popup opening on event details page (rgontarski)
+...GI..PS. [ZBX-25140] made configure reject TLS unaware compilers (jxl)
+.........T [ZBX-26070] fixed macro in HashiCorp Consul Cluster by HTTP template (abrosimovs)
+....I..... [ZBX-25868] fixed missing permissions for built-in templates (asestakovs)
+..F....... [ZBX-22952] made matching of headers to be performed in case-insensitive way (agriscenko)
+A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
+.......PS. [ZBX-25991] fixed invalid SQL statement during network discovery when using Oracle database (asestakovs)
+..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.10
+
+7.0.10rc1 was released as 7.0.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.10rc1
@@ -3680,6 +3751,19 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.40rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.39
+
+6.0.39rc1 was released as 6.0.39 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.39rc1

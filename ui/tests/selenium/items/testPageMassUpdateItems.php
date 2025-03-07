@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../common/testMassUpdateItems.php';
  * @onBefore prepareItemTagsPreprocessingData
  *
  * @backup items, interface
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testPageMassUpdateItems extends testMassUpdateItems {
 

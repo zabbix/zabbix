@@ -113,7 +113,7 @@ static int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 	if (FAIL == (ret = discovery_async_poller_dns_init(poller_config)))
 		event_base_free(poller_config->base);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() error:'%s'", log_worker_id, __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -218,7 +218,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_set_snmp_bulkwalk_options(poller_config->progname);
 
 	if (SUCCEED != (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
-			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
+			poller_config->base, NULL, poller_config->dnsbase, poller_config->config_source_ip,
 			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES, 0)))
 	{
 		if (ZBX_ISSET_MSG(&result))
@@ -315,7 +315,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	item.timeout = dcheck->timeout;
 
 	if (SUCCEED != (ret = zbx_async_check_agent(&item, &result, process_agent_result, async_result, NULL,
-			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
+			poller_config->base, NULL, poller_config->dnsbase, poller_config->config_source_ip,
 			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))

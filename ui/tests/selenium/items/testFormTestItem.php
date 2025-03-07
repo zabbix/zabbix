@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
  * @dataSource Proxies, GlobalMacros
  *
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormTestItem extends testItemTest {
 
