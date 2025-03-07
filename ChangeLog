@@ -1,8 +1,20 @@
 Changes for 7.0.11rc1
 
 New features:
+.........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+........S. [ZBX-25706] updated macro substitution process to re-try resolving macros in item key parameters and macro context without double-quoting if quoting was not possible (asestakovs)
+........S. [ZBX-25907] fixed auto registration with proxy group to specific proxy in same proxy group (wiper)
+.......PS. [ZBX-25860] prevented 06050165 upgrade patch from saving oversized escaped function parameters (arimdjonoks)
+A......... [ZBX-26057] returned the presence of missing "message_format" field in the output of mediatype.get API method (wczerneha)
+....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
+..F....... [ZBX-25678] fixed the inability to select multiple tag values in graph subfilter (esekace)
+........S. [ZBX-25651] improved trend update performance on TimescaleDB by using upserts instead of updates (vso)
+........S. [ZBX-25419] fixed macro expansion when simple context macro begins with substring ":regex" (mprihodko)
+..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
+.........T [ZBX-26029] added device retrieval loop errors exceptions handling to Meraki template (abiba)
+........S. [ZBX-26066] fixed autoreg_host table overflow during autoregistration (sboidenko)
 ........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
 .........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
 .......PS. [ZBX-26014] added c-ares support for agent poller and snmp poller (vso)
@@ -3393,6 +3405,9 @@ Changes for 6.0.40rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
+.........T [ZBX-26029] added device retrieval loop errors exceptions handling to Meraki template (abiba)
+..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
 
 --------------------------------------------------------------------------------
