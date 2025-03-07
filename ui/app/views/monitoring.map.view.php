@@ -20,7 +20,10 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('class.svg.canvas.js');
+$this->addJsFile('class.imagecache.js');
+$this->addJsFile('class.svgcanvas.js');
+$this->addJsFile('class.svgtextarea.js');
+$this->addJsFile('class.svgelement.js');
 $this->addJsFile('class.svgmap.js');
 $this->addJsFile('class.svgmapelement.js');
 $this->addJsFile('class.svgmaplink.js');
