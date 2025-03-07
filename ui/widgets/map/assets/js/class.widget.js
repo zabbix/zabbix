@@ -201,7 +201,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	#activateContentEvents() {
-		this.#map_svg?.container.addEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+		this.#map_svg?.container.addEventListener(SVGMap.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
 
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.addEventListener('click', this.#event_handlers.back);
@@ -209,7 +209,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	#deactivateContentEvents() {
-		this.#map_svg?.container.removeEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+		this.#map_svg?.container.removeEventListener(SVGMap.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
 
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.removeEventListener('click', this.#event_handlers.back);
