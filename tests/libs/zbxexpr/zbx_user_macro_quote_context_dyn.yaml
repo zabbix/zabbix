@@ -25,7 +25,7 @@ in:
   context: 'macro}name\'
   force_quote: 1
 out:
-  exp_result: " "
+  exp_error: 'quoted context "macro}name\" cannot end with ''\'' character'
 ---
 test case: '{MACRO}'
 in:
