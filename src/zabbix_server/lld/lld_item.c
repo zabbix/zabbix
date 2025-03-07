@@ -42,7 +42,7 @@ ZBX_PTR_VECTOR_IMPL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
 ZBX_PTR_VECTOR_IMPL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
 
-static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, zbx_uint64_t flags, int step,
+zbx_lld_item_preproc_t	*lld_item_preproc_create(zbx_uint64_t item_preprocid, zbx_uint64_t flags, int step,
 		int type, const char *params, int error_handler, const char *error_handler_params)
 {
 	zbx_lld_item_preproc_t	*preproc_op;
@@ -87,7 +87,8 @@ static int	lld_item_index_compare_func(const void *d1, const void *d2)
 
 	return 0;
 }
-static int	lld_item_preproc_sort_by_step(const void *d1, const void *d2)
+
+int	lld_item_preproc_sort_by_step(const void *d1, const void *d2)
 {
 	zbx_lld_item_preproc_t	*op1 = *(zbx_lld_item_preproc_t **)d1;
 	zbx_lld_item_preproc_t	*op2 = *(zbx_lld_item_preproc_t **)d2;
@@ -97,14 +98,14 @@ static int	lld_item_preproc_sort_by_step(const void *d1, const void *d2)
 }
 
 /* items index hashset support functions */
-static zbx_hash_t	lld_item_ref_key_hash_func(const void *data)
+zbx_hash_t	lld_item_ref_key_hash_func(const void *data)
 {
 	const zbx_lld_item_ref_t	*ref = (const zbx_lld_item_ref_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_FUNC(ref->item->key_);
 }
 
-static int	lld_item_ref_key_compare_func(const void *d1, const void *d2)
+int	lld_item_ref_key_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_item_ref_t	*ref1 = (const zbx_lld_item_ref_t *)d1;
 	const zbx_lld_item_ref_t	*ref2 = (const zbx_lld_item_ref_t *)d2;
@@ -112,7 +113,7 @@ static int	lld_item_ref_key_compare_func(const void *d1, const void *d2)
 	return strcmp(ref1->item->key_, ref2->item->key_);
 }
 
-static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
+void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
 {
 	zbx_free(op->params);
 	if (0 != (op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS))
@@ -703,7 +704,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 			item = items->values[index];
 			ZBX_STR2UINT64(item_preprocid, row[0]);
-			preproc_op = zbx_init_lld_item_preproc(item_preprocid, ZBX_FLAG_LLD_ITEM_PREPROC_UNSET,
+			preproc_op = lld_item_preproc_create(item_preprocid, ZBX_FLAG_LLD_ITEM_PREPROC_UNSET,
 					atoi(row[2]), atoi(row[3]), row[4], atoi(row[5]), row[6]);
 			zbx_vector_lld_item_preproc_ptr_append(&item->preproc_ops, preproc_op);
 		}
@@ -2305,7 +2306,7 @@ static void	lld_items_preproc_make(const zbx_vector_lld_item_prototype_ptr_t *it
 			if (j >= item->preproc_ops.values_num)
 			{
 				ppsrc = item_proto->preproc_ops.values[j];
-				ppdst = zbx_init_lld_item_preproc(0, ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED |
+				ppdst = lld_item_preproc_create(0, ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED |
 						ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE, ppsrc->step, ppsrc->type,
 						ppsrc->params, ppsrc->error_handler, ppsrc->error_handler_params);
 				substitute_lld_macros_in_preproc_params(ppsrc->type, item->lld_row, &ppdst->params);
@@ -3848,8 +3849,13 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 	zbx_item_param_t		*item_param;
 	zbx_uint64_t			itemid;
 	int				index;
+	zbx_vector_uint64_t		protoids;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&protoids);
 
 	result = zbx_db_select(
 			"select i.itemid,i.name,i.key_,i.type,i.value_type,i.delay,"
@@ -3862,8 +3868,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps,i.discover"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+				" and id.parent_itemid=" ZBX_FS_UI64
+				" and i.flags&%d=0",
+			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -3925,6 +3932,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 				lld_item_ref_key_compare_func);
 
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);
+
+		zbx_vector_uint64_append(&protoids, item_prototype->itemid);
 	}
 	zbx_db_free_result(result);
 
@@ -3935,12 +3944,10 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 
 	/* get item prototype preprocessing options */
 
-	result = zbx_db_select(
-			"select ip.itemid,ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params"
-			" from item_preproc ip,item_discovery id"
-			" where ip.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid,step,type,params,error_handler,error_handler_params from item_preproc where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids.values, protoids.values_num);
+	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -3956,7 +3963,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		}
 
 		item_prototype = item_prototypes->values[index];
-		preproc_op = zbx_init_lld_item_preproc(0, ZBX_FLAG_LLD_ITEM_PREPROC_UNSET, atoi(row[1]), atoi(row[2]),
+		preproc_op = lld_item_preproc_create(0, ZBX_FLAG_LLD_ITEM_PREPROC_UNSET, atoi(row[1]), atoi(row[2]),
 				row[3], atoi(row[4]), row[5]);
 		zbx_vector_lld_item_preproc_ptr_append(&item_prototype->preproc_ops, preproc_op);
 	}
@@ -3971,12 +3978,10 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 
 	/* get item prototype parameters */
 
-	result = zbx_db_select(
-			"select ip.itemid,ip.name,ip.value"
-			" from item_parameter ip,item_discovery id"
-			" where ip.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name,value from item_parameter where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids.values, protoids.values_num);
+	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -3999,12 +4004,10 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 
 	/* get item prototype tags */
 
-	result = zbx_db_select(
-			"select it.itemid,it.tag,it.value"
-			" from item_tag it,item_discovery id"
-			" where it.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids.values, protoids.values_num);
+	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -4028,6 +4031,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 	}
 	zbx_db_free_result(result);
 out:
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&protoids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, item_prototypes->values_num);
 }
 

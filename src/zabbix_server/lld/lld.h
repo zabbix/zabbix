@@ -529,4 +529,11 @@ ZBX_VECTOR_DECL(lld_ext_macro, zbx_lld_ext_macro_t)
 void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_entry_t *entry);
 void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *macros);
 
+void	lld_item_preproc_free(zbx_lld_item_preproc_t *op);
+zbx_hash_t	lld_item_ref_key_hash_func(const void *data);
+int	lld_item_ref_key_compare_func(const void *d1, const void *d2);
+int	lld_item_preproc_sort_by_step(const void *d1, const void *d2);
+zbx_lld_item_preproc_t	*lld_item_preproc_create(zbx_uint64_t item_preprocid, zbx_uint64_t flags, int step,
+		int type, const char *params, int error_handler, const char *error_handler_params);
+
 #endif
