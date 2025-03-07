@@ -47,8 +47,6 @@ AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 
 AC_DEFUN([LIBSSH2_CHECK_CONFIG],
 [
-	AC_REQUIRE([AC_PROG_SED])
-
   AC_ARG_WITH(ssh2,[If you want to use SSH2 based checks:
 AS_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],
     [
