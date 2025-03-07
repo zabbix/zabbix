@@ -451,7 +451,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 			quotes++;
 	}
 
-	if (0 == req_quote && (0 == force_quote || '\\' == *(--ptr_context)))
+	if (0 == req_quote && (0 == force_quote || (ptr_context != context && '\\' == *(--ptr_context))))
 		return zbx_strdup(NULL, context);
 
 	len = (int)strlen(context) + 2 + quotes;
