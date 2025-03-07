@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-17 01:51+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2025-03-06 04:38+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -6529,19 +6529,19 @@ msgstr "削除しました"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "削除されたホスト"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "削除されたホストグループ"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "削除されたホストグループ"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "削除されたトリガー"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -10149,7 +10149,7 @@ msgstr "イメージラベルのタイプ"
 
 #: widgets/itemhistory/Widget.php:33
 msgid "Image loading error."
-msgstr ""
+msgstr "画像の読み込みエラーです。"
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -12170,7 +12170,7 @@ msgstr "LLDルール"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのLLDルールがすでに存在します"
 
 #: app/views/correlation.edit.php:175 app/views/popup.action.edit.php:53
 #: app/views/popup.lldoverride.php:99 app/views/popup.operation.edit.php:435
@@ -14666,7 +14666,7 @@ msgstr "リフレッシュなし"
 
 #: include/classes/api/services/CUser.php:3489
 msgid "No saved state, please login again."
-msgstr ""
+msgstr "保存された状態がありません。再度ログインしてください。"
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -14918,7 +14918,7 @@ msgstr "監視ホスト数"
 
 #: include/classes/data/CItemData.php:2891
 msgid "Number of online proxies. Returns integer."
-msgstr ""
+msgstr "オンラインプロキシの数。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
@@ -15573,7 +15573,7 @@ msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
-msgstr ""
+msgstr "PHP curl拡張機能が存在しません。"
 
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
@@ -15968,7 +15968,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
-msgstr ""
+msgstr "オンラインプロキシの割合。浮動小数点数を返す。"
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -16100,11 +16100,11 @@ msgstr "2つの要素を選択してください"
 
 #: jsLoader.php:194
 msgid "Please update configuration"
-msgstr ""
+msgstr "設定を更新してください"
 
 #: app/partials/administration.system.info.php:47
 msgid "Please upgrade to latest major release."
-msgstr ""
+msgstr "最新のメジャーリリースにアップグレードしてください。"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -19650,7 +19650,7 @@ msgstr "システム情報"
 
 #: include/classes/setup/CFrontendSetup.php:693
 msgid "System locale"
-msgstr ""
+msgstr "システムロケール"
 
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
@@ -20867,7 +20867,7 @@ msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"�
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "トリガーが選択されていません。"
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21340,7 +21340,7 @@ msgstr "ブロックを解除"
 
 #: app/views/administration.user.list.php:310
 msgid "Unblock selected user?"
-msgstr ""
+msgstr "選択したユーザーのブロックを解除しますか？"
 
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
@@ -21823,7 +21823,7 @@ msgstr "iframeサンドボックスを使用する"
 
 #: widgets/itemhistory/views/column.edit.php:232
 msgid "Use monospace font"
-msgstr ""
+msgstr "等幅フォントを使用する"
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
@@ -22068,7 +22068,7 @@ msgstr "ユーザーマクロ"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr ""
+msgstr "ユーザーメディア"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22927,7 +22927,7 @@ msgstr "表示形式"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "関連するレポートの表示"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23137,7 +23137,7 @@ msgstr "指定された列と行の数に対してウィジェットが小さす
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "ウィジェット"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -24264,7 +24264,7 @@ msgstr "リンクを削除できません"
 
 #: include/classes/api/services/CDiscoveryRule.php:3034
 msgid "cannot delete inherited LLD rule"
-msgstr ""
+msgstr "継承された LLD ルールを削除できません"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -24473,7 +24473,7 @@ msgstr "ホスト\"%2$s\"上のディスカバリルール\"%1$s\"は監視さ�
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "すべてのアクションを表示"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
@@ -24693,7 +24693,7 @@ msgstr "ホストパターン"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのホストプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25353,11 +25353,11 @@ msgstr "数値"
 
 #: include/classes/api/services/CUser.php:852
 msgid "object does not exist"
-msgstr ""
+msgstr "オブジェクトが存在しません"
 
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
-msgstr ""
+msgstr "オブジェクトが存在しないか、別のオブジェクトに属しています"
 
 #: include/classes/api/services/CHostBase.php:146
 #: include/classes/api/services/CHostBase.php:174
@@ -25373,7 +25373,7 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:986
 #: include/classes/api/services/CTemplate.php:1066
 msgid "object does not exist, or you have no permissions to it"
-msgstr ""
+msgstr "オブジェクトが存在しないか、権限がありません"
 
 #: include/classes/api/services/CUser.php:823
 msgid "object of TOTP type is expected"
@@ -25526,7 +25526,7 @@ msgstr "参照したオブジェクトが存在しません"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
 msgid "referred widget is unavailable"
-msgstr ""
+msgstr "参照しているウィジェットが利用できません"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
@@ -25590,7 +25590,7 @@ msgstr "round() - 小数点以下桁数で四捨五入"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 msgid "rows must be unique"
-msgstr ""
+msgstr "行は一意である必要があります"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -25630,7 +25630,7 @@ msgstr "選択"
 
 #: include/classes/api/services/CService.php:1415
 msgid "service with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのサービスがすでに存在します"
 
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
@@ -25694,7 +25694,7 @@ msgstr "stddevsamp() - サンプル標準偏差"
 
 #: widgets/actionlog/views/widget.edit.php:43
 msgid "subject or body text"
-msgstr ""
+msgstr "件名または本文"
 
 #: include/graphs.inc.php:84 widgets/piechart/actions/WidgetView.php:666
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:397
@@ -25750,15 +25750,15 @@ msgstr "テンプレートID\"%1$s\"が%2$s回使用されています"
 
 #: include/classes/api/services/CTemplateDashboard.php:395
 msgid "template dashboard with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートダッシュボードがすでに存在します"
 
 #: include/classes/api/services/CTemplateGroup.php:594
 msgid "template group with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートグループがすでに存在します"
 
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートがすでに存在します"
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
@@ -25901,7 +25901,7 @@ msgstr "トリガーのプロトタイプは他のテンプレートやホスト
 
 #: include/classes/api/services/CTriggerGeneral.php:686
 msgid "trigger prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのトリガープロトタイプがすでに存在します"
 
 #: include/classes/api/services/CTriggerGeneral.php:2307
 msgid "trigger with linkages cannot be moved to another template or host"
@@ -25909,7 +25909,7 @@ msgstr "リンクのあるトリガーは他のテンプレートやホストに
 
 #: include/classes/api/services/CTriggerGeneral.php:680
 msgid "trigger with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのトリガーがすでに存在します"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1167
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -26136,7 +26136,7 @@ msgstr "値が長すぎます"
 
 #: include/classes/api/services/CValueMap.php:501
 msgid "value map with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDの値のマッピングがすでに存在します"
 
 #: include/classes/api/services/CReport.php:198
 #: include/classes/api/services/CReport.php:582
@@ -26244,7 +26244,7 @@ msgstr "w"
 
 #: include/classes/api/services/CHttpTest.php:440
 msgid "web scenario with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのWebシナリオがすでに存在します"
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
