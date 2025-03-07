@@ -21,7 +21,6 @@ package smart
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -53,11 +52,10 @@ type Options struct {
 type Plugin struct {
 	plugin.Base
 	options Options
+	ctl     *smartCtl
 }
 
 var impl Plugin
-
-var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -68,6 +66,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
+
+	p.ctl = newSmartCtl(p.options.Path, p.options.Timeout)
 }
 
 // Validate -
@@ -154,13 +154,13 @@ func (p *Plugin) diskGet(params []string) ([]byte, error) {
 }
 
 func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
-	executable := path
+	args := []string{"-a", path, "-j"}
 
 	if raidType != "" {
-		executable = fmt.Sprintf("%s -d %s", executable, raidType)
+		args = []string{"-a", path, "-d", raidType, "-j"}
 	}
 
-	device, err := p.executeSingle(executable)
+	device, err := p.ctl.execute(args...)
 	if err != nil {
 		return nil, err
 	}
@@ -427,14 +427,6 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	return ssdType
 }
 
-func clearString(str string) error {
-	if !cleanRegex.MatchString(str) {
-		return zbxerr.New(fmt.Sprintf("invalid characters found in parameter '%s'", str))
-	}
-
-	return nil
-}
-
 func init() {
 	plugin.RegisterMetrics(&impl, "Smart",
 		"smart.disk.discovery", "Returns JSON array of smart devices.",
@@ -445,6 +437,19 @@ func init() {
 
 // validateExport function validates key, export params and version.
 func (p *Plugin) validateExport(key string, params []string) error {
+	if err := p.checkVersion(); err != nil {
+		return err
+	}
+
+	if err := validateParams(key, params); err != nil {
+		return err
+	}
+
+	return validatePath(params[0])
+}
+
+// validateParams validates the key's params quantity aspect.
+func validateParams(key string, params []string) error {
 	// No params - nothing to validate
 	if len(params) == all {
 		return nil
@@ -455,22 +460,14 @@ func (p *Plugin) validateExport(key string, params []string) error {
 		return zbxerr.ErrorTooManyParameters
 	}
 
-	// Disk descriptor sanitization
-	if err := validatePath(params[0]); err != nil {
-		return err
-	}
-
-	// smartctl version validation
-	return p.checkVersion()
+	return nil
 }
 
-// validatePath validates the key's argument disk path in the context of an input sanitization.
+var pathRegex = regexp.MustCompile(`^(?:\s*-|'*"*\s*-)`)
+
+// validatePath validates the key's param disk path in the context of an input sanitization.
 func validatePath(p string) error {
-	const pattern = `^(?:\s*-|'*"*\s*-)`
-
-	var re = regexp.MustCompile(pattern)
-
-	if re.MatchString(p) {
+	if pathRegex.MatchString(p) {
 		return zbxerr.New("invalid disk descriptor format")
 	}
 
