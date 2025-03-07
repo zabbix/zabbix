@@ -940,14 +940,3 @@ function createFontSelect(string $name): CSelect {
 			->toString()
 	?>
 </script>
-
-<script type="text/javascript">
-	/**
-	 * @see init.js add.popup event
-	 */
-	function addPopupValues(data) {
-		if (data.object === 'linktrigger') {
-			ZABBIX.apps.map.object.linkForm.addNewTriggers(data.values);
-		}
-	}
-</script>
