@@ -518,8 +518,6 @@ static void	lld_rule_fetch_prototypes(zbx_uint64_t lld_ruleid, zbx_vector_lld_ru
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
 	zbx_lld_rule_prototype_t	*rule_prototype;
-	zbx_uint64_t			itemid;
-	int				index;
 	zbx_vector_uint64_t		protoids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -598,6 +596,8 @@ static void	lld_rule_fetch_prototypes(zbx_uint64_t lld_ruleid, zbx_vector_lld_ru
 				lld_item_ref_key_compare_func);
 
 		zbx_vector_lld_rule_prototype_ptr_append(rule_prototypes, rule_prototype);
+
+		zbx_vector_uint64_append(&protoids, rule_prototype->itemid);
 	}
 	zbx_db_free_result(result);
 
@@ -616,20 +616,96 @@ out:
 }
 
 
+static void	lld_rule_prototype_dump(zbx_lld_rule_prototype_t *rule_prototype)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "Prototype:" ZBX_FS_UI64, rule_prototype->itemid);
+	zabbix_log(LOG_LEVEL_TRACE, "  key:%s name:%s", rule_prototype->key, rule_prototype->name);
+	zabbix_log(LOG_LEVEL_TRACE, "  type:%u delay:%s status:%u trapper_hosts:%s allow_traps:%u discover:%u",
+			rule_prototype->type, rule_prototype->delay, rule_prototype->status,
+			rule_prototype->trapper_hosts, rule_prototype->allow_traps, rule_prototype->discover);
+	zabbix_log(LOG_LEVEL_TRACE, "  params:%s ipmi_sensor:%s snmp_oid:%s authtype:%u username:%s password:%s"
+			" publickey:%s privatekey:%s",
+			rule_prototype->params, rule_prototype->ipmi_sensor, rule_prototype->snmp_oid,
+			rule_prototype->authtype, rule_prototype->username, rule_prototype->password,
+			rule_prototype->publickey, rule_prototype->privatekey);
+	zabbix_log(LOG_LEVEL_TRACE, "  description:%s", rule_prototype->description);
+	zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64 " master_itemid:" ZBX_FS_UI64,
+			rule_prototype->interfaceid, rule_prototype->master_itemid);
+	zabbix_log(LOG_LEVEL_TRACE, "  jmx_endpoint:%s timeout:%s",
+			rule_prototype->jmx_endpoint, rule_prototype->timeout);
+	zabbix_log(LOG_LEVEL_TRACE, "  url:%s query_fields:%s posts:%s"
+			" status_codes:%s follow_redirects:%u post_type:%u",
+			rule_prototype->url, rule_prototype->query_fields, rule_prototype->posts,
+			rule_prototype->status_codes, rule_prototype->follow_redirects,
+			rule_prototype->post_type);
+	zabbix_log(LOG_LEVEL_TRACE, "  http_proxy:%s headers:%s retrieve_mode:%u request_method:%u output_format:%u",
+			rule_prototype->http_proxy, rule_prototype->headers, rule_prototype->retrieve_mode,
+			rule_prototype->request_method, rule_prototype->output_format);
+	zabbix_log(LOG_LEVEL_TRACE, "  ssl_cert_file:%s ssl_key_file:%s ssl_key_password:%s verify_peer:%u"
+			" verify_host:%u", rule_prototype->ssl_cert_file, rule_prototype->ssl_key_file,
+			rule_prototype->ssl_key_password, rule_prototype->verify_peer, rule_prototype->verify_host);
+	zabbix_log(LOG_LEVEL_TRACE, "  evaltype:%d  formula:%s lifetime_type:%d lifetime:%s"
+			" enabled_lifetime_type:%d enabled_lifetime:%s",
+			rule_prototype->evaltype, rule_prototype->formula,
+			rule_prototype->lifetime_type, rule_prototype->lifetime,
+			rule_prototype->enabled_lifetime_type, rule_prototype->enabled_lifetime);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  preprocessing:");
+	for (int i = 0; i < rule_prototype->preproc_ops.values_num; i++)
+	{
+		zbx_lld_item_preproc_t	*preproc_op = rule_prototype->preproc_ops.values[i];
+		char			*params;
+
+		params = zbx_string_replace(preproc_op->params, "\n", "\\n");
+		zabbix_log(LOG_LEVEL_TRACE, "    item_preprocid:" ZBX_FS_UI64 "    step:%d type:%d error_handler:%d"
+				" params:%s error_handler_params:%s", preproc_op->item_preprocid, preproc_op->step,
+				preproc_op->type, preproc_op->error_handler, params, preproc_op->error_handler_params);
+
+		zbx_free(params);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  parameters:");
+	for (int i = 0; i < rule_prototype->item_params.values_num; i++)
+	{
+		zbx_item_param_t	*param = rule_prototype->item_params.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    item_parameterid:" ZBX_FS_UI64 "    name:%s value:%s",
+				param->item_parameterid, param->name, param->value);
+	}
+
+}
+
 int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
 		int lastcheck)
 {
 	zbx_vector_lld_rule_prototype_ptr_t	rule_prototypes;
 
-	zbx_vector_lld_rule_prototype_ptr_create(&rule_prototypes);
+	// WDN
+	zabbix_increase_log_level();
+	zabbix_increase_log_level();
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lld_ruleid:" ZBX_FS_UI64, __func__, lld_ruleid);
+
+	zbx_vector_lld_rule_prototype_ptr_create(&rule_prototypes);
 
 	lld_rule_fetch_prototypes(lld_ruleid, &rule_prototypes);
 
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "LLD rule prototypes:");
+
+		for (int i = 0; i < rule_prototypes.values_num; i++)
+			lld_rule_prototype_dump(rule_prototypes.values[i]);
+	}
 
 	zbx_vector_lld_rule_prototype_ptr_clear_ext(&rule_prototypes, lld_rule_prototpe_free);
 	zbx_vector_lld_rule_prototype_ptr_destroy(&rule_prototypes);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	zabbix_decrease_log_level();
+	zabbix_decrease_log_level();
 
 	return SUCCEED;
 }
