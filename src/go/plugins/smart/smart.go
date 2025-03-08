@@ -441,33 +441,25 @@ func (p *Plugin) validateExport(key string, params []string) error {
 		return err
 	}
 
-	if err := validatePath(params[0]); err != nil {
-		return err
-	}
-
 	return p.checkVersion()
-}
-
-// validateParams validates the key's params quantity aspect.
-func validateParams(key string, params []string) error {
-	// No params - nothing to validate
-	if len(params) == all {
-		return nil
-	}
-
-	// The params can only be for a specific function
-	if key != diskGet {
-		return zbxerr.ErrorTooManyParameters
-	}
-
-	return nil
 }
 
 var pathRegex = regexp.MustCompile(`^(?:\s*-|'*"*\s*-)`)
 
-// validatePath validates the key's param disk path in the context of an input sanitization.
-func validatePath(p string) error {
-	if pathRegex.MatchString(p) {
+// validateParams validates the key's params quantity aspect.
+func validateParams(key string, params []string) error {
+	// No params - nothing to validate.
+	if len(params) == all {
+		return nil
+	}
+
+	// The params can only be for a specific function.
+	if key != diskGet {
+		return zbxerr.ErrorTooManyParameters
+	}
+
+	//Validates the param disk path in the context of an input sanitization.
+	if pathRegex.MatchString(params[0]) {
 		return zbxerr.New("invalid disk descriptor format")
 	}
 

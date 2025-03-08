@@ -689,9 +689,29 @@ func Test_validateParams(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"+noParams", args{"", []string{}}, false},
-		{"+diskGet", args{"smart.disk.get", []string{"smth"}}, false},
-		{"-tabHypen", args{"any.other.key", []string{"smth"}}, true},
+		{"+keyNoParams", args{"", []string{}}, false},
+		{"-keyTabHypen", args{"any.other.key", []string{"smth"}}, true},
+
+		{"+spaceHypen", args{"smart.disk.get", []string{"/dev/sda -B/some/file/path"}}, false},
+		{"+manySpacesHypen", args{"smart.disk.get", []string{"/dev/sda    -B/some/file/path"}}, false},
+		{"+tabHypen", args{"smart.disk.get", []string{"/dev/sda\t-B/some/file/path"}}, false},
+		{"+noSpacesHypen", args{"smart.disk.get", []string{"/dev/sda-B/some/file/path"}}, false},
+		{"+hHypenInSpaces", args{"smart.disk.get", []string{"/dev/sda - B/some/file/path"}}, false},
+		{"+hypenEnd", args{"smart.disk.get", []string{"/dev/sda-"}}, false},
+		{"+empty", args{"smart.disk.get", []string{""}}, false},
+		{"+normal", args{"smart.disk.get", []string{"/dev/sda"}}, false},
+		{"+twoParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid"}}, false},
+		{"+threeParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid", "three"}}, false},
+
+		{"-hypenStart", args{"smart.disk.get", []string{"-B/some/file/path"}}, true},
+		{"-hypenStartSpace", args{"smart.disk.get", []string{"- B/some/file/path"}}, true},
+		{"-hypenStartApostr", args{"smart.disk.get", []string{"'-B/some/file/path'"}}, true},
+		{"-hypenStartApostrSpace", args{"smart.disk.get", []string{"'   -B/some/file/path'"}}, true},
+		{"-hypenStartApostrTab", args{"smart.disk.get", []string{"'\t-B/some/file/path'"}}, true},
+		{"-hypenStartApostrTabSpace", args{"smart.disk.get", []string{"'\t -B/some/file/path'"}}, true},
+		{"-hypenStart2Apostr", args{"smart.disk.get", []string{"''-B/some/file/path''"}}, true},
+		{"-hypenStart3Apostr", args{"smart.disk.get", []string{"'''-B/some/file/path'''"}}, true},
+		{"-hypenStartApostrQuote", args{"smart.disk.get", []string{"\"-B/some/file/path\""}}, true},
 	}
 
 	for _, tt := range tests {
@@ -702,54 +722,7 @@ func Test_validateParams(t *testing.T) {
 			err := validateParams(tt.args.key, tt.args.params)
 
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("NewDiskPath() error = %s, wantErr %t", err.Error(), tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_validatePath(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		diskPath string
-	}
-
-	tests := []struct {
-		name string
-		args args
-		// want    string
-		wantErr bool
-	}{
-		{"+spaceHypen", args{"/dev/sda -B/some/file/path"}, false},
-		{"+manySpacesHypen", args{"/dev/sda    -B/some/file/path"}, false},
-		{"+tabHypen", args{"/dev/sda\t-B/some/file/path"}, false},
-		{"+noSpacesHypen", args{"/dev/sda-B/some/file/path"}, false},
-		{"+hHypenInSpaces", args{"/dev/sda - B/some/file/path"}, false},
-		{"+hypenAtEnd", args{"/dev/sda-"}, false},
-		{"+empty", args{""}, false},
-
-		{"-hypenAtStart", args{"-B/some/file/path"}, true},
-		{"-hypenAtStartSpace", args{"- B/some/file/path"}, true},
-		{"-hypenAtStartApostr", args{"'-B/some/file/path'"}, true},
-		{"-hypenAtStartApostrSpace", args{"'   -B/some/file/path'"}, true},
-		{"-hypenAtStartApostrTab", args{"'\t-B/some/file/path'"}, true},
-		{"-hypenAtStartApostrTabSpace", args{"'\t -B/some/file/path'"}, true},
-		{"-hypenAtStart2Apostr", args{"''-B/some/file/path''"}, true},
-		{"-hypenAtStart3Apostr", args{"'''-B/some/file/path'''"}, true},
-		{"-hypenAtStartApostrQuote", args{"\"-B/some/file/path\""}, true},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			err := validatePath(tt.args.diskPath)
-
-			// check if erroneous diskPath
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("NewDiskPath() error = %s, wantErr %t", err.Error(), tt.wantErr)
+				t.Fatalf("validateParams() error = %s, wantErr %t", err.Error(), tt.wantErr)
 			}
 		})
 	}
