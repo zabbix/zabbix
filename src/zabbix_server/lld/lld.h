@@ -20,6 +20,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxregexp.h"
+#include "zbxdbhigh.h"
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
 typedef struct zbx_lld_dependency_s zbx_lld_dependency_t;
@@ -50,28 +51,6 @@ zbx_lld_item_link_t;
 ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
 
 int	lld_item_link_compare_func(const void *d1, const void *d2);
-
-/* lld rule filter condition (item_condition table record) */
-typedef struct
-{
-	zbx_uint64_t		id;
-	char			*macro;
-	char			*regexp;
-	zbx_vector_expression_t	regexps;
-	unsigned char		op;
-}
-lld_condition_t;
-
-ZBX_PTR_VECTOR_DECL(lld_condition_ptr, lld_condition_t*)
-
-/* lld rule filter */
-typedef struct
-{
-	zbx_vector_lld_condition_ptr_t	conditions;
-	char				*expression;
-	int				evaltype;
-}
-zbx_lld_filter_t;
 
 typedef struct
 {
@@ -147,19 +126,6 @@ typedef struct
 	int			duration;
 }
 zbx_lld_lifetime_t;
-
-/* lld rule override */
-typedef struct
-{
-	zbx_uint64_t				overrideid;
-	zbx_lld_filter_t			filter;
-	zbx_vector_lld_override_operation_t	override_operations;
-	int					step;
-	unsigned char				stop;
-}
-zbx_lld_override_t;
-
-ZBX_PTR_VECTOR_DECL(lld_override_ptr, zbx_lld_override_t*)
 
 typedef struct
 {

@@ -27,9 +27,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
-ZBX_PTR_VECTOR_IMPL(lld_condition_ptr, lld_condition_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
-ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
@@ -77,78 +75,23 @@ int	lld_item_prototype_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: releases resources allocated by filter condition                  *
- *                                                                            *
- * Parameters: condition - [IN] filter condition                              *
- *                                                                            *
- ******************************************************************************/
-static void	lld_condition_free(lld_condition_t *condition)
-{
-	zbx_regexp_clean_expressions(&condition->regexps);
-	zbx_vector_expression_destroy(&condition->regexps);
-
-	zbx_free(condition->macro);
-	zbx_free(condition->regexp);
-	zbx_free(condition);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: releases resources allocated by filter conditions                 *
- *                                                                            *
- * Parameters: conditions - [IN] filter conditions                            *
- *                                                                            *
- ******************************************************************************/
-static void	lld_conditions_free(zbx_vector_lld_condition_ptr_t *conditions)
-{
-	zbx_vector_lld_condition_ptr_clear_ext(conditions, lld_condition_free);
-	zbx_vector_lld_condition_ptr_destroy(conditions);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares two filter conditions by their macros                    *
  *                                                                            *
  ******************************************************************************/
 static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
 {
-	lld_condition_t	*condition1 = *(lld_condition_t **)cond1;
-	lld_condition_t	*condition2 = *(lld_condition_t **)cond2;
+	zbx_lld_condition_t	*condition1 = *(zbx_lld_condition_t **)cond1;
+	zbx_lld_condition_t	*condition2 = *(zbx_lld_condition_t **)cond2;
 
 	return strcmp(condition1->macro, condition2->macro);
-}
-
-static void	lld_filter_init(zbx_lld_filter_t *filter)
-{
-	zbx_vector_lld_condition_ptr_create(&filter->conditions);
-	filter->expression = NULL;
-	filter->evaltype = ZBX_CONDITION_EVAL_TYPE_AND_OR;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: releases resources allocated by LLD filter                        *
- *                                                                            *
- ******************************************************************************/
-static void	lld_filter_clean(zbx_lld_filter_t *filter)
-{
-	zbx_free(filter->expression);
-	lld_conditions_free(&filter->conditions);
 }
 
 static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, const char *id, const char *macro,
 		const char *regexp, const char *op, const zbx_dc_item_t *item, char **error)
 {
-	lld_condition_t	*condition;
+	zbx_lld_condition_t	*condition;
 
-	condition = (lld_condition_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
-	ZBX_STR2UINT64(condition->id, id);
-	condition->macro = zbx_strdup(NULL, macro);
-	condition->regexp = zbx_strdup(NULL, regexp);
-	condition->op = (unsigned char)atoi(op);
-
-	zbx_vector_expression_create(&condition->regexps);
-
+	condition = zbx_lld_filter_condition_create(id, op, macro, regexp);
 	zbx_vector_lld_condition_ptr_append(conditions, condition);
 
 	if ('@' == *condition->regexp)
@@ -220,7 +163,7 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, const zbx_dc_item_t *item, 
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_condition_match(const zbx_lld_entry_t *lld_obj, const lld_condition_t *condition, int *result,
+static int	filter_condition_match(const zbx_lld_entry_t *lld_obj, const zbx_lld_condition_t *condition, int *result,
 		char **err_msg)
 {
 	char	*value = NULL;
@@ -294,7 +237,7 @@ static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const zb
 {
 	int			ret = SUCCEED, error_num = 0, res;
 	double			result;
-	lld_condition_t		*condition;
+	zbx_lld_condition_t		*condition;
 	char			*lastmacro = NULL, *ops[] = {NULL, "and", "or"}, error[256], *expression = NULL,
 				*errmsg = NULL;
 	size_t			expression_alloc = 0, expression_offset = 0;
@@ -412,7 +355,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const zbx_
 
 	for (int i = 0; i < filter->conditions.values_num; i++)
 	{
-		const lld_condition_t	*condition = filter->conditions.values[i];
+		const zbx_lld_condition_t	*condition = filter->conditions.values[i];
 
 		if (SUCCEED == filter_condition_match(lld_obj, condition, &res, &errmsg))
 		{
@@ -663,17 +606,9 @@ static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, const zb
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_lld_override_t	*override = (zbx_lld_override_t *)zbx_malloc(NULL, sizeof(zbx_lld_override_t));
+		zbx_lld_override_t	*override;
 
-		ZBX_STR2UINT64(override->overrideid, row[0]);
-		override->step = atoi(row[1]);
-		lld_filter_init(&override->filter);
-		override->filter.evaltype = atoi(row[2]);
-		override->filter.expression = zbx_strdup(NULL, row[3]);
-		override->stop = (unsigned char)atoi(row[4]);
-
-		zbx_vector_lld_override_operation_create(&override->override_operations);
-
+		override = zbx_lld_override_create(row[0], NULL, NULL, row[1], row[2], row[3], row[4]);
 		zbx_vector_lld_override_ptr_append(overrides, override);
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 	}
@@ -698,15 +633,6 @@ static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, const zb
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-}
-
-static void	lld_override_free(zbx_lld_override_t *override)
-{
-	lld_filter_clean(&override->filter);
-
-	zbx_vector_lld_override_operation_clear_ext(&override->override_operations, zbx_lld_override_operation_free);
-	zbx_vector_lld_override_operation_destroy(&override->override_operations);
-	zbx_free(override);
 }
 
 static int	regexp_strmatch_condition(const char *value, const char *pattern, unsigned char op)
@@ -1128,7 +1054,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	zbx_vector_lld_macro_create(&exported_macros);
 
-	lld_filter_init(&filter);
+	zbx_lld_filter_init(&filter);
 
 	result = zbx_db_select(
 			"select hostid,key_,evaltype,formula,lifetime_type,lifetime,enabled_lifetime_type,"
@@ -1223,7 +1149,7 @@ out:
 	zbx_free(info);
 	zbx_free(discovery_key);
 
-	lld_filter_clean(&filter);
+	zbx_lld_filter_clean(&filter);
 
 	for (int i = 0; i < lld_entries->values_num; i++)
 		lld_entries->values[i]->exported_macros = NULL;
@@ -1233,7 +1159,7 @@ out:
 
 	zbx_vector_lld_macro_destroy(&exported_macros);
 
-	zbx_vector_lld_override_ptr_clear_ext(&overrides, lld_override_free);
+	zbx_vector_lld_override_ptr_clear_ext(&overrides, zbx_lld_override_free);
 	zbx_vector_lld_override_ptr_destroy(&overrides);
 	zbx_vector_lld_row_ptr_clear_ext(&lld_rows, lld_row_free);
 	zbx_vector_lld_row_ptr_destroy(&lld_rows);

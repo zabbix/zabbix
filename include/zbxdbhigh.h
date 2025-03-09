@@ -22,6 +22,7 @@
 #include "zbxnum.h"
 #include "zbxversion.h"
 #include "zbxtime.h"
+#include "zbxregexp.h"
 
 #include "zbxtagfilter.h"
 
@@ -710,10 +711,57 @@ zbx_lld_override_operation_t;
 
 ZBX_PTR_VECTOR_DECL(lld_override_operation, zbx_lld_override_operation_t*)
 
+
+/* lld rule filter condition (item_condition table record) */
+typedef struct
+{
+	zbx_uint64_t		id;
+	char			*macro;
+	char			*regexp;
+	zbx_vector_expression_t	regexps;
+	unsigned char		op;
+}
+zbx_lld_condition_t;
+
+ZBX_PTR_VECTOR_DECL(lld_condition_ptr, zbx_lld_condition_t *)
+
+/* lld rule filter */
+typedef struct
+{
+	zbx_vector_lld_condition_ptr_t	conditions;
+	char				*expression;
+	int				evaltype;
+}
+zbx_lld_filter_t;
+
+/* lld rule override */
+typedef struct
+{
+	zbx_uint64_t				overrideid;
+	zbx_uint64_t				itemid;
+	char					*name;
+	zbx_lld_filter_t			filter;
+	zbx_vector_lld_override_operation_t	override_operations;
+	int					step;
+	unsigned char				stop;
+}
+zbx_lld_override_t;
+
+ZBX_PTR_VECTOR_DECL(lld_override_ptr, zbx_lld_override_t *)
+
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
 		zbx_vector_lld_override_operation_t *ops);
+
+void	zbx_lld_override_free(zbx_lld_override_t *override);
+zbx_lld_condition_t	*zbx_lld_filter_condition_create(const char *id, const char *operator, const char *macro,
+		const char *value);
+zbx_lld_override_t	*zbx_lld_override_create(const char *lld_overrideid, const char *itemid, const char *name,
+		const char *step, const char *evaltype, const char *formula, const char *stop);
+
+void	zbx_lld_filter_init(zbx_lld_filter_t *filter);
+void	zbx_lld_filter_clean(zbx_lld_filter_t *filter);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
