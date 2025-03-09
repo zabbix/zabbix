@@ -323,6 +323,40 @@ void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *m
 
 typedef struct
 {
+	zbx_uint64_t	item_conditionid;
+	int		operator;
+	char		*macro;
+	char		*value;
+}
+zbx_lld_rule_filter_t;
+
+ZBX_PTR_VECTOR_DECL(lld_rule_filter_ptr, zbx_lld_rule_filter_t *)
+ZBX_PTR_VECTOR_IMPL(lld_rule_filter_ptr, zbx_lld_rule_filter_t *)
+
+static zbx_lld_rule_filter_t	*lld_rule_filter_create(zbx_uint64_t item_conditionid, int operator, const char *macro,
+		const char *value)
+{
+	zbx_lld_rule_filter_t	*filter;
+
+	filter = zbx_malloc(NULL, sizeof(zbx_lld_rule_filter_t));
+
+	filter->item_conditionid = item_conditionid;
+	filter->operator = operator;
+	filter->macro = zbx_strdup(NULL, macro);
+	filter->value = zbx_strdup(NULL, value);
+
+	return filter;
+}
+
+static void	lld_rule_filter_free(zbx_lld_rule_filter_t *filter)
+{
+	zbx_free(filter->macro);
+	zbx_free(filter->value);
+	zbx_free(filter);
+}
+
+typedef struct
+{
 	zbx_uint64_t				itemid;
 	zbx_uint64_t				interfaceid;
 	zbx_uint64_t				master_itemid;
@@ -370,6 +404,13 @@ typedef struct
 	zbx_vector_lld_row_ptr_t		lld_rows;
 	zbx_vector_lld_item_preproc_ptr_t	preproc_ops;
 	zbx_vector_item_param_ptr_t		item_params;
+	zbx_vector_lld_rule_filter_ptr_t	filters;
+	zbx_vector_lld_macro_path_ptr_t		macro_paths;
+	zbx_vector_lld_override_ptr_t		overrides;
+
+	// TODO:
+	// lld_override* -> overrides
+
 	zbx_hashset_t				item_index;
 	zbx_vector_str_t			keys;		/* keys used to create ll rules from this prototype */
 }
@@ -414,6 +455,12 @@ static void	lld_rule_prototpe_free(zbx_lld_rule_prototype_t *rule_prototype)
 
 	zbx_vector_item_param_ptr_clear_ext(&rule_prototype->item_params, zbx_item_param_free);
 	zbx_vector_item_param_ptr_destroy(&rule_prototype->item_params);
+
+	zbx_vector_lld_rule_filter_ptr_clear_ext(&rule_prototype->filters, lld_rule_filter_free);
+	zbx_vector_lld_rule_filter_ptr_destroy(&rule_prototype->filters);
+
+	zbx_vector_lld_macro_path_ptr_clear_ext(&rule_prototype->macro_paths, zbx_lld_macro_path_free);
+	zbx_vector_lld_macro_path_ptr_destroy(&rule_prototype->macro_paths);
 
 	zbx_hashset_destroy(&rule_prototype->item_index);
 
@@ -513,6 +560,136 @@ static void	lld_rule_fetch_prototype_params(zbx_vector_lld_rule_prototype_ptr_t 
 	zbx_db_free_result(result);
 }
 
+static void	lld_rule_fetch_prototype_filters(zbx_vector_lld_rule_prototype_ptr_t *rule_prototypes,
+		const zbx_vector_uint64_t *protoids)
+{
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_lld_rule_prototype_t	*rule_prototype;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select item_conditionid,itemid,operator,macro,value from"
+			" item_condition where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_rule_prototype_t	rule_prototype_local;
+		zbx_lld_rule_filter_t		*filter;
+		int				index;
+		zbx_uint64_t			item_conditionid;
+
+		ZBX_STR2UINT64(rule_prototype_local.itemid, row[1]);
+
+		if (FAIL == (index = zbx_vector_lld_rule_prototype_ptr_bsearch(rule_prototypes, &rule_prototype_local,
+				lld_rule_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		rule_prototype = rule_prototypes->values[index];
+
+		ZBX_STR2UINT64(item_conditionid, row[0]);
+		filter = lld_rule_filter_create(item_conditionid, atoi(row[2]), row[3], row[4]);
+		zbx_vector_lld_rule_filter_ptr_append(&rule_prototype->filters, filter);
+	}
+	zbx_db_free_result(result);
+}
+
+static void	lld_rule_fetch_prototype_macro_paths(zbx_vector_lld_rule_prototype_ptr_t *rule_prototypes,
+		const zbx_vector_uint64_t *protoids)
+{
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_lld_rule_prototype_t	*rule_prototype;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,lld_macro,path from lld_macro_path where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_rule_prototype_t	rule_prototype_local;
+		zbx_lld_macro_path_t		*macro_path;
+		int				index;
+
+		ZBX_STR2UINT64(rule_prototype_local.itemid, row[0]);
+
+		if (FAIL == (index = zbx_vector_lld_rule_prototype_ptr_bsearch(rule_prototypes, &rule_prototype_local,
+				lld_rule_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		rule_prototype = rule_prototypes->values[index];
+
+		macro_path = lld_macro_path_create(row[1], row[2]);
+		zbx_vector_lld_macro_path_ptr_append(&rule_prototype->macro_paths, macro_path);
+	}
+	zbx_db_free_result(result);
+}
+
+static void	lld_rule_fetch_prototype_overrides(zbx_vector_lld_rule_prototype_ptr_t *rule_prototypes,
+		const zbx_vector_uint64_t *protoids)
+{
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_lld_rule_prototype_t	*rule_prototype;
+	zbx_vector_uint64_t		overrideids;
+	zbx_vector_lld_override_ptr_t	overrides;
+
+	zbx_vector_uint64_create(&overrideids);
+	zbx_vector_lld_override_ptr_create(&overrides);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_overrideid,itemid,name,step,evaltype,formula,stop"
+			" from lld_override where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_rule_prototype_t	rule_prototype_local;
+		int				index;
+		zbx_lld_override_t		*override;
+
+		ZBX_STR2UINT64(rule_prototype_local.itemid, row[0]);
+
+		if (FAIL == (index = zbx_vector_lld_rule_prototype_ptr_bsearch(rule_prototypes, &rule_prototype_local,
+				lld_rule_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		rule_prototype = rule_prototypes->values[index];
+
+		override = zbx_lld_override_create(row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
+		zbx_vector_lld_override_ptr_append(&rule_prototype->overrides, override);
+		zbx_vector_lld_override_ptr_append(&overrides, override);
+		zbx_vector_uint64_append(&overrideids, override->overrideid);
+
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_lld_override_ptr_sort(&overrides, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	// TODO: fetch override conditions & operations
+
+	zbx_vector_lld_override_ptr_destroy(&overrides);
+	zbx_vector_uint64_destroy(&overrideids);
+}
+
 static void	lld_rule_fetch_prototypes(zbx_uint64_t lld_ruleid, zbx_vector_lld_rule_prototype_ptr_t *rule_prototypes)
 {
 	zbx_db_result_t			result;
@@ -594,6 +771,8 @@ static void	lld_rule_fetch_prototypes(zbx_uint64_t lld_ruleid, zbx_vector_lld_ru
 		zbx_vector_item_param_ptr_create(&rule_prototype->item_params);
 		zbx_hashset_create(&rule_prototype->item_index, 0, lld_item_ref_key_hash_func,
 				lld_item_ref_key_compare_func);
+		zbx_vector_lld_rule_filter_ptr_create(&rule_prototype->filters);
+		zbx_vector_lld_macro_path_ptr_create(&rule_prototype->macro_paths);
 
 		zbx_vector_lld_rule_prototype_ptr_append(rule_prototypes, rule_prototype);
 
@@ -607,14 +786,15 @@ static void	lld_rule_fetch_prototypes(zbx_uint64_t lld_ruleid, zbx_vector_lld_ru
 		goto out;
 
 	lld_rule_fetch_prototype_preproc(rule_prototypes, &protoids);
-	lld_rule_fetch_prototype_params(rule_prototypes, &protoids);;
+	lld_rule_fetch_prototype_params(rule_prototypes, &protoids);
+	lld_rule_fetch_prototype_filters(rule_prototypes, &protoids);
+	lld_rule_fetch_prototype_macro_paths(rule_prototypes, &protoids);
 
 out:
 	zbx_vector_uint64_destroy(&protoids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, rule_prototypes->values_num);
 }
-
 
 static void	lld_rule_prototype_dump(zbx_lld_rule_prototype_t *rule_prototype)
 {
@@ -673,6 +853,22 @@ static void	lld_rule_prototype_dump(zbx_lld_rule_prototype_t *rule_prototype)
 				param->item_parameterid, param->name, param->value);
 	}
 
+	zabbix_log(LOG_LEVEL_TRACE, "  filters:");
+	for (int i = 0; i < rule_prototype->filters.values_num; i++)
+	{
+		zbx_lld_rule_filter_t        *filter = rule_prototype->filters.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    item_conditionid:" ZBX_FS_UI64 " operator:%d macro:%s value:%s",
+				filter->item_conditionid, filter->operator, filter->macro, filter->value);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  macro_paths:");
+	for (int i = 0; i < rule_prototype->macro_paths.values_num; i++)
+	{
+		zbx_lld_macro_path_t        *macro_path = rule_prototype->macro_paths.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    lld_macro:%s path:%s", macro_path->lld_macro, macro_path->path);
+	}
 }
 
 int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,

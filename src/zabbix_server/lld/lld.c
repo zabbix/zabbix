@@ -163,8 +163,8 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, const zbx_dc_item_t *item, 
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_condition_match(const zbx_lld_entry_t *lld_obj, const zbx_lld_condition_t *condition, int *result,
-		char **err_msg)
+static int	filter_condition_match(const zbx_lld_entry_t *lld_obj, const zbx_lld_condition_t *condition,
+		int *result, char **err_msg)
 {
 	char	*value = NULL;
 	int	ret = SUCCEED;

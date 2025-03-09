@@ -78,6 +78,7 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_p
 		char **error);
 void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
+zbx_lld_macro_path_t	*lld_macro_path_create(const char *lld_macro, const char *path);
 
 typedef struct
 {

@@ -92,6 +92,17 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_p
 	return ret;
 }
 
+zbx_lld_macro_path_t	*lld_macro_path_create(const char *lld_macro, const char *path)
+{
+	zbx_lld_macro_path_t        *lld_macro_path;
+
+	lld_macro_path = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
+	lld_macro_path->lld_macro = zbx_strdup(NULL, lld_macro);
+	lld_macro_path->path = zbx_strdup(NULL, path);
+
+	return lld_macro_path;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: release resources allocated by lld macro path                     *

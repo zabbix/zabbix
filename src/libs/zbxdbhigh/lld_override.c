@@ -315,7 +315,7 @@ zbx_lld_override_t	*zbx_lld_override_create(const char *lld_overrideid, const ch
 {
 	zbx_lld_override_t	*override = (zbx_lld_override_t *)zbx_malloc(NULL, sizeof(zbx_lld_override_t));
 
-	ZBX_STR2UINT64(override->overrideid, lld_overrideid);
+	ZBX_DBROW2UINT64(override->overrideid, lld_overrideid);
 	ZBX_DBROW2UINT64(override->itemid, itemid);
 	override->name = (NULL != name ? zbx_strdup(NULL, name) : NULL);
 	ZBX_STR2UCHAR(override->step, step);
