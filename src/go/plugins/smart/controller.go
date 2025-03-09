@@ -39,12 +39,12 @@ type smartCtl struct {
 }
 
 // newSmartCtl creates a new SmartCtl instance.
-func newSmartCtl(path string, timeoutSecs int) *smartCtl {
+func newSmartCtl(path string, timeoutSecs int) smartCtl {
 	if path == "" {
 		path = "smartctl"
 	}
 
-	return &smartCtl{
+	return smartCtl{
 		commandPath: path,
 		timeout:     time.Second * time.Duration(timeoutSecs),
 	}
@@ -55,10 +55,9 @@ func newSmartCtl(path string, timeoutSecs int) *smartCtl {
 // returns non-zero exit codes even when command executed successfully, in cases
 // like when a disc is failing.
 // https://linux.die.net/man/8/smartctl
-func (s *smartCtl) execute(args ...string) ([]byte, error) {
+func (s smartCtl) execute(args ...string) ([]byte, error) {
 	_, err := exec.LookPath(s.commandPath)
 	if err != nil {
-		//return nil, zbxerr.Wrap(err, "failed to look up smartctl exec path")
 		return nil, zbxerr.New("failed to look up smartctl exec path").Wrap(err)
 	}
 
@@ -79,11 +78,11 @@ func (s *smartCtl) execute(args ...string) ([]byte, error) {
 	)
 
 	//nolint:gosec
-	out, err := exec.CommandContext(ctx, cmd, cmdArgs...).CombinedOutput()
+	out, err := exec.CommandContext(ctx, cmd, cmdArgs...).
+		CombinedOutput()
 	if err != nil {
 		exitErr := &exec.ExitError{}
 		if errors.As(err, &exitErr) {
-			//return nil, errs.Wrapf(err, "%q", strings.TrimSuffix(string(out), "\n"))
 			return nil, zbxerr.New(fmt.Sprintf("%q", strings.TrimSuffix(string(out), "\n"))).Wrap(err)
 		}
 

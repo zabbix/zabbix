@@ -103,7 +103,7 @@ type healthLog struct {
 	PowerOnTime     int `json:"power_on_hours"`
 	CriticalWarning int `json:"critical_warning"`
 	MediaErrors     int `json:"media_errors"`
-	Percentage_used int `json:"percentage_used"`
+	PercentageUsed  int `json:"percentage_used"`
 }
 
 type temperature struct {

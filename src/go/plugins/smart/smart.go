@@ -42,6 +42,8 @@ const (
 	attributeDiscovery = "smart.attribute.discovery"
 )
 
+var pathRegex = regexp.MustCompile(`^(?:\s*-|'*"*\s*-)`)
+
 // Options -
 type Options struct {
 	Timeout int    `conf:"optional,range=1:30"`
@@ -52,7 +54,7 @@ type Options struct {
 type Plugin struct {
 	plugin.Base
 	options Options
-	ctl     *smartCtl
+	ctl     smartCtl
 }
 
 var impl Plugin
@@ -271,7 +273,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 		out["power_on_time"] = sd.HealthLog.PowerOnTime
 		out["critical_warning"] = sd.HealthLog.CriticalWarning
 		out["media_errors"] = sd.HealthLog.MediaErrors
-		out["percentage_used"] = sd.HealthLog.Percentage_used
+		out["percentage_used"] = sd.HealthLog.PercentageUsed
 	} else {
 		out["temperature"] = sd.Temperature.Current
 		out["power_on_time"] = sd.PowerOnTime.Hours
@@ -443,8 +445,6 @@ func (p *Plugin) validateExport(key string, params []string) error {
 
 	return p.checkVersion()
 }
-
-var pathRegex = regexp.MustCompile(`^(?:\s*-|'*"*\s*-)`)
 
 // validateParams validates the key's params quantity aspect.
 func validateParams(key string, params []string) error {
