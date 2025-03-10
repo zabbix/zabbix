@@ -367,7 +367,7 @@ func checkIfAddressesSpecifiedMoreThanOnce(addrs [][]string, addresses []string,
 	for k := 0; k < len(addrs); k++ {
 		for l := 0; l < len(addrs[k]); l++ {
 			if addrs[k][l] == addresses[j] {
-				return fmt.Errorf("%w address \"%s\" specified more than once",
+				return fmt.Errorf("%w address %q specified more than once",
 					errServerActive, addresses[j])
 			}
 		}
@@ -399,7 +399,7 @@ func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, e
 	ip := net.ParseIP(addresses[j])
 
 	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
-		return nil, fmt.Errorf("%w address \"%s\": empty value", errServerActive, addresses[j])
+		return nil, fmt.Errorf("%w address %q: empty value", errServerActive, addresses[j])
 	}
 
 	switch {
@@ -414,7 +414,7 @@ func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, e
 	h, p, err := net.SplitHostPort(checkAddr)
 
 	if err != nil {
-		return nil, fmt.Errorf("%w address \"%s\": %w", errServerActive, addresses[j], err)
+		return nil, fmt.Errorf("%w address %q: %w", errServerActive, addresses[j], err)
 	}
 
 	err = validateHost(h)
