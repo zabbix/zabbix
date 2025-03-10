@@ -22,11 +22,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_uniq = [
-			['triggerprototype.get', ['hostid' => '{hostid}', 'description' => '{name}'], 'triggerid']
-		];
-
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		return ['object', 'fields' => [
 			'triggerid' => ['db triggers.triggerid', 'required'],
 			'name' => ['db triggers.description', 'required', 'not_empty'],
 			'event_name' => ['db triggers.event_name'],
