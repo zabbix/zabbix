@@ -3,6 +3,10 @@ Changes for 6.0.40rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
+.........T [ZBX-26029] added device retrieval loop errors exceptions handling to Meraki template (abiba)
+..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.39
