@@ -84,6 +84,7 @@ $expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
 		->disableSpellcheck()
+		->setErrorContainer('expression-error-container')
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', _('Add')))
@@ -136,7 +137,10 @@ $expression_row[] = [
 		->setId('expression-constructor-buttons')
 		->addClass(ZBX_STYLE_FORM_SUBFIELD)
 		->addStyle('display: none'),
-	new CDiv($input_method_toggle)
+	new CDiv($input_method_toggle),
+	(new CDiv())
+		->setId('expression-error-container')
+		->addClass(ZBX_STYLE_ERROR_CONTAINER)
 ];
 
 $trigger_form_grid
@@ -172,6 +176,7 @@ $recovery_expression_row = [
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
+		->setErrorContainer('recovery-expression-error-container')
 		->disableSpellcheck()
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -213,7 +218,10 @@ $recovery_expression_row[] = [
 		->setId('recovery-constructor-buttons')
 		->addClass(ZBX_STYLE_FORM_SUBFIELD)
 		->addStyle('display: none'),
-	new CDiv($input_method_toggle)
+	new CDiv($input_method_toggle),
+	(new CDiv())
+		->setId('recovery-expression-error-container')
+		->addClass(ZBX_STYLE_ERROR_CONTAINER)
 ];
 
 $trigger_form_grid
