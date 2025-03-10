@@ -5591,7 +5591,7 @@ zabbix_export:
             - uuid: 6bf8f84c7b494c4da90ef5e47fa75627
               expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=1'
               name: 'Azure MSSQL DTU: Microsoft SQL database is degraded'
-              opdata: 'Current:{ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in a degraded state.'
               tags:
@@ -5600,7 +5600,7 @@ zabbix_export:
             - uuid: 4196d310e6e84c61a0a7115116f10854
               expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=3'
               name: 'Azure MSSQL DTU: Microsoft SQL database is in unknown state'
-              opdata: 'Current:{ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
               tags:
@@ -5609,7 +5609,7 @@ zabbix_export:
             - uuid: b6f356182f3d4b0c88f52d88fce580b9
               expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=2'
               name: 'Azure MSSQL DTU: Microsoft SQL database is unavailable'
-              opdata: 'Current:{ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
               tags:
@@ -5668,7 +5668,7 @@ zabbix_export:
             - uuid: 97caae1175be4c21b2fd5a53d5be25d2
               expression: 'min(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure MSSQL DTU: High CPU utilization'
-              opdata: 'Current {ITEM.LASTVALUE1}'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
@@ -5697,7 +5697,7 @@ zabbix_export:
             - uuid: a21b8c56bd914548949c277c77efbd4b
               expression: 'length(last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.data.errors))>0'
               name: 'Azure MSSQL DTU: There are errors in requests to API'
-              opdata: 'Current:{ITEM.LASTVALUE1}'
+              opdata: 'Current error: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
               tags:
@@ -5936,7 +5936,7 @@ zabbix_export:
             - uuid: eceb245b910841ceb8078ea8b3dbad1b
               expression: 'min(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.dtu.percentage,5m)>{$AZURE.DB.DTU.UTIL.CRIT}'
               name: 'Azure MSSQL DTU: High DTU utilization'
-              opdata: 'Current {ITEM.LASTVALUE1}'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The DTU utilization is too high. The system might be slow to respond.'
               tags:
@@ -6120,7 +6120,7 @@ zabbix_export:
             - uuid: b13d1ed5b1144e0095dca50bcbba37ae
               expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure MSSQL DTU: Storage space is critically low'
-              opdata: 'Current {ITEM.LASTVALUE1}'
+              opdata: 'Current space used: {ITEM.LASTVALUE1}%'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
               tags:
@@ -6129,7 +6129,7 @@ zabbix_export:
             - uuid: 74c7b9f109924177a37bc7717c6f39e0
               expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure MSSQL DTU: Storage space is low'
-              opdata: 'Current {ITEM.LASTVALUE1}'
+              opdata: 'Current space used: {ITEM.LASTVALUE1}%'
               priority: WARNING
               description: 'High utilization of the storage space.'
               dependencies:
