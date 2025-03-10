@@ -666,14 +666,6 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}},
 		},
 		{
-			"+IPv6WithEmptySpaceInside",
-			" fe80::72d5:8d8b: b2ca:206  ",
-			fmt.Errorf("%w %s", errServerActive,
-				`address "fe80::72d5:8d8b: b2ca:206": address fe80::72d5:8d8b: b2ca:206: too many colons in address`),
-			true,
-			nil,
-		},
-		{
 			"+emptyString",
 			"",
 			nil,
@@ -884,6 +876,20 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"foo:10051", "bar:10052"}, {"baz:10053"}},
 		},
 		{
+			"+newlineWithEmptySpaceAndTabs",
+			"    \n\t \n \n\n",
+			nil,
+			false,
+			[][]string{},
+		},
+		{
+			"+newline",
+			"\n",
+			nil,
+			false,
+			[][]string{},
+		},
+		{
 			"-coma",
 			",",
 			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
@@ -961,13 +967,6 @@ func TestParseServerActive(t *testing.T) {
 			nil,
 		},
 		{
-			"-newline",
-			"\n",
-			nil,
-			false,
-			[][]string{},
-		},
-		{
 			"-newlineSymbol",
 			"\\n",
 			fmt.Errorf("%w %s", errServerActive, `failed to validate host: \n`),
@@ -975,11 +974,12 @@ func TestParseServerActive(t *testing.T) {
 			nil,
 		},
 		{
-			"-newlineWithEmptySpaceAndTabs",
-			"    \n\t \n \n\n",
+			"-IPv6WithEmptySpaceInside",
+			" fe80::72d5:8d8b: b2ca:206  ",
+			fmt.Errorf("%w %s", errServerActive,
+				`address "fe80::72d5:8d8b: b2ca:206": address fe80::72d5:8d8b: b2ca:206: too many colons in address`),
+			true,
 			nil,
-			false,
-			[][]string{},
 		},
 	}
 
