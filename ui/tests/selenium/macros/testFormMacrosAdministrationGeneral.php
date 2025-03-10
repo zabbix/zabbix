@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../common/testFormMacros.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testFormMacros.php';
 
 use Facebook\WebDriver\WebDriverBy;
 

@@ -15,8 +15,8 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CElementQuery.php';
-require_once dirname(__FILE__).'/CommandExecutor.php';
+require_once __DIR__.'/CElementQuery.php';
+require_once __DIR__.'/CommandExecutor.php';
 
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Chrome\ChromeOptions;

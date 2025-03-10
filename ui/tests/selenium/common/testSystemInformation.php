@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
 
@@ -78,7 +78,7 @@ class testSystemInformation extends CWebTest {
 		];
 
 		// Update Zabbix frontend config to make sure that the address of the active node is shown correctly in tests.
-		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$file_path = __DIR__.'/../../../conf/zabbix.conf.php';
 		$pattern = array('/[$]ZBX_SERVER/','/[$]ZBX_SERVER_PORT/');
 		$replace = array('// $ZBX_SERVER','// $ZBX_SERVER_PORT');
 		$content = preg_replace($pattern, $replace, file_get_contents($file_path), 1);

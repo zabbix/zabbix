@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * The ignore browser errors annotation is required due to the errors coming from the URL opened in the URL widget.

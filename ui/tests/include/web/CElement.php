@@ -15,12 +15,12 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CBaseElement.php';
-require_once dirname(__FILE__).'/CElementQuery.php';
+require_once __DIR__.'/CBaseElement.php';
+require_once __DIR__.'/CElementQuery.php';
 
-require_once dirname(__FILE__).'/IWaitable.php';
-require_once dirname(__FILE__).'/WaitableTrait.php';
-require_once dirname(__FILE__).'/CastableTrait.php';
+require_once __DIR__.'/IWaitable.php';
+require_once __DIR__.'/WaitableTrait.php';
+require_once __DIR__.'/CastableTrait.php';
 
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;

@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config

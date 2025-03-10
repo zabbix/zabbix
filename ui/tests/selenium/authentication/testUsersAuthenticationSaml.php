@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
+require_once __DIR__.'/../common/testFormAuthentication.php';
 
 /**
  * @backup config

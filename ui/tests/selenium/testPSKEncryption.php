@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once __DIR__.'/../include/CWebTest.php';
 
 /**
  * @backup config, config_autoreg_tls
