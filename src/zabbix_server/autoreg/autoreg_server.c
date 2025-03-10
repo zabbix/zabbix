@@ -47,7 +47,6 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_str_t	hosts;
-	zbx_uint64_t		current_proxyid, current_proxy_groupid;
 	unsigned char		current_monitored_by, monitored_by;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
@@ -118,34 +117,48 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			}
 			else
 			{
-				if (0 != proxy->proxy_groupid)
+				zbx_uint64_t	current_autoreg_proxyid;
+
+				ZBX_DBROW2UINT64(current_autoreg_proxyid, row[8]);
+
+				/* if proxy is in a group then host must be monitored by this group, */
+				/* unless host was already directly monitored by this proxy          */
+				if (0 != proxy->proxy_groupid && (current_monitored_by != HOST_MONITORED_BY_PROXY ||
+						current_autoreg_proxyid != proxy->proxyid))
+				{
 					monitored_by = HOST_MONITORED_BY_PROXY_GROUP;
+				}
 				else
 					monitored_by = HOST_MONITORED_BY_PROXY;
 
 				if (monitored_by != current_monitored_by)
-					break;
-
-				if (monitored_by == HOST_MONITORED_BY_PROXY)
 				{
-					ZBX_DBROW2UINT64(current_proxyid, row[2]);
-					if (current_proxyid != proxy->proxyid)
+					break;
+				}
+				else if (monitored_by == HOST_MONITORED_BY_PROXY)
+				{
+					zbx_uint64_t	current_host_proxyid;
+
+					ZBX_DBROW2UINT64(current_host_proxyid, row[2]);
+					if (current_host_proxyid != proxy->proxyid)
 						break;
 				}
 				else if (monitored_by == HOST_MONITORED_BY_PROXY_GROUP)
 				{
+					zbx_uint64_t	current_proxy_groupid;
+
 					ZBX_DBROW2UINT64(current_proxy_groupid, row[10]);
 
 					if (current_proxy_groupid != proxy->proxy_groupid)
 						break;
-				}
 
-				ZBX_DBROW2UINT64(current_proxyid, row[8]);
-
-				if (current_proxyid != proxy->proxyid)
-				{
-					autoreg_host->autoreg_flags |= ZBX_AUTOREG_FLAGS_SKIP_EVENT;
-					break;
+					/* when host is moved between proxies in a group then event should not be */
+					/* generated while auto-registration record still needs to be updated     */
+					if (current_autoreg_proxyid != proxy->proxyid)
+					{
+						autoreg_host->autoreg_flags |= ZBX_AUTOREG_FLAGS_SKIP_EVENT;
+						break;
+					}
 				}
 			}
 
