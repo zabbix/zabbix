@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormTotp.php';
+require_once __DIR__.'/../common/testFormTotp.php';
 
 /**
  * @backup mfa

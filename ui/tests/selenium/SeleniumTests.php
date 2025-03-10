@@ -188,8 +188,8 @@ require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once __DIR__.'/mediaTypes/testPageAdministrationMediaTypes.php';
 
 // MFA.
-require_once dirname(__FILE__).'/mfa/testFormTotpEnroll.php';
-require_once dirname(__FILE__).'/mfa/testFormTotpValidate.php';
+require_once __DIR__.'/mfa/testFormTotpEnroll.php';
+require_once __DIR__.'/mfa/testFormTotpValidate.php';
 
 // Multiselects.
 require_once __DIR__.'/multiselects/testMultiselects.php';
