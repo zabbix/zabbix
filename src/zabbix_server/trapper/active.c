@@ -52,6 +52,9 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	const char	*p;
 	const char	*p_ip, *p_dns;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' ip:'%s' connection_type:%u", __func__, host, ip,
+			connection_type);
+
 	p_ip = ip;
 	p_dns = dns;
 
@@ -87,6 +90,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
 
 	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsigned short port,
