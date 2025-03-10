@@ -41,9 +41,12 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'recovery_mode' => ['db triggers.recovery_mode', 'in' => [ZBX_RECOVERY_MODE_EXPRESSION,
 				ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE
 			]],
-			'recovery_expression' => ['string', 'required', 'not_empty', 'when' => [
-				['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
-			]],
+			'recovery_expression' => ['string', 'required', 'not_empty',
+				'use' => [CExpressionParser::class, ['usermacros' => true, 'lldmacros' => true]],
+				'when' => [
+					['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
+				]
+			],
 			'correlation_mode' => ['db triggers.correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_NONE,
 				ZBX_TRIGGER_CORRELATION_TAG
 			]],
