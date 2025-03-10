@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * @backup items

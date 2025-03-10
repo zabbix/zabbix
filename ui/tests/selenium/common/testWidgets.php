@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
