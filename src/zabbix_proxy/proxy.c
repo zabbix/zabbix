@@ -1617,7 +1617,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			.events_cbs = &events_cbs,
 			.config_histsyncer_frequency = config_histsyncer_frequency,
 			.config_timeout = zbx_config_timeout,
-			.config_history_storage_pipelines = config_history_storage_pipelines
+			.config_history_storage_pipelines = config_history_storage_pipelines,
+			.config_syncer_num = get_config_forks(ZBX_PROCESS_TYPE_HISTSYNCER)
 		};
 
 	zbx_thread_vmware_args			vmware_args =
