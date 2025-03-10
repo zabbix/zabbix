@@ -353,12 +353,9 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zbx_dc_host_proxy_t		*hp;
 	int				ret;
 	ZBX_DC_HOST			*dc_host;
-	zbx_vector_dc_host_ptr_t	hosts;
 	zbx_hashset_t			psk_owners;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_dc_host_ptr_create(&hosts);
 
 	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
@@ -408,7 +405,6 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 					dc_host_register_proxy(dc_host, hp->proxyid, revision);
 					dc_host->proxyid = hp->proxyid;
 					dc_host->revision = revision;
-					zbx_vector_dc_host_ptr_append(&hosts, dc_host);
 				}
 			}
 		}
@@ -416,8 +412,8 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			dc_strpool_replace(found, &hp->host, row[2]);
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			ZBX_STR2UCHAR(hp->tls_accept, row[6]);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			dc_strpool_replace(found, &hp->tls_issuer, row[7]);
 			dc_strpool_replace(found, &hp->tls_subject, row[8]);
 			hp->tls_dc_psk = dc_psk_sync(row[9], row[10], hp->host, found, &psk_owners, hp->tls_dc_psk);
@@ -439,7 +435,6 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				dc_host_deregister_proxy(dc_host, hp->proxyid, revision);
 				dc_host->proxyid = 0;
 				dc_host->revision = revision;
-				zbx_vector_dc_host_ptr_append(&hosts, dc_host);
 			}
 		}
 
@@ -458,30 +453,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_hashset_remove_direct(&get_dc_config()->host_proxy, hp);
 	}
 
-	if (0 != hosts.values_num)
-	{
-		zbx_vector_uint64_t	hostids;
-
-		zbx_vector_uint64_create(&hostids);
-
-		for (int i = 0; i < hosts.values_num; i++)
-		{
-			ZBX_DC_INTERFACE	*interface;
-
-			for (int j = 0; j < hosts.values[i]->interfaces_v.values_num; j++)
-			{
-				interface = (ZBX_DC_INTERFACE *)hosts.values[i]->interfaces_v.values[j];
-				interface->reset_availability = 1;
-			}
-		}
-
-		zbx_dbsync_process_active_avail_diff(&hostids);
-
-		zbx_vector_uint64_destroy(&hostids);
-	}
-
 	zbx_hashset_destroy(&psk_owners);
-	zbx_vector_dc_host_ptr_destroy(&hosts);
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
@@ -587,7 +559,7 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 
 	if (0 == ((unsigned int)tls_accept & attr->connection_type))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot perform host \"host\" redirection: connection of type \"%s\""
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot perform host \"%s\" redirection: connection of type \"%s\""
 				" is not allowed",
 				host, zbx_tcp_connection_type_name(attr->connection_type));
 

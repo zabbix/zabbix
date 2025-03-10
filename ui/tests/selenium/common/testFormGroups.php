@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * Base class for Host and Template group form.
@@ -64,11 +64,6 @@ class testFormGroups extends CWebTest {
 	 * SQL query to get user group permissions for template and host groups to compare hash values.
 	 */
 	const PERMISSION_SQL = 'SELECT * FROM rights ORDER BY rightid';
-
-	/**
-	 * Flag for group form opened by direct link.
-	 */
-	protected $standalone = false;
 
 	/**
 	 * Link to page for opening group form.
@@ -132,15 +127,9 @@ class testFormGroups extends CWebTest {
 	public function layout($name, $discovered = false) {
 		// Check existing group form.
 		$form = $this->openForm($name, $discovered);
-		if ($this->standalone) {
-			$this->page->assertHeader(ucfirst($this->object).' group');
-			$footer = $form;
-		}
-		else {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->assertEquals(ucfirst($this->object).' group', $dialog->getTitle());
-			$footer = $dialog->getFooter();
-		}
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertEquals(ucfirst($this->object).' group', $dialog->getTitle());
+		$footer = $dialog->getFooter();
 
 		$this->assertTrue($form->isRequired('Group name'));
 		$form->checkValue(['Group name' => $name]);
@@ -156,10 +145,8 @@ class testFormGroups extends CWebTest {
 			$this->assertEquals(self::LLD, $form->getField('Discovered by')->query('tag:a')->one()->getText());
 			$form->query('link', self::LLD)->one()->click();
 			// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
-//			if (!$this->standalone) {
-//				$this->page->acceptAlert();
-//				$this->page->waitUntilReady();
-//			}
+//			$this->page->acceptAlert();
+//			$this->page->waitUntilReady();
 			$this->page->assertHeader('Host prototypes');
 			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
 
@@ -179,18 +166,11 @@ class testFormGroups extends CWebTest {
 			return;
 		}
 
-		// Check new group form.
-		if ($this->standalone) {
-			$this->page->open('zabbix.php?action='.$this->object.'group.edit')->waitUntilReady();
-			$this->page->assertHeader('New '.$this->object.' group');
-		}
-		else {
-			$dialog->close();
+		$dialog->close();
 
-			// Open group create form.
-			$this->query('button', 'Create '.$this->object.' group')->one()->click();
-			$this->assertEquals('New '.$this->object.' group', $dialog->waitUntilReady()->getTitle());
-		}
+		// Open group create form.
+		$this->query('button', 'Create '.$this->object.' group')->one()->click();
+		$this->assertEquals('New '.$this->object.' group', $dialog->waitUntilReady()->getTitle());
 
 		$form->invalidate();
 		$this->assertTrue($form->getField('Group name')->isAttributePresent(['maxlength' => '255', 'value' => '']));
@@ -198,15 +178,7 @@ class testFormGroups extends CWebTest {
 		$this->assertEquals(['Group name'], $form->getLabels(CElementFilter::VISIBLE)->asText());
 		$this->assertEquals(['Add', 'Cancel'], $footer->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText());
 		$footer->query('button:Cancel')->one()->click();
-
-		if ($this->standalone) {
-			$form->waitUntilNotVisible();
-			$this->page->assertHeader(ucfirst($this->object).' groups');
-			$this->assertEquals(PHPUNIT_URL.'zabbix.php?action='.$this->object.'group.list', $this->page->getCurrentUrl());
-		}
-		else {
-			$dialog->ensureNotPresent();
-		}
+		$dialog->ensureNotPresent();
 	}
 
 	/**
@@ -218,35 +190,20 @@ class testFormGroups extends CWebTest {
 	 * @return CForm
 	 */
 	public function openForm($name = null, $discovered = false) {
-		if ($this->standalone) {
-			if ($name) {
-				$groupid = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($name).
-						' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP')
-				);
-				$this->page->login()->open($this->link.$groupid)->waitUntilReady();
-			}
-			else {
-				$this->page->login()->open('zabbix.php?action='.$this->object.'group.edit')->waitUntilReady();
-			}
+		$this->page->login()->open($this->link)->waitUntilReady();
 
-			return $this->query('id', $this->object.'groupForm')->asForm()->waitUntilVisible()->one();
+		if ($name) {
+			$column_name = $this->search ? ucfirst($this->object).' group' : 'Name';
+			$table_selector = $this->search ? 'xpath://section[@id="search_'.$this->object.'group"]//table' : 'class:list-table';
+			$table = $this->query($table_selector)->asTable()->one();
+			$table->findRow($column_name, ($discovered && !$this->search) ? self::LLD.': '.$name : $name)
+					->getColumn($column_name)->query('link', $name)->one()->click();
 		}
 		else {
-			$this->page->login()->open($this->link)->waitUntilReady();
-
-			if ($name) {
-				$column_name = $this->search ? ucfirst($this->object).' group' : 'Name';
-				$table_selector = $this->search ? 'xpath://section[@id="search_'.$this->object.'group"]//table' : 'class:list-table';
-				$table = $this->query($table_selector)->asTable()->one();
-				$table->findRow($column_name, ($discovered && !$this->search) ? self::LLD.': '.$name : $name)
-						->getColumn($column_name)->query('link', $name)->one()->click();
-			}
-			else {
-				$this->query('button', 'Create '.$this->object.' group')->one()->click();
-			}
-
-			return COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+			$this->query('button', 'Create '.$this->object.' group')->one()->click();
 		}
+
+		return COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 	}
 
 	public static function getCreateData() {
@@ -365,9 +322,7 @@ class testFormGroups extends CWebTest {
 		$form->submit();
 
 		if ($data['expected'] === TEST_GOOD) {
-			if (!$this->standalone) {
-				COverlayDialogElement::ensureNotPresent();
-			}
+			COverlayDialogElement::ensureNotPresent();
 			$this->assertMessage(TEST_GOOD, $good_message);
 
 			// Trim trailing and leading spaces in expected values before comparison.
@@ -386,15 +341,13 @@ class testFormGroups extends CWebTest {
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 			$this->assertEquals($permission_old_hash, CDBHelper::getHash(self::PERMISSION_SQL));
-			$error_details =  ($this->object == 'template')
+			$error_details = ($this->object == 'template')
 				? CTestArrayHelper::get($data, 'template_error', $data['error'])
 				: $data['error'];
 			$this->assertMessage(TEST_BAD, $bad_message, $error_details);
 		}
 
-		if (!$this->standalone) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -416,9 +369,7 @@ class testFormGroups extends CWebTest {
 		$form->invalidate();
 		$this->assertEquals($values, $form->getValues());
 
-		if (!$this->standalone) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getCloneData() {
@@ -434,7 +385,7 @@ class testFormGroups extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => self::DELETE_GROUP,
-					'fields'  => [
+					'fields' => [
 						'Group name' => microtime().' cloned group'
 					]
 				]
@@ -443,7 +394,7 @@ class testFormGroups extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => self::SUBGROUP,
-					'fields'  => [
+					'fields' => [
 						'Group name' => microtime().'/cloned/subgroup'
 					]
 				]
@@ -460,18 +411,13 @@ class testFormGroups extends CWebTest {
 		);
 
 		$form = $this->openForm($data['name'], CTestArrayHelper::get($data, 'discovered', false));
-		$footer = ($this->standalone) ? $form : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
+		$footer = COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		$footer->query('button:Clone')->one()->waitUntilClickable()->click();
 		$form->invalidate();
 
 		// Check that the group creation form is open after cloning.
 		$title = 'New '.$this->object.' group';
-		if ($this->standalone) {
-			$this->page->assertHeader($title);
-		}
-		else {
-			$this->assertEquals($title, COverlayDialogElement::find()->one()->waitUntilReady()->getTitle());
-		}
+		$this->assertEquals($title, COverlayDialogElement::find()->one()->waitUntilReady()->getTitle());
 
 		$this->assertEquals(PHPUNIT_URL.'zabbix.php?action=popup&popup='.$this->object.'group.edit'.'&groupid='.$groupid, $this->page->getCurrentUrl());
 		$this->assertEquals(['Add', 'Cancel'], $footer->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText());
@@ -479,13 +425,10 @@ class testFormGroups extends CWebTest {
 		$form->submit();
 
 		if ($data['expected'] === TEST_GOOD) {
-			if (!$this->standalone) {
-				COverlayDialogElement::ensureNotPresent();
-			}
+			COverlayDialogElement::ensureNotPresent();
 			$this->assertMessage(TEST_GOOD, ucfirst($this->object).' group added');
 			$this->page->assertHeader($this->search ? 'Search: group' : ucfirst($this->object).' groups');
-			$url = PHPUNIT_URL.($this->standalone ? 'zabbix.php?action='.$this->object.'group.list' : $this->link);
-			$this->assertEquals($url, $this->page->getCurrentUrl());
+			$this->assertEquals(PHPUNIT_URL.$this->link, $this->page->getCurrentUrl());
 
 			$form = $this->openForm($data['fields']['Group name']);
 			$form->checkValue($data['fields']['Group name']);
@@ -501,9 +444,7 @@ class testFormGroups extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Cannot add '.$this->object.' group', ucfirst($this->object).$data['error']);
 		}
 
-		if (!$this->standalone) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getCancelData() {
@@ -548,32 +489,22 @@ class testFormGroups extends CWebTest {
 
 		// Change name.
 		$form->fill(['Group name' => $new_name]);
-		$footer = ($this->standalone) ? $form : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
-			$footer->query('button', $data['action'])->one()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button', $data['action'])
+					->one()->click();
 		}
 
 		if ($data['action'] === 'Delete') {
 			$this->page->dismissAlert();
 		}
 
-		// Refresh element after opening new form after cloning.
-		if ($data['action'] === 'Clone') {
-			$footer = ($this->standalone)
-				? $form->invalidate()
-				: COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
-		}
-
-		$footer->query('button:Cancel')->waitUntilClickable()->one()->click();
-
-		if (!$this->standalone) {
-			COverlayDialogElement::ensureNotPresent();
-		}
+		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Cancel')->waitUntilClickable()
+				->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->page->assertHeader($this->search ? 'Search: group' : ucfirst($this->object).' groups');
-		$url = PHPUNIT_URL.($this->standalone ? 'zabbix.php?action='.$this->object.'group.list' : $this->link);
-		$this->assertEquals($url, $this->page->getCurrentUrl());
+		$this->assertEquals(PHPUNIT_URL.$this->link, $this->page->getCurrentUrl());
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 
 	}
@@ -607,17 +538,14 @@ class testFormGroups extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
 		}
 
-		$form = $this->openForm($data['name']);
-		$footer = ($this->standalone) ? $form : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
-		$footer->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->openForm($data['name']);
+		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Delete')->one()
+				->waitUntilClickable()->click();
 		$this->assertEquals('Delete selected '.$this->object.' group?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 
 		if ($data['expected'] === TEST_GOOD) {
-			if (!$this->standalone) {
-				COverlayDialogElement::ensureNotPresent();
-			}
-
+			COverlayDialogElement::ensureNotPresent();
 			$this->assertMessage(TEST_GOOD, ucfirst($this->object).' group deleted');
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hstgrp WHERE name='.zbx_dbstr($data['name']).
 					' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP'))
@@ -626,10 +554,7 @@ class testFormGroups extends CWebTest {
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 			$this->assertMessage(TEST_BAD, 'Cannot delete '.$this->object.' group', $data['error']);
-
-			if (!$this->standalone) {
-				COverlayDialogElement::find()->one()->close();
-			}
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 
@@ -887,10 +812,7 @@ class testFormGroups extends CWebTest {
 			$form = $this->openForm(CTestArrayHelper::get($data, 'open_form', null));
 			$form->fill(['Group name' => $data['create']]);
 			$form->submit();
-
-			if (!$this->standalone) {
-				COverlayDialogElement::ensureNotPresent();
-			}
+			COverlayDialogElement::ensureNotPresent();
 
 			// Permission inheritance doesn't apply when changing the name of existing group, only when creating a new group.
 			$this->assertMessage(TEST_GOOD,
@@ -905,10 +827,7 @@ class testFormGroups extends CWebTest {
 			: 'Apply permissions to all subgroups') => true
 		]);
 		$form->submit();
-
-		if (!$this->standalone) {
-			COverlayDialogElement::ensureNotPresent();
-		}
+		COverlayDialogElement::ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, ucfirst($this->object).' group updated');
 
 		// Check group and tag permissions in user group.
@@ -917,6 +836,7 @@ class testFormGroups extends CWebTest {
 		$group_form->selectTab(ucfirst($this->object).' permissions');
 		$group_form->getField('Permissions')->asMultifieldTable()->checkValue($data['groups_after']);
 		$group_form->selectTab('Problem tag filter');
+
 		// Tag permissions do not change for template groups.
 		$this->assertTableData(($this->object === 'template') ? $data['tags_before'] : $data['tags_after'],
 				'id:tag-filter-table'

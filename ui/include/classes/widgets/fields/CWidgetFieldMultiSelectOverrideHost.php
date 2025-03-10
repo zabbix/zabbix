@@ -21,7 +21,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldMultiSelectOverrideHost extends CWidgetFieldMultiSelectHost {
 
-	public function __construct(string $name = 'override_hostid', string $label = null) {
+	public function __construct(string $name = 'override_hostid', ?string $label = null) {
 		parent::__construct($name, $label ?? _('Override host'));
 
 		$this

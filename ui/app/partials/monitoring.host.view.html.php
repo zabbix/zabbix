@@ -40,9 +40,7 @@ $table = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 foreach ($data['hosts'] as $hostid => $host) {
-	$host_name = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($hostid))
-		->addClass(ZBX_STYLE_WORDBREAK);
+	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
 	if ($host['interfaces']) {
@@ -107,10 +105,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$table->addRow([
 		[$host_name, $maintenance_icon],
-		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_WORDBREAK),
-		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
+		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
+		getHostAvailabilityTable($host['interfaces']),
 		$host['tags'],
-		($host['status'] == HOST_STATUS_MONITORED)
+		$host['status'] == HOST_STATUS_MONITORED
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
 		[
