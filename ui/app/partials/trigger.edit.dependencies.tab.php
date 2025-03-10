@@ -43,6 +43,7 @@ $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addIte
 			->addClass('js-remove-dependency')
 			->setAttribute('data-triggerid', '#{triggerid}'),
 		(new CInput('hidden', 'dependencies[]', '#{triggerid}'))
+			->setAttribute('data-field-type', 'hidden')
 			->setId('dependencies_'.'#{triggerid}')
 	]))->setId('dependency_'.'#{triggerid}')
 );
