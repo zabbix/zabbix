@@ -102,11 +102,11 @@ zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t 
 
 char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context);
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
-
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
+		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
+		struct evdns_base *dnsbase, const char *config_source_ip,
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
 
 void	zbx_set_snmp_bulkwalk_options(const char *progname);
 #endif
@@ -137,8 +137,9 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
+		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
+		struct evdns_base *dnsbase, const char *config_source_ip,
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
 
 typedef struct zbx_async_manager	zbx_async_manager_t;
 
@@ -164,9 +165,14 @@ typedef struct
 	const char		*config_ssl_key_location;
 	struct event		*async_wake_timer;
 	struct event		*async_timer;
+#ifdef HAVE_ARES
+	struct event		*async_timeout_timer;
+#endif
 	struct event_base	*base;
 	struct evdns_base	*dnsbase;
+	zbx_channel_t		*channel;
 	zbx_hashset_t		interfaces;
+	zbx_hashset_t		fd_events;
 #ifdef HAVE_LIBCURL
 	CURLM			*curl_handle;
 #endif

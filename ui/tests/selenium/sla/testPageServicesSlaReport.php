@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testSlaReport.php';
+require_once __DIR__.'/../common/testSlaReport.php';
 
 /**
  * @backup profiles

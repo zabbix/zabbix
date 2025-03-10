@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
 
@@ -78,7 +78,7 @@ class testSystemInformation extends CWebTest {
 		];
 
 		// Update Zabbix frontend config to make sure that the address of the active node is shown correctly in tests.
-		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$file_path = __DIR__.'/../../../conf/zabbix.conf.php';
 		$pattern = array('/[$]ZBX_SERVER/','/[$]ZBX_SERVER_PORT/');
 		$replace = array('// $ZBX_SERVER','// $ZBX_SERVER_PORT');
 		$content = preg_replace($pattern, $replace, file_get_contents($file_path), 1);
@@ -177,8 +177,10 @@ class testSystemInformation extends CWebTest {
 			self::$skip_fields[] = $this->query('xpath://footer')->one();
 		}
 
-		// Hide frontend version.
-		self::$skip_fields[] = $this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one();
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+		);
 
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
 		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".

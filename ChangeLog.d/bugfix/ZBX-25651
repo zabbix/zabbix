@@ -1,0 +1,1 @@
+........S. [ZBX-25651] improved trend update performance on TimescaleDB by using upserts instead of updates (vso)

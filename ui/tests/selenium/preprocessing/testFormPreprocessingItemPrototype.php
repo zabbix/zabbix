@@ -14,14 +14,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testFormPreprocessing.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items,users
  * @onBefore setRowsPerPage
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 
