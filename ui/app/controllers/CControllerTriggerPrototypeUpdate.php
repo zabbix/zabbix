@@ -47,13 +47,13 @@ class CControllerTriggerPrototypeUpdate extends CController {
 					['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
 				]
 			],
+			'type' => ['db triggers.type', 'in' => [TRIGGER_MULT_EVENT_DISABLED, TRIGGER_MULT_EVENT_ENABLED]],
 			'correlation_mode' => ['db triggers.correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_NONE,
 				ZBX_TRIGGER_CORRELATION_TAG
 			]],
 			'correlation_tag' => ['db triggers.correlation_tag', 'required', 'not_empty', 'when' => [
 				['correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_TAG]],
 			]],
-			'type' => ['db triggers.type', 'in' => [TRIGGER_MULT_EVENT_DISABLED, TRIGGER_MULT_EVENT_ENABLED]],
 			'manual_close' => ['db triggers.manual_close', 'in' => [ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 			]],
