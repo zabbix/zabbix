@@ -65,7 +65,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU load average|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>5 minute load average of processor load.</p>|SNMP agent|system.cpu.load[loadValue.2]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Load average (5m avg)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>5 minute load average of processor load.</p>|SNMP agent|system.cpu.load.avg5[loadValue.2]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Load average (1m avg)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>1 minute load average of processor load.</p>|SNMP agent|system.cpu.load.avg1[loadValue.1]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Load average (15m avg)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>15 minute load average of processor load.</p>|SNMP agent|system.cpu.load.avg15[loadValue.3]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Free memory|<p>MIB: FROGFOOT-RESOURCES-MIB</p>|SNMP agent|vm.memory.free[memFree.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Total memory|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>The total memory expressed in bytes.</p>|SNMP agent|vm.memory.total[memTotal.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Memory (buffers)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Memory used by kernel buffers (Buffers in /proc/meminfo).</p>|SNMP agent|vm.memory.buffers[memBuffer.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
