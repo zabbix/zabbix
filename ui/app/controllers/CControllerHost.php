@@ -215,6 +215,17 @@ abstract class CControllerHost extends CController {
 			}
 		}
 
+		if ($hosts) {
+			$dashboards = API::HostDashboard()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'hostids' => array_keys($hosts)
+			]);
+			$dashboard_count = array_combine(array_column($dashboards, 'hostid'),
+				array_column($dashboards, 'rowscount')
+			);
+		}
+
 		foreach ($hosts as &$host) {
 			foreach ($host['interfaces'] as &$interface) {
 				$interfaceid = $interface['interfaceid'];
@@ -236,9 +247,7 @@ abstract class CControllerHost extends CController {
 			unset($host['active_available']);
 
 			$host['items_count'] = array_key_exists($host['hostid'], $items_count) ? $items_count[$host['hostid']] : 0;
-
-			// Count number of dashboards for each host.
-			$host['dashboards'] = count(getHostDashboards($host['hostid']));
+			$host['dashboards'] = $dashboard_count[$host['hostid']];
 
 			CArrayHelper::sort($host['interfaces'], [['field' => 'main', 'order' => ZBX_SORT_DOWN]]);
 

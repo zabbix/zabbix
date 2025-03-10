@@ -133,7 +133,7 @@ class CSvgGraphHelper {
 			}
 
 			if ($templateid === '') {
-				if (!$data_set['hosts'] || !$data_set['items']) {
+				if (!$data_set['hosts'] && !$data_set['items']) {
 					continue;
 				}
 			}
