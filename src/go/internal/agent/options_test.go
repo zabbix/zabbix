@@ -17,7 +17,6 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -998,13 +997,12 @@ func TestParseServerActive(t *testing.T) {
 				t.Fatalf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
 			}
 
-			if len(al) != len(tt.result) {
-				t.Errorf("ParseServerActive failed for ServerActive input: %s, expect: %d got: %d "+
-					"address in the list\n", tt.serverActive, len(tt.result), len(al))
-			} else if !reflect.DeepEqual(al, tt.result) {
+			diff := cmp.Diff(al, tt.result)
+			if diff != "" {
 				t.Errorf("ParseServerActive failed for ServerActive input: %s, received value: %s "+
 					"does not match expected value: %s\n", tt.serverActive, al, tt.result)
 			}
+
 		})
 	}
 }
