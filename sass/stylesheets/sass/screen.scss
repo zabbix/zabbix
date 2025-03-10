@@ -626,9 +626,8 @@ form {
 			max-height: 150px;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			writing-mode: vertical-lr;
+			writing-mode: sideways-lr;
 			line-height: 22px;
-			transform: rotate(180deg);
 		}
 
 		a {
