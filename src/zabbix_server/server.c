@@ -1609,7 +1609,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency,
-								zbx_config_timeout, config_history_storage_pipelines};
+								zbx_config_timeout, config_history_storage_pipelines,
+								get_config_forks(ZBX_PROCESS_TYPE_HISTSYNCER)};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};

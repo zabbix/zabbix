@@ -119,6 +119,7 @@ void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff);
 void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
 void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age);
+void	zbx_dc_sync_trends(int parallel_num);
 int	zbx_trend_compare(const void *d1, const void *d2);
 void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
@@ -176,4 +177,7 @@ zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
 
 void	zbx_dbcache_setproxyqueue_state(int proxyqueue_state);
 int	zbx_dbcache_getproxyqueue_state(void);
+void	zbx_hc_acquire(void);
+int	zbx_hc_release(void);
+int	zbx_hc_refcount_peek(void);
 #endif

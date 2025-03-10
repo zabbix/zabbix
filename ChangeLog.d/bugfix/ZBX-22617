@@ -1,0 +1,1 @@
+........S. [ZBX-22617] enhanced Zabbix server performance by implementing parallel syncing of trends and avoiding range queries, resulting in faster shutdown times (vso)
