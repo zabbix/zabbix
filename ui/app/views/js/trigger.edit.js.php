@@ -811,7 +811,16 @@ window.trigger_edit_popup = new class {
 		});
 	}
 
-	clone() {
+	clone({title, buttons, rules}) {
+		this.form.reload(rules);
+		if (!this.readonly) {
+			this.triggerid = null;
+			this.overlay.setProperties({title, buttons});
+			this.overlay.recoverFocus();
+			this.overlay.containFocus();
+			return;
+		}
+
 		const form_refresh = document.createElement('input');
 
 		form_refresh.setAttribute('type', 'hidden');

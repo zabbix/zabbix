@@ -99,7 +99,25 @@ else {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'trigger_edit_popup.clone();'
+			'action' => 'trigger_edit_popup.clone('.json_encode([
+				'title' => _('New trigger'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'trigger_edit_popup.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => ZBX_STYLE_BTN_ALT,
+						'cancel' => true,
+						'action' => ''
+					]
+				],
+				'rules' => (new CFormValidator(CControllerTriggerCreate::getValidationRules()))->getRules()
+			]).');'
 		],
 		[
 			'title' => _('Delete'),
