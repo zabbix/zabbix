@@ -90,7 +90,7 @@ $output = [
 		'isSubmit' => true,
 		'action' => 'token_edit_popup.close();'
 	]],
-	'script_inline' => getPagePostJs().$this->readJsFile('popup.token.view.js.php'),
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.token.view.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
