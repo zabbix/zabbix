@@ -43,6 +43,16 @@ class CDBHelper {
 
 	static $db_extension;
 
+	const STATE_DEFAULT = 0;
+	const STATE_BROKEN = 1;
+
+	/**
+	 * DB state.
+	 *
+	 * @var integer
+	 */
+	static $state = self::STATE_DEFAULT;
+
 	/**
 	 * Perform select query and check the result.
 	 *
@@ -289,6 +299,8 @@ class CDBHelper {
 				$cmd .= ' 2>/dev/null';
 			}
 
+			static::removeDumpFile($file);
+
 			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
@@ -313,6 +325,8 @@ class CDBHelper {
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
 			$cmd .= ' --user='.$DB['USER'].' --add-drop-table '.$DB['DATABASE'];
 			$cmd .= ' '.implode(' ', $tables).' | gzip -c > '.$file;
+
+			static::removeDumpFile($file);
 
 			exec($cmd, $output, $result_code);
 
@@ -369,20 +383,11 @@ class CDBHelper {
 			}
 
 			if ($result_code != 0) {
+				self::$state = self::STATE_BROKEN;
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			if (strstr(strtolower(PHP_OS), 'win') !== false) {
-				$file = str_replace('/', '\\', $file);
-				exec('rd '.$file.' /q /s');
-			}
-			else {
-				exec('rm -rf '.$file, $output, $result_code);
-			}
-
-			if ($result_code != 0) {
-				throw new Exception('Failed to remove "'.$file.'".');
-			}
+			static::removeDumpFile($file);
 		}
 		else {
 			if ($DB['PASSWORD'] !== '') {
@@ -406,20 +411,11 @@ class CDBHelper {
 			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
+				self::$state = self::STATE_BROKEN;
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			if (strstr(strtolower(PHP_OS), 'win') !== false) {
-				$file = str_replace('/', '\\', $file);
-				exec('del '.$file);
-			}
-			else {
-				exec('rm -rf '.$file, $output, $result_code);
-			}
-
-			if ($result_code != 0) {
-				throw new Exception('Failed to remove "'.$file.'".');
-			}
+			static::removeDumpFile($file);
 		}
 	}
 
@@ -648,5 +644,35 @@ class CDBHelper {
 		}
 
 		return $eventids;
+	}
+
+	/**
+	 * Get state of the DB.
+	 *
+	 * @return boolean
+	 */
+	public static function isValid() {
+		return (self::$state === self::STATE_DEFAULT);
+	}
+
+	/**
+	 * Remove dump file.
+	 *
+	 * @param string $file     path of the dump file
+	 *
+	 * @throws Exception on failure to remove the file
+	 */
+	public static function removeDumpFile($file) {
+		if (strstr(strtolower(PHP_OS), 'win') !== false) {
+			$file = str_replace('/', '\\', $file);
+			exec('del '.$file);
+		}
+		else {
+			exec('rm -rf '.$file, $output, $result_code);
+		}
+
+		if ($result_code != 0) {
+			throw new Exception('Failed to remove "'.$file.'".');
+		}
 	}
 }

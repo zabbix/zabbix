@@ -264,6 +264,11 @@ class CTest extends TestCase {
 	 * @before
 	 */
 	public function onBeforeTestCase() {
+		if (!CDBHelper::isValid()) {
+			self::markTestSkipped('Test case skipped because of the broken DB state.');
+			return;
+		}
+
 		global $DB;
 		static $suite = null;
 		$class_name = get_class($this);
