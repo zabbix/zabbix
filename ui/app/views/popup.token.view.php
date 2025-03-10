@@ -44,6 +44,7 @@ $token_from_grid = (new CFormGrid())
 				_("Make sure to copy the auth token as you won't be able to view it after the page is closed.")
 			),
 			(new CButton('copy_button'))
+				->setTitle(_('Copy to clipboard'))
 				->addClass(ZBX_ICON_COPY)
 				->addClass(ZBX_STYLE_BTN_GREY_ICON)
 				->addClass('js-copy-button')
