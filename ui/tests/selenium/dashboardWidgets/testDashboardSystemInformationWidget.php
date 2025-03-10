@@ -121,8 +121,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on second widget name.
-		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshot($dashboard, 'widget_without_ha');
 	}
 
@@ -169,8 +167,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 */
 	public function testDashboardSystemInformationWidget_checkEnabledHA() {
 		$this->assertEnabledHACluster(self::$dashboardid);
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on second widget name.
-		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
 	}
 
