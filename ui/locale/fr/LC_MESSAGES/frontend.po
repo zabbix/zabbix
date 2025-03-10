@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-18 20:06+0000\n"
+"PO-Revision-Date: 2025-02-21 20:53+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3970,7 +3970,7 @@ msgstr "Impossible de mettre à jour \"%1$s\" pour le prototype de déclencheur 
 #: include/classes/api/helpers/CApiSettingsHelper.php:94
 #, c-format
 msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
-msgstr ""
+msgstr "Impossible de mettre à jour le paramètre « %1$s » car il est actuellement en lecture seule. Envisagez de mettre à niveau Zabbix pour supprimer cette limitation."
 
 #: include/classes/api/services/CHost.php:2344
 #, c-format
