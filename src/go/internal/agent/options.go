@@ -36,6 +36,8 @@ import (
 	"golang.zabbix.com/sdk/zbxnet"
 )
 
+const regexDNSString = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
+
 var Options AgentOptions
 
 const (
@@ -363,20 +365,18 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
-func checkIfAddressesSpecifiedMoreThanOnce(addrs [][]string, addresses []string, j int) error {
-	for k := 0; k < len(addrs); k++ {
-		for l := 0; l < len(addrs[k]); l++ {
-			if addrs[k][l] == addresses[j] {
+func checkIfAddressesSpecifiedMoreThanOnce(resultAddresses [][]string, clusterAddresses []string, j int) error {
+	for k := 0; k < len(resultAddresses); k++ {
+		for l := 0; l < len(resultAddresses[k]); l++ {
+			if resultAddresses[k][l] == clusterAddresses[j] {
 				return fmt.Errorf("%w address %q specified more than once",
-					errServerActive, addresses[j])
+					errServerActive, clusterAddresses[j])
 			}
 		}
 	}
 
 	return nil
 }
-
-const regexDNSString = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
 
 func validateHost(host string) error {
 	regexDNS := regexp.MustCompile(regexDNSString)
@@ -392,30 +392,30 @@ func validateHost(host string) error {
 	return fmt.Errorf("%w failed to validate host: %s", errServerActive, host)
 }
 
-func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, error) {
+func checkAddress(clusterAddresses []string, j, i int, resultAddresses [][]string) ([][]string, error) {
 	var checkAddr string
 
-	addresses[j] = strings.TrimSpace(addresses[j])
-	u := url.URL{Host: addresses[j]}
-	ip := net.ParseIP(addresses[j])
+	clusterAddresses[j] = strings.TrimSpace(clusterAddresses[j])
+	u := url.URL{Host: clusterAddresses[j]}
+	ip := net.ParseIP(clusterAddresses[j])
 
 	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
-		return nil, fmt.Errorf("%w address %q: empty value", errServerActive, addresses[j])
+		return nil, fmt.Errorf("%w address %q: empty value", errServerActive, clusterAddresses[j])
 	}
 
 	switch {
 	case ip != nil:
-		checkAddr = net.JoinHostPort(addresses[j], "10051")
+		checkAddr = net.JoinHostPort(clusterAddresses[j], "10051")
 	case u.Port() == "":
 		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
 	default:
-		checkAddr = addresses[j]
+		checkAddr = clusterAddresses[j]
 	}
 
 	h, p, err := net.SplitHostPort(checkAddr)
 
 	if err != nil {
-		return nil, fmt.Errorf("%w address %q: %w", errServerActive, addresses[j], err)
+		return nil, fmt.Errorf("%w address %q: %w", errServerActive, clusterAddresses[j], err)
 	}
 
 	err = validateHost(h)
@@ -424,17 +424,17 @@ func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, e
 		return nil, err
 	}
 
-	addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+	clusterAddresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 
-	err = checkIfAddressesSpecifiedMoreThanOnce(addrs, addresses, j)
+	err = checkIfAddressesSpecifiedMoreThanOnce(resultAddresses, clusterAddresses, j)
 
 	if err != nil {
 		return nil, err
 	}
 
-	addrs[i] = append(addrs[i], addresses[j])
+	resultAddresses[i] = append(resultAddresses[i], clusterAddresses[j])
 
-	return addrs, nil
+	return resultAddresses, nil
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
@@ -445,17 +445,17 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 
 	clusters := strings.Split(optionServerActive, ",")
 
-	addrs := make([][]string, 0, len(clusters))
+	resultAddresses := make([][]string, 0, len(clusters))
 
 	for i := 0; i < len(clusters); i++ {
-		addresses := strings.Split(clusters[i], ";")
+		clusterAddresses := strings.Split(clusters[i], ";")
 
-		addrs = append(addrs, make([]string, 0))
+		resultAddresses = append(resultAddresses, make([]string, 0))
 
-		for j := 0; j < len(addresses); j++ {
+		for j := 0; j < len(clusterAddresses); j++ {
 			var err error
 
-			addrs, err = checkAddress(addresses, j, i, addrs)
+			resultAddresses, err = checkAddress(clusterAddresses, j, i, resultAddresses)
 
 			if err != nil {
 				return nil, err
@@ -463,7 +463,7 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 		}
 	}
 
-	return addrs, nil
+	return resultAddresses, nil
 }
 
 func ValidateOptions(options *AgentOptions) error {
