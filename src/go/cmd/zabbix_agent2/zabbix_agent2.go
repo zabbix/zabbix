@@ -481,6 +481,17 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
+	if logType == log.File {
+		go func() {
+			t := time.NewTicker(15 * time.Second)
+			defer t.Stop()
+
+			for range t.C {
+				log.RefreshLogFile()
+			}
+		}()
+	}
+
 	zbxlib.SetLogLevel(logLevel)
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())

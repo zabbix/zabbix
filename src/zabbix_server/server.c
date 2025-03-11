@@ -1972,6 +1972,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
+
+		__zbx_update_env(zbx_time());
 	}
 
 	zbx_db_version_info_clear();

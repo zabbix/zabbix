@@ -81,6 +81,8 @@ char		*strerror_from_module(unsigned long error, const wchar_t *module);
 int		zbx_redirect_stdio(const char *filename);
 
 void		zbx_handle_log(void);
+void		zbx_log_lock(void);
+void		zbx_log_unlock(void);
 
 int		zbx_get_log_type(const char *logtype);
 int		zbx_validate_log_parameters(ZBX_TASK_EX *task);
