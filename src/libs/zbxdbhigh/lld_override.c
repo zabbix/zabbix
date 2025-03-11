@@ -340,6 +340,16 @@ void	zbx_lld_override_free(zbx_lld_override_t *override)
 	zbx_free(override);
 }
 
+int	zbx_lld_override_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_override_t	*override_1 = *(const zbx_lld_override_t **)d1;
+	const zbx_lld_override_t	*override_2 = *(const zbx_lld_override_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(override_1->overrideid, override_2->overrideid);
+
+	return 0;
+}
+
 zbx_lld_condition_t	*zbx_lld_filter_condition_create(const char *id, const char *operator, const char *macro,
 		const char *value)
 {

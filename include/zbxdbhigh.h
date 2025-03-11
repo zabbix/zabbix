@@ -755,6 +755,7 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		zbx_vector_lld_override_operation_t *ops);
 
 void	zbx_lld_override_free(zbx_lld_override_t *override);
+int	zbx_lld_override_compare_func(const void *d1, const void *d2);
 zbx_lld_condition_t	*zbx_lld_filter_condition_create(const char *id, const char *operator, const char *macro,
 		const char *value);
 zbx_lld_override_t	*zbx_lld_override_create(const char *lld_overrideid, const char *itemid, const char *name,
