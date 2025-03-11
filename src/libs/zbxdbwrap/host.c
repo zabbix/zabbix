@@ -391,6 +391,45 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Description: gets a vector of sysmap element identifiers used with the     *
+ *              trigger identifiers                                           *
+ *                                                                            *
+ * Parameters: selementids - [OUT] sysmap element identifiers                 *
+ *             triggerids  - [IN]                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_sysmapelements_triggers_by_ids(zbx_vector_uint64_t *selementids,
+		const zbx_vector_uint64_t *triggerids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_db_row_t	row;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct selementid"
+			" from sysmap_element_trigger"
+			" where");
+
+	zbx_db_large_query_t	query;
+
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "triggerid", triggerids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	elementid;
+
+		ZBX_STR2UINT64(elementid, row[0]);
+		zbx_vector_uint64_append(selementids, elementid);
+	}
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Description: Check collisions between linked templates                     *
  *                                                                            *
  * Parameters: templateids - [IN] array of template IDs                       *
@@ -1142,8 +1181,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	const char		*event_tables[] = {"events"};
 	zbx_vector_uint64_t	linkids;
 
-	ZBX_UNUSED(audit_context_mode);
-
 	if (0 == triggerids->values_num)
 		return;
 
@@ -1152,10 +1189,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	DBget_trigger_map_links(triggerids, &linkids);
 
 	zbx_vector_uint64_create(&selementids);
-
-	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
-	if (0 != selementids.values_num)
-		zbx_db_execute_multiple_query("delete from sysmaps_elements where", "selementid", &selementids);
+	DBget_sysmapelements_triggers_by_ids(&selementids, triggerids);
 
 	zbx_audit_trigger_delete(audit_context_mode, triggerids);
 
@@ -1164,6 +1198,18 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_execute_multiple_query("delete from trigger_tag where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
+
+	if (0 != selementids.values_num)
+	{
+		/* this query to delete map trigger elements must be executed after the query to delete trigger */
+		zbx_db_execute_multiple_query(
+				"delete from sysmaps_elements"
+				" where selementid not in ("
+					"select selementid from sysmap_element_trigger"
+				")"
+					" and",
+				"selementid", &selementids);
+	}
 
 	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));

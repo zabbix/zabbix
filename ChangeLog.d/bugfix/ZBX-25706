@@ -1,0 +1,1 @@
+........S. [ZBX-25706] updated macro substitution process to re-try resolving macros in item key parameters and macro context without double-quoting if quoting was not possible (asestakovs)

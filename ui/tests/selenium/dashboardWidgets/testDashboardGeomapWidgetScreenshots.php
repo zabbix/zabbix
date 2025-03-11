@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup settings, widget, hosts
@@ -288,8 +288,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		CDashboardElement::find()->waitUntilReady();
 
 		$widgets = [
-			// TODO: temporarily commented out due to mouse pointer on first widget in Jenkins
-//			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
 			'Geomap for screenshots, no zoom',
