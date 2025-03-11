@@ -2103,8 +2103,7 @@ void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, cons
 	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
-				&query->ref.filter, ZBX_MACRO_TYPE_QUERY_FILTER, NULL, 0);
+		zbx_substitute_macros(&query->ref.filter, NULL, 0, zbx_macro_query_filter_resolv, item);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
