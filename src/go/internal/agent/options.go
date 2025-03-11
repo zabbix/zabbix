@@ -36,8 +36,6 @@ import (
 	"golang.zabbix.com/sdk/zbxnet"
 )
 
-const regexDNSString = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
-
 var Options AgentOptions
 
 const (
@@ -49,6 +47,9 @@ const (
 )
 
 var (
+	hostnameRegex *regexp.Regexp = regexp.MustCompile(
+		`^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`)
+
 	errInvalidTLSConnect = errors.New("invalid TLSConnect configuration parameter")
 	errInvalidTLSAccept  = errors.New("invalid TLSAccept configuration parameter")
 	errCipherCertAndAll  = errors.New(`TLSCipherCert configuration parameter cannot be used when the combined list` +
@@ -378,14 +379,18 @@ func checkIfAddressesSpecifiedMoreThanOnce(resultAddresses [][]string, clusterAd
 	return nil
 }
 
-func validateHost(host string) error {
-	regexDNS := regexp.MustCompile(regexDNSString)
+func isValidHostname(hostname string) bool {
+	isValid := hostnameRegex.MatchString(hostname)
 
+	return isValid
+}
+
+func validateHost(host string) error {
 	host = strings.TrimSpace(host)
 
 	if net.ParseIP(host) != nil {
 		return nil
-	} else if regexDNS.MatchString(host) {
+	} else if isValidHostname(host) {
 		return nil
 	}
 
