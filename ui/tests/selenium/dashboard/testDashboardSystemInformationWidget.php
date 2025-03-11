@@ -119,11 +119,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		self::$widgets_dashboardid = $response['dashboardids'][1];
 	}
 
-// Commented until Jenkins issue investigated.
-//	public function testDashboardSystemInformationWidget_checkDisabledHA() {
-//		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-//		$this->assertScreenshot(CDashboardElement::find()->waitUntilReady()->one(), 'widget_without_ha');
-//	}
+	public function testDashboardSystemInformationWidget_checkDisabledHA() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->assertScreenshot(CDashboardElement::find()->waitUntilReady()->one(), 'widget_without_ha');
+	}
 
 	public function testDashboardSystemInformationWidget_Create() {
 		$widgets = [
