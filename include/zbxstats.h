@@ -51,6 +51,6 @@ typedef struct
 zbx_process_info_t;
 
 typedef void (*zbx_zabbix_stats_procinfo_func_t)(zbx_process_info_t *info);
-void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_func_t procinfo_cb);
+void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_func_t stats_procinfo_cb);
 
 #endif

@@ -245,7 +245,7 @@ void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
  * Purpose: gets discovery worker usage statistics                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
+void	zbx_stats_procinfo_discovery(zbx_process_info_t *info)
 {
 	zbx_vector_dbl_t	usage;
 	char			*error = NULL;

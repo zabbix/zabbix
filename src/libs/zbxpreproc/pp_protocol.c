@@ -1152,7 +1152,7 @@ int	zbx_get_usage_stats_preprocessor(zbx_vector_dbl_t *usage, int *count, char *
  * Purpose: get preprocessing worker usage statistics                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info)
+void	zbx_stats_procinfo_preprocessor(zbx_process_info_t *info)
 {
 	zbx_vector_dbl_t	usage;
 	char			*error = NULL;

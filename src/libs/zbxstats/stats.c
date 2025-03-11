@@ -24,7 +24,7 @@
 static zbx_get_program_type_f			get_program_type_cb;
 static zbx_vector_stats_ext_func_t		stats_ext_funcs;
 static zbx_vector_stats_ext_func_t		stats_data_funcs;
-static zbx_zabbix_stats_procinfo_func_t		procinfo_funcs[ZBX_PROCESS_TYPE_COUNT];
+static zbx_zabbix_stats_procinfo_func_t		stats_procinfo_funcs[ZBX_PROCESS_TYPE_COUNT];
 
 ZBX_PTR_VECTOR_IMPL(stats_ext_func, zbx_stats_ext_func_entry_t *)
 
@@ -76,19 +76,16 @@ void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register process information callback for the specified process   *
- *          type                                                              *
+ * Purpose: register process information callback for specified process type  *
  *                                                                            *
- * Parameters: proc_type   - [IN] the process type                            *
- *             procinfo_cb - [IN] the process information callback            *
+ * Parameters: proc_type         - [IN]                                       *
+ *             stats_procinfo_cb - [IN]                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_func_t procinfo_cb)
+void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_func_t stats_procinfo_cb)
 {
 	if (0 <= proc_type && proc_type < ZBX_PROCESS_TYPE_COUNT)
-	{
-		procinfo_funcs[proc_type] = procinfo_cb;
-	}
+		stats_procinfo_funcs[proc_type] = stats_procinfo_cb;
 }
 
 /******************************************************************************
@@ -96,7 +93,7 @@ void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_f
  * Purpose: add process information to json                                   *
  *                                                                            *
  ******************************************************************************/
-static void	stats_add_procinfo(struct zbx_json *json, int proc_type, zbx_process_info_t *info)
+static void	stats_procinfo_add(struct zbx_json *json, int proc_type, zbx_process_info_t *info)
 {
 	if (0 == info->count)
 		return;
@@ -257,15 +254,15 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 	{
 		for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 		{
-			if (NULL != procinfo_funcs[proc_type])
+			if (NULL != stats_procinfo_funcs[proc_type])
 			{
 				zbx_process_info_t	info;
 
-				procinfo_funcs[proc_type](&info);
-				stats_add_procinfo(json, proc_type, &info);
+				stats_procinfo_funcs[proc_type](&info);
+				stats_procinfo_add(json, proc_type, &info);
 			}
 			else
-				stats_add_procinfo(json, proc_type, &process_stats[proc_type]);
+				stats_procinfo_add(json, proc_type, &process_stats[proc_type]);
 		}
 	}
 
