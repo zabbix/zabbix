@@ -986,7 +986,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
-	int		i, db_type;
+	int		i, db_type, ret;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1341,11 +1341,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING())
 	{
-		if (EINTR != errno)
+		zbx_update_env(zbx_time());
+		zbx_sleep(1);
+
+		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
 			break;
 		}
 
@@ -1354,6 +1357,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zbx_diag_log_info(zbx_diaginfo_scope);
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
+		}
+
+		if (-1 == ret && EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			break;
 		}
 	}
 

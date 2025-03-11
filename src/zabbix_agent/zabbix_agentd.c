@@ -974,7 +974,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
-	int		i, j = 0;
+	int		i, j = 0, ret;
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
@@ -1152,9 +1152,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING())
 	{
-		if (EINTR != errno)
+		zbx_update_env(zbx_time());
+		zbx_sleep(1);
+
+		ret = waitpid((pid_t)-1, &i, WNOHANG);
+
+		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			break;

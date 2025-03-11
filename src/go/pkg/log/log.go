@@ -182,6 +182,16 @@ func procLog(format string, args []interface{}, level int) {
 	logger.Printf(format, args...)
 }
 
+// RefreshLogFile exposes rotateLog under lock
+// Used by Agent to avoid holding old fds when the logfile
+// was rotated by external tool.
+func RefreshLogFile() {
+	logAccess.Lock()
+	defer logAccess.Unlock()
+
+	rotateLog()
+}
+
 func rotateLog() {
 	if logStat.logType == File {
 		fstat, err := os.Stat(logStat.filename)
