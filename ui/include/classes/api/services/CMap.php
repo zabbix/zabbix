@@ -1754,7 +1754,8 @@ class CMap extends CMapElement {
 			'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
 			' FROM sysmap_link_threshold slt'.
 			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
-				' AND '.dbConditionId('slt.linkid', $linkids)
+				' AND '.dbConditionId('slt.linkid', $linkids).
+			' ORDER BY slt.threshold'
 		);
 
 		while ($db_threshold = DBfetch($resource)) {
@@ -1780,10 +1781,11 @@ class CMap extends CMapElement {
 		}
 
 		$resource = DBselect(
-			'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.drawtype,slt.color'.
+			'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.sortorder,slt.drawtype,slt.color'.
 			' FROM sysmap_link_threshold slt'.
 			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_HIGHLIGHT.
-				' AND '.dbConditionId('slt.linkid', $linkids)
+				' AND '.dbConditionId('slt.linkid', $linkids).
+			' ORDER BY slt.sortorder'
 		);
 
 		while ($db_threshold = DBfetch($resource)) {
@@ -2015,7 +2017,7 @@ class CMap extends CMapElement {
 
 					foreach ($db_link['highlights'] as $db_highlight) {
 						$link['highlights'][] = array_intersect_key($db_highlight,
-							array_flip(['pattern', 'drawtype', 'color'])
+							array_flip(['pattern', 'sortorder', 'drawtype', 'color'])
 						);
 					}
 				}
@@ -2083,8 +2085,9 @@ class CMap extends CMapElement {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'highlights' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['pattern']], 'fields' => [
+										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['pattern'], ['sortorder']], 'fields' => [
 											'pattern' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'pattern')],
+											'sortorder' =>	['type' => API_INT32, 'flags' => API_REQUIRED],
 											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
 											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
 										]],
@@ -3803,7 +3806,8 @@ class CMap extends CMapElement {
 					'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
 					' FROM sysmap_link_threshold slt'.
 					' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
-						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds())
+						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds()).
+					' ORDER BY slt.threshold'
 				), 'linkthresholdid');
 				$link_threshold_relation_map = $this->createRelationMap($link_thresholds, 'linkid', 'linkthresholdid');
 				$link_thresholds = $this->unsetExtraFields($link_thresholds, ['linkthresholdid', 'linkid']);
@@ -3812,10 +3816,11 @@ class CMap extends CMapElement {
 
 			if ($this->outputIsRequested('highlights', $options['selectLinks'])) {
 				$link_highlights = DBFetchArrayAssoc(DBselect(
-					'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.drawtype,slt.color'.
+					'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.sortorder,slt.drawtype,slt.color'.
 					' FROM sysmap_link_threshold slt'.
 					' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_HIGHLIGHT.
-						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds())
+						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds()).
+					' ORDER BY slt.sortorder'
 				), 'linkthresholdid');
 				$link_highlight_relation_map = $this->createRelationMap($link_highlights, 'linkid', 'linkthresholdid');
 				$link_highlights = $this->unsetExtraFields($link_highlights, ['linkthresholdid', 'linkid']);
