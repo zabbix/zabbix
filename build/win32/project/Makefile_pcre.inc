@@ -12,8 +12,10 @@ INCS =	$(INCS) /I "$(PCRE2INCDIR)"
 LIBS = $(LIBS) "$(PCRE2LIBDIR)\pcre2-8-static.lib"
 !		ELSEIF EXISTS("$(PCRE2LIBDIR)\pcre2-8-staticd.lib")
 LIBS = $(LIBS) "$(PCRE2LIBDIR)\pcre2-8-staticd.lib"
+!		ELSEIF EXISTS("$(PCRE2LIBDIR)\pcre2-8.lib") # else if PCRE2 was installed with vcpkg
+LIBS = $(LIBS) "$(PCRE2LIBDIR)\pcre2-8.lib"
 !		ELSE
-!			ERROR PCRE2LIBDIR "$(PCRE2LIBDIR)" cannot find neither "$(PCRE2LIBDIR)\pcre2-8-static.lib" nor "$(PCRE2LIBDIR)\pcre2-8-staticd.lib"
+!			ERROR PCRE2LIBDIR "$(PCRE2LIBDIR)" cannot find neither "$(PCRE2LIBDIR)\pcre2-8-static.lib", "$(PCRE2LIBDIR)\pcre2-8-staticd.lib" nor "$(PCRE2LIBDIR)\pcre2-8.lib"
 !		ENDIF
 !	ENDIF
 

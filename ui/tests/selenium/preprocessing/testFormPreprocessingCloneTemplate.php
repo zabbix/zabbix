@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testFormPreprocessingClone.php';
+require_once __DIR__.'/../common/testFormPreprocessingClone.php';
 
 /**
  * Test of cloning template with preprocessing steps in items.
