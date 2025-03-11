@@ -4589,7 +4589,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$object->asDashboard()->waitUntilReady();
 		}
 
-		$this->assertScreenshot($object, $id.'_kiosk');
+		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();

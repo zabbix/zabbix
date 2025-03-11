@@ -110,8 +110,6 @@ class testFormSetup extends CWebTest {
 
 		global $DB;
 		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on row in table.
-		$this->query('tag:h1')->one()->hoverMouse();
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
 	}
 

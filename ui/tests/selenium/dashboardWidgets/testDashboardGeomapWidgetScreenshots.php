@@ -288,8 +288,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$widgets = [
-			// TODO: temporarily commented out due to mouse pointer on first widget in Jenkins
-//			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
 			'Geomap for screenshots, no zoom',
