@@ -391,7 +391,6 @@ func elementsUnique(array [][]string) (bool, string) {
 			_, exists := seen[element]
 			if exists {
 				return false, element
-				//return fmt.Errorf("%w address %q specified more than once", errServerActive, seen[element])
 			}
 
 			seen[element] = struct{}{}
@@ -401,54 +400,64 @@ func elementsUnique(array [][]string) (bool, string) {
 	return true, ""
 }
 
+func clusterToAddresses(cluster string) ([]string, error) {
+	rawAddresses := strings.Split(cluster, ";")
+	parsedAddresses := make([]string, len(rawAddresses))
+
+	for i, rawAddress := range rawAddresses {
+		address := strings.TrimSpace(rawAddress)
+		u := url.URL{Host: address}
+		ip := net.ParseIP(address)
+
+		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
+			return nil, fmt.Errorf("%w address %q: empty value", errServerActive, address)
+		}
+
+		var checkAddr string
+		if nil != ip {
+			checkAddr = net.JoinHostPort(address, "10051")
+		} else if 0 == len(u.Port()) {
+			checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+		} else {
+			checkAddr = address
+		}
+
+		if h, p, err := net.SplitHostPort(checkAddr); err != nil {
+			return nil, fmt.Errorf("%w address %q: %w", errServerActive, address, err)
+		} else {
+			err = validateHost(h)
+
+			if err != nil {
+				return nil, err
+			}
+
+			parsedAddresses[i] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+		}
+	}
+
+	return parsedAddresses, nil
+}
+
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
 func ParseServerActive(optionServerActive string) ([][]string, error) {
 	if strings.TrimSpace(optionServerActive) == "" {
 		return [][]string{}, nil
 	}
 
-	var checkAddr string
 	clusters := strings.Split(optionServerActive, ",")
-
 	resultAddresses := make([][]string, len(clusters))
 
-	for i := 0; i < len(clusters); i++ {
-		clusterAddresses := strings.Split(clusters[i], ";")
-
-		for j := 0; j < len(clusterAddresses); j++ {
-			clusterAddresses[j] = strings.TrimSpace(clusterAddresses[j])
-			u := url.URL{Host: clusterAddresses[j]}
-			ip := net.ParseIP(clusterAddresses[j])
-
-			if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
-				return nil, fmt.Errorf("%w address %q: empty value", errServerActive, clusterAddresses[j])
-			}
-
-			if nil != ip {
-				checkAddr = net.JoinHostPort(clusterAddresses[j], "10051")
-			} else if 0 == len(u.Port()) {
-				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-			} else {
-				checkAddr = clusterAddresses[j]
-			}
-
-			if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-				return nil, fmt.Errorf("%w address %q: %w", errServerActive, clusterAddresses[j], err)
-			} else {
-				err = validateHost(h)
-
-				if err != nil {
-					return nil, err
-				}
-
-				clusterAddresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
-			}
-
-			resultAddresses[i] = append(resultAddresses[i], clusterAddresses[j])
+	for i, cluster := range clusters {
+		clusterAddresses, err := clusterToAddresses(cluster)
+		if err != nil {
+			return nil, err
 		}
+
+		resultAddresses[i] = clusterAddresses
 	}
 
 	elementsUniqueRes, duplicateElement := elementsUnique(resultAddresses)
+
 	if !elementsUniqueRes {
 		return nil, fmt.Errorf("%w address %q specified more than once", errServerActive, duplicateElement)
 	}
