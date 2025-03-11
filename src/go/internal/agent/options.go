@@ -400,39 +400,52 @@ func elementsUnique(array [][]string) (bool, string) {
 	return true, ""
 }
 
+func normalizeAddress(address string) (string, error) {
+	address = strings.TrimSpace(address)
+	u := url.URL{Host: address}
+	ip := net.ParseIP(address)
+
+	if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
+		return "", fmt.Errorf("%w address %q: empty value", errServerActive, address)
+	}
+
+	var checkAddr string
+	if nil != ip {
+		checkAddr = net.JoinHostPort(address, "10051")
+	} else if 0 == len(u.Port()) {
+		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+	} else {
+		checkAddr = address
+	}
+
+	h, p, err := net.SplitHostPort(checkAddr)
+
+	if err != nil {
+		return "", fmt.Errorf("%w address %q: %w", errServerActive, address, err)
+	}
+
+	err = validateHost(h)
+
+	if err != nil {
+		return "", err
+	}
+
+	return net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p)), nil
+}
+
 func clusterToAddresses(cluster string) ([]string, error) {
 	rawAddresses := strings.Split(cluster, ";")
 	parsedAddresses := make([]string, len(rawAddresses))
 
 	for i, rawAddress := range rawAddresses {
-		address := strings.TrimSpace(rawAddress)
-		u := url.URL{Host: address}
-		ip := net.ParseIP(address)
 
-		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
-			return nil, fmt.Errorf("%w address %q: empty value", errServerActive, address)
+		address, err := normalizeAddress(rawAddress)
+
+		if err != nil {
+			return nil, err
 		}
 
-		var checkAddr string
-		if nil != ip {
-			checkAddr = net.JoinHostPort(address, "10051")
-		} else if 0 == len(u.Port()) {
-			checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-		} else {
-			checkAddr = address
-		}
-
-		if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-			return nil, fmt.Errorf("%w address %q: %w", errServerActive, address, err)
-		} else {
-			err = validateHost(h)
-
-			if err != nil {
-				return nil, err
-			}
-
-			parsedAddresses[i] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
-		}
+		parsedAddresses[i] = address
 	}
 
 	return parsedAddresses, nil
