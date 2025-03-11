@@ -387,6 +387,10 @@ class CTest extends TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		if (!CDBHelper::isValid()) {
+			return;
+		}
+
 		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
 
 		if ($this->case_backup_config) {
