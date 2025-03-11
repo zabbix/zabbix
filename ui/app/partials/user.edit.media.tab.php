@@ -61,13 +61,9 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 		(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
 		[
-			$data['can_edit_media']
-				? (new CButtonLink(_('Enabled')))
-					->addClass(ZBX_STYLE_COLOR_POSITIVE)
-					->addClass('js-status')
-				: (new CSpan(_('Enabled')))
-					->addClass(ZBX_STYLE_COLOR_POSITIVE)
-					->addClass('js-status'),
+			($data['can_edit_media'] ? new CButtonLink(_('Enabled')) : new CSpan(_('Enabled')))
+				->addClass(ZBX_STYLE_COLOR_POSITIVE)
+				->addClass('js-status'),
 			(new CSpan(_('Disabled')))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		],
 		(new CHorList([

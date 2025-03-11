@@ -311,6 +311,7 @@ $media = new CPartial('user.edit.media.tab', [
 		? CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
 		: CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)
 ] + $data);
+
 $tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
 // Permissions tab.
