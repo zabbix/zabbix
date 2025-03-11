@@ -923,21 +923,7 @@ zabbix_export:
                       name: reference
                       value: AAAAA
                 - type: graph
-                  name: 'Load average (5m avg)'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Ubiquiti AirOS by SNMP'
-                        name: 'Ubiquiti AirOS: Load average (5m avg)'
-                    - type: STRING
-                      name: reference
-                      value: ACAAB
-                - type: graph
-                  name: 'Load average (1m avg)'
+                  name: 'Load average'
                   x: '36'
                   width: '36'
                   height: '5'
@@ -946,25 +932,10 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'Ubiquiti AirOS by SNMP'
-                        name: 'Ubiquiti AirOS: Load average (1m avg)'
+                        name: 'Ubiquiti AirOS: Load average'
                     - type: STRING
                       name: reference
                       value: AAAAB
-                - type: graph
-                  name: 'Load average (15m avg)'
-                  x: '36'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Ubiquiti AirOS by SNMP'
-                        name: 'Ubiquiti AirOS: Load average (15m avg)'
-                    - type: STRING
-                      name: reference
-                      value: ABAAB
       valuemaps:
         - uuid: 2fc5bef495074d0e86641cc136e3dcde
           name: 'IF-MIB::ifOperStatus'
@@ -1587,27 +1558,20 @@ zabbix_export:
         - tag: scope
           value: notice
   graphs:
-    - uuid: b45aa2b85eda44809f76a9587b2a3a1e
-      name: 'Ubiquiti AirOS: Load average (1m avg)'
-      graph_items:
-        - drawtype: GRADIENT_LINE
-          color: 199C0D
-          item:
-            host: 'Ubiquiti AirOS by SNMP'
-            key: 'system.cpu.load.avg1[loadValue.1]'
     - uuid: acb2b7447a6449a591db186a4db81643
-      name: 'Ubiquiti AirOS: Load average (5m avg)'
+      name: 'Ubiquiti AirOS: Load average'
       graph_items:
-        - drawtype: GRADIENT_LINE
-          color: 199C0D
+        - color: 199C0D
           item:
             host: 'Ubiquiti AirOS by SNMP'
             key: 'system.cpu.load.avg5[loadValue.2]'
-    - uuid: 887349158e764fa49b0600d4c8d7a596
-      name: 'Ubiquiti AirOS: Load average (15m avg)'
-      graph_items:
-        - drawtype: GRADIENT_LINE
-          color: 199C0D
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Ubiquiti AirOS by SNMP'
+            key: 'system.cpu.load.avg1[loadValue.1]'
+        - sortorder: '2'
+          color: 00611C
           item:
             host: 'Ubiquiti AirOS by SNMP'
             key: 'system.cpu.load.avg15[loadValue.3]'
