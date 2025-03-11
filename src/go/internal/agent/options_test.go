@@ -1002,7 +1002,6 @@ func TestParseServerActive(t *testing.T) {
 				t.Errorf("ParseServerActive failed for ServerActive input: %s, received value: %s "+
 					"does not match expected value: %s\n", tt.serverActive, al, tt.result)
 			}
-
 		})
 	}
 }

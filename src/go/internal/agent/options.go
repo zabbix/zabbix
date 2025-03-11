@@ -386,6 +386,7 @@ func validateHost(host string) error {
 
 func elementsUnique(array [][]string) (bool, string) {
 	seen := make(map[string]struct{})
+
 	for _, row := range array {
 		for _, element := range row {
 			_, exists := seen[element]
@@ -405,16 +406,18 @@ func normalizeAddress(address string) (string, error) {
 	u := url.URL{Host: address}
 	ip := net.ParseIP(address)
 
-	if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
+	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
 		return "", fmt.Errorf("%w address %q: empty value", errServerActive, address)
 	}
 
 	var checkAddr string
-	if nil != ip {
+
+	switch {
+	case ip != nil:
 		checkAddr = net.JoinHostPort(address, "10051")
-	} else if 0 == len(u.Port()) {
+	case u.Port() == "":
 		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-	} else {
+	default:
 		checkAddr = address
 	}
 
@@ -433,12 +436,12 @@ func normalizeAddress(address string) (string, error) {
 	return net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p)), nil
 }
 
+//nolint:makezero
 func clusterToAddresses(cluster string) ([]string, error) {
 	rawAddresses := strings.Split(cluster, ";")
 	parsedAddresses := make([]string, len(rawAddresses))
 
 	for i, rawAddress := range rawAddresses {
-
 		address, err := normalizeAddress(rawAddress)
 
 		if err != nil {
@@ -451,7 +454,9 @@ func clusterToAddresses(cluster string) ([]string, error) {
 	return parsedAddresses, nil
 }
 
-// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
+//
+//nolint:makezero
 func ParseServerActive(optionServerActive string) ([][]string, error) {
 	if strings.TrimSpace(optionServerActive) == "" {
 		return [][]string{}, nil
