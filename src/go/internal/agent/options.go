@@ -384,6 +384,23 @@ func validateHost(host string) error {
 	return fmt.Errorf("%w failed to validate host: %s", errServerActive, host)
 }
 
+func elementsUnique(array [][]string) (bool, string) {
+	seen := make(map[string]struct{})
+	for _, row := range array {
+		for _, element := range row {
+			_, exists := seen[element]
+			if exists {
+				return false, element
+				//return fmt.Errorf("%w address %q specified more than once", errServerActive, seen[element])
+			}
+
+			seen[element] = struct{}{}
+		}
+	}
+
+	return true, ""
+}
+
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
 func ParseServerActive(optionServerActive string) ([][]string, error) {
 	if strings.TrimSpace(optionServerActive) == "" {
@@ -427,16 +444,13 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 				clusterAddresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 			}
 
-			for k := 0; k < len(resultAddresses); k++ {
-				for l := 0; l < len(resultAddresses[k]); l++ {
-					if resultAddresses[k][l] == clusterAddresses[j] {
-						return nil, fmt.Errorf("%w address %q specified more than once", errServerActive, clusterAddresses[j])
-					}
-				}
-			}
-
 			resultAddresses[i] = append(resultAddresses[i], clusterAddresses[j])
 		}
+	}
+
+	elementsUniqueRes, duplicateElement := elementsUnique(resultAddresses)
+	if !elementsUniqueRes {
+		return nil, fmt.Errorf("%w address %q specified more than once", errServerActive, duplicateElement)
 	}
 
 	return resultAddresses, nil
