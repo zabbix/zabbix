@@ -366,19 +366,6 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
-func checkIfAddressesSpecifiedMoreThanOnce(resultAddresses [][]string, clusterAddresses []string, j int) error {
-	for k := 0; k < len(resultAddresses); k++ {
-		for l := 0; l < len(resultAddresses[k]); l++ {
-			if resultAddresses[k][l] == clusterAddresses[j] {
-				return fmt.Errorf("%w address %q specified more than once",
-					errServerActive, clusterAddresses[j])
-			}
-		}
-	}
-
-	return nil
-}
-
 func isValidHostname(hostname string) bool {
 	isValid := hostnameRegex.MatchString(hostname)
 
@@ -397,74 +384,58 @@ func validateHost(host string) error {
 	return fmt.Errorf("%w failed to validate host: %s", errServerActive, host)
 }
 
-func checkAddress(clusterAddresses []string, j, i int, resultAddresses [][]string) ([][]string, error) {
-	var checkAddr string
-
-	clusterAddresses[j] = strings.TrimSpace(clusterAddresses[j])
-	u := url.URL{Host: clusterAddresses[j]}
-	ip := net.ParseIP(clusterAddresses[j])
-
-	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
-		return nil, fmt.Errorf("%w address %q: empty value", errServerActive, clusterAddresses[j])
-	}
-
-	switch {
-	case ip != nil:
-		checkAddr = net.JoinHostPort(clusterAddresses[j], "10051")
-	case u.Port() == "":
-		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-	default:
-		checkAddr = clusterAddresses[j]
-	}
-
-	h, p, err := net.SplitHostPort(checkAddr)
-
-	if err != nil {
-		return nil, fmt.Errorf("%w address %q: %w", errServerActive, clusterAddresses[j], err)
-	}
-
-	err = validateHost(h)
-
-	if err != nil {
-		return nil, err
-	}
-
-	clusterAddresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
-
-	err = checkIfAddressesSpecifiedMoreThanOnce(resultAddresses, clusterAddresses, j)
-
-	if err != nil {
-		return nil, err
-	}
-
-	resultAddresses[i] = append(resultAddresses[i], clusterAddresses[j])
-
-	return resultAddresses, nil
-}
-
-// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
 func ParseServerActive(optionServerActive string) ([][]string, error) {
 	if strings.TrimSpace(optionServerActive) == "" {
 		return [][]string{}, nil
 	}
 
+	var checkAddr string
 	clusters := strings.Split(optionServerActive, ",")
 
-	resultAddresses := make([][]string, 0, len(clusters))
+	resultAddresses := make([][]string, len(clusters))
 
 	for i := 0; i < len(clusters); i++ {
 		clusterAddresses := strings.Split(clusters[i], ";")
 
-		resultAddresses = append(resultAddresses, make([]string, 0))
-
 		for j := 0; j < len(clusterAddresses); j++ {
-			var err error
+			clusterAddresses[j] = strings.TrimSpace(clusterAddresses[j])
+			u := url.URL{Host: clusterAddresses[j]}
+			ip := net.ParseIP(clusterAddresses[j])
 
-			resultAddresses, err = checkAddress(clusterAddresses, j, i, resultAddresses)
-
-			if err != nil {
-				return nil, err
+			if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
+				return nil, fmt.Errorf("%w address %q: empty value", errServerActive, clusterAddresses[j])
 			}
+
+			if nil != ip {
+				checkAddr = net.JoinHostPort(clusterAddresses[j], "10051")
+			} else if 0 == len(u.Port()) {
+				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+			} else {
+				checkAddr = clusterAddresses[j]
+			}
+
+			if h, p, err := net.SplitHostPort(checkAddr); err != nil {
+				return nil, fmt.Errorf("%w address %q: %w", errServerActive, clusterAddresses[j], err)
+			} else {
+				err = validateHost(h)
+
+				if err != nil {
+					return nil, err
+				}
+
+				clusterAddresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+			}
+
+			for k := 0; k < len(resultAddresses); k++ {
+				for l := 0; l < len(resultAddresses[k]); l++ {
+					if resultAddresses[k][l] == clusterAddresses[j] {
+						return nil, fmt.Errorf("%w address %q specified more than once", errServerActive, clusterAddresses[j])
+					}
+				}
+			}
+
+			resultAddresses[i] = append(resultAddresses[i], clusterAddresses[j])
 		}
 	}
 
