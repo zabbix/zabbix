@@ -16,7 +16,6 @@
 
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
-#include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"

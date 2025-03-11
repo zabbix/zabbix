@@ -21,7 +21,6 @@
 #include "zbxcacheconfig.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
 #include "audit/zbxaudit.h"
@@ -30,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 
 #define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
 

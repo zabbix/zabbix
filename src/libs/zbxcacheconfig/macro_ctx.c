@@ -17,6 +17,8 @@
 #include "zbx_expression_constants.h"
 #include "zbxinterface.h"
 #include "zbxip.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 static int	common_resolv(zbx_macro_resolv_data_t *p, zbx_uint64_t hostid, const char *host, const char *name,
 		const zbx_dc_interface_t *interface, zbx_uint64_t itemid, char **replace_to)
