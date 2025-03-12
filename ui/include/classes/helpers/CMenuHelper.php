@@ -173,8 +173,8 @@ class CMenuHelper {
 						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
 						'trigger.list?context=template', 'graph.list?context=template',
 						'host_discovery.php?context=template', 'item.prototype.list?context=template',
-						'trigger.prototype.list?context=template', 'host_prototypes.php?context=template',
-						'httpconf.php?context=template'
+						'trigger.prototype.list?context=template', 'graph.prototype.list?context=template',
+						'host_prototypes.php?context=template', 'httpconf.php?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -183,8 +183,8 @@ class CMenuHelper {
 					->setAliases([
 						'item.list?context=host', 'trigger.list?context=host', 'graph.list?context=host',
 						'host_discovery.php?context=host', 'item.prototype.list?context=host',
-						'trigger.prototype.list?context=host', 'host_prototypes.php?context=host',
-						'httpconf.php?context=host'
+						'trigger.prototype.list?context=host', 'graph.prototype.list?context=host',
+						'host_prototypes.php?context=host', 'httpconf.php?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)

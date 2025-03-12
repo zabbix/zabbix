@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerGraphList extends CController {
+class CControllerGraphPrototypeList extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -23,11 +23,8 @@ class CControllerGraphList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
-			'filter_set' =>			'in 1',
-			'filter_rst' =>			'in 1',
-			'filter_groupids' =>	'array_id',
-			'filter_hostids' =>		'array_id',
-			'sort' =>				'in '.implode(',', ['graphtype', 'name']),
+			'parent_discoveryid' =>	'required|id',
+			'sort' =>				'in '.implode(',', ['graphtype', 'name', 'discover']),
 			'sortorder' =>			'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
 			'page' =>				'ge 1'
 		];
@@ -42,89 +39,46 @@ class CControllerGraphList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		$discovery_rule = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid'],
+			'itemids' => getRequest('parent_discoveryid'),
+			'editable' => true
+		]);
+
+		$this->discovery_rule = reset($discovery_rule);
+
+		if (!$discovery_rule) {
+			return false;
+		}
+
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	protected function doAction(): void {
-		// Update profiles
 		$context = $this->getInput('context');
+		$hostid = $this->discovery_rule['hostid'];
+
+		// Update profiles
 		$prefix = $context === 'host' ? 'web.hosts.' : 'web.templates.';
+		$sort_field = $this->getInput('sort', CProfile::get($prefix.'graph.prototype.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder',
+			CProfile::get($prefix.'graph.prototype.list.sortorder', ZBX_SORT_UP)
+		);
 
-		$sort_field = $this->getInput('sort', CProfile::get($prefix.'graph.list.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get($prefix.'graph.list.sortorder', ZBX_SORT_UP));
+		CProfile::update($prefix.'graph.prototype.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update($prefix.'graph.prototype.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		CProfile::update($prefix.'graph.list.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update($prefix.'graph.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
-		if ($this->hasInput('filter_set')) {
-			CProfile::updateArray($prefix.'graph.list.filter_groupids', $this->getInput('filter_groupids', []),
-				PROFILE_TYPE_ID
-			);
-			CProfile::updateArray($prefix.'graph.list.filter_hostids', $this->getInput('filter_hostids', []),
-				PROFILE_TYPE_ID
-			);
-		}
-		elseif ($this->hasInput('filter_rst')) {
-			CProfile::deleteIdx($prefix.'graph.list.filter_groupids');
-
-			$filter_hostids = $this->getInput('filter_hostids',
-				CProfile::getArray($prefix.'graph.list.filter_hostids', [])
-			);
-
-			if (count($filter_hostids) != 1) {
-				CProfile::deleteIdx($prefix.'graph.list.filter_hostids');
-			}
-		}
-
-		$filter_groupids = CProfile::getArray($prefix.'graph.list.filter_groupids', []);
-		$filter_hostids = CProfile::getArray($prefix.'graph.list.filter_hostids', []);
-		$filter = [
-			'hosts' => [],
-			'groups' => []
-		];
-
-		$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], $context);
-
-		if ($context === 'host') {
-			$filter['hosts'] = $filter_hostids
-				? CArrayHelper::renameObjectsKeys(API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $filter_hostids,
-					'editable' => true,
-					'preservekeys' => true
-				]), ['hostid' => 'id'])
-				: [];
-		}
-		else {
-			$filter['hosts'] = $filter_hostids
-				? CArrayHelper::renameObjectsKeys(API::Template()->get([
-					'output' => ['templateid', 'name'],
-					'templateids' => $filter_hostids,
-					'editable' => true,
-					'preservekeys' => true
-				]), ['templateid' => 'id'])
-				: [];
-		}
-
-		$hostid = 0;
-
-		if (count($filter['hosts']) == 1) {
-			$hostid = reset($filter['hosts'])['id'];
-		}
-
-		// Select graphs.
-		$options = [
+		$graphs = API::GraphPrototype()->get([
 			'output' => ['graphid', 'name', 'graphtype'],
-			'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-			'groupids' => $filter_groupids ?: null,
 			'templated' => $context === 'template',
+			'discoveryids' => $this->discovery_rule['itemid'],
 			'editable' => true,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
-		];
-
-		$graphs = API::Graph()->get($options);
+		]);
 
 		$data = [
 			'graphs' => $graphs,
@@ -151,14 +105,13 @@ class CControllerGraphList extends CController {
 
 		// Get graphs after paging.
 		$options = [
-			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
+			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectHosts' => ['name'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
 		];
 
-		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['status', 'ts_delete']]);
+		$data['graphs'] = API::GraphPrototype()->get($options);
 
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
@@ -166,35 +119,26 @@ class CControllerGraphList extends CController {
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 
-		if ($data['hostid'] == 0) {
-			foreach ($data['graphs'] as &$graph) {
-				CArrayHelper::sort($graph['hosts'], ['name']);
-			}
-			unset($graph);
-		}
-
 		// pager
 		$page_num = $this->getInput('page', 1);
 
 		CPagerHelper::savePage('graph.list', $page_num);
-
 		$paging = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'graph.list')
 			->setArgument('context', $context)
 		);
 
 		$data += [
-			'filter' => $filter,
+			'parent_discoveryid' => $this->discovery_rule['itemid'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
-			'profileIdx' => $prefix.'graph.list.filter',
-			'active_tab' => CProfile::get($prefix.'graph.list.filter.active', 1),
+			'profileIdx' => $prefix.'graph.prototype.list.filter',
+			'active_tab' => CProfile::get($prefix.'graph.prototype.list.filter.active', 1),
 			'context' => $context,
 			'page' => $page_num,
 			'paging' => $paging,
-			'parent_templates' => getGraphParentTemplates($data['graphs'], ZBX_FLAG_DISCOVERY_NORMAL),
+			'parent_templates' => getGraphParentTemplates($data['graphs'], ZBX_FLAG_DISCOVERY_PROTOTYPE),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'checkbox_hash' => crc32(implode('', $filter_hostids))
 		];
 
 		$response = new CControllerResponseData($data);

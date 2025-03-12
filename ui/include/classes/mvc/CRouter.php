@@ -116,6 +116,7 @@ class CRouter {
 		'gui.edit'									=> ['CControllerGuiEdit',								'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'								=> ['CControllerGuiUpdate',								null,					null],
 		'graph.list'								=> ['CControllerGraphList',								'layout.htmlpage',		'graph.list'],
+		'graph.prototype.list'						=> ['CControllerGraphPrototypeList',					'layout.htmlpage',		'graph.prototype.list'],
 		'hintbox.actionlist'						=> ['CControllerHintboxActionlist',						'layout.json',			'hintbox.actionlist'],
 		'hintbox.eventlist'							=> ['CControllerHintboxEventlist',						'layout.json',			'hintbox.eventlist'],
 		'host.create'								=> ['CControllerHostCreate',							'layout.json',			null],

@@ -19,7 +19,8 @@
  * @var array $data
  */
 
-//$this->includeJsFile('configuration.discovery.list.js.php');
+$this->includeJsFile('graph.list.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Graphs'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
@@ -176,7 +177,12 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$name[] = new CLink($graph['name'], $url);
+
 	$info_icons = [];
+
+	if ($graph['graphDiscovery'] && $graph['graphDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
+	}
 
 	$graphs_table->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
@@ -194,36 +200,30 @@ $buttons = [
 	'graph.masscopyto' => [
 		'content' => (new CSimpleButton(_('Copy')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->setId('js-copy')
+			->addClass('js-copy')
 	],
 	'graph.massdelete' => [
-		'content' => (new CSimpleButton(_('Delete')))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-no-chkbxrange')
-			->setId('js-massdelete-graph')
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected graph?'),
+		'confirm_plural' => _('Delete selected graphs?')
 	]
 ];
 
 // append table to form
 $graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, $data['hostid'])]);
 
+$html_page
+	->addItem($graphs_form)
+	->show();
+
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid'],
+		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'group_graphid',
 		'context' => $data['context'],
 		'form_name' => $graphs_form->getName(),
 		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('graph')],
 	]).');
 '))
-	->setOnDocumentReady()
-	->show();
-
-$html_page
-	->addItem($graphs_form)
-	->show();
-
-
-(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

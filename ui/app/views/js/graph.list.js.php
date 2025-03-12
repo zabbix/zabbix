@@ -20,14 +20,12 @@
 ?>
 
 <script>
-
 	const view = new class {
 
-		init({checkbox_hash, checkbox_object, context, parent_discoveryid, form_name}) {
+		init({checkbox_hash, checkbox_object, context, form_name, token}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
-			this.is_discovery = parent_discoveryid !== null;
 			this.form = document.forms[form_name];
 
 			this.#initActions();
@@ -46,6 +44,7 @@
 						postMessageOk(e.detail.success.title);
 
 						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+
 						uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
 						chkbxRange.update(this.checkbox_object);
@@ -89,9 +88,11 @@
 					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
 
 					if (data.submit.success.action === 'delete') {
-						const url = new URL(this.is_discovery ? 'host_discovery.php' : 'graphs.php', location.href);
+						const url = new URL('zabbix.php', location.href);
 
+						url.searchParams.set('action', 'graph.list');
 						url.searchParams.set('context', this.context);
+						url.searchParams.set('filter_set', 1);
 
 						event.setRedirectUrl(url.href);
 					}
