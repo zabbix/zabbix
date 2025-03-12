@@ -249,18 +249,40 @@ static int	dbconn_is_inhibited_error(zbx_dbconn_t *db, int err_no)
 
 static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, const PGresult *pg_result)
 {
+	static double first_readonly_time;
+
 	if (CONNECTION_OK != PQstatus(db->conn))
 		return SUCCEED;
 
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == db->config->read_only_recoverable &&
-			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 	{
-		return SUCCEED;
-	}
+		if (1 == db->config->read_only_recoverable)
+		{
+			return SUCCEED;
+		}
 
+		if (0 == first_readonly_time)
+		{
+			first_readonly_time = zbx_time();
+
+			return SUCCEED;
+		}
+		else
+		{
+			double time_left = zbx_time() - first_readonly_time;
+			if (10 > time_left)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s() wait for the database to exit read-only state,"
+					"time left: %d seconds", __func__, 10 - (int)time_left);
+
+				return SUCCEED;
+			}
+			first_readonly_time = 0;
+		}
+	}
 	return FAIL;
 }
 
@@ -834,7 +856,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 			errcode = ERR_Z3009;
 		else
 			errcode = ERR_Z3005;
-
+zabbix_log(LOG_LEVEL_WARNING, "THIS IS ERROR  %s", error);
 		dbconn_errlog(db, errcode, 0, error, sql);
 		zbx_free(error);
 
@@ -1436,7 +1458,7 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 	{
 		if (ZBX_DB_DOWN == db->txn_end_error && ERR_Z3009 == db->last_db_errcode)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
+zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
@@ -2525,5 +2547,4 @@ void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *
 {
 	query->suffix = zbx_strdup(NULL, sql);
 }
-
 
