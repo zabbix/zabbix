@@ -2895,7 +2895,7 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
 			exit(EXIT_FAILURE);
 	}
 
-	ret = zbx_replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error,
+	ret = zbx_replace_key_param_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error,
 			maxerrlen);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);

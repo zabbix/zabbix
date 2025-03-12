@@ -448,7 +448,7 @@ char	*zbx_get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *ty
  * Purpose: replaces an item key, SNMP OID or their parameters when callback  *
  *          function returns a new string                                     *
  *                                                                            *
- * Comments: auxiliary function for zbx_replace_key_params_dyn()              *
+ * Comments: auxiliary function for zbx_replace_key_param_dyn()              *
  *                                                                            *
  ******************************************************************************/
 static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
@@ -490,7 +490,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_f replace_key_param_cb,
+int	zbx_replace_key_param_dyn(char **data, int key_type, zbx_replace_key_param_f replace_key_param_cb,
 		void *replace_key_param_cb_data, char *error, size_t maxerrlen)
 {
 	typedef enum

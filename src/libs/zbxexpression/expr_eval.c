@@ -102,7 +102,7 @@ static void	expression_query_free(zbx_expression_query_t *query)
  * Purpose: check if key parameter is a wildcard '*'.                         *
  *                                                                            *
  ******************************************************************************/
-static int	test_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
+static int	replace_key_param_test_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
 		void *cb_data, char **param)
 {
 	ZBX_UNUSED(key_type);
@@ -160,8 +160,8 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 		{
 			int	wildcard = 0;
 
-			zbx_replace_key_params_dyn(&query->ref.key, ZBX_KEY_TYPE_ITEM, test_key_param_wildcard_cb,
-					&wildcard, NULL, 0);
+			zbx_replace_key_param_dyn(&query->ref.key, ZBX_KEY_TYPE_ITEM,
+					replace_key_param_test_wildcard_cb, &wildcard, NULL, 0);
 
 			if (0 != wildcard)
 				query->flags |= ZBX_ITEM_QUERY_KEY_SOME;
@@ -423,7 +423,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 		char	*key;
 
 		key = zbx_strdup(NULL, query->ref.key);
-		zbx_replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param_wildcard_cb, NULL, NULL, 0);
+		zbx_replace_key_param_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param_wildcard_cb, NULL, NULL, 0);
 
 		esc = zbx_db_dyn_escape_string(key);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s i.key_ like '%s'", clause, esc);
