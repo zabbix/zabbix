@@ -1867,10 +1867,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_proxy_stats_ext_get, &config_comms);
-	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_preproc, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_discovery, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_proxy, &config_comms);
+	zbx_register_stats_ext_get_func(zbx_stats_ext_get_vmware, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_stats_procinfo_preprocessor);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_stats_procinfo_discovery);
 	zbx_diag_init(diag_add_section_info_proxy);

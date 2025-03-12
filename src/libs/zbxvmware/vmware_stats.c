@@ -16,7 +16,7 @@
 
 #include "zbxjson.h"
 
-void	zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg)
+void	zbx_stats_ext_get_vmware(struct zbx_json *json, const void *arg)
 {
 	zbx_vmware_stats_t	vmware_stats;
 
