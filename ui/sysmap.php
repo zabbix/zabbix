@@ -196,10 +196,12 @@ if (isset($_REQUEST['favobj'])) {
 
 										$link['highlights'] = array_values($link['highlights']);
 
-										foreach ($link['highlights'] as &$highlight) {
+										foreach ($link['highlights'] as $index => &$highlight) {
 											$highlight = array_intersect_key($highlight,
 												array_flip(['pattern', 'drawtype', 'color'])
 											);
+
+											$highlight['sortorder'] = $index + 1;
 										}
 										unset($highlight);
 								}
@@ -422,14 +424,6 @@ if ($itemids) {
 		];
 	}
 }
-
-foreach ($data['sysmap']['links'] as &$link) {
-	if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && $link['thresholds']) {
-		CArrayHelper::sort($link['thresholds'], ['threshold']);
-		$link['thresholds'] = array_values($link['thresholds']);
-	}
-}
-unset($link);
 
 // get iconmapping
 if ($data['sysmap']['iconmapid']) {
