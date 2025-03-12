@@ -596,7 +596,7 @@ zabbix_export:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
                   templates:
-                    - name: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                    - name: 'Azure Microsoft SQL DTU Database by HTTP'
         - uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
           name: 'MySQL servers discovery'
           type: DEPENDENT
@@ -5504,10 +5504,10 @@ zabbix_export:
             - value: '3'
               newvalue: Unknown
     - uuid: c3a9fa0e07be4c1bbe19ae65c3375d17
-      template: 'Azure Microsoft SQL DTU-based Database by HTTP'
-      name: 'Azure Microsoft SQL DTU-based Database by HTTP'
+      template: 'Azure Microsoft SQL DTU Database by HTTP'
+      name: 'Azure Microsoft SQL DTU Database by HTTP'
       description: |
-        This template is designed to monitor Microsoft SQL DTU-based databases by HTTP.
+        This template is designed to monitor Microsoft SQL DTU-based databases via HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -5531,7 +5531,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.availability.details
           value_type: CHAR
-          description: 'The summary description of the availability status.'
+          description: 'A detailed summary of the availability status.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5589,7 +5589,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 6bf8f84c7b494c4da90ef5e47fa75627
-              expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=1'
+              expression: 'last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=1'
               name: 'Azure MSSQL DTU: Microsoft SQL database is degraded'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5598,7 +5598,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 4196d310e6e84c61a0a7115116f10854
-              expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=3'
+              expression: 'last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=3'
               name: 'Azure MSSQL DTU: Microsoft SQL database is in unknown state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -5607,7 +5607,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: b6f356182f3d4b0c88f52d88fce580b9
-              expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=2'
+              expression: 'last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=2'
               name: 'Azure MSSQL DTU: Microsoft SQL database is unavailable'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -5620,7 +5620,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.connections.failed.system
           value_type: FLOAT
-          description: 'The count of failed connections with system errors.'
+          description: 'The number of failed connections with system errors.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5636,7 +5636,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.connections.successful
           value_type: FLOAT
-          description: 'The count of successful connections.'
+          description: 'The number of successful connections.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5653,7 +5653,7 @@ zabbix_export:
           key: azure.db.mssql.cpu.percentage
           value_type: FLOAT
           units: '%'
-          description: 'The CPU percent of a host.'
+          description: 'The average percentage of CPU usage on a host.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5666,7 +5666,7 @@ zabbix_export:
               value: cpu
           triggers:
             - uuid: 97caae1175be4c21b2fd5a53d5be25d2
-              expression: 'min(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure MSSQL DTU: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -5695,7 +5695,7 @@ zabbix_export:
               value: raw
           triggers:
             - uuid: a21b8c56bd914548949c277c77efbd4b
-              expression: 'length(last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.data.errors))>0'
+              expression: 'length(last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.data.errors))>0'
               name: 'Azure MSSQL DTU: There are errors in requests to API'
               opdata: 'Current error: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5848,7 +5848,7 @@ zabbix_export:
             	Zabbix.log(3, '[ Azure DTU DB ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-          description: 'The result of API requests is expressed in the JSON.'
+          description: 'The result of API requests is expressed in JSON format.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             - name: app_id
@@ -5872,7 +5872,7 @@ zabbix_export:
           key: azure.db.mssql.data.read.percentage
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of physical data read.'
+          description: 'The average percentage of physical data read.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5888,7 +5888,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.deadlocks
           value_type: FLOAT
-          description: 'The count of deadlocks. Not applicable to the data warehouses.'
+          description: 'The number of deadlocks. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5904,7 +5904,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.dtu.limit
           value_type: FLOAT
-          description: 'The DTU limit. Applies to DTU-based databases.'
+          description: 'The DTU limit. Applicable to DTU-based databases.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5921,7 +5921,7 @@ zabbix_export:
           key: azure.db.mssql.dtu.percentage
           value_type: FLOAT
           units: '%'
-          description: 'DTU percentage. Applies to DTU-based databases.'
+          description: 'The average percentage of DTU consumption for a DTU-based database.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5934,7 +5934,7 @@ zabbix_export:
               value: dtu
           triggers:
             - uuid: eceb245b910841ceb8078ea8b3dbad1b
-              expression: 'min(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.dtu.percentage,5m)>{$AZURE.DB.DTU.UTIL.CRIT}'
+              expression: 'min(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.dtu.percentage,5m)>{$AZURE.DB.DTU.UTIL.CRIT}'
               name: 'Azure MSSQL DTU: High DTU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -5947,7 +5947,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.dtu.used
           value_type: FLOAT
-          description: 'The DTU used. Applies to DTU-based databases.'
+          description: 'The DTU used. Applicable to DTU-based databases.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5963,7 +5963,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.db.mssql.firewall.blocked
           value_type: FLOAT
-          description: 'The count of connections blocked by firewall.'
+          description: 'The number of connections blocked by the firewall.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5980,7 +5980,7 @@ zabbix_export:
           key: azure.db.mssql.log.write.percentage
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of I/O log. Not applicable to the data warehouses.'
+          description: 'The percentage of I/O used for log writes. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5997,7 +5997,7 @@ zabbix_export:
           key: azure.db.mssql.server.cpu.percent
           value_type: FLOAT
           units: '%'
-          description: 'The CPU usage by all user and system workloads. Not applicable to data warehouses.'
+          description: 'CPU usage from all user and system workloads. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6016,7 +6016,7 @@ zabbix_export:
           key: azure.db.mssql.server.memory.percent
           value_type: FLOAT
           units: '%'
-          description: 'The memory usage by the database engine instance. Not applicable to data warehouses.'
+          description: 'The percentage of memory used by the database engine instance. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6051,7 +6051,7 @@ zabbix_export:
           key: azure.db.mssql.sessions.percent
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of sessions. Not applicable to the data warehouses.'
+          description: 'The percentage of sessions. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6068,7 +6068,7 @@ zabbix_export:
           key: azure.db.mssql.storage.allocated
           value_type: FLOAT
           units: B
-          description: 'The allocated data storage. Not applicable to the data warehouses.'
+          description: 'The allocated data storage. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6085,7 +6085,7 @@ zabbix_export:
           key: azure.db.mssql.storage.backup.log.size
           value_type: FLOAT
           units: B
-          description: 'Cumulative log backup storage size. Applies to the vCore-based and Hyperscale databases.'
+          description: 'The cumulative log backup storage size. Applies to vCore-based and Hyperscale databases.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6105,7 +6105,7 @@ zabbix_export:
           key: azure.db.mssql.storage.percent
           value_type: FLOAT
           units: '%'
-          description: 'Data space used percent. Not applicable to the data warehouses or Hyperscale databases.'
+          description: 'Data space used in percent. Not applicable to data warehouses or Hyperscale databases.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6118,7 +6118,7 @@ zabbix_export:
               value: storage
           triggers:
             - uuid: b13d1ed5b1144e0095dca50bcbba37ae
-              expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure MSSQL DTU: Storage space is critically low'
               opdata: 'Current space used: {ITEM.LASTVALUE1}%'
               priority: AVERAGE
@@ -6127,14 +6127,14 @@ zabbix_export:
                 - tag: scope
                   value: capacity
             - uuid: 74c7b9f109924177a37bc7717c6f39e0
-              expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure MSSQL DTU: Storage space is low'
               opdata: 'Current space used: {ITEM.LASTVALUE1}%'
               priority: WARNING
               description: 'High utilization of the storage space.'
               dependencies:
                 - name: 'Azure MSSQL DTU: Storage space is critically low'
-                  expression: 'last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+                  expression: 'last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               tags:
                 - tag: scope
                   value: capacity
@@ -6144,7 +6144,7 @@ zabbix_export:
           key: azure.db.mssql.storage.used
           value_type: FLOAT
           units: B
-          description: 'Data space used. Not applicable to the data warehouses.'
+          description: 'Data space used. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6161,7 +6161,7 @@ zabbix_export:
           key: azure.db.mssql.storage.xtp.percent
           value_type: FLOAT
           units: '%'
-          description: 'In-Memory OLTP storage percent. Not applicable to the data warehouses.'
+          description: 'In-Memory OLTP storage percent. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6178,7 +6178,7 @@ zabbix_export:
           key: azure.db.mssql.tempdb.data.size
           value_type: FLOAT
           units: B
-          description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6198,7 +6198,7 @@ zabbix_export:
           key: azure.db.mssql.tempdb.log.percent
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of space used in `tempdb` transaction log file. Not applicable to the data warehouses.'
+          description: 'The percentage of space used in the `tempdb` transaction log file. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6215,7 +6215,7 @@ zabbix_export:
           key: azure.db.mssql.tempdb.log.size
           value_type: FLOAT
           units: B
-          description: 'The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in the `tempdb` transaction log file, expressed in bytes. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6235,7 +6235,7 @@ zabbix_export:
           key: azure.db.mssql.workers.percent
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of workers. Not applicable to the data warehouses.'
+          description: 'The percentage of workers. Not applicable to data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6280,7 +6280,7 @@ zabbix_export:
         - macro: '{$AZURE.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
-          description: 'Microsoft Azure Microsoft SQL DTU-based database ID.'
+          description: 'Microsoft Azure SQL DTU-based database ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
@@ -6301,7 +6301,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.deadlocks
                     - type: INTEGER
                       name: show.0
@@ -6318,7 +6318,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.server.memory.percent
                     - type: INTEGER
                       name: show.0
@@ -6338,7 +6338,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.dtu.limit
                     - type: INTEGER
                       name: show.0
@@ -6355,7 +6355,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.storage.allocated
                     - type: INTEGER
                       name: show.0
@@ -6372,7 +6372,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.connections.successful
                     - type: INTEGER
                       name: show.0
@@ -6389,7 +6389,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.availability.state
                     - type: INTEGER
                       name: show.0
@@ -6410,7 +6410,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.server.cpu.percent
                     - type: INTEGER
                       name: show.0
@@ -6431,7 +6431,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.dtu.used
                     - type: INTEGER
                       name: show.0
@@ -6449,7 +6449,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.storage.used
                     - type: INTEGER
                       name: show.0
@@ -6467,7 +6467,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.connections.failed.system
                     - type: INTEGER
                       name: show.0
@@ -6487,7 +6487,7 @@ zabbix_export:
                     - type: ITEM
                       name: columns.0.itemid
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.availability.details
                     - type: INTEGER
                       name: columns.0.monospace_font
@@ -6511,7 +6511,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.sessions.count
                     - type: INTEGER
                       name: show.0
@@ -6529,7 +6529,7 @@ zabbix_export:
                     - type: GRAPH
                       name: graphid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         name: 'Azure Microsoft SQL: DTU usage'
                     - type: STRING
                       name: reference
@@ -6544,7 +6544,7 @@ zabbix_export:
                     - type: GRAPH
                       name: graphid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         name: 'Azure Microsoft SQL: Storage utilization'
                     - type: STRING
                       name: reference
@@ -6559,7 +6559,7 @@ zabbix_export:
                     - type: GRAPH
                       name: graphid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         name: 'Azure Microsoft SQL: Connections'
                     - type: STRING
                       name: reference
@@ -6574,7 +6574,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.workers.percent
                     - type: INTEGER
                       name: show.0
@@ -6595,7 +6595,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.cpu.percentage
                     - type: INTEGER
                       name: show.0
@@ -6616,7 +6616,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+                        host: 'Azure Microsoft SQL DTU Database by HTTP'
                         key: azure.db.mssql.data.read.percentage
                     - type: INTEGER
                       name: show.0
@@ -16285,17 +16285,17 @@ zabbix_export:
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.connections.successful
         - sortorder: '1'
           color: F63100
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         - sortorder: '2'
           color: 00611C
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.firewall.blocked
     - uuid: 62a9a5e1fb044a52a0b534bd4eeea914
       name: 'Azure Microsoft SQL: Connections'
@@ -16343,12 +16343,12 @@ zabbix_export:
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.dtu.limit
         - sortorder: '1'
           color: F63100
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.dtu.used
     - uuid: ec5714017c744484be8c264d24a0e694
       name: 'Azure Microsoft SQL: Storage utilization'
@@ -16367,12 +16367,12 @@ zabbix_export:
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.storage.used
         - sortorder: '1'
           color: F63100
           item:
-            host: 'Azure Microsoft SQL DTU-based Database by HTTP'
+            host: 'Azure Microsoft SQL DTU Database by HTTP'
             key: azure.db.mssql.storage.allocated
     - uuid: f541b6591683433aba4b3e58a8ad1e5c
       name: 'Azure Microsoft SQL: Storage utilization'

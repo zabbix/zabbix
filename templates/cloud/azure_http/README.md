@@ -889,11 +889,11 @@ This template has been tested on:
 |Azure MSSQL Serverless: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
 |Azure MSSQL Serverless: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
-# Azure Microsoft SQL DTU-based Database by HTTP
+# Azure Microsoft SQL DTU Database by HTTP
 
 ## Overview
 
-This template is designed to monitor Microsoft SQL DTU-based databases by HTTP.
+This template is designed to monitor Microsoft SQL DTU-based databases via HTTP.
 It works without any external scripts and uses the script item.
 
 ## Requirements
@@ -930,7 +930,7 @@ This template has been tested on:
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
-|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure Microsoft SQL DTU-based database ID.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure SQL DTU-based database ID.</p>||
 |{$AZURE.DB.DTU.UTIL.CRIT}|<p>The critical threshold of DTU utilization, expressed in %.</p>|`90`|
 |{$AZURE.DB.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
 |{$AZURE.DB.MEMORY.UTIL.CRIT}|<p>The critical threshold of memory utilization, expressed in %.</p>|`90`|
@@ -941,46 +941,46 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get data|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.db.mssql.data.get|
+|Get data|<p>The result of API requests is expressed in JSON format.</p>|Script|azure.db.mssql.data.get|
 |Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.db.mssql.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Availability state|<p>The availability status of the resource.</p>|Dependent item|azure.db.mssql.availability.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.availabilityState`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Replace: `Available -> 0`</p></li><li><p>Replace: `Degraded -> 1`</p></li><li><p>Replace: `Unavailable -> 2`</p></li><li><p>Replace: `Unknown -> 3`</p></li><li><p>In range: `0 -> 3`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Availability status detailed|<p>The summary description of the availability status.</p>|Dependent item|azure.db.mssql.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|CPU percentage|<p>The CPU percent of a host.</p>|Dependent item|azure.db.mssql.cpu.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.cpu_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|DTU percentage|<p>DTU percentage. Applies to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_consumption_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Data IO percentage|<p>The percentage of physical data read.</p>|Dependent item|azure.db.mssql.data.read.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.physical_data_read_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Log IO percentage|<p>The percentage of I/O log. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.log.write.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.log_write_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Data space used|<p>Data space used. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.storage.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Connections successful|<p>The count of successful connections.</p>|Dependent item|azure.db.mssql.connections.successful<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.connection_successful.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Connections failed: System errors|<p>The count of failed connections with system errors.</p>|Dependent item|azure.db.mssql.connections.failed.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.connection_failed.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Connections blocked by firewall|<p>The count of connections blocked by firewall.</p>|Dependent item|azure.db.mssql.firewall.blocked<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.blocked_by_firewall.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Deadlocks|<p>The count of deadlocks. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.deadlocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.deadlock.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Data space used percent|<p>Data space used percent. Not applicable to the data warehouses or Hyperscale databases.</p>|Dependent item|azure.db.mssql.storage.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|In-Memory OLTP storage percent|<p>In-Memory OLTP storage percent. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.storage.xtp.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.xtp_storage_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Workers percentage|<p>The percentage of workers. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.workers.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.workers_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Sessions percentage|<p>The percentage of sessions. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.sessions.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sessions_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Availability status detailed|<p>A detailed summary of the availability status.</p>|Dependent item|azure.db.mssql.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU percentage|<p>The average percentage of CPU usage on a host.</p>|Dependent item|azure.db.mssql.cpu.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.cpu_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DTU percentage|<p>The average percentage of DTU consumption for a DTU-based database.</p>|Dependent item|azure.db.mssql.dtu.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_consumption_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data IO percentage|<p>The average percentage of physical data read.</p>|Dependent item|azure.db.mssql.data.read.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.physical_data_read_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Log IO percentage|<p>The percentage of I/O used for log writes. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.log.write.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.log_write_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data space used|<p>Data space used. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.storage.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Connections successful|<p>The number of successful connections.</p>|Dependent item|azure.db.mssql.connections.successful<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.connection_successful.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Connections failed: System errors|<p>The number of failed connections with system errors.</p>|Dependent item|azure.db.mssql.connections.failed.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.connection_failed.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Connections blocked by firewall|<p>The number of connections blocked by the firewall.</p>|Dependent item|azure.db.mssql.firewall.blocked<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.blocked_by_firewall.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Deadlocks|<p>The number of deadlocks. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.deadlocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.deadlock.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data space used percent|<p>Data space used in percent. Not applicable to data warehouses or Hyperscale databases.</p>|Dependent item|azure.db.mssql.storage.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|In-Memory OLTP storage percent|<p>In-Memory OLTP storage percent. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.storage.xtp.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.xtp_storage_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Workers percentage|<p>The percentage of workers. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.workers.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.workers_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Sessions percentage|<p>The percentage of sessions. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.sessions.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sessions_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Sessions count|<p>The number of active sessions. Not applicable to Synapse DW Analytics.</p>|Dependent item|azure.db.mssql.sessions.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sessions_count.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|DTU limit|<p>The DTU limit. Applies to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.limit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_limit.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|DTU used|<p>The DTU used. Applies to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_used.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|SQL instance CPU percent|<p>The CPU usage by all user and system workloads. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.server.cpu.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sql_instance_cpu_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|SQL instance memory percent|<p>The memory usage by the database engine instance. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.server.memory.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sql_instance_cpu_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Tempdb data file size|<p>The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.data.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_data_size.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
-|Tempdb log file size|<p>The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.log.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_log_size.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
-|Tempdb log used percent|<p>The percentage of space used in `tempdb` transaction log file. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.log.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_log_used_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Data space allocated|<p>The allocated data storage. Not applicable to the data warehouses.</p>|Dependent item|azure.db.mssql.storage.allocated<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.allocated_data_storage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Log backup storage size|<p>Cumulative log backup storage size. Applies to the vCore-based and Hyperscale databases.</p>|Dependent item|azure.db.mssql.storage.backup.log.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.log_backup_size_bytes.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|DTU limit|<p>The DTU limit. Applicable to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.limit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_limit.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DTU used|<p>The DTU used. Applicable to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_used.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|SQL instance CPU percent|<p>CPU usage from all user and system workloads. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.server.cpu.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sql_instance_cpu_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|SQL instance memory percent|<p>The percentage of memory used by the database engine instance. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.server.memory.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sql_instance_cpu_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Tempdb data file size|<p>The space used in `tempdb` data files, expressed in bytes. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.data.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_data_size.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Tempdb log file size|<p>The space used in the `tempdb` transaction log file, expressed in bytes. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.log.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_log_size.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Tempdb log used percent|<p>The percentage of space used in the `tempdb` transaction log file. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.log.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_log_used_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data space allocated|<p>The allocated data storage. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.storage.allocated<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.allocated_data_storage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Log backup storage size|<p>The cumulative log backup storage size. Applies to vCore-based and Hyperscale databases.</p>|Dependent item|azure.db.mssql.storage.backup.log.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.log_backup_size_bytes.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure MSSQL DTU: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
-|Azure MSSQL DTU: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=2`|High||
-|Azure MSSQL DTU: Microsoft SQL database is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
-|Azure MSSQL DTU: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
-|Azure MSSQL DTU: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure MSSQL DTU: High DTU utilization|<p>The DTU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.dtu.percentage,5m)>{$AZURE.DB.DTU.UTIL.CRIT}`|High||
-|Azure MSSQL DTU: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure MSSQL DTU: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL DTU-based Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning|**Depends on**:<br><ul><li>Azure MSSQL DTU: Storage space is critically low</li></ul>|
+|Azure MSSQL DTU: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
+|Azure MSSQL DTU: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=2`|High||
+|Azure MSSQL DTU: Microsoft SQL database is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
+|Azure MSSQL DTU: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
+|Azure MSSQL DTU: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure MSSQL DTU: High DTU utilization|<p>The DTU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.dtu.percentage,5m)>{$AZURE.DB.DTU.UTIL.CRIT}`|High||
+|Azure MSSQL DTU: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure MSSQL DTU: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning|**Depends on**:<br><ul><li>Azure MSSQL DTU: Storage space is critically low</li></ul>|
 
 # Azure Microsoft SQL Database by HTTP
 
