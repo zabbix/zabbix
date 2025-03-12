@@ -1754,8 +1754,7 @@ class CMap extends CMapElement {
 			'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
 			' FROM sysmap_link_threshold slt'.
 			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
-				' AND '.dbConditionId('slt.linkid', $linkids).
-			' ORDER BY slt.threshold'
+				' AND '.dbConditionId('slt.linkid', $linkids)
 		);
 
 		while ($db_threshold = DBfetch($resource)) {
@@ -1784,8 +1783,7 @@ class CMap extends CMapElement {
 			'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.sortorder,slt.drawtype,slt.color'.
 			' FROM sysmap_link_threshold slt'.
 			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_HIGHLIGHT.
-				' AND '.dbConditionId('slt.linkid', $linkids).
-			' ORDER BY slt.sortorder'
+				' AND '.dbConditionId('slt.linkid', $linkids)
 		);
 
 		while ($db_threshold = DBfetch($resource)) {
@@ -3806,9 +3804,11 @@ class CMap extends CMapElement {
 					'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
 					' FROM sysmap_link_threshold slt'.
 					' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
-						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds()).
-					' ORDER BY slt.threshold'
+						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds())
 				), 'linkthresholdid');
+
+				CArrayHelper::sort($link_thresholds, ['threshold']);
+
 				$link_threshold_relation_map = $this->createRelationMap($link_thresholds, 'linkid', 'linkthresholdid');
 				$link_thresholds = $this->unsetExtraFields($link_thresholds, ['linkthresholdid', 'linkid']);
 				$links = $link_threshold_relation_map->mapMany($links, $link_thresholds, 'thresholds');
