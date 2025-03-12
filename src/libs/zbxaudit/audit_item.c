@@ -157,6 +157,7 @@ PREPARE_AUDIT_ITEM_UPDATE(verify_host,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(allow_traps,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(key_,			const char*,	string)
+
 #undef PREPARE_AUDIT_ITEM_UPDATE
 
 /********************************************************************************

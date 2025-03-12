@@ -1723,8 +1723,7 @@ static void	lld_rules_make(const zbx_vector_lld_rule_prototype_ptr_t *rule_proto
 
 }
 
-
-int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
+int	lld_update_rules_scrap(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
 		int lastcheck)
 {

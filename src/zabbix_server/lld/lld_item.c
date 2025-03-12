@@ -154,6 +154,8 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->ssl_cert_file);
 	zbx_free(item_prototype->ssl_key_file);
 	zbx_free(item_prototype->ssl_key_password);
+	zbx_free(item_prototype->lifetime);
+	zbx_free(item_prototype->enabled_lifetime);
 
 	zbx_vector_lld_row_ptr_destroy(&item_prototype->lld_rows);
 
@@ -227,6 +229,9 @@ static void	lld_item_free(zbx_lld_item_full_t *item)
 	zbx_free(item->logtimefmt_orig);
 	zbx_free(item->publickey_orig);
 	zbx_free(item->privatekey_orig);
+
+	zbx_free(item->lifetime_orig);
+	zbx_free(item->enabled_lifetime_orig);
 
 	zbx_vector_lld_item_preproc_ptr_clear_ext(&item->preproc_ops, lld_item_preproc_free);
 	zbx_vector_lld_item_preproc_ptr_destroy(&item->preproc_ops);
@@ -389,7 +394,8 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					"master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,"
 					"post_type,http_proxy,headers,retrieve_mode,request_method,output_format,"
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
-					"allow_traps,status"
+					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
+					"enabled_lifetime_type,evaltype"
 				" from items"
 				" where");
 
@@ -618,6 +624,40 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 			}
 
 			ZBX_STR2UCHAR(item->status, row[43]);
+
+			if (0 != strcmp(row[44], item_prototype->lifetime))
+			{
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME;
+				item->lifetime_orig = zbx_strdup(NULL, row[44]);
+			}
+			else
+				item->lifetime_orig = NULL;
+
+			if (atoi(row[45]) != item_prototype->lifetime_type)
+			{
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME_TYPE;
+				item->lifetime_type_orig = atoi(row[45]);
+			}
+
+			if (0 != strcmp(row[46], item_prototype->enabled_lifetime))
+			{
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME;
+				item->enabled_lifetime_orig = zbx_strdup(NULL, row[46]);
+			}
+			else
+				item->enabled_lifetime_orig = NULL;
+
+			if (atoi(row[47]) != item_prototype->enabled_lifetime_type)
+			{
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME_TYPE;
+				item->enabled_lifetime_type_orig = atoi(row[47]);
+			}
+
+			if (atoi(row[48]) != item_prototype->evaltype)
+			{
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE;
+				item->evaltype_orig = atoi(row[48]);
+			}
 
 			item->lld_row = NULL;
 
@@ -1655,6 +1695,9 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->publickey_orig = NULL;
 	item->privatekey_orig = NULL;
 
+	item->lifetime_orig = NULL;
+	item->enabled_lifetime_orig = NULL;
+
 	item->lld_row = lld_row;
 
 	zbx_vector_lld_item_preproc_ptr_create(&item->preproc_ops);
@@ -2570,20 +2613,25 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item_prototype->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
 				item->params, item->ipmi_sensor, item->snmp_oid, (int)item_prototype->authtype,
 				item->username, item->password, item_prototype->publickey, item_prototype->privatekey,
-				item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
+				item->description, item_prototype->interfaceid,
+				item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED,
 				item->jmx_endpoint, item->master_itemid,
 				item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
 				item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
 				item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
 				item_prototype->output_format, item->ssl_cert_file, item->ssl_key_file,
 				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
-				item_prototype->allow_traps);
+				item_prototype->allow_traps, item_prototype->lifetime, item_prototype->lifetime_type,
+				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
+				item_prototype->evaltype);
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
 				item->parent_itemid, item_prototype->key, item->lastcheck);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
-		zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
+
+		if (NULL != db_insert_irtname)
+			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
 		zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, *itemid, item->name,
 				ZBX_FLAG_DISCOVERY_CREATED);
@@ -2996,6 +3044,50 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 				(int)ZBX_FLAG_DISCOVERY_CREATED, (int)item->allow_traps_orig,
 				(int)item_prototype->allow_traps);
 	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME))
+	{
+		value_esc = zbx_db_dyn_escape_string(item_prototype->lifetime);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%slifetime='%s'", d, value_esc);
+		d = ",";
+		zbx_audit_item_update_json_update_lifetime(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->lifetime_orig, item_prototype->lifetime);
+		zbx_free(value_esc);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME_TYPE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%slifetime_type=%d", d, item_prototype->lifetime_type);
+		d = ",";
+		zbx_audit_item_update_json_update_lifetime_type(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->lifetime_type_orig,
+				item_prototype->lifetime_type);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME))
+	{
+		value_esc = zbx_db_dyn_escape_string(item_prototype->enabled_lifetime);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%senabled_lifetime='%s'", d, value_esc);
+		d = ",";
+		zbx_audit_item_update_json_update_enabled_lifetime(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->enabled_lifetime_orig,
+				item_prototype->enabled_lifetime);
+		zbx_free(value_esc);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME_TYPE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%senabled_lifetime_type=%d", d,
+				item_prototype->enabled_lifetime_type);
+		d = ",";
+		zbx_audit_item_update_json_update_enabled_lifetime_type(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->enabled_lifetime_type_orig,
+				item_prototype->enabled_lifetime_type);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sevaltype=%d", d, item_prototype->evaltype);
+		d = ",";
+		zbx_audit_item_update_json_update_evaltype(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->evaltype_orig,
+				item_prototype->evaltype);
+	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 
@@ -3066,7 +3158,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	int				ret = SUCCEED, new_items = 0, upd_items = 0;
 	zbx_lld_item_full_t		*item;
 	zbx_uint64_t			itemid, itemdiscoveryid;
-	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname;
+	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname,
+					*pdb_insert_irtname = NULL;
 	zbx_lld_item_index_t		item_index_local;
 	zbx_vector_uint64_t		item_protoids;
 	char				*sql = NULL;
@@ -3130,6 +3223,9 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		goto out;
 	}
 
+	if (ZBX_FLAG_DISCOVERY_NORMAL == item_prototypes->values[0]->item_flags)
+		pdb_insert_irtname = &db_insert_irtname;
+
 	if (0 != upd_items)
 		sql = (char*)zbx_malloc(NULL, sql_alloc);
 
@@ -3146,14 +3242,20 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				"jmx_endpoint", "master_itemid", "timeout", "url", "query_fields", "posts",
 				"status_codes", "follow_redirects", "post_type", "http_proxy", "headers",
 				"retrieve_mode", "request_method", "output_format", "ssl_cert_file", "ssl_key_file",
-				"ssl_key_password", "verify_peer", "verify_host", "allow_traps", (char *)NULL);
+				"ssl_key_password", "verify_peer", "verify_host", "allow_traps",
+				"lifetime", "lifetime_type", "enabled_lifetime", "enabled_lifetime_type",
+				"evaltype", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", "lastcheck", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
-		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
-				"name_resolved_upper", (char *)NULL);
+
+		if (NULL != pdb_insert_irtname)
+		{
+			zbx_db_insert_prepare(pdb_insert_irtname, "item_rtname", "itemid", "name_resolved",
+					"name_resolved_upper", (char *)NULL);
+		}
 	}
 
 	for (int i = 0; i < items->values_num; i++)
@@ -3165,7 +3267,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
-					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname);
+					&db_insert_idiscovery, &db_insert_irtdata, pdb_insert_irtname);
 		}
 		else
 		{
@@ -3177,7 +3279,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
 						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata,
-						&db_insert_irtname);
+						pdb_insert_irtname);
 			}
 		}
 
@@ -3191,8 +3293,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		zbx_db_insert_execute(&db_insert_idiscovery);
 		zbx_db_insert_clean(&db_insert_idiscovery);
 
-		zbx_db_insert_execute(&db_insert_irtname);
-		zbx_db_insert_clean(&db_insert_irtname);
+		if (NULL != pdb_insert_irtname)
+		{
+			zbx_db_insert_execute(pdb_insert_irtname);
+			zbx_db_insert_clean(pdb_insert_irtname);
+		}
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 
@@ -3817,7 +3922,7 @@ static void	lld_item_links_populate(const zbx_vector_lld_item_prototype_ptr_t *i
 			item_link->parent_itemid = item_index->item->parent_itemid;
 			item_link->itemid = item_index->item->itemid;
 
-			zbx_vector_lld_item_link_ptr_append(&item_index_local.lld_row->item_links, item_link);
+			zbx_vector_lld_item_link_ptr_append(&item_index->lld_row->item_links, item_link);
 		}
 	}
 }
@@ -3838,9 +3943,13 @@ void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows)
  *                                                                            *
  * Parameters: lld_ruleid      - [IN]                                         *
  *             item_prototypes - [OUT]                                        *
+ *             item_flags      - [IN] item discovery flags:                   *
+ *                                     ZBX_FLAG_DISCOVERY_NORMAL              *
+ *                                     ZBX_FLAG_DISCOVERY_RULE                *
  *                                                                            *
  ******************************************************************************/
-static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_prototype_ptr_t *item_prototypes)
+static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		int item_flags)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -3865,17 +3974,19 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 				"i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
 				"i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,"
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
-				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps,i.discover"
+				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps,i.discover,"
+				"i.lifetime,i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime_type,i.evaltype"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64
-				" and i.flags&%d=0",
-			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE);
+				" and i.flags&%d=%d",
+			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, item_flags);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		item_prototype = (zbx_lld_item_prototype_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_prototype_t));
 
+		item_prototype->item_flags = item_flags;
 		ZBX_STR2UINT64(item_prototype->itemid, row[0]);
 		item_prototype->name = zbx_strdup(NULL, row[1]);
 		item_prototype->key = zbx_strdup(NULL, row[2]);
@@ -3923,6 +4034,12 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		ZBX_STR2UCHAR(item_prototype->verify_host, row[42]);
 		ZBX_STR2UCHAR(item_prototype->allow_traps, row[43]);
 		ZBX_STR2UCHAR(item_prototype->discover, row[44]);
+
+		item_prototype->lifetime = zbx_strdup(NULL, row[45]);
+		item_prototype->lifetime_type = atoi(row[46]);
+		item_prototype->enabled_lifetime = zbx_strdup(NULL, row[47]);
+		item_prototype->enabled_lifetime_type = atoi(row[48]);
+		item_prototype->evaltype = atoi(row[49]);
 
 		zbx_vector_lld_row_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_lld_item_preproc_ptr_create(&item_prototype->preproc_ops);
@@ -4004,32 +4121,36 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 
 	/* get item prototype tags */
 
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids.values, protoids.values_num);
-	result = zbx_db_select("%s", sql);
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (ZBX_FLAG_DISCOVERY_NORMAL == item_flags)
 	{
-		zbx_db_tag_t	*db_tag;
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids.values,
+				protoids.values_num);
+		result = zbx_db_select("%s", sql);
 
-		ZBX_STR2UINT64(itemid, row[0]);
-
-		zbx_lld_item_prototype_t	cmp = {.itemid = itemid};
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
-				lld_item_prototype_compare_func)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+			zbx_db_tag_t	*db_tag;
+
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			zbx_lld_item_prototype_t	cmp = {.itemid = itemid};
+
+			if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
+					lld_item_prototype_compare_func)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item_prototype = item_prototypes->values[index];
+
+			db_tag = zbx_db_tag_create(row[1], row[2]);
+			zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
 		}
-
-		item_prototype = item_prototypes->values[index];
-
-		db_tag = zbx_db_tag_create(row[1], row[2]);
-		zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
+		zbx_db_free_result(result);
 	}
-	zbx_db_free_result(result);
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&protoids);
@@ -4123,6 +4244,79 @@ static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "itemid:"ZBX_FS_UI64, item_prototype->itemid);
+	zabbix_log(LOG_LEVEL_TRACE, "  key:%s name:%s", item_prototype->key, item_prototype->name);
+	zabbix_log(LOG_LEVEL_TRACE, "  type:%u delay:%s status:%u trapper_hosts:%s allow_traps:%u",
+			item_prototype->type, item_prototype->delay, item_prototype->status,
+			item_prototype->trapper_hosts, item_prototype->allow_traps);
+	zabbix_log(LOG_LEVEL_TRACE, "  params:%s ipmi_sensor:%s snmp_oid:%s",
+			item_prototype->params, item_prototype->ipmi_sensor, item_prototype->snmp_oid);
+	zabbix_log(LOG_LEVEL_TRACE, "  authtype:%u username:%s password:%s", item_prototype->authtype,
+			item_prototype->username, item_prototype->password);
+	zabbix_log(LOG_LEVEL_TRACE, "  publickey:%s privatekey:%s",
+			item_prototype->publickey, item_prototype->privatekey);
+	zabbix_log(LOG_LEVEL_TRACE, "  description:%s", item_prototype->description);
+	zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64 " master_itemid:" ZBX_FS_UI64,
+			item_prototype->interfaceid, item_prototype->master_itemid);
+	zabbix_log(LOG_LEVEL_TRACE, "  jmx_endpoint:%s timeout:%s",
+			item_prototype->jmx_endpoint, item_prototype->timeout);
+	zabbix_log(LOG_LEVEL_TRACE, "  url:%s query_fields:%s posts:%s",
+			item_prototype->url, item_prototype->query_fields, item_prototype->posts);
+	zabbix_log(LOG_LEVEL_TRACE, "  status_codes:%s http_proxy:%s headers:%s",
+			item_prototype->status_codes, item_prototype->http_proxy, item_prototype->headers);
+	zabbix_log(LOG_LEVEL_TRACE, "  ssl_cert_file:%s ssl_key_file:%s ssl_key_password:%s",
+			item_prototype->ssl_cert_file, item_prototype->ssl_key_file,
+			item_prototype->ssl_key_password);
+	zabbix_log(LOG_LEVEL_TRACE, "  follow_redirects:%u post_type:%u",
+			item_prototype->follow_redirects, item_prototype->post_type);
+	zabbix_log(LOG_LEVEL_TRACE, "  retrieve_mode:%u request_method:%u output_format:%u",
+			item_prototype->retrieve_mode, item_prototype->request_method, item_prototype->output_format);
+	zabbix_log(LOG_LEVEL_TRACE, "  verify_peer:%u verify_host:%u",
+			item_prototype->verify_peer, item_prototype->verify_host);
+	zabbix_log(LOG_LEVEL_TRACE, "  discover:%u", item_prototype->discover);
+
+	if (0 != (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "  evaltype:%d formula:%s", item_prototype->evaltype,
+				item_prototype->formula);
+		zabbix_log(LOG_LEVEL_TRACE, "  lifetime:%s lifetime_type:%d",
+				item_prototype->lifetime, item_prototype->lifetime_type);
+		zabbix_log(LOG_LEVEL_TRACE, "  enabled_lifetime:%s enabled_lifetime_type:%d",
+				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "  units:%s history:%s trends:%s",
+				item_prototype->units, item_prototype->history, item_prototype->trends);
+		zabbix_log(LOG_LEVEL_TRACE, "  value_type:%u valuemapid:" ZBX_FS_UI64,
+				item_prototype->value_type, item_prototype->valuemapid);
+		zabbix_log(LOG_LEVEL_TRACE, "  logtimefmt:%s", item_prototype->logtimefmt);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  preprocessing:");
+	for (int i = 0; i < item_prototype->preproc_ops.values_num; i++)
+	{
+		zbx_lld_item_preproc_t	*preproc_op = item_prototype->preproc_ops.values[i];
+		char			*params;
+
+		params = zbx_string_replace(preproc_op->params, "\n", "\\n");
+		zabbix_log(LOG_LEVEL_TRACE, "    item_preprocid:" ZBX_FS_UI64 " step:%d type:%d params:%s",
+				preproc_op->item_preprocid, preproc_op->step, preproc_op->type, params);
+		zbx_free(params);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  parameters:");
+	for (int i = 0; i < item_prototype->item_params.values_num; i++)
+	{
+		zbx_item_param_t	*param = item_prototype->item_params.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    item_parameterid:" ZBX_FS_UI64 " name:%s value:%s",
+				param->item_parameterid, param->name, param->value);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds or updates discovered items                                  *
@@ -4145,7 +4339,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	zbx_vector_lld_item_prototype_ptr_create(&item_prototypes);
 
-	lld_item_prototypes_get(lld_ruleid, &item_prototypes);
+	lld_item_prototypes_get(lld_ruleid, &item_prototypes, ZBX_FLAG_DISCOVERY_NORMAL);
 
 	if (0 == item_prototypes.values_num)
 		goto out;
@@ -4197,6 +4391,87 @@ out:
 	zbx_vector_lld_item_prototype_ptr_destroy(&item_prototypes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}
+
+int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
+		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
+		int lastcheck)
+{
+	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
+	zbx_hashset_t				items_index;
+	int					ret = SUCCEED, host_record_is_locked = 0;
+	zbx_vector_lld_item_full_ptr_t		items;
+
+	// WDN
+	zabbix_increase_log_level();
+	zabbix_increase_log_level();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_lld_item_prototype_ptr_create(&item_prototypes);
+
+	lld_item_prototypes_get(lld_ruleid, &item_prototypes, ZBX_FLAG_DISCOVERY_RULE);
+
+	if (0 == item_prototypes.values_num)
+		goto out;
+
+	zbx_vector_lld_item_full_ptr_create(&items);
+	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
+			lld_item_index_compare_func);
+
+	zbx_db_begin();
+	lld_items_get(&item_prototypes, &items);
+	zbx_db_commit();
+
+	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
+	lld_items_preproc_make(&item_prototypes, &items);
+	lld_items_param_make(&item_prototypes, &items, error);
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "LLD rule prototypes:");
+
+		for (int i = 0; i < item_prototypes.values_num; i++)
+			lld_item_prototype_dump(item_prototypes.values[i]);
+	}
+
+	lld_items_validate(hostid, &items, error);
+
+	zbx_db_begin();
+
+	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
+			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
+			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked))
+	{
+		if (ZBX_DB_OK != zbx_db_commit())
+		{
+			ret = FAIL;
+			goto clean;
+		}
+	}
+	else
+	{
+		zbx_db_rollback();
+		goto clean;
+	}
+
+	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
+clean:
+	zbx_hashset_destroy(&items_index);
+
+	zbx_vector_lld_item_full_ptr_clear_ext(&items, lld_item_free);
+	zbx_vector_lld_item_full_ptr_destroy(&items);
+
+	zbx_vector_lld_item_prototype_ptr_clear_ext(&item_prototypes, lld_item_prototype_free);
+out:
+	zbx_vector_lld_item_prototype_ptr_destroy(&item_prototypes);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	zabbix_decrease_log_level();
+	zabbix_decrease_log_level();
 
 	return ret;
 }

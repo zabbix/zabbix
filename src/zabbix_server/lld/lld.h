@@ -224,6 +224,13 @@ typedef struct
 	zbx_vector_db_tag_ptr_t			item_tags;
 	zbx_hashset_t				item_index;
 	zbx_vector_str_t			keys;		/* keys used to create items from this prototype */
+
+	char					*lifetime;
+	char					*enabled_lifetime;
+	int					lifetime_type;
+	int					enabled_lifetime_type;
+	int					evaltype;
+	int					item_flags;
 }
 zbx_lld_item_prototype_t;
 
@@ -281,6 +288,11 @@ struct zbx_lld_item_full_s
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER		__UINT64_C(0x0020000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST		__UINT64_C(0x0040000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS		__UINT64_C(0x0080000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME		__UINT64_C(0x0100000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME_TYPE		__UINT64_C(0x0200000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME	__UINT64_C(0x0400000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME_TYPE	__UINT64_C(0x0800000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE		__UINT64_C(0x1000000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
 	zbx_uint64_t				flags;
 	char					*key_proto;
@@ -361,6 +373,12 @@ struct zbx_lld_item_full_s
 	unsigned char				verify_peer_orig;
 	unsigned char				verify_host_orig;
 	unsigned char				allow_traps_orig;
+
+	char					*lifetime_orig;
+	char					*enabled_lifetime_orig;
+	int					lifetime_type_orig;
+	int					enabled_lifetime_type_orig;
+	int					evaltype_orig;
 };
 
 int	lld_item_full_compare_func(const void *d1, const void *d2);
