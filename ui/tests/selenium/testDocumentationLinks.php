@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once __DIR__.'/../include/CWebTest.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
@@ -2426,6 +2426,9 @@ class testDocumentationLinks extends CWebTest {
 
 	/**
 	 * @dataProvider getGeneralDocumentationLinkData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
 		if ($data['url'] === 'host_prototype') {

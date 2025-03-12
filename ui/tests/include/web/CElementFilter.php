@@ -15,7 +15,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CElementQuery.php';
+require_once __DIR__.'/CElementQuery.php';
 
 /**
  * Element collection filter based on a specified condition and parameters.

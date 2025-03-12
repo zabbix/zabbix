@@ -251,4 +251,16 @@ out:
   expected_result_buffer:
     - ''
   return: SUCCEED
+---
+test case: shift_jis encoded empty text - nothing happens
+# empty text
+in:
+  encoding: 'shift_jis'
+  buffer_length: 0
+  buffer: buffer
+    - ''
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer: expected_result_buffer ''
+  return: SUCCEED
 ...

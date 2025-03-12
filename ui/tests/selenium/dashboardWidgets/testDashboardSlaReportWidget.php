@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testSlaReport.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testSlaReport.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup dashboard, profiles

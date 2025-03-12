@@ -13696,6 +13696,8 @@ void	zbx_config_clean(zbx_config_t *cfg)
  ********************************************************************************/
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
+/* the tolerance interval must be greater than maximum proxy failover delay  */
+/* to avoid triggering false interface availability resets with proxy groups */
 #define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
 #define ZBX_INTERFACE_VERSION_RESET_INTERVAL	(SEC_PER_HOUR)
 

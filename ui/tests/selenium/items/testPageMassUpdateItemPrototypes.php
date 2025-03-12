@@ -14,12 +14,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testMassUpdateItems.php';
+require_once __DIR__.'/../common/testMassUpdateItems.php';
 
 /**
  * Test the mass update of item prototypes.
  *
  * @backup items, interface
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 

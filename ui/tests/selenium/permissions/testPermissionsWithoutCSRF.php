@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup token, connector
@@ -652,6 +652,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	 * Test function for checking the "POST" form, but with the deleted CSRF token element.
 	 *
 	 * @dataProvider getElementRemoveData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);
