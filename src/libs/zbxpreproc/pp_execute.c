@@ -1060,7 +1060,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		zbx_pp_step_t *step, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
 		zbx_timespec_t *history_ts, const char *config_source_ip)
 {
-	int	ret;
+	int	ret, user_macros = 0;
 	char	*params = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
@@ -1070,14 +1070,20 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 
 	if (NULL != um_handle)
 	{
-		char		*error = NULL;
-		unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE : ZBX_MACRO_ENV_NONSECURE;
-
-		if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
-				env, &error))
+		if (NULL != strstr(params, "{$"))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
-			zbx_free(error);
+			char		*error = NULL;
+			unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE :
+					ZBX_MACRO_ENV_NONSECURE;
+
+			if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params,
+					&hostid, 1, env, &error))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
+				zbx_free(error);
+			}
+
+			user_macros = 1;
 		}
 	}
 
@@ -1139,6 +1145,9 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			goto out;
 		case ZBX_PREPROC_SCRIPT:
 			ret = pp_execute_script(ctx, value, params, history_value_in, history_value_out, config_source_ip);
+			/* don't cache bytecode when user macros are present */
+			if (0 != user_macros)
+				zbx_variant_clear(history_value_out);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_PATTERN:
 			ret = pp_execute_prometheus_pattern(cache, value, params);
@@ -1247,7 +1256,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	for (int i = 0; i < preproc->steps_num; i++)
 	{
-		zbx_variant_t		history_value_out, history_none;
+		zbx_variant_t		history_value_out, history_none = {0};
 		const zbx_variant_t	*history_value_in;
 		zbx_timespec_t		history_ts;
 

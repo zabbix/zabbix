@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-21 10:54+0000\n"
+"PO-Revision-Date: 2025-02-22 07:48+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2695,12 +2695,22 @@ msgstr "No es pot pas esborrar el mètode MFA predeterminat."
 msgid "Cannot delete default user directory."
 msgstr "No es pot pas esborrar el directori d'usuaris per defecte."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "No es pot esborrar la comprovació de descoberta \"%1$s\" de la regla de descoberta \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es pot pas esborrar la regla de descoberta"
 msgstr[1] "No es poden pas esborrar les regles de descoberta"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar la regla de descoberta \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2726,6 +2736,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "No es pot esborrar l'equip"
 msgstr[1] "No es poden pas esborrar els equips"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar l'equip \"%1$s\": %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2738,6 +2753,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "No es pot pas esborrar el grup d'equips"
 msgstr[1] "No es poden pas esborrar els grups d'equips"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar el grup d'equips \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2881,6 +2901,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "No es pot pas esborrar la plantilla"
 msgstr[1] "No es poden pas esborrar les plantilles"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar la plantilla \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2916,6 +2941,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "No es pot pas esborrar el trigger"
 msgstr[1] "No es poden pas esborrar els triggers"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar el trigger \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2938,6 +2968,16 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "No es pot pas esborrar el grup d'usuaris"
 msgstr[1] "No es poden pas esborrar els grups d'usuaris"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris LDAP \"%2$s\"."
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris de SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3926,6 +3966,11 @@ msgstr "No es pot pas actualitzar \"%1$s\" per al trigger de plantilla \"%2$s\".
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "No es pot pas actualitzar \"%1$s\" per al prototip de trigger amb plantilla \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr "No es pot actualitzar el paràmetre \"%1$s\" perquè actualment és només de lectura. Penseu en actualitzar Zabbix per treure aquesta limitació."
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4422,6 +4467,10 @@ msgstr "Comprova si el servei DNS és actiu. Retorna 0: el DNS és inactiu (el s
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Comprova si existeix el fitxer. Retorna 0 - no trobat; 1: existeix un fitxer del tipus especificat"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr "Comprova si l'equip és accessible per via de ping ICMP amb reintents. 0 - El ping ICMP falla. 1 - Ping ICMP correcte."
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6617,6 +6666,22 @@ msgstr "Vols esborrar l'escenari web?"
 msgid "Deleted"
 msgstr "Esborrat"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Equip esborrat"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Grup d'equips esborrat"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Grup(s) d'equips esborrat(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Trigger esborrat"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Delimitador"
@@ -7247,6 +7312,10 @@ msgstr "Mostra el valor de l'element com a"
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Mostra l'hora local"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr "Veure l'hora del registre"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9415,6 +9484,10 @@ msgstr "Selecció de dades de l'historial"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Històric de funcions"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr "Història, tendències i compressió del registre d'auditoria"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13507,6 +13580,10 @@ msgstr "El nom de l'entrada del menú s'empra com a etiqueta per l'URL del trigg
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
 msgstr "Ruta del menú"
+
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr "Combina sectors més petits que"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -17613,6 +17690,10 @@ msgstr "Restableix els valors per defecte"
 msgid "Reset to initial view"
 msgstr "Restableix a la vista inicial"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr "Resol les macros secretes de la caixa forta per"
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Resolt"
@@ -17864,6 +17945,11 @@ msgstr "Executeu l'script \"%1$s\" al servidor Zabbix"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Executeu l'script \"%1$s\" a l'equip actual"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Executa l'script \"%1$s\" als objectes esborrats"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20533,6 +20619,14 @@ msgstr "Tema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Els paràmetre es passaran a l'script com arguments de línia de comandes en l'ordre donat."
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Aquesta acció té condicions o operacions que fan referència a objectes esborrats."
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "Aquesta acció té condicions o operacions que manquen a causa d'objectes esborrats anteriorment."
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20582,6 +20676,10 @@ msgstr "Aquesta configuració hauria d'ésser actives, doncs les taules de tend�
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Aquesta configuració ensenya l'hora local en lloc de la marca de temps. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr "Aquesta configuració ensenya l'hora del registre en lloc de la marca de temps de l'element. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22802,6 +22900,10 @@ msgstr "Comptador de rendiment de la màquina virtual de VMware, \"url\" - URL d
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Estat d'energia de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
@@ -23864,6 +23966,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Servidor Zabbix (servidor intermediari)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr "Servidor i proxy Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr "Servidor i proxy Zabbix: els secrets són recuperats de Vault tant pel servidor com pels proxys Zabbix, cosa que els permet resoldre les macros de manera independent."
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "El servidor Zabbix no s'està executant: és possible que la informació mostrada no sigui l'actual."
@@ -23880,6 +23990,10 @@ msgstr "Nom del servidor Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Versió del servidor Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr "Servidor Zabbix: el servidor Zabbix recupera els secrets de Vault i l'envia als proxys quan cal."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24048,6 +24162,41 @@ msgstr "abs() - Valor absolut"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - L'arccosinus d'un valor com a angle, expressat en radians"
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "l'acció \"%1$s\" empra aquesta comprovació de descoberta"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "l'acció \"%1$s\" empra aquesta regla de descoberta"
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "l'acció \"%1$s\" empra aquest equip"
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "l'acció \"%1$s\" empra aquest grup d'equips"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "l'acció \"%1$s\" empra aquest servei"
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "l'acció \"%1$s\" empra aquesta plantilla"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "l'acció \"%1$s\" empra aquest trigger"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -24820,6 +24969,10 @@ msgstr "primer"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - El valor més antic de l'interval de temps especificat"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr "firstclock() - Marca de temps del valor més antic de l'interval de temps especificat"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Arrodoneix cap avall a l'enter més proper"
@@ -25217,6 +25370,10 @@ msgstr "darrer"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Darrer valor T (més recent)."
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr "lastclock() - Marca de temps del darrer valor T (més recent)."
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "esquerra"
@@ -25252,6 +25409,10 @@ msgstr "logseverity() - Registre de gravetats de lla darrera entrada al registre
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Font de registre de la darrera entrada de registre que coincideix amb el paràmetre V per al període T (1 - coincidència, 0 - sense coincidència)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr "logtimestamp() - Marca de temps del darrer missatge de registre T (més recent)."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

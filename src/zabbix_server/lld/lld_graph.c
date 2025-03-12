@@ -21,7 +21,6 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 
@@ -360,7 +359,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_create(&graph_index, graphs->values_num, lld_graph_ref_id_hash, lld_graph_ref_id_compare);
+	zbx_hashset_create(&graph_index, (size_t)graphs->values_num, lld_graph_ref_id_hash, lld_graph_ref_id_compare);
 	zbx_vector_uint64_create(&graphids);
 	zbx_vector_uint64_append(&graphids, parent_graphid);
 
@@ -522,7 +521,7 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): items:" ZBX_FS_UI64 , __func__, items->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): items:%d", __func__, items->values_num);
 }
 
 /******************************************************************************
@@ -708,10 +707,10 @@ out:
 static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
 		zbx_vector_lld_item_ptr_t *items, zbx_hashset_t *graph_index, const char *name_proto,
 		zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto,
-		int lastcheck, const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
+		int lastcheck, const zbx_lld_row_t *lld_row)
 {
 	zbx_lld_graph_t			*graph = NULL;
-	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
+	const zbx_lld_entry_t		*lld_obj = lld_row->data;
 	zbx_uint64_t			ymin_itemid, ymax_itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -730,7 +729,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 	{
 		char	*buffer = zbx_strdup(NULL, name_proto);
 
-		zbx_substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+		zbx_substitute_lld_macros(&buffer, lld_obj, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 != strcmp(graph->name, buffer))
@@ -773,7 +772,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
-		zbx_substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+		zbx_substitute_lld_macros(&graph->name, lld_obj, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
 		lld_override_graph(&lld_row->overrides, graph->name, &discover_proto);
@@ -819,11 +818,11 @@ static void	lld_graph_index_update(zbx_hashset_t *graph_index, zbx_lld_graph_t *
 static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
 		zbx_vector_lld_item_ptr_t *items, const char *name_proto, zbx_uint64_t ymin_itemid_proto,
 		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, int lastcheck,
-		const zbx_vector_lld_row_ptr_t *lld_rows, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
+		const zbx_vector_lld_row_ptr_t *lld_rows)
 {
 	zbx_hashset_t	graph_index;
 
-	zbx_hashset_create(&graph_index, graphs->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&graph_index, (size_t)graphs->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (int i = 0; i < graphs->values_num; i++)
@@ -834,7 +833,7 @@ static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_
 		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
 		lld_graph_make(gitems_proto, graphs, items, &graph_index, name_proto, ymin_itemid_proto,
-				ymax_itemid_proto, discover_proto, lastcheck, lld_row, lld_macro_paths);
+				ymax_itemid_proto, discover_proto, lastcheck, lld_row);
 	}
 
 	zbx_vector_lld_graph_ptr_sort(graphs, lld_graph_compare_func);
@@ -1560,8 +1559,7 @@ static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zb
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error,
-		const zbx_lld_lifetime_t *lifetime, int lastcheck)
+		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;
@@ -1627,7 +1625,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		/* making graphs */
 
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				discover_proto, lastcheck, lld_rows, lld_macro_paths);
+				discover_proto, lastcheck, lld_rows);
 
 		lld_graphs_validate(hostid, &graphs, error);
 

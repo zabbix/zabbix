@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @onBefore prepareUsersData
  *
- * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, config
+ * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, settings
  */
 class testUsers extends CAPITest {
 
@@ -41,23 +41,6 @@ class testUsers extends CAPITest {
 			'user_for_extend_parameter_tests' => null,
 			'user_with_mfa_default' => null,
 			'user_with_mfa_duo' => null
-		],
-		'userid' => [
-			'Provisioned user' => null
-		],
-		'mediaid' => [
-			'Provision media mapping email' => null,
-			'Provision media mapping sms' => null
-		],
-		'mediatypeid' => [
-			'Email media type' => 1,
-			'SMS media type' => 3
-		],
-		'roleid' => [
-			'Provision user role' => null
-		],
-		'usrgrpid' => [
-			'Provision user group' => null
 		],
 		'userid' => [
 			'Provisioned user' => null
@@ -678,9 +661,7 @@ class testUsers extends CAPITest {
 					'selectRole' => null,
 					'userids' => ['1']
 				],
-				'expected_result' => [[
-					'userid' => '1'
-				]],
+				'expected_result' => [[]],
 				'expected_error' => null
 			],
 			'Test user.get: "selectRole" (empty string)' => [
@@ -690,7 +671,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+				'expected_error' => 'Invalid parameter "/selectRole": value must be "extend".'
 			],
 			'Test user.get: "selectRole" (invalid parameter "abc")' => [
 				'request' => [
@@ -699,7 +680,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+				'expected_error' => 'Invalid parameter "/selectRole": value must be "extend".'
 			],
 			'Test user.get: "selectRole" (unsupported parameter "count")' => [
 				'request' => [
@@ -708,7 +689,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+				'expected_error' => 'Invalid parameter "/selectRole": value must be "extend".'
 			],
 			'Test user.get: "selectRole" with extended output' => [
 				'request' => [
@@ -717,7 +698,6 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [[
-					'userid' => '1',
 					'role' => [
 						'roleid' => '3',
 						'name' => 'Super admin role',
@@ -734,7 +714,6 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [[
-					'userid' => '1',
 					'role' => []
 				]],
 				'expected_error' => null
@@ -746,7 +725,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "roleid", "name", "type", "readonly".'
+				'expected_error' => 'Invalid parameter "/selectRole/1": value must be one of "roleid", "name", "type", "readonly".'
 			],
 
 			'Test user.get: "selectRole" with "roleid"' => [
@@ -756,7 +735,6 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [[
-					'userid' => '1',
 					'role' => [
 						'roleid' => '3'
 					]
@@ -2425,7 +2403,7 @@ class testUsers extends CAPITest {
 	/**
 	 * @dataProvider user_properties
 	 */
-	public function testUser_NotRequiredPropertiesAndMedias($user, $expected_error) {
+	public function testUsers_NotRequiredPropertiesAndMedias($user, $expected_error) {
 		$methods = ['user.create', 'user.update'];
 
 		foreach ($methods as $method) {
@@ -3164,7 +3142,7 @@ class testUsers extends CAPITest {
 	 *
 	 * @dataProvider getUsersCheckAuthenticationDataInvalidParameters
 	 */
-	public function testUser_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
+	public function testUsers_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
@@ -3241,7 +3219,7 @@ class testUsers extends CAPITest {
 	 * @dataProvider getUsersCheckAuthenticationDataInvalidAuthorization
 	 * @dataProvider getUsersCheckAuthenticationDataValidAuthorization
 	 */
-	public function testUser_checkAuthentication_Authorization(array $data, ?string $expected_error) {
+	public function testUsers_checkAuthentication_Authorization(array $data, ?string $expected_error) {
 		foreach ($data as $parameter => $name) {
 			$parameter_key = $parameter === 'sessionids' ? 'sessionid' : 'token';
 
@@ -3255,6 +3233,23 @@ class testUsers extends CAPITest {
 			]);
 
 			$this->checkResult($res, $expected_error);
+		}
+	}
+
+	/**
+	 * There should be minimum 1sec delay/timeout when your login failed with - correct and incorrect username.
+	 */
+	public function testUsers_checkFailedLoginTimeout() {
+		$this->disableAuthorization();
+		foreach (['incorrect_name' => 'incorrect_password', 'Admin' => 'incorrect_password'] as $login => $password) {
+			$start_time = microtime(true);
+			$this->call('user.login', [
+				'username' => $login,
+				'password' => $password
+			], 'Incorrect user name or password or account is temporarily blocked.');
+
+			$end_time = microtime(true);
+			$this->assertTrue($end_time - $start_time >= 1);
 		}
 	}
 
@@ -3279,7 +3274,7 @@ class testUsers extends CAPITest {
 	 *
 	 * @dataProvider getUsersCheckAuthenticationDataValidSessionIDWithExtend
 	 */
-	public function testUser_checkAuthentication_SessionIDWithExtend(bool $extend) {
+	public function testUsers_checkAuthentication_SessionIDWithExtend(bool $extend) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',

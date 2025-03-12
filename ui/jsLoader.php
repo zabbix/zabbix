@@ -72,6 +72,7 @@ $available_js = [
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
 	'class.event-hub.js' => '',
+	'class.event-hub.event.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
@@ -116,7 +117,8 @@ $available_js = [
 	'class.navigationtree.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
-	'class.popupmanager.js' => '',
+	'class.popup-manager.js' => '',
+	'class.popup-manager.event.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
@@ -128,6 +130,7 @@ $available_js = [
 	'class.field.array.js' => 'fields/',
 	'class.field.checkbox.js' => 'fields/',
 	'class.field.hidden.js' => 'fields/',
+	'class.field.multiline.js' => 'fields/',
 	'class.field.multiselect.js' => 'fields/',
 	'class.field.radiolist.js' => 'fields/',
 	'class.field.set.js' => 'fields/',
@@ -522,8 +525,11 @@ if (empty($_GET['files'])) {
 		'component.z-select.js',
 		'component.z-sparkline.js',
 		'class.event-hub.js',
+		'class.event-hub.event.js',
 		'class.base-component.js',
+		'class.calendar.js',
 		'class.cdebug.js',
+		'class.form.fieldset.collapsible.js',
 		'class.overlaycollection.js',
 		'class.overlay.js',
 		'class.cdate.js',
@@ -533,6 +539,7 @@ if (empty($_GET['files'])) {
 		'class.field.array.js',
 		'class.field.checkbox.js',
 		'class.field.hidden.js',
+		'class.field.multiline.js',
 		'class.field.multiselect.js',
 		'class.field.radiolist.js',
 		'class.field.set.js',
@@ -556,15 +563,19 @@ if (empty($_GET['files'])) {
 		'menupopup.js',
 		'inputsecret.js',
 		'macrovalue.js',
+		'multilineinput.js',
 		'multiselect.js',
 		'class.cverticalaccordion.js',
 		'class.cviewswitcher.js',
 		'class.tab-indicators.js',
+		'class.tagfilteritem.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
 		'textareaflexible.js',
-		'init.js',
-		'class.popupmanager.js'
+		'class.popup-manager.js',
+		'class.popup-manager.event.js',
+		'items.js',
+		'init.js'
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {

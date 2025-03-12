@@ -412,9 +412,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		return $result;
@@ -485,7 +484,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array &$triggerids, array &$db_triggers = null) {
+	protected function validateDelete(array &$triggerids, ?array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $triggerids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

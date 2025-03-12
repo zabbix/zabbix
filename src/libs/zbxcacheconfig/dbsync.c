@@ -32,30 +32,6 @@
 #define ZBX_CORRELATION_ENABLED				0
 /*#define ZBX_CORRELATION_DISABLED			1*/
 
-#define ZBX_DBSYNC_OBJ_HOST		1
-#define ZBX_DBSYNC_OBJ_HOST_TAG		2
-#define ZBX_DBSYNC_OBJ_ITEM		3
-#define ZBX_DBSYNC_OBJ_ITEM_TAG		4
-#define ZBX_DBSYNC_OBJ_TRIGGER		5
-#define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
-#define ZBX_DBSYNC_OBJ_FUNCTION		7
-#define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
-#define ZBX_DBSYNC_OBJ_DRULE		9
-#define ZBX_DBSYNC_OBJ_DCHECK		10
-#define ZBX_DBSYNC_OBJ_HTTPTEST		11
-#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
-#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM	13
-#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
-#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
-#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
-#define ZBX_DBSYNC_OBJ_CONNECTOR	17
-#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
-#define ZBX_DBSYNC_OBJ_PROXY		19
-#define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
-#define ZBX_DBSYNC_OBJ_HOST_PROXY	21
-/* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		21
-
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
 #define ZBX_DBSYNC_CHANGELOG_PRUNE_INTERVAL	SEC_PER_MIN * 10
@@ -63,53 +39,9 @@
 
 #define ZBX_DBSYNC_BATCH_SIZE			1000
 
-typedef struct
-{
-	zbx_uint64_t	changelogid;
-	int		clock;
-}
-zbx_dbsync_changelog_t;
-
-ZBX_VECTOR_DECL(dbsync_changelog, zbx_dbsync_changelog_t)
 ZBX_VECTOR_IMPL(dbsync_changelog, zbx_dbsync_changelog_t)
-
-typedef struct
-{
-	zbx_uint64_t		objectid;
-	zbx_dbsync_changelog_t	changelog;
-}
-zbx_dbsync_obj_changelog_t;
-
-ZBX_VECTOR_DECL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
 ZBX_VECTOR_IMPL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
-
-ZBX_PTR_VECTOR_DECL(dbsync, zbx_dbsync_t *)
 ZBX_PTR_VECTOR_IMPL(dbsync, zbx_dbsync_t *)
-
-typedef struct
-{
-	zbx_vector_uint64_t			inserts;
-	zbx_vector_uint64_t			updates;
-	zbx_vector_uint64_t			deletes;
-
-	zbx_vector_dbsync_t 			syncs;
-	zbx_vector_dbsync_obj_changelog_t	changelog;
-}
-zbx_dbsync_journal_t;
-
-typedef struct
-{
-	zbx_hashset_t			strpool;
-	zbx_dc_config_t			*cache;
-
-	zbx_hashset_t			changelog;
-
-	zbx_dbsync_journal_t		journals[ZBX_DBSYNC_OBJ_COUNT];
-
-	zbx_vector_dbsync_t		changelog_dbsyncs;
-	zbx_vector_dbsync_t		dbsyncs;
-}
-zbx_dbsync_env_t;
 
 static zbx_dbsync_env_t	dbsync_env;
 
@@ -261,7 +193,7 @@ static void	dbsync_add_row(zbx_dbsync_t *sync, zbx_uint64_t rowid, unsigned char
  *                                    synchronization process)                *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_preproc_row_func_t preproc_row_func)
+void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_preproc_row_func_t preproc_row_func)
 {
 	sync->columns_num = columns_num;
 	sync->preproc_row_func = preproc_row_func;
@@ -923,62 +855,6 @@ static char	*encode_expression(const zbx_eval_context_t *ctx)
 	zbx_free(data);
 
 	return str;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compares config table with cached configuration data              *
- *                                                                            *
- * Parameter: sync - [OUT] the changeset                                      *
- *                                                                            *
- * Return value: SUCCEED - the changeset was successfully calculated          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
-{
-	zbx_db_result_t	result;
-
-	zbx_dcsync_sql_start(sync);
-
-#define SELECTED_CONFIG_FIELD_COUNT	44	/* number of columns in the following zbx_db_select() */
-
-	if (NULL == (result = zbx_db_select("select discovery_groupid,snmptrap_logging,"
-				"severity_name_0,severity_name_1,severity_name_2,"
-				"severity_name_3,severity_name_4,severity_name_5,"
-				"hk_events_mode,hk_events_trigger,hk_events_internal,"
-				"hk_events_discovery,hk_events_autoreg,hk_services_mode,"
-				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
-				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
-				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept,"
-				"compression_status,compress_older,instanceid,default_timezone,hk_events_service,"
-				"auditlog_enabled,timeout_zabbix_agent,timeout_simple_check,timeout_snmp_agent,"
-				"timeout_external_check,timeout_db_monitor,timeout_http_agent,timeout_ssh_agent,"
-				"timeout_telnet_agent,timeout_script,auditlog_mode,timeout_browser"
-			" from config"
-			" order by configid")))	/* if you change number of columns in zbx_db_select(), */
-						/* adjust SELECTED_CONFIG_FIELD_COUNT */
-	{
-		return FAIL;
-	}
-
-	dbsync_prepare(sync, SELECTED_CONFIG_FIELD_COUNT, NULL);
-
-	if (ZBX_DBSYNC_INIT == sync->mode)
-	{
-		sync->dbresult = result;
-		zbx_dcsync_sql_end(sync);
-		return SUCCEED;
-	}
-
-	zbx_db_free_result(result);
-
-	/* global configuration will be always synchronized directly with database */
-	THIS_SHOULD_NEVER_HAPPEN;
-
-	zbx_dcsync_sql_end(sync);
-	return FAIL;
-#undef SELECTED_CONFIG_FIELD_COUNT
 }
 
 /******************************************************************************

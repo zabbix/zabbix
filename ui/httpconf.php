@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['scripts'] = ['class.tagfilteritem.js', 'items.js', 'multilineinput.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -393,7 +392,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.ma
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

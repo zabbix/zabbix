@@ -51,20 +51,6 @@ abstract class CControllerUserEditGeneral extends CController {
 	 * @array $data
 	 */
 	protected function setUserMedias(array $data) {
-		if ($this->hasInput('new_media')) {
-			$data['medias'][] = ['userdirectory_mediaid' => 0] + $this->getInput('new_media');
-		}
-		elseif ($this->hasInput('enable_media')) {
-			if (array_key_exists($this->getInput('enable_media'), $data['medias'])) {
-				$data['medias'][$this->getInput('enable_media')]['active'] = MEDIA_STATUS_ACTIVE;
-			}
-		}
-		elseif ($this->hasInput('disable_media')) {
-			if (array_key_exists($this->getInput('disable_media'), $data['medias'])) {
-				$data['medias'][$this->getInput('disable_media')]['active'] = MEDIA_STATUS_DISABLED;
-			}
-		}
-
 		$mediatypeids = [];
 
 		foreach ($data['medias'] as $media) {
@@ -72,18 +58,19 @@ abstract class CControllerUserEditGeneral extends CController {
 		}
 
 		$mediatypes = API::Mediatype()->get([
-			'output' => ['name', 'type'],
+			'output' => ['name', 'status'],
 			'mediatypeids' => array_keys($mediatypeids),
 			'preservekeys' => true
 		]);
 
-		foreach ($data['medias'] as &$media) {
-			$media['name'] = array_key_exists($media['mediatypeid'], $mediatypes)
+		foreach ($data['medias'] as $row_index => &$media) {
+			$media['row_index'] = $row_index;
+			$media['mediatype_name'] = array_key_exists($media['mediatypeid'], $mediatypes)
 				? $mediatypes[$media['mediatypeid']]['name']
 				: null;
-			$media['mediatype'] = array_key_exists($media['mediatypeid'], $mediatypes)
-				? (int) $mediatypes[$media['mediatypeid']]['type']
-				: null;
+			$media['mediatype_status'] = array_key_exists($media['mediatypeid'], $mediatypes)
+				? $mediatypes[$media['mediatypeid']]['status']
+				: MEDIA_TYPE_STATUS_DISABLED;
 			$media['send_to_sort_field'] = is_array($media['sendto'])
 				? implode(', ', $media['sendto'])
 				: $media['sendto'];
@@ -91,6 +78,7 @@ abstract class CControllerUserEditGeneral extends CController {
 		unset($media);
 
 		CArrayHelper::sort($data['medias'], ['name', 'send_to_sort_field']);
+		$data['medias'] = array_values($data['medias']);
 
 		foreach ($data['medias'] as &$media) {
 			unset($media['send_to_sort_field']);

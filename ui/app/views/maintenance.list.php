@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.calendar.js');
 $this->includeJsFile('maintenance.list.js.php');
 
 $filter = (new CFilter())
@@ -118,18 +117,12 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 
 	$maintenance_list->addRow([
 		$data['allowed_edit'] ? new CCheckBox('maintenanceids['.$maintenanceid.']', $maintenanceid) : null,
-		(new CCol(
-			(new CLink($maintenance['name'], $maintenance_url))
-				->setAttribute('data-maintenanceid', $maintenanceid)
-				->setAttribute('data-action', 'maintenance.edit')
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		new CLink($maintenance['name'], $maintenance_url),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
 		$maintenance_status,
-		(new CCol($maintenance['description']))
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		$maintenance['description']
 	]);
 }
 

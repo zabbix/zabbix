@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralOtherParams extends testFormAdministrationGeneral {
 
@@ -233,7 +233,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '1m'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '1m'
 					]
 				]
@@ -246,7 +245,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '1h'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '1h'
 					]
 				]
@@ -260,17 +258,20 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '3600s',
 						// Security.
 						'id:validate_uri_schemes' => true,
-						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
-								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,'.
-								'tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
+						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,'.
+								'ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
+								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,'.
+								'file,mailto,tel,ssh,http,https',
 						'id:x_frame_header_enabled' => true,
-						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
+						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'id:iframe_sandboxing_enabled' => true,
-						'id:iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
+						'id:iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-'.
+								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+								'flag-some-new-flag-some-new-flag-som'
 					],
 					'db' => [
 						// Authorization.
@@ -278,16 +279,19 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'login_block' => '3600s',
 						// Security.
 						'validate_uri_schemes' => 1,
-						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
-								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,'.
-						'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
+						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,'.
+								'ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
+								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,'.
+								'mailto,tel,ssh,http,https',
+						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'iframe_sandboxing_enabled' => 1,
-						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
-								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
-								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
+						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-'.
+								'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-'.
+								'new-flag-some-new-flag-some-new-flag-som'
 					]
 				]
 			],
@@ -299,7 +303,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '3600'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '3600'
 					]
 				]
@@ -312,7 +315,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '60m'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '60m'
 					]
 				]

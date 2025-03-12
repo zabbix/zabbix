@@ -129,6 +129,15 @@ if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !CTimezoneHelper::isSupported(
 	$default_timezone = ZBX_DEFAULT_TIMEZONE;
 }
 
+$tz_offsets = array_column(
+	(new DateTimeZone($default_timezone !== ZBX_DEFAULT_TIMEZONE
+		? $default_timezone
+		: CTimezoneHelper::getSystemTimezone()
+	))->getTransitions(0, ZBX_MAX_DATE),
+	'offset',
+	'ts'
+);
+
 CSessionHelper::set('default_timezone', $default_timezone);
 
 // Set default theme.
@@ -162,6 +171,10 @@ $page_header = (new CHtmlPageHeader(_('Installation'), substr($default_lang, 0, 
 $page_header
 	->setTheme($default_theme)
 	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
+	->addJavaScript('
+		const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
+		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
+	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

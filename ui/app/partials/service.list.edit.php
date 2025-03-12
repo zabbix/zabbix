@@ -22,7 +22,7 @@
 $form = (new CForm())
 	->setId('service-list')
 	->setName('service_list')
-	->addVar('back_url', $data['back_url']);
+	->addVar('return_url', $data['return_url']);
 
 $header = [
 	(new CColHeader(
@@ -94,6 +94,12 @@ foreach ($data['services'] as $serviceid => $service) {
 			: $problem_event['name'];
 	}
 
+	$service_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'service.edit')
+		->setArgument('serviceid', $serviceid)
+		->getUrl();
+
 	$table->addRow(new CRow(array_merge($row, [
 		(new CCol([
 			(new CLink($service['name'],
@@ -116,7 +122,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
 			(new CButtonIcon(ZBX_ICON_PENCIL, _('Edit')))
 				->addClass('js-edit-service-list')
-				->setAttribute('data-serviceid', $serviceid)
+				->setAttribute('data-href', $service_url)
 				->setEnabled(!$service['readonly']),
 			(new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete')))
 				->addClass('js-delete-service')

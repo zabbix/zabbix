@@ -182,7 +182,7 @@ class CDashboard {
 
 	broadcast(data) {
 		for (const [type, value] of Object.entries(data)) {
-			ZABBIX.EventHub.publish({
+			ZABBIX.EventHub.publish(new CEventHubEvent({
 				data: value,
 				descriptor: {
 					context: 'dashboard',
@@ -193,7 +193,7 @@ class CDashboard {
 					reference: CDashboard.REFERENCE_DASHBOARD,
 					type
 				}
-			});
+			}));
 
 			this.#broadcast_cache.set(type, value);
 		}
@@ -2214,7 +2214,7 @@ class CDashboard {
 					return;
 				}
 
-				ZABBIX.EventHub.publish({
+				ZABBIX.EventHub.publish(new CEventHubEvent({
 					data: CWidgetsData.getDefault(e.detail.type),
 					descriptor: {
 						context: 'dashboard',
@@ -2225,7 +2225,7 @@ class CDashboard {
 						reference: e.detail.reference,
 						type: e.detail.type
 					}
-				});
+				}));
 
 				console.log('Could not require referred data source', `${e.detail.reference}.${e.detail.type}`);
 			},
@@ -2490,7 +2490,7 @@ class CDashboard {
 					});
 
 					if (this.#broadcast_options[descriptor.type].rebroadcast) {
-						ZABBIX.EventHub.publish({
+						ZABBIX.EventHub.publish(new CEventHubEvent({
 							data,
 							descriptor: {
 								context: 'dashboard',
@@ -2501,7 +2501,7 @@ class CDashboard {
 								reference: CDashboard.REFERENCE_DASHBOARD,
 								type: descriptor.type
 							}
-						});
+						}));
 					}
 				}
 			}
@@ -2548,7 +2548,8 @@ class CDashboard {
 				event_type: 'feedback',
 				reference: CDashboard.REFERENCE_DASHBOARD
 			},
-			callback: this._events.feedback
+			callback: this._events.feedback,
+			accept_cached: true
 		});
 	}
 

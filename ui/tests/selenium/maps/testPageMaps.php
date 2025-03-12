@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource Maps, CopyWidgetsDashboards
+ * @dataSource Maps, CopyWidgetsDashboards, WidgetCommunication
  *
  * @backup sysmaps
  *
@@ -218,6 +218,10 @@ class testPageMaps extends CWebTest {
 
 		// Get filter element.
 		$filter = CFilterElement::find()->one();
+
+		// Expand filter if it is collapsed.
+		$filter->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
 		$form = $filter->getForm();
 
 		$this->assertEquals(['Name'], $form->getLabels()->asText());
@@ -292,6 +296,8 @@ class testPageMaps extends CWebTest {
 						self::SYSMAP_FIRST_A,
 						'Local network',
 						'Map for form testing',
+						'Map for testing feedback',
+						'Map for widget communication test',
 						'Map for widget copies',
 						self::SYSMAP_SPACES_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
@@ -467,7 +473,12 @@ class testPageMaps extends CWebTest {
 	 */
 	public function testPageMaps_Filter($data) {
 		$this->page->login()->open('sysmaps.php?sort=name&sortorder=ASC');
-		$form = CFilterElement::find()->one()->getForm();
+		$filter = CFilterElement::find()->one();
+
+		// Expand filter if it is collapsed.
+		$filter->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
+		$form = $filter->getForm();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));

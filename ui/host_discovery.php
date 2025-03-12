@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['multilineinput.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -234,7 +233,7 @@ $fields = [
 	'filter_rst' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_hostids' =>					[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_name' =>					[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	null],
 	'filter_key' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>					[T_ZBX_INT, O_OPT, null,
 											IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
@@ -649,7 +648,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows($checkbox_hash);
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}
@@ -685,7 +684,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -770,6 +769,9 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
+		throw new CAccessDeniedException();
+	}
 
 	$default_timeout = DB::getDefault('items', 'timeout');
 	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);

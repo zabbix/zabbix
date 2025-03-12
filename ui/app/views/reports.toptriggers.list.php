@@ -20,10 +20,6 @@
  */
 
 $this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('reports.toptriggers.list.js.php');
 
@@ -97,6 +93,7 @@ $filter = (new CFilter())
 						->setChecked($data['filter']['severities'])
 						->setColumns(3)
 						->setVertical()
+						->showTitles()
 				)
 			]),
 		(new CFormGrid())
@@ -130,17 +127,15 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 	array_pop($hosts);
 
 	$table->addRow([
-		(new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(
-			(new CLinkAction($trigger['description']))->setMenuPopup(
-				CMenuPopupHelper::getTrigger([
-					'triggerid' => $trigger['triggerid'],
-					'backurl' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'toptriggers.list')
-						->getUrl()
-				])
-			)
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		$hosts,
+		(new CLinkAction($trigger['description']))->setMenuPopup(
+			CMenuPopupHelper::getTrigger([
+				'triggerid' => $trigger['triggerid'],
+				'backurl' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'toptriggers.list')
+					->getUrl()
+			])
+		),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['problem_count']
 	]);

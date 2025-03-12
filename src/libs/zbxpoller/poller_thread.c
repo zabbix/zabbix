@@ -286,7 +286,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-						ZBX_REQUEST_HOST_IP);
+						ZBX_DC_REQUEST_HOST_IP);
 			}
 		}
 		else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
@@ -298,7 +298,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-						ZBX_REQUEST_HOST_DNS);
+						ZBX_DC_REQUEST_HOST_DNS);
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
@@ -310,7 +310,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-						ZBX_REQUEST_HOST_CONN);
+						ZBX_DC_REQUEST_HOST_CONN);
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
@@ -322,7 +322,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-					ZBX_REQUEST_HOST_PORT);
+						ZBX_DC_REQUEST_HOST_PORT);
 			}
 		}
 	}
@@ -334,7 +334,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		unsigned char expand_macros)
 {
 	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
-	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
 
@@ -349,7 +349,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
-			if (SUCCEED != zbx_substitute_key_macros_unmasked(&items[i].key, NULL, &items[i], NULL, NULL,
+			if (SUCCEED != zbx_substitute_key_macros_unmasked(&items[i].key, NULL, &items[i],
 					ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));

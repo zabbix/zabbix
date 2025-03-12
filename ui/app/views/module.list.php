@@ -90,9 +90,7 @@ foreach ($data['modules'] as $moduleid => $module) {
 		->setArgument('moduleid', $moduleid)
 		->getUrl();
 
-	$name = (new CLink($module['name'], $module_url))
-		->setAttribute('data-moduleid', $moduleid)
-		->setAttribute('data-action', 'module.edit');
+	$name = new CLink($module['name'], $module_url);
 
 	if ($module['status'] == MODULE_STATUS_ENABLED) {
 		$status = (new CLink(_('Enabled')))

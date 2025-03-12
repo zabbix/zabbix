@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = ['effects.js', 'items.js', 'multilineinput.js'];
+$page['scripts'] = ['effects.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -300,7 +300,7 @@ elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscov
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -330,7 +330,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

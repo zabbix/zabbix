@@ -25,6 +25,7 @@
 #include "zbxvariant.h"
 #include "zbx_expression_constants.h"
 #include "zbxexpression.h"
+#include "zbxdb.h"
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -495,6 +496,134 @@ int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: request proxy field value by proxyid.                               *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	result = zbx_db_select(
+			"select %s"
+			" from proxy"
+			" where proxyid=" ZBX_FS_UI64,
+			field_name, proxyid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		ret = SUCCEED;
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the item.             *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = zbx_db_select(
+			"select h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error,"
+					"irn.name_resolved"
+			" from items i"
+				" join hosts h on h.hostid=i.hostid"
+				" left join item_rtdata ir on ir.itemid=i.itemid"
+				" left join item_rtname irn on irn.itemid=i.itemid"
+			" where i.itemid=" ZBX_FS_UI64, itemid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		switch (request)
+		{
+			case ZBX_DB_REQUEST_HOST_DESCRIPTION:
+				*replace_to = zbx_strdup(*replace_to, row[0]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_ID:
+				*replace_to = zbx_strdup(*replace_to, row[1]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_NAME:
+				if (FAIL == zbx_db_is_null(row[7]))
+					*replace_to = zbx_strdup(*replace_to, row[7]);
+				else
+					*replace_to = zbx_strdup(*replace_to, row[2]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_NAME_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[2]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_KEY_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[3]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_DESCRIPTION_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_VALUETYPE:
+				*replace_to = zbx_strdup(*replace_to, row[5]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_ERROR:
+				*replace_to = zbx_strdup(*replace_to, FAIL == zbx_db_is_null(row[6]) ? row[6] : "");
+				ret = SUCCEED;
+				break;
+		}
+	}
+	zbx_db_free_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the trigger's         *
+ *          N_functionid'th function.                                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_with_trigger_itemid(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		zbx_db_with_itemid_func_t cb, int request)
+{
+	zbx_uint64_t	itemid;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid))
+		ret = cb(itemid, replace_to, request);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get unique itemids of trigger functions in the order they are     *
  *          written in expression                                             *
  *                                                                            *
@@ -735,7 +864,8 @@ void	zbx_db_trigger_get_recovery_expression(const zbx_db_trigger *trigger, char 
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
 }
 
-static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_trigger_func_t eval_func_cb)
+static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value,
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb)
 {
 	zbx_dc_item_t		item;
 	zbx_dc_function_t	function;
@@ -763,8 +893,8 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 			evaluate_item.host = item.host.host;
 			evaluate_item.key_orig = item.key_orig;
 
-			if (SUCCEED == eval_func_cb(&var, &evaluate_item, function.function, parameter, &ts, &error) &&
-					ZBX_VARIANT_NONE != var.type)
+			if (SUCCEED == evaluate_function_trigger_cb(&var, &evaluate_item, function.function, parameter,
+					&ts, &error) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
 				zbx_variant_clear(&var);
@@ -784,7 +914,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 }
 
 static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression,
-		zbx_trigger_func_t eval_func_cb)
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb)
 {
 	int			i;
 	zbx_eval_context_t	local_ctx;
@@ -818,7 +948,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 		}
 
 		zbx_variant_clear(&token->value);
-		evaluate_function_by_id(functionid, &value, eval_func_cb);
+		evaluate_function_by_id(functionid, &value, evaluate_function_trigger_cb);
 		zbx_variant_set_str(&token->value, value);
 	}
 
@@ -828,7 +958,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 }
 
 static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int index, char **value_ret,
-		zbx_trigger_func_t eval_func_cb)
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb)
 {
 	int			i;
 	zbx_eval_context_t	local_ctx;
@@ -859,7 +989,7 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 				continue;
 		}
 
-		evaluate_function_by_id(functionid, value_ret, eval_func_cb);
+		evaluate_function_by_id(functionid, value_ret, evaluate_function_trigger_cb);
 		break;
 	}
 
@@ -870,7 +1000,7 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 }
 
 void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **expression,
-		zbx_trigger_func_t eval_func_cb, int recovery)
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb, int recovery)
 {
 	zbx_trigger_cache_t		*cache;
 	zbx_trigger_cache_state_t	state;
@@ -886,11 +1016,11 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 
 	ctx = (1 == recovery) ? &cache->eval_ctx_r : &cache->eval_ctx;
 
-	db_trigger_explain_expression(ctx, expression, eval_func_cb);
+	db_trigger_explain_expression(ctx, expression, evaluate_function_trigger_cb);
 }
 
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
-		zbx_trigger_func_t eval_func_cb, int recovery)
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb, int recovery)
 {
 	zbx_trigger_cache_t		*cache;
 	zbx_trigger_cache_state_t	state;
@@ -906,5 +1036,5 @@ void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index,
 
 	ctx = (1 == recovery) ? &cache->eval_ctx_r : &cache->eval_ctx;
 
-	db_trigger_get_function_value(ctx, index, value, eval_func_cb);
+	db_trigger_get_function_value(ctx, index, value, evaluate_function_trigger_cb);
 }

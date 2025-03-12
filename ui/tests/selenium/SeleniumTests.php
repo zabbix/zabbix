@@ -87,6 +87,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopHostsWidget.ph
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardURLWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardWidgetBroadcastedData.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
 // Event correlation.
@@ -309,6 +310,7 @@ require_once dirname(__FILE__).'/triggers/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserGroups.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
+require_once dirname(__FILE__).'/users/testFormUserLdapMediaJit.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testAlarmNotification.php';
@@ -424,6 +426,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
 		$suite->addTestSuite('testDashboardWidgetCommunication');
 
 		// Event correlation.
@@ -646,6 +649,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUser');
 		$suite->addTestSuite('testFormUserGroups');
 		$suite->addTestSuite('testFormUserMedia');
+		$suite->addTestSuite('testFormUserLdapMediaJit');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testAlarmNotification');
 		$suite->addTestSuite('testFormUserProfile');

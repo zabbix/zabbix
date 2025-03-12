@@ -58,6 +58,10 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	public function get(array $options = []) {
+		$user_output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? CUser::OUTPUT_FIELDS
+			: CUser::OWN_LIMITED_OUTPUT_FIELDS;
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -71,7 +75,7 @@ class CRole extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access']), 'default' => null],
-			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid']), 'default' => null],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $user_output_fields), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -381,7 +385,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkDuplicates(array $roles, array $db_roles = null): void {
+	private function checkDuplicates(array $roles, ?array $db_roles = null): void {
 		$names = [];
 
 		foreach ($roles as $role) {
@@ -414,7 +418,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function checkRules(array $roles, array $db_roles = null): void {
+	private function checkRules(array $roles, ?array $db_roles = null): void {
 		foreach ($roles as $role) {
 			if (!array_key_exists('rules', $role)) {
 				continue;
@@ -441,7 +445,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private static function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private static function checkUiRules(string $name, int $type, array $rules, ?array $db_rules = null): void {
 		if (!array_key_exists('ui', $rules)) {
 			return;
 		}
@@ -491,7 +495,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkServicesRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private function checkServicesRules(string $name, int $type, array $rules, ?array $db_rules = null): void {
 		$this->checkServicesReadRules($name, $rules, $db_rules);
 		$this->checkServicesWriteRules($name, $type, $rules, $db_rules);
 
@@ -539,7 +543,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private function checkServicesReadRules(string $name, array $rules, array $db_rules = null): void {
+	private function checkServicesReadRules(string $name, array $rules, ?array $db_rules = null): void {
 		if (!array_key_exists('services.read.mode', $rules)
 				&& !array_key_exists('services.read.list', $rules)
 				&& !array_key_exists('services.read.tag', $rules)) {
@@ -612,7 +616,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private function checkServicesWriteRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private function checkServicesWriteRules(string $name, int $type, array $rules, ?array $db_rules = null): void {
 		if (!array_key_exists('services.write.mode', $rules)
 				&& !array_key_exists('services.write.list', $rules)
 				&& !array_key_exists('services.write.tag', $rules)) {
@@ -837,7 +841,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function updateRules(array $roles, array $db_roles = null): void {
+	private function updateRules(array $roles, ?array $db_roles = null): void {
 		$default_rules = [
 			'ui' => [],
 			'ui.default_access' => ZBX_ROLE_RULE_ENABLED,
@@ -1279,35 +1283,7 @@ class CRole extends CApiService {
 			unset($role);
 		}
 
-		if ($options['selectUsers'] !== null) {
-			if ($options['selectUsers'] === API_OUTPUT_COUNT) {
-				$output = ['userid', 'roleid'];
-			}
-			elseif ($options['selectUsers'] === API_OUTPUT_EXTEND) {
-				$output = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-					'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
-				];
-			}
-			else {
-				$output = array_unique(array_merge(['userid', 'roleid'], $options['selectUsers']));
-			}
-
-			$users = DB::select('users', [
-				'output' => $output,
-				'filter' => ['roleid' => $roleids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($users, 'roleid', 'userid');
-			$users = $this->unsetExtraFields($users, ['userid', 'roleid'], $options['selectUsers']);
-			$result = $relation_map->mapMany($result, $users, 'users');
-
-			if ($options['selectUsers'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['users'] = (string) count($row['users']);
-				}
-				unset($row);
-			}
-		}
+		$this->addRelatedUsers($options, $result);
 
 		return $result;
 	}
@@ -1559,6 +1535,52 @@ class CRole extends CApiService {
 		}
 
 		return $result;
+	}
+
+	private function addRelatedUsers(array $options, array &$result): void {
+		if ($options['selectUsers'] === null) {
+			return;
+		}
+
+		if ($options['selectUsers'] === API_OUTPUT_COUNT) {
+			$output = ['userid', 'roleid'];
+		}
+		elseif ($options['selectUsers'] === API_OUTPUT_EXTEND) {
+			$output = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+				? CUser::OUTPUT_FIELDS
+				: CUser::OWN_LIMITED_OUTPUT_FIELDS;
+		}
+		else {
+			$output = array_unique(array_merge(['userid', 'roleid'], $options['selectUsers']));
+		}
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$users = API::User()->get([
+				'output' => $output,
+				'filter' => ['roleid' => array_keys($result)],
+				'preservekeys' => true
+			]);
+		}
+		else {
+			$users = array_key_exists(self::$userData['roleid'], $result)
+				? API::User()->get([
+					'output' => $output,
+					'userids' => self::$userData['userid'],
+					'preservekeys' => true
+				])
+				: [];
+		}
+
+		$relation_map = $this->createRelationMap($users, 'roleid', 'userid');
+		$users = $this->unsetExtraFields($users, ['userid', 'roleid'], $options['selectUsers']);
+		$result = $relation_map->mapMany($result, $users, 'users');
+
+		if ($options['selectUsers'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['users'] = (string) count($row['users']);
+			}
+			unset($row);
+		}
 	}
 
 	/**

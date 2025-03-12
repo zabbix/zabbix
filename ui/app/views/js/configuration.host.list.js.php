@@ -32,62 +32,8 @@
 			this.csrf_token = csrf_token;
 
 			this.initFilter();
-
-			const form = document.forms['hosts'];
-
-			form.addEventListener('click', e => {
-				if (e.target.classList.contains('js-enable-host')) {
-					this.enable(e.target, {hostids: [e.target.dataset.hostid]});
-				}
-				else if (e.target.classList.contains('js-disable-host')) {
-					this.disable(e.target, {hostids: [e.target.dataset.hostid]});
-				}
-			});
-
-			document.querySelector('.js-create-host').addEventListener('click', () => {
-				window.popupManagerInstance.openPopup('host.edit',
-					this.applied_filter_groupids ? {groupids: this.applied_filter_groupids} : {}
-				);
-			});
-
-			form.querySelector('.js-massenable-host').addEventListener('click', e => {
-				const hostids = Object.keys(chkbxRange.getSelectedIds());
-
-				const message = hostids.length > 1
-					? <?= json_encode(_('Enable selected hosts?')) ?>
-					: <?= json_encode(_('Enable selected host?')) ?>;
-
-				if (window.confirm(message)) {
-					this.enable(e.target, {hostids});
-				}
-			});
-
-			form.querySelector('.js-massdisable-host').addEventListener('click', e => {
-				const hostids = Object.keys(chkbxRange.getSelectedIds());
-
-				const message = hostids.length > 1
-					? <?= json_encode(_('Disable selected hosts?')) ?>
-					: <?= json_encode(_('Disable selected host?')) ?>;
-
-				if (window.confirm(message)) {
-					this.disable(e.target, {hostids});
-				}
-			});
-
-			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
-				openMassupdatePopup('popup.massupdate.host', {
-					[CSRF_TOKEN_NAME]: this.csrf_token
-				}, {
-					dialogue_class: 'modal-popup-static',
-					trigger_element: e.target
-				})
-			});
-
-			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
-				this.massDeleteHosts(e.target);
-			});
-
-			this.setSubmitCallback();
+			this.initEvents();
+			this.initPopupListeners();
 		},
 
 		enable(target, parameters) {
@@ -198,6 +144,70 @@
 				.trigger('change');
 		},
 
+		initEvents() {
+			const form = document.forms['hosts'];
+
+			form.addEventListener('click', e => {
+				if (e.target.classList.contains('js-enable-host')) {
+					this.enable(e.target, {hostids: [e.target.dataset.hostid]});
+				}
+				else if (e.target.classList.contains('js-disable-host')) {
+					this.disable(e.target, {hostids: [e.target.dataset.hostid]});
+				}
+			});
+
+			form.querySelector('.js-massenable-host').addEventListener('click', e => {
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
+
+				const message = hostids.length > 1
+					? <?= json_encode(_('Enable selected hosts?')) ?>
+					: <?= json_encode(_('Enable selected host?')) ?>;
+
+				if (window.confirm(message)) {
+					this.enable(e.target, {hostids});
+				}
+			});
+
+			form.querySelector('.js-massdisable-host').addEventListener('click', e => {
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
+
+				const message = hostids.length > 1
+					? <?= json_encode(_('Disable selected hosts?')) ?>
+					: <?= json_encode(_('Disable selected host?')) ?>;
+
+				if (window.confirm(message)) {
+					this.disable(e.target, {hostids});
+				}
+			});
+
+			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
+				openMassupdatePopup('popup.massupdate.host', {
+					[CSRF_TOKEN_NAME]: this.csrf_token
+				}, {
+					dialogue_class: 'modal-popup-static',
+					trigger_element: e.target
+				})
+			});
+
+			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
+				this.massDeleteHosts(e.target);
+			});
+
+			document.querySelector('.js-create-host').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
+			});
+		},
+
+		initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('hosts')
+			});
+		},
+
 		massDeleteHosts(button) {
 			const confirm_text = Object.keys(chkbxRange.getSelectedIds()).length > 1
 				? <?= json_encode(_('Delete selected hosts?')) ?>
@@ -230,21 +240,6 @@
 				.finally(() => {
 					button.classList.remove('is-loading');
 				});
-		},
-
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('hosts');
-				location.href = location.href;
-			});
 		}
 	};
 </script>

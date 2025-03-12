@@ -79,5 +79,32 @@ in:
 out:
   checks:
     - 2017-01-29 15:00:00 +02:00
+---
+test case: Calculate nextcheck for unreachable host (10)
+in:
+  delay: 1m;0/1-7,00:00-13:00;0/1-7,13:00-24:00;wd5h15-18
+  timezone: :Europe/Riga
+  disabled_until: 2024-12-19 10:00:00 +02:00
+out:
+  checks:
+    - 2024-12-20 15:00:00 +02:00
+---
+test case: Calculate nextcheck for unreachable host (11)
+in:
+  delay: 1m;0/1-7,00:00-13:00;0/1-7,13:00-24:00;wd1h15-18
+  timezone: :Europe/Riga
+  disabled_until: 2024-12-31 10:00:00 +02:00
+out:
+  checks:
+    - 2025-01-06 15:00:00 +02:00
+---
+test case: Calculate nextcheck for unreachable host (12)
+in:
+  delay: 1m;0/1-5,00:00-24:00
+  timezone: :Europe/Riga
+  disabled_until: 2024-12-31 10:00:00 +02:00
+out:
+  checks:
+    - 2025-01-04 00:00:00 +02:00
 ...
 

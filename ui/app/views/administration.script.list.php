@@ -20,8 +20,6 @@
  */
 
 $this->includeJsFile('administration.script.list.js.php');
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
 
 if ($data['uncheck']) {
 	uncheckTableRows('script');
@@ -117,9 +115,6 @@ foreach ($data['scripts'] as $script) {
 
 					$actions[] = $action['is_editable']
 						? (new CLink($action['name'], $action_url))
-							->setAttribute('data-actionid', $action['actionid'])
-							->setAttribute('data-eventsource', $action['eventsource'])
-							->setAttribute('data-action', 'action.edit')
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY)
 						: (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
@@ -194,28 +189,20 @@ foreach ($data['scripts'] as $script) {
 		->setArgument('scriptid', $script['scriptid'])
 		->getUrl();
 
-	$link = (new CLink($script['name'], $script_url))
-		->setAttribute('data-scriptid', $script['scriptid'])
-		->setAttribute('data-action', 'script.edit');
+	$link = new CLink($script['name'], $script_url);
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))
-			->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
 		$scope,
 		(new CCol($action_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
-		(new CCol($actions))->addClass(ZBX_STYLE_WORDBREAK),
+		$actions,
 		$type,
 		$execute_on,
-		(new CCol(zbx_nl2br($script['command'])))
-			->addClass(ZBX_STYLE_MONOSPACE_FONT)
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-		(new CCol($script['userGroupName'] === null ? _('All') : $script['userGroupName']))
-			->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($script['hostGroupName'] === null ? _('All') : $script['hostGroupName']))
-			->addClass(ZBX_STYLE_WORDBREAK),
-		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
+		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+		$script['userGroupName'] === null ? _('All') : $script['userGroupName'],
+		$script['hostGroupName'] === null ? _('All') : $script['hostGroupName'],
+		$script['host_access'] == PERM_READ_WRITE ? _('Write') : _('Read')
 	]);
 }
 

@@ -1700,15 +1700,20 @@ div {
 }
 
 .menu-popup {
-	position: absolute;
+	position: fixed;
 	z-index: 1001;
 	padding: 5px 15px 5px 25px;
+	box-sizing: border-box;
 	min-width: 166px;
 	max-width: 250px;
+	max-height: calc(100vh - 20px);
+	overflow-y: auto;
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+	@extend %webkit-scrollbar;
 
 	&:focus {
 		outline: none;
@@ -1732,7 +1737,7 @@ div {
 		text-decoration: none;
 		border: 0;
 		outline: 0;
-		padding: 0 15px 0 25px;
+		padding: 0 25px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
 		@extend %overflow-ellipsis;
@@ -1947,6 +1952,10 @@ div {
 			width: calc(100vw - 40px);
 			max-width: calc(100vw - 40px);
 		}
+	}
+
+	.hintbox-raw-data {
+		white-space: pre-wrap;
 	}
 
 	.hintbox-wrap,
@@ -3635,11 +3644,11 @@ svg {
 
 .btn-split {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
 	margin-right: 10px;
 
 	li {
-		display: inline-block;
+		display: inline-flex;
 
 		&:first-child {
 			button {
@@ -3706,7 +3715,7 @@ svg {
 
 .interfaces {
 	display: grid;
-	grid-template-columns: 26px repeat(7, max-content);
+	grid-template-columns: 26px repeat(7, min-content);
 	margin-bottom: 5px;
 	line-height: 24px;
 

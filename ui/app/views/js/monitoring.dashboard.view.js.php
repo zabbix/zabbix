@@ -187,7 +187,6 @@
 			});
 
 			jqBlink.blink();
-			this.#setSubmitCallback();
 		}
 
 		#edit() {
@@ -436,9 +435,10 @@
 			jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
 				position: {
 					of: e.target,
-					my: 'left top',
-					at: 'left bottom',
-					within: '.wrapper'
+					my: 'right top',
+					at: 'right bottom',
+					within: '.wrapper',
+					collision: 'fit flip'
 				}
 			});
 		}
@@ -550,20 +550,6 @@
 					clearMessages();
 					addMessage(makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]));
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
 		}
 	}
 </script>
