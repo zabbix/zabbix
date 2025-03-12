@@ -215,7 +215,7 @@ func run() error {
 
 	err = agent.ValidateOptions(&agent.Options)
 	if err != nil {
-		return eventLogErr(err)
+		return eventLogErr(errs.Wrap(err, "cannot validate configuration"))
 	}
 
 	err = handleWindowsService(args.configPath)

@@ -86,8 +86,6 @@ var (
 	errCipherCert13WithoutCert = errors.New("TLSCipherCert13 configuration parameter set without certificates being" +
 		" used")
 	errInvalidTLSPSKFile = errors.New("invalid TLSPSKFile configuration parameter")
-
-	errServerActive = errors.New(`invalid "ServerActive" configuration parameter`)
 )
 
 // PluginSystemOptions collection of system options for all plugins, map key are plugin names.
@@ -381,7 +379,7 @@ func validateHost(host string) error {
 		return nil
 	}
 
-	return fmt.Errorf("%w failed to validate host: %s", errServerActive, host)
+	return errs.Errorf("failed to validate host: %q", host)
 }
 
 func elementsUnique(array [][]string) (bool, string) {
@@ -407,7 +405,7 @@ func normalizeAddress(address string) (string, error) {
 	ip := net.ParseIP(address)
 
 	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
-		return "", fmt.Errorf("%w address %q: empty value", errServerActive, address)
+		return "", errs.Errorf("failed to parse address %q: empty value", address)
 	}
 
 	var checkAddr string
@@ -423,7 +421,7 @@ func normalizeAddress(address string) (string, error) {
 
 	h, p, err := net.SplitHostPort(checkAddr)
 	if err != nil {
-		return "", fmt.Errorf("%w address %q: %w", errServerActive, address, err)
+		return "", errs.Wrapf(err, "failed to parse address %q", address)
 	}
 
 	err = validateHost(h)
@@ -474,7 +472,7 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 	elementsUniqueRes, duplicateElement := elementsUnique(resultAddresses)
 
 	if !elementsUniqueRes {
-		return nil, fmt.Errorf("%w address %q specified more than once", errServerActive, duplicateElement)
+		return nil, errs.Errorf("address %q specified more than once", duplicateElement)
 	}
 
 	return resultAddresses, nil
@@ -514,7 +512,7 @@ func ValidateOptions(options *AgentOptions) error {
 	_, err = ParseServerActive(options.ServerActive)
 
 	if err != nil {
-		return err
+		return errs.Wrap(err, `failed to validate "ServerActive" configuration parameter`)
 	}
 
 	return nil

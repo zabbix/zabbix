@@ -645,6 +645,7 @@ func Test_ValidateOptions(t *testing.T) {
 func TestParseServerActive(t *testing.T) {
 	t.Parallel()
 
+	errServerActive := errors.New(`Failed to parse`)
 	tests := []struct {
 		name         string
 		serverActive string
@@ -891,84 +892,84 @@ func TestParseServerActive(t *testing.T) {
 		{
 			"-coma",
 			",",
-			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-comaWithEmptySpacesAround",
 			" , ",
-			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-squareBrackets",
 			" [ ]:80 ",
-			fmt.Errorf("%w %s", errServerActive, `address "[ ]:80": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "[ ]:80": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-emptySpaceAddressAndValidPort",
 			" :80 ",
-			fmt.Errorf("%w %s", errServerActive, `address ":80": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address ":80": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-twoStringsSeparatedByComa",
 			"foo,foo",
-			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
+			errors.New(`Address "foo:10051" specified more than once.`),
 			true,
 			nil,
 		},
 		{
 			"-twoStringsSeparatedBySemicolon",
 			"foo;foo",
-			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
+			errors.New(`Address "foo:10051" specified more than once.`),
 			true,
 			nil,
 		},
 		{
 			"-threeClustersWithDNSNames",
 			"foo;bar,foo2;foo",
-			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
+			errors.New(`Address "foo:10051" specified more than once.`),
 			true,
 			nil,
 		},
 		{
 			"-semicolon",
 			";",
-			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-semicolonWithEmptySpaceBefore",
 			" ;",
-			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-semicolonWithEmptySpaceAfter",
 			"; ",
-			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-semicolonWithEmptySpacesBeforeAndAfter",
 			" ; ",
-			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value.`),
 			true,
 			nil,
 		},
 		{
 			"-newlineSymbol",
 			"\\n",
-			fmt.Errorf("%w %s", errServerActive, `failed to validate host: \n`),
+			errors.New(`Failed to validate host: "\\n".`),
 			true,
 			nil,
 		},
@@ -976,7 +977,7 @@ func TestParseServerActive(t *testing.T) {
 			"-IPv6WithEmptySpaceInside",
 			" fe80::72d5:8d8b: b2ca:206  ",
 			fmt.Errorf("%w %s", errServerActive,
-				`address "fe80::72d5:8d8b: b2ca:206": address fe80::72d5:8d8b: b2ca:206: too many colons in address`),
+				`address "fe80::72d5:8d8b: b2ca:206": address fe80::72d5:8d8b: b2ca:206: too many colons in address.`),
 			true,
 			nil,
 		},
