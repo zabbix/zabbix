@@ -422,13 +422,11 @@ func normalizeAddress(address string) (string, error) {
 	}
 
 	h, p, err := net.SplitHostPort(checkAddr)
-
 	if err != nil {
 		return "", fmt.Errorf("%w address %q: %w", errServerActive, address, err)
 	}
 
 	err = validateHost(h)
-
 	if err != nil {
 		return "", err
 	}
@@ -436,10 +434,10 @@ func normalizeAddress(address string) (string, error) {
 	return net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p)), nil
 }
 
-//nolint:makezero
 func clusterToAddresses(cluster string) ([]string, error) {
 	rawAddresses := strings.Split(cluster, ";")
-	parsedAddresses := make([]string, len(rawAddresses))
+
+	parsedAddresses := make([]string, len(rawAddresses)) //nolint:makezero
 
 	for i, rawAddress := range rawAddresses {
 		address, err := normalizeAddress(rawAddress)
@@ -455,15 +453,14 @@ func clusterToAddresses(cluster string) ([]string, error) {
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
-//
-//nolint:makezero
 func ParseServerActive(optionServerActive string) ([][]string, error) {
 	if strings.TrimSpace(optionServerActive) == "" {
 		return [][]string{}, nil
 	}
 
 	clusters := strings.Split(optionServerActive, ",")
-	resultAddresses := make([][]string, len(clusters))
+
+	resultAddresses := make([][]string, len(clusters)) //nolint:makezero
 
 	for i, cluster := range clusters {
 		clusterAddresses, err := clusterToAddresses(cluster)
