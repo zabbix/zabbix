@@ -101,11 +101,12 @@
 								throw {error: response.error};
 							}
 							else {
+								postMessageOk(response.success.title);
+
 								if ('messages' in response.success) {
 									postMessageDetails('success', response.success.messages);
 								}
 
-								postMessageOk(response.success.title);
 								curl.setArgument('action', 'regex.list');
 								location.href = curl.getUrl();
 							}
