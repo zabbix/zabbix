@@ -169,6 +169,7 @@ tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/zbx_add_tags
 tests/libs/zbxdbhigh/zbx_del_tags
 tests/libs/zbxdbhigh/zbx_merge_tags
+tests/libs/zbxdbhigh/zbx_sync_rowset_merge
 tests/libs/zbxeval/zbx_eval_compose_expression
 tests/libs/zbxeval/zbx_eval_execute
 tests/libs/zbxeval/zbx_eval_execute_ext

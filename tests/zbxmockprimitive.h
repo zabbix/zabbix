@@ -37,15 +37,15 @@ void	mock_clear_double(double *value);
 /* assert_eq functions */
 void	mock_assert_eq_char_ptr(const char *prefix, char **v1, char **v2);
 void	mock_assert_eq_const_char_ptr(const char *prefix, const char **v1, const char **v2);
-void	mock_assert_eq_zbx_uint64(const char *prefix, zbx_uint64_t *v1, zbx_uint64_t *v2);
-void	mock_assert_eq_int(const char *prefix, int *v1, int *v2);
-void	mock_assert_eq_double(const char *prefix, double *v1, double *v2);
+void	mock_assert_eq_zbx_uint64(const char *prefix, const zbx_uint64_t *v1, const zbx_uint64_t *v2);
+void	mock_assert_eq_int(const char *prefix, const int *v1, const int *v2);
+void	mock_assert_eq_double(const char *prefix, const double *v1, const double *v2);
 
 /* dump functions */
 void	mock_dump_char_ptr(const char *name, char **value, int indent);
 void	mock_dump_const_char_ptr(const char *name, const char **value, int indent);
-void	mock_dump_zbx_uint64(const char *name, zbx_uint64_t *value, int indent);
-void	mock_dump_int(const char *name, int *value, int indent);
-void	mock_dump_double(const char *name, double *value, int indent);
+void	mock_dump_zbx_uint64(const char *name, const zbx_uint64_t *value, int indent);
+void	mock_dump_int(const char *name, const int *value, int indent);
+void	mock_dump_double(const char *name, const double *value, int indent);
 
 #endif

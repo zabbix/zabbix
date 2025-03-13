@@ -820,4 +820,30 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 
 int	zbx_db_setting_exists(const char *config_name);
 
+/* rowset sync */
+
+typedef struct
+{
+	zbx_uint64_t	rowid;
+	char		**cols;
+	int		cols_num;
+	int		update_num;
+}
+zbx_sync_row_t;
+
+ZBX_PTR_VECTOR_DECL(sync_row_ptr, zbx_sync_row_t *)
+
+typedef struct
+{
+	zbx_vector_sync_row_ptr_t	rows;
+	int				cols_num;
+}
+zbx_sync_rowset_t;
+
+void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num);
+void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...);
+void	zbx_sync_rowset_sort(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+
 #endif
