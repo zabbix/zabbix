@@ -335,6 +335,18 @@ class CMapHelper {
 
 		$duplicated_links = [];
 
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => false
+		]);
+
+		$number_parser_binary = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => true
+		]);
+
 		foreach ($sysmap['links'] as &$link) {
 			if ($link['permission'] < PERM_READ) {
 				continue;
@@ -416,8 +428,28 @@ class CMapHelper {
 							}
 						}
 						elseif ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
-							foreach ($link['thresholds'] as $threshold) {
-								if ($item_value < $threshold['threshold']) {
+							$has_binary_units = isBinaryUnits($link_items_info[$link['itemid']]['units']);
+
+							if ($has_binary_units) {
+								$number_parser_binary->parse($item_value);
+								$parsed_item_value = $number_parser_binary->calcValue();
+							}
+							else {
+								$number_parser->parse($item_value);
+								$parsed_item_value = $number_parser->calcValue();
+							}
+
+							foreach ($link['thresholds'] as &$threshold) {
+								if ($has_binary_units) {
+									$number_parser_binary->parse($threshold['threshold']);
+									$parsed_threshold_value = $number_parser_binary->calcValue();
+								}
+								else {
+									$number_parser->parse($threshold['threshold']);
+									$parsed_threshold_value = $number_parser->calcValue();
+								}
+
+								if ($parsed_item_value < $parsed_threshold_value) {
 									break;
 								}
 

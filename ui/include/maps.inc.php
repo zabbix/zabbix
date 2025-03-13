@@ -1491,7 +1491,7 @@ function getMapLinkItemInfo(array $sysmap): array {
 
 	$db_items = $itemids
 		? API::Item()->get([
-			'output' => ['itemid', 'name_resolved', 'value_type', 'history', 'trends'],
+			'output' => ['itemid', 'name_resolved', 'value_type', 'units', 'history', 'trends'],
 			'selectHosts' => ['name'],
 			'itemids' => $itemids,
 			'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
