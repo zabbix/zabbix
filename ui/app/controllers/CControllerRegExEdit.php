@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CControllerRegExEdit extends CController {
 
 	protected array $db_regexp = [];

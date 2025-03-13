@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CControllerRegExTest extends CController {
 
 	protected function init(): void {
