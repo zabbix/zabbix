@@ -934,14 +934,22 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				$('#formLinkApply').click(function() {
-					try {
-						var linkData = that.linkForm.getValues();
-						that.links[that.currentLinkId].update(linkData);
-						that.linkForm.updateList(that.selection.selements);
-					}
-					catch (err) {
-						alert(err);
-					}
+					const map_window = document.getElementById('map-window');
+					map_window.classList.add('is-loading', 'is-loading-fadein');
+
+					that.linkForm
+						.getValues()
+						.then(values => {
+							that.links[that.currentLinkId].update(values);
+							that.linkForm.updateList(that.selection.selements);
+						})
+						.catch(e => {
+							// Timeout for removing spinner.
+							setTimeout(() => alert(e), 50);
+						})
+						.finally(() => {
+							map_window.classList.remove('is-loading', 'is-loading-fadein');
+						});
 				});
 
 				$('#formLinkClose').click(function() {
@@ -3762,13 +3770,15 @@ ZABBIX.apps.map = (function($) {
 				return Promise.resolve(null);
 			}
 
-			const curl = new Curl('jsrpc.php');
+			const url_params = objectToSearchParams({
+				method: 'item_value_type.get',
+				type: PAGE_TYPE_TEXT_RETURN_JSON,
+				itemid
+			});
 
-			curl.setArgument('method', 'item_value_type.get');
-			curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
-			curl.setArgument('itemid', itemid);
+			const url = new URL(`jsrpc.php?${url_params}`, location.href);
 
-			return fetch(curl.getUrl())
+			return fetch(url)
 				.then(response => response.json())
 				.then(response => {
 					if ('error' in response) {
@@ -3781,6 +3791,39 @@ ZABBIX.apps.map = (function($) {
 					console.log('Could not get item type', exception);
 
 					return null;
+				});
+		}
+
+		/**
+		 * @param {Array} threshold_values
+		 *
+		 * @returns {Promise<any>}  Resolved promise will contain object with error or empty object if thresholds are
+		 *                          correct.
+		 */
+		function promiseValidateThresholdValues(threshold_values) {
+			const url_params = objectToSearchParams({
+				method: 'link_thresholds.validate',
+				type: PAGE_TYPE_TEXT_RETURN_JSON,
+				thresholds: threshold_values
+			});
+
+			const url = new URL(`jsrpc.php?${url_params}`, location.href);
+
+			return fetch(url)
+				.then(response => response.json())
+				.then(response => {
+					if ('result' in response) {
+						return response.result;
+					}
+
+					throw response;
+				})
+				.catch(exception => {
+					console.log('Could not validate link thresholds', exception);
+
+					return {
+						error: 'Could not validate link thresholds'
+					};
 				});
 		}
 
@@ -3889,147 +3932,167 @@ ZABBIX.apps.map = (function($) {
 				}
 			},
 
+			checkThresholds: function(link_thresholds) {
+				const threshold_values = Object.values(link_thresholds).map(link_threshold => {
+					return {
+						threshold: link_threshold.threshold
+					};
+				});
+
+				return promiseValidateThresholdValues(threshold_values);
+			},
+
 			/**
 			 * Get form values for link fields.
 			 */
 			getValues: function() {
-				var values = $('#linkForm').serializeArray(),
-					data = {
-						indicator_type: MAP_INDICATOR_TYPE_STATIC_LINK,
-						linktriggers: {},
-						itemid: null,
-						thresholds: {},
-						highlights: {}
-					},
-					link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|drawtype|color|desc_exp)$/,
-					link_threshold_pattern = /^threshold_(\w+)_(linkid|drawtype|color|threshold)$/,
-					link_highlights_pattern = /^highlight_(\w+)_(linkid|drawtype|color|pattern)$/,
-					link_trigger,
-					link_threshold,
-					link_highlight;
+				return new Promise((resolve, reject) => {
+					const values = $('#linkForm').serializeArray(),
+						link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|drawtype|color|desc_exp)$/,
+						link_threshold_pattern = /^threshold_(\w+)_(linkid|drawtype|color|threshold)$/,
+						link_highlights_pattern = /^highlight_(\w+)_(linkid|drawtype|color|pattern)$/;
 
-				const ms_data = $('#itemid').multiSelect('getData');
+					let data = {
+							indicator_type: MAP_INDICATOR_TYPE_STATIC_LINK,
+							linktriggers: {},
+							itemid: null,
+							thresholds: {},
+							highlights: {}
+						},
+						link_trigger,
+						link_threshold,
+						link_highlight;
 
-				if (ms_data.length > 0) {
-					this.sysmap.items[ms_data[0].id] = ms_data[0];
-				}
+					const ms_data = $('#itemid').multiSelect('getData');
 
-				for (let i = 0, ln = values.length; i < ln; i++) {
-					link_trigger = link_trigger_pattern.exec(values[i].name);
-					link_threshold = link_threshold_pattern.exec(values[i].name);
-					link_highlight = link_highlights_pattern.exec(values[i].name);
-
-					if (link_highlight !== null) {
-						if (data.highlights[link_highlight[1]] === undefined) {
-							data.highlights[link_highlight[1]] = {};
-						}
-
-						if (link_highlight[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_INCORRECT_VALUE'),
-								`/highlights/${Object.keys(data.highlights).length}/color`,
-								t('S_EXPECTING_COLOR_CODE')
-							);
-						}
-
-						if (link_highlight[2] === 'pattern' && !values[i].value) {
-							throw sprintf(t('S_INCORRECT_VALUE'),
-								`/highlights/${Object.keys(data.highlights).length}/pattern`,
-								t('S_CANNOT_BE_EMPTY')
-							);
-						}
-
-						data.highlights[link_highlight[1]][link_highlight[2]] = values[i].value.toString();
+					if (ms_data.length > 0) {
+						this.sysmap.items[ms_data[0].id] = ms_data[0];
 					}
-					else if (link_threshold !== null) {
-						if (data.thresholds[link_threshold[1]] === undefined) {
-							data.thresholds[link_threshold[1]] = {};
-						}
 
-						if (link_threshold[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_INCORRECT_VALUE'),
-								`/thresholds/${Object.keys(data.thresholds).length}/color`,
-								t('S_EXPECTING_COLOR_CODE')
-							);
-						}
+					for (let i = 0, ln = values.length; i < ln; i++) {
+						link_trigger = link_trigger_pattern.exec(values[i].name);
+						link_threshold = link_threshold_pattern.exec(values[i].name);
+						link_highlight = link_highlights_pattern.exec(values[i].name);
 
-						if (link_threshold[2] === 'threshold') {
-							if (!values[i].value) {
+						if (link_highlight !== null) {
+							if (data.highlights[link_highlight[1]] === undefined) {
+								data.highlights[link_highlight[1]] = {};
+							}
+
+							if (link_highlight[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
 								throw sprintf(t('S_INCORRECT_VALUE'),
-									`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
+									`/highlights/${Object.keys(data.highlights).length}/color`,
+									t('S_EXPECTING_COLOR_CODE')
+								);
+							}
+
+							if (link_highlight[2] === 'pattern' && !values[i].value) {
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/highlights/${Object.keys(data.highlights).length}/pattern`,
 									t('S_CANNOT_BE_EMPTY')
 								);
 							}
 
-							if (isNaN(values[i].value)) {
+							data.highlights[link_highlight[1]][link_highlight[2]] = values[i].value.toString();
+						}
+						else if (link_threshold !== null) {
+							if (data.thresholds[link_threshold[1]] === undefined) {
+								data.thresholds[link_threshold[1]] = {};
+							}
+
+							if (link_threshold[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
 								throw sprintf(t('S_INCORRECT_VALUE'),
-									`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
-									t('S_EXPECTING_A_NUMERIC_VALUE')
+									`/thresholds/${Object.keys(data.thresholds).length}/color`,
+									t('S_EXPECTING_COLOR_CODE')
+								);
+							}
+
+							if (link_threshold[2] === 'threshold') {
+								if (!values[i].value) {
+									throw sprintf(t('S_INCORRECT_VALUE'),
+										`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
+										t('S_CANNOT_BE_EMPTY')
+									);
+								}
+							}
+
+							data.thresholds[link_threshold[1]][link_threshold[2]] = values[i].value.toString();
+						}
+						else if (link_trigger !== null) {
+							if (link_trigger[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/linktriggers/${Object.keys(data.linktriggers).length}/color`,
+									t('S_EXPECTING_COLOR_CODE')
+								);
+							}
+
+							if (data.linktriggers[link_trigger[1]] === undefined) {
+								data.linktriggers[link_trigger[1]] = {};
+							}
+
+							data.linktriggers[link_trigger[1]][link_trigger[2]] = values[i].value.toString();
+						}
+						else {
+							if (values[i].name === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+								throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+							}
+
+							data[values[i].name] = values[i].value.toString();
+						}
+					}
+
+					if (data.indicator_type == MAP_INDICATOR_TYPE_TRIGGER) {
+						if (Object.keys(data.linktriggers).length === 0) {
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+								t('S_LINK_TRIGGER_IS_REQUIRED')
+							);
+						}
+					}
+					else if (data.indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						if (data.itemid == null) {
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
+								t('S_CANNOT_BE_EMPTY')
+							);
+						}
+
+						if (this.item_type == ITEM_VALUE_TYPE_LOG || this.item_type == ITEM_VALUE_TYPE_TEXT
+								|| this.item_type == ITEM_VALUE_TYPE_STR) {
+							if (Object.keys(data.highlights).length === 0) {
+								throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+									t('S_LINK_HIGHLIGHT_IS_REQUIRED')
 								);
 							}
 						}
+						else if (this.item_type == ITEM_VALUE_TYPE_FLOAT || this.item_type == ITEM_VALUE_TYPE_UINT64) {
+							if (Object.keys(data.thresholds).length === 0) {
+								throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+									t('S_LINK_THRESHOLD_IS_REQUIRED')
+								);
+							}
 
-						data.thresholds[link_threshold[1]][link_threshold[2]] = values[i].value.toString();
-					}
-					else if (link_trigger !== null) {
-						if (link_trigger[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_INCORRECT_VALUE'),
-								`/linktriggers/${Object.keys(data.linktriggers).length}/color`,
-								t('S_EXPECTING_COLOR_CODE')
-							);
+							this.checkThresholds(data.thresholds)
+								.then(response => {
+									if ('error' in response) {
+										throw response.error;
+									}
+
+									resolve(data);
+								})
+								.catch(e => {
+									reject(e);
+								});
+
+							return;
 						}
-
-						if (data.linktriggers[link_trigger[1]] === undefined) {
-							data.linktriggers[link_trigger[1]] = {};
-						}
-
-						data.linktriggers[link_trigger[1]][link_trigger[2]] = values[i].value.toString();
-					}
-					else {
-						if (values[i].name === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
-						}
-
-						data[values[i].name] = values[i].value.toString();
-					}
-				}
-
-				if (data.indicator_type == MAP_INDICATOR_TYPE_TRIGGER) {
-					if (Object.keys(data.linktriggers).length === 0) {
-						throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
-							t('S_LINK_TRIGGER_IS_REQUIRED')
-						);
-					}
-				}
-				else if (data.indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					if (data.itemid == null) {
-						throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
-							t('S_CANNOT_BE_EMPTY')
-						);
-					}
-
-					if (this.item_type == ITEM_VALUE_TYPE_LOG || this.item_type == ITEM_VALUE_TYPE_TEXT
-							|| this.item_type == ITEM_VALUE_TYPE_STR) {
-						if (Object.keys(data.highlights).length === 0) {
-							throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
-								t('S_LINK_HIGHLIGHT_IS_REQUIRED')
+						else {
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
+								t('S_INCORRECT_ITEM_VALUE_TYPE')
 							);
 						}
 					}
-					else if (this.item_type == ITEM_VALUE_TYPE_FLOAT || this.item_type == ITEM_VALUE_TYPE_UINT64) {
-						if (Object.keys(data.thresholds).length === 0) {
-							throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
-								t('S_LINK_THRESHOLD_IS_REQUIRED')
-							);
-						}
-					}
-					else {
-						throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
-							t('S_INCORRECT_ITEM_VALUE_TYPE')
-						);
-					}
-				}
 
-				return data;
+					resolve(data);
+				});
 			},
 
 			/**
