@@ -21,10 +21,11 @@
 
 window.template_edit_popup = new class {
 
-	init({templateid, warnings}) {
+	init({rules, templateid, warnings}) {
 		this.overlay = overlays_stack.getById('template.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.templateid = templateid;
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.macros_templateids = null;
@@ -41,7 +42,7 @@ window.template_edit_popup = new class {
 				)[0]
 				: makeMessageBox('warning', warnings, null, true, false)[0];
 
-			this.form.parentNode.insertBefore(message_box, this.form);
+			this.form_element.parentNode.insertBefore(message_box, this.form_element);
 		}
 
 		this.#initActions();
@@ -49,11 +50,11 @@ window.template_edit_popup = new class {
 		this.#initMacrosTab();
 		this.#initPopupListeners();
 
-		this.initial_form_fields = getFormFields(this.form);
+		this.initial_form_fields = getFormFields(this.form_element);
 	}
 
 	#initActions() {
-		this.form.addEventListener('click', e => {
+		this.form_element.addEventListener('click', e => {
 			if (e.target.classList.contains('js-unlink')) {
 				this.#unlink(e);
 			}
@@ -64,16 +65,16 @@ window.template_edit_popup = new class {
 		});
 
 		// Add visible name input field placeholder.
-		const template_name = this.form.querySelector('#template_name');
-		const visible_name = this.form.querySelector('#visiblename');
+		const template_name = this.form_element.querySelector('#template_name');
+		const visible_name = this.form_element.querySelector('#visiblename');
 
 		template_name.addEventListener('input', () => visible_name.placeholder = template_name.value);
 		template_name.dispatchEvent(new Event('input'));
 	}
 
 	#initTemplateTab() {
-		const $groups_ms = $('#template_groups_', this.form);
-		const $template_ms = $('#template_add_templates_', this.form);
+		const $groups_ms = $('#template_groups_', this.form_element);
+		const $template_ms = $('#template_add_templates_', this.form_element);
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
@@ -154,7 +155,7 @@ window.template_edit_popup = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form_element))
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -171,7 +172,7 @@ window.template_edit_popup = new class {
 			value != e.target.dataset.templateid
 		);
 
-		$('#template_add_templates_', this.form).trigger('change');
+		$('#template_add_templates_', this.form_element).trigger('change');
 	}
 
 	/**
@@ -185,7 +186,7 @@ window.template_edit_popup = new class {
 		clear_template.type = 'hidden';
 		clear_template.name = 'clear_templates[]';
 		clear_template.value = templateid;
-		this.form.appendChild(clear_template);
+		this.form_element.appendChild(clear_template);
 	}
 
 	/**
@@ -196,7 +197,7 @@ window.template_edit_popup = new class {
 	#getLinkedTemplates() {
 		const linked_templateids = [];
 
-		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+		this.form_element.querySelectorAll('[name^="templates["').forEach((input) => {
 			linked_templateids.push(input.value);
 		});
 
@@ -209,7 +210,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getNewTemplates() {
-		const $template_multiselect = $('#template_add_templates_', this.form);
+		const $template_multiselect = $('#template_add_templates_', this.form_element);
 		const templateids = [];
 
 		if ($template_multiselect.length) {
@@ -222,7 +223,7 @@ window.template_edit_popup = new class {
 	}
 
 	clone() {
-		const parameters = this.#trimFields(getFormFields(this.form));
+		const parameters = this.#trimFields(getFormFields(this.form_element));
 
 		parameters.clone = 1;
 		parameters.templateid = this.templateid;
@@ -254,7 +255,7 @@ window.template_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = getFormFields(this.form_element);
 
 		if (this.templateid !== null) {
 			fields.templateid = this.templateid;
@@ -356,7 +357,7 @@ window.template_edit_popup = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -374,7 +375,7 @@ window.template_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();

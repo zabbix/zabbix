@@ -166,7 +166,7 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
 	'tags_tab_id' => 'template-tags-tab',
-	'has_inline_validation' => false
+	'has_inline_validation' => true
 ]);
 
 $form->addItem(
@@ -186,7 +186,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
 		'readonly' => $data['readonly'],
-		'has_inline_validation' => false
+		'has_inline_validation' => true
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {
@@ -337,6 +337,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			template_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'templateid' => $data['templateid'],
 				'warnings' => $data['warnings']
 			], JSON_THROW_ON_ERROR).');

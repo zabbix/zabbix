@@ -363,6 +363,11 @@ class CControllerTemplateEdit extends CController {
 
 		$data['warnings'] = $warnings;
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['js_validation_rules'] = $templateid === null
+				? CControllerTemplateCreate::getValidationRules()
+				: CControllerTemplateUpdate::getValidationRules();
+
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
