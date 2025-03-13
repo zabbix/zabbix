@@ -763,11 +763,10 @@ func Test_validateExport(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		expect expect
-		fields fields
-		args   args
-		// want    string
+		name    string
+		expect  expect
+		fields  fields
+		args    args
 		wantErr bool
 	}{
 		{
@@ -784,7 +783,8 @@ func Test_validateExport(t *testing.T) {
 			args{"", nil},
 			false,
 		},
-		{"+paramOk",
+		{
+			"+paramOk",
 			expect{true},
 			fields{execOut: mock.OutputVersionValid},
 			args{"smart.disk.get", []string{"smth"}},
@@ -798,13 +798,15 @@ func Test_validateExport(t *testing.T) {
 				[]string{"any"}},
 			true,
 		},
-		{"-badParam",
+		{
+			"-badParam",
 			expect{true},
 			fields{execOut: mock.OutputVersionValid},
 			args{"smart.disk.get", []string{"-Bsmth"}},
 			true,
 		},
-		{"-badVersion",
+		{
+			"-badVersion",
 			expect{true},
 			fields{execOut: mock.OutputVersionInvalid},
 			args{"smart.disk.get", []string{"smth"}},
