@@ -50,7 +50,7 @@ window.template_edit_popup = new class {
 		this.#initMacrosTab();
 		this.#initPopupListeners();
 
-		this.initial_form_fields = getFormFields(this.form_element);
+		this.initial_form_fields = this.form.getAllValues();
 	}
 
 	#initActions() {
@@ -91,6 +91,19 @@ window.template_edit_popup = new class {
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			container: $('#template_macros_container .table-forms-td-right'),
+			source: 'template',
+			load_callback: () => {
+				this.form.discoverAllFields();
+
+				const fields = [];
+
+				Object.values(this.form.findFieldByName('macros').getFields()).forEach(field => {
+					fields.push(field.getName());
+					field.setChanged();
+				});
+
+				this.form.validateChanges(fields, true);
+			},
 			source: 'template'
 		});
 
@@ -155,7 +168,7 @@ window.template_edit_popup = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form_element))
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.form.getAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -223,12 +236,12 @@ window.template_edit_popup = new class {
 	}
 
 	clone() {
-		const parameters = this.#trimFields(getFormFields(this.form_element));
+		const parameters = this.form.getAllValues();
 
 		parameters.clone = 1;
 		parameters.templateid = this.templateid;
-		this.#prepareFields(parameters);
 
+		this.form.release();
 		this.overlay = ZABBIX.PopupManager.open('template.edit', parameters);
 	}
 
@@ -247,91 +260,32 @@ window.template_edit_popup = new class {
 			data.clear = 1;
 		}
 
-		this.#post(curl.getUrl(), data, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+		this.#post(curl.getUrl(), data);
 	}
 
 	submit() {
-		const fields = getFormFields(this.form_element);
+		const fields = this.form.getAllValues();
 
 		if (this.templateid !== null) {
 			fields.templateid = this.templateid;
 		}
 
-		this.#prepareFields(fields);
-		this.#trimFields(fields);
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.templateid === null ? 'template.create' : 'template.update');
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
-	}
-
-	#prepareFields(parameters) {
-		const mappings = [
-			{from: 'template_groups', to: 'groups'},
-			{from: 'template_add_templates', to: 'add_templates'},
-			{from: 'show_inherited_template_macros', to: 'show_inherited_macros'}
-		];
-
-		for (const mapping of mappings) {
-			parameters[mapping.to] = parameters[mapping.from];
-			delete parameters[mapping.from];
-		}
-
-		return parameters;
-	}
-
-	#trimFields(fields) {
-		// Trim all string fields.
-		for (let key in fields) {
-			if (typeof fields[key] === 'string') {
-				fields[key] = fields[key].trim();
-			}
-		}
-
-		// Trim tag input fields.
-		if ('tags' in fields) {
-			for (const key in fields.tags) {
-				const tag = fields.tags[key];
-				tag.tag = tag.tag.trim();
-
-				if ('name' in tag) {
-					tag.name = tag.name.trim();
-				}
-				if ('value' in tag) {
-					tag.value = tag.value.trim();
+					return;
 				}
 
-				delete tag.automatic;
-			}
-		}
-
-		// Trim macro input fields.
-		if ('macros' in fields) {
-			for (const key in fields.macros) {
-				const macro = fields.macros[key];
-				macro.macro = macro.macro.trim();
-
-				if ('value' in macro) {
-					macro.value = macro.value.trim();
-				}
-				if ('description' in macro) {
-					macro.description = macro.description.trim();
-				}
-			}
-		}
-
-		return fields;
+				this.#post(curl.getUrl(), fields);
+			});
 	}
 
 	/**
@@ -339,9 +293,8 @@ window.template_edit_popup = new class {
 	 *
 	 * @param {string}   url               The URL to send the POST request to.
 	 * @param {object}   data              The data to send with the POST request.
-	 * @param {callback} success_callback  The function to execute when a successful response is received.
 	 */
-	#post(url, data, success_callback) {
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -353,9 +306,17 @@ window.template_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {

@@ -17,13 +17,14 @@
 class CControllerTemplateUpdate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	public static function getValidationRules(): array {
 		$api_uniq = [
-			['template.get', ['host' => '{template_name}'], 'hostid'],
-			['template.get', ['name' => '{visiblename}'], 'hostid']
+			['template.get', ['host' => '{template_name}'], 'templateid'],
+			['template.get', ['name' => '{visiblename}'], 'templateid']
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
@@ -33,7 +34,7 @@ class CControllerTemplateUpdate extends CController {
 			],
 			'visiblename' => ['db hosts.host'],
 			'templates' => ['array', 'field' => ['db hosts.hostid']],
-			'add_templates' => ['array', 'field' => ['db hosts.hostid']],
+			'template_add_templates' => ['array', 'field' => ['db hosts.hostid']],
 			'clear_templates' => ['array', 'field' => ['db hosts.hostid']],
 			'template_groups_new' => ['array', 'field' => ['db hstgrp.name']],
 			'template_groups' => [
@@ -111,31 +112,18 @@ class CControllerTemplateUpdate extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'templateid' =>			'required|db hosts.hostid',
-			'template_name' =>		'required|db hosts.host|not_empty',
-			'visiblename' =>		'db hosts.name',
-			'templates' =>			'array_db hosts.hostid',
-			'add_templates' =>		'array_db hosts.hostid',
-			'clear_templates' =>	'array_db hosts.hostid',
-			'groups' =>				'required|array',
-			'description' =>		'db hosts.description',
-			'tags' =>				'array',
-			'macros' =>				'array',
-			'valuemaps' =>			'array'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot update template'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				], JSON_THROW_ON_ERROR)])
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update template'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;
@@ -157,29 +145,25 @@ class CControllerTemplateUpdate extends CController {
 		// Linked templates.
 		$templates = [];
 
-		foreach (array_merge($this->getInput('templates', []), $this->getInput('add_templates', [])) as $linked_id) {
+		foreach (array_merge($this->getInput('templates', []), $this->getInput('template_add_templates', [])) as $linked_id) {
 			$templates[] = ['templateid' => $linked_id];
 		}
 
 		// Clear templates.
 		$templates_clear = array_diff(
 			$this->getInput('clear_templates', []),
-			$this->getInput('add_templates', [])
+			$this->getInput('template_add_templates', [])
 		);
 
 		// Add new group.
-		$groups = $this->getInput('groups', []);
-		$new_groups = [];
-
-		foreach ($groups as $idx => $group) {
-			if (is_array($group) && array_key_exists('new', $group)) {
-				$new_groups[] = ['name' => $group['new']];
-				unset($groups[$idx]);
-			}
-		}
+		$groups = $this->getInput('template_groups', []);
+		$new_groups = $this->getInput('template_groups_new', []);
 
 		if ($new_groups) {
-			$new_groupid = API::TemplateGroup()->create($new_groups);
+			$new_groupid = API::TemplateGroup()->create(array_map(
+				static fn(string $name) => ['name' => $name],
+				$new_groups
+			));
 
 			if (!$new_groupid) {
 				throw new Exception();

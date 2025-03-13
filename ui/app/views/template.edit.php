@@ -24,6 +24,7 @@ $form = (new CForm())
 	->setId('templates-form')
 	->setName('template-edit-form')
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addVar('templateid', $data['templateid'])
 	->addVar('clone_templateid', $data['clone_templateid'] ?? null)
 	->addVar('clone', $data['clone'] ?: null);
 
@@ -52,6 +53,8 @@ if ($data['linked_templates']) {
 	$linked_templates= (new CTable())
 		->setHeader([_('Name'), _('Actions')])
 		->setId('linked-templates')
+		->setAttribute('data-field-name', 'templates')
+		->setAttribute('data-field-type', 'array')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
@@ -94,7 +97,7 @@ if ($data['linked_templates']) {
 $templates_field_items[] = (new CMultiSelect([
 	'name' => 'template_add_templates[]',
 	'object_name' => 'templates',
-	'data' => $data['add_templates'],
+	'data' => $data['template_add_templates'],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'templates',
@@ -122,6 +125,7 @@ $template_tab
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'template_groups[]',
+				'new_item_name' => 'template_groups_new[]',
 				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 				'data' => $data['groups_ms'],
@@ -175,10 +179,12 @@ $form->addItem(
 );
 
 // Macros tab.
-$macros_tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
+$macros_tmpl = $data['show_inherited_template_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 
 $macros_tab = (new CFormList('macrosFormList'))
-	->addRow(null, (new CRadioButtonList('show_inherited_template_macros', (int) $data['show_inherited_macros']))
+	->addRow(null, (new CRadioButtonList('show_inherited_template_macros',
+			(int) $data['show_inherited_template_macros'])
+	)
 		->addValue(_('Template macros'), 0)
 		->addValue(_('Inherited and template macros'), 1)
 		->setModern()
