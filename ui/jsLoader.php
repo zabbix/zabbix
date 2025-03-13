@@ -293,7 +293,6 @@ $translate_strings = [
 		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
 		'S_EXPECTING_COLOR_CODE' => _('expecting hexadecimal color code (6 symbols)'),
 		'S_CANNOT_BE_EMPTY' => _('cannot be empty'),
-		'S_EXPECTING_A_NUMERIC_VALUE' => _('expecting a numeric value'),
 		'S_INVALID_PARAMETER' => _('Invalid parameter "%1$s": %2$s.'),
 		'S_INCORRECT_VALUE' => _('Incorrect value for field "%1$s": %2$s.'),
 		'S_INCORRECT_ITEM_VALUE_TYPE' =>  _('incorrect item value type'),
