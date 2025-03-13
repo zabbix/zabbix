@@ -1132,8 +1132,16 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
+		zbx_err_codes_t	errcode;
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result->pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
+		else
+			errcode = ERR_Z3005;
+
 		db_get_postgresql_error(&error, result->pg_result);
-		dbconn_errlog(db, ERR_Z3005, 0, error, sql);
+		dbconn_errlog(db, errcode, 0, error, sql);
+
 		zbx_free(error);
 
 		if (SUCCEED == dbconn_is_recoverable_error(db, result->pg_result))
