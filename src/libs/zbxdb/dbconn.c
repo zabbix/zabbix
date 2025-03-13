@@ -639,6 +639,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
 	}
+
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(row[0], "on"))
@@ -1327,7 +1328,8 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  ******************************************************************************/
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
-	int	err, ronly_try = 6;
+#define ZBX_DB_WAIT_RETRY_COUNT	6
+	int	err, retries = ZBX_DB_WAIT_RETRY_COUNT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
@@ -1341,7 +1343,6 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 
 	while (ZBX_DB_OK != (err = dbconn_open(db)))
 	{
-
 		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
 			break;
 
@@ -1351,16 +1352,22 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == db->config->read_only_recoverable && 0 <= --retries)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+
 		db->connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
-
-		if (ZBX_DB_RONLY == err && 0 == db->config->read_only_recoverable)
-		{
-			if (0 <= --ronly_try)
-				exit(EXIT_FAILURE);
-		}
-
 	}
 
 	if (0 != db->connection_failure)
@@ -1372,6 +1379,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
+#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 /******************************************************************************
@@ -2557,4 +2565,5 @@ void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *
 {
 	query->suffix = zbx_strdup(NULL, sql);
 }
+
 
