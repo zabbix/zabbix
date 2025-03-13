@@ -36,7 +36,7 @@ class CControllerRegExEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -58,7 +58,7 @@ class CControllerRegExEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$regexp_default = [
 			'regexpid' => DB::getDefault('regexps', 'regexpid'),
 			'name' => DB::getDefault('regexps', 'name'),

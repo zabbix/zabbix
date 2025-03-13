@@ -21,7 +21,6 @@
 ?>
 
 <script>
-
 	window.regular_expression_edit = new class {
 
 		/**
@@ -84,6 +83,7 @@
 					clearMessages();
 
 					const curl = new Curl(this.form_element.getAttribute('action'));
+
 					curl.setArgument('action', document.getElementById('regexpid') ? 'regex.update' : 'regex.create');
 
 					fetch(curl.getUrl(), {
@@ -159,9 +159,9 @@
 		}
 
 		#addRow() {
-			const indexes = Object.keys(this.form.findFieldByName('expressions').getValue());
-			const next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
-			const template = new Template(document.getElementById('row-expression-template').innerHTML);
+			const indexes = Object.keys(this.form.findFieldByName('expressions').getValue()),
+				next_index = indexes.length ? Math.max(...indexes) + 1 : 0,
+				template = new Template(document.getElementById('row-expression-template').innerHTML);
 
 			document
 				.getElementById('expression-list-footer')
@@ -176,8 +176,9 @@
 		}
 
 		#testExpression() {
-			const {expressions, test_string} = this.form.getAllValues();
-			const curl = new Curl(this.form_element.getAttribute('action'));
+			const {expressions, test_string} = this.form.getAllValues(),
+				curl = new Curl(this.form_element.getAttribute('action'));
+
 			curl.setArgument('action', 'regex.test');
 
 			this.#setTestLoadingStatus();
@@ -199,7 +200,7 @@
 				document.getElementById('clone'),
 				document.getElementById('delete'),
 				document.getElementById('update')
-			].forEach(button => {
+			].forEach((button) => {
 				if (button) {
 					button.classList.add('is-loading');
 					button.classList.add('is-loading-fadein');
@@ -214,7 +215,7 @@
 				document.getElementById('clone'),
 				document.getElementById('delete'),
 				document.getElementById('update')
-			].forEach(button => {
+			].forEach((button) => {
 				if (button) {
 					button.classList.remove('is-loading');
 					button.classList.remove('is-loading-fadein');
@@ -242,9 +243,7 @@
 		}
 
 		#showTestResult(response, expressions) {
-			for (let row of this.#test_results.querySelectorAll('.js-expression-result-row')) {
-				row.remove();
-			}
+			this.#test_results.querySelectorAll('.js-expression-result-row').forEach((row) => row.remove());
 
 			const indexes = Object.keys(expressions),
 				message = response.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>,
@@ -287,7 +286,7 @@
 			const template = new Template(document.getElementById('result-row-template').innerHTML);
 
 			this.#test_results.append(template.evaluateToElement({
-				expression: expression,
+				expression,
 				type: this.#expressionTypeToString(expression_type),
 				result: message,
 				result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
@@ -315,11 +314,11 @@
 
 				if (target.value == <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
 					delimeter.removeAttribute('disabled');
-					delimeter.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+					delimeter.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 				else {
 					delimeter.setAttribute('disabled', true);
-					delimeter.classList.add(ZBX_STYLE_DISPLAY_NONE);
+					delimeter.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 			}
 		}

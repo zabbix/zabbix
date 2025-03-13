@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setAction((new CUrl('zabbix.php'))->getUrl())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setId('regexp-form')
-	->addItem($data['regexp']['regexpid'] != 0 ? new CVar('regexpid', $data['regexp']['regexpid']) : null);
+	->addVar('regexpid', $data['regexp']['regexpid']);
 
 $table = (new CTable())
 	->setId('regular-expressions-table')

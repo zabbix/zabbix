@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CControllerRegExCreate extends CController {
 
 	protected function init(): void {
@@ -71,11 +72,11 @@ class CControllerRegExCreate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$regexp = [
 			'name' => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string', ''),
@@ -90,6 +91,7 @@ class CControllerRegExCreate extends CController {
 		unset($expression);
 
 		$result = API::Regexp()->create($regexp);
+
 		$output = [];
 
 		if ($result) {

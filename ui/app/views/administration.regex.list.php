@@ -47,16 +47,16 @@ $table = (new CTableInfo())
 		_('Expressions')
 	]);
 
-foreach($data['regexps'] as $regexpid => $regexp) {
+foreach ($data['regexps'] as $regexpid => $regexp) {
 	$numb = 1;
 	$expressions = [];
 
-	foreach($regexp['expressions'] as $expression) {
+	foreach ($regexp['expressions'] as $expression) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
 			new CCol([' ', RARR(), ' ']),
 			(new CCol($expression['expression']))->addClass(ZBX_STYLE_WORDWRAP),
-			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
+			new CCol('['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);
 	}
 
@@ -67,7 +67,7 @@ foreach($data['regexps'] as $regexpid => $regexp) {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'regex.edit')
 					->setArgument('regexpid', $regexpid)
-			),
+			)
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$expressions
 	]);

@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CControllerRegExDelete extends CController {
 
 	protected function checkInput(): bool {
@@ -29,18 +30,16 @@ class CControllerRegExDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$regexpids = $this->getinput('regexpids');
 
 		$result = API::Regexp()->delete($regexpids);
 
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))->setArgument('action', 'regex.list')
-		);
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
