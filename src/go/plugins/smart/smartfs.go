@@ -375,7 +375,7 @@ func (p *Plugin) checkVersion() error {
 
 	info, err := p.ctl.execute("-j", "-V")
 	if err != nil {
-		return fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+		return fmt.Errorf("failed to execute smartctl: %s.", err.Error())
 	}
 
 	if err = json.Unmarshal(info, &smartctl); err != nil {
@@ -403,7 +403,7 @@ func versionCheckNeeded() bool {
 // evaluateVersion checks version digits if they match the current allowed version or higher.
 func evaluateVersion(versionDigits []int) error {
 	if len(versionDigits) < 1 {
-		return fmt.Errorf("Invalid smartctl version")
+		return fmt.Errorf("invalid smartctl version")
 	}
 
 	var version string
@@ -419,7 +419,7 @@ func evaluateVersion(versionDigits []int) error {
 	}
 
 	if v < supportedSmartctl {
-		return fmt.Errorf("Incorrect smartctl version, must be %v or higher", supportedSmartctl)
+		return fmt.Errorf("incorrect smartctl version, must be %v or higher", supportedSmartctl)
 	}
 
 	return nil
@@ -440,7 +440,7 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	for name := range r.names {
 		devices, err := r.plugin.ctl.execute("-a", name, "-j")
 		if err != nil {
-			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+			r.err <- fmt.Errorf("failed to execute smartctl: %s.", err.Error())
 			return
 		}
 
@@ -705,12 +705,12 @@ func (dp *deviceParser) checkErr() (err error) {
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 	basicTmp, err := p.scanDevices("--scan", "-j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %w.", err)
+		return nil, nil, nil, fmt.Errorf("failed to scan for devices: %w.", err)
 	}
 
 	raidTmp, err := p.scanDevices("--scan", "-d", "sat", "-j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %w.", err)
+		return nil, nil, nil, fmt.Errorf("failed to scan for sat devices: %w.", err)
 	}
 
 	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)

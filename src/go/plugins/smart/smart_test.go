@@ -689,20 +689,20 @@ func Test_validateParams(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
+		{"+valid", args{"smart.disk.get", []string{"/dev/sda"}}, false},
 		{"+keyNoParams", args{"", []string{}}, false},
-		{"-keyTabHypen", args{"any.other.key", []string{"smth"}}, true},
 
 		{"+spaceHypen", args{"smart.disk.get", []string{"/dev/sda -B/some/file/path"}}, false},
 		{"+manySpacesHypen", args{"smart.disk.get", []string{"/dev/sda    -B/some/file/path"}}, false},
 		{"+tabHypen", args{"smart.disk.get", []string{"/dev/sda\t-B/some/file/path"}}, false},
 		{"+noSpacesHypen", args{"smart.disk.get", []string{"/dev/sda-B/some/file/path"}}, false},
-		{"+hHypenInSpaces", args{"smart.disk.get", []string{"/dev/sda - B/some/file/path"}}, false},
+		{"+hypenInSpaces", args{"smart.disk.get", []string{"/dev/sda - B/some/file/path"}}, false},
 		{"+hypenEnd", args{"smart.disk.get", []string{"/dev/sda-"}}, false},
 		{"+empty", args{"smart.disk.get", []string{""}}, false},
-		{"+normal", args{"smart.disk.get", []string{"/dev/sda"}}, false},
 		{"+twoParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid"}}, false},
 		{"+threeParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid", "three"}}, false},
 
+		{"-keyTabHypen", args{"any.other.key", []string{"smth"}}, true},
 		{"-hypenStart", args{"smart.disk.get", []string{"-B/some/file/path"}}, true},
 		{"-hypenStartSpace", args{"smart.disk.get", []string{"- B/some/file/path"}}, true},
 		{"-hypenStartApostr", args{"smart.disk.get", []string{"'-B/some/file/path'"}}, true},

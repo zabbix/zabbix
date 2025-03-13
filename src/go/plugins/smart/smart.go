@@ -439,7 +439,8 @@ func init() {
 
 // validateExport function validates key, export params and version.
 func (p *Plugin) validateExport(key string, params []string) error {
-	if err := validateParams(key, params); err != nil {
+	err := validateParams(key, params)
+	if err != nil {
 		return err
 	}
 
