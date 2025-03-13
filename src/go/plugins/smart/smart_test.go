@@ -18,6 +18,9 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
+
+	"golang.zabbix.com/agent2/plugins/smart/mock"
 )
 
 const (
@@ -471,8 +474,8 @@ func Test_getRateFromJson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := getRateFromJson(tt.args.in); gotOut != tt.wantOut {
-				t.Errorf("getRateFromJson() = %v, want %v", gotOut, tt.wantOut)
+			if gotOut := getRateFromJSON(tt.args.in); gotOut != tt.wantOut {
+				t.Errorf("getRateFromJSON() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
@@ -502,8 +505,8 @@ func Test_getTypeFromJson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := getTypeFromJson(tt.args.in); gotOut != tt.wantOut {
-				t.Errorf("getTypeFromJson() = %v, want %v", gotOut, tt.wantOut)
+			if gotOut := getTypeFromJSON(tt.args.in); gotOut != tt.wantOut {
+				t.Errorf("getTypeFromJSON() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
@@ -540,8 +543,8 @@ func Test_getTablesFromJson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getTablesFromJson(tt.args.in); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getTablesFromJson() = %v, want %v", got, tt.want)
+			if got := getTablesFromJSON(tt.args.in); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getTablesFromJSON() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -685,6 +688,148 @@ func Test_getTypeByRateAndAttr(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getTypeByRateAndAttr(tt.args.rate, tt.args.tables); got != tt.want {
 				t.Errorf("getTypeByRate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_validateParams(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		key    string
+		params []string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"+valid", args{"smart.disk.get", []string{"/dev/sda"}}, false},
+		{"+keyNoParams", args{"", []string{}}, false},
+
+		{"+spaceHypen", args{"smart.disk.get", []string{"/dev/sda -B/some/file/path"}}, false},
+		{"+manySpacesHypen", args{"smart.disk.get", []string{"/dev/sda    -B/some/file/path"}}, false},
+		{"+tabHypen", args{"smart.disk.get", []string{"/dev/sda\t-B/some/file/path"}}, false},
+		{"+noSpacesHypen", args{"smart.disk.get", []string{"/dev/sda-B/some/file/path"}}, false},
+		{"+hypenInSpaces", args{"smart.disk.get", []string{"/dev/sda - B/some/file/path"}}, false},
+		{"+hypenEnd", args{"smart.disk.get", []string{"/dev/sda-"}}, false},
+		{"+empty", args{"smart.disk.get", []string{""}}, false},
+		{"+twoParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid"}}, false},
+		{"+threeParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid", "three"}}, false},
+
+		{"-keyTabHypen", args{"any.other.key", []string{"smth"}}, true},
+		{"-hypenStart", args{"smart.disk.get", []string{"-B/some/file/path"}}, true},
+		{"-hypenStartSpace", args{"smart.disk.get", []string{"- B/some/file/path"}}, true},
+		{"-hypenStartApostr", args{"smart.disk.get", []string{"'-B/some/file/path'"}}, true},
+		{"-hypenStartApostrSpace", args{"smart.disk.get", []string{"'   -B/some/file/path'"}}, true},
+		{"-hypenStartApostrTab", args{"smart.disk.get", []string{"'\t-B/some/file/path'"}}, true},
+		{"-hypenStartApostrTabSpace", args{"smart.disk.get", []string{"'\t -B/some/file/path'"}}, true},
+		{"-hypenStart2Apostr", args{"smart.disk.get", []string{"''-B/some/file/path''"}}, true},
+		{"-hypenStart3Apostr", args{"smart.disk.get", []string{"'''-B/some/file/path'''"}}, true},
+		{"-hypenStartApostrQuote", args{"smart.disk.get", []string{"\"-B/some/file/path\""}}, true},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := validateParams(tt.args.key, tt.args.params)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("validateParams() error = %s, wantErr %t", err.Error(), tt.wantErr)
+			}
+		})
+	}
+}
+
+//nolint:paralleltest
+func Test_validateExport(t *testing.T) {
+	type expect struct {
+		exec bool
+	}
+
+	type fields struct {
+		execErr      error
+		execOut      []byte
+		lastVerCheck time.Time
+	}
+
+	type args struct {
+		key    string
+		params []string
+	}
+
+	tests := []struct {
+		name   string
+		expect expect
+		fields fields
+		args   args
+		// want    string
+		wantErr bool
+	}{
+		{
+			"+valid",
+			expect{true},
+			fields{execOut: mock.OutputVersionValid},
+			args{"smart.disk.get", nil},
+			false,
+		},
+		{
+			"+nothingToValidate",
+			expect{true},
+			fields{execOut: mock.OutputVersionValid},
+			args{"", nil},
+			false,
+		},
+		{"+paramOk",
+			expect{true},
+			fields{execOut: mock.OutputVersionValid},
+			args{"smart.disk.get", []string{"smth"}},
+			false,
+		},
+		{
+			"-onlyWithParams",
+			expect{true},
+			fields{execOut: mock.OutputVersionValid},
+			args{"not smart.disk.get",
+				[]string{"any"}},
+			true,
+		},
+		{"-badParam",
+			expect{true},
+			fields{execOut: mock.OutputVersionValid},
+			args{"smart.disk.get", []string{"-Bsmth"}},
+			true,
+		},
+		{"-badVersion",
+			expect{true},
+			fields{execOut: mock.OutputVersionInvalid},
+			args{"smart.disk.get", []string{"smth"}},
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			lastVerCheck = tt.fields.lastVerCheck
+
+			m := mock.NewMockController(t)
+			if tt.expect.exec {
+				m.ExpectExecute().
+					WithArgs("-j", "-V").
+					WillReturnOutput(tt.fields.execOut).
+					WillReturnError(tt.fields.execErr)
+			}
+
+			p := &Plugin{ctl: m}
+			err := p.validateExport(tt.args.key, tt.args.params)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("validateExport(key, params) error = %s, wantErr %t", err.Error(), tt.wantErr)
 			}
 		})
 	}
