@@ -196,10 +196,12 @@ window.template_edit_popup = new class {
 	#clear(templateid) {
 		const clear_template = document.createElement('input');
 
+		clear_template.setAttribute('data-field-type', 'hidden');
 		clear_template.type = 'hidden';
-		clear_template.name = 'clear_templates[]';
+		clear_template.name = `clear_templates[${templateid}]`;
 		clear_template.value = templateid;
 		this.form_element.appendChild(clear_template);
+		this.form.discoverAllFields();
 	}
 
 	/**
