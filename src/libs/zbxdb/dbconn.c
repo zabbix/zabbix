@@ -1319,8 +1319,7 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  ******************************************************************************/
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
-#define RONLY_RECOVERY_TIME	60
-	int	err, ronly_time = 0;
+	int	err, ronly_try = 6;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
@@ -1334,24 +1333,6 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 
 	while (ZBX_DB_OK != (err = dbconn_open(db)))
 	{
-		if (ZBX_DB_RONLY == err)
-		{
-			/* only standalone Zabbix server will stop if the database becomes read-only */
-			if (1 == db->config->read_only_recoverable)
-				break;
-
-			if (0 == ronly_time)
-				zabbix_log(LOG_LEVEL_WARNING, "database is in read-only state, wait recovery %d seconds"
-					, RONLY_RECOVERY_TIME);
-
-			sleep(1);
-			db->connection_failure = 1;
-
-			if (RONLY_RECOVERY_TIME <= ronly_time++)
-				return ZBX_DB_FAIL;
-
-			continue;
-		}
 
 		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
 			break;
@@ -1365,6 +1346,13 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
 		db->connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
+
+		if (ZBX_DB_RONLY == err && 0 == db->config->read_only_recoverable)
+		{
+			if (0 <= --ronly_try)
+				exit(EXIT_FAILURE);
+		}
+
 	}
 
 	if (0 != db->connection_failure)
@@ -1376,7 +1364,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
-#undef RONLY_RECOVERY_TIME
 }
 
 /******************************************************************************
