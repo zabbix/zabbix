@@ -205,12 +205,14 @@ static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
 
 	row = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
 	row->rowid = rowid;
+	row->parent_rowid = 0;
 	row->cols = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
 	row->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
 	memset(row->cols_orig, 0, sizeof(char *) * cols_num);
 	row->cols_num = cols_num;
 	row->update_num = 0;
 
+	return row;
 }
 
 /******************************************************************************
@@ -258,6 +260,7 @@ static void	sync_rowset_copy_row(zbx_sync_rowset_t *rowset, zbx_sync_row_t *src)
 	zbx_sync_row_t	*row = sync_row_create(0, rowset->cols_num);
 
 	row->update_num = row->cols_num;
+	row->parent_rowid = src->rowid;
 
 	for (int i = 0; i < rowset->cols_num; i++)
 		row->cols[i] = zbx_strdup(NULL, src->cols[i]);
@@ -334,6 +337,8 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 			dst->row->cols[i] = zbx_strdup(NULL, src->row->cols[i]);
 		}
 
+		dst->row->parent_rowid = src->row->rowid;
+
 		sync_list_remove(sync_list, src);
 		sync_list_remove(sync_list, dst);
 
@@ -376,7 +381,7 @@ static void	sync_list_flush(zbx_sync_list_t *sync_list, zbx_sync_rowset_t *dst)
  *             src - [IN] source rowset                                       *
  *                                                                            *
  * Comments: The merge operation modifies the destination rows as follows:    *
- *           - unmodified rows are discarded                                  *
+ *           - unmodified rows have update_num set to 0                       *
  *           - rows marked for deletion have update_num set to -1             *
  *           - new rows (to be inserted) are assigned update_num equal to     *
  *             cols_num and rowid 0, with column values copied from source    *
@@ -414,17 +419,6 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 		sync_merge_nodes(&sync_list, i);
 
 	sync_list_flush(&sync_list, dst);
-
-	for (i = 0; i < dst->rows.values_num;)
-	{
-		if (0 == dst->rows.values[i]->update_num)
-		{
-			sync_row_free(dst->rows.values[i]);
-			zbx_vector_sync_row_ptr_remove_noorder(&dst->rows, i);
-		}
-		else
-			i++;
-	}
 
 	zbx_vector_sync_row_ptr_sort(&dst->rows, sync_row_compare_by_rowid);
 }

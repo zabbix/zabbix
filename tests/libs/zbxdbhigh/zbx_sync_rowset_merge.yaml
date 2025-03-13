@@ -32,7 +32,6 @@ in:
 out: 
   dst: 
     rows:
-    rows:
     - rowid: 0
       update_num: 2
       cols: ["1", "2"]
@@ -91,7 +90,16 @@ in:
     cols_num: 2
 out: 
   dst: 
-    rows: []
+    rows:
+    - rowid: 1
+      update_num: 0
+      cols: ["1", "2"]
+    - rowid: 2
+      update_num: 0
+      cols: ["3", "4"]
+    - rowid: 3
+      update_num: 0
+      cols: ["5", "6"]
     cols_num: 2
 ---
 test case: Update rows (1)
@@ -123,6 +131,9 @@ in:
 out: 
   dst: 
     rows:
+    - rowid: 1
+      update_num: 0
+      cols: ["1", "2"]
     - rowid: 2
       update_num: 1
       cols: ["3", "5"]
@@ -264,8 +275,17 @@ in:
 out: 
   dst: 
     rows:
+    - rowid: 1
+      update_num: 0
+      cols: ["1", "1", "1"]
     - rowid: 2
       update_num: 1
       cols: ["1", "2", "3"]
+    - rowid: 3
+      update_num: 0
+      cols: ["1", "2", "2"]
+    - rowid: 4
+      update_num: 0
+      cols: ["1", "3", "1"]
     cols_num: 3
 ...

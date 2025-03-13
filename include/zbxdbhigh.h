@@ -825,6 +825,7 @@ int	zbx_db_setting_exists(const char *config_name);
 typedef struct
 {
 	zbx_uint64_t	rowid;
+	zbx_uint64_t	parent_rowid;
 	char		**cols;
 	char		**cols_orig;
 	int		cols_num;

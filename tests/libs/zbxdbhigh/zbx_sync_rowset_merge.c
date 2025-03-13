@@ -79,10 +79,12 @@ static zbx_sync_row_t	*mock_read_zbx_sync_row(zbx_mock_handle_t handle, int cols
 	v->update_num = mock_read_int(h);
 
 	v->cols = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
+	v->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
+	memset(v->cols_orig, 0, sizeof(char *) * cols_num);
 
 	h = zbx_mock_get_object_member_handle(handle, "cols");
 	for (int i = 0; ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(h, &hval); i++)
-		v->cols[i] = zbx_strdup(NULL, mock_read_char_ptr(hval));
+		v->cols[i] = mock_read_char_ptr(hval);
 
 	return v;
 }
