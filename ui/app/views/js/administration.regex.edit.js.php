@@ -294,7 +294,7 @@
 		}
 
 		#expressionTypeToString(type) {
-			switch (type) {
+			switch (+type) {
 				case <?= EXPRESSION_TYPE_INCLUDED ?>:
 					return <?= json_encode(_('Character string included')) ?>;
 				case <?= EXPRESSION_TYPE_ANY_INCLUDED ?>:
