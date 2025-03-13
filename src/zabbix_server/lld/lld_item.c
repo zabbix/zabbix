@@ -168,6 +168,8 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_vector_db_tag_ptr_clear_ext(&item_prototype->item_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&item_prototype->item_tags);
 
+	zbx_sync_rowset_clear(&item_prototype->macro_paths);
+
 	zbx_hashset_destroy(&item_prototype->item_index);
 
 	zbx_vector_str_destroy(&item_prototype->keys);
@@ -243,6 +245,8 @@ static void	lld_item_free(zbx_lld_item_full_t *item)
 
 	zbx_vector_db_tag_ptr_destroy(&item->override_tags);
 
+	zbx_sync_rowset_clear(&item->macro_paths);
+
 	zbx_free(item);
 }
 
@@ -302,7 +306,7 @@ static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sq
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items)
+		zbx_vector_lld_item_full_ptr_t *items, int item_flags)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -667,6 +671,8 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 			zbx_vector_db_tag_ptr_create(&item->item_tags);
 			zbx_vector_db_tag_ptr_create(&item->override_tags);
 
+			zbx_sync_rowset_init(&item->macro_paths, 2);
+
 			zbx_vector_lld_item_full_ptr_append(items, item);
 		}
 
@@ -788,43 +794,83 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 		zbx_db_free_result(result);
 	}
 
-	batch_index = 0;
-
-	while (batch_index < itemids.values_num)
+	if (ZBX_FLAG_DISCOVERY_NORMAL == item_flags)
 	{
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select itemtagid,itemid,tag,value"
-				" from item_tag"
-				" where");
+		batch_index = 0;
 
-		add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
-
-		result = zbx_db_select("%s", sql);
-
-		while (NULL != (row = zbx_db_fetch(result)))
+		while (batch_index < itemids.values_num)
 		{
-			zbx_db_tag_t	*db_tag;
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"select itemtagid,itemid,tag,value"
+					" from item_tag"
+					" where");
 
-			ZBX_STR2UINT64(itemid, row[1]);
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
 
-			zbx_lld_item_full_t	cmp = {.itemid = itemid};
+			result = zbx_db_select("%s", sql);
 
-			if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
-					lld_item_full_compare_func)))
+			while (NULL != (row = zbx_db_fetch(result)))
 			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
+				zbx_db_tag_t	*db_tag;
+
+				ZBX_STR2UINT64(itemid, row[1]);
+
+				zbx_lld_item_full_t	cmp = {.itemid = itemid};
+
+				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+						lld_item_full_compare_func)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				item = items->values[index];
+
+				db_tag = zbx_db_tag_create(row[2], row[3]);
+				ZBX_STR2UINT64(db_tag->tagid, row[0]);
+				zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
 			}
 
-			item = items->values[index];
-
-			db_tag = zbx_db_tag_create(row[2], row[3]);
-			ZBX_STR2UINT64(db_tag->tagid, row[0]);
-			zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
+			zbx_db_free_result(result);
 		}
+	}
+	else
+	{
+		batch_index = 0;
 
-		zbx_db_free_result(result);
+		while (batch_index < itemids.values_num)
+		{
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"select lld_macro_pathid,itemid,lld_macro,path"
+					" from lld_macro_path"
+					" where");
+
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+
+			result = zbx_db_select("%s", sql);
+
+			while (NULL != (row = zbx_db_fetch(result)))
+			{
+				ZBX_STR2UINT64(itemid, row[1]);
+
+				zbx_lld_item_full_t	cmp = {.itemid = itemid};
+
+				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+						lld_item_full_compare_func)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				item = items->values[index];
+
+				zbx_sync_rowset_add_row(&item->macro_paths, row[0], row[2], row[3]);
+			}
+
+			zbx_db_free_result(result);
+		}
 	}
 out:
 	zbx_free(sql);
@@ -1705,6 +1751,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	zbx_vector_item_param_ptr_create(&item->item_params);
 	zbx_vector_db_tag_ptr_create(&item->item_tags);
 
+	zbx_sync_rowset_init(&item->macro_paths, 2);
+
 	if (SUCCEED == ret && ZBX_PROTOTYPE_NO_DISCOVER != discover)
 		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	else
@@ -2485,6 +2533,43 @@ static void	lld_items_param_make(const zbx_vector_lld_item_prototype_ptr_t *item
 	}
 
 	zbx_vector_item_param_ptr_destroy(&new_item_params);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Updates existing lld rule macro paths and creates new ones based  *
+ *          on rule prototypes.                                               *
+ *                                                                            *
+ * Parameters: item_prototypes - [IN]                                         *
+ *             items           - [IN/OUT] sorted list of items                *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_items_macro_paths_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_lld_item_full_ptr_t *items)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t	*item = items->values[i];
+		int			index;
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		zbx_lld_item_prototype_t	cmp = {.itemid = item->parent_itemid};
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_merge(&item->macro_paths, &item_prototypes->values[index]->macro_paths);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -3718,6 +3803,167 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: saves/updates/removes lld rule macro paths                        *
+ *                                                                            *
+ * Parameters: hostid      - [IN] parent host id                              *
+ *             items       - [IN]                                             *
+ *             host_locked - [IN/OUT] host record is locked                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_items_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked)
+{
+	int			ret = SUCCEED, new_num = 0, update_num = 0, delete_num = 0;
+	zbx_lld_item_full_t	*item;
+	zbx_vector_uint64_t	deleteids;
+	zbx_db_insert_t		db_insert;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		new_macroid = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&deleteids);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < item->macro_paths.rows.values_num; j++)
+		{
+			zbx_sync_row_t	*row = item->macro_paths.rows.values[j];
+
+			if (-1 == row->update_num)
+			{
+				zbx_vector_uint64_append(&deleteids, row->rowid);
+
+				/*
+				TODO: audit
+				zbx_audit_item_delete_params(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, item_param->item_parameterid);
+				*/
+			}
+			else if (0 == row->rowid)
+			{
+				new_num++;
+			}
+			else
+				update_num++;
+
+		}
+	}
+
+	if (0 == update_num && 0 == new_num && 0 == deleteids.values_num)
+		goto out;
+
+	if (0 == *host_locked)
+	{
+		if (SUCCEED != zbx_db_lock_hostid(hostid))
+		{
+			/* the host was removed while processing lld rule */
+			ret = FAIL;
+			goto out;
+		}
+
+		*host_locked = 1;
+	}
+
+	if (0 != new_num)
+	{
+		new_macroid = zbx_db_get_maxid_num("lld_macro_path", new_num);
+		zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path",
+				(char *)NULL);
+	}
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < item->macro_paths.rows.values_num; j++)
+		{
+			char		delim = ' ';
+			zbx_sync_row_t	*row = item->macro_paths.rows.values[j];
+
+			if (0 == row->rowid)
+			{
+				zbx_db_insert_add_values(&db_insert, new_macroid, item->itemid, row->cols[0],
+						row->cols[1]);
+
+				/*
+				TODO: audit
+				zbx_audit_item_update_json_add_params(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, new_macroid, item_param->name,
+						item_param->value);
+				 */
+				new_macroid++;
+
+				continue;
+			}
+
+			if (0 >= row->update_num)
+				continue;
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro_path set");
+
+			const char	*fields[] = {"lld_macro", "path"};
+
+			for (int k = row->cols_num - row->update_num; k < row->cols_num; k++)
+			{
+				char	*value_esc;
+
+				value_esc = zbx_db_dyn_escape_string(row->cols[k]);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s='%s'", delim, fields[k],
+						value_esc);
+
+				delim = ',';
+				/*
+				TODO: audit
+				zbx_audit_item_update_json_update_params_name(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, item_param->item_parameterid,
+						item_param->name_orig, item_param->name);
+				*/
+				zbx_free(value_esc);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macro_pathid=" ZBX_FS_UI64 ";\n",
+					row->rowid);
+
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+	}
+
+	if (0 != update_num)
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
+
+	if (0 != new_num)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+
+	if (0 != deleteids.values_num)
+	{
+		zbx_vector_uint64_sort(&deleteids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_db_execute_multiple_query("delete from lld_macro_path where", "lld_macro_pathid", &deleteids);
+		delete_num = deleteids.values_num;
+	}
+out:
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&deleteids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() added:%d updated:%d removed:%d", __func__, new_num,
+			update_num, delete_num);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: saves/updates/removes item tags                                   *
  *                                                                            *
  * Parameters: hostid      - [IN] parent host id                              *
@@ -4048,6 +4294,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		zbx_hashset_create(&item_prototype->item_index, 0, lld_item_ref_key_hash_func,
 				lld_item_ref_key_compare_func);
 
+		zbx_sync_rowset_init(&item_prototype->macro_paths, 2);
+
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);
 
 		zbx_vector_uint64_append(&protoids, item_prototype->itemid);
@@ -4150,6 +4398,10 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 			zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
 		}
 		zbx_db_free_result(result);
+	}
+	else
+	{
+		lld_rule_get_prototype_macro_paths(item_prototypes, &protoids);
 	}
 out:
 	zbx_free(sql);
@@ -4315,6 +4567,15 @@ static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
 		zabbix_log(LOG_LEVEL_TRACE, "    item_parameterid:" ZBX_FS_UI64 " name:%s value:%s",
 				param->item_parameterid, param->name, param->value);
 	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  macro_paths:");
+	for (int i = 0; i < item_prototype->macro_paths.rows.values_num; i++)
+	{
+		zbx_sync_row_t	*row = item_prototype->macro_paths.rows.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    lld_macro_pathid:" ZBX_FS_UI64 " lld_macro:%s path:%s",
+				row->rowid, row->cols[0], row->cols[1]);
+	}
 }
 
 /******************************************************************************
@@ -4348,7 +4609,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
 	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items);
+	lld_items_get(&item_prototypes, &items, ZBX_FLAG_DISCOVERY_NORMAL);
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
@@ -4422,12 +4683,13 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 			lld_item_index_compare_func);
 
 	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items);
+	lld_items_get(&item_prototypes, &items, ZBX_FLAG_DISCOVERY_RULE);
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
 	lld_items_preproc_make(&item_prototypes, &items);
 	lld_items_param_make(&item_prototypes, &items, error);
+	lld_items_macro_paths_make(&item_prototypes, &items);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
@@ -4443,7 +4705,8 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked))
+			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
+			SUCCEED == lld_items_macro_paths_save(hostid, &items, &host_record_is_locked))
 	{
 		if (ZBX_DB_OK != zbx_db_commit())
 		{

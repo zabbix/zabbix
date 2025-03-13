@@ -231,6 +231,8 @@ typedef struct
 	int					enabled_lifetime_type;
 	int					evaltype;
 	int					item_flags;
+
+	zbx_sync_rowset_t			macro_paths;
 }
 zbx_lld_item_prototype_t;
 
@@ -379,6 +381,8 @@ struct zbx_lld_item_full_s
 	int					lifetime_type_orig;
 	int					enabled_lifetime_type_orig;
 	int					evaltype_orig;
+
+	zbx_sync_rowset_t			macro_paths;
 };
 
 int	lld_item_full_compare_func(const void *d1, const void *d2);
@@ -524,5 +528,8 @@ int	lld_item_ref_key_compare_func(const void *d1, const void *d2);
 int	lld_item_preproc_sort_by_step(const void *d1, const void *d2);
 zbx_lld_item_preproc_t	*lld_item_preproc_create(zbx_uint64_t item_preprocid, zbx_uint64_t flags, int step,
 		int type, const char *params, int error_handler, const char *error_handler_params);
+
+void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids);
 
 #endif

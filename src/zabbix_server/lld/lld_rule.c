@@ -1779,3 +1779,40 @@ finish:
 
 	return SUCCEED;
 }
+
+// WDN: remove deprecated code above
+
+void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_macro_pathid,itemid,lld_macro,path"
+			" from lld_macro_path where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by lld_macro_pathid");
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_item_prototype_t	item_prototype_local;
+		int				index;
+
+		ZBX_STR2UINT64(item_prototype_local.itemid, row[1]);
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&item_prototypes->values[index]->macro_paths, row[0], row[2], row[3]);
+	}
+	zbx_db_free_result(result);
+}

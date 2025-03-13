@@ -160,7 +160,8 @@ static int	sync_row_compare_by_rowid(const void *d1, const void *d2)
  * Purpose: initialize a sync rowset                                          *
  *                                                                            *
  * Parameters: rowset   - [OUT] sync rowset to initialize                     *
- *             cols_num - [IN] number of columns in the rowset                *
+ *             cols_num - [IN] number of columns in the rowset excluding the  *
+ *                             first id column                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num)
