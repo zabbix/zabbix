@@ -323,7 +323,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 
 		foreach ($widgets as $widget) {
 			$id = $widget.' '.$data['Tile provider'];
-			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
+			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
 
 			$count = count($this->errors);
