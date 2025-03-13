@@ -112,7 +112,7 @@
 								location.href = location.href;
 							}
 						})
-						.catch(this.ajaxExceptionHandler.bind(this));
+						.catch((exception) => this.#ajaxExceptionHandler(exception));
 				});
 		}
 
@@ -153,7 +153,7 @@
 			}
 		}
 
-		ajaxExceptionHandler(exception) {
+		#ajaxExceptionHandler(exception) {
 			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {
