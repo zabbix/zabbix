@@ -2539,43 +2539,6 @@ static void	lld_items_param_make(const zbx_vector_lld_item_prototype_ptr_t *item
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates existing lld rule macro paths and creates new ones based  *
- *          on rule prototypes.                                               *
- *                                                                            *
- * Parameters: item_prototypes - [IN]                                         *
- *             items           - [IN/OUT] sorted list of items                *
- *                                                                            *
- ******************************************************************************/
-static void	lld_items_macro_paths_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	for (int i = 0; i < items->values_num; i++)
-	{
-		zbx_lld_item_full_t	*item = items->values[i];
-		int			index;
-
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-			continue;
-
-		zbx_lld_item_prototype_t	cmp = {.itemid = item->parent_itemid};
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		zbx_sync_rowset_merge(&item->macro_paths, &item_prototypes->values[index]->macro_paths);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Updates existing items tags and creates new ones based on item    *
  *          prototypes.                                                       *
  *                                                                            *
@@ -3238,7 +3201,7 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *                                                                            *
  ******************************************************************************/
 static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked)
+		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked, int item_flags)
 {
 	int				ret = SUCCEED, new_items = 0, upd_items = 0;
 	zbx_lld_item_full_t		*item;
@@ -3839,11 +3802,8 @@ static int	lld_items_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_f
 			{
 				zbx_vector_uint64_append(&deleteids, row->rowid);
 
-				/*
-				TODO: audit
-				zbx_audit_item_delete_params(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, item_param->item_parameterid);
-				*/
+				zbx_audit_discovery_rule_update_json_delete_lld_macro_path(ZBX_AUDIT_LLD_CONTEXT,
+						item->itemid, row->rowid);
 			}
 			else if (0 == row->rowid)
 			{
@@ -3894,12 +3854,8 @@ static int	lld_items_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_f
 				zbx_db_insert_add_values(&db_insert, new_macroid, item->itemid, row->cols[0],
 						row->cols[1]);
 
-				/*
-				TODO: audit
-				zbx_audit_item_update_json_add_params(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, new_macroid, item_param->name,
-						item_param->value);
-				 */
+				zbx_audit_discovery_rule_update_json_add_lld_macro_path(ZBX_AUDIT_LLD_CONTEXT,
+						item->itemid, new_macroid, row->cols[0], row->cols[1]);
 				new_macroid++;
 
 				continue;
@@ -3907,6 +3863,9 @@ static int	lld_items_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_f
 
 			if (0 >= row->update_num)
 				continue;
+
+			zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(ZBX_AUDIT_LLD_CONTEXT,
+					item->itemid, row->rowid);
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro_path set");
 
@@ -3921,12 +3880,11 @@ static int	lld_items_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_f
 						value_esc);
 
 				delim = ',';
-				/*
-				TODO: audit
-				zbx_audit_item_update_json_update_params_name(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, item_param->item_parameterid,
-						item_param->name_orig, item_param->name);
-				*/
+
+				zbx_audit_discovery_rule_update_json_update_lld_macro_path_lld_macro(
+						ZBX_AUDIT_LLD_CONTEXT, item->itemid, row->rowid, row->cols_orig[k],
+						row->cols[k]);
+
 				zbx_free(value_esc);
 			}
 
@@ -4622,7 +4580,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	zbx_db_begin();
 
-	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
+	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
+			ZBX_FLAG_DISCOVERY_NORMAL) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked))
@@ -4689,7 +4648,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
 	lld_items_preproc_make(&item_prototypes, &items);
 	lld_items_param_make(&item_prototypes, &items, error);
-	lld_items_macro_paths_make(&item_prototypes, &items);
+	lld_rule_macro_paths_make(&item_prototypes, &items);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
@@ -4703,7 +4662,8 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	zbx_db_begin();
 
-	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
+	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
+			ZBX_FLAG_DISCOVERY_RULE) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_macro_paths_save(hostid, &items, &host_record_is_locked))

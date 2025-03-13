@@ -826,6 +826,7 @@ typedef struct
 {
 	zbx_uint64_t	rowid;
 	char		**cols;
+	char		**cols_orig;
 	int		cols_num;
 	int		update_num;
 }

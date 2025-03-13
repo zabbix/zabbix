@@ -48,11 +48,11 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	{
 		return ZBX_AUDIT_RESOURCE_ITEM;
 	}
-	else if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flag)
+	else if (0 != (flag & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		return ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE;
 	}
-	else if (ZBX_FLAG_DISCOVERY_RULE == flag)
+	else if (0 != (flag & ZBX_FLAG_DISCOVERY_RULE))
 	{
 		return ZBX_AUDIT_RESOURCE_LLD_RULE;
 	}

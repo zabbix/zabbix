@@ -178,9 +178,13 @@ void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num)
 static void	sync_row_free(zbx_sync_row_t *row)
 {
 	for (int i = 0; i < row->cols_num; i++)
+	{
 		zbx_free(row->cols[i]);
+		zbx_free(row->cols_orig[i]);
+	}
 
 	zbx_free(row->cols);
+	zbx_free(row->cols_orig);
 	zbx_free(row);
 }
 
@@ -193,6 +197,20 @@ void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset)
 {
 	zbx_vector_sync_row_ptr_clear_ext(&rowset->rows, sync_row_free);
 	zbx_vector_sync_row_ptr_destroy(&rowset->rows);
+}
+
+static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
+{
+	zbx_sync_row_t	*row;
+
+	row = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
+	row->rowid = rowid;
+	row->cols = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
+	row->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
+	memset(row->cols_orig, 0, sizeof(char *) * cols_num);
+	row->cols_num = cols_num;
+	row->update_num = 0;
+
 }
 
 /******************************************************************************
@@ -209,16 +227,13 @@ void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...)
 	va_list		args;
 	zbx_sync_row_t	*row;
 	char		*value;
-
-	row = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
-	row->cols = (char **)zbx_malloc(NULL, sizeof(char *) * rowset->cols_num);
-	row->cols_num = rowset->cols_num;
-	row->update_num = 0;
+	zbx_uint64_t	rowid;
 
 	va_start(args, rowset);
 	value = va_arg(args, char *);
 
-	ZBX_DBROW2UINT64(row->rowid, value);
+	ZBX_DBROW2UINT64(rowid, value);
+	row = sync_row_create(rowid, rowset->cols_num);
 
 	for (int i = 0; i < rowset->cols_num; i++)
 	{
@@ -240,13 +255,9 @@ void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...)
  ******************************************************************************/
 static void	sync_rowset_copy_row(zbx_sync_rowset_t *rowset, zbx_sync_row_t *src)
 {
-	zbx_sync_row_t	*row;
+	zbx_sync_row_t	*row = sync_row_create(0, rowset->cols_num);
 
-	row = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
-	row->cols = (char **)zbx_malloc(NULL, sizeof(char *) * rowset->cols_num);
-	row->cols_num = rowset->cols_num;
-	row->rowid = 0;
-	row->update_num = rowset->cols_num;
+	row->update_num = row->cols_num;
 
 	for (int i = 0; i < rowset->cols_num; i++)
 		row->cols[i] = zbx_strdup(NULL, src->cols[i]);
@@ -318,7 +329,10 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 			prev->match_next = abs(sync_row_compare(&prev->row, &next->row));
 
 		for (int i = dst->row->cols_num - 1; i >= dst->row->cols_num - match_level; i--)
-			dst->row->cols[i] = zbx_strdup(dst->row->cols[i], src->row->cols[i]);
+		{
+			dst->row->cols_orig[i] = dst->row->cols[i];
+			dst->row->cols[i] = zbx_strdup(NULL, src->row->cols[i]);
+		}
 
 		sync_list_remove(sync_list, src);
 		sync_list_remove(sync_list, dst);

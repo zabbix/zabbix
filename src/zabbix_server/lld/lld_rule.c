@@ -1782,6 +1782,43 @@ finish:
 
 // WDN: remove deprecated code above
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Updates existing lld rule macro paths and creates new ones based  *
+ *          on rule prototypes.                                               *
+ *                                                                            *
+ * Parameters: item_prototypes - [IN]                                         *
+ *             items           - [IN/OUT] sorted list of items                *
+ *                                                                            *
+ ******************************************************************************/
+void	lld_rule_macro_paths_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_lld_item_full_ptr_t *items)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t	*item = items->values[i];
+		int			index;
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		zbx_lld_item_prototype_t	cmp = {.itemid = item->parent_itemid};
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_merge(&item->macro_paths, &item_prototypes->values[index]->macro_paths);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		zbx_vector_uint64_t *protoids)
 {
