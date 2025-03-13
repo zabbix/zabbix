@@ -105,13 +105,11 @@ class CControllerAutoregUpdate extends CController {
 		$output = [];
 
 		if ($result) {
-			$success = ['title' => _('Configuration updated')];
+			$output['success']['title'] = _('Configuration updated');
 
 			if ($messages = get_and_clear_messages()) {
-				$success['messages'] = array_column($messages, 'message');
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
-
-			$output['success'] = $success;
 		}
 		else {
 			$output['error'] = [
