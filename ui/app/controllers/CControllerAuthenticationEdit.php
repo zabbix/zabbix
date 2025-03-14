@@ -31,13 +31,13 @@ class CControllerAuthenticationEdit extends CController {
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'disabled_usrgrpid' =>				'id',
+			'disabled_usrgrpid' =>				'setting disabled_usrgrpid',
 			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array_id',
-			'jit_provision_interval' =>			'db config.jit_provision_interval',
+			'jit_provision_interval' =>			'setting jit_provision_interval',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
@@ -62,8 +62,8 @@ class CControllerAuthenticationEdit extends CController {
 			'saml_provision_groups' =>			'array',
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
-			'passwd_min_length' =>				'int32',
-			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE),
+			'passwd_min_length' =>				'setting passwd_min_length',
+			'passwd_check_rules' =>				'ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE),
 			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
@@ -74,7 +74,7 @@ class CControllerAuthenticationEdit extends CController {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-				'http_strip_domains' =>		'db config.http_strip_domains',
+				'http_strip_domains' =>		'setting http_strip_domains',
 				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
 			];
 		}
@@ -145,7 +145,7 @@ class CControllerAuthenticationEdit extends CController {
 
 		if ($this->hasInput('form_refresh')) {
 			$config_fields = [
-				'authentication_type' => DB::getDefault('config', 'authentication_type'),
+				'authentication_type' => CSettingsSchema::getDefault('authentication_type'),
 				'disabled_usrgrpid' => 0,
 				'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
@@ -178,9 +178,9 @@ class CControllerAuthenticationEdit extends CController {
 
 			if ($ALLOW_HTTP_AUTH) {
 				$config_fields += [
-					'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
-					'http_login_form' => DB::getDefault('config', 'http_login_form'),
-					'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
+					'http_auth_enabled' => CSettingsSchema::getDefault('http_auth_enabled'),
+					'http_login_form' => CSettingsSchema::getDefault('http_login_form'),
+					'http_strip_domains' => CSettingsSchema::getDefault('http_strip_domains'),
 					'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
 				];
 			}

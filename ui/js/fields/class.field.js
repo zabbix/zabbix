@@ -103,7 +103,7 @@ class CField {
 	}
 
 	getPath() {
-		return '/' + this.getName().replace('[', '/').replace(']', '');
+		return '/' + this.getName().replaceAll('[', '/').replaceAll(']', '');
 	}
 
 	isSameField(field) {

@@ -21,6 +21,7 @@
 #include "zbxtime.h"
 #include "zbxautoreg.h"
 #include "zbxalgo.h"
+#include "zbxstr.h"
 
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host)
 {
@@ -46,11 +47,11 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_str_t	hosts;
-	zbx_uint64_t		current_proxyid, current_proxy_groupid;
 	unsigned char		current_monitored_by, monitored_by;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
 
@@ -58,10 +59,9 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 	/* delete from vector if already exist in hosts table */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
-				"a.listen_port,a.flags,a.autoreg_hostid,"
-				"a.proxyid,h.monitored_by,h.proxy_groupid"
+				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid"
 			" from hosts h"
 			" left join autoreg_host a"
 				" on a.host=h.host"
@@ -80,10 +80,9 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			if (0 != strcmp(autoreg_host->host, row[0]))
 				continue;
 
-			if (SUCCEED == zbx_db_is_null(row[8]))
+			if (SUCCEED == zbx_db_is_null(row[3]))
 				break;
 
-			ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[8]);
 			ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
 
 			if (0 != strcmp(autoreg_host->host_metadata, row[3]) ||
@@ -109,7 +108,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				}
 			}
 
-			ZBX_STR2UCHAR(current_monitored_by, row[10]);
+			ZBX_STR2UCHAR(current_monitored_by, row[9]);
 
 			if (NULL == proxy)
 			{
@@ -118,34 +117,48 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			}
 			else
 			{
-				if (0 != proxy->proxy_groupid)
+				zbx_uint64_t	current_autoreg_proxyid;
+
+				ZBX_DBROW2UINT64(current_autoreg_proxyid, row[8]);
+
+				/* if proxy is in a group then host must be monitored by this group, */
+				/* unless host was already directly monitored by this proxy          */
+				if (0 != proxy->proxy_groupid && (current_monitored_by != HOST_MONITORED_BY_PROXY ||
+						current_autoreg_proxyid != proxy->proxyid))
+				{
 					monitored_by = HOST_MONITORED_BY_PROXY_GROUP;
+				}
 				else
 					monitored_by = HOST_MONITORED_BY_PROXY;
 
 				if (monitored_by != current_monitored_by)
-					break;
-
-				if (monitored_by == HOST_MONITORED_BY_PROXY)
 				{
-					ZBX_DBROW2UINT64(current_proxyid, row[2]);
-					if (current_proxyid != proxy->proxyid)
+					break;
+				}
+				else if (monitored_by == HOST_MONITORED_BY_PROXY)
+				{
+					zbx_uint64_t	current_host_proxyid;
+
+					ZBX_DBROW2UINT64(current_host_proxyid, row[2]);
+					if (current_host_proxyid != proxy->proxyid)
 						break;
 				}
 				else if (monitored_by == HOST_MONITORED_BY_PROXY_GROUP)
 				{
-					ZBX_DBROW2UINT64(current_proxy_groupid, row[11]);
+					zbx_uint64_t	current_proxy_groupid;
+
+					ZBX_DBROW2UINT64(current_proxy_groupid, row[10]);
 
 					if (current_proxy_groupid != proxy->proxy_groupid)
 						break;
-				}
 
-				ZBX_DBROW2UINT64(current_proxyid, row[9]);
-
-				if (current_proxyid != proxy->proxyid)
-				{
-					autoreg_host->autoreg_flags |= ZBX_AUTOREG_FLAGS_SKIP_EVENT;
-					break;
+					/* when host is moved between proxies in a group then event should not be */
+					/* generated while auto-registration record still needs to be updated     */
+					if (current_autoreg_proxyid != proxy->proxyid)
+					{
+						autoreg_host->autoreg_flags |= ZBX_AUTOREG_FLAGS_SKIP_EVENT;
+						break;
+					}
 				}
 			}
 
@@ -158,7 +171,40 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	}
 
 	zbx_db_free_result(result);
-	hosts.values_num = 0;
+
+	if (0 != autoreg_hosts->values_num)
+	{
+		zbx_vector_str_clear(&hosts);
+		autoreg_get_hosts_server(autoreg_hosts, &hosts);
+
+		/* update autoreg_id in vector if already exists in autoreg_host table */
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select autoreg_hostid,host"
+				" from autoreg_host"
+				" where");
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+				(const char * const *)hosts.values, hosts.values_num);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			for (int i = 0; i < autoreg_hosts->values_num; i++)
+			{
+				autoreg_host = autoreg_hosts->values[i];
+
+				if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
+				{
+					ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
+					break;
+				}
+			}
+		}
+
+		zbx_db_free_result(result);
+	}
+
 	zbx_vector_str_destroy(&hosts);
 	zbx_free(sql);
 }
