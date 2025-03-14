@@ -44,7 +44,7 @@ password='<password>'
 
 For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/option-files.html).
 
-**NOTE** that in order to collect replication metrics MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require `SLAVE MONITOR` privelege to be set for the monitoring user:
+**NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
 
 ```text
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
