@@ -177,7 +177,7 @@ void	zbx_mock_test_entry(void **state)
 	src = mock_read_zbx_sync_rowset(zbx_mock_get_parameter_handle("in.src"));
 	out = mock_read_zbx_sync_rowset(zbx_mock_get_parameter_handle("out.dst"));
 
-	zbx_sync_rowset_sort(&src);
+	zbx_sync_rowset_sort_by_rows(&src);
 
 	zbx_sync_rowset_merge(&dst, &src);
 

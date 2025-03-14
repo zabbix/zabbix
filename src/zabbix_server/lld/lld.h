@@ -84,7 +84,6 @@ typedef struct
 {
 	char	*macro;
 	char	*value;
-
 }
 zbx_lld_macro_t;
 
@@ -508,16 +507,6 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const zbx_lld_entry_t *lld_obj,
 		char **error);
 int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_obj, char *error, int maxerrlen);
-
-typedef struct
-{
-	zbx_uint64_t	lld_macroid;
-	char		*name;
-	char		*value;
-}
-zbx_lld_ext_macro_t;
-
-ZBX_VECTOR_DECL(lld_ext_macro, zbx_lld_ext_macro_t)
 
 void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		int item_flags);

@@ -175,7 +175,7 @@ void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num)
  * Purpose: free memory allocated for a sync row                              *
  *                                                                            *
  ******************************************************************************/
-static void	sync_row_free(zbx_sync_row_t *row)
+void	zbx_sync_row_free(zbx_sync_row_t *row)
 {
 	for (int i = 0; i < row->cols_num; i++)
 	{
@@ -195,7 +195,7 @@ static void	sync_row_free(zbx_sync_row_t *row)
  ******************************************************************************/
 void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset)
 {
-	zbx_vector_sync_row_ptr_clear_ext(&rowset->rows, sync_row_free);
+	zbx_vector_sync_row_ptr_clear_ext(&rowset->rows, zbx_sync_row_free);
 	zbx_vector_sync_row_ptr_destroy(&rowset->rows);
 }
 
@@ -273,9 +273,19 @@ static void	sync_rowset_copy_row(zbx_sync_rowset_t *rowset, zbx_sync_row_t *src)
  * Purpose: sort rows in a sync rowset                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_rowset_sort(zbx_sync_rowset_t *rowset)
+void	zbx_sync_rowset_sort_by_rows(zbx_sync_rowset_t *rowset)
 {
 	zbx_vector_sync_row_ptr_sort(&rowset->rows, sync_row_compare);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sort rows in a sync rowset                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_rowset_sort_by_id(zbx_sync_rowset_t *rowset)
+{
+	zbx_vector_sync_row_ptr_sort(&rowset->rows, sync_row_compare_by_rowid);
 }
 
 /******************************************************************************
@@ -395,7 +405,7 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 	zbx_sync_list_t		sync_list;
 	int			i, j;
 
-	zbx_sync_rowset_sort(dst);
+	zbx_sync_rowset_sort_by_rows(dst);
 
 	sync_list_init(&sync_list);
 
@@ -420,5 +430,6 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 
 	sync_list_flush(&sync_list, dst);
 
-	zbx_vector_sync_row_ptr_sort(&dst->rows, sync_row_compare_by_rowid);
+	zbx_sync_rowset_sort_by_id(dst);
 }
+

@@ -835,6 +835,8 @@ zbx_sync_row_t;
 
 ZBX_PTR_VECTOR_DECL(sync_row_ptr, zbx_sync_row_t *)
 
+void	zbx_sync_row_free(zbx_sync_row_t *row);
+
 typedef struct
 {
 	zbx_vector_sync_row_ptr_t	rows;
@@ -845,7 +847,8 @@ zbx_sync_rowset_t;
 void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num);
 void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...);
-void	zbx_sync_rowset_sort(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_sort_by_rows(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_sort_by_id(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
 
 #endif

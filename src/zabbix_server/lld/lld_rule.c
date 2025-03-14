@@ -18,38 +18,20 @@
 #include "lld_audit.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
-
-ZBX_VECTOR_IMPL(lld_ext_macro, zbx_lld_ext_macro_t)
+#include "zbxdbhigh.h"
 
 typedef struct
 {
-	zbx_uint64_t			itemid;
-	zbx_vector_lld_ext_macro_t	macros;
+	zbx_uint64_t		itemid;
+	zbx_sync_rowset_t	macros;
 }
 zbx_lld_rule_macros_t;
 
-static int	lld_ext_macro_compare(const void *d1, const void *d2)
+static void    lld_rule_macros_clear(void *d)
 {
-	const zbx_lld_ext_macro_t	*m1 = (const zbx_lld_ext_macro_t *)d1;
-	const zbx_lld_ext_macro_t	*m2 = (const zbx_lld_ext_macro_t *)d2;
+	zbx_lld_rule_macros_t   *rule_macros = (zbx_lld_rule_macros_t *)d;
 
-	return strcmp(m1->name, m2->name);
-}
-
-static void	lld_ext_macro_clear(zbx_lld_ext_macro_t *macro)
-{
-	zbx_free(macro->name);
-	zbx_free(macro->value);
-}
-
-static void	lld_rule_macros_clear(void *d)
-{
-	zbx_lld_rule_macros_t	*rule_macros = (zbx_lld_rule_macros_t *)d;
-
-	for (int i = 0; i < rule_macros->macros.values_num; i++)
-		lld_ext_macro_clear(&rule_macros->macros.values[i]);
-
-	zbx_vector_lld_ext_macro_destroy(&rule_macros->macros);
+	zbx_sync_rowset_clear(&rule_macros->macros);
 }
 
 /******************************************************************************
@@ -59,84 +41,40 @@ static void	lld_rule_macros_clear(void *d)
  * Parameters: rule_macros - [IN/OUT] LLD rule macros                         *
  *             entry       - [IN] LLD entry                                   *
  *                                                                            *
- * Return value: Merged list of macros containing:                            *
- *               1) macros to update (lld_macroid set, new name/value)        *
- *               2) macros to insert (lld_macroid 0, new name/value)          *
- *               3) macros to remove (lld_macroid set, NULL name/value)       *
- *                                                                            *
  ******************************************************************************/
 static void	lld_rule_merge_exported_macros(zbx_lld_rule_macros_t *rule_macros,
 		const zbx_lld_entry_t *entry)
 {
-	zbx_vector_lld_macro_t	macros;
-	int			i, j;
+	zbx_sync_rowset_t	src;
 
-	zbx_vector_lld_ext_macro_sort(&rule_macros->macros, lld_ext_macro_compare);
+	zbx_sync_rowset_init(&src, 2);
 
-	zbx_vector_lld_macro_create(&macros);
-	zbx_vector_lld_macro_append_array(&macros, entry->macros.values, entry->macros.values_num);
-
-	for (i = 0; i < entry->exported_macros->values_num; i++)
+	for (int i = 0; i < entry->exported_macros->values_num; i++)
 	{
-		if (FAIL == zbx_vector_lld_macro_search(&entry->macros, entry->exported_macros->values[i],
-				lld_macro_compare))
-		{
-			zbx_vector_lld_macro_append(&macros, entry->exported_macros->values[i]);
-		}
+		const zbx_lld_macro_t	*macro = &entry->exported_macros->values[i];
+
+		zbx_sync_rowset_add_row(&src, NULL, macro->macro, macro->value);
 	}
 
-	zbx_vector_lld_macro_sort(&macros, lld_macro_compare);
+	zbx_sync_rowset_sort_by_rows(&src);
+	zbx_sync_rowset_sort_by_rows(&rule_macros->macros);
 
-	/* remove matching macros from both vectors */
-	for (i = macros.values_num - 1, j = rule_macros->macros.values_num - 1; 0 <= i && 0 <= j; )
+	zbx_sync_rowset_merge(&rule_macros->macros, &src);
+
+	for (int i = 0; i < rule_macros->macros.rows.values_num; )
 	{
-		int	ret;
+		zbx_sync_row_t	*row = rule_macros->macros.rows.values[i];
 
-		if (0 == (ret = strcmp(macros.values[i].macro, rule_macros->macros.values[j].name)))
+		if (0 == row->update_num)
 		{
-			if (0 == strcmp(macros.values[i].value, rule_macros->macros.values[j].value))
-			{
-				zbx_vector_lld_macro_remove(&macros, i);
-				lld_ext_macro_clear(&rule_macros->macros.values[j]);
-				zbx_vector_lld_ext_macro_remove(&rule_macros->macros, j);
-
-				j--;
-			}
-
-			i--;
-			continue;
+			zbx_sync_row_free(row);
+			zbx_vector_sync_row_ptr_remove(&rule_macros->macros.rows, i);
 		}
-
-		if (0 < ret)
-			i--;
 		else
-			j--;
+			i++;
 	}
 
-	/* free old data that will be either replaced or removed */
-	for (j = 0; j < rule_macros->macros.values_num; j++)
-	{
-		zbx_free(rule_macros->macros.values[j].name);
-		zbx_free(rule_macros->macros.values[j].value);
-	}
-
-	if (macros.values_num > rule_macros->macros.values_num)
-	{
-		zbx_lld_ext_macro_t	macro = {0};
-
-		zbx_vector_lld_ext_macro_reserve(&rule_macros->macros, (size_t)macros.values_num);
-
-		for (j = rule_macros->macros.values_num; j < macros.values_num; j++)
-			zbx_vector_lld_ext_macro_append(&rule_macros->macros, macro);
-	}
-
-	for (i = 0; i < macros.values_num; i++)
-	{
-		rule_macros->macros.values[i].name = zbx_strdup(NULL, macros.values[i].macro);
-		rule_macros->macros.values[i].value = zbx_strdup(NULL, macros.values[i].value);
-	}
-
-	zbx_vector_lld_macro_destroy(&macros);
+	zbx_sync_rowset_sort_by_id(&rule_macros->macros);
 }
 
 /******************************************************************************
@@ -159,7 +97,7 @@ static void	lld_fetch_exported_macros(const zbx_vector_uint64_t *ruleids, zbx_ha
 		zbx_lld_rule_macros_t	rule_macros_local;
 
 		rule_macros_local.itemid = ruleids->values[i];
-		zbx_vector_lld_ext_macro_create(&rule_macros_local.macros);
+		zbx_sync_rowset_init(&rule_macros_local.macros, 2);
 		zbx_hashset_insert(lld_rules, &rule_macros_local, sizeof(rule_macros_local));
 	}
 
@@ -170,7 +108,6 @@ static void	lld_fetch_exported_macros(const zbx_vector_uint64_t *ruleids, zbx_ha
 	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
 		zbx_lld_rule_macros_t	*rule_macros, rule_macros_local;
-		zbx_lld_ext_macro_t	macro;
 
 		ZBX_STR2UINT64(rule_macros_local.itemid, row[1]);
 		if (NULL == (rule_macros = (zbx_lld_rule_macros_t *)zbx_hashset_search(lld_rules, &rule_macros_local)))
@@ -179,11 +116,7 @@ static void	lld_fetch_exported_macros(const zbx_vector_uint64_t *ruleids, zbx_ha
 			continue;
 		}
 
-		ZBX_STR2UINT64(macro.lld_macroid, row[0]);
-		macro.name = zbx_strdup(NULL, row[2]);
-		macro.value = zbx_strdup(NULL, row[3]);
-
-		zbx_vector_lld_ext_macro_append(&rule_macros->macros, macro);
+		zbx_sync_rowset_add_row(&rule_macros->macros, row[0], row[2], row[3]);
 	}
 	zbx_db_large_query_clear(&query);
 	zbx_free(sql);
@@ -199,7 +132,7 @@ static void	lld_fetch_exported_macros(const zbx_vector_uint64_t *ruleids, zbx_ha
 static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 {
 	zbx_db_insert_t		db_insert;
-	char			*sql = NULL, *name_esc, *value_esc;
+	char			*sql = NULL;
 	size_t			sql_alloc = 1024, sql_offset = 0;
 	zbx_hashset_iter_t	iter;
 	zbx_lld_rule_macros_t	*rule_macros;
@@ -213,32 +146,46 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 	zbx_hashset_iter_reset(lld_rules, &iter);
 	while (NULL != (rule_macros = (zbx_lld_rule_macros_t *)zbx_hashset_iter_next(&iter)))
 	{
-		for (int i = 0; i < rule_macros->macros.values_num; i++)
+		for (int i = 0; i < rule_macros->macros.rows.values_num; i++)
 		{
-			zbx_lld_ext_macro_t	*macro = &rule_macros->macros.values[i];
+			zbx_sync_row_t	*row = rule_macros->macros.rows.values[i];
 
-			if (0 == macro->lld_macroid)
+			if (0 == row->update_num)
+				continue;
+
+			if (0 == row->rowid)
 			{
-				zbx_db_insert_add_values(&db_insert, macro->lld_macroid, rule_macros->itemid,
-						macro->name, macro->value);
+				zbx_db_insert_add_values(&db_insert, row->rowid, rule_macros->itemid,
+						row->cols[0], row->cols[1]);
 				continue;
 			}
 
-			if (NULL == macro->name)
+			if (-1 == row->update_num)
 			{
-				zbx_vector_uint64_append(&deleted_ids, macro->lld_macroid);
+				zbx_vector_uint64_append(&deleted_ids, row->rowid);
 				continue;
 			}
 
-			name_esc = zbx_db_dyn_escape_string(macro->name);
-			value_esc = zbx_db_dyn_escape_string(macro->value);
+			const char	*fields[] = {"name", "value"};
+			char		delim = ' ';
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro set name='%s',value='%s'"
-					" where lld_macroid=" ZBX_FS_UI64 ";\n",
-					name_esc, value_esc, macro->lld_macroid);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro set");
 
-			zbx_free(value_esc);
-			zbx_free(name_esc);
+			for (int j = row->cols_num - row->update_num; j < row->cols_num; j++)
+			{
+				char	*value_esc;
+
+				value_esc = zbx_db_dyn_escape_string(row->cols[j]);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s='%s'", delim, fields[j],
+						value_esc);
+
+				delim = ',';
+
+				zbx_free(value_esc);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macroid=" ZBX_FS_UI64 ";\n",
+					row->rowid);
 
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -286,12 +233,11 @@ void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_
 	{
 		lld_rule_merge_exported_macros(rule_macros, entry);
 
-		if (0 == rule_macros->macros.values_num)
+		if (0 == rule_macros->macros.rows.values_num)
 			zbx_hashset_iter_remove(&iter);
 	}
 
-	if (0 != lld_rules.num_data)
-		lld_flush_exported_macros(&lld_rules);
+	lld_flush_exported_macros(&lld_rules);
 
 	zbx_hashset_destroy(&lld_rules);
 }

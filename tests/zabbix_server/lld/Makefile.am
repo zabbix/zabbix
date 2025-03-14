@@ -2,8 +2,7 @@ if SERVER
 SERVER_tests = zbx_lld_hgsets_test \
 		lld_entry_create \
 		lld_compare_entries \
-		zbx_substitute_lld_macros \
-		lld_rule_merge_exported_macros
+		zbx_substitute_lld_macros
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -214,27 +213,4 @@ zbx_substitute_lld_macros_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LD
 zbx_substitute_lld_macros_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 
-
-lld_rule_merge_exported_macros_SOURCES = \
-	../../../src/zabbix_server/lld/lld_common.c \
-	../../../src/zabbix_server/lld/lld_graph.c \
-	../../../src/zabbix_server/lld/lld_audit.c \
-	../../../src/zabbix_server/lld/lld_item.c \
-	../../../src/zabbix_server/lld/lld_trigger.c \
-	../../../src/zabbix_server/lld/lld_macro.c \
-	../../../src/zabbix_server/lld/lld_host.c \
-	../../../src/zabbix_server/lld/lld_entry.c \
-	../../../src/zabbix_server/lld/lld.c \
-	lld_rule_merge_exported_macros.c 
-
-lld_rule_merge_exported_macros_CFLAGS = \
-	-I@top_srcdir@ \
-	-I@top_srcdir@/tests \
-	$(COMMON_COMPILER_FLAGS) \
-	@LIBXML2_CFLAGS@
-
-lld_rule_merge_exported_macros_LDADD = $(LLD_LIBS) @SERVER_LIBS@ $(TEST_LIBS) $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS) 
-
-lld_rule_merge_exported_macros_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
-	
 endif
