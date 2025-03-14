@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .totals-list.totals-list-horizontal .count,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -54,13 +54,13 @@ z-select .focusable::after, .link-external::after, .drag-icon::before, .btn-drop
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon, .color-picker .use-transparent::after,
+button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-grey-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-grey-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon, .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after, .drag-icon {
   position: relative;
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty, .color-picker .use-transparent:empty::after,
+  button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-grey-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-grey-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty, .color-picker .use-transparent:empty::after,
   .color-picker-dialogue .use-transparent:empty::after, .drag-icon:empty {
     justify-content: center; }
 
@@ -1193,7 +1193,7 @@ footer {
     top: 1px;
     vertical-align: text-bottom; }
 
-button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .btn-debug {
+button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
   min-width: 24px;
   height: 24px;
@@ -1205,29 +1205,29 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
   cursor: pointer;
   border: 1px solid;
   border-radius: 2px; }
-  button:empty, .btn:empty, .btn-alt:empty, .btn-grey:empty, .btn-icon:empty, .btn-link:empty, .btn-overlay-close:empty, .btn-debug:empty {
+  button:empty, .btn:empty, .btn-alt:empty, .btn-grey:empty, .btn-icon:empty, .btn-grey-icon:empty, .btn-link:empty, .btn-overlay-close:empty, .btn-debug:empty {
     padding-right: 0;
     padding-left: 0; }
-  button:active, .btn:active, .btn-alt:active, .btn-grey:active, .btn-icon:active, .btn-link:active, .btn-overlay-close:active, .btn-debug:active, button:focus, .btn:focus, .btn-alt:focus, .btn-grey:focus, .btn-icon:focus, .btn-link:focus, .btn-overlay-close:focus, .btn-debug:focus {
+  button:active, .btn:active, .btn-alt:active, .btn-grey:active, .btn-icon:active, .btn-grey-icon:active, .btn-link:active, .btn-overlay-close:active, .btn-debug:active, button:focus, .btn:focus, .btn-alt:focus, .btn-grey:focus, .btn-icon:focus, .btn-grey-icon:focus, .btn-link:focus, .btn-overlay-close:focus, .btn-debug:focus {
     box-shadow: 0 0 0 2px #ffffff;
     outline: none; }
-  button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug {
+  button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-grey-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug {
     line-height: 14px; }
-  button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug {
+  button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-grey-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug {
     line-height: 16px; }
-  button[class^="zi-"]:not(:empty)::before, [class^="zi-"].btn:not(:empty)::before, [class^="zi-"].btn-alt:not(:empty)::before, [class^="zi-"].btn-grey:not(:empty)::before, [class^="zi-"].btn-icon:not(:empty)::before, [class^="zi-"].btn-link:not(:empty)::before, [class^="zi-"].btn-overlay-close:not(:empty)::before, [class^="zi-"].btn-debug:not(:empty)::before, button[class*=" zi-"]:not(:empty)::before, [class*=" zi-"].btn:not(:empty)::before, [class*=" zi-"].btn-alt:not(:empty)::before, [class*=" zi-"].btn-grey:not(:empty)::before, [class*=" zi-"].btn-icon:not(:empty)::before, [class*=" zi-"].btn-link:not(:empty)::before, [class*=" zi-"].btn-overlay-close:not(:empty)::before, [class*=" zi-"].btn-debug:not(:empty)::before {
+  button[class^="zi-"]:not(:empty)::before, [class^="zi-"].btn:not(:empty)::before, [class^="zi-"].btn-alt:not(:empty)::before, [class^="zi-"].btn-grey:not(:empty)::before, [class^="zi-"].btn-icon:not(:empty)::before, [class^="zi-"].btn-grey-icon:not(:empty)::before, [class^="zi-"].btn-link:not(:empty)::before, [class^="zi-"].btn-overlay-close:not(:empty)::before, [class^="zi-"].btn-debug:not(:empty)::before, button[class*=" zi-"]:not(:empty)::before, [class*=" zi-"].btn:not(:empty)::before, [class*=" zi-"].btn-alt:not(:empty)::before, [class*=" zi-"].btn-grey:not(:empty)::before, [class*=" zi-"].btn-icon:not(:empty)::before, [class*=" zi-"].btn-grey-icon:not(:empty)::before, [class*=" zi-"].btn-link:not(:empty)::before, [class*=" zi-"].btn-overlay-close:not(:empty)::before, [class*=" zi-"].btn-debug:not(:empty)::before {
     margin-right: 4px;
     margin-left: -6px; }
 
 .form-grid table .btn-icon,
-.form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
+.form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-grey-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
 .list-table .icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-piechart .list-item-actions .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .overlay-dialogue-header .btn-icon {
   min-width: 18px;
   height: 18px; }
 
 .form-grid table .btn-icon.btn-small,
-.form-grid table .icon.btn-small, button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
+.form-grid table .icon.btn-small, button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-grey-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
   min-width: 16px;
   height: 16px; }
 
@@ -1255,15 +1255,15 @@ button, .btn {
     background-color: #d3d3d3;
     border-color: #d3d3d3; }
 
-.btn-grey, .btn-debug {
+.btn-grey, .btn-grey-icon, .btn-debug {
   color: #f2f2f2;
   background-color: #383838;
   border-color: #666666; }
-  .btn-grey:hover, .btn-debug:hover {
+  .btn-grey:hover, .btn-grey-icon:hover, .btn-debug:hover {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #666666; }
-  .btn-grey:active, .btn-debug:active, .btn-grey:focus, .btn-debug:focus {
+  .btn-grey:active, .btn-grey-icon:active, .btn-debug:active, .btn-grey:focus, .btn-grey-icon:focus, .btn-debug:focus {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #bbbbbb; }
@@ -1297,7 +1297,7 @@ button, .btn {
     background: transparent;
     border-color: rgba(211, 211, 211, 0.5); }
 
-button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
+button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey, [disabled].btn-grey-icon {
   pointer-events: none;
   color: #7d7d7d;
   background-color: transparent;
@@ -1321,6 +1321,11 @@ button {
     pointer-events: none; }
   .btn-icon.btn-small {
     line-height: 16px; }
+
+.btn-grey-icon::before {
+  color: #dddddd; }
+.btn-grey-icon[disabled]::before {
+  color: #555555; }
 
 .btn-link {
   box-sizing: content-box;
@@ -1379,7 +1384,7 @@ button {
 .problem-icon-list .problem-icon-list-item::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -7430,6 +7435,8 @@ svg {
       flex: 0 0 295px;
       max-width: 295px;
       padding-left: 30px; }
+    .preprocessing-list .preprocessing-list-head .step-on-fail {
+      display: inline-block; }
   .preprocessing-list .preprocessing-list-foot {
     justify-content: space-between; }
     .preprocessing-list .preprocessing-list-foot .step-action {
@@ -7481,9 +7488,26 @@ svg {
 
 .preprocessing-test-results td {
   vertical-align: top !important; }
+.preprocessing-test-results tr.display-icon {
+  line-height: 24px; }
 .preprocessing-test-results .rel-container {
   top: 4px;
   margin-left: 3px; }
+
+.item-final-result .table-forms-separator {
+  display: inline-grid;
+  width: 675px; }
+.item-final-result .final-result-row {
+  display: flex;
+  align-items: center; }
+  .item-final-result .final-result-row .final-result-action {
+    margin-right: auto; }
+  .item-final-result .final-result-row .btn-grey-icon {
+    margin-left: 5px; }
+  .item-final-result .final-result-row:not(:first-child) {
+    margin-top: 5px; }
+  .item-final-result .final-result-row.display-icon {
+    line-height: 24px; }
 
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
@@ -7499,6 +7523,9 @@ svg {
     width: 250px; }
 #preprocessing-test-form .item-test-result {
   display: inline-flex; }
+
+#token_form .btn-grey-icon {
+  margin-left: 5px; }
 
 .totals-list:not(.list-table) {
   display: flex;
