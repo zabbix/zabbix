@@ -275,19 +275,53 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 	return ret;
 }
 
-static unsigned long int compute_recursion_limit(void)
+static unsigned long	compute_match_recursion_limit(void)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	struct rlimit	rlim;
 
-	/* calculate recursion limit, PCRE man page suggests to reckon on about 500 bytes per recursion */
+	/* calculate recursion limit, man pcrestack suggests to reckon on about 500 bytes per recursion */
 	/* but to be on the safe side - reckon on 800 bytes and do not set limit higher than 100000 */
 	if (0 == getrlimit(RLIMIT_STACK, &rlim))
 		return rlim.rlim_cur < 80000000 ? rlim.rlim_cur / 800 : 100000;
 	else
 		return 10000;	/* if stack size cannot be retrieved then assume ~8 MB */
 #else
-	return ZBX_REGEXP_RECURSION_LIMIT;
+	/* https://learn.microsoft.com/en-us/windows/win32/procthread/thread-stack-size */
+	/* The default stack reservation size used by the linker is 1 MB.               */
+	/* If it is not possible to detect current thread stack limits,                 */
+	/* assume ~1 MB stack and ~800 bytes per recursion, add some additional margin. */
+	/* Recursion limit 2000 seems to bee too large and it might cause Zabbix agent  */
+	/* crash while executing prce_exec() (see ZBX-22900).                           */
+#define WIN_DEFAULT_MATCH_RECURSION_LIMIT	1000
+#define WIN_ASSUMED_BYTES_PER_RECURSION		800
+	typedef void (WINAPI *GetCurrentThreadStackLimits)(PULONG_PTR, PULONG_PTR);
+	static ZBX_THREAD_LOCAL GetCurrentThreadStackLimits	get_stack_limits;
+
+	if (NULL == get_stack_limits)
+	{
+		/* GetCurrentThreadStackLimits() is supported by Windows 8, Windows Server 2012 and newer */
+		get_stack_limits = (GetCurrentThreadStackLimits)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+				"GetCurrentThreadStackLimits");
+	}
+
+	if (NULL == get_stack_limits)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): GetCurrentThreadStackLimits() is not available on this system,"
+			" %s", __func__, strerror_from_system(GetLastError()));
+
+		return WIN_DEFAULT_MATCH_RECURSION_LIMIT;
+	}
+
+	ULONG_PTR	lo, hi;
+	unsigned long	stack_size;
+
+	get_stack_limits(&lo, &hi);
+	stack_size = (unsigned long)(hi - lo);
+
+	return stack_size / WIN_ASSUMED_BYTES_PER_RECURSION;
+#undef WIN_DEFAULT_MATCH_RECURSION_LIMIT
+#undef WIN_ASSUMED_BYTES_PER_RECURSION
 #endif
 }
 
@@ -356,7 +390,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
 	pextra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
 	pextra->match_limit = 1000000;
-	pextra->match_limit_recursion = compute_recursion_limit();
+	pextra->match_limit_recursion = compute_match_recursion_limit();
 #endif
 	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
 	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, (int)strlen(string), flags, 0, ovector, ovecsize)))
@@ -372,6 +406,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() pcre_exec() returned error %d while matching against subject string"
+				" '%s'", __func__, r, string);
+
 		if (NULL != err_msg)
 		{
 			*err_msg = zbx_dsprintf(NULL, "pcre_exec() returned %d. See PCRE library documentation or"
@@ -394,7 +431,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	PCRE2_SIZE		*ovector = NULL;
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
-	pcre2_set_recursion_limit(regexp->match_ctx, (uint32_t)compute_recursion_limit());
+	pcre2_set_recursion_limit(regexp->match_ctx, (uint32_t)compute_match_recursion_limit());
 	match_data = pcre2_match_data_create((uint32_t)count, NULL);
 
 	if (NULL == match_data)
@@ -433,6 +470,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		}
 		else
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() pcre2_match() returned error %d while matching against"
+					" subject string '%s'", __func__, r, string);
+
 			if (NULL != err_msg)
 				*err_msg = decode_pcre2_match_error(r);
 
