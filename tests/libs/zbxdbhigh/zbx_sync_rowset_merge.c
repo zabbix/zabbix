@@ -68,6 +68,8 @@ static zbx_sync_row_t	*mock_read_zbx_sync_row(zbx_mock_handle_t handle, int cols
 {
 	zbx_sync_row_t		*v;
 	zbx_mock_handle_t	h, hval;
+	zbx_mock_error_t	err;
+	const char		*value;
 
 	v = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
 
@@ -75,8 +77,10 @@ static zbx_sync_row_t	*mock_read_zbx_sync_row(zbx_mock_handle_t handle, int cols
 
 	h = zbx_mock_get_object_member_handle(handle, "rowid");
 	v->rowid = mock_read_zbx_uint64(h);
-	h = zbx_mock_get_object_member_handle(handle, "update_num");
-	v->update_num = mock_read_int(h);
+
+	h = zbx_mock_get_object_member_handle(handle, "flags");
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(h, &v->flags)))
+		fail_msg("Cannot read flags: %s", zbx_mock_error_string(err));
 
 	v->cols = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
 	v->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
@@ -129,8 +133,8 @@ static void	mock_assert_eq_zbx_sync_row(const char *prefix, const zbx_sync_row_t
 		zbx_mock_assert_str_eq(buf, v1->cols[i], v2->cols[i]);
 	}
 
-	zbx_snprintf(buf, sizeof(buf), "%s: .update_num", prefix);
-	mock_assert_eq_int(buf, &v1->update_num, &v2->update_num);
+	zbx_snprintf(buf, sizeof(buf), "%s: .flags", prefix);
+	mock_assert_eq_zbx_uint64(buf, &v1->flags, &v2->flags);
 }
 
 static void	mock_dump_zbx_vector_sync_row_ptr(const char *name, zbx_vector_sync_row_ptr_t *v, int indent)
@@ -161,9 +165,8 @@ static void	mock_dump_zbx_sync_row(const char *name, zbx_sync_row_t *v, int inde
 	{
 		mock_dump_char_ptr("", &v->cols[i], indent + 2);
 	}
-	mock_dump_int("update_num", &v->update_num, indent + 1);
+	mock_dump_zbx_uint64("flags", &v->flags, indent + 1);
 }
-
 
 void	zbx_mock_test_entry(void **state)
 {

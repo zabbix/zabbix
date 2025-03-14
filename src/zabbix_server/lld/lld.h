@@ -232,6 +232,7 @@ typedef struct
 	int					item_flags;
 
 	zbx_sync_rowset_t			macro_paths;
+	zbx_sync_rowset_t                       filters;
 }
 zbx_lld_item_prototype_t;
 
@@ -359,6 +360,7 @@ struct zbx_lld_item_full_s
 	unsigned char				type;
 	unsigned char				value_type_orig;
 	char					*trapper_hosts_orig;
+	char					*formula;
 	char					*formula_orig;
 	char					*logtimefmt_orig;
 	zbx_uint64_t				valuemapid_orig;
@@ -382,6 +384,7 @@ struct zbx_lld_item_full_s
 	int					evaltype_orig;
 
 	zbx_sync_rowset_t			macro_paths;
+	zbx_sync_rowset_t			filters;
 };
 
 int	lld_item_full_compare_func(const void *d1, const void *d2);
@@ -542,9 +545,8 @@ int	lld_item_preproc_sort_by_step(const void *d1, const void *d2);
 zbx_lld_item_preproc_t	*lld_item_preproc_create(zbx_uint64_t item_preprocid, zbx_uint64_t flags, int step,
 		int type, const char *params, int error_handler, const char *error_handler_params);
 
-void	lld_rule_macro_paths_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items);
 void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		zbx_vector_uint64_t *protoids);
-int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
+void	lld_rule_get_prototype_filters(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids);
 #endif

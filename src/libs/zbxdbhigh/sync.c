@@ -19,8 +19,8 @@ ZBX_PTR_VECTOR_IMPL(sync_row_ptr, zbx_sync_row_t *)
 
 typedef enum
 {
-	ZBX_SYNC_SRC,
-	ZBX_SYNC_DST
+	ZBX_SYNC_ROW_SRC,
+	ZBX_SYNC_ROW_DST
 }
 zbx_sync_role_t;
 
@@ -210,7 +210,7 @@ static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
 	row->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
 	memset(row->cols_orig, 0, sizeof(char *) * cols_num);
 	row->cols_num = cols_num;
-	row->update_num = 0;
+	row->flags = ZBX_SYNC_ROW_NONE;
 
 	return row;
 }
@@ -259,7 +259,7 @@ static void	sync_rowset_copy_row(zbx_sync_rowset_t *rowset, zbx_sync_row_t *src)
 {
 	zbx_sync_row_t	*row = sync_row_create(0, rowset->cols_num);
 
-	row->update_num = row->cols_num;
+	row->flags = ZBX_SYNC_ROW_INSERT;
 	row->parent_rowid = src->rowid;
 
 	for (int i = 0; i < rowset->cols_num; i++)
@@ -323,7 +323,7 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 
 		zbx_sync_node_t	*src, *dst, *prev, *next;
 
-		if (ZBX_SYNC_SRC == node->role)
+		if (ZBX_SYNC_ROW_SRC == node->role)
 		{
 			src = node;
 			dst = node->next;
@@ -334,7 +334,6 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 			dst = node;
 		}
 
-		dst->row->update_num = match_level;
 		prev = node->prev;
 		next = node->next->next;
 
@@ -343,8 +342,12 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 
 		for (int i = dst->row->cols_num - 1; i >= dst->row->cols_num - match_level; i--)
 		{
-			dst->row->cols_orig[i] = dst->row->cols[i];
-			dst->row->cols[i] = zbx_strdup(NULL, src->row->cols[i]);
+			if (i == match_level || 0 != strcmp(dst->row->cols[i], src->row->cols[i]))
+			{
+				dst->row->cols_orig[i] = dst->row->cols[i];
+				dst->row->cols[i] = zbx_strdup(NULL, src->row->cols[i]);
+				dst->row->flags |= UINT32_C(1) << i;
+			}
 		}
 
 		dst->row->parent_rowid = src->row->rowid;
@@ -373,8 +376,8 @@ static void	sync_list_flush(zbx_sync_list_t *sync_list, zbx_sync_rowset_t *dst)
 	{
 		zbx_sync_node_t	*next = node->next;
 
-		if (ZBX_SYNC_DST == node->role)
-			node->row->update_num = -1;
+		if (ZBX_SYNC_ROW_DST == node->role)
+			node->row->flags = ZBX_SYNC_ROW_DELETE;
 		else
 			sync_rowset_copy_row(dst, node->row);
 
@@ -391,13 +394,13 @@ static void	sync_list_flush(zbx_sync_list_t *sync_list, zbx_sync_rowset_t *dst)
  *             src - [IN] source rowset                                       *
  *                                                                            *
  * Comments: The merge operation modifies the destination rows as follows:    *
- *           - unmodified rows have update_num set to 0                       *
- *           - rows marked for deletion have update_num set to -1             *
- *           - new rows (to be inserted) are assigned update_num equal to     *
- *             cols_num and rowid 0, with column values copied from source    *
- *           - updated rows have update_num set to the count of modified      *
- *             columns, starting from the last column. Modified column values *
- *             values are copied from the source rowset.                      *
+ *           - unmodified rows have flags set to ZBX_SYNC_ROW_NONE                *
+ *           - rows marked for deletion have flags set to ZBX_SYNC_ROW_DELETE     *
+ *           - new rows (to be inserted) have flags set to ZBX_SYNC_ROW_INSERT,   *
+ *             rowid 0, and column values copied from source                  *
+ *           - updated rows have flags set as a bitset indicating which       *
+ *             columns were modified. Modified column values are copied       *
+ *             from the source rowset                                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
@@ -412,16 +415,16 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 	for (i = 0, j = 0; i < src->rows.values_num && j < dst->rows.values_num; )
 	{
 		if (0 > sync_row_compare(&src->rows.values[i], &dst->rows.values[j]))
-			sync_list_append(&sync_list, src->rows.values[i++], ZBX_SYNC_SRC);
+			sync_list_append(&sync_list, src->rows.values[i++], ZBX_SYNC_ROW_SRC);
 		else
-			sync_list_append(&sync_list, dst->rows.values[j++], ZBX_SYNC_DST);
+			sync_list_append(&sync_list, dst->rows.values[j++], ZBX_SYNC_ROW_DST);
 	}
 
 	for (int k = i; k < src->rows.values_num; k++)
-		sync_list_append(&sync_list, src->rows.values[k], ZBX_SYNC_SRC);
+		sync_list_append(&sync_list, src->rows.values[k], ZBX_SYNC_ROW_SRC);
 
 	for (int k = j; k < dst->rows.values_num; k++)
-		sync_list_append(&sync_list, dst->rows.values[k], ZBX_SYNC_DST);
+		sync_list_append(&sync_list, dst->rows.values[k], ZBX_SYNC_ROW_DST);
 
 	sync_list_prepare(&sync_list);
 
@@ -432,4 +435,3 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 
 	zbx_sync_rowset_sort_by_id(dst);
 }
-

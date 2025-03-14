@@ -208,7 +208,7 @@ void	zbx_audit_discovery_rule_update_json_add_filter_conditions(int audit_contex
 	zbx_snprintf(audit_key_macro, sizeof(audit_key_macro),
 			"discoveryrule.filter.conditions[" ZBX_FS_UI64 "].macro", rule_conditionid);
 	zbx_snprintf(audit_key_value, sizeof(audit_key_value),
-			"discoveryrule.filter.conditions[" ZBX_FS_UI64 "]value", rule_conditionid);
+			"discoveryrule.filter.conditions[" ZBX_FS_UI64 "].value", rule_conditionid);
 
 #define	AUDIT_TABLE_NAME	"item_condition"
 	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_op,
@@ -236,6 +236,21 @@ void	zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(
 
 	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_UPDATE, buf);
 }
+
+void	zbx_audit_discovery_rule_update_json_update_filter_conditions(int audit_context_mode,
+		zbx_uint64_t itemid, zbx_uint64_t item_conditionid, const char *resource, const char *value_old,
+		const char *value_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+
+	zbx_snprintf(buf, sizeof(buf), "discoveryrule.filter[" ZBX_FS_UI64 "].conditions.%s",
+			item_conditionid, resource);
+
+	zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, buf, value_old, value_new);
+}
+
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(resource, type1, type2)						\
 void	zbx_audit_discovery_rule_update_json_update_filter_conditions_##resource(int audit_context_mode,	\
@@ -600,20 +615,28 @@ void	zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(int
 	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_UPDATE, buf);
 }
 
+void	zbx_audit_discovery_rule_update_json_update_lld_macro_path(int audit_context_mode,
+		zbx_uint64_t itemid, zbx_uint64_t lld_macro_pathid, const char *resource, const char *value_old,
+		const char *value_new)
+{
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+
+	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.lld_macro_paths[" ZBX_FS_UI64 "].%s",
+			lld_macro_pathid, resource);
+
+	zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key, value_old, value_new);
+}
+
+
 #define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH(resource)						\
 void	zbx_audit_discovery_rule_update_json_update_lld_macro_path_##resource(int audit_context_mode,		\
 		zbx_uint64_t itemid, zbx_uint64_t lld_macro_pathid, const char *resource##_old,			\
 		const char *resource##_new)									\
 {														\
-	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
-														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
-														\
-	zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource),					\
-			"discoveryrule.lld_macro_paths[" ZBX_FS_UI64 "]."#resource, lld_macro_pathid);		\
-														\
-	zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_##resource, resource##_old,	\
-			resource##_new);									\
+	zbx_audit_discovery_rule_update_json_update_lld_macro_path(audit_context_mode, itemid, lld_macro_pathid,\
+			#resource, resource##_old, resource##_new); 						\
 }
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH(lld_macro)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH(path)
@@ -630,6 +653,7 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_macro_path(int audit_contex
 
 	zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
+
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, const char *name, int step, int stop)

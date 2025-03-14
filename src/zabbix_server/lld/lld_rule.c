@@ -65,7 +65,7 @@ static void	lld_rule_merge_exported_macros(zbx_lld_rule_macros_t *rule_macros,
 	{
 		zbx_sync_row_t	*row = rule_macros->macros.rows.values[i];
 
-		if (0 == row->update_num)
+		if (ZBX_SYNC_ROW_NONE == row->flags)
 		{
 			zbx_sync_row_free(row);
 			zbx_vector_sync_row_ptr_remove(&rule_macros->macros.rows, i);
@@ -150,17 +150,17 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 		{
 			zbx_sync_row_t	*row = rule_macros->macros.rows.values[i];
 
-			if (0 == row->update_num)
+			if (ZBX_SYNC_ROW_NONE == row->flags)
 				continue;
 
-			if (0 == row->rowid)
+			if (ZBX_SYNC_ROW_INSERT == row->flags)
 			{
 				zbx_db_insert_add_values(&db_insert, row->rowid, rule_macros->itemid,
 						row->cols[0], row->cols[1]);
 				continue;
 			}
 
-			if (-1 == row->update_num)
+			if (ZBX_SYNC_ROW_DELETE == row->flags)
 			{
 				zbx_vector_uint64_append(&deleted_ids, row->rowid);
 				continue;
@@ -171,8 +171,11 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro set");
 
-			for (int j = row->cols_num - row->update_num; j < row->cols_num; j++)
+			for (int j = 0; j < row->cols_num; j++)
 			{
+				if (0 == (row->flags & (UINT32_C(1) << j)))
+					continue;
+
 				char	*value_esc;
 
 				value_esc = zbx_db_dyn_escape_string(row->cols[j]);
@@ -287,15 +290,16 @@ void	lld_rule_macro_paths_make(const zbx_vector_lld_item_prototype_ptr_t *item_p
 
 	for (int i = 0; i < items->values_num; i++)
 	{
-		zbx_lld_item_full_t	*item = items->values[i];
-		int			index;
+		zbx_lld_item_full_t		*item = items->values[i];
+		int				index;
+		zbx_lld_item_prototype_t	item_prototype_local;
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		zbx_lld_item_prototype_t	cmp = {.itemid = item->parent_itemid};
+		item_prototype_local.itemid = item->parent_itemid;
 
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
 				lld_item_prototype_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -342,14 +346,14 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 		{
 			zbx_sync_row_t	*row = item->macro_paths.rows.values[j];
 
-			if (-1 == row->update_num)
+			if (ZBX_SYNC_ROW_DELETE == row->flags)
 			{
 				zbx_vector_uint64_append(&deleteids, row->rowid);
 
 				zbx_audit_discovery_rule_update_json_delete_lld_macro_path(ZBX_AUDIT_LLD_CONTEXT,
 						item->itemid, row->rowid);
 			}
-			else if (0 == row->rowid)
+			else if (ZBX_SYNC_ROW_INSERT == row->flags)
 			{
 				new_num++;
 			}
@@ -393,7 +397,7 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 			char		delim = ' ';
 			zbx_sync_row_t	*row = item->macro_paths.rows.values[j];
 
-			if (0 == row->rowid)
+			if (ZBX_SYNC_ROW_INSERT == row->flags)
 			{
 				zbx_db_insert_add_values(&db_insert, new_macroid, item->itemid, row->cols[0],
 						row->cols[1]);
@@ -405,18 +409,18 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 				continue;
 			}
 
-			if (0 >= row->update_num)
+			if (0 == (row->flags & ZBX_SYNC_ROW_UPDATE))
 				continue;
-
-			zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(ZBX_AUDIT_LLD_CONTEXT,
-					item->itemid, row->rowid);
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro_path set");
 
 			const char	*fields[] = {"lld_macro", "path"};
 
-			for (int k = row->cols_num - row->update_num; k < row->cols_num; k++)
+			for (int k = 0; k < row->cols_num; k++)
 			{
+				if (0 == (row->flags & (UINT32_C(1) << k)))
+					continue;
+
 				char	*value_esc;
 
 				value_esc = zbx_db_dyn_escape_string(row->cols[k]);
@@ -425,9 +429,8 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 
 				delim = ',';
 
-				zbx_audit_discovery_rule_update_json_update_lld_macro_path_lld_macro(
-						ZBX_AUDIT_LLD_CONTEXT, item->itemid, row->rowid, row->cols_orig[k],
-						row->cols[k]);
+				zbx_audit_discovery_rule_update_json_update_lld_macro_path(ZBX_AUDIT_LLD_CONTEXT,
+						item->itemid, row->rowid, fields[k], row->cols_orig[k], row->cols[k]);
 
 				zbx_free(value_esc);
 			}
@@ -464,6 +467,379 @@ out:
 	return ret;
 }
 
+static void	lld_rule_filters_set_ids(zbx_vector_lld_item_full_ptr_t *items)
+{
+	int	new_num = 0;
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t	*item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < item->filters.rows.values_num; j++)
+		{
+			zbx_sync_row_t	*row = item->filters.rows.values[j];
+
+			if (ZBX_SYNC_ROW_INSERT == row->flags)
+				new_num++;
+		}
+	}
+
+	if (0 == new_num)
+	{
+		zbx_uint64_t	new_conditionid = zbx_db_get_maxid_num("item_condition", new_num);
+
+		for (int i = 0; i < items->values_num; i++)
+		{
+			zbx_lld_item_full_t	*item = items->values[i];
+
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+				continue;
+
+			for (int j = 0; j < item->filters.rows.values_num; j++)
+			{
+				zbx_sync_row_t	*row = item->filters.rows.values[j];
+
+				if (ZBX_SYNC_ROW_INSERT == row->flags)
+					row->rowid = new_conditionid++;
+			}
+		}
+	}
+}
+
+static void	lld_rule_rollback_filter(zbx_lld_item_full_t *item)
+{
+	if (0 != item->itemid)
+	{
+		item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	}
+	else
+	{
+		item->flags &= ~(ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA | ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE);
+		for (int i = 0; i < item->filters.rows.values_num; i++)
+			item->filters.rows.values[i]->flags &= ZBX_SYNC_ROW_NONE;
+	}
+}
+
+static void	lld_rule_update_item_formula(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_lld_item_full_ptr_t *items, char **info)
+{
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t		*item = items->values[i];
+		int				j, index;
+		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
+		zbx_eval_context_t		ctx;
+		char				*error = NULL;
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		item_prototype_local.itemid = item->parent_itemid;
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item_prototype = item_prototypes->values[index];
+
+		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != item_prototype->evaltype)
+		{
+			if (0 != strcmp(item->formula, item_prototype->formula))
+			{
+				item->formula_orig = item->formula;
+				item->formula = zbx_strdup(NULL, item_prototype->formula);
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA;
+			}
+
+			continue;
+		}
+
+		/* update custom LLD filter formula */
+
+		if (SUCCEED != zbx_eval_parse_expression(&ctx, item_prototype->formula,
+				ZBX_EVAL_PARSE_LLD_FILTER_EXPRESSION, &error))
+		{
+			*info = zbx_strdcatf(*info, "Cannot parse LLD filter expression for item \"%s\": %s.\n",
+					item->name, error);
+			zbx_free(error);
+
+			lld_rule_rollback_filter(item);
+
+			continue;
+		}
+
+		for (j = 0; j < ctx.stack.values_num; j++)
+		{
+			zbx_eval_token_t	*token = &ctx.stack.values[j];
+			zbx_uint64_t		conditionid;
+			int			k;
+
+			if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+				continue;
+
+			if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
+					token->loc.r - token->loc.l - 1, &conditionid))
+			{
+				*info = zbx_strdcatf(*info, "Invalid LLD filter formula starting with \"%s\".\n",
+						ctx.expression + token->loc.l);
+
+				lld_rule_rollback_filter(item);
+				break;
+			}
+
+			for (k = 0; k < item->filters.rows.values_num; k++)
+			{
+				zbx_sync_row_t        *row = item->filters.rows.values[k];
+
+				if (row->parent_rowid == conditionid)
+				{
+					zbx_variant_set_str(&token->value, zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}",
+							row->rowid));
+					break;
+				}
+			}
+
+			if (k == item->filters.rows.values_num)
+			{
+				*info = zbx_strdcat(*info, "Cannot update custom LLD filter.\n");
+				lld_rule_rollback_filter(item);
+				break;
+			}
+		}
+
+		if (j == ctx.stack.values_num)
+		{
+			char	*formula = NULL;
+
+			zbx_eval_compose_expression(&ctx, &formula);
+
+			if (0 != strcmp(item->formula, formula))
+			{
+				item->formula_orig = item->formula;
+				item->formula = formula;
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA;
+			}
+			else
+				zbx_free(formula);
+		}
+
+		zbx_eval_clear(&ctx);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Updates existing lld rule filters and creates new ones based      *
+ *          on rule prototypes.                                               *
+ *                                                                            *
+ * Parameters: item_prototypes - [IN]                                         *
+ *             items           - [IN/OUT] sorted list of items                *
+ *             info            - [OUT] error message                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_rule_filters_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_lld_item_full_ptr_t *items, char **info)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t		*item = items->values[i];
+		int				index;
+		zbx_lld_item_prototype_t	item_prototype_local;
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		item_prototype_local.itemid = item->parent_itemid;
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_merge(&item->filters, &item_prototypes->values[index]->filters);
+	}
+
+	lld_rule_filters_set_ids(items);
+	lld_rule_update_item_formula(item_prototypes, items, info);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: saves/updates/removes lld rule filters                            *
+ *                                                                            *
+ * Parameters: hostid      - [IN] parent host id                              *
+ *             items       - [IN]                                             *
+ *             host_locked - [IN/OUT] host record is locked                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked)
+{
+	int			ret = SUCCEED, new_num = 0, update_num = 0, delete_num = 0;
+	zbx_lld_item_full_t	*item;
+	zbx_vector_uint64_t	deleteids;
+	zbx_db_insert_t		db_insert;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&deleteids);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < item->filters.rows.values_num; j++)
+		{
+			zbx_sync_row_t	*row = item->filters.rows.values[j];
+
+			if (ZBX_SYNC_ROW_DELETE == row->flags)
+			{
+				zbx_vector_uint64_append(&deleteids, row->rowid);
+
+				zbx_audit_discovery_rule_update_json_delete_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
+						item->itemid, row->rowid);
+			}
+			else if (ZBX_SYNC_ROW_INSERT == row->flags)
+			{
+				new_num++;
+			}
+			else
+				update_num++;
+
+		}
+	}
+
+	if (0 == update_num && 0 == new_num && 0 == deleteids.values_num)
+		goto out;
+
+	if (0 == *host_locked)
+	{
+		if (SUCCEED != zbx_db_lock_hostid(hostid))
+		{
+			/* the host was removed while processing lld rule */
+			ret = FAIL;
+			goto out;
+		}
+
+		*host_locked = 1;
+	}
+
+	if (0 != new_num)
+	{
+		zbx_db_insert_prepare(&db_insert, "item_condition", "item_conditionid", "itemid", "operator",
+				"macro", "value", (char *)NULL);
+	}
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < item->filters.rows.values_num; j++)
+		{
+			char		delim = ' ';
+			zbx_sync_row_t	*row = item->filters.rows.values[j];
+
+			if (ZBX_SYNC_ROW_INSERT == row->flags)
+			{
+				zbx_db_insert_add_values(&db_insert, row->rowid, item->itemid, atoi(row->cols[0]),
+						row->cols[1], row->cols[2]);
+
+				zbx_audit_discovery_rule_update_json_add_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
+						item->itemid, row->rowid, (zbx_uint64_t)atoi(row->cols[0]),
+						row->cols[1], row->cols[2]);
+
+				continue;
+			}
+
+			if (0 == (row->flags & ZBX_SYNC_ROW_UPDATE))
+				continue;
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_condition set");
+
+			const char	*fields[] = {"operator", "macro", "value"};
+
+			if (0 != (row->flags & 0x01))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%coperator=%s", delim, row->cols[0]);
+				delim = ',';
+
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(
+						ZBX_AUDIT_LLD_CONTEXT, item->itemid, row->rowid,
+						atoi(row->cols_orig[0]), atoi(row->cols[0]));
+
+			}
+
+			for (int k = 1; k < row->cols_num; k++)
+			{
+				if (0 == (row->flags & (UINT32_C(1) << k)))
+					continue;
+
+				char	*value_esc;
+
+				value_esc = zbx_db_dyn_escape_string(row->cols[k]);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s='%s'", delim, fields[k],
+						value_esc);
+
+				delim = ',';
+
+				zbx_audit_discovery_rule_update_json_update_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
+						item->itemid, row->rowid, fields[k], row->cols_orig[k], row->cols[k]);
+
+				zbx_free(value_esc);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_conditionid=" ZBX_FS_UI64 ";\n",
+					row->rowid);
+
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+	}
+
+	if (0 != update_num)
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
+
+	if (0 != new_num)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+
+	if (0 != deleteids.values_num)
+	{
+		zbx_vector_uint64_sort(&deleteids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_db_execute_multiple_query("delete from item_condition where", "item_conditionid", &deleteids);
+		delete_num = deleteids.values_num;
+	}
+out:
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&deleteids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() added:%d updated:%d removed:%d", __func__, new_num,
+			update_num, delete_num);
+
+	return ret;
+}
+
+
 void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		zbx_vector_uint64_t *protoids)
 {
@@ -475,7 +851,6 @@ void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *ite
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_macro_pathid,itemid,lld_macro,path"
 			" from lld_macro_path where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by lld_macro_pathid");
 
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
@@ -495,6 +870,40 @@ void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *ite
 		}
 
 		zbx_sync_rowset_add_row(&item_prototypes->values[index]->macro_paths, row[0], row[2], row[3]);
+	}
+	zbx_db_free_result(result);
+}
+
+void	lld_rule_get_prototype_filters(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select item_conditionid,itemid,operator,macro,value"
+			" from item_condition where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_item_prototype_t	item_prototype_local;
+		int				index;
+
+		ZBX_STR2UINT64(item_prototype_local.itemid, row[1]);
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&item_prototypes->values[index]->filters, row[0], row[2], row[3], row[4]);
 	}
 	zbx_db_free_result(result);
 }
@@ -533,6 +942,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	lld_items_preproc_make(&item_prototypes, &items);
 	lld_items_param_make(&item_prototypes, &items, error);
 	lld_rule_macro_paths_make(&item_prototypes, &items);
+	lld_rule_filters_make(&item_prototypes, &items, error);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
@@ -550,7 +960,8 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 			ZBX_FLAG_DISCOVERY_RULE) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_rule_macro_paths_save(hostid, &items, &host_record_is_locked))
+			SUCCEED == lld_rule_macro_paths_save(hostid, &items, &host_record_is_locked) &&
+			SUCCEED == lld_rule_filters_save(hostid, &items, &host_record_is_locked))
 	{
 		if (ZBX_DB_OK != zbx_db_commit())
 		{

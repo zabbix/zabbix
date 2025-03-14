@@ -169,6 +169,7 @@ void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_vector_db_tag_ptr_destroy(&item_prototype->item_tags);
 
 	zbx_sync_rowset_clear(&item_prototype->macro_paths);
+	zbx_sync_rowset_clear(&item_prototype->filters);
 
 	zbx_hashset_destroy(&item_prototype->item_index);
 
@@ -227,6 +228,7 @@ void	lld_item_full_free(zbx_lld_item_full_t *item)
 	zbx_free(item->ssl_key_password);
 	zbx_free(item->ssl_key_password_orig);
 	zbx_free(item->trapper_hosts_orig);
+	zbx_free(item->formula);
 	zbx_free(item->formula_orig);
 	zbx_free(item->logtimefmt_orig);
 	zbx_free(item->publickey_orig);
@@ -246,6 +248,7 @@ void	lld_item_full_free(zbx_lld_item_full_t *item)
 	zbx_vector_db_tag_ptr_destroy(&item->override_tags);
 
 	zbx_sync_rowset_clear(&item->macro_paths);
+	zbx_sync_rowset_clear(&item->filters);
 
 	zbx_free(item);
 }
@@ -476,11 +479,7 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 			item->units_orig = NULL;
 
 			item->formula_orig = NULL;
-			if (0 != strcmp(row[10], item_prototype->formula))
-			{
-				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA;
-				item->formula_orig = zbx_strdup(NULL, row[10]);
-			}
+			item->formula = zbx_strdup(NULL, row[10]);
 
 			item->logtimefmt_orig = NULL;
 			if (0 != strcmp(row[11], item_prototype->logtimefmt))
@@ -672,6 +671,7 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 			zbx_vector_db_tag_ptr_create(&item->override_tags);
 
 			zbx_sync_rowset_init(&item->macro_paths, 2);
+			zbx_sync_rowset_init(&item->filters, 3);
 
 			zbx_vector_lld_item_full_ptr_append(items, item);
 		}
@@ -838,7 +838,6 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 	else
 	{
 		batch_index = 0;
-
 		while (batch_index < itemids.values_num)
 		{
 			sql_offset = 0;
@@ -867,6 +866,40 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 				item = items->values[index];
 
 				zbx_sync_rowset_add_row(&item->macro_paths, row[0], row[2], row[3]);
+			}
+
+			zbx_db_free_result(result);
+		}
+
+		batch_index = 0;
+		while (batch_index < itemids.values_num)
+		{
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"select item_conditionid,itemid,operator,macro,value"
+					" from item_condition"
+					" where");
+
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+
+			result = zbx_db_select("%s", sql);
+
+			while (NULL != (row = zbx_db_fetch(result)))
+			{
+				ZBX_STR2UINT64(itemid, row[1]);
+
+				zbx_lld_item_full_t	cmp = {.itemid = itemid};
+
+				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+						lld_item_full_compare_func)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				item = items->values[index];
+
+				zbx_sync_rowset_add_row(&item->filters, row[0], row[2], row[3], row[4]);
 			}
 
 			zbx_db_free_result(result);
@@ -1736,6 +1769,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->trapper_hosts_orig = NULL;
+	item->formula = zbx_strdup(NULL, item_prototype->formula);
 	item->formula_orig = NULL;
 	item->logtimefmt_orig = NULL;
 	item->publickey_orig = NULL;
@@ -1752,6 +1786,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	zbx_vector_db_tag_ptr_create(&item->item_tags);
 
 	zbx_sync_rowset_init(&item->macro_paths, 2);
+	zbx_sync_rowset_init(&item->filters, 3);
 
 	if (SUCCEED == ret && ZBX_PROTOTYPE_NO_DISCOVER != discover)
 		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -2658,7 +2693,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				(int)item_prototype->type, (int)item_prototype->value_type,
 				item->delay, item->history, item->trends,
 				(int)item->status, item_prototype->trapper_hosts, item->units,
-				item_prototype->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
+				item->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
 				item->params, item->ipmi_sensor, item->snmp_oid, (int)item_prototype->authtype,
 				item->username, item->password, item_prototype->publickey, item_prototype->privatekey,
 				item->description, item_prototype->interfaceid,
@@ -2800,11 +2835,11 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA))
 	{
-		value_esc = zbx_db_dyn_escape_string(item_prototype->formula);
+		value_esc = zbx_db_dyn_escape_string(item->formula);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sformula='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_formula(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-				(int)ZBX_FLAG_DISCOVERY_CREATED, item->formula_orig, item_prototype->formula);
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->formula_orig, item->formula);
 		zbx_free(value_esc);
 
 	}
@@ -4097,6 +4132,7 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 				lld_item_ref_key_compare_func);
 
 		zbx_sync_rowset_init(&item_prototype->macro_paths, 2);
+		zbx_sync_rowset_init(&item_prototype->filters, 3);
 
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);
 
@@ -4204,6 +4240,7 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 	else
 	{
 		lld_rule_get_prototype_macro_paths(item_prototypes, &protoids);
+		lld_rule_get_prototype_filters(item_prototypes, &protoids);
 	}
 out:
 	zbx_free(sql);
@@ -4377,6 +4414,15 @@ void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
 
 		zabbix_log(LOG_LEVEL_TRACE, "    lld_macro_pathid:" ZBX_FS_UI64 " lld_macro:%s path:%s",
 				row->rowid, row->cols[0], row->cols[1]);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  filters:");
+	for (int i = 0; i < item_prototype->filters.rows.values_num; i++)
+	{
+		zbx_sync_row_t	*row = item_prototype->filters.rows.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    item_conditionid:" ZBX_FS_UI64 " operator:%s macro:%s value:%s",
+				row->rowid, row->cols[0], row->cols[1], row->cols[2]);
 	}
 }
 

@@ -822,6 +822,12 @@ int	zbx_db_setting_exists(const char *config_name);
 
 /* rowset sync */
 
+#define ZBX_SYNC_ROW_NONE	0x00000000
+#define ZBX_SYNC_ROW_INSERT	0x40000000
+#define ZBX_SYNC_ROW_DELETE	0x80000000
+
+#define ZBX_SYNC_ROW_UPDATE	(~(ZBX_SYNC_ROW_INSERT | ZBX_SYNC_ROW_DELETE))
+
 typedef struct
 {
 	zbx_uint64_t	rowid;
@@ -829,7 +835,7 @@ typedef struct
 	char		**cols;
 	char		**cols_orig;
 	int		cols_num;
-	int		update_num;
+	zbx_uint64_t	flags;
 }
 zbx_sync_row_t;
 
