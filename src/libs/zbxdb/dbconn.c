@@ -1344,7 +1344,11 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	while (ZBX_DB_OK != (err = dbconn_open(db)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
+		{
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
 			break;
+		}
 
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
 		{
