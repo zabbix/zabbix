@@ -1,9 +1,21 @@
 Changes for 7.0.11rc1
 
 New features:
+.........T [ZBXNEXT-9271] added Azure MSSQL DTU database by HTTP template (abrosimovs)
+...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Zabbix Agent 2 Smart plugin (lsurvilo)
+.........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
+.........T [ZBX-25940] added namespace to Pod discovery rule in Kubernetes nodes by HTTP template (egordymov)
+...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
+..F....... [ZBX-25946] fixed special pattern removing from multiselect and pattern select fields (esekace)
+.........T [ZBX-25855] fixed CPU item in Ubiquiti AirOS by SNMP template (abrosimovs)
+..F....... [ZBX-25837] fixed global notification sound playback duration (esekace)
+........S. [ZBX-22617] enhanced Zabbix server performance by implementing parallel syncing of trends and avoiding range queries, resulting in faster shutdown times (vso)
+...G...... [ZBX-25798] fixed error with converting empty string to utf8 (MVekslers)
+........S. [ZBX-25365] fixed map elements deletion during LLD and action operations processing by Zabbix server (asestakovs)
 ........S. [ZBX-25706] updated macro substitution process to re-try resolving macros in item key parameters and macro context without double-quoting if quoting was not possible (asestakovs)
 ........S. [ZBX-25907] fixed auto registration with proxy group to specific proxy in same proxy group (wiper)
 .......PS. [ZBX-25860] prevented 06050165 upgrade patch from saving oversized escaped function parameters (arimdjonoks)
@@ -3403,8 +3415,14 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.40rc1
 
 New features:
+.........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
+...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
+.......PS. [ZBX-26109] fixed crash on HTTP checks with empty data (sboidenko)
+...G...... [ZBX-25798] fixed error with converting empty string to utf8 (MVekslers)
+........S. [ZBX-25365] fixed map elements deletion during LLD and action operations processing by Zabbix server (asestakovs)
 ....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
 .........T [ZBX-26029] added device retrieval loop errors exceptions handling to Meraki template (abiba)
 ..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
