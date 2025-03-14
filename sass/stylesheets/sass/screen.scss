@@ -3306,6 +3306,11 @@ svg {
 			max-width: $name-width + $drag-icon;
 			padding-left: 30px;
 		}
+
+		.step-on-fail {
+			@extend %overflow-ellipsis;
+			display: inline-block;
+		}
 	}
 
 	.preprocessing-list-foot {
@@ -3849,7 +3854,7 @@ z-select {
 }
 
 .modal-popup-preprocessing {
-	.preprocessing-list-head{
+	.preprocessing-list-head {
 		.step-name {
 			flex: 0 0 190px;
 		}

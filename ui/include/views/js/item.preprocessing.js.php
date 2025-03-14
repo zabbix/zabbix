@@ -57,13 +57,16 @@
 			]))->addClass('step-action')
 		]))->addClass('preprocessing-step'),
 		(new CDiv([
-			new CLabel(_('Custom on fail')),
-			(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]', ZBX_PREPROC_FAIL_DISCARD_VALUE))
-				->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
-				->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
-				->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
-				->setModern(true)
-				->setEnabled(false),
+			new CLabel(_('Custom on fail'), 'label-preprocessing-#{rowNum}-error-handler'),
+			(new CSelect('preprocessing[#{rowNum}][error_handler]'))
+				->setId('preprocessing-#{rowNum}-error-handler')
+				->setFocusableElementId('label-preprocessing-#{rowNum}-error-handler')
+				->setValue(ZBX_PREPROC_FAIL_DISCARD_VALUE)
+				->addOptions(CSelect::createOptionsFromArray([
+					ZBX_PREPROC_FAIL_DISCARD_VALUE => _('Discard value'),
+					ZBX_PREPROC_FAIL_SET_VALUE => _('Set value to'),
+					ZBX_PREPROC_FAIL_SET_ERROR => _('Set error to')
+				])),
 			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
 				->setEnabled(false)
 				->addStyle('display: none;')
@@ -568,15 +571,19 @@
 				var $on_fail_options = $(this).closest('.preprocessing-list-item').find('.on-fail-options');
 
 				if ($(this).is(':checked')) {
-					$on_fail_options.find('input').prop('disabled', false);
+					$on_fail_options
+						.find('z-select[name*="[error_handler]"], input[name*="error_handler_params"]')
+						.prop('disabled', false);
 					$on_fail_options.show();
 				}
 				else {
-					$on_fail_options.find('input').prop('disabled', true);
+					$on_fail_options
+						.find('z-select[name*="[error_handler]"], input[name*="error_handler_params"]')
+						.prop('disabled', true);
 					$on_fail_options.hide();
 				}
 			})
-			.on('change', 'input[name*="error_handler]"]', function() {
+			.on('change', 'z-select[name*="[error_handler]"]', function() {
 				var error_handler = $(this).val(),
 					$error_handler_params = $(this).closest('.on-fail-options').find('[name*="error_handler_params"]');
 
