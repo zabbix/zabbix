@@ -822,4 +822,14 @@ class CElement extends CBaseElement implements IWaitable {
 
 		return $this;
 	}
+
+	/**
+	 * Moves the mouse to the element.
+	 */
+	public function moveMouse() {
+		$actions = new WebDriverActions(CElementQuery::getDriver());
+		$actions->moveToElement($this)->perform();
+
+		return $this;
+	}
 }

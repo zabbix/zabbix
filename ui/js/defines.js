@@ -27,6 +27,7 @@ const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 const ZBX_STYLE_BTN = 'btn';
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';
+const ZBX_STYLE_BTN_GREY_ICON = 'btn-grey-icon';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
