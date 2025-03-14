@@ -1345,8 +1345,10 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	{
 		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
 		{
+#if defined(HAVE_POSTGRESQL)
 			if (ZBX_DB_RONLY == err)
 				err = ZBX_DB_DOWN;
+#endif
 			break;
 		}
 
@@ -1356,6 +1358,7 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 			exit(EXIT_FAILURE);
 		}
 
+#if defined(HAVE_POSTGRESQL)
 		if (ZBX_DB_RONLY == err)
 		{
 			if (0 == db->config->read_only_recoverable && 0 >= retries--)
@@ -1368,7 +1371,10 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 					ZBX_DB_WAIT_DOWN);
 		}
 		else
+#endif
+		{
 			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
 
 		db->connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
