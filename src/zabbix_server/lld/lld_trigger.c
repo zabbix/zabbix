@@ -939,7 +939,7 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
  *             items              - [OUT] sorted list of items                *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
+static void	lld_trigger_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
 		zbx_vector_lld_item_ptr_t *items)
 {
 	zbx_db_result_t		result;
@@ -3858,7 +3858,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_functions_get(&trigger_prototypes, &triggers);
 	lld_dependencies_get(&trigger_prototypes, &triggers);
 	lld_tags_get(&trigger_prototypes, &triggers);
-	lld_items_get(&trigger_prototypes, &items);
+	lld_trigger_items_get(&trigger_prototypes, &items);
 
 	/* simplifying trigger expressions */
 

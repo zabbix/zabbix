@@ -462,7 +462,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
  *             items             - [OUT] sorted list of items                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_uint64_t ymin_itemid_proto,
+static void	lld_graph_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_uint64_t ymin_itemid_proto,
 		zbx_uint64_t ymax_itemid_proto, zbx_vector_lld_item_ptr_t *items)
 {
 	zbx_db_result_t		result;
@@ -1620,7 +1620,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 
 		lld_gitems_get(parent_graphid, &gitems_proto, &graphs);
 
-		lld_items_get(&gitems_proto, ymin_itemid_proto, ymax_itemid_proto, &items);
+		lld_graph_items_get(&gitems_proto, ymin_itemid_proto, ymax_itemid_proto, &items);
 
 		/* making graphs */
 
