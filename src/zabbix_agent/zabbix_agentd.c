@@ -1326,17 +1326,16 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 {
 #ifdef _WINDOWS
 	ZBX_UNUSED(on_exit_args);
-#endif
-
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-#ifndef _WINDOWS
+#else
 	if (LOG_TYPE_FILE == CONFIG_LOG_TYPE)
 	{
 		zbx_log_lock();
 		zbx_redirect_stdio(CONFIG_LOG_FILE);
 		zbx_log_unlock();
 	}
-
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+#ifndef _WINDOWS
 	if (NULL != on_exit_args)
 	{
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
