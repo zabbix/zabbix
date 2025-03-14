@@ -238,7 +238,7 @@ window.template_edit_popup = new class {
 	}
 
 	clone() {
-		const parameters = this.form.getAllValues();
+		const parameters = this.#trimFields(this.form.getAllValues());
 
 		parameters.clone = 1;
 		parameters.templateid = this.templateid;
@@ -267,6 +267,7 @@ window.template_edit_popup = new class {
 
 	submit() {
 		const fields = this.form.getAllValues();
+		this.#trimFields(fields);
 
 		if (this.templateid !== null) {
 			fields.templateid = this.templateid;
@@ -288,6 +289,49 @@ window.template_edit_popup = new class {
 
 				this.#post(curl.getUrl(), fields);
 			});
+	}
+
+	#trimFields(fields) {
+		// Trim all string fields.
+		for (let key in fields) {
+			if (typeof fields[key] === 'string') {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		// Trim tag input fields.
+		if ('tags' in fields) {
+			for (const key in fields.tags) {
+				const tag = fields.tags[key];
+				tag.tag = tag.tag.trim();
+
+				if ('name' in tag) {
+					tag.name = tag.name.trim();
+				}
+				if ('value' in tag) {
+					tag.value = tag.value.trim();
+				}
+
+				delete tag.automatic;
+			}
+		}
+
+		// Trim macro input fields.
+		if ('macros' in fields) {
+			for (const key in fields.macros) {
+				const macro = fields.macros[key];
+				macro.macro = macro.macro.trim();
+
+				if ('value' in macro) {
+					macro.value = macro.value.trim();
+				}
+				if ('description' in macro) {
+					macro.description = macro.description.trim();
+				}
+			}
+		}
+
+		return fields;
 	}
 
 	/**
