@@ -20,6 +20,7 @@
  */
 
 $this->includeJsFile('graph.list.js.php');
+$this->addJsFile('colorpicker.js');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Graphs'))
@@ -176,7 +177,12 @@ foreach ($data['graphs'] as $graph) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = new CLink($graph['name'], $url);
+	$name[] = new CLink($graph['name'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'graph.edit')
+		->setArgument('graphid', $graph['graphid'])
+		->setArgument('context', $data['context'])
+	);
 
 	$info_icons = [];
 

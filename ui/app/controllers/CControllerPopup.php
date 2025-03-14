@@ -43,6 +43,7 @@ class CControllerPopup extends CController {
 			'connector.edit' => _('Connector edit'),
 			'correlation.edit' => _('Correlation edit'),
 			'discovery.edit' => _('Discovery rule edit'),
+			'graph.edit' => _('Graph edit'),
 			'host.edit' => _('Host edit'),
 			'hostgroup.edit' => _('Host group edit'),
 			'item.edit' => _('Item edit'),

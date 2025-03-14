@@ -1,0 +1,340 @@
+<?php declare(strict_types = 0);
+/*
+** Copyright (C) 2001-2025 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+require_once __DIR__ .'/../../include/forms.inc.php';
+
+class CControllerGraphPrototypeEdit extends CController {
+
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
+	// todo - add all necessarry code from graphs.php
+
+	protected function checkInput(): bool {
+		$fields = [
+			'context' =>			'in '.implode(',', ['host', 'template']),
+			'hostid' =>				'id',
+			'parent_discoveryid'=>	'id',
+			'graphid' =>			'db graphs.graphid',
+			'name' =>				'string',
+			'width' =>				'db graphs.width|ge 20|le 65535',
+			'height' => 			'db graphs.height|ge 20|le 65535',
+			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
+				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
+			]),
+			'show_legend' =>		'db graphs.show_legend|in 0,1',
+			'show_3d' =>			'db graphs.show_3d|in 0,1',
+			'show_work_period' =>	'db graphs.show_work_period|in 0,1',
+			'show_triggers' =>		'db graphs.show_triggers|in 0,1',
+
+			// todo - add validation for BETWEEN_DBL(0, 100, 4) - no more than 4 digits after decimal point:
+			'percent_left' =>		'db graphs.perecent_left|ge 0|le 100',
+
+			// todo - add validation for BETWEEN_DBL(0, 100, 4) - no more than 4 digits after decimal point:
+			'percent_right' =>		'db graphs.perecent_right|ge 0|le 100',
+
+			'ymin_type' =>			'db graphs.ymin_type|in '.implode(',', [
+				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
+			]),
+			'ymax_type' =>			'db graphs.ymax_type|in '.implode(',', [
+				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
+			]),
+
+			// todo - update validation - these two only if graphtype GRAPH_TYPE_NORMAL or GRAPH_TYPE_STACKED
+			'yaxismin' =>			'db graphs.yaxis_min',
+			'yaxismax' =>			'db graphs.yaxis_ax',
+
+			// todo - update validation - this only when ymin_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
+			'ymin_itemid' =>		'db graphs.ymin_itemid',
+
+			// todo - update validation - this only when ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
+			'ymax_itemid' =>		'db graphs.ymax_itemid',
+			'items' =>				'array',
+			'discover' =>			'in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])
+		];
+
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		// todo - check. looks like this has to be in graph edit, but double check.
+		$discovery_rule = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid'],
+			'itemids' => $this->getInput('parent_discoveryid'),
+			'editable' => true
+		]);
+
+		if (!$discovery_rule) {
+			return false;
+		}
+
+		$this->hostid = $discovery_rule['hostid'];
+		$this->discovery_rule = reset($discovery_rule);
+
+		if ($this->hostid && !isWritableHostTemplates([$this->hostid])) {
+			return false;
+		}
+
+		// check whether graph prototype is editable by user
+		if ($this->getInput('graphid')) {
+			$graphPrototype = (bool) API::GraphPrototype()->get([
+				'output' => [],
+				'graphids' => $this->getInput('graphid'),
+				'editable' => true
+			]);
+
+			if (!$graphPrototype) {
+				return false;
+			}
+		}
+
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	}
+
+	protected function doAction() {
+		// todo - check if this is necessary:
+		$gitems = [];
+
+		foreach ($this->getInput('items', []) as $gitem) {
+			if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+				$gitems[] = $gitem;
+			}
+		}
+
+		// todo - ???
+		$_REQUEST['show_3d'] = $this->getInput('show_3d', 0);
+		$_REQUEST['show_legend'] = $this->getInput('show_legend', 0);
+
+		$data = [
+			'graphid' => $this->getInput('graphid', 0),
+			'parent_discoveryid' => $this->hasInput('parent_discoveryid') ? $this->getInput('parent_discoveryid') : null,
+			// todo - check this param:
+			'group_gid' => $this->getInput('group_gid', []),
+			'hostid' => $this->hostid,
+			'context' => $this->getInput('context')
+			// todo - check this param:
+			//'normal_only' => $this->getInput('normal_only'),
+			//'readonly' => $this->getInput('readonly', 0)
+		];
+
+		// todo - add check - if readonly:
+		if ($data['graphid'] != 0) {
+			$options = [
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => ['hostid'],
+				'graphids' => $data['graphid']
+			];
+
+			$graph = API::GraphPrototype()->get($options);
+			$graph = reset($graph);
+
+			// todo - check if this can be written shorter:
+			$data['name'] = $graph['name'];
+			$data['width'] = $graph['width'];
+			$data['height'] = $graph['height'];
+			$data['ymin_type'] = $graph['ymin_type'];
+			$data['ymax_type'] = $graph['ymax_type'];
+			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
+			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
+			$data['ymin_itemid'] = $graph['ymin_itemid'];
+			$data['ymax_itemid'] = $graph['ymax_itemid'];
+			$data['show_work_period'] = $graph['show_work_period'];
+			$data['show_triggers'] = $graph['show_triggers'];
+			$data['graphtype'] = $graph['graphtype'];
+			$data['show_legend'] = $graph['show_legend'];
+			$data['show_3d'] = $graph['show_3d'];
+			$data['percent_left'] = $graph['percent_left'];
+			$data['percent_right'] = $graph['percent_right'];
+			$data['templateid'] = $graph['templateid'];
+			$data['templates'] = [];
+			$data['discover'] = $graph['discover'];
+
+			// if no host has been selected for the navigation panel, use the first graph host
+			if ($data['hostid'] == 0) {
+				$host = reset($graph['hosts']);
+				$data['hostid'] = $host['hostid'];
+			}
+
+			// templates
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
+				$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
+
+			// items
+			$data['items'] = API::GraphItem()->get([
+				'output' => [
+					'gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color', 'sortorder'
+				],
+				'graphids' => $data['graphid'],
+				'sortfield' => 'gitemid'
+			]);
+		}
+		else {
+			$data['name'] = $this->getInput('name', '');
+			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
+
+			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$data['width'] = $this->getInput('width', 400);
+				$data['height'] = $this->getInput('height', 300);
+			}
+			else {
+				$data['width'] = $this->getInput('width', 900);
+				$data['height'] = $this->getInput('height', 200);
+			}
+
+			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['yaxismin'] = $this->getInput('yaxismin', 0);
+			$data['yaxismax'] = $this->getInput('yaxismax', 100);
+			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
+			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
+			$data['show_work_period'] = $this->getInput('show_work_period', 1);
+			$data['show_triggers'] = $this->getInput('show_triggers', 1);
+			$data['show_legend'] = $this->getInput('show_legend', 1);
+			$data['show_3d'] = $this->getInput('show_3d', 0);
+			$data['visible'] = $this->getInput('visible', []);
+			$data['percent_left'] = 0;
+			$data['percent_right'] = 0;
+			$data['items'] = $gitems;
+			$data['discover'] = $this->getInput('discover', DB::getDefault('graphs', 'discover'));
+			$data['templates'] = [];
+
+			if (array_key_exists('percent_left', $data['visible'])) {
+				$data['percent_left'] = $this->getInput('percent_left', 0);
+			}
+			if (array_key_exists('percent_right', $data['visible'])) {
+				$data['percent_right'] = $this->getInput('percent_right', 0);
+			}
+		}
+
+		if ($data['ymax_itemid'] || $data['ymin_itemid']) {
+			$options = [
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'selectHosts' => ['name'],
+				'itemids' => [$data['ymax_itemid'], $data['ymin_itemid']],
+				'webitems' => true,
+				'preservekeys' => true
+			];
+
+			$items = API::Item()->get($options) + API::ItemPrototype()->get($options);
+			$data['yaxis_items'] = $items;
+
+			unset($items);
+		}
+
+		// items
+		if ($data['items']) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'flags'],
+				'selectHosts' => ['hostid', 'name'],
+				'itemids' => array_column($data['items'], 'itemid'),
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				],
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+
+			if ($items) {
+				foreach ($data['items'] as &$item) {
+					$host = reset($items[$item['itemid']]['hosts']);
+
+					$item['host'] = $host['name'];
+					$item['hostid'] = $items[$item['itemid']]['hostid'];
+					$item['name'] = $items[$item['itemid']]['name'];
+					$item['flags'] = $items[$item['itemid']]['flags'];
+				}
+				unset($item);
+			}
+		}
+
+		// Set ymin_item_name.
+		$data['ymin_item_name'] = '';
+		$data['ymax_item_name'] = '';
+
+		if ($data['ymin_itemid'] != 0 || $data['ymax_itemid'] != 0) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'name'],
+				'selectHosts' => ['name'],
+				'itemids' => array_filter([$data['ymin_itemid'], $data['ymax_itemid']]),
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				],
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+
+			if ($data['ymin_itemid'] != 0 && array_key_exists($data['ymin_itemid'], $items)) {
+				$item = $items[$data['ymin_itemid']];
+				$data['ymin_item_name'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
+			}
+
+			if ($data['ymax_itemid'] != 0 && array_key_exists($data['ymax_itemid'], $items)) {
+				$item = $items[$data['ymax_itemid']];
+				$data['ymax_item_name'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
+			}
+		}
+
+		$data['items'] = array_values($data['items']);
+		$item_count = count($data['items']);
+
+		// todo - double check this part:
+		for ($i = 0; $i < $item_count - 1;) {
+			// Check if we delete an item.
+			$next = $i + 1;
+			while (!isset($data['items'][$next]) && $next < ($item_count - 1)) {
+				$next++;
+			}
+
+			if ($data['items'][$next] && $data['items'][$i]['sortorder'] == $data['items'][$next]['sortorder']) {
+				for ($j = $next; $j < $item_count; $j++) {
+					if ($data['items'][$j - 1]['sortorder'] >= $data['items'][$j]['sortorder']) {
+						$data['items'][$j]['sortorder']++;
+					}
+				}
+			}
+
+			$i = $next;
+		}
+		CArrayHelper::sort($data['items'], ['sortorder']);
+
+		$data += [
+			'items' => array_values($data['items']),
+			'is_template' => $data['hostid'] == 0 ? false : isTemplate($data['hostid']),
+			'user' => ['debug_mode' => $this->getDebugMode()]
+		];
+
+		$response = new CControllerResponseData($data);
+		$this->setResponse($response);
+	}
+}

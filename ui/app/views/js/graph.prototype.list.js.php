@@ -33,6 +33,13 @@
 		}
 
 		#initActions() {
+			document.getElementById('js-create')?.addEventListener('click', e => {
+				ZABBIX.PopupManager.open('graph.prototype.edit', {
+					parent_discoveryid: e.target.dataset.parent_discoveryid,
+					context: this.context
+				});
+			});
+
 			const copy = document.querySelector('.js-copy');
 
 			if (copy !== null) {

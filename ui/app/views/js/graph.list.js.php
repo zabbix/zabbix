@@ -27,12 +27,18 @@
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 			this.form = document.forms[form_name];
+			// todo - check if needed:
+			this.token = token;
 
 			this.#initActions();
 			this.#initPopupListeners();
 		}
 
 		#initActions() {
+			document.getElementById('js-create')?.addEventListener('click', e => {
+				ZABBIX.PopupManager.open('graph.edit', {hostid: e.target.dataset.hostid, context: this.context});
+			});
+
 			const copy = document.querySelector('.js-copy');
 
 			if (copy !== null) {

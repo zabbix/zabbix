@@ -20,6 +20,7 @@
  */
 
 $this->includeJsFile('graph.prototype.list.js.php');
+$this->addJsFile('colorpicker.js');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Graph prototypes'))
@@ -31,13 +32,9 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					// todo - update this when form moved to popup:
-					new CRedirectButton(_('Create graph prototype'),
-						(new CUrl('graphs.php'))
-							->setArgument('form', 'create')
-							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-							->setArgument('context', $data['context'])
-					)
+					(new CSimpleButton(_('Create graph prototype')))
+						->setId('js-create')
+						->setAttribute('data-parent_discoveryid',$data['parent_discoveryid'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -106,7 +103,13 @@ foreach ($data['graphs'] as $graph) {
 		makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			$data['allowed_ui_conf_templates']
 		),
-		new CLink($graph['name'], $url)
+		new CLink($graph['name'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'graph.prototype.edit')
+			->setArgument('context', $data['context'])
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('graphid', $graphid)
+		)
 	];
 
 	$nodiscover = ($graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
