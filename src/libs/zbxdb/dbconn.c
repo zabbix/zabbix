@@ -1358,7 +1358,7 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 
 		if (ZBX_DB_RONLY == err)
 		{
-			if (0 == db->config->read_only_recoverable && 0 >= --retries)
+			if (0 == db->config->read_only_recoverable && 0 >= retries--)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
 				exit(EXIT_FAILURE);
