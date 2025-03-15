@@ -36,10 +36,44 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 		err      error
 	}{
 		{
-			"+emptyParams",
+			"+allOptionalParamsEmpty",
+			[]string{
+				"",
+				"example.com",
+				"",
+				"",
+				"",
+				"",
+				"",
+			},
+			false,
+			&dnsGetOptions{
+				options{
+					"127.0.0.53:53",
+					"example.com",
+					udpProtocol,
+					dns.TypeSOA,
+					defaultCount,
+					time.Second,
+				},
+				map[string]bool{
+					"aaflag": false,
+					"adflag": false,
+					"cdflag": false,
+					"dnssec": false,
+					"edns0":  true,
+					"nsid":   false,
+					"rdflag": true,
+				},
+			},
+			nil,
+		},
+
+		{
+			"+emptyParamsRecordTypeDNSServerSpecified",
 			[]string{
 				"1.1.1.1",
-				"_nonexistant__.example.com",
+				"example.com",
 				"A",
 				"",
 				"",
@@ -50,7 +84,7 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			&dnsGetOptions{
 				options{
 					"1.1.1.1:53",
-					"_nonexistant__.example.com",
+					"example.com",
 					udpProtocol,
 					dns.TypeA,
 					defaultCount,
@@ -69,17 +103,17 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			nil,
 		},
 		{
-			"+paramsNotSpecified",
+			"+paramsNotSpecifiedAfterRecordType",
 			[]string{
 				"1.1.1.1",
-				"_nonexistant__.example.com",
+				"example.com",
 				"A",
 			},
 			false,
 			&dnsGetOptions{
 				options{
 					"1.1.1.1:53",
-					"_nonexistant__.example.com",
+					"example.com",
 					udpProtocol,
 					dns.TypeA,
 					defaultCount,
@@ -101,7 +135,7 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			"+paramsEmptyButFlagsSpecified",
 			[]string{
 				"1.1.1.1",
-				"_nonexistant__.example.com",
+				"example.com",
 				"A",
 				"",
 				"",
@@ -112,7 +146,7 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			&dnsGetOptions{
 				options{
 					"1.1.1.1:53",
-					"_nonexistant__.example.com",
+					"example.com",
 					udpProtocol,
 					dns.TypeA,
 					defaultCount,
@@ -134,7 +168,7 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			"+paramsEmptyAllFlagsNegative",
 			[]string{
 				"1.1.1.1",
-				"_nonexistant__.example.com",
+				"example.com",
 				"A",
 				"",
 				"",
@@ -145,7 +179,7 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			&dnsGetOptions{
 				options{
 					"1.1.1.1:53",
-					"_nonexistant__.example.com",
+					"example.com",
 					udpProtocol,
 					dns.TypeA,
 					defaultCount,
@@ -163,12 +197,11 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			},
 			nil,
 		},
-
 		{
 			"-tooManyParams",
 			[]string{
 				"1.1.1.1",
-				"_nonexistant__.example.com",
+				"example.com",
 				"A",
 				"",
 				"",
