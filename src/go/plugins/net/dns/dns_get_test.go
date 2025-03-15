@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/miekg/dns"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -230,9 +231,9 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 				t.Fatalf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
 			}
 
-			if fmt.Sprint(tt.result) != fmt.Sprint(res) {
-				t.Errorf("\nExpected options: ->%v<-\nFor input flags: ->%s<-\nBut received: ->%v<-\n",
-					tt.result, tt.paramsIn, res)
+			diff := cmp.Diff(tt.result, res, cmp.AllowUnexported(dnsGetOptions{}, options{}))
+			if diff != "" {
+				t.Fatalf("ValidateOptions() result mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
