@@ -1724,7 +1724,7 @@ static int	DBpatch_2010195(void)
 	{
 		key = zbx_strdup(key, row[1]);
 
-		if (SUCCEED != zbx_replace_key_param_dyn(&key, ZBX_KEY_TYPE_ITEM, DBpatch_2010195_replace_key_param_cb,
+		if (SUCCEED != zbx_replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, DBpatch_2010195_replace_key_param_cb,
 				NULL, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
