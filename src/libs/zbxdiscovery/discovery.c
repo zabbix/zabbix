@@ -229,7 +229,7 @@ zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vect
 	return data_len;
 }
 
-void zbx_stats_ext_get_data_discovery(struct zbx_json *json, const void *arg)
+void zbx_discovery_stats_ext_get_data(struct zbx_json *json, const void *arg)
 {
 	zbx_uint64_t	size;
 

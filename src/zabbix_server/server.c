@@ -2526,10 +2526,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_preproc, NULL);
-	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_discovery, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
-	zbx_register_stats_ext_get_func(zbx_stats_ext_get_vmware, NULL);
+	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_stats_procinfo_preprocessor);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_stats_procinfo_discovery);
 	zbx_diag_init(diag_add_section_info_server);
