@@ -172,6 +172,21 @@ ZBX_PTR_VECTOR_DECL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
 
 typedef struct
 {
+	zbx_uint64_t		overrideid;
+	zbx_sync_rowset_t	conditions;
+	zbx_sync_rowset_t	operations;
+	zbx_sync_rowset_t	optags;
+	zbx_sync_rowset_t	optemplates;
+}
+zbx_lld_override_sync_t;
+
+ZBX_PTR_VECTOR_DECL(lld_override_sync_ptr, zbx_lld_override_sync_t *)
+
+void	lld_override_sync_free(zbx_lld_override_sync_t *sync);
+int	lld_override_sync_compare(const void *v1, const void *v2);
+
+typedef struct
+{
 	zbx_uint64_t				itemid;
 	zbx_uint64_t				valuemapid;
 	zbx_uint64_t				interfaceid;
@@ -233,6 +248,8 @@ typedef struct
 
 	zbx_sync_rowset_t			macro_paths;
 	zbx_sync_rowset_t                       filters;
+	zbx_sync_rowset_t			overrides;
+	zbx_vector_lld_override_sync_ptr_t	override_sync;
 }
 zbx_lld_item_prototype_t;
 
@@ -385,6 +402,8 @@ struct zbx_lld_item_full_s
 
 	zbx_sync_rowset_t			macro_paths;
 	zbx_sync_rowset_t			filters;
+	zbx_sync_rowset_t			overrides;
+	zbx_vector_lld_override_sync_ptr_t	override_sync;
 };
 
 int	lld_item_full_compare_func(const void *d1, const void *d2);
@@ -549,4 +568,7 @@ void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *ite
 		zbx_vector_uint64_t *protoids);
 void	lld_rule_get_prototype_filters(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		zbx_vector_uint64_t *protoids);
+void	lld_rule_get_prototype_overrides(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids);
+
 #endif

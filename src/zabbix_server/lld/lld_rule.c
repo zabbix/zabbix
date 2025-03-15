@@ -20,6 +20,8 @@
 #include "audit/zbxaudit_item.h"
 #include "zbxdbhigh.h"
 
+ZBX_PTR_VECTOR_IMPL(lld_override_sync_ptr, zbx_lld_override_sync_t *)
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -487,7 +489,7 @@ static void	lld_rule_filters_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 		}
 	}
 
-	if (0 == new_num)
+	if (0 != new_num)
 	{
 		zbx_uint64_t	new_conditionid = zbx_db_get_maxid_num("item_condition", new_num);
 
@@ -906,6 +908,241 @@ void	lld_rule_get_prototype_filters(zbx_vector_lld_item_prototype_ptr_t *item_pr
 		zbx_sync_rowset_add_row(&item_prototypes->values[index]->filters, row[0], row[2], row[3], row[4]);
 	}
 	zbx_db_free_result(result);
+}
+
+static zbx_lld_override_sync_t *lld_override_sync_create(zbx_uint64_t overrideid)
+{
+	zbx_lld_override_sync_t	*sync;
+
+	sync = (zbx_lld_override_sync_t *)zbx_malloc(NULL, sizeof(zbx_lld_override_sync_t));
+
+	sync->overrideid = overrideid;
+	zbx_sync_rowset_init(&sync->conditions, 3);
+	zbx_sync_rowset_init(&sync->operations, 10);
+	zbx_sync_rowset_init(&sync->optags, 3);
+	zbx_sync_rowset_init(&sync->optemplates, 2);
+
+	return sync;
+}
+
+void	lld_override_sync_free(zbx_lld_override_sync_t *sync)
+{
+	zbx_sync_rowset_clear(&sync->conditions);
+	zbx_sync_rowset_clear(&sync->operations);
+	zbx_sync_rowset_clear(&sync->optags);
+	zbx_sync_rowset_clear(&sync->optemplates);
+
+	zbx_free(sync);
+}
+
+int	lld_override_sync_compare(const void *v1, const void *v2)
+{
+	const zbx_lld_override_sync_t        *sync1 = *(const zbx_lld_override_sync_t * const *)v1;
+	const zbx_lld_override_sync_t        *sync2 = *(const zbx_lld_override_sync_t * const *)v2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(sync1->overrideid, sync2->overrideid);
+
+	return 0;
+}
+
+void	lld_rule_get_prototype_overrides(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids)
+{
+
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t			overrideids;
+	zbx_uint64_t				overrideid;
+	zbx_vector_lld_override_sync_ptr_t	overrides;
+
+	zbx_vector_uint64_create(&overrideids);
+	zbx_vector_lld_override_sync_ptr_create(&overrides);
+
+	/* fetch overrides */
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_overrideid,itemid,name,step,stop,evaltype,formula"
+			" from lld_override where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids->values, protoids->values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_item_prototype_t	item_prototype_local;
+		int				index;
+		zbx_lld_override_sync_t		*sync;
+
+		ZBX_STR2UINT64(item_prototype_local.itemid, row[1]);
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		ZBX_STR2UINT64(overrideid, row[0]);
+		sync = lld_override_sync_create(overrideid);
+		zbx_vector_lld_override_sync_ptr_append(&item_prototypes->values[index]->override_sync, sync);
+		zbx_vector_lld_override_sync_ptr_append(&overrides, sync);
+
+		zbx_sync_rowset_add_row(&item_prototypes->values[index]->overrides, row[0], row[2], row[3], row[4],
+				row[5], row[6]);
+
+		zbx_vector_uint64_append(&overrideids, overrideid);
+	}
+	zbx_db_free_result(result);
+
+	if (0 == overrideids.values_num)
+		goto out;
+
+	zbx_vector_uint64_sort(&overrideids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_lld_override_sync_ptr_sort(&overrides, lld_override_sync_compare);
+
+	/* fetch override conditions */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_override_conditionid,lld_overrideid,operator,"
+			"macro,value from lld_override_condition where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_overrideid", overrideids.values,
+			overrideids.values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_override_sync_t	override_local;
+		int			index;
+
+		ZBX_STR2UINT64(override_local.overrideid, row[1]);
+		if (FAIL == (index = zbx_vector_lld_override_sync_ptr_bsearch(&overrides, &override_local,
+				lld_override_sync_compare)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&overrides.values[index]->conditions, row[0], row[2], row[3], row[4]);
+	}
+	zbx_db_free_result(result);
+
+	/* fetch override operations */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select o.lld_override_operationid,o.lld_overrideid,o.operationobject,o.operator,o.value,"
+				"od.discover,oh.history,oi.inventory_mode,op.delay,os.severity,ost.status,ot.trends"
+			" from lld_override_operation o"
+				" left join lld_override_opdiscover od"
+					" on o.lld_override_operationid=od.lld_override_operationid"
+				" left join lld_override_ophistory oh"
+					" on o.lld_override_operationid=oh.lld_override_operationid"
+				" left join lld_override_opinventory oi"
+					" on o.lld_override_operationid=oi.lld_override_operationid"
+				" left join lld_override_opperiod op"
+					" on o.lld_override_operationid=op.lld_override_operationid"
+				" left join lld_override_opseverity os"
+					" on o.lld_override_operationid=os.lld_override_operationid"
+				" left join lld_override_opstatus ost"
+					" on o.lld_override_operationid=ost.lld_override_operationid"
+				" left join lld_override_optrends ot"
+					" on o.lld_override_operationid=ot.lld_override_operationid"
+			" where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_overrideid", overrideids.values,
+			overrideids.values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_override_sync_t	override_local;
+		int			index;
+
+		ZBX_STR2UINT64(override_local.overrideid, row[1]);
+		if (FAIL == (index = zbx_vector_lld_override_sync_ptr_bsearch(&overrides, &override_local,
+				lld_override_sync_compare)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&overrides.values[index]->operations, row[0], row[2], row[3], row[4], row[5],
+				row[6], row[7], row[8], row[9], row[10], row[11]);
+	}
+	zbx_db_free_result(result);
+
+	/* fetch operation tags */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ot.lld_override_optagid,o.lld_overrideid,ot.lld_override_operationid,ot.tag,ot.value"
+			" from lld_override_operation o"
+				" join lld_override_optag ot"
+					" on o.lld_override_operationid=ot.lld_override_operationid"
+			" where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "o.lld_overrideid", overrideids.values,
+			overrideids.values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_override_sync_t	override_local;
+		int			index;
+
+		ZBX_STR2UINT64(override_local.overrideid, row[1]);
+		if (FAIL == (index = zbx_vector_lld_override_sync_ptr_bsearch(&overrides, &override_local,
+				lld_override_sync_compare)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&overrides.values[index]->optags, row[0], row[2], row[3], row[4]);
+	}
+	zbx_db_free_result(result);
+
+	/* fetch operation templates */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ot.lld_override_optagid,o.lld_overrideid,ot.lld_override_operationid,ot.templateid"
+			" from lld_override_operation o"
+				" join lld_override_optemplate ot"
+					" on o.lld_override_operationid=ot.lld_override_operationid"
+			" where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "o.lld_overrideid", overrideids.values,
+			overrideids.values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_override_sync_t	override_local;
+		int			index;
+
+		ZBX_STR2UINT64(override_local.overrideid, row[1]);
+		if (FAIL == (index = zbx_vector_lld_override_sync_ptr_bsearch(&overrides, &override_local,
+				lld_override_sync_compare)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&overrides.values[index]->optemplates, row[0], row[2], row[3]);
+	}
+	zbx_db_free_result(result);
+out:
+	zbx_free(sql);
+	zbx_vector_lld_override_sync_ptr_destroy(&overrides);
+	zbx_vector_uint64_destroy(&overrideids);
+
 }
 
 int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,

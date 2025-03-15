@@ -102,6 +102,22 @@ void	sync_list_remove(zbx_sync_list_t *list, zbx_sync_node_t *node)
 	zbx_free(node);
 }
 
+static int	strcmp_null(const char *s1, const char *s2)
+{
+	if (NULL == s1)
+	{
+		if (NULL != s2)
+			return -1;
+		else
+			return 0;
+	}
+
+	if (NULL == s2)
+		return 1;
+
+	return strcmp(s1, s2);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compare two rows                                                  *
@@ -125,9 +141,9 @@ static int	sync_row_compare(const void *d1, const void *d2)
 
 	for (int i = 0; i < row1->cols_num; i++)
 	{
-		int	ret = strcmp(row1->cols[i], row2->cols[i]);
+		int	ret;
 
-		if (0 != ret)
+		if (0 != (ret = strcmp_null(row2->cols[i], row2->cols[i])))
 		{
 			if (0 > ret)
 				return i - row1->cols_num;
@@ -342,7 +358,7 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 
 		for (int i = dst->row->cols_num - 1; i >= dst->row->cols_num - match_level; i--)
 		{
-			if (i == match_level || 0 != strcmp(dst->row->cols[i], src->row->cols[i]))
+			if (i == match_level || 0 != strcmp_null(dst->row->cols[i], src->row->cols[i]))
 			{
 				dst->row->cols_orig[i] = dst->row->cols[i];
 				dst->row->cols[i] = zbx_strdup(NULL, src->row->cols[i]);
