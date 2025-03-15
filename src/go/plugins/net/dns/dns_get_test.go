@@ -17,6 +17,7 @@ package dns
 import (
 	"errors"
 	"fmt"
+	"net"
 	"reflect"
 	"testing"
 	"time"
@@ -27,6 +28,8 @@ import (
 )
 
 func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
+	dnsConfig, _ := dns.ClientConfigFromFile("/etc/resolv.conf")
+
 	t.Parallel()
 
 	tests := []struct {
@@ -50,7 +53,7 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 			false,
 			&dnsGetOptions{
 				options{
-					"127.0.0.53:53",
+					net.JoinHostPort(dnsConfig.Servers[0], dnsConfig.Port),
 					"example.com",
 					udpProtocol,
 					dns.TypeSOA,
