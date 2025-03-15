@@ -69,7 +69,7 @@ void	zbx_register_stats_ext_get_data_func(zbx_zabbix_stats_ext_get_data_func_t s
 {
 	zbx_stats_ext_get_data_func_entry_t	*entry;
 
-	entry = (zbx_stats_ext_get_data_func_entry_t *)zbx_malloc(NULL, sizeof(zbx_stats_ext_get_func_entry_t));
+	entry = (zbx_stats_ext_get_data_func_entry_t *)zbx_malloc(NULL, sizeof(zbx_stats_ext_get_data_func_entry_t));
 	entry->arg = arg;
 	entry->stats_ext_get_data_cb = stats_ext_get_data_cb;
 
