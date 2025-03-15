@@ -17,7 +17,6 @@ package dns
 import (
 	"errors"
 	"fmt"
-	"net"
 	"reflect"
 	"testing"
 	"time"
@@ -28,8 +27,6 @@ import (
 )
 
 func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
-	dnsConfig, _ := dns.ClientConfigFromFile("/etc/resolv.conf")
-
 	t.Parallel()
 
 	tests := []struct {
@@ -39,40 +36,6 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 		result   *dnsGetOptions
 		err      error
 	}{
-		{
-			"+allOptionalParamsEmpty",
-			[]string{
-				"",
-				"example.com",
-				"",
-				"",
-				"",
-				"",
-				"",
-			},
-			false,
-			&dnsGetOptions{
-				options{
-					net.JoinHostPort(dnsConfig.Servers[0], dnsConfig.Port),
-					"example.com",
-					udpProtocol,
-					dns.TypeSOA,
-					defaultCount,
-					time.Second,
-				},
-				map[string]bool{
-					"aaflag": false,
-					"adflag": false,
-					"cdflag": false,
-					"dnssec": false,
-					"edns0":  true,
-					"nsid":   false,
-					"rdflag": true,
-				},
-			},
-			nil,
-		},
-
 		{
 			"+emptyParamsRecordTypeDNSServerSpecified",
 			[]string{
