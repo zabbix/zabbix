@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -13,24 +13,20 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once __DIR__.'/../common/testFormPreprocessingClone.php';
 
 /**
- * Test of cloning host with preprocessing steps in items.
- *
- * @backup hosts, items
+ * @var CView $this
  */
-class testFormPreprocessingCloneHost extends testFormPreprocessingClone {
+?>
 
-	public $hostid = 40001;				// Simple form test host.
-	public $itemid = 99102;				// StestFormItem.
-	public $lldid = 133800;				// testFormDiscoveryRule.
-	public $item_prototypeid = 23800;	// testFormItemPrototype1.
+window.token_view_popup = {
 
-	/**
-	 * @onBefore prepareLLDPreprocessing, prepareItemPreprocessing, prepareItemPrototypePreprocessing
-	 */
-	public function testFormPreprocessingCloneHost_CloneHost() {
-		$this->executeCloning();
+	init() {
+		const form = document.getElementById('token_form');
+
+		form.querySelector('.js-copy-button').addEventListener('click', (e) => {
+			writeTextClipboard(e.target.getAttribute('data-auth_token'));
+			e.target.focus();
+		});
 	}
 }
