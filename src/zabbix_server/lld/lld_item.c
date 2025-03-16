@@ -170,10 +170,7 @@ void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 
 	zbx_sync_rowset_clear(&item_prototype->macro_paths);
 	zbx_sync_rowset_clear(&item_prototype->filters);
-	zbx_sync_rowset_clear(&item_prototype->overrides);
-
-	zbx_vector_lld_override_sync_ptr_clear_ext(&item_prototype->override_sync, lld_override_sync_free);
-	zbx_vector_lld_override_sync_ptr_destroy(&item_prototype->override_sync);
+	zbx_sync_rowset_clear_ext(&item_prototype->overrides, lld_override_data_free);
 
 	zbx_hashset_destroy(&item_prototype->item_index);
 
@@ -253,10 +250,7 @@ void	lld_item_full_free(zbx_lld_item_full_t *item)
 
 	zbx_sync_rowset_clear(&item->macro_paths);
 	zbx_sync_rowset_clear(&item->filters);
-	zbx_sync_rowset_clear(&item->overrides);
-
-	zbx_vector_lld_override_sync_ptr_clear_ext(&item->override_sync, lld_override_sync_free);
-	zbx_vector_lld_override_sync_ptr_destroy(&item->override_sync);
+	zbx_sync_rowset_clear_ext(&item->overrides, lld_override_data_free);
 
 	zbx_free(item);
 }
@@ -681,7 +675,6 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 			zbx_sync_rowset_init(&item->macro_paths, 2);
 			zbx_sync_rowset_init(&item->filters, 3);
 			zbx_sync_rowset_init(&item->overrides, 5);
-			zbx_vector_lld_override_sync_ptr_create(&item->override_sync);
 
 			zbx_vector_lld_item_full_ptr_append(items, item);
 		}
@@ -862,11 +855,11 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 
 			while (NULL != (row = zbx_db_fetch(result)))
 			{
-				ZBX_STR2UINT64(itemid, row[1]);
+				zbx_lld_item_full_t	item_local;
 
-				zbx_lld_item_full_t	cmp = {.itemid = itemid};
+				ZBX_STR2UINT64(item_local.itemid, row[1]);
 
-				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &item_local,
 						lld_item_full_compare_func)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -877,7 +870,6 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 
 				zbx_sync_rowset_add_row(&item->macro_paths, row[0], row[2], row[3]);
 			}
-
 			zbx_db_free_result(result);
 		}
 
@@ -896,11 +888,11 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 
 			while (NULL != (row = zbx_db_fetch(result)))
 			{
-				ZBX_STR2UINT64(itemid, row[1]);
+				zbx_lld_item_full_t	item_local;
 
-				zbx_lld_item_full_t	cmp = {.itemid = itemid};
+				ZBX_STR2UINT64(item_local.itemid, row[1]);
 
-				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &item_local,
 						lld_item_full_compare_func)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -911,9 +903,59 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 
 				zbx_sync_rowset_add_row(&item->filters, row[0], row[2], row[3], row[4]);
 			}
-
 			zbx_db_free_result(result);
 		}
+
+		/* fetch overrides */
+
+		zbx_vector_lld_override_data_ptr_t	overrides;
+
+		zbx_vector_lld_override_data_ptr_create(&overrides);
+
+		batch_index = 0;
+		while (batch_index < itemids.values_num)
+		{
+			sql_offset = 0;
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"select lld_overrideid,itemid,name,step,stop,evaltype,formula"
+					" from lld_override where");
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+
+			result = zbx_db_select("%s", sql);
+
+			while (NULL != (row = zbx_db_fetch(result)))
+			{
+				zbx_lld_item_full_t	item_local;
+				zbx_sync_row_t		*sync_row;
+				zbx_lld_override_data_t	*data;
+
+				ZBX_STR2UINT64(item_local.itemid, row[1]);
+
+				if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &item_local,
+						lld_item_full_compare_func)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				item = items->values[index];
+
+				sync_row = zbx_sync_rowset_add_row(&items->values[index]->overrides, row[0], row[2],
+						row[3], row[4], row[5], row[6]);
+
+				data = lld_override_data_create(sync_row->rowid);
+				sync_row->data = data;
+
+				zbx_vector_lld_override_data_ptr_append(&overrides, data);
+			}
+			zbx_db_free_result(result);
+		}
+
+		if (0 != overrides.values_num)
+			lld_rule_fetch_override_data(&overrides);
+
+		zbx_vector_lld_override_data_ptr_destroy(&overrides);
 	}
 out:
 	zbx_free(sql);
@@ -1798,7 +1840,6 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	zbx_sync_rowset_init(&item->macro_paths, 2);
 	zbx_sync_rowset_init(&item->filters, 3);
 	zbx_sync_rowset_init(&item->overrides, 5);
-	zbx_vector_lld_override_sync_ptr_create(&item->override_sync);
 
 	if (SUCCEED == ret && ZBX_PROTOTYPE_NO_DISCOVER != discover)
 		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -4146,7 +4187,6 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 		zbx_sync_rowset_init(&item_prototype->macro_paths, 2);
 		zbx_sync_rowset_init(&item_prototype->filters, 3);
 		zbx_sync_rowset_init(&item_prototype->overrides, 5);
-		zbx_vector_lld_override_sync_ptr_create(&item_prototype->override_sync);
 
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);
 
@@ -4350,13 +4390,13 @@ void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const zbx_lld
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	lld_override_sync_dump(const zbx_lld_override_sync_t *sync)
+static void	lld_override_data_dump(const zbx_lld_override_data_t *data)
 {
 
 	zabbix_log(LOG_LEVEL_TRACE, "    conditions:");
-	for (int i = 0; i < sync->conditions.rows.values_num; i++)
+	for (int i = 0; i < data->conditions.rows.values_num; i++)
 	{
-		zbx_sync_row_t	*row = sync->conditions.rows.values[i];
+		zbx_sync_row_t	*row = data->conditions.rows.values[i];
 
 		zabbix_log(LOG_LEVEL_TRACE, "      lld_override_conditionid:" ZBX_FS_UI64
 				" operator:%s macro:%s value:%s",
@@ -4364,38 +4404,53 @@ static void	lld_override_sync_dump(const zbx_lld_override_sync_t *sync)
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "    operations:");
-	for (int i = 0; i < sync->operations.rows.values_num; i++)
+	for (int i = 0; i < data->operations.rows.values_num; i++)
 	{
-		zbx_sync_row_t	*row = sync->operations.rows.values[i];
+		zbx_sync_row_t	*row = data->operations.rows.values[i];
 
 		zabbix_log(LOG_LEVEL_TRACE, "      lld_override_operationid:" ZBX_FS_UI64
 				" operationobject:%s operator:%s value:%s discover:%s history:%s inventory_mode:%s"
 				" delay:%s severity:%s status:%s trends:%s",
 				row->rowid, row->cols[0], row->cols[1], row->cols[2],
-				ZBX_NULL2EMPTY_STR(row->cols[3]), ZBX_NULL2EMPTY_STR(row->cols[4]),
-				ZBX_NULL2EMPTY_STR(row->cols[5]), ZBX_NULL2EMPTY_STR(row->cols[6]),
-				ZBX_NULL2EMPTY_STR(row->cols[7]), ZBX_NULL2EMPTY_STR(row->cols[8]),
-				ZBX_NULL2EMPTY_STR(row->cols[9]));
+				ZBX_NULL2STR(row->cols[3]), ZBX_NULL2STR(row->cols[4]),
+				ZBX_NULL2STR(row->cols[5]), ZBX_NULL2STR(row->cols[6]),
+				ZBX_NULL2STR(row->cols[7]), ZBX_NULL2STR(row->cols[8]),
+				ZBX_NULL2STR(row->cols[9]));
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "    optags:");
-	for (int i = 0; i < sync->optags.rows.values_num; i++)
+	for (int i = 0; i < data->optags.rows.values_num; i++)
 	{
-		zbx_sync_row_t	*row = sync->optags.rows.values[i];
+		zbx_sync_row_t	*row = data->optags.rows.values[i];
 
 		zabbix_log(LOG_LEVEL_TRACE, "      lld_override_optagid:" ZBX_FS_UI64
 				" lld_override_operationid:%s tag:%s value:%s",
-				row->rowid, row->cols[0], row->cols[1], row->cols[2]);
+				row->rowid, row->cols[2], row->cols[0], row->cols[1]);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "    optemplates:");
-	for (int i = 0; i < sync->optags.rows.values_num; i++)
+	for (int i = 0; i < data->optemplates.rows.values_num; i++)
 	{
-		zbx_sync_row_t	*row = sync->optags.rows.values[i];
+		zbx_sync_row_t	*row = data->optemplates.rows.values[i];
 
 		zabbix_log(LOG_LEVEL_TRACE, "      lld_override_optemplateid:" ZBX_FS_UI64
 				" lld_override_operationid:%s templateid:%s",
-				row->rowid, row->cols[0], row->cols[1]);
+				row->rowid, row->cols[1], row->cols[0]);
+	}
+}
+
+void	lld_override_dump(zbx_sync_rowset_t *rowset)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "  overrides:");
+	for (int i = 0; i < rowset->rows.values_num; i++)
+	{
+		zbx_sync_row_t	*row = rowset->rows.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    lld_overrideid:" ZBX_FS_UI64
+				" name:%s step:%s stop:%s evaltype:%s formula:%s",
+				row->rowid, row->cols[0], row->cols[1], row->cols[2], row->cols[3], row->cols[4]);
+
+		lld_override_data_dump(row->data);
 	}
 }
 
@@ -4489,24 +4544,7 @@ void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
 				row->rowid, row->cols[0], row->cols[1], row->cols[2]);
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "  overrides:");
-	for (int i = 0; i < item_prototype->overrides.rows.values_num; i++)
-	{
-		zbx_sync_row_t		*row = item_prototype->overrides.rows.values[i];
-		int			index;
-		zbx_lld_override_sync_t	sync_local;
-
-		zabbix_log(LOG_LEVEL_TRACE, "    lld_overrideid:" ZBX_FS_UI64
-				" name:%s step:%s stop:%s evaltype:%s formula:%s",
-				row->rowid, row->cols[0], row->cols[1], row->cols[2], row->cols[3], row->cols[4]);
-
-		sync_local.overrideid = row->rowid;
-		if (FAIL != (index = zbx_vector_lld_override_sync_ptr_search(&item_prototype->override_sync,
-				&sync_local, lld_override_sync_compare)))
-		{
-			lld_override_sync_dump(item_prototype->override_sync.values[index]);
-		}
-	}
+	lld_override_dump(&item_prototype->overrides);
 }
 
 /******************************************************************************

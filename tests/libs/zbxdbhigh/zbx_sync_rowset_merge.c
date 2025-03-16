@@ -69,7 +69,6 @@ static zbx_sync_row_t	*mock_read_zbx_sync_row(zbx_mock_handle_t handle, int cols
 	zbx_sync_row_t		*v;
 	zbx_mock_handle_t	h, hval;
 	zbx_mock_error_t	err;
-	const char		*value;
 
 	v = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
 

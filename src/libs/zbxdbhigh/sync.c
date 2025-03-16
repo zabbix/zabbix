@@ -45,7 +45,7 @@ typedef struct
 }
 zbx_sync_list_t;
 
-void	sync_list_init(zbx_sync_list_t *list)
+static void	sync_list_init(zbx_sync_list_t *list)
 {
 	list->head = list->tail = NULL;
 }
@@ -57,13 +57,12 @@ void	sync_list_init(zbx_sync_list_t *list)
  * Parameters: list - [IN/OUT] sync list to append to                         *
  *             row  - [IN] row to be added                                    *
  *             role - [IN] role of the sync row (source or destination)       *
+ *             node - [IN/OUT] the node to append                             *
  *                                                                            *
  ******************************************************************************/
-void	sync_list_append(zbx_sync_list_t *list, zbx_sync_row_t *row, zbx_sync_role_t role)
+static void	sync_list_append(zbx_sync_list_t *list, zbx_sync_row_t *row, zbx_sync_role_t role,
+		zbx_sync_node_t *node)
 {
-	zbx_sync_node_t	*node;
-
-	node = (zbx_sync_node_t *)zbx_malloc(NULL, sizeof(zbx_sync_node_t));
 	memset(node, 0, sizeof(zbx_sync_node_t));
 	node->row = row;
 	node->role = role;
@@ -87,7 +86,7 @@ void	sync_list_append(zbx_sync_list_t *list, zbx_sync_row_t *row, zbx_sync_role_
  *             node - [IN] node to be removed                                 *
  *                                                                            *
  ******************************************************************************/
-void	sync_list_remove(zbx_sync_list_t *list, zbx_sync_node_t *node)
+static void	sync_list_remove(zbx_sync_list_t *list, zbx_sync_node_t *node)
 {
 	if (node != list->head)
 		node->prev->next = node->next;
@@ -98,8 +97,6 @@ void	sync_list_remove(zbx_sync_list_t *list, zbx_sync_node_t *node)
 		node->next->prev = node->prev;
 	else
 		list->tail = node->prev;
-
-	zbx_free(node);
 }
 
 static int	strcmp_null(const char *s1, const char *s2)
@@ -143,7 +140,7 @@ static int	sync_row_compare(const void *d1, const void *d2)
 	{
 		int	ret;
 
-		if (0 != (ret = strcmp_null(row2->cols[i], row2->cols[i])))
+		if (0 != (ret = strcmp_null(row1->cols[i], row2->cols[i])))
 		{
 			if (0 > ret)
 				return i - row1->cols_num;
@@ -169,6 +166,41 @@ static int	sync_row_compare_by_rowid(const void *d1, const void *d2)
 	ZBX_RETURN_IF_NOT_EQUAL(row1->rowid, row2->rowid);
 
 	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare two sync rows by their rowid                              *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	sync_row_compare_by_parent_rowid(const void *d1, const void *d2)
+{
+	const zbx_sync_row_t        *row1 = *(const zbx_sync_row_t * const *)d1;
+	const zbx_sync_row_t        *row2 = *(const zbx_sync_row_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(row1->parent_rowid, row2->parent_rowid);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: roll back changes made to a specific column in a row              *
+ *                                                                            *
+ * Parameters: row     - [IN/OUT] sync row to be modified                     *
+ *             col_num - [IN] number of the column to roll back               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_row_rollback_col(zbx_sync_row_t *row, int col_num)
+{
+	if (0 != (row->flags & (UINT32_C(1) << col_num)))
+	{
+		zbx_free(row->cols[col_num]);
+		row->cols[col_num] = row->cols_orig[col_num];
+		row->cols_orig[col_num] = NULL;
+		row->flags &= ~(UINT32_C(1) << col_num);
+	}
 }
 
 /******************************************************************************
@@ -215,6 +247,22 @@ void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset)
 	zbx_vector_sync_row_ptr_destroy(&rowset->rows);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear a sync rowset and free allocated memory                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_rowset_clear_ext(zbx_sync_rowset_t *rowset, void (*free_func)(void *data))
+{
+	for (int i = 0; i < rowset->rows.values_num; i++)
+	{
+		free_func(rowset->rows.values[i]->data);
+		zbx_sync_row_free(rowset->rows.values[i]);
+	}
+
+	zbx_vector_sync_row_ptr_destroy(&rowset->rows);
+}
+
 static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
 {
 	zbx_sync_row_t	*row;
@@ -227,6 +275,7 @@ static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
 	memset(row->cols_orig, 0, sizeof(char *) * cols_num);
 	row->cols_num = cols_num;
 	row->flags = ZBX_SYNC_ROW_NONE;
+	row->data = NULL;
 
 	return row;
 }
@@ -239,8 +288,10 @@ static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
  *             ...    - [IN] column values, first column always being object  *
  *                           identifier (itemid, triggerid ...)               *
  *                                                                            *
+ * Return value: added row                                                    *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...)
+zbx_sync_row_t	*zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...)
 {
 	va_list		args;
 	zbx_sync_row_t	*row;
@@ -256,11 +307,13 @@ void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...)
 	for (int i = 0; i < rowset->cols_num; i++)
 	{
 		value = va_arg(args, char *);
-		row->cols[i] = zbx_strdup(NULL, NULL != value ? value : "");
+		row->cols[i] = (NULL != value ? zbx_strdup(NULL, value) : NULL);
 	}
 	va_end(args);
 
 	zbx_vector_sync_row_ptr_append(&rowset->rows, row);
+
+	return row;
 }
 
 /******************************************************************************
@@ -279,7 +332,7 @@ static void	sync_rowset_copy_row(zbx_sync_rowset_t *rowset, zbx_sync_row_t *src)
 	row->parent_rowid = src->rowid;
 
 	for (int i = 0; i < rowset->cols_num; i++)
-		row->cols[i] = zbx_strdup(NULL, src->cols[i]);
+		row->cols[i] = (NULL != src->cols[i] ? zbx_strdup(NULL, src->cols[i]) : NULL);
 
 	zbx_vector_sync_row_ptr_append(&rowset->rows, row);
 }
@@ -361,7 +414,8 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 			if (i == match_level || 0 != strcmp_null(dst->row->cols[i], src->row->cols[i]))
 			{
 				dst->row->cols_orig[i] = dst->row->cols[i];
-				dst->row->cols[i] = zbx_strdup(NULL, src->row->cols[i]);
+				dst->row->cols[i] = (NULL != src->row->cols[i] ?
+						zbx_strdup(NULL, src->row->cols[i]) : NULL);
 				dst->row->flags |= UINT32_C(1) << i;
 			}
 		}
@@ -422,25 +476,28 @@ static void	sync_list_flush(zbx_sync_list_t *sync_list, zbx_sync_rowset_t *dst)
 void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 {
 	zbx_sync_list_t		sync_list;
-	int			i, j;
+	zbx_sync_node_t		*nodes;
+	int			i, j, next_node = 0;
 
 	zbx_sync_rowset_sort_by_rows(dst);
 
 	sync_list_init(&sync_list);
+	nodes = (zbx_sync_node_t *)zbx_malloc(NULL, sizeof(zbx_sync_node_t) *
+			(dst->rows.values_num + src->rows.values_num));
 
 	for (i = 0, j = 0; i < src->rows.values_num && j < dst->rows.values_num; )
 	{
 		if (0 > sync_row_compare(&src->rows.values[i], &dst->rows.values[j]))
-			sync_list_append(&sync_list, src->rows.values[i++], ZBX_SYNC_ROW_SRC);
+			sync_list_append(&sync_list, src->rows.values[i++], ZBX_SYNC_ROW_SRC, &nodes[next_node++]);
 		else
-			sync_list_append(&sync_list, dst->rows.values[j++], ZBX_SYNC_ROW_DST);
+			sync_list_append(&sync_list, dst->rows.values[j++], ZBX_SYNC_ROW_DST, &nodes[next_node++]);
 	}
 
 	for (int k = i; k < src->rows.values_num; k++)
-		sync_list_append(&sync_list, src->rows.values[k], ZBX_SYNC_ROW_SRC);
+		sync_list_append(&sync_list, src->rows.values[k], ZBX_SYNC_ROW_SRC, &nodes[next_node++]);
 
 	for (int k = j; k < dst->rows.values_num; k++)
-		sync_list_append(&sync_list, dst->rows.values[k], ZBX_SYNC_ROW_DST);
+		sync_list_append(&sync_list, dst->rows.values[k], ZBX_SYNC_ROW_DST, &nodes[next_node++]);
 
 	sync_list_prepare(&sync_list);
 
@@ -450,4 +507,65 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 	sync_list_flush(&sync_list, dst);
 
 	zbx_sync_rowset_sort_by_id(dst);
+
+	zbx_free(nodes);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: search for a row in a rowset by its row ID                        *
+ *                                                                            *
+ * Parameters: rowset       - [IN] rowset to search in, sorted by rowid       *
+ *             parent_rowid - [IN] row ID to search for                       *
+ *                                                                            *
+ * Return value: pointer to the found row or NULL if not found                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_sync_row_t	*zbx_sync_rowset_bsearch_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid)
+{
+	zbx_sync_row_t	row_local;
+	int		i;
+
+	row_local.rowid = rowid;
+
+	if (FAIL == (i = zbx_vector_sync_row_ptr_bsearch(&rowset->rows, &row_local, sync_row_compare_by_rowid)))
+		return NULL;
+
+	return rowset->rows.values[i];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: search for a row in a rowset by its parent row ID                 *
+ *                                                                            *
+ * Parameters: rowset       - [IN] rowset to search in                        *
+ *             parent_rowid - [IN] parent row ID to search for                *
+ *                                                                            *
+ * Return value: pointer to the found row or NULL if not found                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid)
+{
+	zbx_sync_row_t	row_local;
+	int		i;
+
+	row_local.parent_rowid = parent_rowid;
+
+	if (FAIL == (i = zbx_vector_sync_row_ptr_search(&rowset->rows, &row_local, sync_row_compare_by_parent_rowid)))
+		return NULL;
+
+	return rowset->rows.values[i];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: discard any changes made to rowset                                *
+ *                                                                            *
+ * Parameters: rowset - [IN/OUT] sync rowset to be reset                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset)
+{
+	for (int i = 0; i < rowset->rows.values_num; i++)
+		rowset->rows.values[i]->flags = ZBX_SYNC_ROW_NONE;
 }

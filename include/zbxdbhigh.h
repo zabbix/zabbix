@@ -836,6 +836,7 @@ typedef struct
 	char		**cols_orig;
 	int		cols_num;
 	zbx_uint64_t	flags;
+	void		*data;
 }
 zbx_sync_row_t;
 
@@ -850,11 +851,16 @@ typedef struct
 }
 zbx_sync_rowset_t;
 
+void	zbx_sync_row_rollback_col(zbx_sync_row_t *row, int col_num);
 void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num);
 void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset);
-void	zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...);
+void	zbx_sync_rowset_clear_ext(zbx_sync_rowset_t *rowset, void (*free_func)(void *data));
+zbx_sync_row_t	*zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...);
 void	zbx_sync_rowset_sort_by_rows(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_sort_by_id(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+zbx_sync_row_t	*zbx_sync_rowset_bsearch_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid);
+zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
+void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 
 #endif
