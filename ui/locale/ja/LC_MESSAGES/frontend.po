@@ -5831,6 +5831,11 @@ msgstr "データベース接続のTLS暗号化"
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "データベースのヒストリテーブルが主キーを使用"

@@ -5819,6 +5819,11 @@ msgstr "მონაცემთა ბაზის TLS დაშიფვრა
 msgid "Database TLS key file"
 msgstr "მონაცემთა ბაზის TLS გასაღების ფაილი"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr ""

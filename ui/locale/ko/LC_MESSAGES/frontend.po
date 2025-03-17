@@ -5849,6 +5849,11 @@ msgstr "데이터베이스 TLS 암호화"
 msgid "Database TLS key file"
 msgstr "데이터베이스 TLS 키 파일"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "데이터베이스 기록 테이블은 기본 키를 사용합니다."

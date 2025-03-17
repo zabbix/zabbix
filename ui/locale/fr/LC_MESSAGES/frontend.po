@@ -5941,6 +5941,11 @@ msgstr "Chiffrement TLS de la base de données"
 msgid "Database TLS key file"
 msgstr "Fichier de clé TLS de la base de données"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Les tables d'historique de la base de données utilisent la clé primaire"

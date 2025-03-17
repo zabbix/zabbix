@@ -5956,6 +5956,11 @@ msgstr "הצפנת TLS של מסד הנתונים"
 msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "טבלאות היסטוריה במסד הנתונים משתמשות במפתח עיקרי"
