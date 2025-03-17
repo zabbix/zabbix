@@ -4,6 +4,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+.......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
 ...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
 .......PS. [ZBX-26109] fixed crash on HTTP checks with empty data (sboidenko)
