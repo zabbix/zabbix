@@ -11,6 +11,8 @@ New features:
 A.F.I..PS. [ZBXNEXT-7048] converted the settings table to a key-value format (askolmeisters, jfreibergs, vmaksimovs)
 
 Bug fixes:
+........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when the database transaction commit fails; fixed inability to identify the interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 .......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 ..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
@@ -72,6 +74,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when the database transaction commit fails; fixed inability to identify the interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
 .........T [ZBX-25940] added namespace to Pod discovery rule in Kubernetes nodes by HTTP template (egordymov)
@@ -427,6 +430,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when the database transaction commit fails; fixed inability to identify the interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
 .........T [ZBX-25940] added namespace to Pod discovery rule in Kubernetes nodes by HTTP template (egordymov)
