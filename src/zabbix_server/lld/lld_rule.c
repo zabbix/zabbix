@@ -985,8 +985,8 @@ static zbx_uint64_t	lld_override_data_get_sync_flags(const zbx_lld_override_data
 			flags |= LLD_OVERRIDE_SYNC_DELETE;
 			zbx_vector_uint64_append(delids_condition, row->rowid);
 
-			zbx_audit_discovery_rule_update_json_delete_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
-					itemid, row->rowid);
+			zbx_audit_discovery_rule_update_json_delete_lld_override_filter(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, data->overrideid, row->rowid);
 		}
 	}
 
@@ -1006,6 +1006,9 @@ static zbx_uint64_t	lld_override_data_get_sync_flags(const zbx_lld_override_data
 		{
 			flags |= LLD_OVERRIDE_SYNC_DELETE;
 			zbx_vector_uint64_append(delids_operation, row->rowid);
+
+			zbx_audit_discovery_rule_update_json_delete_lld_override_operation(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, data->overrideid, row->rowid);
 			continue;
 		}
 
@@ -1080,8 +1083,9 @@ static void	lld_override_data_save_conditions(zbx_uint64_t lld_overrideid, zbx_u
 			zbx_db_insert_add_values(db_insert, row->rowid, lld_overrideid, atoi(row->cols[0]),
 					row->cols[1], row->cols[2]);
 
-			zbx_audit_discovery_rule_update_json_add_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
-					itemid, row->rowid, atoi(row->cols_orig[0]), row->cols[1], row->cols[2]);
+			zbx_audit_discovery_rule_update_json_add_lld_override_condition(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, lld_overrideid, row->rowid, atoi(row->cols[0]), row->cols[1],
+					row->cols[2]);
 			continue;
 		}
 
@@ -1113,8 +1117,9 @@ static void	lld_override_data_save_conditions(zbx_uint64_t lld_overrideid, zbx_u
 			else
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", row->cols[k]);
 
-			zbx_audit_discovery_rule_update_json_update_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
-					itemid, row->rowid, fields[k], row->cols_orig[k], row->cols[k]);
+			zbx_audit_discovery_rule_update_json_update_lld_override_filter_condition_str(
+					ZBX_AUDIT_LLD_CONTEXT, itemid, lld_overrideid, row->rowid, fields[k],
+					row->cols_orig[k], row->cols[k]);
 		}
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where lld_override_conditionid=" ZBX_FS_UI64 ";\n",
@@ -2019,7 +2024,7 @@ static int	lld_override_update_formula(zbx_sync_row_t *dst_row, const zbx_sync_r
 			}
 		}
 
-		if (k == dst->operations.rows.values_num)
+		if (k == dst->conditions.rows.values_num)
 		{
 			*info = zbx_strdcat(*info, "Cannot update custom LLD filter.\n");
 			ret = lld_override_rollback_formula(dst_row);
