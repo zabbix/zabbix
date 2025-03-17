@@ -66,7 +66,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		sort($user_alias);
 
 		$users = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/z-vetical'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/z-vertical'));
 		foreach ($elements as $i => $element) {
 			$users[] = $element->getText();
 		}

@@ -18,9 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CVertical extends CTag
-{
-	private array $span_items = [];
+
+class CVertical extends CTag {
 
 	public function __construct($item = null) {
 		parent::__construct('z-vertical', true);

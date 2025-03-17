@@ -19,6 +19,8 @@
 
 class ZVertical extends HTMLElement {
 
+	#inner_container = null;
+
 	constructor() {
 		super();
 
@@ -27,15 +29,14 @@ class ZVertical extends HTMLElement {
 		const container_styles = window.getComputedStyle(this);
 
 		const div = document.createElement('div');
-		div.classList.add('inner-container');
+		this.#inner_container = div;
 
 		Object.assign(div.style, {
 			display: 'inline-block',
 			position: 'absolute',
 			bottom: 0,
 			left: 0,
-			transform: `rotate(270deg)`,
-			transformOrigin: `11px 11px`,
+			transform: `rotate(270deg)`
 		});
 
 		const props_to_inherit = {
@@ -51,7 +52,7 @@ class ZVertical extends HTMLElement {
 
 		for (const prop in props_to_inherit) {
 			if (container_styles[prop] !== 'auto' && container_styles[prop] !== 'none'
-					&& container_styles[prop] !== '0px') {
+				&& container_styles[prop] !== '0px') {
 				div.style[props_to_inherit[prop]] = container_styles[prop];
 			}
 		}
@@ -72,12 +73,16 @@ class ZVertical extends HTMLElement {
 	}
 
 	_refresh() {
-		const inner_container = this.shadowRoot.querySelector('.inner-container');
-
-		if (inner_container !== null) {
-			this.style.width = `${inner_container.scrollHeight}px`;
-			this.style.height = `${inner_container.scrollWidth}px`;
+		if (this.#inner_container === null) {
+			return;
 		}
+
+		this.style.width = `${this.#inner_container.scrollHeight}px`;
+		this.style.height = `${this.#inner_container.scrollWidth}px`;
+
+		const anchor_position = this.#inner_container.scrollHeight / 2;
+
+		this.#inner_container.style.transformOrigin = `${anchor_position}px ${anchor_position}px`;
 	}
 
 	registerEvents() {
