@@ -27,7 +27,6 @@ import (
 	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/agent2/pkg/zbxcomms"
-	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxnet"
 )
@@ -87,19 +86,19 @@ func (sl *ServerListener) run() {
 
 	for {
 
-		outerErr := func() error {
-			conn, err := sl.listener.Accept(
-				time.Second*time.Duration(sl.options.Timeout),
-				zbxcomms.TimeoutModeShift,
-			)
-			if err != nil {
-				if sl.handleError(err) == nil {
-					return nil
-				}
-
-				return errs.New("failed handling error")
+		conn, err := sl.listener.Accept(
+			time.Second*time.Duration(sl.options.Timeout),
+			zbxcomms.TimeoutModeShift,
+		)
+		if err != nil {
+			if sl.handleError(err) != nil {
+				break
 			}
 
+			continue
+		}
+
+		go func() {
 			remoteIP := conn.RemoteIP()
 
 			parsedIP := net.ParseIP(remoteIP)
@@ -113,7 +112,7 @@ func (sl *ServerListener) run() {
 					sl.options.Server,
 				)
 
-				return nil
+				return
 			}
 
 			data, err := conn.Read()
@@ -133,15 +132,8 @@ func (sl *ServerListener) run() {
 				remoteIP,
 			)
 
-			go handleCheck(sl.scheduler, conn, data)
-
-			return nil
+			handleCheck(sl.scheduler, conn, data)
 		}()
-
-		if outerErr != nil {
-			break
-		}
-
 	}
 
 	log.Debugf("listener has been stopped")
