@@ -626,9 +626,10 @@ form {
 			display: inline-block;
 			position: relative;
 			max-height: 150px;
+			min-width: 22px;
+			overflow: hidden;
 			text-overflow: ellipsis;
 			line-height: 22px;
-			overflow: hidden;
 		}
 
 		a {
