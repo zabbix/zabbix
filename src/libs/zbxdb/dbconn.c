@@ -1384,6 +1384,9 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		db->connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		db->last_db_errcode = 0;
+#endif
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
