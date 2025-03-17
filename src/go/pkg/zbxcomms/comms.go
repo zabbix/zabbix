@@ -298,15 +298,20 @@ func (c *Connection) RemoteIP() string {
 	return addr
 }
 
-func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection, err error) {
-	var conn net.Conn
-	if conn, err = l.listener.Accept(); err != nil {
-		return
-	} else {
-		c = &Connection{conn: conn, tlsConfig: l.tlsconfig, state: connStateAccept, timeout: timeout,
-			timeoutMode: timeoutMode}
+func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (*Connection, error) {
+	conn, err := l.listener.Accept()
+	if err != nil {
+		return nil, err
 	}
-	return
+
+	c := &Connection{conn: conn,
+		tlsConfig:   l.tlsconfig,
+		state:       connStateAccept,
+		timeout:     timeout,
+		timeoutMode: timeoutMode,
+	}
+
+	return c, nil
 }
 
 func (c *Connection) Close() (err error) {

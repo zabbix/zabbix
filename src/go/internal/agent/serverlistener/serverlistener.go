@@ -105,9 +105,11 @@ func (sl *ServerListener) run() {
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
-		conn, err := sl.listener.Accept(time.Second*time.Duration(sl.options.Timeout),
-			zbxcomms.TimeoutModeShift)
 
+		conn, err := sl.listener.Accept(
+			time.Second*time.Duration(sl.options.Timeout),
+			zbxcomms.TimeoutModeShift,
+		)
 		if err != nil {
 			if sl.handleError(err) == nil {
 				continue
@@ -124,7 +126,7 @@ func (sl *ServerListener) run() {
 			_ = conn.Close()
 
 			log.Warningf(
-				"failed to accept an incoming connection: connection from \"%s\" rejected, allowed hosts: \"%s\"",
+				"failed to accept an incoming connection: connection from %q rejected, allowed hosts: %q",
 				remoteIP,
 				sl.options.Server,
 			)
@@ -132,7 +134,8 @@ func (sl *ServerListener) run() {
 			continue
 		}
 
-		if err := sl.processConnection(conn); err != nil {
+		err = sl.processConnection(conn)
+		if err != nil {
 			log.Warningf(
 				"failed to process an incoming connection from %s: %s",
 				remoteIP,
