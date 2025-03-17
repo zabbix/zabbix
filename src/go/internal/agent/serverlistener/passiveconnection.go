@@ -22,14 +22,18 @@ type passiveConnection struct {
 	conn *zbxcomms.Connection
 }
 
-func (pc *passiveConnection) Write(data []byte) (n int, err error) {
-	if err = pc.conn.Write(data); err != nil {
-		n = len(data)
+// every passive connection simply *zbxcomms.Connection with deferred close
+func (pc *passiveConnection) Write(data []byte) error {
+	defer pc.conn.Close()
+
+	err := pc.conn.Write(data)
+	if err != nil {
+		return err
 	}
-	pc.conn.Close()
-	return
+	return nil
 }
 
+// wrapper for conn.RemoteIP()
 func (pc *passiveConnection) Address() string {
 	return pc.conn.RemoteIP()
 }

@@ -103,7 +103,6 @@ func (sl *ServerListener) run() {
 	for {
 
 		outerErr := func() error {
-
 			conn, err := sl.listener.Accept(
 				time.Second*time.Duration(sl.options.Timeout),
 				zbxcomms.TimeoutModeShift,
@@ -143,7 +142,11 @@ func (sl *ServerListener) run() {
 				)
 			}
 
-			log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
+			log.Debugf(
+				"received passive check request: '%s' from '%s'",
+				string(data),
+				remoteIP,
+			)
 
 			response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
 			go response.handleCheck(data)

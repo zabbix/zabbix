@@ -119,7 +119,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	out, err := json.Marshal(response)
 	if err == nil {
 		log.Debugf("sending passive check response: '%s' to '%s'", string(out), pc.conn.Address())
-		_, err = pc.conn.Write(out)
+		err = pc.conn.Write(out)
 	}
 
 	if err != nil {
@@ -146,10 +146,10 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 
 	if err != nil {
 		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())
-		_, err = pc.conn.Write(pc.formatError(err.Error()))
+		err = pc.conn.Write(pc.formatError(err.Error()))
 	} else if taskResult != nil {
 		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, pc.conn.Address())
-		_, err = pc.conn.Write([]byte(*taskResult))
+		err = pc.conn.Write([]byte(*taskResult))
 	} else {
 		log.Debugf("got nil value, skipping sending of response")
 	}
