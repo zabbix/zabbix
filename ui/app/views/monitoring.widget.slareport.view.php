@@ -40,7 +40,7 @@ elseif (!$data['has_serviceid']) {
 
 	foreach ($data['sli']['periods'] as $period) {
 		$header[] = CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
-			$data['sla']['timezone'], $data['sla']['period'] !== ZBX_SLA_PERIOD_ANNUALLY
+			$data['sla']['timezone'], $data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY
 		);
 	}
 
