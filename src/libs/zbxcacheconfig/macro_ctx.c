@@ -148,7 +148,7 @@ int	zbx_macro_allowed_hosts_resolv(zbx_macro_resolv_data_t *p, va_list args, cha
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
 
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else
 		{
@@ -179,7 +179,7 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
 
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 		{
@@ -222,7 +222,7 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
 
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_ITEM_ID))
 		{
