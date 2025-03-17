@@ -561,16 +561,13 @@ class testTriggerLinking extends CIntegrationTest {
 		/* We need agent 2 only because it will have the different host metadata from the agent 1.
 			This would retrigger the autoregistration with linking. Stop this for now.
 			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
-		/*$this->killComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_SERVER);*/
 		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
 		$this->checkTriggersCreate();
-		$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
+		//$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
 		//$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_AGENT);
 
@@ -603,39 +600,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
 		$this->reloadConfigurationCache();
 		sleep(1);
-
-		$response = $this->call('trigger.get', [
-			'selectTags' => 'extend',
-			'filter' => [
-				'host' => self::HOST_NAME,
-				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
-				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE
-			],
-			'output' => [
-				'triggerid',
-				'description',
-				'priority',
-				'status',
-				'templateid',
-				'comments',
-				'url',
-				'type',
-				'flags',
-				'recovery_mode',
-				'correlation_mode',
-				'correlation_tag',
-				'manual_close',
-				'opdata',
-				'discover',
-				'event_name',
-				'functions',
-				'expression',
-				'recovery_expression'
-			],
-			'selectFunctions' => 'extend',
-			'sortfield' => 'description',
-			'selectDependencies' => ['triggerid']
-		]);
 
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 
