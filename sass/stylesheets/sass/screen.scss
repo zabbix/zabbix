@@ -622,12 +622,13 @@ form {
 			}
 		}
 
-		.text-vertical {
+		z-vertical {
+			display: inline-block;
+			position: relative;
 			max-height: 150px;
-			overflow: hidden;
 			text-overflow: ellipsis;
-			writing-mode: sideways-lr;
 			line-height: 22px;
+			overflow: hidden;
 		}
 
 		a {

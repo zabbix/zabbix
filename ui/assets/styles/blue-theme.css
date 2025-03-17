@@ -3039,12 +3039,13 @@ form.is-loading {
       border-top-color: #768d99; }
     .list-table thead th .treeview span {
       margin: 0; }
-    .list-table thead th .text-vertical {
+    .list-table thead th z-vertical {
+      display: inline-block;
+      position: relative;
       max-height: 150px;
-      overflow: hidden;
       text-overflow: ellipsis;
-      writing-mode: sideways-lr;
-      line-height: 22px; }
+      line-height: 22px;
+      overflow: hidden; }
     .list-table thead th a {
       display: block;
       position: relative;
