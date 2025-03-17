@@ -45,15 +45,10 @@ type ServerListener struct {
 }
 
 func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
-	defer func() {
-		if err != nil {
-			conn.Close()
-		}
-	}()
-
-	var data []byte
-	if data, err = conn.Read(); err != nil {
-		return
+	data, err := conn.Read()
+	if err != nil {
+		_ = conn.Close()
+		return err
 	}
 
 	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
