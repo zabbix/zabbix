@@ -1,0 +1,1 @@
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when the database transaction commit fails; fixed inability to identify the interruption of database connection when calling *.get API methods (vmaksimovs)

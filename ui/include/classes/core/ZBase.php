@@ -697,12 +697,21 @@ class ZBase {
 				'stylesheet' => [
 					'files' => []
 				],
-				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
-				'config' => [
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL
+			];
+
+			try {
+				$layout_data_defaults['config'] = [
 					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
 					'x_frame_options' => CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS)
-				]
-			];
+				];
+			}
+			catch (Throwable $e) {
+				$layout_data_defaults['config'] = [
+					'server_check_interval' => DB::getDefault('config', 'server_check_interval'),
+					'x_frame_options' => DB::getDefault('config', 'x_frame_options')
+				];
+			}
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
 				$this->view = new CView($router->getView(), $response->getData());
