@@ -862,6 +862,20 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_override_operation(int audi
 	zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
+void	zbx_audit_discovery_rule_update_json_update_lld_override_opertion_str(int audit_context_mode,
+		zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_uint64_t operationid, const char *resource,
+		const char *value_old, const char  *value_new)
+{
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+
+	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.overrides[" ZBX_FS_UI64 "].operations["
+			ZBX_FS_UI64 "].%s", overrideid, operationid, resource);
+
+	zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key, value_old, value_new);
+}
+
 #define PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(resource, type, type2, table, field)				\
 void	zbx_audit_discovery_rule_update_json_add_lld_override_##resource(int audit_context_mode,		\
 		zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_uint64_t resource##_id, type resource)	\

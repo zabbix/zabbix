@@ -1061,8 +1061,8 @@ static zbx_uint64_t	lld_override_data_get_sync_flags(const zbx_lld_override_data
  *                                                                            *
  * Purpose: save new/updated LLD override conditions to database              *
  *                                                                            *
- * Parameters: lld_overrideid - [IN] LLD override ID                          *
- *             itemid         - [IN] item ID                                  *
+ * Parameters: itemid         - [IN] item ID                                  *
+ *             lld_overrideid - [IN] LLD override ID                          *
  *             conditions     - [IN] conditions to save                       *
  *             db_insert      - [IN] prepared database insert                 *
  *             sql            - [IN/OUT] sql buffer                           *
@@ -1070,7 +1070,7 @@ static zbx_uint64_t	lld_override_data_get_sync_flags(const zbx_lld_override_data
  *             sql_offset     - [IN/OUT] sql buffer used size                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_override_data_save_conditions(zbx_uint64_t lld_overrideid, zbx_uint64_t itemid,
+static void	lld_override_data_save_conditions(zbx_uint64_t itemid, zbx_uint64_t lld_overrideid,
 		const zbx_sync_rowset_t *conditions, zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
@@ -1132,7 +1132,8 @@ static void	lld_override_data_save_conditions(zbx_uint64_t lld_overrideid, zbx_u
  *                                                                            *
  * Purpose: save new/updated LLD override operations to database              *
  *                                                                            *
- * Parameters: lld_overrideid - [IN] LLD override ID                          *
+ * Parameters: itemid         - [IN] item ID                                  *
+ *             lld_overrideid - [IN] LLD override ID                          *
  *             operations     - [IN] operations to save                       *
  *             db_insert      - [IN] prepared database insert                 *
  *             sql            - [IN/OUT] sql buffer                           *
@@ -1140,8 +1141,9 @@ static void	lld_override_data_save_conditions(zbx_uint64_t lld_overrideid, zbx_u
  *             sql_offset     - [IN/OUT] sql buffer used size                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_override_data_save_operations(zbx_uint64_t lld_overrideid, const zbx_sync_rowset_t *operations,
-		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static void	lld_override_data_save_operations(zbx_uint64_t itemid, zbx_uint64_t lld_overrideid,
+		const zbx_sync_rowset_t *operations, zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	for (int i = 0; i < operations->rows.values_num; i++)
 	{
@@ -1151,6 +1153,10 @@ static void	lld_override_data_save_operations(zbx_uint64_t lld_overrideid, const
 		{
 			zbx_db_insert_add_values(db_insert, row->rowid, lld_overrideid, atoi(row->cols[0]),
 					atoi(row->cols[1]), row->cols[2]);
+
+			zbx_audit_discovery_rule_update_json_add_lld_override_operation(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, lld_overrideid, row->rowid, atoi(row->cols[0]), atoi(row->cols[1]),
+					row->cols[2]);
 			continue;
 		}
 
@@ -1182,11 +1188,8 @@ static void	lld_override_data_save_operations(zbx_uint64_t lld_overrideid, const
 			else
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", row->cols[k]);
 
-			/* TODO:
-				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(
-						ZBX_AUDIT_LLD_CONTEXT, item->itemid, row->rowid,
-						atoi(row->cols_orig[0]), atoi(row->cols[0]));
-				*/
+			zbx_audit_discovery_rule_update_json_update_lld_override_opertion_str(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, lld_overrideid, row->rowid, fields[k], row->cols_orig[k], row->cols[k]);
 		}
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where lld_override_operationid=" ZBX_FS_UI64 ";\n",
@@ -1420,10 +1423,10 @@ static void 	lld_override_data_save(zbx_uint64_t lld_overrideid, zbx_uint64_t it
 		const zbx_lld_override_data_t *data, zbx_db_insert_t *db_insert_data, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
-	lld_override_data_save_conditions(lld_overrideid, itemid, &data->conditions,
+	lld_override_data_save_conditions(itemid, lld_overrideid, &data->conditions,
 			&db_insert_data[LLD_OVERRIDE_DATA_CONDITION], sql, sql_alloc, sql_offset);
 
-	lld_override_data_save_operations(lld_overrideid, &data->operations,
+	lld_override_data_save_operations(itemid, lld_overrideid, &data->operations,
 			&db_insert_data[LLD_OVERRIDE_DATA_OPERATION], sql, sql_alloc, sql_offset);
 
 	lld_override_data_save_optags(&data->optags, &db_insert_data[LLD_OVERRIDE_DATA_TAG], sql, sql_alloc,
