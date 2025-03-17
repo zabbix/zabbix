@@ -1639,6 +1639,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
+define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
