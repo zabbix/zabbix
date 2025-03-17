@@ -108,23 +108,38 @@ func (sl *ServerListener) run() {
 		conn, err := sl.listener.Accept(time.Second*time.Duration(sl.options.Timeout),
 			zbxcomms.TimeoutModeShift)
 
-		if err == nil {
-			if !sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
-				conn.Close()
-				log.Warningf("failed to accept an incoming connection: connection from \"%s\" rejected, allowed hosts: \"%s\"",
-					conn.RemoteIP(), sl.options.Server)
-			} else if err := sl.processConnection(conn); err != nil {
-				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
+		if err != nil {
+			if sl.handleError(err) == nil {
+				continue
 			}
-		} else {
-			if err != nil {
-				if sl.handleError(err) == nil {
-					continue
-				}
 
-				break
-			}
+			break
 		}
+
+		remoteIP := conn.RemoteIP()
+
+		parsedIP := net.ParseIP(remoteIP)
+
+		if !sl.allowedPeers.CheckPeer(parsedIP) {
+			_ = conn.Close()
+
+			log.Warningf(
+				"failed to accept an incoming connection: connection from \"%s\" rejected, allowed hosts: \"%s\"",
+				remoteIP,
+				sl.options.Server,
+			)
+
+			continue
+		}
+
+		if err := sl.processConnection(conn); err != nil {
+			log.Warningf(
+				"failed to process an incoming connection from %s: %s",
+				remoteIP,
+				err.Error(),
+			)
+		}
+
 	}
 
 	log.Debugf("listener has been stopped")
