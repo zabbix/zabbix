@@ -132,14 +132,21 @@ func (sl *ServerListener) run() {
 				return nil
 			}
 
-			err = sl.processConnection(conn)
+			data, err := conn.Read()
 			if err != nil {
+				_ = conn.Close()
+
 				log.Warningf(
 					"failed to process an incoming connection from %s: %s",
 					remoteIP,
 					err.Error(),
 				)
 			}
+
+			log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
+
+			response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
+			go response.handleCheck(data)
 
 			return nil
 		}()
