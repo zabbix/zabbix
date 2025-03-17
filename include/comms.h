@@ -42,10 +42,10 @@
 #	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
 #	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN			EINTR
-#	define ZBX_PROTO_ERROR			-1
-#	define ZBX_SOCKET_ERROR			-1
-#	define ZBX_SOCKET_TO_INT(s)		(s)
+#	define ZBX_PROTO_AGAIN		EINTR
+#	define ZBX_PROTO_ERROR		-1
+#	define ZBX_SOCKET_ERROR		-1
+#	define ZBX_SOCKET_TO_INT(s)	(s)
 #endif
 
 #ifdef _WINDOWS

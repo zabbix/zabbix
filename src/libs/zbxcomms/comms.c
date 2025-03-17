@@ -1388,10 +1388,10 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	fd_set		sock_set;
 	ZBX_SOCKET	accepted_socket;
 	ZBX_SOCKLEN_T	nlen;
-	int		i, n = 0, ret = FAIL, select_ret;
+	int		i, n = 0, ret = FAIL, num_fds;
 	ssize_t		res;
 	unsigned char	buf;	/* 1 byte buffer */
-	struct timeval	timeout;
+	struct timeval	tv = {1, 0};
 
 	zbx_tcp_unaccept(s);
 
@@ -1406,17 +1406,12 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 #endif
 	}
 
-	timeout.tv_sec = 1;
-	timeout.tv_usec = 0;
-
-	select_ret = select(n + 1, &sock_set, NULL, NULL, &timeout);
-
-	if (0 == select_ret)
+	if (0 == (num_fds = select(n + 1, &sock_set, NULL, NULL, &tv)))
 	{
 		ret = TIMEOUT_ERROR;
 		goto out;
 	}
-	else if (ZBX_PROTO_ERROR == select_ret)
+	else if (ZBX_PROTO_ERROR == num_fds)
 	{
 		zbx_set_socket_strerror("select() failed: %s", strerror_from_system(zbx_socket_last_error()));
 		return ret;
