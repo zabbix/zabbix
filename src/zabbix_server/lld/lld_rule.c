@@ -29,7 +29,9 @@
 #define LLD_OVERRIDE_OPERATION_COL_OPERATIONOBJECT	0
 #define LLD_OVERRIDE_OPERATION_COL_OPERATOR		1
 #define LLD_OVERRIDE_OPERATION_COL_VALUE		2
-#define LLD_OVERRIDE_OPERATION_COL_OFFSET		LLD_OVERRIDE_OPERATION_COL_DISCOVER
+#define LLD_OVERRIDE_OPERATION_COL_OFFSET		LLD_OVERRIDE_OPERATION_COL_VALUE + 1
+
+#define LLD_OVERRIDE_OPERATION_UPDATE_MASK		((UINT64_C(1) << (LLD_OVERRIDE_OPERATION_COL_OFFSET - 1)) - 1)
 
 /* lld_override_op* data tables */
 #define LLD_OVERRIDE_OPERATION_COL_DISCOVER		3
@@ -204,14 +206,14 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 			if (ZBX_SYNC_ROW_NONE == row->flags)
 				continue;
 
-			if (ZBX_SYNC_ROW_INSERT == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
 				zbx_db_insert_add_values(&db_insert, row->rowid, rule_macros->itemid,
 						row->cols[0], row->cols[1]);
 				continue;
 			}
 
-			if (ZBX_SYNC_ROW_DELETE == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
 			{
 				zbx_vector_uint64_append(&deleted_ids, row->rowid);
 				continue;
@@ -397,14 +399,14 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 		{
 			zbx_sync_row_t	*row = item->macro_paths.rows.values[j];
 
-			if (ZBX_SYNC_ROW_DELETE == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, row->rowid);
 
 				zbx_audit_discovery_rule_update_json_delete_lld_macro_path(ZBX_AUDIT_LLD_CONTEXT,
 						item->itemid, row->rowid);
 			}
-			else if (ZBX_SYNC_ROW_INSERT == row->flags)
+			else if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
 				new_num++;
 			}
@@ -448,7 +450,7 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 			char		delim = ' ';
 			zbx_sync_row_t	*row = item->macro_paths.rows.values[j];
 
-			if (ZBX_SYNC_ROW_INSERT == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
 				zbx_db_insert_add_values(&db_insert, new_macroid, item->itemid, row->cols[0],
 						row->cols[1]);
@@ -540,7 +542,7 @@ static void	lld_rule_filters_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 		{
 			zbx_sync_row_t	*row = item->filters.rows.values[j];
 
-			if (ZBX_SYNC_ROW_INSERT == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 				new_num++;
 		}
 	}
@@ -560,7 +562,7 @@ static void	lld_rule_filters_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 			{
 				zbx_sync_row_t	*row = item->filters.rows.values[j];
 
-				if (ZBX_SYNC_ROW_INSERT == row->flags)
+				if (0 != (ZBX_SYNC_ROW_INSERT & row->flags))
 					row->rowid = new_conditionid++;
 			}
 		}
@@ -586,7 +588,7 @@ static void	lld_rule_rollback_filter(zbx_lld_item_full_t *item)
 	{
 		item->flags &= ~(ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA | ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE);
 		for (int i = 0; i < item->filters.rows.values_num; i++)
-			item->filters.rows.values[i]->flags &= ZBX_SYNC_ROW_NONE;
+			item->filters.rows.values[i]->flags = ZBX_SYNC_ROW_NONE;
 	}
 }
 
@@ -785,14 +787,14 @@ static int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_p
 		{
 			zbx_sync_row_t	*row = item->filters.rows.values[j];
 
-			if (ZBX_SYNC_ROW_DELETE == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, row->rowid);
 
 				zbx_audit_discovery_rule_update_json_delete_filter_conditions(ZBX_AUDIT_LLD_CONTEXT,
 						item->itemid, row->rowid);
 			}
-			else if (ZBX_SYNC_ROW_INSERT == row->flags)
+			else if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
 				new_num++;
 			}
@@ -835,7 +837,7 @@ static int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_p
 			char		delim = ' ';
 			zbx_sync_row_t	*row = item->filters.rows.values[j];
 
-			if (ZBX_SYNC_ROW_INSERT == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
 				zbx_db_insert_add_values(&db_insert, row->rowid, item->itemid, atoi(row->cols[0]),
 						row->cols[1], row->cols[2]);
@@ -930,18 +932,23 @@ static zbx_uint64_t	lld_operation_get_col_sync_flags(zbx_sync_row_t *row, int in
 {
 	int	col = index + LLD_OVERRIDE_OPERATION_COL_OFFSET;
 
-	if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE) && 0 == (row->flags & (UINT32_C(1) << col)))
-		return 0;
-
 	if (NULL == row->cols_orig[col])
 	{
-		return (NULL != row->cols[col] ? UINT64_C(1) << index : 0);
+		/* return insert flag */
+		if (NULL != row->cols[col])
+			return UINT64_C(1) << index;
+
+		/* both null = no changes */
+		return 0;
 	}
 
 	if (NULL == row->cols[col])
 		return LLD_OVERRIDE_SYNC_DELETE;
 
-	return LLD_OVERRIDE_SYNC_UPDATE;
+	if (0 != (row->flags & (UINT32_C(1) << col)))
+		return LLD_OVERRIDE_SYNC_UPDATE;
+
+	return 0;
 }
 
 /******************************************************************************
@@ -1030,8 +1037,14 @@ static zbx_uint64_t	lld_override_data_get_sync_flags(const zbx_lld_override_data
 		}
 		else if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
 		{
+			zbx_uint64_t	operationid;
+
 			flags |= LLD_OVERRIDE_SYNC_DELETE;
 			zbx_vector_uint64_append(delids_optag, row->rowid);
+
+			ZBX_STR2UINT64(operationid, row->cols[LLD_OVERRIDE_OPTAG_COL_OPID]);
+			zbx_audit_discovery_rule_update_json_delete_lld_override_operation_optag(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, data->overrideid, operationid, row->rowid);
 		}
 	}
 
@@ -1049,8 +1062,15 @@ static zbx_uint64_t	lld_override_data_get_sync_flags(const zbx_lld_override_data
 		}
 		else if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
 		{
+			zbx_uint64_t	operationid;
+
 			flags |= LLD_OVERRIDE_SYNC_DELETE;
 			zbx_vector_uint64_append(delids_optemplate, row->rowid);
+
+			ZBX_STR2UINT64(operationid, row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_OPID]);
+			zbx_audit_discovery_rule_update_json_delete_lld_override_operation_optemplate(
+					ZBX_AUDIT_LLD_CONTEXT, itemid, data->overrideid, operationid, row->rowid);
+
 		}
 	}
 
@@ -1160,7 +1180,7 @@ static void	lld_override_data_save_operations(zbx_uint64_t itemid, zbx_uint64_t 
 			continue;
 		}
 
-		if (0 == (row->flags & ZBX_SYNC_ROW_UPDATE))
+		if (0 == (row->flags & LLD_OVERRIDE_OPERATION_UPDATE_MASK))
 			continue;
 
 		const char	*fields[] = {"operationobject", "operator", "value"};
@@ -1188,7 +1208,7 @@ static void	lld_override_data_save_operations(zbx_uint64_t itemid, zbx_uint64_t 
 			else
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", row->cols[k]);
 
-			zbx_audit_discovery_rule_update_json_update_lld_override_opertion_str(ZBX_AUDIT_LLD_CONTEXT,
+			zbx_audit_discovery_rule_update_json_update_lld_override_operation_str(ZBX_AUDIT_LLD_CONTEXT,
 					itemid, lld_overrideid, row->rowid, fields[k], row->cols_orig[k], row->cols[k]);
 		}
 
@@ -1202,15 +1222,18 @@ static void	lld_override_data_save_operations(zbx_uint64_t itemid, zbx_uint64_t 
  *                                                                            *
  * Purpose: save new/updated LLD override operation tags to database          *
  *                                                                            *
- * Parameters: optags     - [IN] operation tags to save                       *
+ * Parameters: itemid         - [IN] item ID                                  *
+ *             lld_overrideid - [IN] LLD override ID                          *
+ *             optags     - [IN] operation tags to save                       *
  *             db_insert  - [IN] prepared database insert                     *
  *             sql        - [IN/OUT] sql buffer                               *
  *             sql_alloc  - [IN/OUT] sql buffer allocated size                *
  *             sql_offset - [IN/OUT] sql buffer used size                     *
  *                                                                            *
  ******************************************************************************/
-static void	lld_override_data_save_optags(const zbx_sync_rowset_t *optags, zbx_db_insert_t *db_insert, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
+static void	lld_override_data_save_optags(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		const zbx_sync_rowset_t *optags, zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	for (int i = 0; i < optags->rows.values_num; i++)
 	{
@@ -1222,6 +1245,9 @@ static void	lld_override_data_save_optags(const zbx_sync_rowset_t *optags, zbx_d
 
 			ZBX_DBROW2UINT64(operationid, row->cols[2]);
 			zbx_db_insert_add_values(db_insert, row->rowid, operationid, row->cols[0], row->cols[1]);
+
+			zbx_audit_discovery_rule_update_json_add_lld_override_optag(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, overrideid, operationid, row->rowid, row->cols[0], row->cols[1]);
 			continue;
 		}
 
@@ -1230,11 +1256,20 @@ static void	lld_override_data_save_optags(const zbx_sync_rowset_t *optags, zbx_d
 
 		const char	*fields[] = {"tag", "value", "lld_override_operationid"};
 		char		delim = ' ';
+		zbx_uint64_t	operationid;
+
+		if (NULL != row->cols_orig[LLD_OVERRIDE_OPTAG_COL_OPID])
+			ZBX_STR2UINT64(operationid, row->cols_orig[LLD_OVERRIDE_OPTAG_COL_OPID]);
+		else
+			ZBX_STR2UINT64(operationid, row->cols[LLD_OVERRIDE_OPTAG_COL_OPID]);
 
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update lld_override_optag set");
 
 		for (int k = 0; k < row->cols_num; k++)
 		{
+			if (0 == (row->flags & (UINT32_C(1) << k)))
+				continue;
+
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%s=", delim, fields[k]);
 			delim = ',';
 
@@ -1250,11 +1285,9 @@ static void	lld_override_data_save_optags(const zbx_sync_rowset_t *optags, zbx_d
 			else
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", row->cols[k]);
 
-			/* TODO:
-				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(
-						ZBX_AUDIT_LLD_CONTEXT, item->itemid, row->rowid,
-						atoi(row->cols_orig[0]), atoi(row->cols[0]));
-			*/
+			zbx_audit_discovery_rule_update_json_update_lld_override_optag(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, overrideid, operationid, row->rowid, fields[k], row->cols_orig[k],
+					row->cols[k]);
 		}
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where lld_override_optagid=" ZBX_FS_UI64 ";\n",
@@ -1267,15 +1300,18 @@ static void	lld_override_data_save_optags(const zbx_sync_rowset_t *optags, zbx_d
  *                                                                            *
  * Purpose: save new/updated LLD override operation template links to database*
  *                                                                            *
- * Parameters: optemplates - [IN] operation templates to save                 *
+ * Parameters: itemid         - [IN] item ID                                  *
+ *             lld_overrideid - [IN] LLD override ID                          *
+ *             optemplates - [IN] operation templates to save                 *
  *             db_insert   - [IN] prepared database insert                    *
  *             sql         - [IN/OUT] sql buffer                              *
  *             sql_alloc   - [IN/OUT] sql buffer allocated size               *
  *             sql_offset  - [IN/OUT] sql buffer used size                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_override_data_save_optemplates(const zbx_sync_rowset_t *optemplates, zbx_db_insert_t *db_insert,
-		char **sql, size_t *sql_alloc, size_t *sql_offset)
+static void	lld_override_data_save_optemplates(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		const zbx_sync_rowset_t *optemplates, zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	for (int i = 0; i < optemplates->rows.values_num; i++)
 	{
@@ -1297,11 +1333,20 @@ static void	lld_override_data_save_optemplates(const zbx_sync_rowset_t *optempla
 
 		const char	*fields[] = {"templateid", "lld_override_operationid"};
 		char		delim = ' ';
+		zbx_uint64_t	operationid;
 
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update lld_override_optag set");
+		if (NULL != row->cols_orig[LLD_OVERRIDE_OPTEMPLATE_COL_OPID])
+			ZBX_STR2UINT64(operationid, row->cols_orig[LLD_OVERRIDE_OPTEMPLATE_COL_OPID]);
+		else
+			ZBX_STR2UINT64(operationid, row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_OPID]);
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update lld_override_optemplate set");
 
 		for (int k = 0; k < row->cols_num; k++)
 		{
+			if (0 == (row->flags & (UINT32_C(1) << k)))
+				continue;
+
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%s=", delim, fields[k]);
 			delim = ',';
 
@@ -1317,81 +1362,73 @@ static void	lld_override_data_save_optemplates(const zbx_sync_rowset_t *optempla
 			else
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", row->cols[k]);
 
-			/* TODO:
-				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(
-						ZBX_AUDIT_LLD_CONTEXT, item->itemid, row->rowid,
-						atoi(row->cols_orig[0]), atoi(row->cols[0]));
-			*/
+			zbx_audit_discovery_rule_update_json_update_lld_override_optemplate(ZBX_AUDIT_LLD_CONTEXT,
+					itemid, overrideid, operationid, row->rowid, fields[k], row->cols_orig[k],
+					row->cols[k]);
 		}
+
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where lld_override_optemplateid=" ZBX_FS_UI64 ";\n",
+				row->rowid);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: save integer LLD override operation field to database             *
- *                                                                            *
- * Parameters: overrideid - [IN] operation identifier                         *
- *             row        - [IN] data row                                     *
- *             col        - [IN] column index                                 *
- *             table_name - [IN] target table name                            *
- *             field_name - [IN] target field name                            *
- *             db_insert  - [IN] prepared database insert                     *
- *             sql        - [IN/OUT] sql buffer                               *
- *             sql_alloc  - [IN/OUT] sql buffer allocated size                *
- *             sql_offset - [IN/OUT] sql buffer used size                     *
- *                                                                            *
- ******************************************************************************/
-static void	lld_override_data_save_opint(zbx_uint64_t overrideid, zbx_sync_row_t *row, int col,
-		const char *table_name, const char *field_name, zbx_db_insert_t *db_insert, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
+static void	lld_override_data_save_opint(zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_sync_row_t *row,
+		int col, const char *table_name, const char *field_name, const char *resource,
+		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	if ((ZBX_SYNC_ROW_UPDATE != row->flags || 0 == (row->flags & (UINT32_C(1) << col))) &&
-			(ZBX_SYNC_ROW_INSERT != row->flags || NULL == row->cols[col]))
+	if (0 == (row->flags & (UINT32_C(1) << col)) &&
+			(0 == (row->flags & ZBX_SYNC_ROW_INSERT) || NULL == row->cols[col]))
 	{
 		return;
 	}
 
 	if (NULL == row->cols_orig[col])
 	{
-		zbx_db_insert_add_values(db_insert, overrideid, atoi(row->cols[col]));
+		zbx_db_insert_add_values(db_insert, row->rowid, atoi(row->cols[col]));
+
+		zbx_audit_discovery_rule_update_json_add_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
+				itemid, overrideid, row->rowid, resource, row->cols[col], field_name);
 	}
 	else if (NULL != row->cols[col])
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set %s=%s"
 				" where lld_override_operationid=" ZBX_FS_UI64 ";\n",
-				table_name, field_name, row->cols[col], overrideid);
+				table_name, field_name, row->cols[col], row->rowid);
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+		zbx_audit_discovery_rule_update_json_update_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
+				itemid, overrideid, row->rowid, resource, row->cols_orig[col], row->cols[col]);
+	}
+	else
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from %s"
+				" where lld_override_operationid=" ZBX_FS_UI64 ";\n",
+				table_name, row->rowid);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+		zbx_audit_discovery_rule_update_json_delete_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
+				itemid, overrideid, row->rowid, resource);
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: save string LLD override operation field to database              *
- *                                                                            *
- * Parameters: overrideid - [IN] operation identifier                         *
- *             row        - [IN] data row                                     *
- *             col        - [IN] column index                                 *
- *             table_name - [IN] target table name                            *
- *             field_name - [IN] target field name                            *
- *             db_insert  - [IN] prepared database insert                     *
- *             sql        - [IN/OUT] sql buffer                               *
- *             sql_alloc  - [IN/OUT] sql buffer allocated size                *
- *             sql_offset - [IN/OUT] sql buffer used size                     *
- *                                                                            *
- ******************************************************************************/
-static void	lld_override_data_save_opstr(zbx_uint64_t overrideid, zbx_sync_row_t *row, int col,
-		const char *table_name, const char *field_name, zbx_db_insert_t *db_insert, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
+static void	lld_override_data_save_opstr(zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_sync_row_t *row,
+		int col, const char *table_name, const char *field_name, const char *resource,
+		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	if ((ZBX_SYNC_ROW_UPDATE != row->flags || 0 == (row->flags & (UINT32_C(1) << col))) &&
-			(ZBX_SYNC_ROW_INSERT != row->flags || NULL == row->cols[col]))
+	if (0 == (row->flags & (UINT32_C(1) << col)) &&
+			(0 == (row->flags & ZBX_SYNC_ROW_INSERT) || NULL == row->cols[col]))
 	{
 		return;
 	}
 
 	if (NULL == row->cols_orig[col])
 	{
-		zbx_db_insert_add_values(db_insert, overrideid, row->cols[col]);
+		zbx_db_insert_add_values(db_insert, row->rowid, row->cols[col]);
+
+		zbx_audit_discovery_rule_update_json_add_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
+				itemid, overrideid, row->rowid, resource, row->cols[col], field_name);
+
 	}
 	else if (NULL != row->cols[col])
 	{
@@ -1403,6 +1440,19 @@ static void	lld_override_data_save_opstr(zbx_uint64_t overrideid, zbx_sync_row_t
 
 		zbx_free(value_esc);
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+		zbx_audit_discovery_rule_update_json_update_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
+				itemid, overrideid, row->rowid, resource, row->cols_orig[col], row->cols[col]);
+	}
+	else
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from %s"
+				" where lld_override_operationid=" ZBX_FS_UI64 ";\n",
+				table_name, row->rowid);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+		zbx_audit_discovery_rule_update_json_delete_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
+				itemid, overrideid, row->rowid, resource);
 	}
 }
 
@@ -1419,56 +1469,56 @@ static void	lld_override_data_save_opstr(zbx_uint64_t overrideid, zbx_sync_row_t
  *             sql_offset      - [IN/OUT] sql buffer used size                *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_override_data_save(zbx_uint64_t lld_overrideid, zbx_uint64_t itemid,
-		const zbx_lld_override_data_t *data, zbx_db_insert_t *db_insert_data, char **sql, size_t *sql_alloc,
-		size_t *sql_offset)
+static void 	lld_override_data_save(zbx_uint64_t itemid, const zbx_lld_override_data_t *data,
+		zbx_db_insert_t *db_insert_data, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	lld_override_data_save_conditions(itemid, lld_overrideid, &data->conditions,
+	lld_override_data_save_conditions(itemid, data->overrideid, &data->conditions,
 			&db_insert_data[LLD_OVERRIDE_DATA_CONDITION], sql, sql_alloc, sql_offset);
 
-	lld_override_data_save_operations(itemid, lld_overrideid, &data->operations,
+	lld_override_data_save_operations(itemid, data->overrideid, &data->operations,
 			&db_insert_data[LLD_OVERRIDE_DATA_OPERATION], sql, sql_alloc, sql_offset);
 
-	lld_override_data_save_optags(&data->optags, &db_insert_data[LLD_OVERRIDE_DATA_TAG], sql, sql_alloc,
-			sql_offset);
+	lld_override_data_save_optags(itemid, data->overrideid, &data->optags, &db_insert_data[LLD_OVERRIDE_DATA_TAG],
+			sql, sql_alloc, sql_offset);
 
-	lld_override_data_save_optemplates(&data->optemplates, &db_insert_data[LLD_OVERRIDE_DATA_TEMPLATE], sql,
-			sql_alloc, sql_offset);
+	lld_override_data_save_optemplates(itemid, data->overrideid, &data->optemplates,
+			&db_insert_data[LLD_OVERRIDE_DATA_TEMPLATE], sql, sql_alloc, sql_offset);
 
 	for (int i = 0; i < data->operations.rows.values_num; i++)
 	{
 		zbx_sync_row_t	*row = data->operations.rows.values[i];
 
-		if (ZBX_SYNC_ROW_INSERT != row->flags && ZBX_SYNC_ROW_UPDATE != row->flags)
+		if (0 == (row->flags & (ZBX_SYNC_ROW_INSERT | ZBX_SYNC_ROW_UPDATE)))
 			continue;
 
-		lld_override_data_save_opint(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_DISCOVER,
-				"lld_override_opdiscover", "discover", &db_insert_data[LLD_OVERRIDE_DATA_DISCOVER],
-				sql, sql_alloc, sql_offset);
+		lld_override_data_save_opint(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_DISCOVER, "lld_override_opdiscover", "discover",
+				"opdiscover", &db_insert_data[LLD_OVERRIDE_DATA_DISCOVER], sql, sql_alloc, sql_offset);
 
-		lld_override_data_save_opstr(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_HISTORY,
-				"lld_override_ophistory", "history", &db_insert_data[LLD_OVERRIDE_DATA_HISTORY],
-				sql, sql_alloc, sql_offset);
+		lld_override_data_save_opstr(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_HISTORY, "lld_override_ophistory", "history", "ophistory",
+				&db_insert_data[LLD_OVERRIDE_DATA_HISTORY], sql, sql_alloc, sql_offset);
 
-		lld_override_data_save_opint(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_INVENTORY,
-				"lld_override_opinventory", "inventory_mode",
-				&db_insert_data[LLD_OVERRIDE_DATA_INVENTORY], sql, sql_alloc, sql_offset);
+		lld_override_data_save_opint(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_INVENTORY, "lld_override_opinventory", "inventory_mode",
+				"opinventory", &db_insert_data[LLD_OVERRIDE_DATA_INVENTORY], sql, sql_alloc,
+				sql_offset);
 
-		lld_override_data_save_opstr(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_PERIOD,
-				"lld_override_opperiod", "delay", &db_insert_data[LLD_OVERRIDE_DATA_PERIOD],
-				sql, sql_alloc, sql_offset);
+		lld_override_data_save_opstr(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_PERIOD, "lld_override_opperiod", "delay", "opperiod",
+				&db_insert_data[LLD_OVERRIDE_DATA_PERIOD], sql, sql_alloc, sql_offset);
 
-		lld_override_data_save_opint(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_SEVERITY,
-				"lld_override_opseverity", "severity", &db_insert_data[LLD_OVERRIDE_DATA_SEVERITY],
-				sql, sql_alloc, sql_offset);
+		lld_override_data_save_opint(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_SEVERITY, "lld_override_opseverity", "severity",
+				"opseverity", &db_insert_data[LLD_OVERRIDE_DATA_SEVERITY], sql, sql_alloc, sql_offset);
 
-		lld_override_data_save_opint(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_STATUS,
-				"lld_override_opstatus", "status", &db_insert_data[LLD_OVERRIDE_DATA_STATUS],
-				sql, sql_alloc, sql_offset);
+		lld_override_data_save_opint(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_STATUS, "lld_override_opstatus", "status", "opstatus",
+				&db_insert_data[LLD_OVERRIDE_DATA_STATUS], sql, sql_alloc, sql_offset);
 
-		lld_override_data_save_opstr(row->rowid, row, LLD_OVERRIDE_OPERATION_COL_TRENDS,
-				"lld_override_optrends", "trends", &db_insert_data[LLD_OVERRIDE_DATA_TRENDS],
-				sql, sql_alloc, sql_offset);
+		lld_override_data_save_opstr(itemid, data->overrideid, row,
+				LLD_OVERRIDE_OPERATION_COL_TRENDS, "lld_override_optrends", "trends", "optrends",
+				&db_insert_data[LLD_OVERRIDE_DATA_TRENDS], sql, sql_alloc, sql_offset);
 	}
 }
 
@@ -1558,14 +1608,14 @@ static int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_ful
 		{
 			zbx_sync_row_t	*row = item->overrides.rows.values[j];
 
-			if (ZBX_SYNC_ROW_DELETE == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
 			{
 				zbx_vector_uint64_append(&delids_override, row->rowid);
 
 				zbx_audit_discovery_rule_update_json_delete_lld_override(ZBX_AUDIT_LLD_CONTEXT,
 						item->itemid, row->rowid);
 			}
-			else if (ZBX_SYNC_ROW_INSERT == row->flags)
+			else if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
 				new_num++;
 			}
@@ -1680,9 +1730,9 @@ static int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_ful
 		{
 			zbx_sync_row_t	*row = item->overrides.rows.values[j];
 
-			if (ZBX_SYNC_ROW_INSERT == row->flags)
+			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
-				row->rowid = overrideid++;
+				row->rowid = ((zbx_lld_override_data_t *)row->data)->overrideid = overrideid++;
 
 				zbx_db_insert_add_values(&db_insert, row->rowid, item->itemid, row->cols[0],
 						atoi(row->cols[1]), atoi(row->cols[2]), atoi(row->cols[3]),
@@ -1697,8 +1747,8 @@ static int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_ful
 				lld_rule_override_update_sql(&sql, &sql_alloc, &sql_offset, item->itemid, row);
 			}
 
-			lld_override_data_save(row->rowid, item->itemid, (zbx_lld_override_data_t *)row->data,
-					db_insert_data, &sql, &sql_alloc, &sql_offset);
+			lld_override_data_save(item->itemid, (zbx_lld_override_data_t *)row->data, db_insert_data,
+					&sql, &sql_alloc, &sql_offset);
 		}
 	}
 
@@ -1856,7 +1906,7 @@ static void	lld_rule_override_merge(zbx_sync_row_t *dst_row, const zbx_sync_row_
  ******************************************************************************/
 static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 {
-	int	new_conditions_num = 0, new_operations_num = 0;
+	int	new_conditions_num = 0, new_operations_num = 0, new_optags_num = 0, new_optemplates_num = 0;
 
 	/* calculate the number of new conditions and operations */
 	for (int i = 0; i < items->values_num; i++)
@@ -1876,7 +1926,7 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 			{
 				zbx_sync_row_t 	*row = data->conditions.rows.values[k];
 
-				if (ZBX_SYNC_ROW_INSERT == row->flags)
+				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 					new_conditions_num++;
 			}
 
@@ -1884,22 +1934,44 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 			{
 				zbx_sync_row_t 	*row = data->operations.rows.values[k];
 
-				if (ZBX_SYNC_ROW_INSERT == row->flags)
+				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 					new_operations_num++;
+			}
+
+			for (int k = 0; k < data->optags.rows.values_num; k++)
+			{
+				zbx_sync_row_t         *row = data->optags.rows.values[k];
+
+				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+					new_optags_num++;
+			}
+
+			for (int k = 0; k < data->optemplates.rows.values_num; k++)
+			{
+				zbx_sync_row_t         *row = data->optemplates.rows.values[k];
+
+				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+					new_optemplates_num++;
 			}
 		}
 	}
 
-	/* reserve and assign IDs for new conditions and operations */
-	if (0 != new_conditions_num || 0 != new_operations_num)
+	/* reserve and assign IDs for new conditions, operations, optags and optemplates */
+	if (0 != new_conditions_num || 0 != new_operations_num || 0 != new_optags_num || 0 != new_optemplates_num)
 	{
-		zbx_uint64_t	new_conditionid, new_operationid;
+		zbx_uint64_t	new_conditionid, new_operationid, new_optagid, new_optemplateid;
 
 		if (0 != new_conditions_num)
 			new_conditionid = zbx_db_get_maxid_num("lld_override_condition", new_conditions_num);
 
 		if (0 != new_operations_num)
 			new_operationid = zbx_db_get_maxid_num("lld_override_operation", new_operations_num);
+
+		if (0 != new_optags_num)
+			new_optagid = zbx_db_get_maxid_num("lld_override_optag", new_optags_num);
+
+		if (0 != new_optemplates_num)
+			new_optemplateid = zbx_db_get_maxid_num("lld_override_optemplate", new_optemplates_num);
 
 		for (int i = 0; i < items->values_num; i++)
 		{
@@ -1918,7 +1990,7 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 				{
 					zbx_sync_row_t	*row = data->conditions.rows.values[k];
 
-					if (ZBX_SYNC_ROW_INSERT == row->flags)
+					if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 						row->rowid = new_conditionid++;
 				}
 
@@ -1926,8 +1998,24 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 				{
 					zbx_sync_row_t	*row = data->operations.rows.values[k];
 
-					if (ZBX_SYNC_ROW_INSERT == row->flags)
+					if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 						row->rowid = new_operationid++;
+				}
+
+				for (int k = 0; k < data->optags.rows.values_num; k++)
+				{
+					zbx_sync_row_t         *row = data->optags.rows.values[k];
+
+					if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+						row->rowid = new_optagid++;
+				}
+
+				for (int k = 0; k < data->optemplates.rows.values_num; k++)
+				{
+					zbx_sync_row_t         *row = data->optemplates.rows.values[k];
+
+					if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+						row->rowid = new_optemplateid++;
 				}
 			}
 		}

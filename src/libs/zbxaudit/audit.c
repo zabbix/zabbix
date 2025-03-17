@@ -437,6 +437,7 @@ int	audit_field_value_matches_db_default(const char *table_name, const char *fie
 		if (NULL == (table = zbx_db_get_table(table_name)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table_name);
+			*cached_table_name = '\0';
 			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
 		}
