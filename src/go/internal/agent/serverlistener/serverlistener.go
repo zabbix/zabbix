@@ -27,6 +27,7 @@ import (
 	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxnet"
 )
@@ -106,41 +107,50 @@ func (sl *ServerListener) run() {
 
 	for {
 
-		conn, err := sl.listener.Accept(
-			time.Second*time.Duration(sl.options.Timeout),
-			zbxcomms.TimeoutModeShift,
-		)
-		if err != nil {
-			if sl.handleError(err) == nil {
-				continue
+		outerErr := func() error {
+
+			conn, err := sl.listener.Accept(
+				time.Second*time.Duration(sl.options.Timeout),
+				zbxcomms.TimeoutModeShift,
+			)
+			if err != nil {
+				if sl.handleError(err) == nil {
+					return nil
+				}
+
+				return errs.New("failed handling error")
 			}
 
+			remoteIP := conn.RemoteIP()
+
+			parsedIP := net.ParseIP(remoteIP)
+
+			if !sl.allowedPeers.CheckPeer(parsedIP) {
+				_ = conn.Close()
+
+				log.Warningf(
+					"failed to accept an incoming connection: connection from %q rejected, allowed hosts: %q",
+					remoteIP,
+					sl.options.Server,
+				)
+
+				return nil
+			}
+
+			err = sl.processConnection(conn)
+			if err != nil {
+				log.Warningf(
+					"failed to process an incoming connection from %s: %s",
+					remoteIP,
+					err.Error(),
+				)
+			}
+
+			return nil
+		}()
+
+		if outerErr != nil {
 			break
-		}
-
-		remoteIP := conn.RemoteIP()
-
-		parsedIP := net.ParseIP(remoteIP)
-
-		if !sl.allowedPeers.CheckPeer(parsedIP) {
-			_ = conn.Close()
-
-			log.Warningf(
-				"failed to accept an incoming connection: connection from %q rejected, allowed hosts: %q",
-				remoteIP,
-				sl.options.Server,
-			)
-
-			continue
-		}
-
-		err = sl.processConnection(conn)
-		if err != nil {
-			log.Warningf(
-				"failed to process an incoming connection from %s: %s",
-				remoteIP,
-				err.Error(),
-			)
 		}
 
 	}
