@@ -2770,7 +2770,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
 		zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, *itemid, item->name,
-				ZBX_FLAG_DISCOVERY_CREATED);
+				item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED);
 		zbx_audit_item_update_json_add_lld_data(*itemid, item, item_prototype, hostid);
 		item->itemid = (*itemid)++;
 	}
@@ -3322,9 +3322,23 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 		}
 		else
 		{
+			zbx_lld_item_prototype_t	item_prototype_local;
+			int				index;
+
+			item_prototype_local.itemid = item->parent_itemid;
+
+			if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes,
+					&item_prototype_local, lld_item_prototype_compare_func)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item_prototype = item_prototypes->values[index];
+
 			zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, item->itemid,
 					(NULL == item->name_proto) ? item->name : item->name_proto,
-					ZBX_FLAG_DISCOVERY_CREATED);
+					item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
 		if (0 != item->itemid && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
