@@ -21,7 +21,6 @@
 
 
 $is_templated = (bool) $data['templates'];
-// todo - double check if works correctly
 $discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
 $readonly = $is_templated || $discovered_graph;
 
@@ -39,8 +38,9 @@ if ($discovered_graph) {
 		new CLabel(_('Discovered by')),
 		new CFormField(
 			new CLink($data['discoveryRule']['name'],
-				(new CUrl('graphs.php'))
-					->setArgument('form', 'update')
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'graph.prototype.edit')
 					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 					->setArgument('graphid', $data['graphDiscovery']['parent_graphid'])
 					->setArgument('context', $data['context'])
@@ -120,7 +120,7 @@ $percent_left_checkbox = (new CCheckBox('visible[percent_left]'))
 if (array_key_exists('visible', $data) && array_key_exists('percent_left', $data['visible'])) {
 	$percent_left_checkbox->setChecked(true);
 }
-elseif($data['percent_right'] == 0) {
+elseif($data['percent_left'] == 0) {
 	$percent_left_checkbox->setChecked(false);
 }
 
@@ -176,9 +176,6 @@ $yaxis_min_value = (new CDiv(
 	->setId('yaxis_min_value')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
-// todo - add this to graph tab? (maybe necessary for chart view)
-//	$graphForm->addVar('yaxismin', $data['yaxismin']);
-
 $ymin_axis_ms_data = [];
 
 if ($data['ymin_itemid'] != 0) {
@@ -225,9 +222,6 @@ $yaxis_min_itemid = (new CDiv(
 	->setId('yaxis_min_ms')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
-// todo - add this to graph tab? (maybe necessary for chart view)
-//$graphForm->addVar('yaxismin', $data['yaxismin']);
-
 $graph_tab->addItem([
 	(new CLabel(_('Y axis MIN value'),'ymin_type_label')),
 	(new CFormField([$yaxis_min_type, $yaxis_min_value, $yaxis_min_itemid]))->setId('yaxis_min_field')
@@ -249,9 +243,6 @@ $yaxis_max_value = (new CDiv(
 ))
 	->setId('yaxis_max_value')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-
-// todo - add this to graph tab? (maybe necessary for chart view)
-//$graphForm->addVar('yaxismax', $data['yaxismax']);
 
 $ymax_axis_ms_data = [];
 
@@ -314,7 +305,7 @@ $graph_tab
 	]);
 
 $items_table = (new CTable())
-	->setId('items_table')
+	->setId('items-table')
 	->addClass(ZBX_STYLE_LIST_NUMBERED)
 	->setColumns([
 		(new CTableColumn())->addClass('table-col-handle'),
@@ -330,15 +321,6 @@ $items_table = (new CTable())
 		$readonly ? null : (new CTableColumn(''))->addClass('table-col-action')
 	]);
 
-// todo - check about normal only. Moved all other params to JS
-// if ($data['normal_only']) {
-//	$parameters_add['normal_only'] = '1';
-// }
-// todo - double check about this. (if $data['hostid'] - move this to JS.
-if ($data['hostid']) {
-	$parameters_add['hostid'] = $data['hostid'];
-}
-
 $items_table->addRow(
 	(new CRow(
 		$readonly
@@ -346,9 +328,13 @@ $items_table->addRow(
 			: (new CCol(
 			new CHorList([
 				(new CButton('add_item', _('Add')))
-					//->setAttribute('data-parameters', json_encode($parameters_add))
 					->addClass('js-add-item')
-					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass(ZBX_STYLE_BTN_LINK),
+				$data['parent_discoveryid']
+					? (new CButton('add_item_prototype', _('Add prototype')))
+						->addClass('js-add-item-prototype')
+						->addClass(ZBX_STYLE_BTN_LINK)
+					: null
 			])
 		))->setColSpan(8)
 	))->setId('item-buttons-row')
@@ -383,7 +369,9 @@ $item_row_template_normal = (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_NORMAL
 			new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
 			new CCol($readonly
 				? (new CSpan('#{name}'))->setId('items_#{number}_name')
-				: (new CLink('#{name}', 'javascript:void(0);'))->setId('items_#{number}_name')
+				: (new CLink('#{name}', 'javascript:void(0);'))
+					->addClass('js-item-name')
+					->setId('items_#{number}_name')
 			),
 			new CCol(
 				(new CSelect('items[#{number}][calc_fnc]'))
@@ -412,8 +400,7 @@ $item_row_template_normal = (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_NORMAL
 					->setReadonly($readonly)
 			),
 			new CCol([
-				//(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))
-				(new CColor('items[#{number}][color]', '#{color}',))
+				(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))
 					->addClass('js-event-color-picker')
 			]),
 			$readonly
@@ -439,7 +426,7 @@ $item_row_template_stacked = (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_STACK
 				(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))->setId('items_#{number}_itemid'),
 				(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))->setId('items_#{number}_sortorder'),
 				(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))->setId('items_#{number}_flags'),
-				// todo - check if stacked shouldne be added here:
+				// todo - check if stacked shouldnt be added here:
 				(new CInput('hidden', 'items[#{number}][type]', GRAPH_ITEM_SIMPLE))->setId('items_#{number}_type'),
 				(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))->setId('items_#{number}_calc_fnc'),
 				(new CInput('hidden', 'items[#{number}][drawtype]', '#{drawtype}'))->setId('items_#{number}_drawtype'),
@@ -603,14 +590,17 @@ $item_row_template_exploded = (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_EXPL
 
 $graph_tab->addItem([
 	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
-	(new CDiv($items_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+	(new CDiv($items_table))
+		->addStyle('graph-items')
+		->addStyle('max-width: 750px')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 	$item_row_template_normal,
 	$item_row_template_stacked,
 	$item_row_template_pie,
 	$item_row_template_exploded
 ]);
 
-if ($data['parent_discoveryid']) {
+if (array_key_exists('parent_discoveryid', $data)) {
 	$graph_tab->addItem([
 		new CLabel(_('Discover')),
 		new CFormField(

@@ -7698,25 +7698,25 @@ svg {
   float: left;
   line-height: 24px; }
 
-#items_table .table-col-handle {
+#items-table .table-col-handle {
   width: 12px; }
-#items_table .table-col-no {
+#items-table .table-col-no {
   width: 20px; }
-#items_table .table-col-name-normal {
+#items-table .table-col-name-normal {
   width: 285px; }
-#items_table .table-col-name {
+#items-table .table-col-name {
   width: 365px; }
-#items_table .table-col-type {
+#items-table .table-col-type {
   width: 85px; }
-#items_table .table-col-function {
+#items-table .table-col-function {
   width: 85px; }
-#items_table .table-col-draw-style {
+#items-table .table-col-draw-style {
   width: 85px; }
-#items_table .table-col-y-axis-side {
+#items-table .table-col-y-axis-side {
   width: 85px; }
-#items_table .table-col-color {
+#items-table .table-col-color {
   width: 55px; }
-#items_table .table-col-action {
+#items-table .table-col-action {
   width: 55px; }
 
 .z-select.z-select-host-interface .description:not(:empty),

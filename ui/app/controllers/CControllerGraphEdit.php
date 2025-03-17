@@ -25,7 +25,6 @@ class CControllerGraphEdit extends CController {
 		$fields = [
 			'context' =>			'in '.implode(',', ['host', 'template']),
 			'hostid' =>				'id',
-			'parent_discoveryid'=>	'id',
 			'graphid' =>			'db graphs.graphid',
 			'name' =>				'string',
 			'width' =>				'db graphs.width|ge 20|le 65535',
@@ -60,7 +59,8 @@ class CControllerGraphEdit extends CController {
 
 			// todo - update validation - this only when ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
-			'items' =>				'array'
+			'items' =>				'array',
+			'normal_only' =>		'in 1'
 		];
 
 
@@ -89,32 +89,22 @@ class CControllerGraphEdit extends CController {
 	protected function doAction() {
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
-			'parent_discoveryid' => $this->hasInput('parent_discoveryid') ? $this->getInput('parent_discoveryid') : null,
 			'group_gid' => $this->getInput('group_gid', []),
-			'hostid' => $this->getInput('hostid', []),
-			'context' => $this->getInput('context')
-			// todo - check this param:
-			//'normal_only' => $this->getInput('normal_only')
+			'hostid' => $this->getInput('hostid', 0),
+			'context' => $this->getInput('context'),
+			'normal_only' => $this->getInput('normal_only', 0)
 		];
 
 		if ($data['graphid'] != 0) {
 			$options = [
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => ['hostid'],
-				'graphids' => $data['graphid']
+				'graphids' => $data['graphid'],
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectGraphDiscovery' 	=> ['parent_graphid']
 			];
 
-			if ($data['parent_discoveryid'] === null) {
-				$options += [
-					'selectDiscoveryRule'	=> ['itemid', 'name'],
-					'selectGraphDiscovery'	=> ['parent_graphid']
-				];
-				$graph = API::Graph()->get($options);
-			}
-			else {
-				$graph = API::GraphPrototype()->get($options);
-			}
-
+			$graph = API::Graph()->get($options);
 			$graph = reset($graph);
 
 			$data['name'] = $graph['name'];
@@ -134,17 +124,11 @@ class CControllerGraphEdit extends CController {
 			$data['percent_left'] = $graph['percent_left'];
 			$data['percent_right'] = $graph['percent_right'];
 			$data['templateid'] = $graph['templateid'];
-			$data['templates'] = [];
+			$data['flags'] = $graph['flags'];
+			$data['discoveryRule'] = $graph['discoveryRule'];
+			$data['graphDiscovery'] = $graph['graphDiscovery'];
 
-			if ($data['parent_discoveryid'] === null) {
-				$data['flags'] = $graph['flags'];
-				$data['discoveryRule'] = $graph['discoveryRule'];
-				$data['graphDiscovery'] = $graph['graphDiscovery'];
-			}
-			else {
-				$data['discover'] = $graph['discover'];
-			}
-
+			// todo - check if still relevant
 			// if no host has been selected for the navigation panel, use the first graph host
 			if ($data['hostid'] == 0) {
 				$host = reset($graph['hosts']);
@@ -152,15 +136,15 @@ class CControllerGraphEdit extends CController {
 			}
 
 			// templates
-			$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
-			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-				$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'],
+				getGraphParentTemplates([$graph], ZBX_FLAG_DISCOVERY_NORMAL), ZBX_FLAG_DISCOVERY_NORMAL,
+				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
 
 			// items
 			$data['items'] = API::GraphItem()->get([
-				'output' => [
-					'gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color', 'sortorder'
+				'output' => ['gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color',
+					'sortorder'
 				],
 				'graphids' => $data['graphid'],
 				'sortfield' => 'gitemid'
@@ -183,8 +167,8 @@ class CControllerGraphEdit extends CController {
 
 			foreach ($this->getInput('items', []) as $gitem) {
 				if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+						&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+						&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
 					$gitems[] = $gitem;
 				}
 			}
@@ -223,15 +207,7 @@ class CControllerGraphEdit extends CController {
 				'preservekeys' => true
 			];
 
-			$items = API::Item()->get($options);
-
-			if ($data['parent_discoveryid'] !== null) {
-				$items = $items + API::ItemPrototype()->get($options);
-			}
-
-			$data['yaxis_items'] = $items;
-
-			unset($items);
+			$data['yaxis_items'] = API::Item()->get($options);
 		}
 
 		// items

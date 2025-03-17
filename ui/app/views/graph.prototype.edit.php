@@ -34,11 +34,6 @@ $is_templated = (bool) $data['templates'];
 $discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
 $readonly = $is_templated || $discovered_graph;
 
-//// todo - check if necessarry
-// if ($readonly) {
-//	$graph_form->addItem((new CVar('readonly', 1))->removeId());
-// }
-
 // Preview tab.
 $preview_table = (new CTable())
 	->addStyle('width: 100%;')
@@ -87,18 +82,9 @@ else {
 	];
 }
 
-$popup_parameters = [
-	'dstfrm' => $graph_form->getName(),
-	'context' => $data['context']
-];
-
-// todo - check about this:
-if ($data['hostid']) {
-	$popup_parameters['hostid'] = $data['hostid'];
-}
-
 $return_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'graph.prototype.list')
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
@@ -122,16 +108,17 @@ $graph_form
 				'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
 				'graphs' => [
 					'graphtype' => $data['graphtype'],
-					'readonly' => $readonly,
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
-					//'normal_only' => $data['normal_only'],
+					'normal_only' => $data['normal_only'],
 					'parent_discoveryid' => $data['parent_discoveryid']
 				],
+				'readonly' => $readonly,
 				'items' => $data['items'],
 				'context' => $data['context'],
-				'parent_discoveryid' => $data['parent_discoveryid'],
-				'overlayid' => 'graph.prototype.edit'
+				'hostid' => $data['hostid'],
+				'overlayid' => 'graph.prototype.edit',
+				'return_url' => $return_url
 			]).');
 		'))->setOnDocumentReady()
 	);

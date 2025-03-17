@@ -20,6 +20,7 @@
  */
 
 $this->includeJsFile('popup.view.js.php');
+$this->addJsFile('colorpicker.js');
 
 $html_page = (new CHtmlPage())->show();
 

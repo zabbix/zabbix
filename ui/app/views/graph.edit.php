@@ -49,7 +49,7 @@ if ($data['graphid'] != 0) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'enabled' => $readonly && $data['parent_discoveryid'] === null,
+			'enabled' => !$readonly,
 			'action' => 'graph_edit_popup.submit();'
 		],
 		[
@@ -81,15 +81,6 @@ else {
 	];
 }
 
-// todo - move popup_parameters to JS
-$popup_parameters = [
-	'dstfrm' => $graph_form->getName(),
-	'context' => $data['context']
-];
-if ($data['hostid']) {
-	$popup_parameters['hostid'] = $data['hostid'];
-}
-
 $return_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'graph.list')
 	->setArgument('context', $data['context'])
@@ -115,28 +106,28 @@ $graph_form
 				'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
 				'graphs' => [
 					'graphtype' => $data['graphtype'],
-					'readonly' => $readonly,
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
-					//'normal_only' => $data['normal_only'],
+					'normal_only' => $data['normal_only'],
 					'parent_discoveryid' => $data['parent_discoveryid']
 				],
+				'readonly' => $readonly,
 				'items' => $data['items'],
 				'context' => $data['context'],
-				'parent_discoveryid' => $data['parent_discoveryid'],
-				'overlayid' => 'graph.edit'
+				'hostid' => $data['hostid'],
+				'overlayid' => 'graph.edit',
+				'return_url' => $return_url
 			]).');
 		'))->setOnDocumentReady()
 	);
 
 $output = [
-	'header' => $data['graphid'] === null ? _('New graph') : _('Graph'),
+	'header' => $data['graphid'] == 0 ? _('New graph') : _('Graph'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_GRAPH_EDIT),
 	'body' => $graph_form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('graph.edit.js.php'),
-	'dialogue_class' => 'modal-popup-large',
-	'return_url' => $return_url
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

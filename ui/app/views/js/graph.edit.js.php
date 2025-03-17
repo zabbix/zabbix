@@ -22,14 +22,17 @@
 
 window.graph_edit_popup = new class {
 
-	init({form_name, theme_colors, graphs, items, context, parent_discoveryid, return_url, overlayid}) {
+	init({form_name, theme_colors, graphs, readonly, items, context, hostid, overlayid, return_url}) {
 		this.form_name = form_name;
 		this.graphs = graphs;
+		this.readonly = readonly;
 		this.context = context;
-		this.is_discovery = parent_discoveryid !== null;
+		this.hostid = hostid;
 		this.graph_type = this.graphs.graphtype;
 		this.overlay = overlays_stack.getById(overlayid);
+		this.return_url = return_url;
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
 		colorPalette.setThemeColors(theme_colors);
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
@@ -55,7 +58,6 @@ window.graph_edit_popup = new class {
 	#recalculateSortOrder() {
 		let i = 0;
 
-		// Rewrite IDs, set "tmp" prefix.
 		$('#items-table tbody tr.graph-item').find('*[id]').each(function() {
 			const $obj = $(this);
 
@@ -68,7 +70,7 @@ window.graph_edit_popup = new class {
 			$obj.attr('id', 'tmp' + $obj.attr('id'));
 		});
 
-		for (const [index, row] of document.querySelectorAll('#itemsTable tbody tr.graph-item').entries()) {
+		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
 			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
 
 			row.querySelectorAll('[id]').forEach(element => {
@@ -90,53 +92,13 @@ window.graph_edit_popup = new class {
 
 			i++;
 		});
-
-		!this.graphs.readonly &&this.#rewriteNameLinks();
-	}
-
-	#rewriteNameLinks() {
-		const size = $('#itemsTable tbody tr.graph-item').length;
-
-		for (let i = 0; i < size; i++) {
-			const parameters = {
-				srcfld1: 'itemid',
-				srcfld2: 'name',
-				dstfrm: this.form_name,
-				dstfld1: 'items_' + i + '_itemid',
-				dstfld2: 'items_' + i + '_name',
-				numeric: 1,
-				writeonly: 1
-			};
-
-			if ($('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
-				parameters['srctbl'] = 'item_prototypes',
-					parameters['srcfld3'] = 'flags',
-					parameters['dstfld3'] = 'items_' + i + '_flags',
-					parameters['parent_discoveryid'] = this.graphs.parent_discoveryid;
-			}
-			else {
-				parameters['srctbl'] = 'items';
-			}
-
-			if (this.graphs.normal_only !== '') {
-				parameters['normal_only'] = '1';
-			}
-
-			if (!this.graphs.parent_discoveryid && this.graphs.hostid) {
-				parameters['hostid'] = this.graphs.hostid;
-			}
-
-			$('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
-				'$.extend(' + JSON.stringify(parameters) + ', view.getOnlyHostParam()),' +
-				'{dialogue_class: "modal-popup-generic", trigger_element: this.parentNode});'
-			);
-		}
 	}
 
 	#initActions() {
-		// on graph type change
 		this.form.querySelector('#graphtype').addEventListener('change', (e) => {
 			this.#toggleGraphTypeFields(e.target.value);
+			this.#updateItemsTable(e.target.value);
+
 			this.graph_type = e.target.value;
 		});
 
@@ -165,6 +127,9 @@ window.graph_edit_popup = new class {
 			if (e.target.classList.contains('js-add-item')) {
 				this.#openItemSelectPopup();
 			}
+			else if (e.target.classList.contains('js-add-item-prototype')) {
+				this.#openItemPrototypeSelectPopup();
+			}
 		});
 
 		// Percent fields
@@ -179,18 +144,94 @@ window.graph_edit_popup = new class {
 		this.#togglePercentField('left');
 		this.#togglePercentField('right');
 
-		// todo - fix sortable
+		// Initialize sortable instance for items table.
 		if (this.form.querySelector('#items-table tbody')) {
 			new CSortable(this.form.querySelector('#items-table tbody'), {
 				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				freeze_end: 1,
-				enable_sorting: !this.graphs.readonly
+				enable_sorting: !this.readonly
 			}).on(CSortable.EVENT_SORT, this.#recalculateSortOrder);
 		}
 
-		//!this.graphs.readonly && this.#rewriteNameLinks();
+		document.getElementById('items-table').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-item-name')) {
+				this.#openItemPopup(e.target);
+			}
+		});
+	}
 
-		//this.initPopupListeners();
+	#openItemPopup(target) {
+		const item_num = target.id.match(/\d+/g);
+		const parameters = {
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_name,
+			dstfld1: 'items_' + item_num + '_itemid',
+			dstfld2: 'items_' + item_num + '_name',
+			numeric: 1,
+			writeonly: 1,
+			normal_only: 1
+		};
+
+		if ($('#items_' + item_num + '_flags') == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
+			parameters['srctbl'] = 'item_prototypes';
+			parameters['srcfld3'] = 'flags';
+			parameters['dstfld3'] = 'items_' + item_num + '_flags';
+			parameters['parent_discoveryid'] = this.graphs.parent_discoveryid;
+		}
+		else {
+			parameters['srctbl'] = 'items';
+		}
+
+		if (!this.graphs.parent_discoveryid && this.graphs.hostid) {
+			parameters['hostid'] = this.graphs.hostid;
+		}
+
+		if (this.graphs.is_template) {
+			parameters['only_hostid'] = this.graphs.hostid
+		}
+		else {
+			parameters['real_hosts'] = '1';
+			parameters['hostid'] = this.graphs.hostid;
+		}
+
+		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+	}
+
+	#updateItemsTable(graph_type) {
+		const tbody = this.form.querySelector('#items-table tbody');
+		const item_row_template = new Template($('#tmpl-item-row-' + graph_type).html());
+		const rows = Array.from(tbody.querySelectorAll('tr.graph-item'));
+
+		rows.forEach((row, index) => {
+			let row_data = {};
+
+			row.querySelectorAll('input[type="hidden"]').forEach(input => {
+				const match = input.name.match(/\[(\w+)\]$/);
+				if (match) {
+					const key = match[1];
+					row_data[key] = input.value;
+				}
+			});
+
+			row_data.number = index;
+
+			const name_element = row.querySelector('[id^="items_"][id$="_name"]');
+			row_data.name = name_element.textContent;
+
+			const new_row_html = item_row_template.evaluate(row_data);
+
+			const temp = document.createElement('tbody');
+			temp.innerHTML = new_row_html.trim();
+			const new_row = temp.firstElementChild;
+
+			// Replace the old row with the new row.
+			tbody.replaceChild(new_row, row);
+
+			const $row = $(new_row);
+			$row.find('#items_' + index + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
+			$(`#items_${index}_color`).colorpicker();
+		});
 	}
 
 	#loadItem(item) {
@@ -200,8 +241,6 @@ window.graph_edit_popup = new class {
 
 		$('#item-buttons-row').before($row);
 		$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
-
-		!this.graphs.readonly && this.#rewriteNameLinks();
 	}
 
 	#togglePercentField(type) {
@@ -214,15 +253,42 @@ window.graph_edit_popup = new class {
 	}
 
 	#openItemSelectPopup() {
-		PopUp('popup.generic', {
+		const parameters = {
 			srctbl: 'items',
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_name,
+			numeric: 1,
+			writeonly: 1,
+			multiselect: 1,
+			hostid: this.hostid
+		};
+
+		if (this.graphs.normal_only == 1) {
+			parameters['normal_only'] = this.graphs.normal_only;
+		}
+
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
+	}
+
+	#openItemPrototypeSelectPopup() {
+		const parameters = {
+			srctbl: 'item_prototypes',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
 			dstfrm: this.form_name,
 			numeric: '1',
 			writeonly: '1',
-			multiselect: '1'
-		}, {dialogue_class: 'modal-popup-generic'});
+			multiselect: '1',
+			graphtype: this.graph_type,
+			parent_discoveryid: this.graphs.parent_discoveryid
+		}
+
+		if (this.graphs.normal_only == 1) {
+			parameters['normal_only'] = this.graphs.normal_only;
+		}
+
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
 
 	#toggleYAxisFields(target, yaxis) {
@@ -283,7 +349,7 @@ window.graph_edit_popup = new class {
 		});
 
 		// Toggle items table columns and update column classes.
-		const table = this.form.querySelector('#items_table');
+		const table = this.form.querySelector('#items-table');
 		let name_column = table.querySelector('#name-column');
 
 		if (graph_type == <?= GRAPH_TYPE_NORMAL ?>) {
@@ -307,13 +373,11 @@ window.graph_edit_popup = new class {
 		y_axis_col.style.display = graph_type == <?= GRAPH_TYPE_NORMAL ?> || graph_type == <?= GRAPH_TYPE_STACKED ?>
 			? ''
 			: 'none';
-
-			// todo - rewrite all existing rows using the new template!
 	}
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;;
 
 			if ($panel.attr('id') === 'preview-tab') {
 				const $preview_chart = $('#preview-chart');
@@ -333,6 +397,7 @@ window.graph_edit_popup = new class {
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
 						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
+
 					src.setPath('chart7.php');
 					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
 				}
@@ -366,7 +431,7 @@ window.graph_edit_popup = new class {
 					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
 				}
 
-				$('#items_table tbody tr.graph-item').each((i, node) => {
+				$('#items-table tbody tr.graph-item').each((i, node) => {
 					const short_fmt = [];
 
 					$(node).find('*[name]').each((_, input) => {
@@ -374,7 +439,9 @@ window.graph_edit_popup = new class {
 							const regex = /items\[\d+\]\[([a-zA-Z0-9\-\_\.]+)\]/;
 							const name = input.name.match(regex);
 
-							short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
+							if (input.name !== 'remove') {
+								short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
+							}
 						}
 					});
 
@@ -397,6 +464,19 @@ window.graph_edit_popup = new class {
 					});
 			}
 		});
+
+		if (this.readonly) {
+			const size = $('#items-table tbody tr.graph-item').length;
+
+			for (let i = 0; i < size; i++) {
+				$('#items_' + i + '_color')
+					.removeAttr('onchange')
+					.prop('readonly', true);
+				$('#lbl_items_' + i + '_color')
+					.removeAttr('onclick')
+					.prop('readonly', true);
+			}
+		}
 	}
 
 	addPopupValues(list) {
@@ -430,45 +510,14 @@ window.graph_edit_popup = new class {
 				color: colorPalette.getNextColor(used_colors),
 				name: list[i].name
 			};
+
+			this.items.push(item);
+
 			const $row = $(item_row_template.evaluate(item));
 
 			$('#item-buttons-row').before($row);
 			$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
-			// todo - fix colorpicker
-			//$(`#items_${number}_color`).colorpicker();
-
+			$(`#items_${number}_color`).colorpicker();
 		}
-
-		//!this.graphs.readonly && this.rewriteNameLinks();
-	}
-
-	refresh() {
-		const url = new Curl('');
-		const form = document.getElementsByName(this.form_name)[0];
-		const fields = getFormFields(form);
-
-		post(url.getUrl(), fields);
-	}
-
-	initPopupListeners() {
-		ZABBIX.EventHub.subscribe({
-			require: {
-				context: CPopupManager.EVENT_CONTEXT,
-				event: CPopupManagerEvent.EVENT_SUBMIT
-			},
-			callback: ({data, event}) => {
-				if (data.submit.success.action === 'delete') {
-					// todo - update to graph.list:
-					const url = new URL(this.is_discovery ? 'host_discovery.php' : 'graphs.php', location.href);
-
-					url.searchParams.set('context', this.context);
-
-					event.setRedirectUrl(url.href);
-				}
-				else {
-					this.refresh();
-				}
-			}
-		});
 	}
 }

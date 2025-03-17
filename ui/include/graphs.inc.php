@@ -318,16 +318,19 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
-				->setArgument('popup', 'graph.edit')
 				->setArgument('context', 'template')
 				->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+				$url
+					->setArgument('popup', 'graph.prototype.edit')
+					->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
 			}
 
 			if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$url->setArgument('hostid', $template['hostid']);
+				$url
+					->setArgument('popup', 'graph.edit')
+					->setArgument('hostid', $template['hostid']);
 			}
 
 			$name = new CLink($template['name'], $url);

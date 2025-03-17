@@ -23,7 +23,6 @@ $discovered_trigger = array_key_exists('discovered_trigger', $data) ? $data['dis
 $readonly = $data['readonly'];
 
 $trigger_form_grid = new CFormGrid();
-
 if ($data['templates']) {
 	$trigger_form_grid->addItem([new CLabel(_('Parent triggers')), new CFormField($data['templates'])]);
 }

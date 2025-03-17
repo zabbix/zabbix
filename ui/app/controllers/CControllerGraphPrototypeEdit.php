@@ -17,6 +17,16 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerGraphPrototypeEdit extends CController {
 
+	/**
+	 * @var mixed
+	 */
+	private $hostid = 0;
+
+	/**
+	 * @var array
+	 */
+	private $discovery_rule = [];
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -62,7 +72,8 @@ class CControllerGraphPrototypeEdit extends CController {
 			// todo - update validation - this only when ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
-			'discover' =>			'in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])
+			'discover' =>			'in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
+			'normal_only' =>		'in 1'
 		];
 
 
@@ -82,37 +93,7 @@ class CControllerGraphPrototypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// todo - check. looks like this has to be in graph edit, but double check.
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'hostid'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
-
-		if (!$discovery_rule) {
-			return false;
-		}
-
-		$this->hostid = $discovery_rule['hostid'];
-		$this->discovery_rule = reset($discovery_rule);
-
-		if ($this->hostid && !isWritableHostTemplates([$this->hostid])) {
-			return false;
-		}
-
-		// check whether graph prototype is editable by user
-		if ($this->getInput('graphid')) {
-			$graphPrototype = (bool) API::GraphPrototype()->get([
-				'output' => [],
-				'graphids' => $this->getInput('graphid'),
-				'editable' => true
-			]);
-
-			if (!$graphPrototype) {
-				return false;
-			}
-		}
-
+		// todo - add validation to specific graph prototype
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -134,16 +115,22 @@ class CControllerGraphPrototypeEdit extends CController {
 		$_REQUEST['show_3d'] = $this->getInput('show_3d', 0);
 		$_REQUEST['show_legend'] = $this->getInput('show_legend', 0);
 
+		$discovery_rule = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid'],
+			'itemids' => $this->getInput('parent_discoveryid'),
+			'editable' => true
+		]);
+		$discovery_rule = reset($discovery_rule);
+
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
 			'parent_discoveryid' => $this->hasInput('parent_discoveryid') ? $this->getInput('parent_discoveryid') : null,
 			// todo - check this param:
 			'group_gid' => $this->getInput('group_gid', []),
-			'hostid' => $this->hostid,
-			'context' => $this->getInput('context')
-			// todo - check this param:
-			//'normal_only' => $this->getInput('normal_only'),
-			//'readonly' => $this->getInput('readonly', 0)
+			'hostid' => $discovery_rule['hostid'],
+			'context' => $this->getInput('context'),
+			'normal_only' => $this->getInput('normal_only', 0),
+			'readonly' => $this->getInput('readonly', 0)
 		];
 
 		// todo - add check - if readonly:
@@ -330,7 +317,7 @@ class CControllerGraphPrototypeEdit extends CController {
 
 		$data += [
 			'items' => array_values($data['items']),
-			'is_template' => $data['hostid'] == 0 ? false : isTemplate($data['hostid']),
+			'is_template' => $this->hostid == 0 ? false : isTemplate($data['hostid']),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
