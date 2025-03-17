@@ -103,7 +103,6 @@ void	zbx_mock_test_entry(void **state)
 	flags = get_flags("in.flags");
 
 	expression = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.expression"));
-	expected_expression = zbx_mock_get_parameter_string("out.expression");
 
 	lld_row = zbx_mock_get_parameter_string("in.lld");
 	if (SUCCEED != zbx_jsonobj_open(lld_row, &obj))
@@ -116,7 +115,12 @@ void	zbx_mock_test_entry(void **state)
 	returned_ret = zbx_substitute_lld_macros(&expression, &entry, flags, NULL, 0);
 
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
-	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
+
+	if (SUCCEED == expected_ret)
+	{
+		expected_expression = zbx_mock_get_parameter_string("out.expression");
+		zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
+	}
 
 	zbx_free(expression);
 	zbx_vector_lld_macro_path_ptr_clear_ext(&macros, zbx_lld_macro_path_free);

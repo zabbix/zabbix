@@ -14,11 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemGeneral.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemPrototype.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
+require_once __DIR__.'/../../../include/classes/api/services/CItemPrototype.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 

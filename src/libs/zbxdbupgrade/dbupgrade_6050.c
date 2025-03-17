@@ -2006,10 +2006,12 @@ static int	DBpatch_6050165(void)
 
 	/* functions table contains history functions used in trigger expressions */
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
-	if (NULL == (result = zbx_db_select("select functionid,parameter,triggerid"
-			" from functions"
-			" where " ZBX_DB_CHAR_LENGTH(parameter) ">1 and"
-				" parameter like '%%%s%%'", like_condition)))
+	if (NULL == (result = zbx_db_select("select f.functionid,f.parameter,f.name,h.name,t.templateid,"
+				"t.description"
+			" from functions f,hosts h,items i,triggers t"
+			" where " ZBX_DB_CHAR_LENGTH(f.parameter) ">1 and"
+				" f.parameter like '%%%s%%' and i.itemid=f.itemid and i.hostid=h.hostid and"
+				" f.triggerid=t.triggerid", like_condition)))
 	{
 		goto clean;
 	}
@@ -2017,7 +2019,7 @@ static int	DBpatch_6050165(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*ptr;
-		char		*tmp, *param = NULL;
+		char		*param = NULL;
 		int		func_params_changed = 0;
 		size_t		param_pos, param_len, sep_pos, buf_offset = 0, params_len;
 
@@ -2059,12 +2061,42 @@ static int	DBpatch_6050165(void)
 
 		if (0 == buf_offset)
 			continue;
-
 		if (0 != func_params_changed)
 		{
-			tmp = zbx_db_dyn_escape_string(buf);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
+			char	*tmp = zbx_db_dyn_escape_string(buf);
+
+			size_t	escaped_param_len = strlen(tmp);
+
+			if (ZBX_DBPATCH_FUNCTION_PARAM_LEN < escaped_param_len)
+			{
+				if (SUCCEED == zbx_db_is_null(row[4]))
+				{
+					zabbix_log(LOG_LEVEL_CRIT,
+							"%s(): cannot save in DB function parameter: resulting size "
+							ZBX_FS_SIZE_T " is longer than the maximum %d.\n"
+							"functionid:%s function:'%s'\n"
+							"used on host: '%s'\n"
+							"  in trigger: '%s'.\n"
+							"Current parameter value:\n"
+							"'%s'\n"
+							"Resulting escaped value would be:\n"
+							"'%s\n"
+							"DB upgrade and Zabbix server can continue to run,"
+							" but to make sure this function works correctly\n"
+							"MANUAL INTERVENTION IS REQUIRED !\n"
+							"Need to manually reduce the size of this parameter"
+							" with macro as a workaround.\n",
+							__func__, (zbx_fs_size_t)escaped_param_len,
+							ZBX_DBPATCH_FUNCTION_PARAM_LEN, row[0], row[2], row[3], row[5],
+							row[1], tmp);
+				}
+			}
+			else
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"update functions set parameter='%s' where functionid=%s;\n", tmp,
+						row[0]);
+			}
 			zbx_free(tmp);
 		}
 
@@ -2155,7 +2187,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 
 static int	DBpatch_6050166(void)
 {
-int			ret = SUCCEED;
+	int			ret = SUCCEED;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	char			*sql = NULL, *error = NULL, *like_condition;
@@ -3912,7 +3944,7 @@ static int	DBpatch_6050301(void)
 	zbx_db_row_t	row;
 	zbx_db_insert_t	db_insert_int, db_insert_str, db_insert_itemid;
 	zbx_uint64_t	last_widgetid = 0;
-	int		index, ret;
+	int		ret, index = 0;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
