@@ -21,8 +21,7 @@ import (
 func TestFormatError(t *testing.T) {
 	const notsupported = "ZBX_NOTSUPPORTED"
 	const message = "error message"
-	pc := &passiveCheck{}
-	result := pc.formatError(message)
+	result := formatError(message)
 
 	if string(result[:len(notsupported)]) != notsupported {
 		t.Errorf("Expected error message to start with '%s' while got '%s'", notsupported,

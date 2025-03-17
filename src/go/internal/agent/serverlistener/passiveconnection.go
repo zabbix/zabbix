@@ -13,27 +13,3 @@
 **/
 
 package serverlistener
-
-import (
-	"golang.zabbix.com/agent2/pkg/zbxcomms"
-)
-
-type passiveConnection struct {
-	conn *zbxcomms.Connection
-}
-
-// every passive connection simply *zbxcomms.Connection with deferred close
-func (pc *passiveConnection) Write(data []byte) error {
-	defer pc.conn.Close()
-
-	err := pc.conn.Write(data)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// wrapper for conn.RemoteIP()
-func (pc *passiveConnection) Address() string {
-	return pc.conn.RemoteIP()
-}

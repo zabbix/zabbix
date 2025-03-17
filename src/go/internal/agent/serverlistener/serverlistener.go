@@ -44,21 +44,6 @@ type ServerListener struct {
 	stopped      bool
 }
 
-func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
-	data, err := conn.Read()
-	if err != nil {
-		_ = conn.Close()
-		return err
-	}
-
-	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
-
-	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
-	go response.handleCheck(data)
-
-	return nil
-}
-
 func (c *ServerListener) handleError(err error) error {
 	var netErr net.Error
 
@@ -148,8 +133,7 @@ func (sl *ServerListener) run() {
 				remoteIP,
 			)
 
-			response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
-			go response.handleCheck(data)
+			go handleCheck(sl.scheduler, conn, data)
 
 			return nil
 		}()

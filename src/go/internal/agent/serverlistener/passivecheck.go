@@ -22,6 +22,7 @@ import (
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
 	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
 	"golang.zabbix.com/sdk/log"
 )
 
@@ -52,12 +53,7 @@ type passiveChecksResponse struct {
 	Error   *string `json:"error,omitempty"`
 }
 
-type passiveCheck struct {
-	conn      *passiveConnection
-	scheduler scheduler.Scheduler
-}
-
-func (pc *passiveCheck) formatError(msg string) (data []byte) {
+func formatError(msg string) (data []byte) {
 	data = make([]byte, len(notsupported)+len(msg)+1)
 	copy(data, notsupported)
 	copy(data[len(notsupported)+1:], msg)
@@ -67,7 +63,7 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 // handleCheckJSON handles json formatted passive check request.
 // False is returned if the json parsing failed and request must
 // be treated as plain text format request.
-func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
+func handleCheckJSON(sch scheduler.Scheduler, conn *zbxcomms.Connection, data []byte) (errJson error) {
 	var request passiveChecksRequest
 	var timeout int
 	var err error
@@ -97,7 +93,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 		if timeout, err = scheduler.ParseItemTimeoutAny(request.Data[0].Timeout); err == nil {
 			// direct passive check timeout is handled by the scheduler
-			value, err = pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
+			value, err = sch.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
 		}
 
 		if err != nil {
@@ -118,23 +114,24 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 	out, err := json.Marshal(response)
 	if err == nil {
-		log.Debugf("sending passive check response: '%s' to '%s'", string(out), pc.conn.Address())
-		err = pc.conn.Write(out)
+		log.Debugf("sending passive check response: '%s' to '%s'", string(out), conn.RemoteIP())
+		err = conn.Write(out)
+		_ = conn.Close()
 	}
 
 	if err != nil {
-		log.Debugf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
 	}
 
 	return nil
 }
 
-func (pc *passiveCheck) handleCheck(data []byte) {
+func handleCheck(sch scheduler.Scheduler, conn *zbxcomms.Connection, data []byte) {
 	// the timeout is one minute to allow see any timeout problem with passive checks
 	const timeoutForSinglePassiveChecks = time.Minute
 	var checkTimeout time.Duration
 
-	err := pc.handleCheckJSON(data)
+	err := handleCheckJSON(sch, conn, data)
 	if err == nil {
 		return
 	}
@@ -142,19 +139,21 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	checkTimeout = timeoutForSinglePassiveChecks
 
 	// direct passive check timeout is handled by the scheduler
-	taskResult, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
+	taskResult, err := sch.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
 
 	if err != nil {
-		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())
-		err = pc.conn.Write(pc.formatError(err.Error()))
+		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), conn.RemoteIP())
+		err = conn.Write(formatError(err.Error()))
+		_ = conn.Close()
 	} else if taskResult != nil {
-		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, pc.conn.Address())
-		err = pc.conn.Write([]byte(*taskResult))
+		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, conn.RemoteIP())
+		err = conn.Write([]byte(*taskResult))
+		_ = conn.Close()
 	} else {
 		log.Debugf("got nil value, skipping sending of response")
 	}
 
 	if err != nil {
-		log.Debugf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
 	}
 }
