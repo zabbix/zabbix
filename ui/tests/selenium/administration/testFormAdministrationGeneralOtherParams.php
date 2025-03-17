@@ -87,81 +87,71 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	];
 
 	/**
-	 * Label data for layout checks.
-	 */
-	public function getLableData() {
-		return [
-			[
-				[
-					'title' => 'Other configuration parameters',
-					'headers' => ['Authorization', 'Storage of secrets', 'Security'],
-					'limits' => [
-						'url' => 2048,
-						'login_attempts' => 2,
-						'login_block' => 32,
-						'uri_valid_schemes' => 255,
-						'x_frame_options' => 255,
-						'iframe_sandboxing_exceptions' => 255
-					],
-					'checkboxes' => ['snmptrap_logging', 'validate_uri_schemes', 'x_frame_header_enabled', 'iframe_sandboxing_enabled'],
-					'checkbox_fields' => ['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'],
-					'hintboxes' => [
-						'Resolve secret vault macros by' => 'Zabbix server: secrets are retrieved from Vault by '.
-								'Zabbix server and forwarded to proxies when needed.'."\n".
-								'Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server '.
-								'and proxies, allowing them to resolve macros independently.',
-						'Use X-Frame-Options HTTP header' => 'X-Frame-Options HTTP header supported values:'."\n".
-								'SAMEORIGIN or \'self\' - allows the page to be displayed only in a frame on the '.
-								'same origin as the page itself'."\n".
-								'DENY or \'none\' - prevents the page from being displayed in a frame, regardless of '.
-								'the site attempting to do so'."\n".'a string of space-separated hostnames; adding '.
-								'\'self\' to the list allows the page to '.
-								'be displayed in a frame on the same origin as the page itself'."\n".
-								"\n".
-								'Note that \'self\' or \'none\' will be regarded as hostnames if used without single quotes.'
-					],
-					'buttons' => ['Update', 'Reset defaults']
-				]
-			]
-		];
-	}
-
-	/**
 	 * Test for checking form layout.
-	 *
-	 * @dataProvider getLableData
 	 */
-	public function testFormAdministrationGeneralOtherParams_CheckLayout($data) {
+	public function testFormAdministrationGeneralOtherParams_CheckLayout() {
 		$this->page->login()->open($this->config_link);
-		$this->page->assertTitle($data['title']);
-		$this->page->assertHeader($data['title']);
+		$this->page->assertTitle('Other configuration parameters');
+		$this->page->assertHeader('Other configuration parameters');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
-		foreach ($data['headers'] as $header) {
+		foreach (['Authorization', 'Security'] as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
 		}
 
-		foreach ($data['limits'] as $id => $limit) {
+		$limits = [
+			'url' => 2048,
+			'login_attempts' => 2,
+			'login_block' => 32,
+			'uri_valid_schemes' => 255,
+			'x_frame_options' => 255,
+			'iframe_sandboxing_exceptions' => 255
+		];
+		foreach ($limits as $id => $limit) {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
 		foreach ([true, false] as $status) {
-			foreach ($data['checkboxes'] as $checkbox) {
+			$checkboxes = [
+				'snmptrap_logging',
+				'validate_uri_schemes',
+				'x_frame_header_enabled',
+				'iframe_sandboxing_enabled'
+			];
+			foreach ($checkboxes as $checkbox) {
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
-			foreach ($data['checkbox_fields'] as $input) {
+
+			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
 		}
 
-		foreach ($data['hintboxes'] as $label => $hint_text) {
+		// Check X-Frame-Options hintbox.
+		$hints = [
+			'Resolve secret vault macros by' => 'Zabbix server: secrets are retrieved from Vault by '.
+					'Zabbix server and forwarded to proxies when needed.'."\n".
+					'Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server '.
+					'and proxies, allowing them to resolve macros independently.',
+			'Use X-Frame-Options HTTP header' => 'X-Frame-Options HTTP header supported values:'."\n".
+					'SAMEORIGIN or \'self\' - allows the page to be displayed only in a frame on the '.
+					'same origin as the page itself'."\n".
+					'DENY or \'none\' - prevents the page from being displayed in a frame, regardless of '.
+					'the site attempting to do so'."\n".'a string of space-separated hostnames; adding '.
+					'\'self\' to the list allows the page to '.
+					'be displayed in a frame on the same origin as the page itself'."\n".
+					"\n".
+					'Note that \'self\' or \'none\' will be regarded as hostnames if used without single quotes.'
+		];
+
+		foreach ($hints as $label => $hint_text) {
 			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($hint_text, $hint->getText());
 			$hint->close();
 		}
 
-		foreach ($data['buttons'] as $button) {
+		foreach (['Update', 'Reset defaults'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
 		}
 	}
