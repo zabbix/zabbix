@@ -409,9 +409,11 @@ static void	sync_merge_nodes(zbx_sync_list_t *sync_list, int match_level)
 		if (NULL != prev && NULL != next)
 			prev->match_next = abs(sync_row_compare(&prev->row, &next->row));
 
-		for (int i = dst->row->cols_num - 1; i >= dst->row->cols_num - match_level; i--)
+		int	diff_col = dst->row->cols_num - match_level;
+
+		for (int i = diff_col; i < dst->row->cols_num; i++)
 		{
-			if (i == match_level || 0 != strcmp_null(dst->row->cols[i], src->row->cols[i]))
+			if (i == diff_col || 0 != strcmp_null(dst->row->cols[i], src->row->cols[i]))
 			{
 				dst->row->cols_orig[i] = dst->row->cols[i];
 				dst->row->cols[i] = (NULL != src->row->cols[i] ?
@@ -478,12 +480,15 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
 	zbx_sync_list_t		sync_list;
 	zbx_sync_node_t		*nodes;
 	int			i, j, next_node = 0;
+	size_t			list_len = (size_t)(dst->rows.values_num + src->rows.values_num);
+
+	if (0 == list_len)
+		return;
 
 	zbx_sync_rowset_sort_by_rows(dst);
 
 	sync_list_init(&sync_list);
-	nodes = (zbx_sync_node_t *)zbx_malloc(NULL, sizeof(zbx_sync_node_t) *
-			(dst->rows.values_num + src->rows.values_num));
+	nodes = (zbx_sync_node_t *)zbx_malloc(NULL, list_len * sizeof(zbx_sync_node_t));
 
 	for (i = 0, j = 0; i < src->rows.values_num && j < dst->rows.values_num; )
 	{
@@ -515,20 +520,20 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
  *                                                                            *
  * Purpose: search for a row in a rowset by its row ID                        *
  *                                                                            *
- * Parameters: rowset       - [IN] rowset to search in, sorted by rowid       *
+ * Parameters: rowset       - [IN] rowset to search in                        *
  *             parent_rowid - [IN] row ID to search for                       *
  *                                                                            *
  * Return value: pointer to the found row or NULL if not found                *
  *                                                                            *
  ******************************************************************************/
-zbx_sync_row_t	*zbx_sync_rowset_bsearch_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid)
+zbx_sync_row_t	*zbx_sync_rowset_search_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid)
 {
 	zbx_sync_row_t	row_local;
 	int		i;
 
 	row_local.rowid = rowid;
 
-	if (FAIL == (i = zbx_vector_sync_row_ptr_bsearch(&rowset->rows, &row_local, sync_row_compare_by_rowid)))
+	if (FAIL == (i = zbx_vector_sync_row_ptr_search(&rowset->rows, &row_local, sync_row_compare_by_rowid)))
 		return NULL;
 
 	return rowset->rows.values[i];

@@ -859,7 +859,7 @@ zbx_sync_row_t	*zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...);
 void	zbx_sync_rowset_sort_by_rows(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_sort_by_id(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
-zbx_sync_row_t	*zbx_sync_rowset_bsearch_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid);
+zbx_sync_row_t	*zbx_sync_rowset_search_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid);
 zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 

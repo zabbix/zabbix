@@ -180,10 +180,15 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_macro_path(int audit_contex
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, const char *name, int step, int stop);
+void	zbx_audit_discovery_rule_update_json_update_lld_override_str(int audit_context_mode, zbx_uint64_t itemid,
+		zbx_uint64_t overrideid, const char *resource, const char *value_old, const char *value_new);
 void	zbx_audit_discovery_rule_update_json_delete_lld_override(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid);
 void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, int evaltype, const char *formula);
+
+void	zbx_audit_discovery_rule_update_json_update_lld_override_filter_str(int audit_context_mode, zbx_uint64_t itemid,
+		zbx_uint64_t overrideid, const char *resource, const char *value_old, const char  *value_new);
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override_condition(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, zbx_uint64_t override_conditionid, int condition_operator, const char *macro,
