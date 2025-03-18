@@ -32,13 +32,13 @@ class CControllerTriggerUpdate extends CController {
 				TRIGGER_SEVERITY_DISASTER
 			]],
 			'expression' => ['string', 'required', 'not_empty',
-				'use' => [CExpressionParser::class, ['usermacros' => true, 'lldmacros' => false]]
+				'use' => [CTriggerExpressionParser::class, ['usermacros' => true, 'lldmacros' => false]]
 			],
 			'recovery_mode' => ['db triggers.recovery_mode', 'in' => [ZBX_RECOVERY_MODE_EXPRESSION,
 				ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE
 			]],
 			'recovery_expression' => ['string', 'required', 'not_empty',
-				'use' => [CExpressionParser::class, ['usermacros' => true, 'lldmacros' => false]],
+				'use' => [CTriggerExpressionParser::class, ['usermacros' => true, 'lldmacros' => false]],
 				'when' => [
 					['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
 				]

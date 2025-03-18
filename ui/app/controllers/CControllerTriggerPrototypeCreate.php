@@ -31,13 +31,13 @@ class CControllerTriggerPrototypeCreate extends CController {
 				TRIGGER_SEVERITY_DISASTER
 			]],
 			'expression' => ['string', 'required', 'not_empty',
-				'use' => [CExpressionParser::class, ['usermacros' => true, 'lldmacros' => true]]
+				'use' => [CTriggerExpressionParser::class, ['usermacros' => true, 'lldmacros' => true]]
 			],
 			'recovery_mode' => ['db triggers.recovery_mode', 'in' => [ZBX_RECOVERY_MODE_EXPRESSION,
 				ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE
 			]],
 			'recovery_expression' => ['string', 'required', 'not_empty',
-				'use' => [CExpressionParser::class, ['usermacros' => true, 'lldmacros' => true]],
+				'use' => [CTriggerExpressionParser::class, ['usermacros' => true, 'lldmacros' => true]],
 				'when' => [
 					['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
 				]
