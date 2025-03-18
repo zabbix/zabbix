@@ -178,6 +178,7 @@ window.trigger_edit_popup = new class {
 			const button_ids = ['#add_expression', '#and_expression', '#or_expression', '#replace_expression'];
 
 			this.#disableExpressionConstructorButtons(button_ids, e.target);
+			this.form.validateChanges(['expression']);
 		})
 
 		this.recovery_expression.addEventListener('change', (e) => {
@@ -186,6 +187,7 @@ window.trigger_edit_popup = new class {
 			];
 
 			this.#disableExpressionConstructorButtons(button_ids, e.target);
+			this.form.validateChanges(['expression_recovery']);
 		})
 	}
 
@@ -397,6 +399,7 @@ window.trigger_edit_popup = new class {
 			});
 
 			expression_constructor.style.display = 'none';
+			document.getElementById(this.expression.dataset.errorContainer).style.display = 'none';
 			this.expression.readOnly = true;
 			this.expression.name = 'expr_temp';
 			this.expression.id = 'expr_temp';
@@ -420,6 +423,7 @@ window.trigger_edit_popup = new class {
 			});
 
 			expression_constructor.style.display = '';
+			document.getElementById(this.expression.dataset.errorContainer).style.display = '';
 			this.expression.name = 'expression';
 			this.expression.id = 'expression';
 			this.expr_temp.name = 'expr_temp';
@@ -429,6 +433,7 @@ window.trigger_edit_popup = new class {
 			this.expression.value = this.expr_temp.value;
 			this.expression_constructor_active = false;
 		}
+		this.form.validateChanges(['expression']);
 	}
 
 	#toggleRecoveryExpressionConstructor(id) {
@@ -446,6 +451,7 @@ window.trigger_edit_popup = new class {
 			});
 
 			recovery_expression_constructor.style.display = 'none';
+			document.getElementById(this.recovery_expression.dataset.errorContainer).style.display = 'none';
 			this.recovery_expression.readOnly = true;
 			this.recovery_expression.name = 'recovery_expr_temp';
 			this.recovery_expression.id = 'recovery_expr_temp';
@@ -469,6 +475,7 @@ window.trigger_edit_popup = new class {
 			});
 
 			recovery_expression_constructor.style.display = '';
+			document.getElementById(this.recovery_expression.dataset.errorContainer).style.display = '';
 			this.recovery_expression.name = 'recovery_expression';
 			this.recovery_expression.id = 'recovery_expression';
 			this.recovery_expr_temp.name = 'recovery_expr_temp';
@@ -478,6 +485,7 @@ window.trigger_edit_popup = new class {
 			this.recovery_expression.value = this.recovery_expr_temp.value;
 			this.recovery_expression_constructor_active = false;
 		}
+		this.form.validateChanges(['recovery_expression']);
 	}
 
 	#openPopupTriggerExpr(trigger_options) {
