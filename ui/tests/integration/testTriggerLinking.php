@@ -450,21 +450,17 @@ class testTriggerLinking extends CIntegrationTest {
 
 	private function createDiscoveryRuleWithItemPrototype() {
 		// Create discovery rule with item prototype using a generic macro for testing
-		/*$response = $this->call('discoveryrule.create', [
+		$response = $this->call('discoveryrule.create', [
 			'name' => 'Test LLD Discovery Rule',
 			'key_' => 'test.discovery',
 			'hostid' => self::$templateids[0],
 			'type' => 0,
-			'delay' => 60
-		]);*/
-
-		$response = $this->call('itemprototype.create', [
-			'name' => 'TEST {#TEST}',
-			'key_' => 'vfs.fs.size[{#TEST},free]',
-			'hostid' => self::$templateids[0],
-			'type' => 0
+			'delay' => 60,
+			'lld_macropath' => [
+				'lld_macro' => '{#MACRO1}',
+				'path' => '.path.1'
+			]
 		]);
-
 		}
 
 	/**
