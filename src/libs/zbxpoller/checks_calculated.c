@@ -32,7 +32,7 @@ int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __func__, dc_item->key_orig, dc_item->params);
 
-	um_handle = zbx_dc_open_user_macros_masked();
+	um_handle = zbx_dc_open_user_macros();
 
 	if (NULL == dc_item->formula_bin)
 	{
