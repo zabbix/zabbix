@@ -770,14 +770,3 @@ finish:
 
 	zbx_free(buf);
 }
-
-void	zbx_log_lock(void)
-{
-	LOCK_LOG;
-}
-
-void	zbx_log_unlock(void)
-{
-	UNLOCK_LOG;
-}
-
