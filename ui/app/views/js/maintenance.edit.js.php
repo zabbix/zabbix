@@ -40,6 +40,7 @@ window.maintenance_edit = new class {
 		this.rules_for_clone = rules_for_clone;
 
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'maintenance.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
@@ -92,9 +93,8 @@ window.maintenance_edit = new class {
 
 	#update() {
 		const tags_enabled = this.form_element
-			.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
-
-		const tags_container = document.getElementById('tags');
+			.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>,
+			tags_container = document.getElementById('tags');
 
 		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
 			text_input.disabled = !tags_enabled;
@@ -106,8 +106,8 @@ window.maintenance_edit = new class {
 			}
 		});
 
-		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]');
-		const tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
+		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]'),
+			tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
 
 		[...tags_evaltypes, ...tags_operators].forEach((radio_button) => {
 			radio_button.disabled = !tags_enabled || !this._allowed_edit;
