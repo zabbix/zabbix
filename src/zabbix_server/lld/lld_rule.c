@@ -2892,6 +2892,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	{
 		zbx_lld_prototype_rules_t	prules_local, *prules;
 		zbx_hashset_t			*rule_index;
+		zbx_lld_item_prototype_t	*item_prototype = item_prototypes.values[i];
 
 		prules_local.itemid = item_prototypes.values[i]->itemid;
 		if (NULL != (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_search(&prototype_rules, &prules_local)))
@@ -2899,14 +2900,23 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		else
 			rule_index = NULL;
 
-		if (FAIL == lld_update_items(hostid, item_prototypes.values[i]->itemid, lld_rows, error, lifetime,
+		if (FAIL == lld_update_items(hostid, item_prototype->itemid, lld_rows, error, lifetime,
 				enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
-			goto out;
+			goto clean;
 		}
 
+		lld_item_links_sort(lld_rows);
+
+		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, lld_rows, error, lifetime,
+				enabled_lifetime, lastcheck))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
+					" processing lld rule");
+			goto clean;
+		}
 	}
 
 	ret = SUCCEED;
