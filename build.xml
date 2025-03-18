@@ -202,9 +202,9 @@
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address -ftest-coverage -fprofile-arcs'"/>
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address'"/>
 			<arg line="CC='clang'"/>
-			<arg line="LDFLAGS='-fsanitize=leak,address -lgcov'"/>
+			<arg line="LDFLAGS='-fsanitize=leak,address'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -404,16 +404,6 @@
 	</target>
 
 	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-postgresql,init-proxy-postgresql">
-		<!-- Generate Zabbix integration tests coverage report-->
-		<delete dir="tests_results"/>
-                <mkdir dir="tests_results"/>
-                <mkdir dir="tests_results/html"/>
-                <exec executable="lcov" failonerror="on">
-                        <arg line="--directory"/>
-                        <arg line="src"/>
-                        <arg line="-zerocounters"/>
-                </exec>
-
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -451,9 +441,9 @@
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address -ftest-coverage -fprofile-arcs'"/>
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address'"/>
 			<arg line="CC='clang'"/>
-			<arg line="LDFLAGS='-fsanitize=leak,address -lgcov'"/>
+			<arg line="LDFLAGS='-fsanitize=leak,address'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -588,16 +578,6 @@
 	</target>
 
 	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
-		<!-- Generate Zabbix integration tests coverage report-->
-		<delete dir="tests_results"/>
-		<mkdir dir="tests_results"/>
-		<mkdir dir="tests_results/html"/>
-		<exec executable="lcov" failonerror="on">
-			<arg line="--directory"/>
-			<arg line="src"/>
-			<arg line="-zerocounters"/>
-		</exec>
-
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
@@ -648,20 +628,6 @@
 			<arg line="--dont-report-useless-tests"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
-		</exec>
-		<exec executable="lcov" failonerror="on">
-			<arg line="--directory"/>
-			<arg line="src"/>
-			<arg line="--capture"/>
-			<arg line="--output-file"/>
-			<arg line="tests_results/html/app.info"/>
-		</exec>
-		<exec executable="genhtml" failonerror="on">
-			<arg line="-p"/>
-			<arg line="${user.dir}"/>
-			<arg line="-o"/>
-			<arg line="tests_results/html"/>
-			<arg line="tests_results/html/app.info"/>
 		</exec>
 	</target>
 
