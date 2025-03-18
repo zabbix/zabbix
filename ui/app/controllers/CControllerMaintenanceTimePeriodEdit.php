@@ -21,7 +21,7 @@ class CControllerMaintenanceTimePeriodEdit extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	private static function getValidationRules() {
+	private static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'edit' => ['integer', 'in' => [1]],
 			'row_index' => ['integer', 'required'],

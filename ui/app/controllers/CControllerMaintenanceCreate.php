@@ -21,7 +21,7 @@ class CControllerMaintenanceCreate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	public static function getValidationRules() {
+	public static function getValidationRules(): array {
 		$api_uniq = [
 			['maintenance.get', ['name' => '{name}']]
 		];

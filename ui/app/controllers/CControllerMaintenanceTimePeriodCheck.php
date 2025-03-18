@@ -22,7 +22,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	public static function getValidationRules() {
+	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'row_index' => ['integer', 'required'],
 			'timeperiod_type' => ['db timeperiods.timeperiod_type', 'required',
