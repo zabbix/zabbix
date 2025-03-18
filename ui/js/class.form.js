@@ -352,13 +352,13 @@ class CForm {
 					field.setErrors(errors, force_display_errors);
 				}
 				else if (force_display_errors || field.hasChanged() || errors.some((error) => error.message === '')) {
-					errors.forEach(error => field.setErrors(error));
+					errors.forEach((error) => field.setErrors(error));
 				}
 
 				this.addGeneralErrors(field.getGlobalErrors());
 			}
 			else {
-				errors.forEach(error => {
+				errors.forEach((error) => {
 					if (error.message !== '') {
 						console.log('Validation error for missing field "' + key + '": ' + error.message);
 					}
@@ -367,7 +367,7 @@ class CForm {
 		});
 
 		Object.entries(general_errors).forEach(([key, errors]) => {
-			errors.forEach(error => {
+			errors.forEach((error) => {
 				if (error.message !== '') {
 					console.log('Validation error for missing field "' + key + '": ' + error.message);
 				}
