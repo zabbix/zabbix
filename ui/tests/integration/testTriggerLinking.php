@@ -601,7 +601,7 @@ class testTriggerLinking extends CIntegrationTest {
 		/* We need agent 2 only because it will have the different host metadata from the agent 1.
 			This would retrigger the autoregistration with linking. Stop this for now.
 			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
-			$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
+
 			$this->startComponent(self::COMPONENT_SERVER);
 			sleep(1);
 			$this->startComponent(self::COMPONENT_AGENT);
