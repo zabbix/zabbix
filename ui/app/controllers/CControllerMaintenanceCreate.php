@@ -31,7 +31,7 @@ class CControllerMaintenanceCreate extends CController {
 			'maintenance_type' => ['db maintenances.maintenance_type', 'required', 'in' => [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]],
 			'active_since' => ['string', 'required', 'not_empty', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]], 'messages' => ['use' => _('Invalid date.')]],
 			'active_till' => ['string', 'required', 'not_empty', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]], 'messages' => ['use' => _('Invalid date.')]],
-			'timeperiods' => ['objects', 'required', 'not_empty', 'fields' => [
+			'timeperiods' => ['objects', 'required', 'not_empty', 'messages' => ['not_empty' => _('At least one period must be added.')], 'fields' => [
 				'timeperiod_type' => ['db timeperiods.timeperiod_type', 'required', 'in' => [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]],
 				'every' => [
 					['db timeperiods.every', 'min' => 1, 'max' => 999, 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY]]],
