@@ -267,9 +267,6 @@ static unsigned long	compute_match_recursion_limit(void)
 			if (REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP < (rxp_stacklimit = rlim.rlim_cur))
 				rxp_stacklimit = REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP;
 		}
-
-		if (0 == rxp_stacklimit)
-			rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
 #else
 	/* https://learn.microsoft.com/en-us/windows/win32/procthread/thread-stack-size */
 	/* The default stack reservation size used by the linker is 1 MB.               */
@@ -288,22 +285,23 @@ static unsigned long	compute_match_recursion_limit(void)
 					"GetCurrentThreadStackLimits");
 		}
 
-		if (NULL == get_stack_limits)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): GetCurrentThreadStackLimits() is not available on this"
-				" system, %s", __func__, zbx_strerror_from_system(GetLastError()));
-
-			rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
-		}
-		else
+		if (NULL != get_stack_limits)
 		{
 			ULONG_PTR	lo, hi;
 
 			get_stack_limits(&lo, &hi);
 			rxp_stacklimit = (unsigned long)(hi - lo);
 		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): GetCurrentThreadStackLimits() is not available on this"
+					" system, %s", __func__, zbx_strerror_from_system(GetLastError()));
+		}
 #endif
 	}
+
+	if (0 == rxp_stacklimit)
+		rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
 
 	return rxp_stacklimit / REGEXP_RECURSION_STEP;
 #undef REGEXP_RECURSION_DEFAULT
