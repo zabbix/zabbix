@@ -72,8 +72,8 @@
 			this.#setIsLoading(this.#update_btn);
 			clearMessages();
 
-			const fields = this.form.getAllValues();
-			const curl = new Curl(this.form_element.getAttribute('action'));
+			const fields = this.form.getAllValues(),
+				curl = new Curl(this.form_element.getAttribute('action'));
 
 			this.form.validateSubmit(fields)
 				.then((result) => {
@@ -122,22 +122,19 @@
 			if (tls_in_psk) {
 				this.#toggle('change_psk', this.#psk_required.value == 0);
 
-				for (const field of ['tls_psk_identity', 'tls_psk']) {
-					this.#toggle(field, this.#psk_required.value == 1, true);
-				}
+				['tls_psk_identity', 'tls_psk']
+					.forEach((field) => this.#toggle(field, this.#psk_required.value == 1, true));
 			}
 			else {
 				this.#toggle('change_psk', false);
 
-				for (const field of ['tls_psk_identity', 'tls_psk']) {
-					this.#toggle(field, false, true);
-				}
+				['tls_psk_identity', 'tls_psk'].forEach((field) => this.#toggle(field, false, true));
 			}
 		}
 
 		#toggle(id, show, disable = false) {
-			const field = document.getElementById(id);
-			const label = this.form_element.querySelector(`label[for="${id}"]`);
+			const field = document.getElementById(id),
+				label = this.form_element.querySelector(`label[for="${id}"]`);
 
 			if (show) {
 				field.parentElement.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
