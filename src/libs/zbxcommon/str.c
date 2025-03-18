@@ -2044,9 +2044,19 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		for (i = 0; i < wide_size; i++)
 			wide_string[i] = ((wide_string_be[i] << 8) & 0xff00) | ((wide_string_be[i] >> 8) & 0xff);
 	}
+	else if (0 == in_size)
+	{
+		wide_string = wide_string_static;
+		wide_size = 0;
+	}
 	else
 	{
-		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
+		if (0 == (wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to size of wide string. Error: %s", encoding, in_size,
+					strerror_from_system(GetLastError()));
+		}
 
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
@@ -2054,15 +2064,39 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 			wide_string = wide_string_static;
 
 		/* convert from 'in' to 'wide_string' */
-		MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size);
+		if (0 != wide_size && 0 == MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size))
+		{
+			wide_size = 0;
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to wide string. Error: %s", encoding, in_size,
+					strerror_from_system(GetLastError()));
+		}
 	}
 
-	utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL);
-	utf8_string = (char *)zbx_malloc(utf8_string, (size_t)utf8_size + 1/* '\0' */);
+	if (0 != wide_size)
+	{
+		if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to size of utf-8. Error: %s", encoding, in_size,
+					strerror_from_system(GetLastError()));
+		}
 
-	/* convert from 'wide_string' to 'utf8_string' */
-	WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, utf8_string, utf8_size, NULL, NULL);
-	utf8_string[utf8_size] = '\0';
+		utf8_string = (char *)zbx_malloc(utf8_string, (size_t)utf8_size + 1/* '\0' */);
+
+		/* convert from 'wide_string' to 'utf8_string' */
+		if (0 != utf8_size && 0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, utf8_string,
+				utf8_size, NULL, NULL))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to utf-8. Error: %s", encoding, in_size,
+					strerror_from_system(GetLastError()));
+		}
+
+		utf8_string[utf8_size] = '\0';
+	}
+	else
+		utf8_string = (char *)zbx_calloc(utf8_string, 1/* '\0' */, sizeof(char));
 
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
