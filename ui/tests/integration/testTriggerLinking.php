@@ -448,6 +448,56 @@ class testTriggerLinking extends CIntegrationTest {
 		}
 	}
 
+	private function createSingleTemplateWithTrigger() {
+		$templateName = self::TEMPLATE_NAME_PRE . "_single";
+		$itemKey = self::ITEM_KEY_PRE . "_single";
+		$stringId = 'a';
+
+		$templateResponse = $this->call('template.create', [
+			'host' => $templateName,
+		]);
+
+		$this->assertArrayHasKey('templateids', $templateResponse['result']);
+		$templateId = $templateResponse['result']['templateids'][0];
+
+		$itemResponse = $this->call('item.create', [
+			'hostid' => $templateId,
+			'name' => self::ITEM_NAME_PRE . "_" . $stringId,
+			'key_' => $itemKey,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		]);
+
+		$this->assertArrayHasKey('itemids', $itemResponse['result']);
+		$itemId = $itemResponse['result']['itemids'][0];
+
+		$triggerResponse = $this->call('trigger.create', [
+			'description' => self::TRIGGER_DESCRIPTION_PRE . "_" . $stringId,
+			'priority' => self::TRIGGER_PRIORITY,
+			'status' => self::TRIGGER_STATUS,
+			'comments' => self::TRIGGER_COMMENTS_PRE . "_" . $stringId,
+			'url' => self::TRIGGER_URL_PRE . "_" . $stringId,
+			'url_name' => self::TRIGGER_URL_NAME_PRE . "_" . $stringId,
+			'type' => self::TRIGGER_TYPE,
+			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
+			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+			'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . $stringId,
+			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
+			'opdata' => self::TRIGGER_OPDATA_PRE . "_" . $stringId,
+			'event_name' => self::TRIGGER_EVENT_NAME_PRE . "_" . $stringId,
+			'expression' => 'last(/' . $templateName . '/' . $itemKey . ')=2',
+			'recovery_expression' => 'last(/' . $templateName . '/' . $itemKey . ')=3',
+			'tags' => [
+			[
+				'tag' => self::TAG_NAME_PRE . "_" . $stringId,
+				'value' => self::TAG_VALUE_PRE . "_" . $stringId
+			]
+		]
+		]);
+		$this->assertArrayHasKey('triggerids', $triggerResponse['result']);
+	}
+
+
 	/**
 	 * Test trigger linking cases.
 	 *
@@ -558,10 +608,7 @@ class testTriggerLinking extends CIntegrationTest {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function testTriggerLinking_conflict() {
 
-		/* We need agent 2 only because it will have the different host metadata from the agent 1.
-			This would retrigger the autoregistration with linking. Stop this for now.
-			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
-		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
+		$this->createSingleTemplateWithTrigger();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
