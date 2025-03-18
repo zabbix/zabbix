@@ -133,7 +133,7 @@ class CControllerMaintenanceUpdate extends CController {
 			'maintenanceid' => $this->getInput('maintenanceid'),
 			'name' => $this->getInput('name'),
 			'maintenance_type' => $this->getInput('maintenance_type'),
-			'description' => $this->getInput('description'),
+			'description' => $this->getInput('description', ''),
 			'active_since' => $active_since_ts,
 			'active_till' => $active_till_ts,
 			'groups' => zbx_toObject($this->getInput('groupids', []), 'groupid'),
