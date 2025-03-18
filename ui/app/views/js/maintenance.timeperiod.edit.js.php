@@ -45,8 +45,8 @@ window.maintenance_timeperiod_edit = new class {
 	}
 
 	#update() {
-		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value;
-		const month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
+		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value,
+			month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
 
 		this.form_element.querySelectorAll('.js-every-day').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>;
@@ -106,6 +106,7 @@ window.maintenance_timeperiod_edit = new class {
 				}
 
 				const curl = new Curl('zabbix.php');
+
 				curl.setArgument('action', 'maintenance.timeperiod.check');
 
 				this.#post(curl.getUrl(), fields, (response) => {
