@@ -448,20 +448,28 @@ class testTriggerLinking extends CIntegrationTest {
 		}
 	}
 
-	private function createDiscoveryRuleWithItemPrototype() {
-		// Create discovery rule with item prototype using a generic macro for testing
-		$response = $this->call('discoveryrule.create', [
-			'name' => 'Test LLD Discovery Rule',
-			'key_' => 'test.discovery',
-			'hostid' => self::$templateids[0],
-			'type' => 0,
-			'delay' => 60,
-			'lld_macro_paths' => [
-				'lld_macro' => '{#MACRO1}',
-				'path' => '.path.1'
+	private function unlinkTemplates() {
+
+		$response = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => [
+				'host' => self::HOST_NAME
 			]
-		]);
-		}
+			]);
+
+		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
+		$hostid = $response['result'][0]['hostid'];
+
+		$response = $this->call('host.update', [
+			'hostid' => $hostid,
+			'templates' => []
+			]);
+
+		sleep(1);
+
+		$sql = "SELECT COUNT(*) FROM hosts_templates WHERE hostid='".$hostid."';";
+		$this->assertEquals(0, CDBHelper::getCount($sql));
+	}
 
 	/**
 	 * Test trigger linking cases.
@@ -478,14 +486,13 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
-		$this->createDiscoveryRuleWithItemPrototype();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
 		$this->checkTriggersCreate();
 		$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
-		//$this->stopComponent(self::COMPONENT_SERVER);
+		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_AGENT);
 
 		$response = $this->call('host.get', [
@@ -509,7 +516,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-		//$this->startComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
@@ -571,23 +578,30 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
 	}
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/*public function testTriggerLinking_conflict() {
+	/**
+	 * Test trigger linking cases.
+	 *
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @required-components server, agent, agent2
+	 */
+	public function testTriggerLinking_conflict() {
 
-
-			$this->startComponent(self::COMPONENT_SERVER);
-			sleep(1);
-			$this->startComponent(self::COMPONENT_AGENT);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
-			$this->checkTriggersCreate();
-			$this->createDiscoveryRuleWithItemPrototype();
-			$this->stopComponent(self::COMPONENT_SERVER);
-			$this->stopComponent(self::COMPONENT_AGENT);
-
-			$this->startComponent(self::COMPONENT_SERVER);
-			sleep(1);
-
-			$this->startComponent(self::COMPONENT_AGENT2);
-
-	}]*/
+		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->killComponent(self::COMPONENT_AGENT);
+		$this->killComponent(self::COMPONENT_SERVER);
+		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
+		$this->startComponent(self::COMPONENT_SERVER);
+		sleep(1);
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->checkTriggersCreate();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->unlinkTemplates();
+		$this->startComponent(self::COMPONENT_SERVER);
+		sleep(1);
+		$this->startComponent(self::COMPONENT_AGENT2);
+	}
 }
