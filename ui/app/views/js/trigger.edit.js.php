@@ -91,7 +91,13 @@ window.trigger_edit_popup = new class {
 
 		this.form_element.addEventListener('click', (e) => {
 			if (e.target.id === 'expression-constructor' || e.target.id === 'close-expression-constructor') {
-				this.#toggleExpressionConstructor(e.target.id);
+				if (!this.expression_constructor_active && this.expression.value) {
+					this.form.validateFieldsForAction(['expression'])
+						.then((result) => result && this.#toggleExpressionConstructor(e.target.id))
+				}
+				else {
+					this.#toggleExpressionConstructor(e.target.id);
+				}
 			}
 			else if (e.target.id === 'insert-expression') {
 				this.#openPopupTriggerExpr({
@@ -125,7 +131,13 @@ window.trigger_edit_popup = new class {
 			}
 			else if (e.target.id === 'recovery-expression-constructor'
 					|| e.target.id === 'close-recovery-expression-constructor') {
-				this.#toggleRecoveryExpressionConstructor(e.target.id);
+				if (!this.recovery_expression_constructor_active && this.recovery_expression.value) {
+					this.form.validateFieldsForAction(['recovery_expression'])
+						.then((result) => result && this.#toggleRecoveryExpressionConstructor(e.target.id))
+				}
+				else {
+					this.#toggleRecoveryExpressionConstructor(e.target.id);
+				}
 			}
 			else if (e.target.id === 'insert-recovery-expression') {
 				this.#openPopupTriggerExpr({

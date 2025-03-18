@@ -107,7 +107,10 @@ class CFormValidator {
 				await this.#validateDelayed();
 				await this.#validateApiUniqueness();
 				this.#validateDistinctness(values, validation_rules);
-				resolve_whole();
+				resolve_whole(
+					!Object.values(this.#errors)
+						.find((field_errors) => field_errors.find(({message}) => message.length))
+				);
 			}
 			catch (error) {
 				if (error.cause !== 'RulesError' && error.type !== 'abort') {
