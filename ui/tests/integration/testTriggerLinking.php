@@ -453,7 +453,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('discoveryrule.create', [
 			'name' => 'Test LLD Discovery Rule',
 			'key_' => 'test.discovery',
-			'hostid' => self::$templateX_ID,
+			'hostid' => self::$templateids[0],
 			'type' => 0,
 			'delay' => 60,
 			'status' => 0,
@@ -503,7 +503,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
-		$this->createDiscoveryRuleWithItemPrototype();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -595,5 +594,27 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
+	}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function testTriggerLinking_conflict() {
+
+		/* We need agent 2 only because it will have the different host metadata from the agent 1.
+			This would retrigger the autoregistration with linking. Stop this for now.
+			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
+			$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
+			$this->startComponent(self::COMPONENT_SERVER);
+			sleep(1);
+			$this->startComponent(self::COMPONENT_AGENT);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
+			$this->checkTriggersCreate();
+			$this->createDiscoveryRuleWithItemPrototype();
+			$this->stopComponent(self::COMPONENT_SERVER);
+			$this->stopComponent(self::COMPONENT_AGENT);
+
+			$this->startComponent(self::COMPONENT_SERVER);
+			sleep(1);
+
+			$this->startComponent(self::COMPONENT_AGENT2);
+
 	}
 }
