@@ -68,10 +68,12 @@ class CControllerMaintenanceUpdate extends CController {
 				['db maintenances.tags_evaltype', 'required', 'in' => [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR], 'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]]
 			],
 			'tags' => ['objects', 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
-				'operator' => ['db maintenance_tag.operator', 'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
-				'value' => ['db maintenance_tag.value'],
-				'tag' => ['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
-			], 'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]],
+					'operator' => ['db maintenance_tag.operator', 'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
+					'value' => ['db maintenance_tag.value'],
+					'tag' => ['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				],
+				'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]
+			],
 			'description' => ['db maintenances.description']
 		]];
 	}
