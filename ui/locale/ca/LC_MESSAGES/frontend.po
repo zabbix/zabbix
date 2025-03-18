@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-17 08:09+0000\n"
+"PO-Revision-Date: 2025-03-17 21:40+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -5943,7 +5943,7 @@ msgstr "Fitxer de claus TLS de la base de dades"
 #: include/classes/api/clients/CLocalApiClient.php:133
 #: include/classes/api/clients/CLocalApiClient.php:147
 msgid "Database error occurred."
-msgstr ""
+msgstr "S'ha produït un error de base de dades."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
