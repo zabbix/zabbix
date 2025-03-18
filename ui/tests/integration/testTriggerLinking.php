@@ -453,20 +453,9 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('discoveryrule.create', [
 			'name' => 'Test LLD Discovery Rule',
 			'key_' => 'test.discovery',
-			'hostid' => self::$templateids[0],
+			'templateid' => self::$templateids[0],
 			'type' => 0,
 			'delay' => 60,
-			'item_prototypes' => [
-			[
-				'name' => 'Test Item {#TEST_MACRO}',
-				'key_' => 'test.item[{#TEST_MACRO}]',
-				'type' => 0,
-				'value_type' => 4,
-				'lld_macro' => '{#TEST_MACRO}',
-				'applications' => ['Test Application'],
-				'delay' => 30
-			]
-			]
 		]);
 
 		// Verify the API call was successful
