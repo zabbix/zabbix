@@ -1,5 +1,1 @@
-pointer-overflow:memalloc.c
-pointer-overflow:service_protocol.c
-pointer-overflow:duktape.c
-float-divide-by-zero:evalsimple.c
 float-divide-by-zero:evalfunc.c
