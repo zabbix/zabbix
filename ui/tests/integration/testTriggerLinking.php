@@ -453,7 +453,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('discoveryrule.create', [
 			'name' => 'Test LLD Discovery Rule',
 			'key_' => 'test.discovery',
-			'templateid' => self::$templateids[0],
+			'hostid' => self::$templateids[0],
 			'type' => 0,
 			'delay' => 60
 		]);
