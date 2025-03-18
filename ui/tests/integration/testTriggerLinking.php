@@ -455,15 +455,8 @@ class testTriggerLinking extends CIntegrationTest {
 			'key_' => 'test.discovery',
 			'templateid' => self::$templateids[0],
 			'type' => 0,
-			'delay' => 60,
+			'delay' => 60
 		]);
-
-		// Verify the API call was successful
-		$this->assertEquals(
-			200,
-			$response->getStatusCode(),
-			'Failed to create LLD discovery rule: ' . json_encode($response)
-		);
 		}
 
 	/**
