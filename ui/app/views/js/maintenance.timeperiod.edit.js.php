@@ -20,18 +20,18 @@ window.maintenance_timeperiod_edit = new class {
 	/**
 	 * @type {HTMLElement}
 	 */
-	#form_element;
+	form_element;
 
 	/**
 	 * @type {CForm}
 	 */
-	#form;
+	form;
 
 	init({rules}) {
 		this._overlay = overlays_stack.getById('maintenance-timeperiod-edit');
 		this._dialogue = this._overlay.$dialogue[0];
-		this.#form_element = this._overlay.$dialogue.$body[0].querySelector('form');
-		this.#form = new CForm(this.#form_element, rules);
+		this.form_element = this._overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
 		// Update form field state according to the form data.
 		document.querySelectorAll('[name="timeperiod_type"], [name="month_date_type"]').forEach((element) => {
@@ -41,53 +41,53 @@ window.maintenance_timeperiod_edit = new class {
 		this._update();
 
 		document.getElementById('maintenance-timeperiod-form').style.display = '';
-		this.#form_element.querySelector('[name="timeperiod_type"]').focus();
+		this.form_element.querySelector('[name="timeperiod_type"]').focus();
 	}
 
 	_update() {
-		const timeperiod_type_value = this.#form_element.querySelector('[name="timeperiod_type"]').value;
-		const month_date_type_value = this.#form_element.querySelector('[name="month_date_type"]:checked').value;
+		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value;
+		const month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
 
-		this.#form_element.querySelectorAll('.js-every-day').forEach((element) => {
+		this.form_element.querySelectorAll('.js-every-day').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>;
 		});
 
-		this.#form_element.querySelectorAll('.js-every-week').forEach((element) => {
+		this.form_element.querySelectorAll('.js-every-week').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>;
 		});
 
-		this.#form_element.querySelectorAll('.js-weekly-days').forEach((element) => {
+		this.form_element.querySelectorAll('.js-weekly-days').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>;
 		});
 
-		this.#form_element.querySelectorAll('.js-months').forEach((element) => {
+		this.form_element.querySelectorAll('.js-months').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
 		});
 
-		this.#form_element.querySelectorAll('.js-month-date-type').forEach((element) => {
+		this.form_element.querySelectorAll('.js-month-date-type').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
 		});
 
-		this.#form_element.querySelectorAll('.js-every-dow').forEach((element) => {
+		this.form_element.querySelectorAll('.js-every-dow').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
 				|| month_date_type_value != 1;
 		});
 
-		this.#form_element.querySelectorAll('.js-monthly-days').forEach((element) => {
+		this.form_element.querySelectorAll('.js-monthly-days').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
 				|| month_date_type_value != 1;
 		});
 
-		this.#form_element.querySelectorAll('.js-day').forEach((element) => {
+		this.form_element.querySelectorAll('.js-day').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
 				|| month_date_type_value != 0;
 		});
 
-		this.#form_element.querySelectorAll('.js-start-date').forEach((element) => {
+		this.form_element.querySelectorAll('.js-start-date').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_ONETIME ?>;
 		});
 
-		this.#form_element.querySelectorAll('.js-hour-minute').forEach((element) => {
+		this.form_element.querySelectorAll('.js-hour-minute').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>
 				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>
 				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
@@ -95,9 +95,9 @@ window.maintenance_timeperiod_edit = new class {
 	}
 
 	submit() {
-		const fields = this.#form.getAllValues();
+		const fields = this.form.getAllValues();
 
-		this.#form.validateSubmit(fields)
+		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
 					this._overlay.unsetLoading();
@@ -110,8 +110,8 @@ window.maintenance_timeperiod_edit = new class {
 
 				this._post(curl.getUrl(), fields, (response) => {
 					if ('form_errors' in response) {
-						this.#form.setErrors(response.form_errors, true, true);
-						this.#form.renderErrors();
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
 					}
 					else if ('error' in response) {
 						throw {error: response.error};
@@ -142,7 +142,7 @@ window.maintenance_timeperiod_edit = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.#form_element.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -160,7 +160,7 @@ window.maintenance_timeperiod_edit = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this._overlay.unsetLoading();
