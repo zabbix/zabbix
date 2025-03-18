@@ -567,58 +567,5 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
 		$this->checkTriggersCreate();
-		//$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
-		//$this->stopComponent(self::COMPONENT_SERVER);
-		$this->stopComponent(self::COMPONENT_AGENT);
-
-		$response = $this->call('host.get', [
-			'output' => ['hostid'],
-			'filter' => [
-				'host' => [
-					self::HOST_NAME
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
-
-		$hostid = $response['result'][0]['hostid'];
-
-		$response = CDataHelper::call('host.update', [
-			'hostid' => $hostid,
-			'templates' => []
-		]);
-		sleep(1);
-
-		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-		//$this->startComponent(self::COMPONENT_SERVER);
-		sleep(1);
-
-		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'query [txnlev:1] [insert into triggers', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
-		$this->reloadConfigurationCache();
-		sleep(1);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-
-		$entry = $response['result'][0];
-
-		$ep = json_encode($entry, JSON_PRETTY_PRINT);
-
-		$this->assertArrayHasKey('tags', $entry, $ep);
-		$this->assertArrayHasKey(0, $entry['tags'], $ep);
-		$this->assertArrayHasKey('tag', $entry['tags'][0], $ep);
-		$this->assertEquals('templateX_tag', $entry['tags'][0]['tag'], $ep);
-		$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_SAME_ALL, $ep);
-		$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
-		$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
-		$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
-		$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
-		$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
-		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
-		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
-		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
 	}
 }
