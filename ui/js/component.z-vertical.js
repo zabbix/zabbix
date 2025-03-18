@@ -52,7 +52,7 @@ class ZVertical extends HTMLElement {
 
 		for (const prop in props_to_inherit) {
 			if (container_styles[prop] !== 'auto' && container_styles[prop] !== 'none'
-				&& container_styles[prop] !== '0px') {
+					&& container_styles[prop] !== '0px') {
 				div.style[props_to_inherit[prop]] = container_styles[prop];
 			}
 		}
