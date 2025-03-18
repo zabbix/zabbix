@@ -51,6 +51,7 @@ zbx_lld_item_link_t;
 ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
 
 int	lld_item_link_compare_func(const void *d1, const void *d2);
+void	lld_item_link_free(zbx_lld_item_link_t *item_link);
 
 typedef struct
 {
@@ -126,6 +127,10 @@ typedef struct
 	int			duration;
 }
 zbx_lld_lifetime_t;
+
+
+void	lld_lifetime_init(zbx_lld_lifetime_t *lifetime, const char *key, zbx_uint64_t hostid, int type,
+		const char *duration);
 
 typedef struct
 {
@@ -405,6 +410,13 @@ struct zbx_lld_item_full_s
 	zbx_sync_rowset_t			overrides;
 };
 
+typedef struct
+{
+	const zbx_lld_row_t	*lld_row;
+	zbx_uint64_t 		ruleid;
+}
+zbx_lld_row_ruleid_t;
+
 int	lld_item_full_compare_func(const void *d1, const void *d2);
 
 int	lld_ids_names_compare_func(const void *d1, const void *d2);
@@ -425,7 +437,7 @@ int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *
 
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck);
+		int lastcheck, int item_flags, zbx_hashset_t *rule_index);
 
 void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows);
 
@@ -545,7 +557,8 @@ void	lld_items_param_make(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype);
 void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, char **error);
 int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked, int item_flags);
+		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked, int item_flags,
+		zbx_hashset_t *rule_index);
 int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const zbx_lld_lifetime_t *lifetime,

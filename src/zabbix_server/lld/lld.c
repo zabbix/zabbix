@@ -971,7 +971,7 @@ static int	lld_rows_get(zbx_vector_lld_entry_ptr_t *lld_entries, zbx_lld_filter_
 	return ret;
 }
 
-static void	lld_item_link_free(zbx_lld_item_link_t *item_link)
+void	lld_item_link_free(zbx_lld_item_link_t *item_link)
 {
 	zbx_free(item_link);
 }
@@ -982,6 +982,31 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
 	zbx_vector_lld_item_link_ptr_destroy(&lld_row->item_links);
 	zbx_vector_lld_override_ptr_destroy(&lld_row->overrides);
 	zbx_free(lld_row);
+}
+
+void	lld_lifetime_init(zbx_lld_lifetime_t *lifetime, const char *key, zbx_uint64_t hostid, int type,
+		const char *duration)
+{
+	if (ZBX_LLD_LIFETIME_TYPE_AFTER != (lifetime->type = (unsigned char)type))
+	{
+		lifetime->duration = 0;
+		return;
+	}
+
+	char	*duration_res = zbx_strdup(NULL, duration);
+
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			&duration_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+	if (SUCCEED != zbx_is_time_suffix(duration_res, &lifetime->duration, ZBX_LENGTH_UNLIMITED))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule "
+				" \"%s:%s\": \"%s\" is not a valid value", zbx_host_string(hostid),
+				key, duration_res);
+		lifetime->duration = 25 * SEC_PER_YEAR;	/* max value for the field */
+	}
+
+	zbx_free(duration_res);
 }
 
 /******************************************************************************
@@ -997,29 +1022,6 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  ******************************************************************************/
 int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *lld_entries, char **error)
 {
-#define LIFETIME_DURATION_GET(lt, lt_str)									\
-	do													\
-	{													\
-		char	*lt_res;										\
-														\
-		if (ZBX_LLD_LIFETIME_TYPE_AFTER != lt.type)							\
-			break;											\
-														\
-		lt_res = zbx_strdup(NULL, lt_str);								\
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,	\
-				NULL, NULL, &lt_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);				\
-														\
-		if (SUCCEED != zbx_is_time_suffix(lt_res, &lt.duration, ZBX_LENGTH_UNLIMITED))			\
-		{												\
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule "	\
-					" \"%s:%s\": \"%s\" is not a valid value", zbx_host_string(hostid),	\
-					discovery_key, lt_res);							\
-			lt.duration = 25 * SEC_PER_YEAR;	/* max value for the field */			\
-		}												\
-		zbx_free(lt_res);										\
-	}													\
-	while(0)
-
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
 	zbx_uint64_t			hostid;
@@ -1055,15 +1057,12 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		filter.evaltype = atoi(row[2]);
 		filter.expression = zbx_strdup(NULL, row[3]);
-		ZBX_STR2UCHAR(lifetime.type, row[4]);
-		LIFETIME_DURATION_GET(lifetime, row[5]);
-		ZBX_STR2UCHAR(enabled_lifetime.type, row[6]);
-		LIFETIME_DURATION_GET(enabled_lifetime, row[7]);
+		lld_lifetime_init(&lifetime, discovery_key, hostid, atoi(row[4]), row[5]);
+		lld_lifetime_init(&enabled_lifetime, discovery_key, hostid, atoi(row[6]), row[7]);
 	}
 	zbx_db_free_result(result);
 
@@ -1098,7 +1097,8 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
-	if (SUCCEED != lld_update_items(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");

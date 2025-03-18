@@ -396,7 +396,7 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 	while (batch_index < itemids.values_num)
 	{
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,name,key_,type,value_type,delay,history,trends,trapper_hosts,units,"
 					"formula,logtimefmt,valuemapid,params,ipmi_sensor,snmp_oid,authtype,username,"
 					"password,publickey,privatekey,description,interfaceid,jmx_endpoint,"
@@ -406,7 +406,9 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
 					"enabled_lifetime_type,evaltype"
 				" from items"
-				" where");
+				" where"
+					" flags&%d=0 and",
+					ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
 
@@ -2717,12 +2719,14 @@ static void	lld_items_tags_make(const zbx_vector_lld_item_prototype_ptr_t *item_
  *             db_insert_irtdata    - [IN] prepared item real-time data bulk  *
  *                                         insert                             *
  *             db_insert_irtname    - [IN]                                    *
+ *             rule_index           - [IN] mapping of lld rows to discovered  *
+ *                                        lld rules (optional)                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		zbx_lld_item_full_t *item, zbx_uint64_t *itemid, zbx_uint64_t *itemdiscoveryid,
 		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_idiscovery,
-		zbx_db_insert_t *db_insert_irtdata, zbx_db_insert_t *db_insert_irtname)
+		zbx_db_insert_t *db_insert_irtdata, zbx_db_insert_t *db_insert_irtname, zbx_hashset_t *rule_index)
 {
 	int	index;
 
@@ -2741,6 +2745,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	if (0 == item->itemid)
 	{
 		const zbx_lld_item_prototype_t	*item_prototype = item_prototypes->values[index];
+		zbx_uint64_t 			parent_itemid = item->parent_itemid;
 
 		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
@@ -2761,10 +2766,22 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
 				item_prototype->evaltype);
 
-		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
-				item->parent_itemid, item_prototype->key, item->lastcheck);
+		/* In the case of prototype items being discovered for LLD rule the parent_itemid refers */
+		/* to it's prototype itemid. Change it to the corresponding discovered LLD rule itemid.  */
+		if (NULL != rule_index)
+		{
+			zbx_lld_row_ruleid_t	row_ruleid_local, *row_ruleid;
 
-		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
+			row_ruleid_local.lld_row = item->lld_row;
+			if (NULL != (row_ruleid = zbx_hashset_search(rule_index, &row_ruleid_local)))
+				parent_itemid = row_ruleid->ruleid;
+		}
+
+		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
+				parent_itemid, item_prototype->key, item->lastcheck);
+
+		if (NULL != db_insert_irtdata)
+			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
 		if (NULL != db_insert_irtname)
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
@@ -2781,7 +2798,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 		dependent->master_itemid = item->itemid;
 		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert_items,
-				db_insert_idiscovery, db_insert_irtdata, db_insert_irtname);
+				db_insert_idiscovery, db_insert_irtdata, db_insert_irtname, rule_index);
 	}
 }
 
@@ -3282,6 +3299,8 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *             items           - [IN/OUT] items to save                       *
  *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
+ *             item_flags      - [IN] item flags                              *
+ *             rule_index      - [IN] mappiong of                               *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully saved or saving was not *
  *                         necessary                                          *
@@ -3289,13 +3308,14 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *                                                                            *
  ******************************************************************************/
 int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked, int item_flags)
+		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked, int item_flags,
+		zbx_hashset_t *rule_index)
 {
 	int				ret = SUCCEED, new_items = 0, upd_items = 0;
 	zbx_lld_item_full_t		*item;
 	zbx_uint64_t			itemid, itemdiscoveryid;
 	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname,
-					*pdb_insert_irtname = NULL;
+					*pdb_insert_irtname = NULL, *pdb_insert_irtdata = NULL;
 	zbx_lld_item_index_t		item_index_local;
 	zbx_vector_uint64_t		item_protoids;
 	char				*sql = NULL;
@@ -3373,8 +3393,12 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 		goto out;
 	}
 
-	if (ZBX_FLAG_DISCOVERY_NORMAL == item_prototypes->values[0]->item_flags)
+	if (0 == (item_flags & (ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_RULE)))
 		pdb_insert_irtname = &db_insert_irtname;
+
+	if (0 == (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		pdb_insert_irtdata = &db_insert_irtdata;
+
 
 	if (0 != upd_items)
 		sql = (char*)zbx_malloc(NULL, sql_alloc);
@@ -3399,7 +3423,8 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", "lastcheck", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
+		if (NULL != pdb_insert_irtdata)
+			zbx_db_insert_prepare(pdb_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
 
 		if (NULL != pdb_insert_irtname)
 		{
@@ -3417,7 +3442,7 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
-					&db_insert_idiscovery, &db_insert_irtdata, pdb_insert_irtname);
+					&db_insert_idiscovery, pdb_insert_irtdata, pdb_insert_irtname, rule_index);
 		}
 		else
 		{
@@ -3428,8 +3453,8 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
-						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata,
-						pdb_insert_irtname);
+						&db_insert_items, &db_insert_idiscovery, pdb_insert_irtdata,
+						pdb_insert_irtname, rule_index);
 			}
 		}
 
@@ -3448,8 +3473,12 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 			zbx_db_insert_execute(pdb_insert_irtname);
 			zbx_db_insert_clean(pdb_insert_irtname);
 		}
-		zbx_db_insert_execute(&db_insert_irtdata);
-		zbx_db_insert_clean(&db_insert_irtdata);
+
+		if (NULL != pdb_insert_irtdata)
+		{
+			zbx_db_insert_execute(pdb_insert_irtdata);
+			zbx_db_insert_clean(pdb_insert_irtdata);
+		}
 
 		zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 	}
@@ -4129,8 +4158,8 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64
-				" and i.flags&%d=%d",
-			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, item_flags);
+				" and i.flags&%d=%d&%d",
+			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, item_flags, ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -4572,7 +4601,7 @@ void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck)
+		int lastcheck, int item_flags, zbx_hashset_t *rule_index)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;
@@ -4583,7 +4612,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	zbx_vector_lld_item_prototype_ptr_create(&item_prototypes);
 
-	lld_item_prototypes_get(lld_ruleid, &item_prototypes, ZBX_FLAG_DISCOVERY_NORMAL);
+	lld_item_prototypes_get(lld_ruleid, &item_prototypes, item_flags);
 
 	if (0 == item_prototypes.values_num)
 		goto out;
@@ -4592,7 +4621,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
 	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items, ZBX_FLAG_DISCOVERY_NORMAL);
+	lld_items_get(&item_prototypes, &items, item_flags);
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
@@ -4606,7 +4635,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_begin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
-			ZBX_FLAG_DISCOVERY_NORMAL) &&
+			item_flags, rule_index) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked))
