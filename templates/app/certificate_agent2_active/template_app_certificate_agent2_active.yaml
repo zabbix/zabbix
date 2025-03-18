@@ -124,7 +124,7 @@ zabbix_export:
             }
             
             return JSON.stringify(lld_data);
-          description: 'Parsing the parameters in user macros. JSON string, which is used in LLD.'
+          description: 'Parses the parameters from user macros and returns a JSON string used in LLD.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -147,7 +147,7 @@ zabbix_export:
               name: 'Certificate: Error parse parameters'
               event_name: 'Certificate: {?jsonpath(last(//cert.get.data),"$.error.message", "")}'
               priority: WARNING
-              description: 'Some entries in the macro "{$CERT.WEBSITE.HOSTNAME}" are incorrect and ignored.'
+              description: 'Some entries in the macro `{$CERT.WEBSITE.HOSTNAME}` are incorrect and ignored.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -158,8 +158,8 @@ zabbix_export:
               event_name: 'Certificate: {?jsonpath(last(//cert.get.data),"$.error.message", "")}'
               priority: HIGH
               description: |
-                Some entries in the macro "{$CERT.WEBSITE.HOSTNAME}" are incorrect.
-                Please, in order not to lose the data, edit the macros.
+                Some entries in the macro `{$CERT.WEBSITE.HOSTNAME}` are incorrect.
+                Please edit the macros to avoid data loss.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -175,7 +175,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'cert.alternative_names[{#CERT.WEBSITE.ITEMNAME}]'
               value_type: TEXT
-              description: 'The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).'
+              description: 'The subject alternative name extension allows identities to be bound to the subject of the certificate. These identities may be included in addition to or in place of the identity in the subject field of the certificate. Defined options include an e-mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -190,7 +190,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'cert.issuer[{#CERT.WEBSITE.ITEMNAME}]'
               value_type: TEXT
-              description: 'The field identifies the entity that has signed and issued the certificate.'
+              description: 'The field identifies the entity that signed and issued the certificate.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -205,7 +205,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'cert.message[{#CERT.WEBSITE.ITEMNAME}]'
               value_type: TEXT
-              description: 'Last check result message.'
+              description: 'Message from the latest certificate check.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -263,7 +263,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'cert.public_key_algorithm[{#CERT.WEBSITE.ITEMNAME}]'
               value_type: CHAR
-              description: 'The digital signature algorithm is used to verify the signature of a certificate.'
+              description: 'The digital signature algorithm used to verify the signature of a certificate.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -293,7 +293,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'cert.sha1_fingerprint[{#CERT.WEBSITE.ITEMNAME}]'
               value_type: CHAR
-              description: 'The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.'
+              description: 'The certificate signature (SHA1 fingerprint or thumbprint) is the hash of the entire certificate in DER form.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -366,7 +366,7 @@ zabbix_export:
                   expression: 'find(/Website certificate by Zabbix agent 2 active/cert.validation[{#CERT.WEBSITE.ITEMNAME}],,"like","invalid")=1'
                   name: 'Cert [{#CERT.WEBSITE.ITEMNAME}]: SSL certificate is invalid'
                   priority: HIGH
-                  description: 'SSL certificate has expired or it is issued for another domain.'
+                  description: 'The SSL certificate has expired or it is issued for another domain.'
                   tags:
                     - tag: scope
                       value: security
@@ -392,7 +392,7 @@ zabbix_export:
               delay: 15m
               history: '0'
               value_type: TEXT
-              description: 'Returns the JSON with attributes of a certificate of the requested site.'
+              description: 'Returns a JSON with the attributes of a certificate of the requested site.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -427,14 +427,14 @@ zabbix_export:
         - macro: '{$CERT.PARAMS.CHECK}'
           value: STRICT
           description: |
-            Type of verification of input parameters. 
-            A "STRICT" (by default) - when an error occurs, the check stops. 
-            Any other meaning - erroneous records are ignored.
+            The type of verification of input parameters.
+            `STRICT` (default) - when an error occurs, the check stops.
+            Any other value - erroneous records are ignored.
         - macro: '{$CERT.WEBSITE.HOSTNAME}'
-          value: '<Put DNS name>'
-          description: 'The website DNS name for the connection.'
+          value: '<Enter DNS name>'
+          description: 'The website''s DNS name used for the connection.'
         - macro: '{$CERT.WEBSITE.IP}'
-          description: 'The website IP address for the connection.'
+          description: 'The website''s IP address used for the connection.'
         - macro: '{$CERT.WEBSITE.PORT}'
           value: '443'
           description: 'The TLS/SSL port number of the website.'
