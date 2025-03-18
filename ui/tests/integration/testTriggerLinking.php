@@ -456,17 +456,6 @@ class testTriggerLinking extends CIntegrationTest {
 			'hostid' => self::$templateids[0],
 			'type' => 0,
 			'delay' => 60,
-			'status' => 0,
-			'filter' => [
-			'evaltype' => 0,
-			'conditions' => [
-				[
-				'conditiontype' => 0,
-				'operator' => 2,
-				'value' => self::HOST_NAME
-				]
-			]
-			],
 			'item_prototypes' => [
 			[
 				'name' => 'Test Item {#TEST_MACRO}',
