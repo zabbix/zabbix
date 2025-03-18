@@ -35,16 +35,16 @@ window.maintenance_timeperiod_edit = new class {
 
 		// Update form field state according to the form data.
 		document.querySelectorAll('[name="timeperiod_type"], [name="month_date_type"]').forEach((element) => {
-			element.addEventListener('change', () => this._update());
+			element.addEventListener('change', () => this.#update());
 		});
 
-		this._update();
+		this.#update();
 
 		document.getElementById('maintenance-timeperiod-form').style.display = '';
 		this.form_element.querySelector('[name="timeperiod_type"]').focus();
 	}
 
-	_update() {
+	#update() {
 		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value;
 		const month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
 
@@ -108,7 +108,7 @@ window.maintenance_timeperiod_edit = new class {
 				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'maintenance.timeperiod.check');
 
-				this._post(curl.getUrl(), fields, (response) => {
+				this.#post(curl.getUrl(), fields, (response) => {
 					if ('form_errors' in response) {
 						this.form.setErrors(response.form_errors, true, true);
 						this.form.renderErrors();
@@ -124,7 +124,7 @@ window.maintenance_timeperiod_edit = new class {
 			});
 	}
 
-	_post(url, data, success_callback) {
+	#post(url, data, success_callback) {
 		this._overlay.setLoading();
 
 		fetch(url, {
