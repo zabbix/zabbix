@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, UserPermissions
+ * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets
  */
 class testPageMonitoringHosts extends CWebTest {
 
@@ -185,6 +185,7 @@ class testPageMonitoringHosts extends CWebTest {
 					],
 					'expected' => [
 						'1_Host_to_check_Monitoring_Overview',
+						'2nd host for widgets',
 						'ЗАББИКС Сервер'
 					]
 				]
@@ -198,7 +199,8 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'expected' => [
-						'1_Host_to_check_Monitoring_Overview'
+						'1_Host_to_check_Monitoring_Overview',
+						'3rd host for widgets'
 					]
 				]
 			],
@@ -211,6 +213,7 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'expected' => [
+						'1st host for widgets',
 						'1_Host_to_check_Monitoring_Overview'
 					]
 				]
@@ -332,7 +335,10 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'expected' => [
+						'1st host for widgets',
 						'1_Host_to_check_Monitoring_Overview',
+						'2nd host for widgets',
+						'3rd host for widgets',
 						'3_Host_to_check_Monitoring_Overview',
 						'4_Host_to_check_Monitoring_Overview',
 						'Host for tag permissions',

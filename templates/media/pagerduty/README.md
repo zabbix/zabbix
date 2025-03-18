@@ -1,121 +1,158 @@
-![](images/PagerDuty-GreenRGB.png?raw=true) 
-# PagerDuty + Zabbix Integration Benefits
-* ***Notify on-call responders based on alerts sent from Zabbix.***
-* ***Send enriched event data from Zabbix including operational data that was triggered during event.***
-* ***Create high and low urgency incidents based on the severity of event from Zabbix.***
-* ***Problem updates are synchronised to PagerDuty from Zabbix.***
-* ***Incidents will automatically resolve in PagerDuty when the metric in Zabbix returns to normal.***
-# How it Works
-* ***If a trigger fires, Zabbix will send an event to a service in PagerDuty. Events from Zabbix will trigger a new incident on the corresponding PagerDuty service or group as alerts into an existing incident.***
-* ***Once the trigger is resolved, a resolving event will be sent to the PagerDuty service to resolve the alert and associated incident on that service.***
-# Requirements
-1. PagerDuty integrations with Zabbix require Events API v2 key. If you do not have permission to create Event API v2 key, please reach out to an Admin or Account Owner within your organization to help you configure the integration.
-2. PagerDuty webhook integration works with Zabbix version 7.0 or higher.
-# Support
-* If you need help use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393216-discussion-thread-for-official-integration-with-pagerduty) 
-* If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).
-# Description
-This guide describes how to integrate your Zabbix 7.4 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+![](images/logo.png?raw=true)
+# PagerDuty webhook
 
-## In PagerDuty
+## Overview
 
-* From the **Service** menu, select **Service Directory**.
+This guide describes how to integrate your Zabbix installation with PagerDuty using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
-* On your Services page:
+### Why PagerDuty + Zabbix
 
-    *   If you are creating a new service for your integration, click **+New Service**.
+* Notify on-call responders based on alerts sent from Zabbix.
+* Send enriched event data from Zabbix, including operational data triggered during the event.
+* Create high- and low-urgency incidents based on the severity of the event from Zabbix.
+* Problem updates are synchronized to PagerDuty from Zabbix.
+* Incidents will automatically resolve in PagerDuty when the metric in Zabbix returns to normal.
 
-    [![](images/tn_1.png?raw=true)](images/1.png)
+### How it works
 
-    *   Set name and description for new service.
+* When a trigger fires, Zabbix sends an event to a service in PagerDuty. Events from Zabbix will trigger a new incident on the corresponding PagerDuty service or will be grouped as alerts into an existing incident.
+* Once the trigger is resolved, a resolving event will be sent to the PagerDuty service to resolve the alert and the associated incident on that service.
 
-    [![](images/tn_1.1.png?raw=true)](images/1.1.png)
+### Supported versions
 
-    *   Assign required an Escalation Policy.
+PagerDuty integrations with Zabbix require an Events API v2 key. If you do not have permission to create an Event API v2 key, please reach out to an Admin or Account Owner within your organization to help you configure the integration.
 
-    [![](images/tn_1.2.png?raw=true)](images/1.2.png)
+## Requirements
 
-    *  Select Alert Grouping.
+Zabbix version: 7.4 and higher.
 
-    [![](images/tn_1.3.png?raw=true)](images/1.3.png)
+## Parameters
 
-    *  In integration section select Zabbix Webhook using search field and click **Create service**.
+After importing the webhook, you can configure it using webhook parameters.
 
-    [![](images/tn_1.4.png?raw=true)](images/1.4.png)
+### Configurable parameters
 
-* If you are adding your integration to an existing service, click the name of the service you want to add the integration to. Then click the **Integrations** tab and click the **+Add an Integration** button, select Zabbix Webhook using search field and click **Add**.
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
 
-    [![](images/tn_2.png?raw=true)](images/2.png)
+|Name|Value|Description|
+|----|-----|-----------|
+|zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 
-* After successfully added integration use **Integration Key** from it in **token** macros for PagerDuty zabbix media type.
+### Internal parameters
 
-    [![](images/tn_3.png?raw=true)](images/3.png)
+Internal parameters are reserved for predefined macros that are not meant to be changed.
 
-## In Zabbix
+|Name|Value|Description|
+|----|-----|-----------|
+|event_source|\{EVENT\.SOURCE\}|Numeric value of the event source. Possible values: 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal, 4 - Service.|
+|event_value|\{EVENT\.VALUE\}|Numeric value of the event that triggered an action (1 for problem, 0 for recovering).|
+|event_nseverity|\{EVENT\.NSEVERITY\}|Numeric value of the event severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_severity|\{EVENT\.SEVERITY\}|Name of the event severity.|
+|event_update_nseverity|\{EVENT\.UPDATE\.NSEVERITY\}|Numeric value of the event update severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_update_severity|\{EVENT\.UPDATE\.SEVERITY\}|Name of the event update severity.|
+|event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
+|alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
+|alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
+|event_ack|\{EVENT\.ACK\.STATUS\}|Acknowledgment status of the event (Yes/No).|
+|event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
+|trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
+|host_ip|\{HOST\.IP\}|Host IP address|
+|host_name|\{HOST\.NAME\}|Visible host name.|
+|api_token|\{ALERT\.SENDTO\}|Integration token that is used to access the PagerDuty HTTP API.|
 
-The configuration consists of a _media type_ in Zabbix, which will invoke webhook to send alerts to PagerDuty through the PagerDuty Event API v2\. To utilize the media type, we will create a Zabbix user to represent PagerDuty. We will then create an alert action to notify the user via this media type whenever there is a problem detected.
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
-## Create Global Macro
+## Service setup
 
-1\. Go to the **Administration** tab.
+* From the PagerDuty *Service* menu, select *Service Directory*.
 
-2\. Under Administration, go to the **General** page and choose the **Macros** from drop-down list.
+* On your *Services* page:
 
-3\. Add the macro {$ZABBIX.URL} with Zabbix frontend URL (for example http://192.168.7.123:8081).
+    *   If you are creating a new service for your integration, click *+New Service*.
 
-[![](images/tn_6.png?raw=true)](images/6.png)
+    [![](images/thumb.1.png?raw=true)](images/1.png)
 
-4\. Click the **Update** button to save the global macros.
+    *   Set the name and description for the new service.
 
-## Create the PagerDuty media type
+    [![](images/thumb.1.1.png?raw=true)](images/1.1.png)
 
-1\. Go to the **Administration** tab.
+    *   Assign an escalation policy (required).
 
-2\. Under Administration, go to the **Media types** page and click the **Import** button.
+    [![](images/thumb.1.2.png?raw=true)](images/1.2.png)
 
-[![](images/tn_7.png?raw=true)](images/7.png)
+    *  Enable alert grouping.
 
-3\. Select Import file [media_pagerduty.yaml](media_pagerduty.yaml) and click the **Import** button at the bottom to import the PagerDuty media type.
+    [![](images/thumb.1.3.png?raw=true)](images/1.3.png)
 
-4\. Change the value of the variable token
+    *  In the *Integrations* section, select the Zabbix Webhook using the search field and click *Create service*.
 
-[![](images/tn_8.png?raw=true)](images/8.png)
+    [![](images/thumb.1.4.png?raw=true)](images/1.4.png)
 
-## Create the PagerDuty user for alerting
+* If you are adding your integration to an existing service, click the name of the service you want to add the integration to. Then click the *Integrations* tab and click the *+Add an Integration* button, select the Zabbix Webhook using the search field, and click *Add*.
 
-1\. Go to the **Administration** tab.
+    [![](images/thumb.2.png?raw=true)](images/2.png)
 
-2\. Under Administration, go to the **Users** page and click the **Create user** button.
+* After successfully adding the integration, use its Integration Key in the **token** macros for the PagerDuty Zabbix media type.
 
-[![](images/tn_9.png?raw=true)](images/9.png)
+    [![](images/thumb.3.png?raw=true)](images/3.png)
 
-3\. Fill in the details of this new user, and call it “PagerDuty User”. The default settings for PagerDuty User should suffice as this user will not be logging into Zabbix.
+## Zabbix configuration
 
-4\. Click the **Select** button next to **Groups**.
+The configuration includes a media type in Zabbix that invokes a webhook to send alerts to PagerDuty through the PagerDuty Event API v2. To use this media type, we will create a Zabbix user to represent PagerDuty and set up an alert action to notify this user whenever a problem is detected.
 
-[![](images/tn_10.png?raw=true)](images/10.png)
+### Create global macro
 
-* Please note, that in order to notify on problems with host this user must have at least read permissions for such host.
+1\. In the Zabbix web interface, go to *Administration* > *Macros*.
 
-5\. Click on the **Media** tab and, inside of the **Media** box, click the **Add** button.
+2\. Add the macro `{$ZABBIX.URL}` with Zabbix frontend URL (for example, http://192.168.7.123:8081).
 
-[![](images/tn_11.png?raw=true)](images/11.png)
+[![](images/thumb.6.png?raw=true)](images/6.png)
 
-6\. In the new window that appears, configure the media for the user as follows:
+3\. Click the *Update* button to save.
 
-[![](images/tn_12.png?raw=true)](images/12.png)
+### Create the PagerDuty media type
+
+1\. In the Zabbix interface *Alerts* > *Media types* section, click the *Import* button.
+
+[![](images/thumb.7.png?raw=true)](images/7.png)
+
+2\. Select the import file [`media_pagerduty.yaml`](media_pagerduty.yaml) and click the *Import* button at the bottom to import the PagerDuty media type.
+
+### Create the PagerDuty user for alerting
+
+1\. In the Zabbix interface, go to *Users* > *Users* and click the *Create user* button.
+
+[![](images/thumb.8.png?raw=true)](images/8.png)
+
+2\. Assign the new user the username "PagerDuty User". The default settings should suffice as this user will not be logging into Zabbix.
+
+3\. Click the *Select* button next to *Groups*.
+
+[![](images/thumb.9.png?raw=true)](images/9.png)
+
+* Please note that in order to be able to notify on problems with host, this user must have at least read permissions for the respective host.
+
+4\. Click on the *Media* tab and, inside the *Media* box, click the *Add* button.
+
+[![](images/thumb.10.png?raw=true)](images/10.png)
+
+5\. In the new window that appears, configure the media for the user as follows:
+
+[![](images/thumb.11.png?raw=true)](images/11.png)
 
 * For the **Type**, select **PagerDuty** (the new media type that was created).
-* For **Send to**: enter any text, as this value is not used, but is required.
+* Specify the token as the user's **Send to** field.
 * Make sure the **Enabled** box is checked.
 * Click the **Add** button when done.
 
-7\. Click the **Add** button at the bottom of the user page to save the user.
+6\. Click the *Add* button at the bottom of the user page to save the user.
 
-8\. Use the PagerDuty User in any Actions of your choice.
+7\. Use the PagerDuty User in any actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
+For more information, please see the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentation.
 
-# Supported Versions
+## Feedback
 
-Zabbix 7.4, PagerDuty Events API v2.
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
+
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).

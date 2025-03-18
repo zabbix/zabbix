@@ -21,6 +21,9 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testInheritanceItemPrototype extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'

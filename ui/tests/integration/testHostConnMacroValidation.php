@@ -13,7 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../../include/classes/api/services/CSettings.php';
 
 class CAutoregClient extends CZabbixClient {
 	public function sendRequest($host, $ip) {
@@ -61,15 +62,16 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 *
 	 */
 	private function updateServerStatus() {
-		$server_status = [
-			"version" => ZABBIX_VERSION,
-			"configuration" => [
-				"enable_global_scripts" => true,
-				"allow_software_update_check" => true
-			]
-		];
-
-		DBexecute("update config set server_status='".json_encode($server_status)."'");
+		DB::update('settings', [
+			'values' => ['value_str' => json_encode([
+				'version' => ZABBIX_VERSION,
+				'configuration' => [
+					'enable_global_scripts' => true,
+					'allow_software_update_check' => true
+				]
+			])],
+			'where' => ['name' => 'server_status']
+		]);
 	}
 
 	/**
@@ -193,7 +195,10 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_action = $response['result']['scriptids'][0];
 
-		DBexecute("update config set server_status=''");
+		DB::update('settings', [
+			'values' => ['value_str' => ''],
+			'where' => ['name' => 'server_status']
+		]);
 
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',

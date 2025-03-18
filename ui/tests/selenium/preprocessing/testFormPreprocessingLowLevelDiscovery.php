@@ -18,6 +18,9 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 

@@ -1483,12 +1483,6 @@ function getMapLinkTriggerInfo($sysmap, $options) {
  * @return string
  */
 function getSelementLabelColor($is_problem, $is_ack) {
-	static $schema = null;
-
-	if ($schema === null) {
-		$schema = DB::getSchema('config');
-	}
-
 	if ($is_problem) {
 		$param = $is_ack ? CSettingsHelper::PROBLEM_ACK_COLOR : CSettingsHelper::PROBLEM_UNACK_COLOR;
 	}
@@ -1496,11 +1490,9 @@ function getSelementLabelColor($is_problem, $is_ack) {
 		$param = $is_ack ? CSettingsHelper::OK_ACK_COLOR : CSettingsHelper::OK_UNACK_COLOR;
 	}
 
-	if (CSettingsHelper::get(CSettingsHelper::CUSTOM_COLOR) === '1') {
-		return CSettingsHelper::get($param);
-	}
-
-	return $schema['fields'][$param]['default'];
+	return CSettingsHelper::get(CSettingsHelper::CUSTOM_COLOR) == 1
+		? CSettingsHelper::get($param)
+		: CSettingsSchema::getDefault($param);
 }
 
 /**

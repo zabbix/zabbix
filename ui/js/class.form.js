@@ -19,6 +19,7 @@ class CForm {
 		'array': CFieldArray,
 		'checkbox': CFieldCheckBox,
 		'hidden': CFieldHidden,
+		'multiline': CFieldMultiline,
 		'multiselect': CFieldMultiselect,
 		'radio-list': CFieldRadioList,
 		'set': CFieldSet,
@@ -341,6 +342,7 @@ class CForm {
 	 * Sets errors in field objects and in #general_errors array.
 	 */
 	setErrors(raw_errors, focus_error_field, force_display_errors = false) {
+		this.clearGlobalErrors(raw_errors);
 		const {field_errors, general_errors} = this.convertRawErrors(raw_errors);
 
 		Object.entries(field_errors).forEach(([key, errors]) => {
@@ -376,6 +378,17 @@ class CForm {
 		if (focus_error_field) {
 			this.focusErrorField();
 		}
+	}
+
+	/**
+	 * Remove global errors for fields that are now being validated.
+	 *
+	 * @param raw_errors
+	 */
+	clearGlobalErrors(raw_errors) {
+		Object.keys(raw_errors).forEach(path => {
+			delete this.#general_errors[path];
+		});
 	}
 
 	/**

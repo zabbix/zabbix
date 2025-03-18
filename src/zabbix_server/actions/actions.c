@@ -2823,6 +2823,8 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
 		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids);
 
+	zbx_config_clean(&cfg);
+
 	zbx_vector_uint64_destroy(&del_groupids);
 	zbx_vector_uint64_destroy(&new_groupids);
 	zbx_vector_uint64_destroy(&del_templateids);

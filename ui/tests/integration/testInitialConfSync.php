@@ -20,12 +20,12 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup hosts, regexps, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
+ * @backup hosts, regexps, settings, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
  */
 class testInitialConfSync extends CIntegrationTest
 {
 	private $expected_initial = [
-			'config' =>
+			'settings' =>
 			[
 				'insert' => '1',
 				'update' => '0',
@@ -265,7 +265,7 @@ class testInitialConfSync extends CIntegrationTest
 
 	private $expected_update =
 	[
-		"config" =>
+		"settings" =>
 		[
 			"insert" =>
 			"1",
@@ -574,7 +574,7 @@ class testInitialConfSync extends CIntegrationTest
 	];
 
 	private $expected_delete = [
-		"config" =>
+		"settings" =>
 		[
 			"insert" =>
 			"1",

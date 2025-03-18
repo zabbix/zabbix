@@ -1454,7 +1454,7 @@ static int	zbx_check_db(void)
 			goto out;
 	}
 
-	if (SUCCEED == zbx_db_field_exists("config", "dbversion_status"))
+	if (SUCCEED == zbx_db_setting_exists("dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1512,7 +1512,7 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_close(&json);
 
-	if (ZBX_DB_OK > zbx_db_execute("update config set server_status='%s'", json.buffer))
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='%s' where name='server_status'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
 
 	zbx_json_free(&json);

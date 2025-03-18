@@ -9,502 +9,678 @@ zabbix_export:
         - name: alert_subject
           value: '{ALERT.SUBJECT}'
         - name: bot_token
-          value: '<PLACE YOUR KEY HERE>'
+          value: '<PLACE YOUR TOKEN>'
         - name: channel
           value: '{ALERT.SENDTO}'
-        - name: discovery_host_dns
-          value: '{DISCOVERY.DEVICE.DNS}'
-        - name: discovery_host_ip
-          value: '{DISCOVERY.DEVICE.IPADDRESS}'
-        - name: event_date
-          value: '{EVENT.DATE}'
         - name: event_id
           value: '{EVENT.ID}'
         - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        - name: event_opdata
-          value: '{EVENT.OPDATA}'
-        - name: event_recovery_date
-          value: '{EVENT.RECOVERY.DATE}'
-        - name: event_recovery_time
-          value: '{EVENT.RECOVERY.TIME}'
         - name: event_severity
           value: '{EVENT.SEVERITY}'
         - name: event_source
           value: '{EVENT.SOURCE}'
         - name: event_tags
           value: '{EVENT.TAGSJSON}'
-        - name: event_time
-          value: '{EVENT.TIME}'
-        - name: event_update_date
-          value: '{EVENT.UPDATE.DATE}'
+        - name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
+        - name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        - name: event_update_nseverity
+          value: '{EVENT.UPDATE.NSEVERITY}'
+        - name: event_update_severity
+          value: '{EVENT.UPDATE.SEVERITY}'
         - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        - name: event_update_time
-          value: '{EVENT.UPDATE.TIME}'
         - name: event_value
           value: '{EVENT.VALUE}'
-        - name: host_conn
-          value: '{HOST.CONN}'
-        - name: host_name
-          value: '{HOST.NAME}'
-        - name: slack_as_user
-          value: 'true'
         - name: slack_mode
           value: alarm
-        - name: trigger_description
-          value: '{TRIGGER.DESCRIPTION}'
         - name: trigger_id
           value: '{TRIGGER.ID}'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
-      status: DISABLED
+      attempts: '1'
       script: |
-        var SEVERITY_COLORS = [
-            '#97AAB3', '#7499FF', '#FFC859',
-            '#FFA059', '#E97659', '#E45959'
-        ];
+        const CLogger = function(serviceName) {
+        	this.serviceName = serviceName;
+        	this.INFO = 4
+        	this.WARN = 3
+        	this.ERROR = 2
+        	this.log = function(level, msg) {
+        		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
+        	}
+        }
         
-        var RESOLVE_COLOR = '#009900';
+        const CWebhook = function(value) {
+        	try {
+        		params = JSON.parse(value);
         
-        var SLACK_MODE_HANDLERS = {
-            alarm: handlerAlarm,
-            event: handlerEvent
+        		if (['0', '1', '2', '3', '4'].indexOf(params.event_source) === -1) {
+        			throw 'Incorrect "event_source" parameter given: ' + params.event_source + '.\nMust be 0-4.';
+        		}
+        
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1 && ['0', '1'].indexOf(params.event_value) === -1) {
+        			throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0 or 1.';
+        		}
+        
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1) {
+        			if (params.event_source === '1' && ['0', '1', '2', '3'].indexOf(params.event_value) === -1) {
+        				throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0-3.';
+        			}
+        
+        			if (params.event_source === '0' && ['0', '1'].indexOf(params.event_update_status) === -1) {
+        				throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '.\nMust be 0 or 1.';
+        			}
+        
+        			if (params.event_source === '4') {
+        				if (['0', '1', '2', '3', '4', '5'].indexOf(params.event_update_nseverity) !== -1 && params.event_update_nseverity != params.event_nseverity) {
+        					params.event_nseverity = params.event_update_nseverity;
+        					params.event_severity = params.event_update_severity;
+        					params.event_update_status = '1';
+        				}
+        			}
+        		}
+        
+        		this.runCallback = function(name, params) {
+        			if (typeof this[name] === 'function') {
+        				return this[name].apply(this, [params]);
+        			}
+        		}
+        
+        		this.handleEvent = function(source, event) {
+        			const alert = { source: source, event: event };
+        			return [
+        				this.runCallback('on' + source + event, alert),
+        				this.runCallback('on' + event, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
+        
+        		this.handleEventless = function(source) {
+        			const alert = { source: source, event: null };
+        			return [
+        				this.runCallback('on' + source, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
+        
+        		this.run = function() {
+        			var results = [];
+        			if (typeof this.httpProxy === 'string' && this.httpProxy.trim() !== '') {
+        				this.request.setProxy(this.httpProxy);
+        			}
+        			const types = { '0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service' };
+        
+        			if (['0', '3', '4'].indexOf(this.params.event_source) !== -1) {
+        				var event = (this.params.event_update_status === '1')
+        					? 'Update'
+        					: ((this.params.event_value === '1') ? 'Problem' : 'Resolve');
+        
+        				results = this.handleEvent(types[this.params.event_source], event);
+        			}
+        			else if (typeof types[this.params.event_source] !== 'undefined') {
+        				results = this.handleEventless(types[this.params.event_source]);
+        			}
+        			else {
+        				throw 'Unexpected "event_source": ' + this.params.event_source;
+        			}
+        
+        			for (idx in results) {
+        				if (typeof results[idx] !== 'undefined') {
+        					return JSON.stringify(results[idx]);
+        				}
+        			}
+        		}
+        		this.httpProxy = params.http_proxy;
+        		this.params = params;
+        		this.runCallback('onCheckParams', {});
+        	} catch (error) {
+        		throw 'Webhook processing failed: ' + error;
+        	}
+        }
+        
+        const CParamValidator = {
+        
+        	isType: function(value, type) {
+        		if (type === 'array') {
+        			return Array.isArray(value);
+        		}
+        		if (type === 'integer') {
+        			return CParamValidator.isInteger(value);
+        		}
+        		if (type === 'float') {
+        			return CParamValidator.isFloat(value);
+        		}
+        
+        		return (typeof value === type);
+        	},
+        
+        	isInteger: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseInt(value));
+        	},
+        
+        	isFloat: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+\.\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseFloat(value));
+        	},
+        
+        	isDefined: function(value) {
+        		return !CParamValidator.isType(value, 'undefined');
+        	},
+        
+        	isEmpty: function(value) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be checked for emptiness.';
+        		}
+        
+        		return (value.trim() === '');
+        	},
+        
+        	isMacroSet: function(value, macro) {
+        		if (CParamValidator.isDefined(macro)) {
+        			return !(CParamValidator.ifMatch(value, '^\{' + macro + '\}$'))
+        		}
+        
+        		return !(CParamValidator.ifMatch(value, '^\{[$#]{0,1}[A-Z_\.]+[\:]{0,1}["]{0,1}.*["]{0,1}\}$') || value === '*UNKNOWN*')
+        	},
+        
+        	withinRange: function(value, min, max) {
+        		if (!CParamValidator.isType(value, 'number')) {
+        			throw 'Value "' + value + '" must be a number to be checked for range.';
+        		}
+        		if (value < ((CParamValidator.isDefined(min)) ? min : value)
+        			|| value > ((CParamValidator.isDefined(max)) ? max : value)) {
+        			return false;
+        		}
+        
+        		return true;
+        	},
+        
+        	inArray: function(value, array) {
+        		if (!CParamValidator.isType(array, 'array')) {
+        			throw 'The array must be an array to check the value for existing in it.';
+        		}
+        
+        		return (array.indexOf((typeof value === 'string') ? value.toLowerCase() : value) !== -1);
+        	},
+        
+        	ifMatch: function(value, regex) {
+        		return (new RegExp(regex)).test(value);
+        	},
+        
+        	match: function(value, regex) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be matched with the regular expression.';
+        		}
+        
+        		return value.match(new RegExp(regex));
+        	},
+        
+        	checkURL: function(value) {
+        		if (CParamValidator.isEmpty(value)) {
+        			throw 'URL value "' + value + '" must be a non-empty string.';
+        		}
+        		if (!CParamValidator.ifMatch(value, '^(http|https):\/\/.+')) {
+        			throw 'URL value "' + value + '" must contain a schema.';
+        		}
+        
+        		return value.endsWith('/') ? value.slice(0, -1) : value;
+        	},
+        
+        	check: function(key, rule, params) {
+        		if (!CParamValidator.isDefined(rule.type)) {
+        			throw 'Mandatory attribute "type" has not been defined for parameter "' + key + '".';
+        		}
+        		if (!CParamValidator.isDefined(params[key])) {
+        			throw 'Checked parameter "' + key + '" was not found in the list of input parameters.';
+        		}
+        		var value = params[key],
+        			error_message = null;
+        		switch (rule.type) {
+        			case 'string':
+        				if (!CParamValidator.isType(value, 'string')) {
+        					throw 'Value "' + key + '" must be a string.';
+        				}
+        				if (CParamValidator.isEmpty(value)) {
+        					error_message = 'Value "' + key + '" must be a non-empty string';
+        					break;
+        				}
+        				if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
+        					error_message = 'Value "' + key + '" must be a string with a length > ' + rule.len;
+        				}
+        				if (CParamValidator.isDefined(rule.regex) && !CParamValidator.ifMatch(value, rule.regex)) {
+        					error_message = 'Value "' + key + '" must match the regular expression "' + rule.regex + '"';
+        				}
+        				if (CParamValidator.isDefined(rule.url) && rule.url === true) {
+        					value = CParamValidator.checkURL(value);
+        				}
+        				break;
+        			case 'integer':
+        				if (!CParamValidator.isInteger(value)) {
+        					error_message = 'Value "' + key + '" must be an integer';
+        					break;
+        				}
+        				value = parseInt(value);
+        				break;
+        			case 'float':
+        				if (!CParamValidator.isFloat(value)) {
+        					error_message = 'Value "' + key + '" must be a floating-point number';
+        					break;
+        				}
+        				value = parseFloat(value);
+        				break;
+        			case 'boolean':
+        				if (CParamValidator.inArray(value, ['1', 'true', 'yes', 'on'])) {
+        					value = true;
+        				}
+        				else if (CParamValidator.inArray(value, ['0', 'false', 'no', 'off'])) {
+        					value = false;
+        				}
+        				else {
+        					error_message = 'Value "' + key + '" must be a boolean-like.';
+        				}
+        				break;
+        			case 'array':
+        				try {
+        					value = JSON.parse(value);
+        				} catch (error) {
+        					throw 'Value "' + key + '" contains invalid JSON.';
+        				}
+        				if (!CParamValidator.isType(value, 'array')) {
+        					error_message = 'Value "' + key + '" must be an array.';
+        				}
+        				if (CParamValidator.isDefined(rule.tags) && rule.tags === true) {
+        					value = value.reduce(function(acc, obj) {
+        						acc[obj.tag] = obj.value || null;
+        						return acc;
+        					}, {});
+        				}
+        				break;
+        			case 'object':
+        				value = JSON.parse(value);
+        				if (!CParamValidator.isType(value, 'object')) {
+        					error_message = 'Value "' + key + '" must be an object.';
+        				}
+        				break;
+        			default:
+        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' +
+        				['integer', 'float', 'string', 'boolean', 'array', 'object'].join(', ');
+        		}
+        		params[key] = value;
+        		if (CParamValidator.inArray(rule.type, ['integer', 'float']) && error_message === null && (CParamValidator.isDefined(rule.min)
+        			|| CParamValidator.isDefined(rule.max)) && !CParamValidator.withinRange(value, rule.min, rule.max)) {
+        			error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
+        				? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
+        		}
+        		else if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
+        			error_message = 'Value "' + key + '" must be in the array ' + JSON.stringify(rule.array);
+        		}
+        		else if (CParamValidator.isDefined(rule.macro) && !CParamValidator.isMacroSet(value.toString(), rule.macro)) {
+        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ') + 'is not set';
+        		}
+        		if (error_message !== null) {
+        			if (CParamValidator.isDefined(rule.default) && CParamValidator.isType(rule.default, rule.type)) {
+        				params[key] = rule.default;
+        			}
+        			else {
+        				Zabbix.log(4, 'Default value for "' + key + '" must be a ' + rule.type + '. Skipped.');
+        				throw 'Incorrect value for variable "' + key + '". ' + error_message;
+        			}
+        		}
+        
+        		return this;
+        	},
+        
+        	validate: function(rules, params) {
+        		if (!CParamValidator.isType(params, 'object') || CParamValidator.isType(params, 'array')) {
+        			throw 'Incorrect parameters value. The value must be an object.';
+        		}
+        		for (var key in rules) {
+        			CParamValidator.check(key, rules[key], params);
+        		}
+        	}
+        }
+        
+        const CHttpRequest = function(logger) {
+        	this.request = new HttpRequest();
+        	if (typeof logger !== 'object' || logger === null) {
+        		this.logger = Zabbix;
+        	}
+        	else {
+        		this.logger = logger;
+        	}
+        
+        	this.clearHeader = function() {
+        		this.request.clearHeader();
+        	}
+        
+        	this.addHeaders = function(value) {
+        		var headers = [];
+        
+        		if (typeof value === 'object' && value !== null) {
+        			if (!Array.isArray(value)) {
+        				Object.keys(value).forEach(function(key) {
+        					headers.push(key + ': ' + value[key]);
+        				});
+        			}
+        			else {
+        				headers = value;
+        			}
+        		}
+        		else if (typeof value === 'string') {
+        			value.split('\r\n').forEach(function(header) {
+        				headers.push(header);
+        			});
+        		}
+        
+        		for (var idx in headers) {
+        			this.request.addHeader(headers[idx]);
+        		}
+        	}
+        
+        	this.setProxy = function(proxy) {
+        		this.request.setProxy(proxy);
+        	}
+        
+        	this.plainRequest = function(method, url, data) {
+        		var resp = null;
+        		method = method.toLowerCase();
+        		this.logger.log(4, 'Sending ' + method + ' request:' + JSON.stringify(data));
+        		if (['get', 'post', 'put', 'patch', 'delete', 'trace'].indexOf(method) !== -1) {
+        			resp = this.request[method](url, data);
+        		}
+        		else if (['connect', 'head', 'options'].indexOf(method) !== -1) {
+        			resp = this.request[method](url);
+        		}
+        		else {
+        			throw 'Unexpected method. Method ' + method + ' is not supported.';
+        		}
+        		this.logger.log(4, 'Response has been received: ' + resp);
+        
+        		return resp;
+        	}
+        
+        	this.jsonRequest = function(method, url, data) {
+        		this.addHeaders('Content-Type: application/json');
+        		var resp = this.plainRequest(method, url, JSON.stringify(data));
+        		try {
+        			resp = JSON.parse(resp);
+        		}
+        		catch (error) {
+        			throw 'Failed to parse response: not well-formed JSON was received';
+        		}
+        
+        		return resp;
+        	}
+        
+        	this.getStatus = function() {
+        		return this.request.getStatus();
+        	}
+        }
+        
+        const CWebhookHelper = {
+        
+        	createProblemURL: function(event_source, zabbix_url, trigger_id, event_id) {
+        		if (event_source === '0') {
+        			return zabbix_url + '/tr_events.php?triggerid=' + trigger_id + '&eventid=' + event_id;
+        		} else if (event_source === '4') {
+        			return zabbix_url + '/zabbix.php?action=service.list';
+        		}
+        
+        		return zabbix_url;
+        	},
+        
         };
         
-        
-        if (!String.prototype.format) {
-            String.prototype.format = function() {
-                var args = arguments;
-        
-                return this.replace(/{(\d+)}/g, function(match, number) {
-                    return number in args
-                        ? args[number]
-                        : match
-                    ;
-                });
-            };
-        }
-        
-        function isEventProblem(params) {
-            return params.event_value == 1
-                && params.event_update_status == 0
-            ;
-        }
-        
-        function isEventUpdate(params) {
-            return params.event_value == 1
-                && params.event_update_status == 1
-            ;
-        }
-        
-        function isEventResolve(params) {
-            return params.event_value == 0;
-        }
-        
-        function getPermalink(channelId, messageTimestamp) {
-            var req = new HttpRequest();
-        
-            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.setProxy(params.HTTPProxy);
-            }
-        
-            req.addHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');
-            req.addHeader('Authorization: Bearer ' + params.bot_token);
-        
-            var query = '{0}?channel={1}&message_ts={2}'.format(
-                    Slack.getPermalink,
-                    encodeURIComponent(channelId),
-                    encodeURIComponent(messageTimestamp)),
-                resp = JSON.parse(req.get(query));
-        
-            if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                throw 'message was created, but getting message link was failed with reason "' + resp.error + '"';
-            }
-        
-            return resp.permalink;
-        }
-        
-        function createProblemURL(zabbix_url, triggerid, eventid, event_source) {
-            var problem_url = '';
-            if (event_source === '0') {
-                problem_url = '{0}/tr_events.php?triggerid={1}&eventid={2}'
-                    .format(
-                        zabbix_url,
-                        triggerid,
-                        eventid
-                    );
-            }
-            else {
-                problem_url = zabbix_url;
-            }
-        
-            return problem_url;
-        }
-        
-        function handlerAlarm(params) {
-            var fields = {
-                channel: params.channel,
-                as_user: params.slack_as_user,
-            };
-        
-            if (isEventProblem(params)) {
-                fields.attachments = [
-                    createMessage(
-                        SEVERITY_COLORS[params.event_nseverity] || 0,
-                        params.event_date,
-                        params.event_time,
-                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
-                    )
-                ];
-        
-                var resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
-        
-                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                    throw resp.error;
-                }
-        
-                result.tags = {
-                    ['__message_ts_' + params.channel]: resp.ts,
-                    ['__channel_id_' + params.channel]: resp.channel,
-                    ['__message_link_' + params.channel]: getPermalink(resp.channel, resp.ts),
-                };
-        
-            }
-            else if (isEventUpdate(params)) {
-                try {
-                    var channel_event_tags = JSON.parse(params.event_tags);
-                } catch (error) {
-                    throw 'Cannot process event tags: ' + error;
-                }
-        
-                if (Array.isArray(channel_event_tags)) {
-                    for (i in channel_event_tags) {
-                        if (channel_event_tags[i].tag.includes('__message_ts_' + params.channel)) {
-                            fields.thread_ts = channel_event_tags[i].value;
-                            break;
-                        }
-                    }
-                }
-        
-                fields.attachments = [
-                    createMessage(
-                        SEVERITY_COLORS[params.event_nseverity] || 0,
-                        params.event_update_date,
-                        params.event_update_time,
-                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source),
-                        true
-                    )
-                ];
-        
-                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
-        
-                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                    throw resp.error;
-                }
-        
-            }
-            else if (isEventResolve(params)) {
-        
-                fields.text = '';
-        
-                try {
-                    var channel_event_tags = JSON.parse(params.event_tags);
-                } catch (error) {
-                    throw 'Cannot process event tags: ' + error;
-                }
-        
-                if (Array.isArray(channel_event_tags)) {
-                    for (i in channel_event_tags) {
-                        if (channel_event_tags[i].tag.includes('__channel_id_' + params.channel)) {
-                            fields.channel = channel_event_tags[i].value;
-                            continue;
-                        }
-                        if (channel_event_tags[i].tag.includes('__message_ts_' + params.channel)) {
-                            fields.ts = channel_event_tags[i].value;
-                        }
-                    }
-                }
-        
-                fields.attachments = [
-                    createMessage(
-                        RESOLVE_COLOR,
-                        params.event_date,
-                        params.event_time,
-                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
-                    )
-                ];
-        
-                resp = JSON.parse(req.post(Slack.chatUpdate, JSON.stringify(fields)));
-                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                    throw resp.error;
-                }
-            }
-        }
-        
-        function handlerEvent(params) {
-            var fields = {
-                channel: params.channel,
-                as_user: params.slack_as_user
-            };
-        
-            if (isEventProblem(params)) {
-                fields.attachments = [
-                    createMessage(
-                        SEVERITY_COLORS[params.event_nseverity] || 0,
-                        params.event_date,
-                        params.event_time,
-                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
-                    )
-                ];
-        
-                var resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
-        
-                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                    throw resp.error;
-                }
-        
-                result.tags = {
-                    ['__message_link_' + params.channel]: getPermalink(resp.channel, resp.ts)
-                }
-        
-            }
-            else if (isEventUpdate(params)) {
-                fields.attachments = [
-                    createMessage(
-                        SEVERITY_COLORS[params.event_nseverity] || 0,
-                        params.event_update_date,
-                        params.event_update_time,
-                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source),
-                        false
-                    )
-                ];
-        
-                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
-        
-                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                    throw resp.error;
-                }
-        
-            }
-            else if (isEventResolve(params)) {
-                fields.attachments = [
-                    createMessage(
-                        RESOLVE_COLOR,
-                        params.event_recovery_date,
-                        params.event_recovery_time,
-                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
-                    )
-                ];
-        
-                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
-        
-                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
-                    throw resp.error;
-                }
-            }
-        }
-        
-        function createMessage(
-            event_severity_color,
-            event_date,
-            event_time,
-            problem_url,
-            isShort,
-            messageText
-        ) {
-            var message = {
-                fallback: params.alert_subject,
-                title: params.alert_subject,
-                color: event_severity_color,
-                title_link: problem_url,
-                pretext: messageText || '',
-        
-                fields: [
-                    {
-                        title: 'Host',
-                        value: '{0} [{1}]'.format(params.host_name, params.host_conn),
-                        short: true
-                    },
-                    {
-                        title: 'Event time',
-                        value: '{0} {1}'.format(event_date, event_time),
-                        short: true
-                    }
-                ],
-            };
-        
-            if (params.event_source === '0') {
-                message.fields.push(
-                    {
-                        title: 'Severity',
-                        value: params.event_severity,
-                        short: true
-                    },
-                    {
-                        title: 'Opdata',
-                        value: params.event_opdata,
-                        short: true
-                    }
-                );
-            }
-        
-            if (!isShort  && params.event_source === '0') {
-                message['actions'] = [
-                    {
-                        type: 'button',
-                        text: 'Open in Zabbix',
-                        url: problem_url
-                    }
-                ];
-        
-                message.fields.push(
-                    {
-                        title: 'Event tags',
-                        value: JSON.parse(params.event_tags).filter(function (e) { return !e.tag.includes('__') }).map(function (e) { return e.tag + ': ' + e.value }).join('\n') || 'None',
-                        short: true
-                    },
-                    {
-                        title: 'Trigger description',
-                        value: params.trigger_description,
-                        short: true
-                    }
-                );
-            }
-        
-            if (params.event_source !== '0' || params.event_update_status === '1') {
-                message.fields.push(
-                    {
-                        title: 'Details',
-                        value: params.alert_message,
-                        short: false
-                    }
-                );
-            }
-        
-            return message;
-        }
-        
-        function validateParams(params) {
-            if (typeof params.bot_token !== 'string' || params.bot_token.trim() === '') {
-                throw 'Field "bot_token" cannot be empty';
-            }
-        
-            if (typeof params.channel !== 'string' || params.channel.trim() === '') {
-                throw 'Field "channel" cannot be empty';
-            }
-        
-            if (isNaN(params.event_id)) {
-                throw 'Field "event_id" is not a number';
-            }
-        
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
-            }
-        
-            if (params.event_source !== '0') {
-                params.event_nseverity = '0';
-                params.event_severity = 'Not classified';
-                params.event_update_status = '0';
-                params.slack_mode = 'event';
-            }
-        
-            if (params.event_source === '1' || params.event_source === '2') {
-                params.event_value = '1';
-            }
-        
-            if (params.event_source === '1') {
-                params.host_name = params.discovery_host_dns;
-                params.host_ip = params.discovery_host_ip;
-            }
-        
-            if (!~[0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity))) {
-                throw 'Incorrect "event_nseverity" parameter given: ' + params.event_nseverity + '\nMust be 0-5.';
-            }
-        
-            if (typeof params.event_severity !== 'string' || params.event_severity.trim() === '') {
-                throw 'Field "event_severity" cannot be empty';
-            }
-        
-            if (params.event_update_status !== '0' && params.event_update_status !== '1') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
-        
-            if (params.event_value !== '0' && params.event_value !== '1') {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
-        
-            if (typeof params.host_conn !== 'string' || params.host_conn.trim() === '') {
-                throw 'Field "host_conn" cannot be empty';
-            }
-        
-            if (typeof params.host_name !== 'string' || params.host_name.trim() === '') {
-                throw 'Field "host_name" cannot be empty';
-            }
-        
-            if (!~['true', 'false'].indexOf(params.slack_as_user.toLowerCase())) {
-                throw 'Incorrect "slack_as_user" parameter given: ' + params.slack_as_user + '\nMust be "true" or "false".';
-            }
-        
-            if (!~['alarm', 'event'].indexOf(params.slack_mode)) {
-                throw 'Incorrect "slack_mode" parameter given: ' + params.slack_mode + '\nMust be "alarm" or "event".';
-            }
-        
-            if (isNaN(params.trigger_id) && params.event_source === '0') {
-                throw 'field "trigger_id" is not a number';
-            }
-        
-            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '') {
-                throw 'Field "zabbix_url" cannot be empty';
-            }
-        
-            if (!/^(http|https):\/\/.+/.test(params.zabbix_url)) {
-                throw 'Field "zabbix_url" must contain a schema';
-            }
-        }
+        var serviceLogName = 'Slack Webhook',
+        	Logger = new CLogger(serviceLogName),
+        	Slack = CWebhook;
+        
+        Slack.prototype.onCheckParams = function () {
+        	CParamValidator.validate({
+        		alert_subject: { type: 'string' },
+        		alert_message: { type: 'string' },
+        		bot_token: { type: 'string' },
+        		zabbix_url: { type: 'string', url: true },
+        		channel: { type: 'string', macro: 'ALERT.SENDTO' },
+        		slack_mode: { type: 'string', array: ['alarm', 'event'], }
+        	}, this.params);
+        
+        	if (this.params.event_source === '0') {
+        		CParamValidator.validate({
+        			event_id: { type: 'integer' },
+        			trigger_id: { type: 'integer' }
+        		}, this.params);
+        	}
+        
+        	if (CParamValidator.inArray(this.params.event_source, ['0', '3', '4'])) {
+        		CParamValidator.validate({
+        			event_tags: { type: 'array', macro: 'EVENT.TAGSJSON', tags: true, default: {} }
+        		}, this.params);
+        	}
+        
+        	if (this.params.event_value != '0' && CParamValidator.isDefined(this.params.event_tags['__channel_id_' + this.params.channel])) {
+        		this.params.event_update_status = '1';
+        	}
+        
+        	this.severity_colors = [
+        		'#97AAB3',
+        		'#7499FF',
+        		'#FFC859',
+        		'#FFA059',
+        		'#E97659',
+        		'#E45959'
+        	];
+        
+        	this.resolve_color = '#009900';
+        	this.slack_endpoint = 'https://slack.com/api/';
+        
+        	this.problem_url = CWebhookHelper.createProblemURL(this.params.event_source, this.params.zabbix_url, this.params.trigger_id, this.params.event_id);
+        
+        	this.data = {
+        		channel: this.params.channel,
+        		attachments: [
+        			{
+        				fallback: this.params.alert_subject,
+        				title: this.params.alert_subject,
+        				color: this.severity_colors[this.params.event_nseverity],
+        				title_link: this.problem_url,
+        				text: this.params.alert_message,
+        				actions: [
+        					{
+        						type: 'button',
+        						text: 'Open in Zabbix',
+        						url: this.problem_url
+        					}
+        				]
+        			}
+        		]
+        	};
+        
+        	this.reply = {
+        		channel: this.params.channel,
+        		thread_ts: '',
+        		blocks: [
+        			{
+        				type: 'context',
+        				elements: [
+        					{
+        						type: 'plain_text',
+        						text: 'Event update message'
+        					}
+        				]
+        			},
+        			{
+        				type: 'rich_text',
+        				elements: [
+        					{
+        						type: 'rich_text_section',
+        						elements: [
+        							{
+        								type: 'text',
+        								text: '',
+        								style: {
+        									italic: true
+        								}
+        							}
+        						]
+        					}
+        				]
+        			}
+        		]
+        	};
+        };
+        
+        Slack.prototype.sendRequest = function (route, data, tags) {
+        	this.request.clearHeader();
+        	this.request.addHeaders({
+        		'Content-Type': 'application/json; charset=utf-8;',
+        		'Authorization': 'Bearer ' + this.params.bot_token
+        	});
+        
+        	var response = this.request.jsonRequest('POST', this.slack_endpoint + route, data);
+        
+        	if (this.request.getStatus() !== 200 || !CParamValidator.isType(response.ok, 'boolean') || response.ok !== true) {
+        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus());
+        		if (CParamValidator.isType(response.error, 'string')) {
+        			throw 'Endpoint response:' + response.error;
+        		}
+        		else {
+        			throw 'Unknown error. Check debug log for more information.';
+        		}
+        	}
+        
+        	if (tags) {
+        		return {
+        			tags: {
+        				['__message_ts_' + this.params.channel]: response.ts,
+        				['__channel_id_' + this.params.channel]: response.channel,
+        				['__message_link_' + this.params.channel]: this.getPermalink(response.channel, response.ts),
+        			}
+        		};
+        
+        	}
+        	else {
+        		return { tags: {} };
+        	}
+        };
+        
+        Slack.prototype.getPermalink = function (channel, message_ts) {
+        	var response = this.request.jsonRequest('GET', this.slack_endpoint + 'chat.getPermalink' + '?channel=' + channel + '&message_ts=' + message_ts);
+        
+        	if (this.request.getStatus() !== 200 || !CParamValidator.isType(response.ok, 'boolean') || response.ok !== true) {
+        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus());
+        		if (CParamValidator.isType(response.error, 'string')) {
+        			throw 'Endpoint response:' + response.error;
+        		}
+        		else {
+        			throw 'Unknown error. Check debug log for more information.';
+        		}
+        	}
+        
+        	if (!CParamValidator.isDefined(response.permalink)) {
+        		throw 'Permalink is missed from the JSON response';
+        	}
+        
+        	return response.permalink;
+        };
+        
+        Slack.prototype.onProblem = function (properties) {
+        	Logger.log(Logger.INFO, 'Source: ' + properties.source + '; Event: ' + properties.event);
+        
+        	if (this.params.slack_mode === "alarm") {
+        		return this.sendRequest('chat.postMessage', this.data, true);
+        	} else {
+        		return this.sendRequest('chat.postMessage', this.data, false);
+        	}
+        };
+        
+        Slack.prototype.onUpdate = function (properties) {
+        	Logger.log(Logger.INFO, 'Source: ' + properties.source + '; Event: ' + properties.event);
+        
+        	if (this.params.slack_mode === "alarm") {
+        		this.data.channel = this.params.event_tags['__channel_id_' + this.params.channel];
+        		this.data.ts = this.params.event_tags['__message_ts_' + this.params.channel];
+        
+        		if (CParamValidator.isMacroSet(this.params.event_update_message, 'EVENT.UPDATE.MESSAGE') && !CParamValidator.isEmpty(this.params.event_update_message)) {
+        			this.reply.thread_ts = this.data.ts;
+        			this.reply.blocks[1].elements[0].elements[0].text = this.params.event_update_message;
+        			this.sendRequest('chat.postMessage', this.reply, false);
+        		}
+        
+        		if (/\backnowledged/.test(this.params.event_update_action)) {
+        			this.sendRequest('reactions.add', { channel: this.data.channel, timestamp: this.data.ts, name: 'white_check_mark' }, false);
+        		}
+        
+        		if (/\bunacknowledged/.test(this.params.event_update_action)) {
+        			this.sendRequest('reactions.remove', { channel: this.data.channel, timestamp: this.data.ts, name: 'white_check_mark' }, false);
+        		}
+        
+        		if (/\bclosed/.test(this.params.event_update_action)) {
+        			return { tags: {} };
+        		}
+        		else {
+        			return this.sendRequest('chat.update', this.data, false);
+        		}
+        	} else {
+        		return this.sendRequest('chat.postMessage', this.data, false);
+        	}
+        };
+        
+        Slack.prototype.onResolve = function (properties) {
+        	Logger.log(Logger.INFO, 'Source: ' + properties.source + '; Event: ' + properties.event);
+        	this.data.attachments[0].color = this.resolve_color;
+        
+        	if (this.params.slack_mode === "alarm") {
+        		this.data.channel = this.params.event_tags['__channel_id_' + this.params.channel];
+        		this.data.ts = this.params.event_tags['__message_ts_' + this.params.channel];
+        
+        		return this.sendRequest('chat.update', this.data, false);
+        	} else {
+        		return this.sendRequest('chat.postMessage', this.data, false);
+        	}
+        };
+        
+        Slack.prototype.onDiscovery = function (properties) {
+        	return this.onProblem(properties);
+        };
+        
+        Slack.prototype.onAutoreg = function (properties) {
+        	return this.onProblem(properties);
+        };
         
         try {
-            var params = JSON.parse(value);
-        
-            validateParams(params);
-        
-            var req = new HttpRequest(),
-                result = {tags: {}};
-        
-            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.setProxy(params.HTTPProxy);
-            }
-        
-            req.addHeader('Content-Type: application/json; charset=utf-8');
-            req.addHeader('Authorization: Bearer ' + params.bot_token);
-        
-            var slack_endpoint = 'https://slack.com/api/';
-        
-            var Slack = {
-                postMessage: slack_endpoint + 'chat.postMessage',
-                getPermalink: slack_endpoint + 'chat.getPermalink',
-                chatUpdate: slack_endpoint + 'chat.update'
-            };
-        
-            params.slack_mode = params.slack_mode.toLowerCase();
-            params.slack_mode = params.slack_mode in SLACK_MODE_HANDLERS
-                ? params.slack_mode
-                : 'alarm';
-        
-            SLACK_MODE_HANDLERS[params.slack_mode](params);
-        
-            if (params.event_source === '0') {
-                return JSON.stringify(result);
-            }
-            else {
-                return 'OK';
-            }
+        	var hook = new Slack(value);
+        	hook.request = new CHttpRequest(Logger);
+        	return hook.run();
         }
         catch (error) {
-            Zabbix.log(4, '[ Slack Webhook ] Slack notification failed : ' + error);
-            throw 'Slack notification failed : ' + error;
+        	Logger.log(Logger.WARN, 'Notification failed: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
+      description: |
+        Preparing slack for a Zabbix media type:
+        1. On the page Your Apps (https://api.slack.com/apps) press 'Create an App', select 'From scratch' and specify its name and workspace.
+        2. In the 'Add features and functionality' section, select 'Bots' and press 'Review Scopes to Add'.
+        3. In the 'Scopes' section, find 'Bot Token Scopes', press 'Add an OAuth Scope' and add 'chat:write', 'im:write', 'groups:write' and 'reactions:write' scopes.
+        4. In the 'Settings' section on the left side of the page press 'Install App' and then 'Install to Workspace'.
+        5. Press 'Allow' and copy 'Bot User OAuth Access Token', which will be used to set up webhook.
+        
+        In Zabbix:
+        1. Set global macro {$ZABBIX.URL}
+        2. Set user media for slack using channel name or member ID
+        3. Set media param 'bot_token' to the previously created token
+        
+        For a detailed instructions please read full README file https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/slack/README.md
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
@@ -521,21 +697,23 @@ zabbix_export:
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
-            Problem duration: {EVENT.DURATION}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          subject: 'Updated: {EVENT.NAME}'
           message: |
-            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
-            {EVENT.UPDATE.MESSAGE}
-            
-            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+            Problem updated at {EVENT.TIME} on {EVENT.DATE}
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
@@ -558,3 +736,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

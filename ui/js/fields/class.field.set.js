@@ -217,7 +217,8 @@ class CFieldSet extends CField {
 			}
 			else if (errors[key] !== '') {
 				// Field is not present in fields, display generic error.
-				const extended_name = this.getName() + key;
+				let extended_name = this.getName() + key;
+				extended_name = '/' + extended_name.replaceAll('[', '/').replaceAll(']', '');
 				const missing_errors = field_errors.filter(error => error.message !== '').map(error => error.message);
 
 				if (missing_errors.length != 0) {

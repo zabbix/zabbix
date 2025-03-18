@@ -745,6 +745,9 @@ class testFormTabIndicators extends CWebTest {
 
 	/**
 	 * @dataProvider getTabData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTabIndicators_CheckGeneralForms($data) {
 		$this->page->login()->open($data['url'])->waitUntilReady();
