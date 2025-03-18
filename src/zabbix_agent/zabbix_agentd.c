@@ -1248,6 +1248,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())
 	{
+		__zbx_update_env(zbx_time());
+		zbx_sleep(1);
+
 		ret = waitpid((pid_t)-1, &i, WNOHANG);
 
 		if (-1 == ret && EINTR != errno)
@@ -1256,10 +1259,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
-
-		__zbx_update_env(zbx_time());
-
-		zbx_sleep(1);
 	}
 
 	ret = ZBX_EXIT_STATUS();
