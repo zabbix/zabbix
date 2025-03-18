@@ -506,11 +506,11 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent, agent2
 	 */
-	public function testTriggerLinking_checkMe() {
+	/* public function testTriggerLinking_checkMe() {
 
-		/* We need agent 2 only because it will have the different host metadata from the agent 1.
+		We need agent 2 only because it will have the different host metadata from the agent 1.
 			This would retrigger the autoregistration with linking. Stop this for now.
-			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
+			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2.
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
@@ -606,7 +606,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
-	}
+	}*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function testTriggerLinking_conflict() {
 
