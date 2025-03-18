@@ -448,57 +448,45 @@ class testTriggerLinking extends CIntegrationTest {
 		}
 	}
 
-	private function createSingleTemplateWithTrigger() {
-		$templateName = self::TEMPLATE_NAME_PRE . "_single";
-		$itemKey = self::ITEM_KEY_PRE . "_single";
-		$stringId = 'a';
-
-		$templateResponse = $this->call('template.create', [
-			'host' => $templateName,
-			'groups' => [
-				'groupid' => 1
-			]]);
-
-		$this->assertArrayHasKey('templateids', $templateResponse['result']);
-		$templateId = $templateResponse['result']['templateids'][0];
-
-		$itemResponse = $this->call('item.create', [
-			'hostid' => $templateId,
-			'name' => self::ITEM_NAME_PRE . "_" . $stringId,
-			'key_' => $itemKey,
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
-		]);
-
-		$this->assertArrayHasKey('itemids', $itemResponse['result']);
-		$itemId = $itemResponse['result']['itemids'][0];
-
-		$triggerResponse = $this->call('trigger.create', [
-			'description' => self::TRIGGER_DESCRIPTION_PRE . "_" . $stringId,
-			'priority' => self::TRIGGER_PRIORITY,
-			'status' => self::TRIGGER_STATUS,
-			'comments' => self::TRIGGER_COMMENTS_PRE . "_" . $stringId,
-			'url' => self::TRIGGER_URL_PRE . "_" . $stringId,
-			'url_name' => self::TRIGGER_URL_NAME_PRE . "_" . $stringId,
-			'type' => self::TRIGGER_TYPE,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-			'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . $stringId,
-			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-			'opdata' => self::TRIGGER_OPDATA_PRE . "_" . $stringId,
-			'event_name' => self::TRIGGER_EVENT_NAME_PRE . "_" . $stringId,
-			'expression' => 'last(/' . $templateName . '/' . $itemKey . ')=2',
-			'recovery_expression' => 'last(/' . $templateName . '/' . $itemKey . ')=3',
-			'tags' => [
-			[
-				'tag' => self::TAG_NAME_PRE . "_" . $stringId,
-				'value' => self::TAG_VALUE_PRE . "_" . $stringId
+	private function createDiscoveryRuleWithItemPrototype() {
+		// Create discovery rule with item prototype using a generic macro for testing
+		$response = $this->call('discoveryrule.create', [
+			'name' => 'Test LLD Discovery Rule',
+			'key_' => 'test.discovery',
+			'hostid' => self::$templateX_ID,
+			'type' => 0,
+			'delay' => 60,
+			'status' => 0,
+			'filter' => [
+			'evaltype' => 0,
+			'conditions' => [
+				[
+				'conditiontype' => 0,
+				'operator' => 2,
+				'value' => self::HOST_NAME
+				]
 			]
-		]
+			],
+			'item_prototypes' => [
+			[
+				'name' => 'Test Item {#TEST_MACRO}',
+				'key_' => 'test.item[{#TEST_MACRO}]',
+				'type' => 0,
+				'value_type' => 4,
+				'lld_macro' => '{#TEST_MACRO}',
+				'applications' => ['Test Application'],
+				'delay' => 30
+			]
+			]
 		]);
-		$this->assertArrayHasKey('triggerids', $triggerResponse['result']);
-	}
 
+		// Verify the API call was successful
+		$this->assertEquals(
+			200,
+			$response->getStatusCode(),
+			'Failed to create LLD discovery rule: ' . json_encode($response)
+		);
+		}
 
 	/**
 	 * Test trigger linking cases.
@@ -506,15 +494,16 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent, agent2
 	 */
-	/* public function testTriggerLinking_checkMe() {
+	public function testTriggerLinking_checkMe() {
 
-		We need agent 2 only because it will have the different host metadata from the agent 1.
+		/* We need agent 2 only because it will have the different host metadata from the agent 1.
 			This would retrigger the autoregistration with linking. Stop this for now.
-			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2.
+			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
+		$this->createDiscoveryRuleWithItemPrototype();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -606,15 +595,5 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
-	}*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function testTriggerLinking_conflict() {
-
-		$this->killComponent(self::COMPONENT_SERVER);
-		$this->createSingleTemplateWithTrigger();
-		$this->startComponent(self::COMPONENT_SERVER);
-		sleep(1);
-		$this->startComponent(self::COMPONENT_AGENT);
-		$this->assertEquals(201, $response->getStatusCode());
 	}
 }
