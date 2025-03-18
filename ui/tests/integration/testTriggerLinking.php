@@ -455,7 +455,9 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$templateResponse = $this->call('template.create', [
 			'host' => $templateName,
-		]);
+			'groups' => [
+				'groupid' => 1
+			]]);
 
 		$this->assertArrayHasKey('templateids', $templateResponse['result']);
 		$templateId = $templateResponse['result']['templateids'][0];
