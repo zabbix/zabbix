@@ -274,28 +274,19 @@ class CTriggerGeneralHelper {
 	 * @param array $input_tags
 	 */
 	public static function getInheritedTags(array $data, array $input_tags): array {
-		$items = [];
-		$item_prototypes = [];
-
-		foreach ($data['items'] as $item) {
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$items[] = $item;
-			}
-			else {
-				$item_prototypes[] = $item;
-			}
+		if ($data['discoveryRule']) {
+			$parent_templates = getItemParentTemplates([$data['discoveryRule']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
 		}
+		else {
+			$parent_templates = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
+		}
+		unset($parent_templates[0]);
 
-		$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
-			+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
-
-		unset($item_parent_templates[0]);
-
-		$db_templates = $item_parent_templates
+		$db_templates = $parent_templates
 			? API::Template()->get([
 				'output' => ['templateid'],
 				'selectTags' => ['tag', 'value'],
-				'templateids' => array_keys($item_parent_templates),
+				'templateids' => array_keys($parent_templates),
 				'preservekeys' => true
 			])
 			: [];
@@ -303,7 +294,7 @@ class CTriggerGeneralHelper {
 		$inherited_tags = [];
 
 		// Make list of parent template tags.
-		foreach ($item_parent_templates as $templateid => $template) {
+		foreach ($parent_templates as $templateid => $template) {
 			if (array_key_exists($templateid, $db_templates)) {
 				foreach ($db_templates[$templateid]['tags'] as $tag) {
 					if (array_key_exists($tag['tag'], $inherited_tags)
