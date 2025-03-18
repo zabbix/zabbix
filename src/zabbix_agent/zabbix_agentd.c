@@ -1042,34 +1042,6 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 }
 #endif	/* _WINDOWS */
 
-#ifndef _WINDOWS
-static int	wait_for_children(void)
-{
-	int	ws;
-	pid_t	pid;
-
-	zbx_log_lock();
-	zbx_redirect_stdio(NULL);
-	zbx_log_unlock();
-
-	pid = wait(&ws);
-
-	if (-1 == pid)
-	{
-		if (EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
-			return FAIL;
-		}
-
-		return SUCCEED;
-	}
-
-	return SUCCEED;
-}
-#endif
-
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t		listen_sock = {0};
@@ -1274,8 +1246,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children())
-		;
+	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
+			break;
+		}
+	}
 
 	ret = ZBX_EXIT_STATUS();
 
@@ -1326,14 +1305,8 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 {
 #ifdef _WINDOWS
 	ZBX_UNUSED(on_exit_args);
-#else
-	if (LOG_TYPE_FILE == CONFIG_LOG_TYPE)
-	{
-		zbx_log_lock();
-		zbx_redirect_stdio(CONFIG_LOG_FILE);
-		zbx_log_unlock();
-	}
 #endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 #ifndef _WINDOWS
 	if (NULL != on_exit_args)
