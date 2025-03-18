@@ -18,7 +18,7 @@ use Widgets\ProblemsBySv\Widget;
 
 ?>
 
-window.widget_problemsbysv_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init() {
 		this._show_type = document.getElementById('show_type');

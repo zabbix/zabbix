@@ -86,7 +86,7 @@ $form
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_problems_form.init('.json_encode([
+	->initFormJs('widget_form.init('.json_encode([
 		'sort_with_enabled_show_timeline' => [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => true,
 			SCREEN_SORT_TRIGGERS_TIME_ASC => true

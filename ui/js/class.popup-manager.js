@@ -56,11 +56,11 @@ class CPopupManager {
 	static #on_submit = null;
 
 	/**
-	 * Update event handler for currently open dialogue overlay.
+	 * Reload event handler for currently open dialogue overlay.
 	 *
 	 * @type {function|null}
 	 */
-	static #on_update = null;
+	static #on_reload = null;
 
 	/**
 	 * Non-standalone origin URL from where the first popup was opened.
@@ -164,7 +164,7 @@ class CPopupManager {
 		if (CPopupManager.#overlay !== null) {
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.close', CPopupManager.#on_close);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
-			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.update', CPopupManager.#on_update);
+			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.reload', CPopupManager.#on_reload);
 
 			if (dialogueid !== CPopupManager.#overlay.dialogueid || !reuse_existing) {
 				overlayDialogueDestroy(CPopupManager.#overlay.dialogueid);
@@ -319,11 +319,7 @@ class CPopupManager {
 				}
 			};
 
-			CPopupManager.#on_update = e => {
-				if (!e.detail.properties.includes('script_inline')) {
-					return;
-				}
-
+			CPopupManager.#on_reload = () => {
 				const end_scripting_event = new CPopupManagerEvent({
 					data: {
 						overlay: {
@@ -344,7 +340,7 @@ class CPopupManager {
 
 			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.close', CPopupManager.#on_close);
 			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit);
-			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.update', CPopupManager.#on_update);
+			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.reload', CPopupManager.#on_reload);
 		});
 
 		return overlay;

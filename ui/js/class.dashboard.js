@@ -45,7 +45,11 @@ class CDashboard {
 
 	#edit_widget_cache = null;
 
-	#widget_properties_overlay_position_fix = null;
+	#widget_form_position_fix = null;
+
+	#widget_form_abort_controller = null;
+
+	#widget_form_input_subscription = null;
 
 	constructor(target, {
 		containers,
@@ -590,7 +594,7 @@ class CDashboard {
 	}
 
 	addNewWidget() {
-		this.editWidgetProperties();
+		this.editWidget();
 	}
 
 	addDashboardPage({dashboard_pageid, name, display_period, widgets}) {
@@ -1448,7 +1452,7 @@ class CDashboard {
 			});
 	}
 
-	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
+	editWidget(properties = {}, {new_widget_pos = null} = {}) {
 		this._clearWarnings();
 
 		if (!('type' in properties)) {
@@ -1477,72 +1481,123 @@ class CDashboard {
 			templateid: this._data.templateid ?? undefined,
 			...properties
 		}, {
-			dialogueid: 'widget_properties',
+			// Form name is used as dialogue ID.
+			dialogueid: CWidgetForm.FORM_NAME_PRIMARY,
 			dialogue_class: 'modal-widget-configuration',
 			is_modal: true,
 			is_draggable: true,
-			position_fix: this.#widget_properties_overlay_position_fix,
+			position_fix: this.#widget_form_position_fix,
 			prevent_navigation: true
 		});
 
-		overlay.xhr.then(() => {
-			const form = overlay.$dialogue.$body[0].querySelector('form');
+		if (this.#widget_form_abort_controller !== null) {
+			this.#widget_form_abort_controller.abort();
+		}
 
-			if (!('unique_id' in properties) || !('dashboard_page_unique_id' in properties)) {
-				this.#edit_widget_cache.new_widget_pos = new_widget_pos;
+		this.#widget_form_abort_controller = new AbortController();
 
-				const default_widget_size = this._widget_defaults[properties.type].size;
+		const signal = this.#widget_form_abort_controller.signal;
 
-				if (new_widget_pos === null) {
-					this.#edit_widget_cache.new_widget_pos_reserved =
-						this.#edit_widget_cache.new_widget_dashboard_page.findFreePos(default_widget_size);
-				}
-				else {
-					this.#edit_widget_cache.new_widget_pos_reserved = {
-						...default_widget_size,
-						...new_widget_pos
-					};
+		const dialogue = overlay.$dialogue[0];
 
-					this.#edit_widget_cache.new_widget_pos_reserved.width = Math.min(
-						this.#edit_widget_cache.new_widget_pos_reserved.width,
-						this._max_columns - this.#edit_widget_cache.new_widget_pos_reserved.x
-					);
+		dialogue.addEventListener(CWidgetForm.EVENT_READY,
+			() => this.#onWidgetFormReady({overlay, properties, new_widget_pos}),
+			{signal}
+		);
 
-					this.#edit_widget_cache.new_widget_pos_reserved.height = Math.min(
-						this.#edit_widget_cache.new_widget_pos_reserved.height,
-						this._max_rows - this.#edit_widget_cache.new_widget_pos_reserved.y
-					);
+		dialogue.addEventListener(CWidgetForm.EVENT_CLOSE,
+			e => this.#onWidgetFormClose({position_fix: e.detail.position_fix}),
+			{signal}
+		);
 
-					this.#edit_widget_cache.new_widget_pos_reserved =
-						this.#edit_widget_cache.new_widget_dashboard_page.accommodatePos(
-							this.#edit_widget_cache.new_widget_pos_reserved
-						);
-				}
+		dialogue.addEventListener(CWidgetForm.EVENT_RELOAD_REQUEST,
+			() => this.#onWidgetFormReloadRequest({overlay}),
+			{signal}
+		);
 
-				if (this.#edit_widget_cache.new_widget_pos_reserved === null) {
-					for (const el of form.parentNode.children) {
-						if (el.matches('.msg-warning')) {
-							el.parentNode.removeChild(el);
-						}
-					}
+		dialogue.addEventListener(CWidgetForm.EVENT_SUBMIT_REQUEST,
+			() => this.#onWidgetFormSubmitRequest({overlay}),
+			{signal}
+		);
 
-					const message_box = makeMessageBox('warning', [],
-						t('Cannot add widget: not enough free space on the dashboard.')
-					)[0];
-
-					form.parentNode.insertBefore(message_box, form);
-
-					overlay.$btn_submit[0].disabled = true;
-				}
-			}
+		this.#widget_form_input_subscription = ZABBIX.EventHub.subscribe({
+			require: {
+				context: CWidgetForm.EVENT_CONTEXT,
+				event: CWidgetFormEvent.EVENT_INPUT,
+				form_name: CWidgetForm.FORM_NAME_PRIMARY
+			},
+			callback: () => console.log('WIDGET UPDATE REQUEST'),
+			signal
 		});
-
-		overlay.$dialogue[0].removeEventListener('dialogue.close', this._events.editWidgetPropertiesClose);
-		overlay.$dialogue[0].addEventListener('dialogue.close', this._events.editWidgetPropertiesClose, {once: true});
 	}
 
-	reloadWidgetProperties() {
-		const overlay = overlays_stack.getById('widget_properties');
+	#onWidgetFormReady({overlay, properties, new_widget_pos}) {
+		if ('unique_id' in properties && 'dashboard_page_unique_id' in properties) {
+			return;
+		}
+
+		this.#edit_widget_cache.new_widget_pos = new_widget_pos;
+
+		const default_widget_size = this._widget_defaults[properties.type].size;
+
+		if (new_widget_pos === null) {
+			this.#edit_widget_cache.new_widget_pos_reserved =
+				this.#edit_widget_cache.new_widget_dashboard_page.findFreePos(default_widget_size);
+		}
+		else {
+			this.#edit_widget_cache.new_widget_pos_reserved = {
+				...default_widget_size,
+				...new_widget_pos
+			};
+
+			this.#edit_widget_cache.new_widget_pos_reserved.width = Math.min(
+				this.#edit_widget_cache.new_widget_pos_reserved.width,
+				this._max_columns - this.#edit_widget_cache.new_widget_pos_reserved.x
+			);
+
+			this.#edit_widget_cache.new_widget_pos_reserved.height = Math.min(
+				this.#edit_widget_cache.new_widget_pos_reserved.height,
+				this._max_rows - this.#edit_widget_cache.new_widget_pos_reserved.y
+			);
+
+			this.#edit_widget_cache.new_widget_pos_reserved =
+				this.#edit_widget_cache.new_widget_dashboard_page.accommodatePos(
+					this.#edit_widget_cache.new_widget_pos_reserved
+				);
+		}
+
+		if (this.#edit_widget_cache.new_widget_pos_reserved === null) {
+			const form = overlay.$dialogue.$body[0].querySelector('form');
+
+			for (const element of form.parentNode.children) {
+				if (element.matches('.msg-warning')) {
+					element.parentNode.removeChild(element);
+				}
+			}
+
+			const message_box = makeMessageBox('warning', [],
+				t('Cannot add widget: not enough free space on the dashboard.')
+			)[0];
+
+			form.parentNode.insertBefore(message_box, form);
+
+			overlay.$btn_submit[0].disabled = true;
+		}
+	}
+
+	#onWidgetFormClose({position_fix}) {
+		this.#widget_form_position_fix = position_fix;
+
+		if (this.#widget_form_abort_controller !== null) {
+			this.#widget_form_abort_controller.abort();
+		}
+
+		this._selected_dashboard_page.resetWidgetPlaceholder();
+	}
+
+	#onWidgetFormReloadRequest({overlay}) {
+		console.log('FORM RELOAD REQUEST, shall update widget as well');
+
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(form);
 
@@ -1573,11 +1628,10 @@ class CDashboard {
 			new_widget_pos = this.#edit_widget_cache.new_widget_pos;
 		}
 
-		this.editWidgetProperties(properties, {new_widget_pos});
+		this.editWidget(properties, {new_widget_pos});
 	}
 
-	applyWidgetProperties() {
-		const overlay = overlays_stack.getById('widget_properties');
+	#onWidgetFormSubmitRequest({overlay}) {
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(form);
 
@@ -1603,7 +1657,7 @@ class CDashboard {
 		const busy_condition = this._createBusyCondition();
 
 		Promise.resolve()
-			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
+			.then(() => this.#promiseCheckWidget({templateid, type, name, view_mode, fields}))
 			.then(({fields}) => {
 				this._is_unsaved = true;
 
@@ -1691,36 +1745,6 @@ class CDashboard {
 			});
 	}
 
-	initWidgetPropertiesForm() {
-		const overlay = overlays_stack.getById('widget_properties');
-		const form = overlay.$dialogue.$body[0].querySelector('form');
-
-		form.fields = {};
-
-		form.querySelector('[name="type"]').addEventListener('change', () => this.reloadWidgetProperties());
-
-		form.addEventListener('change', e => {
-			const do_trim = e.target.matches(
-				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
-			);
-
-			if (do_trim) {
-				e.target.value = e.target.value.trim();
-			}
-		}, {capture: true});
-
-		for (const fieldset of
-				form.querySelectorAll(`fieldset.${ZBX_STYLE_COLLAPSIBLE}`)) {
-			new CFormFieldsetCollapsible(fieldset);
-		}
-
-		try {
-			new TabIndicators();
-		}
-		catch (error) {
-		}
-	}
-
 	getEditingWidgetContext() {
 		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
 			return {
@@ -1735,11 +1759,12 @@ class CDashboard {
 		};
 	}
 
-	_isEditingWidgetProperties() {
-		return overlays_stack.getById('widget_properties') !== undefined;
+	_isEditingWidget() {
+		// Form name is used as dialogue ID.
+		return overlays_stack.getById(CWidgetForm.FORM_NAME_PRIMARY) !== undefined;
 	}
 
-	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
+	#promiseCheckWidget({templateid, type, name, view_mode, fields}) {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'dashboard.widget.check');
@@ -1911,15 +1936,15 @@ class CDashboard {
 		}
 
 		if (this._getDashboardPageActionsContextMenu(dashboard_page).length > 0) {
-			const properties_button = document.createElement('button');
+			const actions_button = document.createElement('button');
 
-			properties_button.type = 'button';
-			properties_button.title = t('Actions');
-			properties_button.setAttribute('aria-expanded', 'false');
-			properties_button.setAttribute('aria-haspopup', 'true');
-			properties_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES);
+			actions_button.type = 'button';
+			actions_button.title = t('Actions');
+			actions_button.setAttribute('aria-expanded', 'false');
+			actions_button.setAttribute('aria-haspopup', 'true');
+			actions_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES);
 
-			tab_contents.append(properties_button);
+			tab_contents.append(actions_button);
 		}
 
 		this._tabs.getTarget().insertBefore(tab, null);
@@ -2252,7 +2277,7 @@ class CDashboard {
 							items: [
 								{
 									label: t('Add widget'),
-									clickCallback: () => this.editWidgetProperties({}, {new_widget_pos})
+									clickCallback: () => this.editWidget({}, {new_widget_pos})
 								},
 								{
 									label: t('Paste widget'),
@@ -2269,23 +2294,23 @@ class CDashboard {
 
 					jQuery(placeholder).menuPopup(menu, placeholder_event, {
 						closeCallback: () => {
-							if (!this._isEditingWidgetProperties()) {
+							if (!this._isEditingWidget()) {
 								dashboard_page.resetWidgetPlaceholder();
 							}
 						}
 					});
 				}
 				else {
-					this.editWidgetProperties({}, {new_widget_pos});
+					this.editWidget({}, {new_widget_pos});
 
-					if (!this._isEditingWidgetProperties()) {
+					if (!this._isEditingWidget()) {
 						dashboard_page.resetWidgetPlaceholder();
 					}
 				}
 			},
 
 			dashboardPageWidgetAddNew: () => {
-				this.editWidgetProperties();
+				this.editWidget();
 			},
 
 			dashboardPageWidgetDelete: () => {
@@ -2315,7 +2340,7 @@ class CDashboard {
 				const dashboard_page = e.detail.target;
 				const widget = e.detail.widget;
 
-				this.editWidgetProperties({
+				this.editWidget({
 					type: widget.getType(),
 					name: widget.getName(),
 					view_mode: widget.getViewMode(),
@@ -2475,12 +2500,6 @@ class CDashboard {
 				this._selectDashboardPage(
 					dashboard_pages[dashboard_page_index < dashboard_pages.length - 1 ? dashboard_page_index + 1 : 0]
 				);
-			},
-
-			editWidgetPropertiesClose: e => {
-				this.#widget_properties_overlay_position_fix = e.detail.position_fix;
-
-				this._selected_dashboard_page.resetWidgetPlaceholder();
 			},
 
 			feedback: ({data, descriptor}) => {

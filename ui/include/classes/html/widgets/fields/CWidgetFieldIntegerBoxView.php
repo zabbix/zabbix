@@ -29,4 +29,15 @@ class CWidgetFieldIntegerBoxView extends CWidgetFieldView {
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired($this->isRequired());
 	}
+
+	public function getJavaScript(): string {
+		return '
+			CWidgetForm.addField(
+				new CWidgetFieldIntegerBox('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
+			);
+		';
+	}
 }

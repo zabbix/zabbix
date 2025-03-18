@@ -62,7 +62,7 @@ $form
 	->addItem([$preview, $form_tabs])
 	->addJavaScript($form_tabs->makeJavascript())
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_svggraph_form.init('.json_encode([
+	->initFormJs('widget_form.init('.json_encode([
 		'form_tabs_id' => $form_tabs->getId(),
 		'color_palette' => CWidgetFieldDataSet::DEFAULT_COLOR_PALETTE,
 		'templateid' => $data['templateid']

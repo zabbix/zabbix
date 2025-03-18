@@ -15,7 +15,7 @@
 ?>
 
 
-window.widget_slareport_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init({serviceid_field_id}) {
 		this._$service = jQuery(`#${serviceid_field_id}`);

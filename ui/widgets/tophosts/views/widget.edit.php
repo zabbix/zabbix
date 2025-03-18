@@ -29,7 +29,15 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 	: null;
 
-$column = $form->registerField(new CWidgetFieldSelectView($data['fields']['column']));
+$column = new CWidgetFieldSelectView($data['fields']['column']);
+
+if ($data['fields']['column']->getValues()) {
+	$form->registerField($column);
+	$column_view = $column->getView();
+}
+else {
+	$column_view = _('Add a column');
+}
 
 $form
 	->addField($groupids)
@@ -58,8 +66,7 @@ $form
 	)
 	->addItem([
 		$column->getLabel(),
-		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add a column')))
-			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
+		(new CFormField($column_view))->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
 	])
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['order'])
@@ -69,7 +76,7 @@ $form
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_tophosts_form.init('.json_encode([
+	->initFormJs('widget_form.init('.json_encode([
 		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();

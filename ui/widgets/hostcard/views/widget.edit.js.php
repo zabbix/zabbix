@@ -18,7 +18,7 @@ use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 
 ?>
 
-window.widget_hostcard_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * @type {HTMLFormElement};
@@ -31,7 +31,7 @@ window.widget_hostcard_form = new class {
 	#table;
 
 	init() {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 		this.#table = document.getElementById('sections-table');
 
 		this.#table.addEventListener('change', () => this.#updateForm());

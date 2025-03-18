@@ -344,6 +344,10 @@ function PopUp(action, parameters, {
 			position_fix
 		});
 	}
+	else {
+		// Throw reload event for dialogs to shut down scripting properly.
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.reload'));
+	}
 
 	overlay
 		.load(action, parameters)

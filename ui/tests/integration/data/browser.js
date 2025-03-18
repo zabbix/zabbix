@@ -253,7 +253,7 @@ try
 		el = findElementStrict(browser2, "xpath", "//input[@id='url']");
 		el.sendKeys(parameters.url + "zabbix.php?action=queue.overview");
 
-		clickElement(browser2, "xpath", "//button[@class='dialogue-widget-save']");
+		clickElement(browser2, "xpath", "//button[@class='js-button-submit']");
 
 		el = findElementStrict(browser2, "xpath", "//iframe");
 		browser2.switchFrame(el);

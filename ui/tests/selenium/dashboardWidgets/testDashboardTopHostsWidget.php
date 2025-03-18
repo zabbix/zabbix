@@ -2970,7 +2970,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$column_count = 1;
 		}
 
-		$form = $this->query('id:widget-dialogue-form')->one()->asForm();
+		$form = $this->query('id:widget-form')->one()->asForm();
 		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';

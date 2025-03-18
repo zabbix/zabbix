@@ -502,7 +502,7 @@
 			const $row = $(itemTpl.evaluate(item));
 
 			$('#itemButtonsRow').before($row);
-			$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
+			$row.find(`.${ZBX_STYLE_COLOR_PICKER} input`).colorpicker();
 
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},
@@ -521,7 +521,7 @@
 			for (let i = 0; i < list.values.length; i++) {
 				const used_colors = [];
 
-				for (const color of form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+				for (const color of form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 					if (color.value !== '') {
 						used_colors.push(color.value);
 					}

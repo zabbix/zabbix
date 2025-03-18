@@ -740,10 +740,9 @@ class CWidgetNavTree extends CWidget {
 					buttons: [
 						{
 							title: item_edit ? t('Apply') : t('Add'),
-							class: 'dialogue-widget-save',
 							enabled: response.error === undefined,
 							action: (overlay) => {
-								const form = document.getElementById('widget-dialogue-form');
+								const form = document.forms['widget_item_form'];
 								const form_inputs = form.elements;
 								const url = new Curl('zabbix.php');
 

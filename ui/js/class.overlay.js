@@ -681,83 +681,93 @@ Overlay.prototype.unsetProperty = function(key) {
 };
 
 /**
- * Evaluates and applies properties.
+ * Set overlay properties.
  *
- * @param {object} obj
+ * Whenever setting multiple properties at once, the "script_inline" will execute in the end.
+ *
+ * @param {Object} properties
  */
-Overlay.prototype.setProperties = function(obj) {
-	for (var key in obj) {
-		if (!obj[key]) {
-			this.unsetProperty(key);
+Overlay.prototype.setProperties = function(properties) {
+	const names_ordered = ['class', 'title', 'doc_url', 'buttons', 'footer', 'content', 'controls', 'debug',
+		'prevent_navigation', 'trigger_element', 'data', 'script_inline'
+	];
+
+	for (const name of names_ordered) {
+		if (!(name in properties)) {
 			continue;
 		}
 
-		switch (key) {
+		const value = properties[name];
+
+		if (!value) {
+			this.unsetProperty(name);
+			continue;
+		}
+
+		switch (name) {
 			case 'class':
-				this.$dialogue.addClass(obj[key]);
+				this.$dialogue.addClass(value);
 				break;
 
 			case 'title':
-				this.$dialogue.$head.$header.text(obj[key]);
+				this.$dialogue.$head.$header.text(value);
 				break;
 
 			case 'doc_url':
-				this.unsetProperty(key);
+				this.unsetProperty(name);
 				this.$dialogue.$head.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${value}"></a>
 				`);
 				break;
 
 			case 'buttons':
-				this.unsetProperty(key);
-				this.$dialogue.$footer.append(this.makeButtons(obj[key]));
+				this.unsetProperty(name);
+				this.$dialogue.$footer.append(this.makeButtons(value));
 				break;
 
 			case 'footer':
-				this.unsetProperty(key);
-				this.$dialogue.$footer.append(obj[key]);
+				this.unsetProperty(name);
+				this.$dialogue.$footer.append(value);
 				break;
 
 			case 'content':
-				this.$dialogue.$body.html(obj[key]);
+				this.$dialogue.$body.html(value);
 				if (this.$dialogue.$debug.html().length) {
 					this.$dialogue.$body.append(this.$dialogue.$debug);
 				}
 				break;
 
 			case 'controls':
-				this.$dialogue.$controls.html(obj[key]);
+				this.$dialogue.$controls.html(value);
 				this.$dialogue.$body.before(this.$dialogue.$controls);
 				break;
 
 			case 'debug':
-				this.$dialogue.$debug.html(jQuery(obj[key]).html());
+				this.$dialogue.$debug.html(jQuery(value).html());
 				this.$dialogue.$body.append(this.$dialogue.$debug);
 				break;
 
 			case 'script_inline':
-				this.unsetProperty(key);
+				this.unsetProperty(name);
 				// See: jQuery.html() rnoInnerhtml = /<script|<style|<link/i
 				// If content matches this regex it will be parsed in jQuery.buildFragment as HTML, but here we have JS.
-				this.$dialogue.$script.get(0).innerHTML = obj[key];
+				this.$dialogue.$script.get(0).innerHTML = value;
 				this.$dialogue.$footer.prepend(this.$dialogue.$script);
 				break;
 
 			case 'prevent_navigation':
-				this.$dialogue[0].dataset.preventNavigation = obj[key];
-				this.unsetProperty(key);
+				this.$dialogue[0].dataset.preventNavigation = value;
+				this.unsetProperty(name);
 				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
 				break;
 
 			case 'trigger_element':
-				this.trigger_element = obj[key];
+				this.trigger_element = value;
 				break;
 
 			case 'data':
-				this.data = obj[key];
+				this.data = value;
 				break;
 		}
 	}
-
-	this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.update', {detail: {properties: Object.keys(obj)}}));
 };

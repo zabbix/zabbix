@@ -16,10 +16,10 @@
 
 ?>
 
-window.widget_systeminfo_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init() {
-		this._form = document.getElementById('widget-dialogue-form');
+		this._form = this.getForm();
 		this._info_type = document.getElementById('info_type');
 
 		this._info_type.addEventListener('change', () => this.#updateForm());

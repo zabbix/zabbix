@@ -28,8 +28,8 @@ class CWidgetFieldPatternSelectHostView extends CWidgetFieldPatternSelectView {
 
 	protected function getPopupParameters(): array {
 		return $this->popup_parameters + [
-				'srctbl' => 'hosts',
-				'srcfld1' => 'hostid'
-			];
+			'srctbl' => 'hosts',
+			'srcfld1' => 'hostid'
+		];
 	}
 }

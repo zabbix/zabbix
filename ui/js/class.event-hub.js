@@ -67,14 +67,25 @@ class CEventHub {
 	/**
 	 * Subscribe to events.
 	 *
-	 * @param {Object}   require        Event descriptor requirements.
-	 * @param {string}   require_type   Event type requirement.
-	 * @param {function} callback       Callback to invoke for matching events.
-	 * @param {boolean}  accept_cached  Whether to invoke callback for the last cached event matching the criteria.
+	 * @param {Object}      require        Event descriptor requirements.
+	 * @param {string}      require_type   Event type requirement.
+	 * @param {function}    callback       Callback to invoke for matching events.
+	 * @param {boolean}     accept_cached  Whether to invoke callback for the last cached event matching the criteria.
+	 * @param {AbortSignal} signal         If passed, will unsubscribe the subscription on abort signal.
 	 *
-	 * @returns {Object}  Subscription object to use for unsubscription.
+	 * @returns {Object|null}  Subscription object for unsubscription, or null, if abort signal has already fired.
 	 */
-	subscribe({require = {}, require_type = CEventHubEvent.TYPE_NATIVE, callback, accept_cached = false}) {
+	subscribe({
+		require = {},
+		require_type = CEventHubEvent.TYPE_NATIVE,
+		callback,
+		accept_cached = false,
+		signal = null
+	}) {
+		if (signal !== null && signal.aborted) {
+			return null;
+		}
+
 		if (accept_cached) {
 			for (const event of [...this.#cache.values()].reverse()) {
 				if (CEventHub.#matchEvent(require, require_type, event)) {
@@ -87,7 +98,11 @@ class CEventHub {
 
 		const subscription = {};
 
-		this.#subscribers.set(subscription, {require, require_type, callback});
+		const subscription_abort_callback = signal !== null
+			? () => this.unsubscribe(subscription)
+			: null;
+
+		this.#subscribers.set(subscription, {require, require_type, callback, signal, subscription_abort_callback});
 
 		this
 			.publish(new CEventHubEvent({
@@ -96,6 +111,10 @@ class CEventHub {
 				type: CEventHubEvent.TYPE_SUBSCRIBE
 			}))
 			.invalidateData({}, CEventHubEvent.TYPE_SUBSCRIBE);
+
+		if (signal !== null) {
+			signal.addEventListener('abort', subscription_abort_callback);
+		}
 
 		return subscription;
 	}
@@ -112,7 +131,11 @@ class CEventHub {
 			return false;
 		}
 
-		const {require, require_type} = this.#subscribers.get(subscription);
+		const {require, require_type, signal, subscription_abort_callback} = this.#subscribers.get(subscription);
+
+		if (signal !== null) {
+			signal.removeEventListener('abort', subscription_abort_callback);
+		}
 
 		this.#subscribers.delete(subscription);
 

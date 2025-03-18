@@ -78,7 +78,15 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 	}
 
 	public function getJavaScript(): string {
-		return 'jQuery("#'.$this->getId().'").multiSelect();';
+		return '
+			CWidgetForm.addField(
+				new CWidgetFieldPatternSelect('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name,
+					'id' => $this->getId()
+				]).')
+			);
+		';
 	}
 
 	public function setFilterPreselect(array $filter_preselect): self {

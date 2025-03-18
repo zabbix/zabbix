@@ -21,7 +21,7 @@ use Widgets\PieChart\Includes\{
 
 ?>
 
-window.widget_pie_chart_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * @type {HTMLFormElement}
@@ -51,7 +51,7 @@ window.widget_pie_chart_form = new class {
 	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
 
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 		this.#dataset_wrapper = document.getElementById('data_sets');
 
 		this.#templateid = templateid;
@@ -61,7 +61,7 @@ window.widget_pie_chart_form = new class {
 
 		jQuery('.overlay-dialogue-body').off('scroll');
 
-		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const colorpicker of this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
 				use_default: colorpicker.name === 'value_color'
@@ -70,7 +70,17 @@ window.widget_pie_chart_form = new class {
 
 		jQuery(`#${form_tabs_id}`)
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', () => this.#updateForm());
+			.on('change', 'input, z-select, .multiselect', () => {
+				this.#updateForm();
+
+				this.registerInputEvent({immediate: true});
+			});
+
+		this.#dataset_wrapper.addEventListener('input', e => {
+			if (e.target.matches('input[name$="[data_set_label]"]')) {
+				this.registerInputEvent();
+			}
+		});
 
 		this.#datasetTabInit();
 		this.#displayingOptionsTabInit();
@@ -143,7 +153,7 @@ window.widget_pie_chart_form = new class {
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
 
-		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const colorpicker of jQuery(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 			jQuery(colorpicker).colorpicker({
 				onUpdate: function(color) {
 					jQuery('.<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>',
@@ -264,7 +274,7 @@ window.widget_pie_chart_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const color of this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 			if (color.value !== '') {
 				used_colors.push(color.value);
 			}
@@ -284,7 +294,7 @@ window.widget_pie_chart_form = new class {
 
 		const dataset = this.#getOpenedDataset();
 
-		for (const colorpicker of dataset.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const colorpicker of dataset.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
 		}
 
@@ -294,6 +304,8 @@ window.widget_pie_chart_form = new class {
 
 		this.#initDataSetSortable();
 		this.#updateForm();
+
+		this.registerInputEvent({immediate: true});
 	}
 
 	#cloneDataset() {
@@ -370,6 +382,8 @@ window.widget_pie_chart_form = new class {
 		this.#initDataSetSortable();
 		this.updateSingleItemsReferences();
 		this.#updateForm();
+
+		this.registerInputEvent({immediate: true});
 	}
 
 	#getOpenedDataset() {
@@ -401,6 +415,8 @@ window.widget_pie_chart_form = new class {
 			this._sortable_data_set.on(CSortable.EVENT_SORT, () => {
 				this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this.#updateDatasetsLabel();
+
+				this.registerInputEvent({immediate: true});
 			});
 		}
 	}
@@ -459,7 +475,7 @@ window.widget_pie_chart_form = new class {
 					srctbl: 'items',
 					srcfld1: 'itemid',
 					srcfld2: 'name',
-					dstfrm: widget_svggraph_form._form.id,
+					dstfrm: this.#form.id,
 					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
 					dstfld2: `items_${dataset_index}_${row_index}_name`,
 					numeric: 1,
@@ -475,7 +491,7 @@ window.widget_pie_chart_form = new class {
 					srctbl: 'items',
 					srcfld1: 'itemid',
 					srcfld2: 'name',
-					dstfrm: widget_svggraph_form._form.id,
+					dstfrm: this.#form.id,
 					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
 					dstfld2: `items_${dataset_index}_${row_index}_name`,
 					numeric: 1,
@@ -527,7 +543,6 @@ window.widget_pie_chart_form = new class {
 				}),
 				name: widget.getHeaderName()
 			});
-
 		}
 
 		const popup = new CWidgetSelectPopup(result);
@@ -592,7 +607,7 @@ window.widget_pie_chart_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const color of this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 			if (color.value !== '') {
 				used_colors.push(color.value);
 			}
@@ -601,6 +616,8 @@ window.widget_pie_chart_form = new class {
 		jQuery(`#items_${dataset_index}_${items_new_index}_color`)
 			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
+
+		this.registerInputEvent({immediate: true});
 	}
 
 	#removeSingleItem(element) {
@@ -610,6 +627,8 @@ window.widget_pie_chart_form = new class {
 
 		this.#updateSingleItemsOrder(dataset);
 		this.#initSingleItemSortable(dataset);
+
+		this.registerInputEvent({immediate: true});
 	}
 
 	#initSingleItemSortable(dataset) {
@@ -629,6 +648,8 @@ window.widget_pie_chart_form = new class {
 
 		sortable.on(CSortable.EVENT_SORT, () => {
 			this.#updateSingleItemsOrder(dataset);
+
+			this.registerInputEvent({immediate: true});
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);
@@ -670,7 +691,7 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#updateSingleItemsOrder(dataset) {
-		jQuery.colorpicker('destroy', jQuery('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input', dataset));
+		jQuery.colorpicker('destroy', jQuery(`.single-item-table .${ZBX_STYLE_COLOR_PICKER} input`, dataset));
 
 		const dataset_index = dataset.getAttribute('data-set');
 
@@ -682,7 +703,7 @@ window.widget_pie_chart_form = new class {
 			row.querySelector('.table-col-type z-select').id = `${prefix}_type`
 			row.querySelector('.table-col-action input').id = `${prefix}_input`;
 
-			const colorpicker = row.querySelector('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input');
+			const colorpicker = row.querySelector(`.single-item-table .${ZBX_STYLE_COLOR_PICKER} input`);
 
 			colorpicker.id = `${prefix}_color`;
 			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
