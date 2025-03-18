@@ -402,11 +402,20 @@ class CWebTest extends CTest {
 		}
 
 		$script = 'var tag = document.createElement("style");tag.setAttribute("id", "selenium-injected-style");'.
-				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated} .selenium-hide {opacity: 0 !important}";'.
-				'(document.head||document.documentElement).appendChild(tag);';
+				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated}'.
+				' .selenium-hide {opacity: 0 !important;transition: opacity 0s !important;}'.
+				' #selenium-injected-pixel {position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0}";'.
+				'(document.head||document.documentElement).appendChild(tag);'.
+				'var pix = document.createElement("div");pix.setAttribute("id", "selenium-injected-pixel");'.
+				'(document.body||document.documentElement).appendChild(pix);';
 
 		try {
 			$this->page->getDriver()->executeScript($script);
+
+			$pixel = $this->query('id:selenium-injected-pixel')->one(false);
+			if ($pixel->isValid()) {
+				$pixel->moveMouse();
+			}
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
@@ -501,7 +510,8 @@ class CWebTest extends CTest {
 		}
 
 		try {
-			$this->page->getDriver()->executeScript('document.getElementById("selenium-injected-style").remove();');
+			$this->page->getDriver()->executeScript('document.getElementById("selenium-injected-style").remove();'.
+					'document.getElementById("selenium-injected-pixel").remove();');
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
