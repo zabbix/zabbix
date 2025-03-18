@@ -456,7 +456,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'hostid' => self::$templateids[0],
 			'type' => 0,
 			'delay' => 60,
-			'lld_macro_path' => [
+			'lld_macro_paths' => [
 				'lld_macro' => '{#MACRO1}',
 				'path' => '.path.1'
 			]
