@@ -23,15 +23,12 @@
 #include "zbxcachevalue.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-#include "zbxparam.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_expression_constants.h"
 #include "zbxevent.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "zbxinterface.h"
-#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *

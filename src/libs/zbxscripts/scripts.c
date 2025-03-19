@@ -13,7 +13,6 @@
 **/
 
 #include "zbxscripts.h"
-#include "zbxexpression.h"
 
 #include "zbxexec.h"
 #include "zbxtasks.h"

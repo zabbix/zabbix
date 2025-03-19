@@ -19,9 +19,8 @@
 
 #include "zbxdbhigh.h"
 #include "zbxip.h"
-#include "zbxexpression.h"
 #include "zbx_discoverer_constants.h"
-#include "zbxparam.h"
+#include "zbxexpr.h"
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 

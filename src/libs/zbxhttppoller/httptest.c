@@ -15,7 +15,6 @@
 #include "httptest.h"
 
 #include "zbxnix.h"
-#include "zbxexpression.h"
 #include "zbxhttp.h"
 #include "httpmacro.h"
 #include "zbxnum.h"

@@ -20,7 +20,6 @@
 #include "checks_script.h"
 #include "checks_browser.h"
 #include "checks_simple.h"
-#include "zbxparam.h"
 
 #ifdef HAVE_NETSNMP
 #	include "checks_snmp.h"

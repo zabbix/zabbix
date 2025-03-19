@@ -13,7 +13,6 @@
 **/
 
 #include "zbxpinger.h"
-#include "zbxexpression.h"
 
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
@@ -30,7 +29,7 @@
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
 #include "zbxalgo.h"
-#include "zbxparam.h"
+#include "zbxexpr.h"
 
 typedef struct
 {

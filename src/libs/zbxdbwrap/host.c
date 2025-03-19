@@ -19,7 +19,6 @@
 #include "graph_linking.h"
 
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "audit/zbxaudit_host.h"
 #include "audit/zbxaudit_item.h"
 #include "audit/zbxaudit_trigger.h"

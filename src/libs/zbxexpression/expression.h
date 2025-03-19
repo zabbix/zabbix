@@ -18,7 +18,6 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
-#include "zbxexpression.h"
 
 int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
 		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,

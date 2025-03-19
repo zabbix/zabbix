@@ -16,7 +16,6 @@
 
 #include "zbxtrapper.h"
 
-#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
@@ -35,7 +34,6 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxautoreg.h"
-#include "zbxparam.h"
 
 /*************************************************************************************
  *                                                                                   *

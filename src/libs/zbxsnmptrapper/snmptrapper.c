@@ -21,7 +21,6 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
@@ -33,7 +32,7 @@
 #include "zbxpreproc.h"
 #include "zbxcrypto.h"
 #include "zbxhash.h"
-#include "zbxparam.h"
+#include "zbxexpr.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
