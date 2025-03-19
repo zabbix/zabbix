@@ -57,6 +57,15 @@ type Connection struct {
 	timeoutMode int
 }
 
+type ConnectionInterface interface {
+	Close() (err error)
+	Read() (data []byte, err error)
+	RemoteIP() string
+	SetCompress(compress bool)
+	Write(data []byte) error
+	WriteString(s string) error
+}
+
 type Listener struct {
 	listener  net.Listener
 	tlsconfig *tls.Config

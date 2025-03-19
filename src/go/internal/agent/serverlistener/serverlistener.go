@@ -15,6 +15,7 @@
 package serverlistener
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -86,6 +87,12 @@ func (sl *ServerListener) run() {
 
 	for {
 
+		// 1. open connection
+		// 2. read task from connection
+		// 3. parse taks
+		// 4. give task to scheduler
+		// 5. send result to connection
+
 		conn, err := sl.listener.Accept(
 			time.Second*time.Duration(sl.options.Timeout),
 			zbxcomms.TimeoutModeShift,
@@ -99,10 +106,10 @@ func (sl *ServerListener) run() {
 		}
 
 		go func() {
+
+			// Check if IP is whitelisted
 			remoteIP := conn.RemoteIP()
-
 			parsedIP := net.ParseIP(remoteIP)
-
 			if !sl.allowedPeers.CheckPeer(parsedIP) {
 				_ = conn.Close()
 
@@ -115,7 +122,8 @@ func (sl *ServerListener) run() {
 				return
 			}
 
-			data, err := conn.Read()
+			// Receive passive check request
+			rawRequest, err := conn.Read()
 			if err != nil {
 				_ = conn.Close()
 
@@ -128,11 +136,16 @@ func (sl *ServerListener) run() {
 
 			log.Debugf(
 				"received passive check request: '%s' from '%s'",
-				string(data),
+				string(rawRequest),
 				remoteIP,
 			)
 
-			handleCheck(sl.scheduler, conn, data)
+			if json.Valid(rawRequest) {
+				key = []byte(rawRequest)
+			}
+
+			key, timeout, err := parsePassiveCheckJSONRequest(rawRequest)
+			// handleCheck(sl.scheduler, conn, data)
 		}()
 	}
 
