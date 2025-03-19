@@ -14,11 +14,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormTags.php';
+require_once __DIR__.'/../common/testFormTags.php';
 
 /**
  * @dataSource EntitiesTags
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormTagsItem extends testFormTags {
 	public $update_name = 'Item with tags for updating';

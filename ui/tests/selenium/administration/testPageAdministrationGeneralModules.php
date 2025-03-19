@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup module, widget
@@ -509,6 +509,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Status' => 'Disabled'
 			],
 			[
+				'Name' => 'Test Broadcaster',
+				'Version' => '1.0',
+				'Author' => 'Zabbix',
+				'Description' => 'Allows to test listening functionality of other widgets.',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'Test Listener',
+				'Version' => '1.0',
+				'Author' => 'Zabbix',
+				'Description' => 'Allows to test broadcasting functionality of other widgets.',
+				'Status' => 'Disabled'
+			],
+			[
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
 				'Author' => 'Работник Заббикса',
@@ -959,7 +973,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'5th Module',
 						'Clock2',
 						'Empty widget',
+						'Test Broadcaster',
 						'Test CSRF token',
+						'Test Listener',
 						'шестой модуль'
 					]
 				]
@@ -992,12 +1008,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$row = $table->findRow('Name', '2nd Module name !@#$%^&*()_+');
 		if ($row->getColumn('Status')->getText() !== 'Enabled') {
 			$row->query('link:Disabled')->one()->click();
+			$this->assertMessage(TEST_GOOD, 'Module enabled');
 		}
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		// Check (using module name) that only the expected filters are returned in the list.
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));

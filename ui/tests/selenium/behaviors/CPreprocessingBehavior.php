@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CBehavior.php';
+require_once __DIR__.'/../../include/CBehavior.php';
 
 /**
  * Behavior for preprocessing related tests.
@@ -61,9 +61,9 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'error_handler',
-				'selector'	=> 'xpath:.//ul[contains(@id, "_error_handler")]',
-				'class'		=> 'CSegmentedRadioElement',
-				'value'		=> ['getText']
+				'selector'	=> 'xpath:.//z-select[contains(@id, "-error-handler")]',
+				'detect'	=> true,
+				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'error_handler_params',
@@ -130,7 +130,7 @@ class CPreprocessingBehavior extends CBehavior {
 				$add->click();
 			}
 
-			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
+			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item") and @data-step="'.$rows - 1 .'"]')
 					->waitUntilPresent()->one();
 
 			foreach ($fields as $field) {

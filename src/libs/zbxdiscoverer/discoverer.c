@@ -625,7 +625,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_discoverer_drule_error_t *drule_errors,
 		zbx_hashset_t *incomplete_druleids, zbx_discovery_open_func_t discovery_open_cb,
 		zbx_discovery_close_func_t discovery_close_cb,
-		zbx_discovery_update_drule_func_t discovery_udpate_drule_cb)
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb)
 {
 	void	*handle;
 	int	i;
@@ -657,7 +657,7 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 			zbx_vector_discoverer_drule_error_remove(drule_errors, j);
 		}
 
-		discovery_udpate_drule_cb(handle, derror.druleid, err, now);
+		discovery_update_drule_cb(handle, derror.druleid, err, now);
 		zbx_free(err);
 		zbx_vector_uint64_remove(del_jobs, i - 1);
 	}

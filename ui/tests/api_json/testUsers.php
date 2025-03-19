@@ -59,23 +59,6 @@ class testUsers extends CAPITest {
 		'usrgrpid' => [
 			'Provision user group' => null
 		],
-		'userid' => [
-			'Provisioned user' => null
-		],
-		'mediaid' => [
-			'Provision media mapping email' => null,
-			'Provision media mapping sms' => null
-		],
-		'mediatypeid' => [
-			'Email media type' => 1,
-			'SMS media type' => 3
-		],
-		'roleid' => [
-			'Provision user role' => null
-		],
-		'usrgrpid' => [
-			'Provision user group' => null
-		],
 		'sessionids' => [
 			'not_authorized_session' => null,
 			'expired_session' => null,
