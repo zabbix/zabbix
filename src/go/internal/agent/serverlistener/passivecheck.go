@@ -54,11 +54,13 @@ type passiveChecksResponse struct {
 	Error   *string `json:"error,omitempty"`
 }
 
-func formatError(msg string) (data []byte) {
-	data = make([]byte, len(notsupported)+len(msg)+1)
-	copy(data, notsupported)
-	copy(data[len(notsupported)+1:], msg)
-	return
+func formatError(msg string) []byte {
+	data := make([]byte, 0, len(notsupported)+len(msg)+1)
+	data = append(data, notsupported...)
+	data = append(data, 0)
+	data = append(data, msg...)
+
+	return data
 }
 
 func handleConnection(
@@ -100,7 +102,6 @@ func handleConnection(
 }
 
 func parsePassiveCheckJSONRequest(rawRequest []byte) (string, time.Duration, error) {
-	// Check if request is in json format
 	var request passiveChecksRequest
 
 	err := json.Unmarshal(rawRequest, &request)

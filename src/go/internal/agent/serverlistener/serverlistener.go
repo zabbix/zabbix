@@ -25,7 +25,6 @@ import (
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
 	"golang.zabbix.com/agent2/internal/monitor"
-	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/agent2/pkg/zbxcomms"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxnet"
@@ -36,7 +35,6 @@ type ServerListener struct {
 	listener     *zbxcomms.Listener
 	scheduler    scheduler.Scheduler
 	options      *agent.AgentOptions
-	tlsConfig    *tls.Config
 	allowedPeers *zbxnet.AllowedPeers
 	bindIP       string
 	last_err     string
@@ -116,17 +114,26 @@ func New(listenerID int, s scheduler.Scheduler, bindIP string, options *agent.Ag
 }
 
 func (sl *ServerListener) Start() (err error) {
-	if sl.tlsConfig, err = agent.GetTLSConfig(sl.options); err != nil {
+	tlsConfig, err := agent.GetTLSConfig(sl.options)
+	if err != nil {
 		return
 	}
-	if sl.allowedPeers, err = zbxnet.GetAllowedPeers(sl.options.Server); err != nil {
+
+	sl.allowedPeers, err = zbxnet.GetAllowedPeers(sl.options.Server)
+	if err != nil {
 		return
 	}
-	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("[%s]:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {
+
+	address := fmt.Sprintf("[%s]:%d", sl.bindIP, sl.options.ListenPort)
+
+	sl.listener, err = zbxcomms.Listen(address, tlsConfig)
+	if err != nil {
 		return
 	}
+
 	monitor.Register(monitor.Input)
 	go sl.run()
+
 	return
 }
 
