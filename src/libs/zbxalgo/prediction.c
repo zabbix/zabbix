@@ -1189,14 +1189,14 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
+	else if (0.0 > result || DBL_MAX < result)
+	{
+		result = DBL_MAX;
+	}
 	else if (ZBX_IS_NAN(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
-	}
-	else if (0.0 > result || DBL_MAX < result)
-	{
-		result = DBL_MAX;
 	}
 
 	zbx_matrix_free(coefficients);
