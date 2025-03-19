@@ -73,7 +73,7 @@ class testFormTotpValidate extends testFormTotp {
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
 		$totp = CTestArrayHelper::get($data, 'totp',
-			CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
+				CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
 		);
 		$totp = CTestArrayHelper::get($data, 'totp_pre', '').$totp.CTestArrayHelper::get($data, 'totp_after', '');
 

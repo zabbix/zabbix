@@ -108,7 +108,7 @@ class testFormTotp extends CWebTest {
 		$help_link = $links->query('xpath:./a[text()="Help"]')->one();
 		$this->assertTrue($help_link->isClickable());
 		$this->assertEquals(1,
-			preg_match('/^https:\/\/www.zabbix.com\/documentation\/\d.\d\/$/', $help_link->getAttribute('href'))
+				preg_match('/^https:\/\/www.zabbix.com\/documentation\/\d.\d\/$/', $help_link->getAttribute('href'))
 		);
 		$this->assertEquals('_blank', $help_link->getAttribute('target')); // opens link in a new tab
 
@@ -231,9 +231,9 @@ class testFormTotp extends CWebTest {
 		$data = reset($providedData);
 
 		$this->resetTotpConfiguration(
-			CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
-			CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
-			CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
+				CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
+				CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
+				CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
 		);
 
 		return $data;
@@ -259,7 +259,7 @@ class testFormTotp extends CWebTest {
 				// Validate the blocked message on the n-th time.
 				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_BAD, 'You are not logged in',
-					'Incorrect user name or password or account is temporarily blocked.'
+						'Incorrect user name or password or account is temporarily blocked.'
 				);
 			}
 		}

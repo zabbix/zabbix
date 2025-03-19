@@ -112,7 +112,7 @@ class testFormTotpEnroll extends testFormTotp {
 
 		// Assert the QR code and get the secret.
 		$totp_secret = $this->validateQrCodeAndExtractSecret($qr_code, $totp_name, self::USER_NAME, $totp_algo,
-			$totp_code_length
+				$totp_code_length
 		);
 
 		// Assert the description text.
@@ -122,7 +122,7 @@ class testFormTotpEnroll extends testFormTotp {
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
 		$totp = CTestArrayHelper::get($data, 'totp',
-			CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
+				CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
 		);
 		$totp = CTestArrayHelper::get($data, 'totp_pre', '').$totp.CTestArrayHelper::get($data, 'totp_after', '');
 
@@ -157,7 +157,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->refresh()->waitUntilReady();
 		$new_totp_secret = $this->validateQrCodeAndExtractSecret();
 		$this->assertNotEquals($old_totp_secret, $new_totp_secret,
-			'The TOTP secret seems to have stayed the same after reload, when it should have changed.'
+				'The TOTP secret seems to have stayed the same after reload, when it should have changed.'
 		);
 	}
 
@@ -269,7 +269,7 @@ class testFormTotpEnroll extends testFormTotp {
 
 		$qr_title = urldecode($qr_code->getAttribute('title'));
 		$this->assertEquals(1, preg_match($regex, $qr_title, $matches),
-			"Failed to assert the QR code.\nExpected title regex: ".$regex."\nActual title: ".$qr_title
+				"Failed to assert the QR code.\nExpected title regex: ".$regex."\nActual title: ".$qr_title
 		);
 
 		// Extract the secret with regex and return it.
