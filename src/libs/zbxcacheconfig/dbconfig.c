@@ -9212,14 +9212,17 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 	UNLOCK_CACHE;
 
-	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
 	{
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 		return psk_len;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "host PSK and autoregistration PSK have the same identity \"%s\" but"
+	/* stricter API validation for PSK identities is expected to make this use-case impossible */
+	zabbix_log(LOG_LEVEL_CRIT, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
+	THIS_SHOULD_NEVER_HAPPEN;
+
 	return psk_len;
 }
 #endif
@@ -13696,6 +13699,8 @@ void	zbx_config_clean(zbx_config_t *cfg)
  ********************************************************************************/
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
+/* the tolerance interval must be greater than maximum proxy failover delay  */
+/* to avoid triggering false interface availability resets with proxy groups */
 #define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
 #define ZBX_INTERFACE_VERSION_RESET_INTERVAL	(SEC_PER_HOUR)
 

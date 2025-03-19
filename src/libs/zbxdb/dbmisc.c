@@ -297,7 +297,8 @@ int	zbx_dbconn_flush_overflowed_sql(zbx_dbconn_t *db, char *sql, size_t sql_offs
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset)
+int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+			const char *clause)
 {
 	int	ret = SUCCEED;
 
@@ -307,10 +308,15 @@ int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_
 		if (',' == (*sql)[*sql_offset - 1])
 		{
 			(*sql_offset)--;
+
+			if (NULL != clause)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, clause);
+
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #else
 		ZBX_UNUSED(sql_alloc);
+		ZBX_UNUSED(clause);
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */

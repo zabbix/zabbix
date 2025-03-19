@@ -1442,6 +1442,20 @@ static int	substitute_formula_macros(char **data, const zbx_lld_entry_t *lld_obj
 	return ret;
 }
 
+static int	lld_resolver(char **data, char *error, size_t maxerrlen, va_list args)
+{
+	/* Passed arguments */
+	const zbx_lld_entry_t	*lld_obj = va_arg(args, const zbx_lld_entry_t *);
+
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	/* error message in substitution is being ignored */
+	zbx_substitute_lld_macros(data, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+
+	return SUCCEED;
+}
+
 /*******************************************************************************
  *                                                                             *
  * Purpose: Creates a new item based on item prototype and LLD data row.       *
@@ -1605,8 +1619,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 			zbx_substitute_lld_macros(&item->posts, lld_obj, ZBX_MACRO_JSON, NULL, 0);
 			break;
 		case ZBX_POSTTYPE_XML:
-			if (SUCCEED == ret && FAIL == (ret = zbx_substitute_macros_xml(&item->posts, NULL,
-					lld_resolve_macros, lld_obj, err, sizeof(err))))
+			if (SUCCEED == ret && FAIL == (ret = zbx_xml_traverse(&item->posts, err, sizeof(err),
+					lld_resolver, lld_obj)))
 			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
 				*error = zbx_strdcatf(*error, "Cannot create item, error in XML: %s.\n", err);
@@ -1936,7 +1950,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
 	{
-		if (FAIL == zbx_substitute_macros_xml(&buffer, NULL, lld_resolve_macros, lld_obj, err, sizeof(err)))
+		if (FAIL == zbx_xml_traverse(&buffer, err, sizeof(err), lld_resolver, lld_obj))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
 			*error = zbx_strdcatf(*error, "Cannot update item, error in XML: %s.\n", err);

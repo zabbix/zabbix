@@ -8,8 +8,14 @@ zabbix_export:
           value: '{ALERT.MESSAGE}'
         - name: alert_subject
           value: '{ALERT.SUBJECT}'
+        - name: event_id
+          value: '{EVENT.ID}'
+        - name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
         - name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
+        - name: event_severity
+          value: '{EVENT.SEVERITY}'
         - name: event_source
           value: '{EVENT.SOURCE}'
         - name: event_tags_json
@@ -18,347 +24,736 @@ zabbix_export:
           value: '{EVENT.UPDATE.ACTION}'
         - name: event_update_message
           value: '{EVENT.UPDATE.MESSAGE}'
+        - name: event_update_nseverity
+          value: '{EVENT.UPDATE.NSEVERITY}'
+        - name: event_update_severity
+          value: '{EVENT.UPDATE.SEVERITY}'
         - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
         - name: event_update_user
           value: '{USER.FULLNAME}'
         - name: event_value
           value: '{EVENT.VALUE}'
-        - name: jira_issue_key
-          value: '{EVENT.TAGS.__zbx_jira_issuekey}'
         - name: jira_issue_type
           value: '<PLACE ISSUETYPE NAME>'
         - name: jira_password
           value: '<PLACE PASSWORD OR TOKEN>'
+        - name: jira_priority_autoregistration
+          value: Low
+        - name: jira_priority_discovery
+          value: Low
+        - name: jira_priority_internal
+          value: Low
         - name: jira_project_key
           value: '<PLACE PROJECT KEY>'
         - name: jira_url
           value: '<PLACE YOUR JIRA URL>'
         - name: jira_user
           value: '<PLACE LOGIN>'
+        - name: severity_average
+          value: Medium
+        - name: severity_disaster
+          value: Highest
+        - name: severity_high
+          value: High
+        - name: severity_information
+          value: Lowest
+        - name: severity_not_classified
+          value: Lowest
+        - name: severity_warning
+          value: Low
         - name: trigger_description
           value: '{TRIGGER.DESCRIPTION}'
-      status: DISABLED
+        - name: trigger_id
+          value: '{TRIGGER.ID}'
+        - name: zabbix_url
+          value: '{$ZABBIX.URL}'
       script: |
-        var Jira = {
-            params: {},
+        const CLogger = function(serviceName) {
+        	this.serviceName = serviceName;
+        	this.INFO = 4
+        	this.WARN = 3
+        	this.ERROR = 2
+        	this.log = function(level, msg) {
+        		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
+        	}
+        }
         
-            setParams: function (params) {
-                if (typeof params !== 'object') {
-                    return;
-                }
+        const CWebhook = function(value) {
+        	try {
+        		params = JSON.parse(value);
         
-                Jira.params = params;
-                if (typeof Jira.params.url === 'string') {
-                    if (!Jira.params.url.endsWith('/')) {
-                        Jira.params.url += '/';
-                    }
+        		if (['0', '1', '2', '3', '4'].indexOf(params.event_source) === -1) {
+        			throw 'Incorrect "event_source" parameter given: ' + params.event_source + '.\nMust be 0-4.';
+        		}
         
-                    Jira.params.url += 'rest/api/latest/';
-                }
-            },
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1 && ['0', '1'].indexOf(params.event_value) === -1) {
+        			throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0 or 1.';
+        		}
         
-            setProxy: function (HTTPProxy) {
-                Jira.HTTPProxy = HTTPProxy;
-            },
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1) {
+        			if (params.event_source === '1' && ['0', '1', '2', '3'].indexOf(params.event_value) === -1) {
+        				throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0-3.';
+        			}
         
-            setTags: function (event_tags_json) {
-                if (typeof event_tags_json !== 'undefined' && event_tags_json !== ''
-                    && event_tags_json !== '{EVENT.TAGSJSON}') {
-                    try {
-                        var tags = JSON.parse(event_tags_json),
-                            label;
+        			if (params.event_source === '0' && ['0', '1'].indexOf(params.event_update_status) === -1) {
+        				throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '.\nMust be 0 or 1.';
+        			}
         
-                        Jira.labels = [];
+        			if (params.event_source === '4') {
+        				if (['0', '1', '2', '3', '4', '5'].indexOf(params.event_update_nseverity) !== -1 && params.event_update_nseverity != params.event_nseverity) {
+        					params.event_nseverity = params.event_update_nseverity;
+        					params.event_severity = params.event_update_severity;
+        					params.event_update_status = '1';
+        				}
+        			}
+        		}
         
-                        tags.forEach(function (tag) {
-                            if (typeof tag.tag !== 'undefined' && typeof tag.value !== 'undefined'
-                                && !tag.tag.startsWith('__zbx')) {
-                                label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');
-                                if (label.length < 256) {
-                                    Jira.labels.push(label);
-                                }
-                            }
-                        });
-                    }
-                    catch (error) {
-                        // Code is not missing here.
-                    }
-                }
-            },
+        		this.runCallback = function(name, params) {
+        			if (typeof this[name] === 'function') {
+        				return this[name].apply(this, [params]);
+        			}
+        		}
         
-            escapeMarkup: function (str) {
-                var length = str.length,
-                    result = '',
-                    markup = ['{', '|', '}', '~', '_', '\\', '[', ']', '^', '<', '>', '?', '!', '#', '+', '*', '&'];
+        		this.handleEvent = function(source, event) {
+        			const alert = { source: source, event: event };
+        			return [
+        				this.runCallback('on' + source + event, alert),
+        				this.runCallback('on' + event, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
         
-                for (var i = 0; i < length; i++) {
-                    var char = str[i];
+        		this.handleEventless = function(source) {
+        			const alert = { source: source, event: null };
+        			return [
+        				this.runCallback('on' + source, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
         
-                    result += (markup.indexOf(char) !== -1) ? ('&#' + str[i].charCodeAt() + ';') : char;
-                }
+        		this.run = function() {
+        			var results = [];
+        			if (typeof this.httpProxy === 'string' && this.httpProxy.trim() !== '') {
+        				this.request.setProxy(this.httpProxy);
+        			}
+        			const types = { '0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service' };
         
-                return result;
-            },
+        			if (['0', '3', '4'].indexOf(this.params.event_source) !== -1) {
+        				var event = (this.params.event_update_status === '1')
+        					? 'Update'
+        					: ((this.params.event_value === '1') ? 'Problem' : 'Resolve');
         
-            addCustomFields: function (data, fields) {
-                if (typeof fields === 'object' && Object.keys(fields).length) {
-                    var schemaData = Jira.request('get', 'field/').response,
-                        schema = {};
+        				results = this.handleEvent(types[this.params.event_source], event);
+        			}
+        			else if (typeof types[this.params.event_source] !== 'undefined') {
+        				results = this.handleEventless(types[this.params.event_source]);
+        			}
+        			else {
+        				throw 'Unexpected "event_source": ' + this.params.event_source;
+        			}
         
-                    schemaData.forEach(function (item) {
-                        schema[item.id] = item.schema;
-                    });
+        			for (idx in results) {
+        				if (typeof results[idx] !== 'undefined') {
+        					return JSON.stringify(results[idx]);
+        				}
+        			}
+        		}
+        		this.httpProxy = params.http_proxy;
+        		this.params = params;
+        		this.runCallback('onCheckParams', {});
+        	} catch (error) {
+        		throw 'Webhook processing failed: ' + error;
+        	}
+        }
         
-                    Object.keys(fields).forEach(function (field) {
-                        if (typeof schema[field] === 'object' && schema[field].type) {
-                            switch (schema[field].type) {
-                                case 'number':
-                                    data.fields[field] = parseInt(fields[field]);
-                                    break;
+        const CWebhookHelper = {
         
-                                case 'datetime':
-                                    if (fields[field].match(/\d+[.-]\d+[.-]\d+T\d+:\d+:\d+/) !== null) {
-                                        data.fields[field] = fields[field].replace(/\./g, '-');
-                                    }
-                                    break;
+        	createProblemURL: function(event_source, zabbix_url, trigger_id, event_id) {
+        		if (event_source === '0') {
+        			return zabbix_url + '/tr_events.php?triggerid=' + trigger_id + '&eventid=' + event_id;
+        		} else if (event_source === '4') {
+        			return zabbix_url + '/zabbix.php?action=service.list';
+        		}
         
-                                case 'option':
-                                    data.fields[field] = { value: fields[field] };
-                                    break;
+        		return zabbix_url;
+        	},
         
-                                case 'array':
-                                    if (schema[field].items === 'option') {
-                                        data.fields[field] = [{ value: fields[field] }];
-                                    } else {
-                                        data.fields[field] = [fields[field]];
-                                    }
-                                    break;
-        
-                                default:
-                                    data.fields[field] = fields[field];
-                            }
-                        }
-                    });
-                }
-                else {
-                    Zabbix.log(4, '[ Jira Webhook ] Failed to retrieve field schema.');
-                }
-                return data;
-            },
-        
-            request: function (method, query, data) {
-                ['url', 'user', 'password', 'project_key', 'issue_type'].forEach(function (field) {
-                    if (typeof Jira.params !== 'object' || typeof Jira.params[field] === 'undefined'
-                        || Jira.params[field] === '') {
-                        throw 'Required Jira param is not set: "' + field + '".';
-                    }
-                });
-        
-                var response,
-                    url = Jira.params.url + query,
-                    request = new HttpRequest();
-        
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Authorization: Basic ' + btoa(Jira.params.user + ':' + Jira.params.password));
-        
-                if (typeof Jira.HTTPProxy !== 'undefined' && Jira.HTTPProxy !== '') {
-                    request.setProxy(Jira.HTTPProxy);
-                }
-        
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
-        
-                Zabbix.log(4, '[ Jira Webhook ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
-        
-                switch (method) {
-                    case 'get':
-                        response = request.get(url, data);
-                        break;
-        
-                    case 'post':
-                        response = request.post(url, data);
-                        break;
-        
-                    case 'put':
-                        response = request.put(url, data);
-                        break;
-        
-                    default:
-                        throw 'Unsupported HTTP request method: ' + method;
-                }
-        
-                Zabbix.log(4, '[ Jira Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
-        
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ Jira Webhook ] Failed to parse response received from Jira');
-                        response = null;
-                    }
-                }
-        
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
-        
-                    if (response !== null && typeof response.errors !== 'undefined'
-                        && Object.keys(response.errors).length > 0) {
-                        message += ': ' + JSON.stringify(response.errors);
-                    }
-                    else if (response !== null && typeof response.errorMessages !== 'undefined'
-                        && Object.keys(response.errorMessages).length > 0) {
-                        message += ': ' + JSON.stringify(response.errorMessages);
-                    }
-        
-                    throw message + ' Check debug log for more information.';
-                }
-        
-                return {
-                    status: request.getStatus(),
-                    response: response
-                };
-            },
-        
-            createIssue: function (summary, description, fields) {
-                var data = {
-                    fields: {
-                        project: {
-                            key: Jira.params.project_key
-                        },
-                        issuetype: {
-                            name: Jira.params.issue_type
-                        },
-                        summary: summary,
-                        description: description
-                    }
-                };
-        
-                if (Jira.labels && Jira.labels.length > 0) {
-                    data.fields.labels = Jira.labels;
-                }
-                var result = Jira.request('post', 'issue', Jira.addCustomFields(data, fields));
-        
-                if (typeof result.response !== 'object' || typeof result.response.key === 'undefined') {
-                    throw 'Cannot create Jira issue. Check debug log for more information.';
-                }
-        
-                return result.response.key;
-            },
-        
-            updateIssue: function (summary, fields, update) {
-                var data = { fields: {} };
-        
-                if (summary) {
-                    data.fields.summary = summary;
-                }
-        
-                Jira.request('put', 'issue/' + encodeURIComponent(Jira.params.issue_key), Jira.addCustomFields(data, fields));
-                Jira.commentIssue(update);
-            },
-        
-            commentIssue: function (update) {
-                var data = {};
-        
-                if (typeof update === 'string') {
-                    data.body = update;
-                    Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);
-                }
-                else if (update.status === '1') {
-                    data.body = update.user + ' ' + update.action + '.';
-        
-                    if (update.message) {
-                        data.body += '\nMessage: {quote}' + Jira.escapeMarkup(update.message) + '{quote}';
-                    }
-        
-                    Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);
-                }
-            }
         };
         
+        const CParamValidator = {
+        
+        	isType: function(value, type) {
+        		if (type === 'array') {
+        			return Array.isArray(value);
+        		}
+        		if (type === 'integer') {
+        			return CParamValidator.isInteger(value);
+        		}
+        		if (type === 'float') {
+        			return CParamValidator.isFloat(value);
+        		}
+        
+        		return (typeof value === type);
+        	},
+        
+        	isInteger: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseInt(value));
+        	},
+        
+        	isFloat: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+\.\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseFloat(value));
+        	},
+        
+        	isDefined: function(value) {
+        		return !CParamValidator.isType(value, 'undefined');
+        	},
+        
+        	isEmpty: function(value) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be checked for emptiness.';
+        		}
+        
+        		return (value.trim() === '');
+        	},
+        
+        	isMacroSet: function(value, macro) {
+        		if (CParamValidator.isDefined(macro)) {
+        			return !(CParamValidator.ifMatch(value, '^\{' + macro + '\}$'))
+        		}
+        
+        		return !(CParamValidator.ifMatch(value, '^\{[$#]{0,1}[A-Z_\.]+[\:]{0,1}["]{0,1}.*["]{0,1}\}$') || value === '*UNKNOWN*')
+        	},
+        
+        	withinRange: function(value, min, max) {
+        		if (!CParamValidator.isType(value, 'number')) {
+        			throw 'Value "' + value + '" must be a number to be checked for range.';
+        		}
+        		if (value < ((CParamValidator.isDefined(min)) ? min : value)
+        			|| value > ((CParamValidator.isDefined(max)) ? max : value)) {
+        			return false;
+        		}
+        
+        		return true;
+        	},
+        
+        	inArray: function(value, array) {
+        		if (!CParamValidator.isType(array, 'array')) {
+        			throw 'The array must be an array to check the value for existing in it.';
+        		}
+        
+        		return (array.indexOf((typeof value === 'string') ? value.toLowerCase() : value) !== -1);
+        	},
+        
+        	ifMatch: function(value, regex) {
+        		return (new RegExp(regex)).test(value);
+        	},
+        
+        	match: function(value, regex) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be matched with the regular expression.';
+        		}
+        
+        		return value.match(new RegExp(regex));
+        	},
+        
+        	checkURL: function(value) {
+        		if (CParamValidator.isEmpty(value)) {
+        			throw 'URL value "' + value + '" must be a non-empty string.';
+        		}
+        		if (!CParamValidator.ifMatch(value, '^(http|https):\/\/.+')) {
+        			throw 'URL value "' + value + '" must contain a schema.';
+        		}
+        
+        		return value.endsWith('/') ? value.slice(0, -1) : value;
+        	},
+        
+        	check: function(key, rule, params) {
+        		if (!CParamValidator.isDefined(rule.type)) {
+        			throw 'Mandatory attribute "type" has not been defined for parameter "' + key + '".';
+        		}
+        		if (!CParamValidator.isDefined(params[key])) {
+        			throw 'Checked parameter "' + key + '" was not found in the list of input parameters.';
+        		}
+        		var value = params[key],
+        			error_message = null;
+        		switch (rule.type) {
+        			case 'string':
+        				if (!CParamValidator.isType(value, 'string')) {
+        					throw 'Value "' + key + '" must be a string.';
+        				}
+        				if (CParamValidator.isEmpty(value)) {
+        					error_message = 'Value "' + key + '" must be a non-empty string';
+        					break;
+        				}
+        				if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
+        					error_message = 'Value "' + key + '" must be a string with a length > ' + rule.len;
+        				}
+        				if (CParamValidator.isDefined(rule.regex) && !CParamValidator.ifMatch(value, rule.regex)) {
+        					error_message = 'Value "' + key + '" must match the regular expression "' + rule.regex + '"';
+        				}
+        				if (CParamValidator.isDefined(rule.url) && rule.url === true) {
+        					value = CParamValidator.checkURL(value);
+        				}
+        				break;
+        			case 'integer':
+        				if (!CParamValidator.isInteger(value)) {
+        					error_message = 'Value "' + key + '" must be an integer';
+        					break;
+        				}
+        				value = parseInt(value);
+        				break;
+        			case 'float':
+        				if (!CParamValidator.isFloat(value)) {
+        					error_message = 'Value "' + key + '" must be a floating-point number';
+        					break;
+        				}
+        				value = parseFloat(value);
+        				break;
+        			case 'boolean':
+        				if (CParamValidator.inArray(value, ['1', 'true', 'yes', 'on'])) {
+        					value = true;
+        				}
+        				else if (CParamValidator.inArray(value, ['0', 'false', 'no', 'off'])) {
+        					value = false;
+        				}
+        				else {
+        					error_message = 'Value "' + key + '" must be a boolean-like.';
+        				}
+        				break;
+        			case 'array':
+        				try {
+        					value = JSON.parse(value);
+        				} catch (error) {
+        					throw 'Value "' + key + '" contains invalid JSON.';
+        				}
+        				if (!CParamValidator.isType(value, 'array')) {
+        					error_message = 'Value "' + key + '" must be an array.';
+        				}
+        				if (CParamValidator.isDefined(rule.tags) && rule.tags === true) {
+        					value = value.reduce(function(acc, obj) {
+        						acc[obj.tag] = obj.value || null;
+        						return acc;
+        					}, {});
+        				}
+        				break;
+        			case 'object':
+        				value = JSON.parse(value);
+        				if (!CParamValidator.isType(value, 'object')) {
+        					error_message = 'Value "' + key + '" must be an object.';
+        				}
+        				break;
+        			default:
+        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' +
+        				['integer', 'float', 'string', 'boolean', 'array', 'object'].join(', ');
+        		}
+        		params[key] = value;
+        		if (CParamValidator.inArray(rule.type, ['integer', 'float']) && error_message === null && (CParamValidator.isDefined(rule.min)
+        			|| CParamValidator.isDefined(rule.max)) && !CParamValidator.withinRange(value, rule.min, rule.max)) {
+        			error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
+        				? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
+        		}
+        		else if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
+        			error_message = 'Value "' + key + '" must be in the array ' + JSON.stringify(rule.array);
+        		}
+        		else if (CParamValidator.isDefined(rule.macro) && !CParamValidator.isMacroSet(value.toString(), rule.macro)) {
+        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ') + 'is not set';
+        		}
+        		if (error_message !== null) {
+        			if (CParamValidator.isDefined(rule.default) && CParamValidator.isType(rule.default, rule.type)) {
+        				params[key] = rule.default;
+        			}
+        			else {
+        				Zabbix.log(4, 'Default value for "' + key + '" must be a ' + rule.type + '. Skipped.');
+        				throw 'Incorrect value for variable "' + key + '". ' + error_message;
+        			}
+        		}
+        
+        		return this;
+        	},
+        
+        	validate: function(rules, params) {
+        		if (!CParamValidator.isType(params, 'object') || CParamValidator.isType(params, 'array')) {
+        			throw 'Incorrect parameters value. The value must be an object.';
+        		}
+        		for (var key in rules) {
+        			CParamValidator.check(key, rules[key], params);
+        		}
+        	}
+        }
+        
+        const CHttpRequest = function(logger) {
+        	this.request = new HttpRequest();
+        	if (typeof logger !== 'object' || logger === null) {
+        		this.logger = Zabbix;
+        	}
+        	else {
+        		this.logger = logger;
+        	}
+        
+        	this.clearHeader = function() {
+        		this.request.clearHeader();
+        	}
+        
+        	this.addHeaders = function(value) {
+        		var headers = [];
+        
+        		if (typeof value === 'object' && value !== null) {
+        			if (!Array.isArray(value)) {
+        				Object.keys(value).forEach(function(key) {
+        					headers.push(key + ': ' + value[key]);
+        				});
+        			}
+        			else {
+        				headers = value;
+        			}
+        		}
+        		else if (typeof value === 'string') {
+        			value.split('\r\n').forEach(function(header) {
+        				headers.push(header);
+        			});
+        		}
+        
+        		for (var idx in headers) {
+        			this.request.addHeader(headers[idx]);
+        		}
+        	}
+        
+        	this.setProxy = function(proxy) {
+        		this.request.setProxy(proxy);
+        	}
+        
+        	this.plainRequest = function(method, url, data) {
+        		var resp = null;
+        		method = method.toLowerCase();
+        		this.logger.log(4, 'Sending ' + method + ' request:' + JSON.stringify(data));
+        		if (['get', 'post', 'put', 'patch', 'delete', 'trace'].indexOf(method) !== -1) {
+        			resp = this.request[method](url, data);
+        		}
+        		else if (['connect', 'head', 'options'].indexOf(method) !== -1) {
+        			resp = this.request[method](url);
+        		}
+        		else {
+        			throw 'Unexpected method. Method ' + method + ' is not supported.';
+        		}
+        		this.logger.log(4, 'Response has been received: ' + resp);
+        
+        		return resp;
+        	}
+        
+        	this.jsonRequest = function(method, url, data) {
+        		this.addHeaders('Content-Type: application/json');
+        		var resp = this.plainRequest(method, url, JSON.stringify(data));
+        		try {
+        			resp = JSON.parse(resp);
+        		}
+        		catch (error) {
+        			throw 'Failed to parse response: not well-formed JSON was received';
+        		}
+        
+        		return resp;
+        	}
+        
+        	this.getStatus = function() {
+        		return this.request.getStatus();
+        	}
+        }
+        
+        var ZABBIX_SEVERITY_MAP = ["not_classified", "information", "warning", "average", "high", "disaster"];
+        
+        var serviceLogName = 'Jira Webhook',
+        	Logger = new CLogger(serviceLogName),
+        	Jira = CWebhook;
+        
+        Jira.prototype.onCheckParams = function () {
+        	CParamValidator.validate({
+        		jira_url: { type: 'string', url: true},
+        		jira_user: { type: 'string' },
+        		jira_password: { type: 'string' },
+        		jira_issue_type: { type: 'string' },
+        		jira_project_key: { type: 'string' },
+        		event_source: { type: 'string' },
+        		alert_subject: { type: 'string' },
+        		alert_message: { type: 'string' },
+        		event_nseverity: { type: 'integer', default: 0 }
+        	}, this.params);
+        
+        	this.priority = this.params.event_source == 3 ? this.params.jira_priority_internal : this.params['severity_' + ZABBIX_SEVERITY_MAP[this.params.event_nseverity]];
+        	this.params.event_tags_json = parseTags(this.params.event_tags_json, false);
+        
+        	if (this.params.event_tags_json.length > 0) {
+        		this.labels = setLabels(this.params.event_tags_json);
+        	}
+        
+        	parseOptionalFields();
+        
+        	this.result = { tags: {} };
+        }
+        
+        function escapeMarkup(str) {
+        	var length = str.length,
+        		result = '',
+        		markup = ['{', '|', '}', '~', '_', '\\', '[', ']', '^', '<', '>', '?', '!', '#', '+', '*', '&'];
+        
+        	for (var i = 0; i < length; i++) {
+        		var char = str[i];
+        		result += (markup.indexOf(char) !== -1) ? ('&#' + str[i].charCodeAt() + ';') : char;
+        	}
+        
+        	return result;
+        }
+        
+        function parseOptionalFields() {
+        	this.params.customfields = {};
+        	this.params.components = [];
+        
+        	Object.keys(this.params).forEach(function (key) {
+        		if (key.startsWith('customfield_')) {
+        			this.params.customfields[key] = this.params[key];
+        		}
+        
+        		if (key.startsWith('component_')) {
+        			this.params.components.push({"name": this.params[key]})
+        		}
+        	});
+        }
+        
+        Jira.prototype.addCustomFields = function (data) {
+        	if (typeof this.params.customfields === 'object' && Object.keys(this.params.customfields).length) {
+        		var schemaData = this.sendRequest('GET', '/rest/api/latest/field'),
+        			schema = {};
+        
+        		schemaData.forEach(function (item) {
+        			schema[item.id] = item.schema;
+        		});
+        
+        		Object.keys(this.params.customfields).forEach(function (field) {
+        			if (typeof schema[field] === 'object' && schema[field].type) {				
+        				const type = schema[field].type;
+        
+        				if (type === 'number') {
+        					data.fields[field] = parseInt(this.params.customfields[field]);
+        				}
+        				else if (type === 'string' && schema[field]['custom'].split(':')[1] === 'url') {
+        					if (this.params.customfields[field] === 'zabbix_url') {
+        						data.fields[field] = CWebhookHelper.createProblemURL(this.params.event_source, this.params.zabbix_url, this.params.trigger_id, this.params.event_id);
+        					} else {
+        						data.fields[field] = this.params.customfields[field];
+        					}
+        				}
+        				else if (type === 'date') {
+        					if (this.params.customfields[field].match(/\d+[.-]\d+[.-]\d+/) !== null) {
+        						data.fields[field] = this.params.customfields[field].replace(/\./g, '-');
+        					}
+        				}
+        				else if (type === 'datetime') {
+        					if (this.params.customfields[field].match(/\d+[.-]\d+[.-]\d+T\d+:\d+:\d+/) !== null) {
+        						data.fields[field] = this.params.customfields[field].replace(/\./g, '-');
+        					}
+        				}
+        				else if (type === 'option') {
+        					data.fields[field] = { 'value': this.params.customfields[field] };
+        				}
+        				else if (type === 'array') {
+        					if (schema[field].items === 'option') {
+        						const valuesList = this.params.customfields[field].split(',');
+        						data.fields[field] = [];
+        						valuesList.forEach(function (val) {
+        							data.fields[field].push({'value': val})
+        						});
+        					}
+        					else {
+        						data.fields[field] = [this.params.customfields[field]];
+        					}
+        				}
+        				else {
+        					data.fields[field] = this.params.customfields[field];
+        				}
+        			}
+        		});
+        	}
+        	else {
+        		Logger.log(Logger.WARN, 'No customfields found.');
+        	}
+        
+        	return data;
+        }
+        
+        function parseTags(event_tags) {
+        	try {
+        		return JSON.parse(event_tags);
+        	}
+        	catch (error) {
+        		if (this.params.event_source == 0 || this.params.event_source > 2) {
+        			Logger.log(Logger.WARN, 'No event tags were found. Should be an object. Received event tags: "' + event_tags + '".');
+        		}
+        		return [];
+        	}
+        }
+        
+        function getTagValue(tags, key, throw_on_fail) {
+        	for (i in tags) {
+        		if (tags[i].tag === key) {
+        			return tags[i].value
+        		}
+        	}
+        
+        	if (!throw_on_fail) {
+        		return false;
+        	} else {
+        		throw 'Tag "' + key + '" is not in the event tag list.'
+        	}
+        };
+        
+        function setLabels(event_tags_json) {
+        	var buffer = [];
+        
+        	event_tags_json.forEach(function (tag) {
+        		if (typeof tag.tag !== 'undefined' && typeof tag.value !== 'undefined' && !tag.tag.startsWith('__zbx')) {
+        			label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');
+        			if (label.length < 256) {
+        				buffer.push(label);
+        			}
+        		}
+        	});
+        
+        	if (buffer.length === 0) {
+        		Logger.log(Logger.WARN, 'No labels were set.');
+        	}
+        
+        	return buffer;
+        }
+        
+        Jira.prototype.commentIssue = function (issue_key) {
+        	var data = {
+        		body: this.params.alert_message,
+        	};
+        	this.sendRequest('POST', '/rest/api/latest/issue/' + encodeURIComponent(issue_key) + '/comment', data);
+        }
+        
+        Jira.prototype.sendRequest = function (method, path, data) {
+        	this.request.clearHeader();
+        	this.request.addHeaders('Authorization: Basic ' + btoa(this.params.jira_user + ':' + this.params.jira_password));
+        
+        	var response = this.request.jsonRequest(method, this.params.jira_url + path, data);
+        
+        	if ((this.request.getStatus() !== 200 && this.request.getStatus() !== 201)) {
+        		Logger.log(Logger.WARN, 'HTTP code: ' + this.request.getStatus());
+        		if (CParamValidator.isType(response.description, 'string')) {
+        			throw response.description;
+        		}
+        		else {
+        			Logger.log(Logger.WARN, 'Request not successful. Received response: ' + JSON.stringify(response));
+        			throw 'Unknown error. Check debug log for more information.';
+        		}
+        	}
+        
+        	return response;
+        }
+        
+        Jira.prototype.onProblem = function (alert) {
+        	if (this.params.event_tags_json.length > 0 && getTagValue(this.params.event_tags_json, '__zbx_jira_issuekey', false) !== false) {
+        		return this.onUpdate(alert, true);
+        	}
+        
+        	var data = {
+        		fields: {
+        			project: {
+        				key: this.params.jira_project_key
+        			},
+        			issuetype: {
+        				name: this.params.jira_issue_type
+        			},
+        			summary: this.params.alert_subject,
+        			description: this.params.alert_message,
+        			priority: {
+        				"name": this.priority
+        			}
+        		}
+        	};
+        
+        	if (this.labels && this.labels.length > 0) {
+        		data.fields.labels = this.labels;
+        	}
+        
+        	if (this.params.components && this.params.components.length > 0) {
+        		data.fields.components = this.params.components;
+        	}
+        
+        	var response = this.sendRequest('POST', '/rest/api/latest/issue', this.addCustomFields(data));
+        	this.result.tags = {
+        		__zbx_jira_issuekey: response.key,
+        		__zbx_jira_issuelink: this.params.jira_url + '/browse/' + response.key
+        	}
+        	return this.result;
+        }
+        
+        Jira.prototype.onUpdate = function (alert, dontUpdatePriority) {
+        	var data = {
+        		fields: {
+        			summary: this.params.alert_subject,
+        			priority: {
+        				"name": this.priority
+        			}
+        		}
+        	};
+        
+        	if (dontUpdatePriority && this.params.event_source != 0) {
+        		delete data['fields']['priority'];
+        	}
+        
+        	var jira_issue_key = getTagValue(this.params.event_tags_json, '__zbx_jira_issuekey', true);
+        	this.sendRequest('PUT', '/rest/api/latest/issue/' + encodeURIComponent(jira_issue_key) + '?returnIssue=true', this.addCustomFields(data));
+        	this.commentIssue(jira_issue_key);
+        
+        	return this.result;
+        }
+        
+        Jira.prototype.onResolve = function (alert) {
+        	return this.onUpdate(alert, true);
+        }
+        
+        Jira.prototype.onDiscovery = function (alert) {
+        	this.priority = this.params.jira_priority_discovery;
+        	return this.onProblem(alert);
+        }
+        
+        Jira.prototype.onAutoreg = function (alert) {
+        	this.priority = this.params.jira_priority_autoregistration;
+        	return this.onProblem(alert);
+        }
+        
         try {
-            var params = JSON.parse(value),
-                fields = {},
-                jira = {},
-                update = {},
-                result = { tags: {} },
-                required_params = ['alert_subject', 'summary', 'event_recovery_value', 'event_source', 'event_value'];
-        
-            Object.keys(params)
-                .forEach(function (key) {
-                    if (key.startsWith('jira_')) {
-                        jira[key.substring(5)] = params[key];
-                    }
-                    else if (key.startsWith('customfield_')) {
-                        fields[key] = params[key];
-                    }
-                    else if (key.startsWith('event_update_')) {
-                        update[key.substring(13)] = params[key];
-                    }
-                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
-                        throw 'Parameter "' + key + '" can\'t be empty.';
-                    }
-                });
-        
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
-            }
-        
-            // Check {EVENT.VALUE} for trigger-based and internal events.
-            if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
-        
-            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
-            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
-        
-            if (params.event_source !== '0' && params.event_recovery_value === '0') {
-                throw 'Recovery operations are supported only for trigger-based actions.';
-            }
-        
-            Jira.setParams(jira);
-            Jira.setProxy(params.HTTPProxy);
-            Jira.setTags(params.event_tags_json);
-        
-            // Create issue for non trigger-based events.
-            if (params.event_source !== '0' && params.event_recovery_value !== '0') {
-                Jira.createIssue(params.alert_subject, params.alert_message);
-            }
-            // Create issue for trigger-based events.
-            else if (params.event_value === '1' && update.status === '0' && !jira.issue_key.startsWith(jira.project_key)) {
-                var key = Jira.createIssue(params.alert_subject,
-                    (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);
-        
-        
-                result.tags.__zbx_jira_issuekey = key;
-                result.tags.__zbx_jira_issuelink = params.jira_url +
-                    (params.jira_url.endsWith('/') ? '' : '/') + 'browse/' + key;
-            }
-            // Update created issue for trigger-based event.
-            else {
-                if (!jira.issue_key.startsWith(jira.project_key)) {
-                    throw 'Incorrect Issue key given: ' + jira.issue_key;
-                }
-                Jira.updateIssue(params.alert_subject, fields,
-                    ((params.event_value === '0' && !Object.keys(fields).length)
-                        ? params.alert_message : update));
-            }
-        
-            return JSON.stringify(result);
+        	var hook = new Jira(value);
+        	hook.request = new CHttpRequest(Logger);
+        	return hook.run();
         }
         catch (error) {
-            Zabbix.log(3, '[ Jira Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Logger.log(Logger.WARN, 'notification failed: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
       event_menu_url: '{EVENT.TAGS.__zbx_jira_issuelink}'
       event_menu_name: 'Jira: {EVENT.TAGS.__zbx_jira_issuekey}'
+      description: |
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/jira
+        
+        1. To make this integration work, you will need the following from Jira:
+          * Jira instance URL;
+          * Jira project key and issue type that the issues created by Zabbix will use;
+          * Jira username and password or API token. API token is strongly recommended and can be obtained at https://id.atlassian.com/manage/api-tokens.
+        2. In the Zabbix web interface, go to Administration → Macros section. Set up the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend.
+        3. On this page replace the placeholder '<...>' values with the ones from the step #1.
+        4. In Zabbix, you need to have a Zabbix user and add Media with the Jira media type. Make sure this user has access to all hosts for which you would like problem issues to be created in Jira.
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
@@ -371,6 +766,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
+            
         - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
@@ -381,6 +777,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
+            
         - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
@@ -389,6 +786,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+            
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
@@ -411,3 +809,53 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+            
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}      
+            

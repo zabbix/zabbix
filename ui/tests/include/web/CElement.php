@@ -15,16 +15,17 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CBaseElement.php';
-require_once dirname(__FILE__).'/CElementQuery.php';
+require_once __DIR__.'/CBaseElement.php';
+require_once __DIR__.'/CElementQuery.php';
 
-require_once dirname(__FILE__).'/IWaitable.php';
-require_once dirname(__FILE__).'/WaitableTrait.php';
-require_once dirname(__FILE__).'/CastableTrait.php';
+require_once __DIR__.'/IWaitable.php';
+require_once __DIR__.'/WaitableTrait.php';
+require_once __DIR__.'/CastableTrait.php';
 
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Interactions\WebDriverActions;
 
 /**
  * Generic web page element.
@@ -572,6 +573,18 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Double-click on element.
+	 *
+	 * @return $this
+	 */
+	public function doubleClick() {
+		$actions = new WebDriverActions(CElementQuery::getDriver());
+		$actions->doubleClick($this)->perform();
+
+		return $this;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getReadyCondition() {
@@ -806,6 +819,16 @@ class CElement extends CBaseElement implements IWaitable {
 	public function hoverMouse() {
 		$mouse = CElementQuery::getDriver()->getMouse();
 		$mouse->mouseMove($this->getCoordinates());
+
+		return $this;
+	}
+
+	/**
+	 * Moves the mouse to the element.
+	 */
+	public function moveMouse() {
+		$actions = new WebDriverActions(CElementQuery::getDriver());
+		$actions->moveToElement($this)->perform();
 
 		return $this;
 	}
