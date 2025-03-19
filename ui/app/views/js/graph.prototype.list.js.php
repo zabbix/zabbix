@@ -22,11 +22,13 @@
 <script>
 	const view = new class {
 
-		init({checkbox_hash, checkbox_object, context, form_name, token}) {
+		init({checkbox_hash, checkbox_object, context, parent_discoveryid, form_name, token}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
+			this.parent_discoveryid = parent_discoveryid;
 			this.form = document.forms[form_name];
+			this.token = token;
 
 			this.#initActions();
 			this.#initPopupListeners();
@@ -38,6 +40,9 @@
 					parent_discoveryid: e.target.dataset.parent_discoveryid,
 					context: this.context
 				});
+			});
+			document.getElementById('js-massdelete-graph-prototype').addEventListener('click', (e) => {
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 			});
 
 			const copy = document.querySelector('.js-copy');
@@ -66,6 +71,21 @@
 			}
 		}
 
+		#delete(target, graphids) {
+			const confirmation = graphids.length > 1
+				? <?= json_encode(_('Delete selected graph prototypes?')) ?>
+				: <?= json_encode(_('Delete selected graph prototype?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'graph.prototype.delete');
+
+			this.#post(target, graphids, curl);
+		}
+
 		#openCopyPopup() {
 			const parameters = {
 				graphids: Object.keys(chkbxRange.getSelectedIds()),
@@ -85,6 +105,49 @@
 			});
 		}
 
+		#post(target, graphids, url) {
+			target.classList.add('is-loading');
+
+			return fetch(url.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({...{graphids: graphids}, ...this.token})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('graph_prototypes', response.keepids ?? []);
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('graph_prototypes');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
+		}
+
 		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
@@ -97,9 +160,9 @@
 					if (data.submit.success.action === 'delete') {
 						const url = new URL('zabbix.php', location.href);
 
-						url.searchParams.set('action', 'graph.list');
+						url.searchParams.set('action', 'graph.prototype.list');
 						url.searchParams.set('context', this.context);
-						url.searchParams.set('filter_set', 1);
+						url.searchParams.set('parent_discoveryid', this.parent_discoveryid);
 
 						event.setRedirectUrl(url.href);
 					}

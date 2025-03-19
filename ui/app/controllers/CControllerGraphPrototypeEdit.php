@@ -48,16 +48,16 @@ class CControllerGraphPrototypeEdit extends CController {
 			'show_3d' =>			'db graphs.show_3d|in 0,1',
 			'show_work_period' =>	'db graphs.show_work_period|in 0,1',
 			'show_triggers' =>		'db graphs.show_triggers|in 0,1',
-			'percent_left' =>		'db graphs.percent_left|ge 0|le 100',
-			'percent_right' =>		'db graphs.percent_right|ge 0|le 100',
+			'percent_left' =>		'string',
+			'percent_right' =>		'string',
 			'ymin_type' =>			'db graphs.ymin_type|in '.implode(',', [
 				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
 			]),
 			'ymax_type' =>			'db graphs.ymax_type|in '.implode(',', [
 				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
 			]),
-			'yaxismin' =>			'db graphs.yaxismin',
-			'yaxismax' =>			'db graphs.yaxismax',
+			'yaxismin' =>			'string',
+			'yaxismax' =>			'string',
 			'ymin_itemid' =>		'db graphs.ymin_itemid',
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
@@ -145,7 +145,7 @@ class CControllerGraphPrototypeEdit extends CController {
 			$data['percent_left'] = 0;
 			$data['percent_right'] = 0;
 			$data['items'] = $gitems;
-			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;
+			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;;
 
 			if (array_key_exists('percent_left', $data['visible'])) {
 				$data['percent_left'] = $this->getInput('percent_left', 0);
@@ -334,9 +334,9 @@ class CControllerGraphPrototypeEdit extends CController {
 			$i = $next;
 		}
 		CArrayHelper::sort($data['items'], ['sortorder']);
+		$data['items'] = array_values($data['items']);
 
 		$data += [
-			'items' => array_values($data['items']),
 			'is_template' => $this->hostid == 0 ? false : isTemplate($data['hostid']),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];

@@ -147,16 +147,15 @@ foreach ($data['graphs'] as $graph) {
 // buttons
 $buttons = [
 	'graph.massdelete' => [
-		'name' => _('Delete'),
-		'confirm_singular' => _('Delete selected graph prototype?'),
-		'confirm_plural' => _('Delete selected graph prototypes?')
+		'content' => (new CSimpleButton(_('Delete')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-no-chkbxrange')
+			->setId('js-massdelete-graph-prototype')
 	]
 ];
 
 // append table to form
-$graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons,
-	$data['parent_discoveryid']
-)]);
+$graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, 'graph_prototypes')]);
 
 $html_page
 	->addItem($graphs_form)
@@ -167,6 +166,7 @@ $html_page
 		'checkbox_hash' => $data['parent_discoveryid'],
 		'checkbox_object' => 'group_graphid',
 		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid'],
 		'form_name' => $graphs_form->getName(),
 		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('graph')],
 	]).');

@@ -43,7 +43,7 @@ window.graph_edit_popup = new class {
 			this.addPopupValues(data.values);
 		}
 
-		this.items = items;
+		this.items = Array.isArray(items) ? items : Object.values(items);
 
 		this.items.forEach((item, i) => {
 			item.number = i;

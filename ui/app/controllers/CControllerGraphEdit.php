@@ -302,9 +302,9 @@ class CControllerGraphEdit extends CController {
 			$i = $next;
 		}
 		CArrayHelper::sort($data['items'], ['sortorder']);
+		$data['items'] = array_values($data['items']);
 
 		$data += [
-			'items' => array_values($data['items']),
 			'is_template' => $data['hostid'] == 0 ? false : isTemplate($data['hostid']),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];

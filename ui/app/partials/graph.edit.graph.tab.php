@@ -604,9 +604,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 	$graph_tab->addItem([
 		new CLabel(_('Discover')),
 		new CFormField(
-			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
-				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
-				//->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
+			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
 		)
 	]);
 }
