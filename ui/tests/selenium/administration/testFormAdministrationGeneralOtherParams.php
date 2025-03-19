@@ -95,8 +95,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		$this->page->assertHeader('Other configuration parameters');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
-		foreach (['Authorization', 'Security'] as $header) {
-			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
+		foreach (['Authorization', 'Storage of secrets', 'Security'] as $header) {
+			$this->assertTrue($this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes($header).']')->one()->isVisible());
 		}
 
 		$limits = [
@@ -122,7 +122,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
 
-			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
+			foreach (['uri_valid_schemes', 'iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
 		}
@@ -352,9 +352,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'User group for database down message' => '',
 						// Authorization.
 						'Login attempts' => '',
-						'Login blocking interval' => '',
-						// Security.
-						'id:x_frame_options' => ''
+						'Login blocking interval' => ''
 					],
 					'details' => [
 						'Field "discovery_groupid" is mandatory.',
@@ -572,7 +570,20 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// #24 Trimming spaces.
+			// #24 Empty X-Frame field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						// Security.
+						'id:x_frame_options' => ''
+					],
+					'details' => [
+						'Incorrect value for field "x_frame_options": cannot be empty.'
+					]
+				]
+			],
+			// #25 Trimming spaces.
 			[
 				[
 					'trim' => true,
