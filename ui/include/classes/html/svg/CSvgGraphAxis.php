@@ -119,10 +119,8 @@ class CSvgGraphAxis extends CSvgGroup {
 	}
 
 	private function getAxis(): array {
-		$offset = ceil(self::ZBX_ARROW_SIZE / 2);
-
 		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
-			$x = $this->x + $this->width + self::ZBX_ARROW_OFFSET;
+			$x = $this->x + $this->width;
 			$y = $this->y;
 
 			return [
@@ -130,12 +128,7 @@ class CSvgGraphAxis extends CSvgGroup {
 				(new CSvgPath())
 					->setAttribute('shape-rendering', 'crispEdges')
 					->moveTo($this->x, $y)
-					->lineTo($x, $y),
-				// Draw arrow.
-				(new CSvgPath())
-					->moveTo($x + self::ZBX_ARROW_SIZE, $y)
-					->lineTo($x, $y - $offset)
-					->lineTo($x, $y + $offset)
+					->lineTo($x, $y)
 					->closePath()
 			];
 		}
@@ -148,12 +141,7 @@ class CSvgGraphAxis extends CSvgGroup {
 			(new CSvgPath())
 				->setAttribute('shape-rendering', 'crispEdges')
 				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET),
-			// Draw arrow.
-			(new CSvgPath())
-				->moveTo($x, $y - self::ZBX_ARROW_SIZE)
-				->lineTo($x - $offset, $y)
-				->lineTo($x + $offset, $y)
+				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET)
 				->closePath()
 		];
 	}
