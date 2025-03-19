@@ -27,7 +27,6 @@
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 			this.form = document.forms[form_name];
-			// todo - check if needed:
 			this.token = token;
 
 			this.#initActions();
@@ -37,6 +36,9 @@
 		#initActions() {
 			document.getElementById('js-create')?.addEventListener('click', e => {
 				ZABBIX.PopupManager.open('graph.edit', {hostid: e.target.dataset.hostid, context: this.context});
+			});
+			document.getElementById('js-massdelete-graph').addEventListener('click', (e) => {
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 			});
 
 			const copy = document.querySelector('.js-copy');
@@ -84,6 +86,64 @@
 			});
 		}
 
+		#delete(target, graphids) {
+			const confirmation = graphids.length > 1
+				? <?= json_encode(_('Delete selected graphs?')) ?>
+				: <?= json_encode(_('Delete selected graph?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'graph.delete');
+
+			this.#post(target, graphids, curl);
+		}
+
+		#post(target, graphids, url) {
+			target.classList.add('is-loading');
+
+			return fetch(url.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({...{graphids: graphids}, ...this.token})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('graph', response.keepids ?? []);
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('graph');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
+		}
+
 		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
@@ -98,7 +158,6 @@
 
 						url.searchParams.set('action', 'graph.list');
 						url.searchParams.set('context', this.context);
-						url.searchParams.set('filter_set', 1);
 
 						event.setRedirectUrl(url.href);
 					}

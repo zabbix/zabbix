@@ -22,14 +22,16 @@
 
 window.graph_edit_popup = new class {
 
-	init({form_name, theme_colors, graphs, readonly, items, context, hostid, overlayid, return_url}) {
+	init({form_name, action, theme_colors, graphs, readonly, items, context, hostid, overlayid, return_url}) {
 		this.form_name = form_name;
-		this.graphs = graphs;
+		this.action = action;
+		this.graph = graphs;
 		this.readonly = readonly;
 		this.context = context;
 		this.hostid = hostid;
-		this.graph_type = this.graphs.graphtype;
+		this.graph_type = this.graph.graphtype;
 		this.overlay = overlays_stack.getById(overlayid);
+		this.dialogue = this.overlay.$dialogue[0];
 		this.return_url = return_url;
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
@@ -104,6 +106,7 @@ window.graph_edit_popup = new class {
 
 		this.#toggleGraphTypeFields(this.form.querySelector('#graphtype').value);
 
+		// todo - move to 1 method?
 		const ymin_type = this.form.querySelector('#ymin_type');
 
 		if (ymin_type) {
@@ -121,16 +124,7 @@ window.graph_edit_popup = new class {
 		}
 
 		this.#toggleYAxisFields(ymin_type, 'min');
-		this.#toggleYAxisFields(ymin_type, 'max');
-
-		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add-item')) {
-				this.#openItemSelectPopup();
-			}
-			else if (e.target.classList.contains('js-add-item-prototype')) {
-				this.#openItemPrototypeSelectPopup();
-			}
-		});
+		this.#toggleYAxisFields(ymax_type, 'max');
 
 		// Percent fields
 		this.form.querySelector('#visible_percent_left').addEventListener('change', () => {
@@ -157,7 +151,18 @@ window.graph_edit_popup = new class {
 			if (e.target.classList.contains('js-item-name')) {
 				this.#openItemPopup(e.target);
 			}
+			else if (e.target.classList.contains('js-add-item')) {
+				this.#openItemSelectPopup();
+			}
+			else if (e.target.classList.contains('js-add-item-prototype')) {
+				this.#openItemPrototypeSelectPopup();
+			}
+			else if (e.target.classList.contains('js-remove')) {
+				this.#removeItem(e.target);
+			}
 		});
+
+		this.#toggleColorPickerStatus();
 	}
 
 	#openItemPopup(target) {
@@ -177,25 +182,45 @@ window.graph_edit_popup = new class {
 			parameters['srctbl'] = 'item_prototypes';
 			parameters['srcfld3'] = 'flags';
 			parameters['dstfld3'] = 'items_' + item_num + '_flags';
-			parameters['parent_discoveryid'] = this.graphs.parent_discoveryid;
+			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
 		}
 		else {
 			parameters['srctbl'] = 'items';
 		}
 
-		if (!this.graphs.parent_discoveryid && this.graphs.hostid) {
-			parameters['hostid'] = this.graphs.hostid;
+		if (!this.graph.parent_discoveryid && this.graph.hostid) {
+			parameters['hostid'] = this.graph.hostid;
 		}
 
-		if (this.graphs.is_template) {
-			parameters['only_hostid'] = this.graphs.hostid
+		if (this.graph.is_template) {
+			parameters['only_hostid'] = this.graph.hostid
 		}
 		else {
 			parameters['real_hosts'] = '1';
-			parameters['hostid'] = this.graphs.hostid;
+			parameters['hostid'] = this.graph.hostid;
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+	}
+
+	#toggleColorPickerStatus() {
+		if (this.graph.readonly) {
+			const size = $('#items-table tbody tr.graph-item').length;
+
+			for (let i = 0; i < size; i++) {
+				$('#items_' + i + '_color')
+					.removeAttr('onchange')
+					.prop('readonly', true);
+				$('#lbl_items_' + i + '_color')
+					.removeAttr('onclick')
+					.prop('readonly', true);
+			}
+		}
+	}
+
+	#removeItem(target) {
+		const number = target.dataset.remove;
+		this.form.querySelector(`#items_${number}`).remove();
 	}
 
 	#updateItemsTable(graph_type) {
@@ -244,11 +269,15 @@ window.graph_edit_popup = new class {
 	}
 
 	#togglePercentField(type) {
+		const percent_field = this.form.querySelector(`#percent_${type}`);
+
 		if (this.form.querySelector(`input[name="visible[percent_${type}]"]:checked`)) {
-			this.form.querySelector(`#percent_${type}`).style.display = '';
+			percent_field.style.display = '';
+			percent_field.disabled = false;
 		}
 		else {
-			this.form.querySelector(`#percent_${type}`).style.display = 'none';
+			percent_field.style.display = 'none';
+			percent_field.disabled = true;
 		}
 	}
 
@@ -264,8 +293,8 @@ window.graph_edit_popup = new class {
 			hostid: this.hostid
 		};
 
-		if (this.graphs.normal_only == 1) {
-			parameters['normal_only'] = this.graphs.normal_only;
+		if (this.graph.normal_only == 1) {
+			parameters['normal_only'] = this.graph.normal_only;
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
@@ -281,11 +310,11 @@ window.graph_edit_popup = new class {
 			writeonly: '1',
 			multiselect: '1',
 			graphtype: this.graph_type,
-			parent_discoveryid: this.graphs.parent_discoveryid
+			parent_discoveryid: this.graph.parent_discoveryid
 		}
 
-		if (this.graphs.normal_only == 1) {
-			parameters['normal_only'] = this.graphs.normal_only;
+		if (this.graph.normal_only == 1) {
+			parameters['normal_only'] = this.graph.normal_only;
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
@@ -295,8 +324,18 @@ window.graph_edit_popup = new class {
 		const text_field = this.form.querySelector(`#yaxis_${yaxis}_value`);
 		const ms_field = this.form.querySelector(`#yaxis_${yaxis}_ms`);
 
-		text_field.style.display = (target.value == <?= GRAPH_YAXIS_TYPE_FIXED ?>) ? '' : 'none';
-		ms_field.style.display = (target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) ? '' : 'none';
+		const display_text_field = target.value == <?= GRAPH_YAXIS_TYPE_FIXED ?>;
+		const display_ms_field = target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>;
+
+		text_field.style.display = display_text_field ? '' : 'none';
+		text_field.querySelectorAll('input').forEach(input => {
+			input.disabled = !display_text_field;
+		});
+
+		ms_field.style.display = display_ms_field ? '' : 'none';
+		ms_field.querySelectorAll('input').forEach(input => {
+			input.disabled = !display_ms_field;
+		});
 
 		this.form.querySelector(`label[for="y${yaxis}_type_label"]`)
 			.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>
@@ -304,51 +343,49 @@ window.graph_edit_popup = new class {
 	}
 
 	#toggleGraphTypeFields(graph_type) {
-		const work_period_field = this.form.querySelector('#show_work_period_field');
-		const show_triggers_field = this.form.querySelector('#show_triggers_field');
-		const percent_left_field = this.form.querySelector('#percent_left_field');
-		const percent_right_field = this.form.querySelector('#percent_right_field');
-		const yaxis_min_field = this.form.querySelector('#yaxis_min_field');
-		const yaxis_max_field = this.form.querySelector('#yaxis_max_field');
-		const show_3d_field = this.form.querySelector('#show_3d_field');
-
 		// Toggle fields.
 		let show_fields = [];
 		let hide_fields = [];
 
 		switch (parseInt(graph_type)) {
 			case <?= GRAPH_TYPE_NORMAL ?>:
-				show_fields = [work_period_field, show_triggers_field, percent_left_field, percent_right_field,
-					yaxis_min_field, yaxis_max_field
+				show_fields = ['#show_work_period_field', '#show_triggers_field', '#percent_left_field',
+					'#percent_right_field', '#yaxis_min_field', '#yaxis_max_field'
 				];
-				hide_fields = [show_3d_field];
+				hide_fields = ['#show_3d_field'];
 				break;
 
 			case <?= GRAPH_TYPE_STACKED ?>:
-				show_fields = [work_period_field, show_triggers_field, yaxis_min_field, yaxis_max_field];
-				hide_fields = [percent_left_field, percent_right_field, show_3d_field];
+				show_fields = ['#show_work_period_field', '#show_triggers_field', '#yaxis_min_field', '#yaxis_max_field'];
+				hide_fields = ['#percent_left_field', '#percent_right_field', '#show_3d_field'];
 				break;
 
 			case <?= GRAPH_TYPE_PIE ?>:
 			case <?= GRAPH_TYPE_EXPLODED ?>:
-				show_fields = [show_3d_field];
-				hide_fields = [work_period_field, show_triggers_field, percent_left_field, percent_right_field,
-					yaxis_min_field, yaxis_max_field
+				show_fields = ['#show_3d_field'];
+				hide_fields = ['#show_work_period_field', '#show_triggers_field', '#percent_left_field',
+					'#percent_right_field', '#yaxis_min_field', '#yaxis_max_field'
 				];
 				break;
 		}
 
-		show_fields.forEach(field => {
-			field.style.display = '';
-			field.previousElementSibling.style.display = '';
+		show_fields.forEach((field) => {
+			const field_element = this.form.querySelector(field);
+
+			field_element.style.display = '';
+			field_element.previousElementSibling.style.display = '';
+			field_element.querySelectorAll('input').forEach((input) => input.disabled = false);
 		});
 
-		hide_fields.forEach(field => {
-			field.style.display = 'none';
-			field.previousElementSibling.style.display = 'none';
+		hide_fields.forEach((field) => {
+			const field_element = this.form.querySelector(field);
+
+			field_element.style.display = 'none';
+			field_element.previousElementSibling.style.display = 'none';
+			field_element.querySelectorAll('input').forEach((input) => input.disabled = true);
 		});
 
-		// Toggle items table columns and update column classes.
+		// Update items table columns and update column classes.
 		const table = this.form.querySelector('#items-table');
 		let name_column = table.querySelector('#name-column');
 
@@ -519,5 +556,90 @@ window.graph_edit_popup = new class {
 			$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
 			$(`#items_${number}_color`).colorpicker();
 		}
+	}
+
+	clone() {
+		const form_refresh = document.createElement('input');
+
+		form_refresh.setAttribute('type', 'hidden');
+		form_refresh.setAttribute('name', 'clone');
+		form_refresh.setAttribute('value', 1);
+		this.form.append(form_refresh);
+
+		this.form.querySelector('[name="graphid"]').remove();
+		this.graph.graphid = 0;
+
+		reloadPopup(this.form, this.action);
+	}
+
+	delete() {
+		const action = this.action === 'graph.edit' ? 'graph.delete' : 'graph.prototype.delete';
+
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', action);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('graph')) ?>);
+
+		this.#post(curl.getUrl(), {graphids: [this.graph.graphid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+		});
+	}
+
+	submit() {
+		const fields = getFormFields(this.form);
+		fields.name = fields.name.trim();
+
+		const curl = new Curl('zabbix.php');
+
+		if (this.action === 'graph.edit') {
+			curl.setArgument('action', !this.graph.graphid ? 'graph.create' : 'graph.update');
+		}
+		else {
+			curl.setArgument('action', !this.graph.graphid ? 'graph.prototype.create' : 'graph.prototype.update');
+		}
+
+		this.#post(curl.getUrl(), fields);
+	}
+
+	#post(url, data) {
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			})
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 }

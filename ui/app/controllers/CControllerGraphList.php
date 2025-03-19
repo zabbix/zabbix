@@ -80,6 +80,7 @@ class CControllerGraphList extends CController {
 
 		$filter_groupids = CProfile::getArray($prefix.'graph.list.filter_groupids', []);
 		$filter_hostids = CProfile::getArray($prefix.'graph.list.filter_hostids', []);
+
 		$filter = [
 			'hosts' => [],
 			'groups' => []

@@ -48,34 +48,24 @@ class CControllerGraphPrototypeEdit extends CController {
 			'show_3d' =>			'db graphs.show_3d|in 0,1',
 			'show_work_period' =>	'db graphs.show_work_period|in 0,1',
 			'show_triggers' =>		'db graphs.show_triggers|in 0,1',
-
-			// todo - add validation for BETWEEN_DBL(0, 100, 4) - no more than 4 digits after decimal point:
-			'percent_left' =>		'db graphs.perecent_left|ge 0|le 100',
-
-			// todo - add validation for BETWEEN_DBL(0, 100, 4) - no more than 4 digits after decimal point:
-			'percent_right' =>		'db graphs.perecent_right|ge 0|le 100',
-
+			'percent_left' =>		'db graphs.percent_left|ge 0|le 100',
+			'percent_right' =>		'db graphs.percent_right|ge 0|le 100',
 			'ymin_type' =>			'db graphs.ymin_type|in '.implode(',', [
 				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
 			]),
 			'ymax_type' =>			'db graphs.ymax_type|in '.implode(',', [
 				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
 			]),
-
-			// todo - update validation - these two only if graphtype GRAPH_TYPE_NORMAL or GRAPH_TYPE_STACKED
-			'yaxismin' =>			'db graphs.yaxis_min',
-			'yaxismax' =>			'db graphs.yaxis_ax',
-
-			// todo - update validation - this only when ymin_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
+			'yaxismin' =>			'db graphs.yaxismin',
+			'yaxismax' =>			'db graphs.yaxismax',
 			'ymin_itemid' =>		'db graphs.ymin_itemid',
-
-			// todo - update validation - this only when ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
-			'discover' =>			'in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
-			'normal_only' =>		'in 1'
+			'discover' =>			'db graphs.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
+			'normal_only' =>		'in 1',
+			'clone' =>				'in 1'
 		];
-
+		// todo - add additional validation rules for dbl
 
 		$ret = $this->validateInput($fields);
 
@@ -100,7 +90,6 @@ class CControllerGraphPrototypeEdit extends CController {
 	}
 
 	protected function doAction() {
-		// todo - check if this is necessary:
 		$gitems = [];
 
 		foreach ($this->getInput('items', []) as $gitem) {
@@ -110,10 +99,6 @@ class CControllerGraphPrototypeEdit extends CController {
 				$gitems[] = $gitem;
 			}
 		}
-
-		// todo - ???
-		$_REQUEST['show_3d'] = $this->getInput('show_3d', 0);
-		$_REQUEST['show_legend'] = $this->getInput('show_legend', 0);
 
 		$discovery_rule = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
@@ -133,8 +118,43 @@ class CControllerGraphPrototypeEdit extends CController {
 			'readonly' => $this->getInput('readonly', 0)
 		];
 
-		// todo - add check - if readonly:
-		if ($data['graphid'] != 0) {
+		if ($this->hasInput('clone')) {
+			$data['name'] = $this->getInput('name');
+			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
+
+			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$data['width'] = $this->getInput('width', 400);
+				$data['height'] = $this->getInput('height', 300);
+			}
+			else {
+				$data['width'] = $this->getInput('width', 900);
+				$data['height'] = $this->getInput('height', 200);
+			}
+
+			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['yaxismin'] = $this->getInput('yaxismin', 0);
+			$data['yaxismax'] = $this->getInput('yaxismax', 100);
+			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
+			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
+			$data['show_work_period'] = $this->hasInput('show_work_period');
+			$data['show_triggers'] = $this->hasInput('show_triggers');
+			$data['show_legend'] = $this->hasInput('show_legend');
+			$data['show_3d'] = $this->hasInput('show_3d');
+			$data['visible'] = $this->getInput('visible', []);
+			$data['percent_left'] = 0;
+			$data['percent_right'] = 0;
+			$data['items'] = $gitems;
+			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;
+
+			if (array_key_exists('percent_left', $data['visible'])) {
+				$data['percent_left'] = $this->getInput('percent_left', 0);
+			}
+			if (array_key_exists('percent_right', $data['visible'])) {
+				$data['percent_right'] = $this->getInput('percent_right', 0);
+			}
+		}
+		elseif ($data['graphid'] != 0) {
 			$options = [
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => ['hostid'],

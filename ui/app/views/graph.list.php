@@ -201,22 +201,25 @@ foreach ($data['graphs'] as $graph) {
 	]);
 }
 
-// buttons
-$buttons = [
-	'graph.masscopyto' => [
-		'content' => (new CSimpleButton(_('Copy')))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-copy')
+$buttons = 	new CActionButtonList('action', 'group_graphid',
+	[
+		'graph.masscopyto' => [
+			'content' => (new CSimpleButton(_('Copy')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-copy')
+		],
+		'graph.massdelete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-no-chkbxrange')
+				->setId('js-massdelete-graph')
+		]
 	],
-	'graph.massdelete' => [
-		'name' => _('Delete'),
-		'confirm_singular' => _('Delete selected graph?'),
-		'confirm_plural' => _('Delete selected graphs?')
-	]
-];
+	'graph'
+);
 
 // append table to form
-$graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, $data['hostid'])]);
+$graphs_form->addItem([$graphs_table, $buttons]);
 
 $html_page
 	->addItem($graphs_form)

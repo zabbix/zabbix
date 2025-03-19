@@ -36,33 +36,23 @@ class CControllerGraphEdit extends CController {
 			'show_3d' =>			'db graphs.show_3d|in 0,1',
 			'show_work_period' =>	'db graphs.show_work_period|in 0,1',
 			'show_triggers' =>		'db graphs.show_triggers|in 0,1',
-
-			// todo - add validation for BETWEEN_DBL(0, 100, 4) - no more than 4 digits after decimal point:
-			'percent_left' =>		'db graphs.perecent_left|ge 0|le 100',
-
-			// todo - add validation for BETWEEN_DBL(0, 100, 4) - no more than 4 digits after decimal point:
-			'percent_right' =>		'db graphs.perecent_right|ge 0|le 100',
-
+			'percent_left' =>		'string',
+			'percent_right' =>		'string',
 			'ymin_type' =>			'db graphs.ymin_type|in '.implode(',', [
 				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
 			]),
 			'ymax_type' =>			'db graphs.ymax_type|in '.implode(',', [
 				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
 			]),
-
-			// todo - update validation - these two only if graphtype GRAPH_TYPE_NORMAL or GRAPH_TYPE_STACKED
-			'yaxismin' =>			'db graphs.yaxis_min',
-			'yaxismax' =>			'db graphs.yaxis_ax',
-
-			// todo - update validation - this only when ymin_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
+			'yaxismin' =>			'string',
+			'yaxismax' =>			'string',
 			'ymin_itemid' =>		'db graphs.ymin_itemid',
-
-			// todo - update validation - this only when ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
-			'normal_only' =>		'in 1'
+			'normal_only' =>		'in 1',
+			'clone' =>				'in 1'
 		];
-
+		// todo - add additional validation rules for dbl
 
 		$ret = $this->validateInput($fields);
 
@@ -95,7 +85,45 @@ class CControllerGraphEdit extends CController {
 			'normal_only' => $this->getInput('normal_only', 0)
 		];
 
-		if ($data['graphid'] != 0) {
+		$gitems = [];
+
+		foreach ($this->getInput('items', []) as $gitem) {
+			if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+				&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+				&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+				$gitems[] = $gitem;
+			}
+		}
+
+		if ($this->hasInput('clone')) {
+			$data['name'] = $this->getInput('name', '');
+			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
+
+			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$data['width'] = $this->getInput('width', 400);
+				$data['height'] = $this->getInput('height', 300);
+			}
+			else {
+				$data['width'] = $this->getInput('width', 900);
+				$data['height'] = $this->getInput('height', 200);
+			}
+
+			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['yaxismin'] = $this->getInput('yaxismin', 0);
+			$data['yaxismax'] = $this->getInput('yaxismax', 100);
+			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
+			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
+			$data['show_work_period'] = $this->hasInput('show_work_period');
+			$data['show_triggers'] = $this->hasInput('show_triggers');
+			$data['show_legend'] = $this->hasInput('show_legend');
+			$data['show_3d'] = $this->hasInput('show_3d');
+			$data['visible'] = $this->getInput('visible', []);
+			$data['percent_left'] = $this->getInput('percent_left', 0);
+			$data['percent_right'] = $this->getInput('percent_right', 0);
+			$data['items'] = $gitems;
+		}
+		elseif ($data['graphid'] != 0) {
 			$options = [
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => ['hostid'],
@@ -163,16 +191,6 @@ class CControllerGraphEdit extends CController {
 				$data['height'] = $this->getInput('height', 200);
 			}
 
-			$gitems = [];
-
-			foreach ($this->getInput('items', []) as $gitem) {
-				if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-						&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-						&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
-					$gitems[] = $gitem;
-				}
-			}
-
 			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$data['yaxismin'] = $this->getInput('yaxismin', 0);
@@ -185,7 +203,7 @@ class CControllerGraphEdit extends CController {
 			$data['show_3d'] = $this->getInput('show_3d', 0);
 			$data['visible'] = $this->getInput('visible', []);
 			$data['percent_left'] = 0;
-			$data['percent_right'] = 0;
+			$data['percent_right'] =0;
 			$data['items'] = $gitems;
 			$data['discover'] = $this->getInput('discover', DB::getDefault('graphs', 'discover'));
 			$data['templates'] = [];

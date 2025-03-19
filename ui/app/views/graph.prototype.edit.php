@@ -50,7 +50,7 @@ if ($data['graphid'] != 0) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'enabled' => $readonly && $data['parent_discoveryid'] === null,
+			'enabled' => !$readonly,
 			'action' => 'graph_edit_popup.submit();'
 		],
 		[
@@ -105,8 +105,10 @@ $graph_form
 		(new CScriptTag('
 			graph_edit_popup.init('.json_encode([
 				'form_name' => $graph_form->getName(),
+				'action' => 'graph.prototype.edit',
 				'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
 				'graphs' => [
+					'graphid' => $data['graphid'],
 					'graphtype' => $data['graphtype'],
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
@@ -129,8 +131,7 @@ $output = [
 	'body' => $graph_form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('graph.edit.js.php'),
-	'dialogue_class' => 'modal-popup-large',
-	'return_url' => $return_url
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

@@ -1,0 +1,190 @@
+<?php declare(strict_types = 0);
+/*
+** Copyright (C) 2001-2025 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+class CControllerGraphCreate extends CController {
+
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
+		$fields = [
+			'context' =>			'in '.implode(',', ['host', 'template']),
+		//	'hostid' =>				'id',
+			'name' =>				'required|not_empty|string',
+			'width' =>				'required|not_empty|db graphs.width|ge 20|le 65535',
+			'height' => 			'required|not_empty|db graphs.height|ge 20|le 65535',
+			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
+				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
+			]),
+			'show_legend' =>		'db graphs.show_legend|in 0,1',
+			'show_3d' =>			'db graphs.show_3d|in 0,1',
+			'show_work_period' =>	'db graphs.show_work_period|in 0,1',
+			'show_triggers' =>		'db graphs.show_triggers|in 0,1',
+			'percent_left' =>		'string',
+			'percent_right' =>		'string',
+			'ymin_type' =>			'db graphs.ymin_type|in '.implode(',', [
+				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
+			]),
+			'ymax_type' =>			'db graphs.ymax_type|in '.implode(',', [
+				GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE
+			]),
+			'yaxismin' =>			'string',
+			'yaxismax' =>			'string',
+			'ymin_itemid' =>		'db graphs.ymin_itemid',
+			'ymax_itemid' =>		'db graphs.ymax_itemid',
+			'items' =>				'required|array'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		$graphtype = $this->getInput('graphtype');
+
+		if ($ret && $graphtype == GRAPH_TYPE_NORMAL) {
+			$ret = $this->validatePercentFields();
+		}
+
+		if ($ret && ($graphtype == GRAPH_TYPE_NORMAL || $graphtype == GRAPH_TYPE_STACKED)) {
+			$ret = $this->validateYAxisFields();
+		}
+
+		if (!$ret) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot add graph'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)])
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	}
+
+	protected function doAction(): void {
+		try {
+			$gitems = [];
+
+			foreach ($this->getInput('items', []) as $gitem) {
+				if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+						&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+						&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+					$gitems[] = $gitem;
+				}
+			}
+
+			$graph = $this->getInputAll();
+			$graph['gitems'] = $gitems;
+			unset ($graph['items']);
+
+			DBstart();
+
+			$result = API::Graph()->create($graph);
+
+			if ($result === false) {
+				throw new Exception();
+			}
+
+			$result = DBend();
+		}
+		catch (Exception $e) {
+			$result = false;
+
+			DBend(false);
+		}
+
+		$output = [];
+
+		if ($result) {
+			$output['success']['title'] = _('Graph added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Cannot add graph'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+	}
+
+	private function validateYAxisFields(): bool {
+		$fields = [];
+
+		if ($this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED) == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$fields['ymin_itemid'] = 'required|not_empty|db graphs.ymin_itemid';
+		}
+
+		if ($this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED) == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$fields['ymax_itemid'] = 'required|not_empty|db graphs.ymax_itemid';
+		}
+
+		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+		foreach ($validator->getAllErrors() as $error) {
+			info($error);
+		}
+
+		return !$validator->isErrorFatal() && !$validator->isError();
+	}
+
+	private function validatePercentFields(): bool {
+		$fields = [
+			'percent_left'  => 'Percentile line (left)',
+			'percent_right' => 'Percentile line (right)'
+		];
+
+		foreach ($fields as $field => $label) {
+			if ($this->hasInput($field)
+					&& !self::validateNumberRangeWithPrecision($this->getInput($field), 0, 100, 4)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', $label,
+					_s('value must be between "%1$s" and "%2$s", and have no more than "%3$s" digits after the decimal point',
+						'0', '100', '4'
+					)
+				));
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validates that a number is within a given range and has the correct decimal precision.
+	 *
+	 * @param mixed $string  Value to check.
+	 * @param int   $min     Minimum allowed value.
+	 * @param int   $max     Maximum allowed value.
+	 * @param int   $scale   Number of decimal places.
+	 *
+	 * @return bool
+	 */
+	private static function validateNumberRangeWithPrecision($value, $min, $max, $scale): bool {
+		return !(!is_numeric($value) || $value < $min || $value > $max || round($value, $scale) != $value);
+	}
+}

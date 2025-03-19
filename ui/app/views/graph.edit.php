@@ -103,8 +103,10 @@ $graph_form
 		(new CScriptTag('
 			graph_edit_popup.init('.json_encode([
 				'form_name' => $graph_form->getName(),
+				'action' => 'graph.edit',
 				'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
 				'graphs' => [
+					'graphid' => $data['graphid'],
 					'graphtype' => $data['graphtype'],
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
