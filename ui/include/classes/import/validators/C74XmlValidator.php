@@ -3250,6 +3250,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 								['if' => ['tag' => 'indicator_type', 'in' => [CXmlConstantValue::INDICATOR_TYPE_ITEM_VALUE => CXmlConstantName::INDICATOR_TYPE_ITEM_VALUE]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'highlight', 'rules' => [
 									'highlight' =>	['type' => XML_ARRAY, 'rules' => [
 										'pattern' =>	['type' => XML_STRING | XML_REQUIRED],
+										'sortorder' =>	['type' => XML_STRING | XML_REQUIRED],
 										'drawtype' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->MAP_LINK_DRAWTYPE],
 										'color' =>		['type' => XML_STRING, 'default' => '000000']
 									]]
