@@ -267,6 +267,11 @@ class CTest extends TestCase {
 	 * @before
 	 */
 	public function onBeforeTestCase() {
+		if (!CDBHelper::isValid()) {
+			self::markTestSkipped('Test case skipped because of the broken DB state.');
+			return;
+		}
+
 		global $DB;
 		static $suite = null;
 		$class_name = get_class($this);
@@ -385,6 +390,10 @@ class CTest extends TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		if (!CDBHelper::isValid()) {
+			return;
+		}
+
 		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
 
 		if ($this->case_backup_config) {

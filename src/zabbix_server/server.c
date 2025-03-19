@@ -1753,7 +1753,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.events_cbs = &events_cbs,
 			.config_histsyncer_frequency = config_histsyncer_frequency,
 			.config_timeout = zbx_config_timeout,
-			.config_history_storage_pipelines = config_history_storage_pipelines
+			.config_history_storage_pipelines = config_history_storage_pipelines,
+			.config_syncer_num = get_config_forks(ZBX_PROCESS_TYPE_HISTSYNCER)
 		};
 
 	zbx_thread_vmware_args			vmware_args =

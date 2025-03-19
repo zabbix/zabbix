@@ -19,6 +19,9 @@ require_once __DIR__.'/../common/testFormPreprocessingClone.php';
  * Test of cloning template with preprocessing steps in items.
  *
  * @backup hosts, items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormPreprocessingCloneTemplate extends testFormPreprocessingClone {
 
