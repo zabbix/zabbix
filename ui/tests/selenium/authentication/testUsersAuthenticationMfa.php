@@ -206,7 +206,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 				[
 					'fields' => [
 						'Name' => '  TOTP whitespace  '
-					]
+					],
+					'trim' => true
 				]
 			],
 			'Duo standard case' => [
@@ -224,10 +225,11 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 						'Name' => '  Duo whitespace  ',
 						'API hostname' => '  some.api.hostname  ',
 						'Client ID' => '  test  '
-					]
+					],
+					'trim' => true
 				]
 			],
-			'All fields max length.' => [
+			'All fields max length' => [
 				[
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
@@ -238,7 +240,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			'TOTP name already used.' => [
+			'TOTP name already used' => [
 				[
 					'expected_authentication_form' => TEST_BAD,
 					'error' => 'MFA method "Pre-existing TOTP" already exists.',
@@ -253,7 +255,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'error' => 'MFA method "Pre-existing TOTP" already exists.',
 					'fields' => [
 						'Name' => '  Pre-existing TOTP  '
-					]
+					],
+					'trim' => true
 				]
 			],
 			'Duo name already used' => [
@@ -358,34 +361,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 	}
 
-	/**
-	 * Deletes all MFA methods with API.
-	 */
-	public function prepareSaveEmpty() {
-		// Disable MFA before deleting all methods.
-		CDataHelper::call('authentication.update', ["mfa_status" => MFA_DISABLED]);
-
-		// Get all MFA methods for deletion.
-		$methods = CDataHelper::call('mfa.get', []);
-
-		// Delete all MFA methods.
-		$mfaids = array_column($methods, 'mfaid');
-		CDataHelper::call('mfa.delete', $mfaids);
-	}
-
-	/**
-	 * Try to save the MFA configuration when MFA is enabled, but no methods are defined.
-	 *
-	 * @backup mfa
-	 *
-	 * @onBefore prepareSaveEmpty
-	 */
-	public function testUsersAuthenticationMfa_SaveEmpty() {
-		$mfa_form = $this->openMfaForm();
-		$mfa_form->query('button:Update')->one()->click();
-		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Default MFA method must be specified.');
-	}
-
 	public function getUpdateData() {
 		$update_data = [
 			'TOTP name whitespace' => [
@@ -393,6 +368,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'fields' => [
 						'Name' => '  TOTP update with whitespace  '
 					],
+					'trim' => true,
 					'skip_name_append' => true
 				]
 			],
@@ -404,6 +380,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 						'API hostname' => '  some.api.hostname  ',
 						'Client ID' => '  test  '
 					],
+					'trim' => true,
 					'skip_name_append' => true
 				]
 			],
@@ -471,7 +448,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$sql_total = 'SELECT NULL FROM mfa';
 		$method_count_before = CDBHelper::getCount($sql_total);
 
-		$sql_specific = "SELECT NULL FROM mfa WHERE name IN ('TOTP for deletion', 'Duo for deletion')";
+		$sql_specific = 'SELECT NULL FROM mfa WHERE name IN (\'TOTP for deletion\', \'Duo for deletion\')';
 		$this->assertEquals(2, CDBHelper::getCount($sql_specific));
 
 		$mfa_form = $this->openMfaForm();
@@ -572,7 +549,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$dialog_form->fill($fields);
 
 		// Two different paths depending on if cancelling inside the MFA method form or Authentication form.
-		if (CTestArrayHelper::get($data, 'save_mfa_method', false)) {
+		if (CTestArrayHelper::get($data, 'save_mfa_method')) {
 			// Create/Update the MFA method without cancelling, but reload the Authentication page without saving.
 			$dialog_form->submit();
 
@@ -658,6 +635,32 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
+	 * Deletes all MFA methods with API.
+	 */
+	public function prepareSaveEmpty() {
+		// Disable MFA before deleting all methods.
+		CDataHelper::call('authentication.update', ['mfa_status' => MFA_DISABLED]);
+
+		// Get all MFA methods for deletion.
+		$methods = CDataHelper::call('mfa.get', []);
+
+		// Delete all MFA methods.
+		$mfaids = array_column($methods, 'mfaid');
+		CDataHelper::call('mfa.delete', $mfaids);
+	}
+
+	/**
+	 * Try to save the MFA configuration when MFA is enabled, but no methods are defined.
+	 *
+	 * @onBefore prepareSaveEmpty
+	 */
+	public function testUsersAuthenticationMfa_SaveEmpty() {
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Default MFA method must be specified.');
+	}
+
+	/**
 	 * Performs the testing of create and update scenarios.
 	 *
 	 * @param array $data    Data from data provider.
@@ -682,9 +685,11 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		// Client secret update is a special case.
 		if ($update && array_key_exists('Client secret', $fields)) {
 			$secret = $fields['Client secret'];
+
 			unset($fields['Client secret']);
 		}
 		$dialog_form->fill($fields);
+
 		if (isset($secret)) {
 			$dialog_form->query('button:Change client secret')->one()->click();
 			$dialog_form->fill(['Client secret' => $secret]);
@@ -705,6 +710,23 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		else {
 			// Open the Method edit form to verify data is still there.
 			$dialog->ensureNotPresent();
+
+			// Transform the field data to what is expected in UI.
+			$fields['Type'] = CTestArrayHelper::get($fields, 'Type', 'TOTP');
+			if ($fields['Type'] === 'TOTP') {
+				$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', self::TOTP_HASH);
+				$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', self::TOTP_LENGTH);
+			}
+
+			// Trim text fields, it is expected that any leading and trailing spaces are not saved.
+			if (CTestArrayHelper::get($data, 'trim')) {
+				foreach (['Name', 'API hostname', 'Client ID'] as $field) {
+					if (array_key_exists($field, $fields)) {
+						$fields[$field] = trim($fields[$field]);
+					}
+				}
+			}
+
 			$this->checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields);
 
 			// Save changes to the Authentication configuration.
@@ -812,25 +834,11 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Checks that data is displayed as expected in the MFA methods table and inside the Method edit form.
 	 *
-	 * @param CFormElement          $mfa_form  The form element that contains the method table.
-	 * @param COverlayDialogElement $dialog    The dialog that contains the edit form.
-	 * @param array                 $fields    Expected fields data for the record.
+	 * @param CFormElement          $mfa_form	The form element that contains the method table.
+	 * @param COverlayDialogElement $dialog		The dialog that contains the edit form.
+	 * @param array                 $fields		Expected fields data for the record.
 	 */
 	protected function checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields) {
-		// Transform the field data to what is expected in UI.
-		$fields['Type'] = CTestArrayHelper::get($fields, 'Type', 'TOTP');
-		if ($fields['Type'] === 'TOTP') {
-			$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', self::TOTP_HASH);
-			$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', self::TOTP_LENGTH);
-		}
-
-		// Trim text fields, it is expected that any leading and trailing spaces are not saved.
-		foreach (['Name', 'API hostname', 'Client ID'] as $field) {
-			if (array_key_exists($field, $fields)) {
-				$fields[$field] = trim($fields[$field]);
-			}
-		}
-
 		// Check data in the Method table.
 		$table = $this->selectMethodTable($mfa_form);
 		$row = $table->findRow('Name', $fields['Name']);
@@ -871,7 +879,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	protected function setDefaultFieldsData($fields, $update, $skip_name_append) {
 		// When creating a Duo method, avoid having to input the field values each time.
-		if (!$update && CTestArrayHelper::get($fields, 'Type', '') === 'Duo Universal Prompt') {
+		if (!$update && CTestArrayHelper::get($fields, 'Type') === 'Duo Universal Prompt') {
 			$fields['API hostname'] = CTestArrayHelper::get($fields, 'API hostname', self::DUO_API_HOSTNAME);
 			$fields['Client ID'] = CTestArrayHelper::get($fields, 'Client ID', self::DUO_CLIENT_ID);
 			$fields['Client secret'] = CTestArrayHelper::get($fields, 'Client secret', self::DUO_CLIENT_SECRET);
@@ -922,7 +930,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	protected function getMfaNamesFromTable($table) {
 		$method_list = [];
-		foreach($table->getRows() as $row) {
+		foreach ($table->getRows() as $row) {
 			$method_list[] = $row->getColumn('Name')->getText();
 		}
 
