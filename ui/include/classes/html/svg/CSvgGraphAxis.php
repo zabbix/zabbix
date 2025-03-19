@@ -26,15 +26,6 @@ class CSvgGraphAxis extends CSvgGroup {
 	private const ZBX_STYLE_GRAPH_AXIS_BOTTOM = 'svg-graph-axis-bottom';
 
 	/**
-	 * Axis triangle icon size.
-	 *
-	 * @var int
-	 */
-	private const ZBX_ARROW_SIZE = 5;
-
-	private const ZBX_ARROW_OFFSET = 5;
-
-	/**
 	 * Array of labels. Key is coordinate, value is text label.
 	 *
 	 * @var array
@@ -134,14 +125,14 @@ class CSvgGraphAxis extends CSvgGroup {
 		}
 
 		$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
-		$y = $this->y - self::ZBX_ARROW_OFFSET;
+		$y = $this->y;
 
 		return [
 			// Draw axis line.
 			(new CSvgPath())
 				->setAttribute('shape-rendering', 'crispEdges')
 				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET)
+				->lineTo($x, $this->height + $y)
 				->closePath()
 		];
 	}
