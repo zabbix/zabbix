@@ -125,6 +125,7 @@ class CRouter {
 		'graph.prototype.edit'						=> ['CControllerGraphPrototypeEdit',					'layout.json',			'graph.prototype.edit'],
 		'graph.prototype.list'						=> ['CControllerGraphPrototypeList',					'layout.htmlpage',		'graph.prototype.list'],
 		'graph.prototype.update'					=> ['CControllerGraphPrototypeUpdate',					'layout.json',			null],
+		'graph.prototype.updatediscover'			=> ['CControllerGraphPrototypeUpdateDiscover',			'layout.json',			null],
 		'hintbox.actionlist'						=> ['CControllerHintboxActionlist',						'layout.json',			'hintbox.actionlist'],
 		'hintbox.eventlist'							=> ['CControllerHintboxEventlist',						'layout.json',			'hintbox.eventlist'],
 		'host.create'								=> ['CControllerHostCreate',							'layout.json',			null],

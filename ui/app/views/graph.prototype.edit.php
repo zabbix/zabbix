@@ -50,7 +50,6 @@ if ($data['graphid'] != 0) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'enabled' => !$readonly,
 			'action' => 'graph_edit_popup.submit();'
 		],
 		[

@@ -54,7 +54,10 @@ window.graph_edit_popup = new class {
 
 		this.#initActions();
 		this.#initPreviewTab();
+		this.#initPopupListeners();
+
 		this.overlay.recoverFocus();
+		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#recalculateSortOrder() {
@@ -88,12 +91,14 @@ window.graph_edit_popup = new class {
 			});
 		}
 
-		$('#items-table tbody tr.graph-item').each(function() {
-			// Set remove number.
-			$('#items_' + i + '_remove').data('remove', i);
+		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
+			const remove_element = document.getElementById('items_' + index + '_remove');
 
-			i++;
+			if (remove_element) {
+				remove_element.setAttribute('data-remove', index);
+			}
 		});
+
 	}
 
 	#initActions() {
@@ -155,10 +160,16 @@ window.graph_edit_popup = new class {
 				this.#openItemSelectPopup();
 			}
 			else if (e.target.classList.contains('js-add-item-prototype')) {
-				this.#openItemPrototypeSelectPopup();
+				this.#openItemPrototypeSelectPopup({writeonly: '1', multiselect: '1', graphtype: this.graph_type});
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeItem(e.target);
+			}
+		});
+
+		this.form.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-item-prototype-select')) {
+				this.#openItemPrototypeSelectPopup(e.target.dataset);
 			}
 		});
 
@@ -221,12 +232,14 @@ window.graph_edit_popup = new class {
 	#removeItem(target) {
 		const number = target.dataset.remove;
 		this.form.querySelector(`#items_${number}`).remove();
+
+		this.#recalculateSortOrder();
 	}
 
 	#updateItemsTable(graph_type) {
 		const tbody = this.form.querySelector('#items-table tbody');
 		const item_row_template = new Template($('#tmpl-item-row-' + graph_type).html());
-		const rows = Array.from(tbody.querySelectorAll('tr.graph-item'));
+		const rows = [...tbody.querySelectorAll('tr.graph-item')];
 
 		rows.forEach((row, index) => {
 			let row_data = {};
@@ -300,18 +313,17 @@ window.graph_edit_popup = new class {
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
 
-	#openItemPrototypeSelectPopup() {
+	#openItemPrototypeSelectPopup(popup_parameters = {}) {
 		const parameters = {
 			srctbl: 'item_prototypes',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
 			dstfrm: this.form_name,
 			numeric: '1',
-			writeonly: '1',
-			multiselect: '1',
-			graphtype: this.graph_type,
 			parent_discoveryid: this.graph.parent_discoveryid
 		}
+
+		Object.assign(parameters, popup_parameters);
 
 		if (this.graph.normal_only == 1) {
 			parameters['normal_only'] = this.graph.normal_only;
@@ -323,9 +335,11 @@ window.graph_edit_popup = new class {
 	#toggleYAxisFields(target, yaxis) {
 		const text_field = this.form.querySelector(`#yaxis_${yaxis}_value`);
 		const ms_field = this.form.querySelector(`#yaxis_${yaxis}_ms`);
+		const ms_prototype_button = this.form.querySelector(`#yaxis_${yaxis}_prototype_ms`);
 
 		const display_text_field = target.value == <?= GRAPH_YAXIS_TYPE_FIXED ?>;
 		const display_ms_field = target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>;
+		const display_ms_prototype = display_ms_field && this.graph.parent_discoveryid;
 
 		text_field.style.display = display_text_field ? '' : 'none';
 		text_field.querySelectorAll('input').forEach(input => {
@@ -336,6 +350,8 @@ window.graph_edit_popup = new class {
 		ms_field.querySelectorAll('input').forEach(input => {
 			input.disabled = !display_ms_field;
 		});
+
+		ms_prototype_button.style.display = display_ms_prototype ? '' : 'none';
 
 		this.form.querySelector(`label[for="y${yaxis}_type_label"]`)
 			.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>
@@ -517,10 +533,9 @@ window.graph_edit_popup = new class {
 	}
 
 	addPopupValues(list) {
-		// todo - update method
-		// if (!isset('object', list) || list.object != 'itemid') {
-		//	return false;
-		// }
+		if (!Array.isArray(list) || !list.every(item => item && typeof item === 'object' && 'itemid' in item)) {
+			return false;
+		}
 
 		const item_row_template = new Template($('#tmpl-item-row-' + this.graph_type).html());
 
@@ -533,7 +548,7 @@ window.graph_edit_popup = new class {
 				}
 			}
 
-			const number = $('#items-table tbody tr.graph-item').length;
+			const number = document.querySelectorAll('#items-table tbody tr.graph-item').length;
 
 			const item = {
 				number: number,
@@ -641,5 +656,46 @@ window.graph_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	#initPopupListeners() {
+		const subscriptions = [];
+
+		for (const action of ['graph.edit', 'graph.prototype.edit']) {
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({data, event}) => {
+						if (data.action_parameters.graphid === this.graph.graphid || this.graph.graphid == 0) {
+							return;
+						}
+
+						if (!this.#isConfirmed()) {
+							event.preventDefault();
+						}
+					}
+				})
+			);
+		}
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
+	}
+
+	#isConfirmed() {
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 }

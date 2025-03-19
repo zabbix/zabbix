@@ -77,7 +77,7 @@ class CControllerGraphPrototypeList extends CController {
 			'templated' => $context === 'template',
 			'discoveryids' => $this->discovery_rule['itemid'],
 			'editable' => true,
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+			'limit' => $limit
 		]);
 
 		$data = [
@@ -138,7 +138,7 @@ class CControllerGraphPrototypeList extends CController {
 			'page' => $page_num,
 			'paging' => $paging,
 			'parent_templates' => getGraphParentTemplates($data['graphs'], ZBX_FLAG_DISCOVERY_PROTOTYPE),
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
 		$response = new CControllerResponseData($data);

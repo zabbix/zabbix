@@ -30,7 +30,6 @@ class CControllerGraphPrototypeEdit extends CController {
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
-	// todo - add all necessarry code from graphs.php
 
 	protected function checkInput(): bool {
 		$fields = [

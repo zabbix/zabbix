@@ -118,7 +118,8 @@ class CControllerGraphPrototypeUpdate extends CController {
 				'show_3d' => $this->getInput('show_3d', 0),
 				'percent_left' => $this->getInput('percent_left', 0),
 				'percent_right' => $this->getInput('percent_right', 0),
-				'gitems' => $gitems
+				'gitems' => $gitems,
+				'discover' => $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER
 			];
 
 			if ($graph_prototype['graphtype'] == GRAPH_TYPE_NORMAL
@@ -150,7 +151,7 @@ class CControllerGraphPrototypeUpdate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _('Graph updated');
+			$output['success']['title'] = _('Graph prototype updated');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -158,7 +159,7 @@ class CControllerGraphPrototypeUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot update graph'),
+				'title' => _('Cannot update graph prototype'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

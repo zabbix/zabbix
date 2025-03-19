@@ -97,8 +97,6 @@ foreach ($data['graphs'] as $graph) {
 		}
 	}
 
-	$csrf_token = CCsrfTokenHelper::get('graphs');
-
 	$name = [
 		makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			$data['allowed_ui_conf_templates']
@@ -114,22 +112,10 @@ foreach ($data['graphs'] as $graph) {
 
 	$nodiscover = ($graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
-		(new CUrl('graphs.php'))
-			->setArgument('action', 'graph.updatediscover')
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('graphid', $graphid)
-			->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-			->setArgument('context', $data['context'])
-			->setArgument('backurl',
-				(new CUrl('graphs.php'))
-					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			)
-			->getUrl()
-	))
-		->addCsrfToken($csrf_token)
+	$discover = (new CLink($nodiscover ? _('No') : _('Yes')))
+		->setAttribute('data-graphid', $graphid)
+		->setAttribute('data-discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+		->addClass('js-update-discover')
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -168,7 +154,7 @@ $html_page
 		'context' => $data['context'],
 		'parent_discoveryid' => $data['parent_discoveryid'],
 		'form_name' => $graphs_form->getName(),
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('graph')],
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('graph')]
 	]).');
 '))
 	->setOnDocumentReady()

@@ -231,7 +231,7 @@ $html_page
 		'checkbox_object' => 'group_graphid',
 		'context' => $data['context'],
 		'form_name' => $graphs_form->getName(),
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('graph')],
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('graph')]
 	]).');
 '))
 	->setOnDocumentReady()

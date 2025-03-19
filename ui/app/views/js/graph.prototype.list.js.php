@@ -45,6 +45,12 @@
 				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 			});
 
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-update-discover')) {
+					this.#updateDiscover(e.target, [e.target.dataset.graphid]);
+				}
+			});
+
 			const copy = document.querySelector('.js-copy');
 
 			if (copy !== null) {
@@ -69,6 +75,13 @@
 					});
 				});
 			}
+		}
+
+		#updateDiscover(target, graphid) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'graph.prototype.updatediscover');
+
+			this.#post(target, graphid, curl);
 		}
 
 		#delete(target, graphids) {
@@ -108,10 +121,18 @@
 		#post(target, graphids, url) {
 			target.classList.add('is-loading');
 
+			let fields = {
+				graphids: graphids
+			};
+
+			if (target.dataset.discover !== null) {
+				fields.discover = target.dataset.discover;
+			}
+
 			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({...{graphids: graphids}, ...this.token})
+				body: JSON.stringify({...this.token, ...fields})
 			})
 				.then((response) => response.json())
 				.then((response) => {

@@ -222,9 +222,21 @@ $yaxis_min_itemid = (new CDiv(
 	->setId('yaxis_min_ms')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
+$yaxis_min_item_prototpye = (new CDiv(
+	(new CButton('yaxis_main_prototype', _('Select prototype')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->addClass('js-item-prototype-select')
+		->setAttribute('data-dstfld1', 'ymin_itemid')
+		->setEnabled(!$readonly)
+))
+	->setId('yaxis_min_prototype_ms')
+	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+
 $graph_tab->addItem([
 	(new CLabel(_('Y axis MIN value'),'ymin_type_label')),
-	(new CFormField([$yaxis_min_type, $yaxis_min_value, $yaxis_min_itemid]))->setId('yaxis_min_field')
+	(new CFormField([
+		$yaxis_min_type, $yaxis_min_value, $yaxis_min_itemid, $yaxis_min_item_prototpye
+	]))->setId('yaxis_min_field')
 ]);
 
 $yaxis_max_type = (new CSelect('ymax_type'))
@@ -290,10 +302,22 @@ $yaxis_max_itemid = (new CDiv(
 	->setId('yaxis_max_ms')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
+$yaxis_max_item_prototpye = (new CDiv(
+	(new CButton('yaxis_max_prototype', _('Select prototype')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->addClass('js-item-prototype-select')
+		->setAttribute('data-dstfld1', 'ymax_itemid')
+		->setEnabled(!$readonly)
+))
+	->setId('yaxis_max_prototype_ms')
+	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+
 $graph_tab
 	->addItem([
 		(new CLabel(_('Y axis MAX value'), 'ymax_type_label')),
-		(new CFormField([$yaxis_max_type, $yaxis_max_value, $yaxis_max_itemid]))->setId('yaxis_max_field')
+		(new CFormField([
+			$yaxis_max_type, $yaxis_max_value, $yaxis_max_itemid, $yaxis_max_item_prototpye
+		]))->setId('yaxis_max_field')
 	])
 	->addItem([
 		new CLabel(_('3D view')),
