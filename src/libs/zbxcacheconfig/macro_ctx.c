@@ -102,7 +102,7 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%u", item->interface.port);
+				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
@@ -119,9 +119,8 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 
 	if (NULL != replace_to)
 	{
-		char	*esc;
+		char	*esc = zbx_dyn_escape_string(*replace_to, "\\");
 
-		esc = zbx_dyn_escape_string(*replace_to, "\\");
 		zbx_free(*replace_to);
 		*replace_to = esc;
 	}
@@ -185,7 +184,7 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%u", item->interface.port);
+				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
