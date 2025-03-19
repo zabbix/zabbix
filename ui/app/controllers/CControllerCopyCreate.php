@@ -178,7 +178,7 @@ class CControllerCopyCreate extends CController {
 				break;
 		}
 
-		DBend($success);
+		$success = DBend($success);
 
 		$output = $success
 			? ['success' => ['title' => $title]]

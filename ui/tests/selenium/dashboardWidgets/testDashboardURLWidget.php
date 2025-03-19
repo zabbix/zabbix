@@ -823,7 +823,7 @@ class testDashboardURLWidget extends CWebTest {
 	 * @param string $expected		expected result after widget form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		foreach ($data as $scheme) {
 			$dashboard->getWidget(self::$default_widget)->edit();
 			COverlayDialogElement::find()->one()->waitUntilReady();

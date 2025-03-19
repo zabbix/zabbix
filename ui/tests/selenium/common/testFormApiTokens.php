@@ -346,7 +346,7 @@ class testFormApiTokens extends CWebTest {
 		}
 
 		// Check that token string will be copied to clipboard.
-		$clipboard_element = $auth_token->query('button:Copy to clipboard')->one();
+		$clipboard_element = $auth_token->query('id:copy_button')->one();
 		$this->assertEquals($token_text, $clipboard_element->getAttribute('data-auth_token'));
 	}
 }
