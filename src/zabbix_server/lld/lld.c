@@ -1093,8 +1093,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 			break;											\
 														\
 		lt_res = zbx_strdup(NULL, lt_str);								\
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,	\
-				NULL, NULL, &lt_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);				\
+		zbx_dc_expand_user_and_func_macros(um_handle, &lt_res, &hostid, 1, NULL);			\
 														\
 		if (SUCCEED != zbx_is_time_suffix(lt_res, &lt.duration, ZBX_LENGTH_UNLIMITED))			\
 		{												\

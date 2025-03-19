@@ -35,6 +35,7 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxautoreg.h"
+#include "zbxparam.h"
 
 /*************************************************************************************
  *                                                                                   *
@@ -330,8 +331,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &dc_items[i].delay, &dc_items[i].host.hostid, 1,
+					NULL);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
@@ -583,14 +584,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 	{
 		zbx_dc_item_t		*dc_items;
 		int			*errcodes, delay;
-		zbx_dc_um_handle_t	*um_handle;
+		zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
 		char			*timeout = NULL;
 
 		dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
 		zbx_dc_config_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
 
-		um_handle = zbx_dc_open_user_macros();
+		um_handle_masked = zbx_dc_open_user_macros_masked();
+		um_handle_secure = zbx_dc_open_user_macros_secure();
 
 		for (int i = 0; i < num; i++)
 		{
@@ -608,8 +610,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle_masked, &dc_items[i].delay,
+					&dc_items[i].host.hostid, 1, NULL);
 
 			if (ZBX_COMPONENT_VERSION(4, 4, 0) > version &&
 					SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
@@ -618,8 +620,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 			}
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
-			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i],
-					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0);
+			zbx_substitute_item_key_params(&dc_items[i].key, NULL, 0, zbx_item_key_subst_cb,
+					um_handle_secure, &dc_items[i]);
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
@@ -652,9 +654,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 
 			timeout = zbx_strdup(NULL, dc_items[i].timeout_orig);
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
+			zbx_dc_expand_user_and_func_macros(um_handle_masked, &timeout, &dc_items[i].host.hostid, 1,
+					NULL);
 
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_TIMEOUT, timeout, ZBX_JSON_TYPE_STRING);
 
@@ -671,7 +672,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		zbx_free(errcodes);
 		zbx_free(dc_items);
 
-		zbx_dc_close_user_macros(um_handle);
+		zbx_dc_close_user_macros(um_handle_masked);
+		zbx_dc_close_user_macros(um_handle_secure);
 	}
 
 	zbx_json_close(&json);

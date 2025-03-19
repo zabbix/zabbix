@@ -843,6 +843,7 @@ zbx_expr_db_item_value_property_t;
 
 int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
 		const char *tz);
+int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to);
 
 int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to);
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
@@ -1585,5 +1586,8 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		char *error, size_t maxerrlen);
 int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);
+
+int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
+int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
 #endif

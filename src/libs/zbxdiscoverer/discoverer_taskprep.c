@@ -21,6 +21,7 @@
 #include "zbxip.h"
 #include "zbxexpression.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxparam.h"
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
@@ -53,12 +54,16 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 	zbx_ds_dcheck_t	*ds_dcheck, ds_dcheck_cmp = {.dcheck.dcheckid = dcheck->dcheckid};
 	zbx_dc_dcheck_t	*dcheck_ptr;
 	int		idx;
+	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	if (FAIL != (idx = zbx_vector_ds_dcheck_ptr_search(ds_dchecks_common, &ds_dcheck_cmp,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		return ds_dchecks_common->values[idx];
 	}
+
+	um_handle = zbx_dc_open_user_macros();
+	um_handle_secure = zbx_dc_open_user_macros_secure();
 
 	ds_dcheck = (zbx_ds_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_ds_dcheck_t));
 	dcheck_ptr = &ds_dcheck->dcheck;
@@ -70,34 +75,26 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 	if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
 			SVC_SNMPv3 == dcheck_ptr->type)
 	{
-		zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
-				ZBX_MACRO_TYPE_COMMON, NULL, 0);
-		zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
-				ZBX_MACRO_TYPE_SNMP_OID, NULL, 0);
+		zbx_dc_expand_user_and_func_macros(um_handle_secure, &dcheck_ptr->snmp_community, NULL, 0, NULL);
+		zbx_substitute_snmp_oid_params(&dcheck_ptr->key_, NULL, 0, zbx_snmp_oid_subst_cb, um_handle, NULL);
 
 		if (SVC_SNMPv3 == dcheck_ptr->type)
 		{
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, NULL,
-					&dcheck_ptr->snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL,
-					0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, NULL,
-					&dcheck_ptr->snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
-					0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, NULL,
-					&dcheck_ptr->snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
-					0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, NULL,
-					&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
-					0);
+			zbx_dc_expand_user_and_func_macros(um_handle_secure, &dcheck_ptr->snmpv3_securityname, NULL,
+					0, NULL);
+			zbx_dc_expand_user_and_func_macros(um_handle_secure, &dcheck_ptr->snmpv3_authpassphrase, NULL,
+					0, NULL);
+			zbx_dc_expand_user_and_func_macros(um_handle_secure, &dcheck_ptr->snmpv3_privpassphrase, NULL,
+					0, NULL);
+			zbx_dc_expand_user_and_func_macros(um_handle_secure, &dcheck_ptr->snmpv3_contextname, NULL,
+					0, NULL);
 		}
 	}
 
 	zbx_vector_ds_dcheck_ptr_append(ds_dchecks_common, ds_dcheck);
+
+	zbx_dc_close_user_macros(um_handle_secure);
+	zbx_dc_close_user_macros(um_handle);
 
 	return ds_dcheck;
 }

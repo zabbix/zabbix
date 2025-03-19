@@ -414,8 +414,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			int	history;
 
 			tmp = zbx_strdup(tmp, row[2]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 			{
@@ -450,8 +449,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				rule_add = rule;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 			{
