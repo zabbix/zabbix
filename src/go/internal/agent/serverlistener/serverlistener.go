@@ -15,7 +15,6 @@
 package serverlistener
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -86,13 +85,6 @@ func (sl *ServerListener) run() {
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
-
-		// 1. open connection
-		// 2. read task from connection
-		// 3. parse taks
-		// 4. give task to scheduler
-		// 5. send result to connection
-
 		conn, err := sl.listener.Accept(
 			time.Second*time.Duration(sl.options.Timeout),
 			zbxcomms.TimeoutModeShift,
@@ -105,53 +97,17 @@ func (sl *ServerListener) run() {
 			continue
 		}
 
-		go func() {
-
-			// Check if IP is whitelisted
-			remoteIP := conn.RemoteIP()
-			parsedIP := net.ParseIP(remoteIP)
-			if !sl.allowedPeers.CheckPeer(parsedIP) {
-				_ = conn.Close()
-
-				log.Warningf(
-					"failed to accept an incoming connection: connection from %q rejected, allowed hosts: %q",
-					remoteIP,
-					sl.options.Server,
-				)
-
-				return
-			}
-
-			// Receive passive check request
-			rawRequest, err := conn.Read()
-			if err != nil {
-				_ = conn.Close()
-
-				log.Warningf(
-					"failed to process an incoming connection from %s: %s",
-					remoteIP,
-					err.Error(),
-				)
-			}
-
-			log.Debugf(
-				"received passive check request: '%s' from '%s'",
-				string(rawRequest),
-				remoteIP,
-			)
-
-			if json.Valid(rawRequest) {
-				key = []byte(rawRequest)
-			}
-
-			key, timeout, err := parsePassiveCheckJSONRequest(rawRequest)
-			// handleCheck(sl.scheduler, conn, data)
-		}()
+		go handleConnection(sl.scheduler, conn, sl.allowedPeers, sl.options)
 	}
 
 	log.Debugf("listener has been stopped")
 	monitor.Unregister(monitor.Input)
+}
 
+func isAllowedConnection(remoteIP string, allowedPeers *zbxnet.AllowedPeers) bool {
+	parsedIP := net.ParseIP(remoteIP)
+
+	return allowedPeers.CheckPeer(parsedIP)
 }
 
 func New(listenerID int, s scheduler.Scheduler, bindIP string, options *agent.AgentOptions) (sl *ServerListener) {
