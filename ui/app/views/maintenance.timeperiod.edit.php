@@ -205,7 +205,7 @@ $form_grid = (new CFormGrid())
 		))->addClass('js-start-date')
 	])
 	->addItem([
-		(new CLabel(_('At (hour:minute)'), 'hour'))->addClass('js-hour-minute'),
+		(new CLabel(_('At (hour:minute)'), 'hour'))->addClass('js-hour-minute')->setAsteriskMark(),
 		(new CFormField([
 			(new CNumericBox('hour', $data['form']['hour'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
