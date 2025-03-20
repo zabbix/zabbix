@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testTriggerLinking extends CIntegrationTest {
 	const HOST_NAME = 'test_trigger_linking';
+	const HOST_NAME1 = 'test_trigger_conflict';
 
 	const TEMPLATE_NAME_PRE = 'strata_template_name';
 
@@ -454,7 +455,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
 			'filter' => [
-				'host' => self::HOST_NAME
+				'host' => self::HOST_NAME1
 			]
 			]);
 
@@ -474,7 +475,7 @@ class testTriggerLinking extends CIntegrationTest {
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent, agent2
-	 * @backup autoreg_host
+	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
 	public function testTriggerLinking_checkMe() {
 
@@ -586,7 +587,7 @@ class testTriggerLinking extends CIntegrationTest {
 	public function agentConfigurationProvider1() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname'		=>  self::HOST_NAME,
+				'Hostname'		=>  self::HOST_NAME1,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
 				'DebugLevel'    => 4,
@@ -609,17 +610,69 @@ class testTriggerLinking extends CIntegrationTest {
 		}
 	}
 
+	private function hostCreateAutoRegAndLink() {
+
+		$response = $this->call('action.create', [
+			'name' => 'create_host',
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => 0,
+			'operations' => [
+				[
+					'operationtype' => 2
+				]
+			]
+		]);
+
+		$ep = json_encode($response, JSON_PRETTY_PRINT);
+
+		$this->assertArrayHasKey('actionids', $response['result'], $ep);
+		$this->assertEquals(1, count($response['result']['actionids']), $ep);
+
+		$response = $this->call('template.create', [
+			'host' =>  self::$templateX_name,
+				'groups' => [
+					'groupid' => 1
+				]
+		]);
+
+		$ep = json_encode($response, JSON_PRETTY_PRINT);
+
+		$this->assertArrayHasKey('templateids', $response['result'], $ep);
+		$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
+
+		$response = $this->call('action.create', [
+			'name' => 'link_templates',
+			'eventsource' => 2,
+			'status' => 0,
+			'operations' => [
+				[
+					'operationtype' => 6,
+					'optemplate' =>
+					$templateX_name
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
+
+	}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Test trigger linking cases.
 	 *
 	 * @configurationDataProvider agentConfigurationProvider1
 	 * @required-components server, agent
+	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
 	public function testTriggerLinking_conflict() {
 
+		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
+		//$this->hostCreateAutoRegAndLink();
+		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
 		$this->metaDataItemUpdate();
+		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
 		$this->stopComponent(self::COMPONENT_AGENT);
