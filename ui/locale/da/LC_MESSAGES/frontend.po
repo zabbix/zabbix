@@ -1374,6 +1374,14 @@ msgstr "Bruges også som forklaringsbetegnelse for aggregerede datasæt."
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativt kan du installere det manuelt:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Mængden af fysisk gæstehukommelse, der er byttet ud til swap-pladsen, \"url\" - VMware-tjenestens URL, \"uuid\" - VMware virtuel maskine globalt unikt id"
@@ -1827,6 +1835,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Auto"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr ""
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "Auto-login"
@@ -1948,6 +1964,10 @@ msgstr "Baggrundsfarve"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Baggrundsbillede"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -3285,6 +3305,11 @@ msgstr "Kan ikke finde datapunktet \"%1$s\" på \"%2$s\" brugt som Y-aksens MIN-
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finde datapunktet \"%1$s\" på \"%2$s\" brugt som Y-aksens MIN-værdi for grafprototypen \"%3$s\" af opdagelsesreglen \"%4$s\" på \"%5$s\"."
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -5968,6 +5993,11 @@ msgstr "Database TLS-kryptering"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "Database TLS nøglefil"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr ""
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -11221,6 +11251,10 @@ msgstr "Forøg med"
 #: include/actions.inc.php:2008 include/html.inc.php:971
 msgid "Indefinitely"
 msgstr "Uendelig"
+
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr ""
 
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
@@ -16761,6 +16795,10 @@ msgstr "Prometheus til JSON"
 msgid "Properties"
 msgstr "Egenskaber"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "Protokol"
@@ -19104,6 +19142,12 @@ msgstr "Vis overskrift"
 msgid "Show hosts in maintenance"
 msgstr "Vis værter i vedligeholdelse"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "Vis etiketter"
@@ -19121,6 +19165,14 @@ msgstr ""
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Vis linjer"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19577,6 +19629,10 @@ msgstr "Status for proxyhukommelsesbuffer."
 msgctxt "history source selection method"
 msgid "Static"
 msgstr "Statisk"
+
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
@@ -24363,6 +24419,18 @@ msgstr "ascii() - Returnerer ASCII-koden for tegnet længst til venstre i værdi
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - Bøjningen af en værdi som en vinkel, udtrykt i radianer"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24418,6 +24486,10 @@ msgstr "baselinewma() - Beregner baseline ved at tage et gennemsnit af dataperio
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Kontrollerer, om en værdi hører til det givne område (1 - i området, 0 - ellers)"
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -24937,6 +25009,10 @@ msgstr "eksisterer"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - Eulers tal i en potens af en værdi"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - Eulers tal i en potens af en værdi minus 1"
@@ -25061,6 +25137,10 @@ msgstr "værts gruppe"
 msgid "host group with the same UUID already exists"
 msgstr "der findes allerede værtsgruppe med samme UUID"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -25078,6 +25158,10 @@ msgstr "værtsmønstre"
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "værtsprototype med samme UUID findes allerede"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25138,6 +25222,10 @@ msgstr "forkert antal elementer"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "forkert udtryk startende fra \"%1$s\""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
