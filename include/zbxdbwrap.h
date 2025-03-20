@@ -102,6 +102,7 @@ void	zbx_host_groups_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids, int
 void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 
 void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
+void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldrule_itemids, int audit_context_mode);
 
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags, int audit_context_mode);

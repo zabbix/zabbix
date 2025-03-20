@@ -574,3 +574,18 @@ void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset)
 	for (int i = 0; i < rowset->rows.values_num; i++)
 		rowset->rows.values[i]->flags = ZBX_SYNC_ROW_NONE;
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy rows from source rowset to destination rowset                *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination rowset                                 *
+ *             src - [IN] source rowset                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
+{
+	for (int i = 0; i < src->rows.values_num; i++)
+		sync_rowset_copy_row(dst, src->rows.values[i]);
+}

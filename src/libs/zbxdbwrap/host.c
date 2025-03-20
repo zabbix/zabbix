@@ -1415,6 +1415,8 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 
 	zbx_audit_item_delete(audit_context_mode, itemids);
 
+	zbx_delete_lld_rule_host_prototypes(itemids, ZBX_AUDIT_LLD_CONTEXT);
+
 	zbx_vector_uint64_create(&profileids);
 
 	DBdelete_graphs_by_itemids(itemids, audit_context_mode);
@@ -6896,4 +6898,46 @@ void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, siz
 
 	zbx_sha256_finish(&ctx, hash);
 	(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hash_str, hash_len);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: deletes host prototypes defined for specified LLD rules           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *             lldrule_itemids    - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldrule_itemids, int audit_context_mode)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	host_prototype_ids;
+	zbx_vector_str_t	host_prototype_names;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&host_prototype_ids);
+	zbx_vector_str_create(&host_prototype_names);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select h.hostid,h.name"
+			" from host_discovery hd,hosts h"
+			" where hd.hostid=h.hostid"
+				" and");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.parent_itemid", lldrule_itemids->values,
+			lldrule_itemids->values_num);
+	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
+		goto clean;
+	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+clean:
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&host_prototype_ids);
+	zbx_vector_str_clear_ext(&host_prototype_names, zbx_str_free);
+	zbx_vector_str_destroy(&host_prototype_names);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

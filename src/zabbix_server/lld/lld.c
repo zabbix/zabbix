@@ -1123,7 +1123,8 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 		goto out;
 	}
 
-	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now);
+	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now, ZBX_FLAG_DISCOVERY_NORMAL,
+			NULL);
 
 	if (SUCCEED != lld_update_rules(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
 	{

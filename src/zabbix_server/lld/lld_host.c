@@ -37,6 +37,11 @@
 #define ZBX_USERMACRO_MANUAL	0
 #define ZBX_USERMACRO_AUTOMATIC	1
 
+/* group prototype sync columns */
+#define LLD_GROUP_PROTOTYPE_COL_NAME	0
+#define LLD_GROUP_PROTOTYPE_COL_GROUPID	1
+#define LLD_GROUP_PROTOTYPE_COLS_NUM	2
+
 typedef struct
 {
 	zbx_uint64_t	hostmacroid;
@@ -149,7 +154,7 @@ typedef struct
 	{
 		zbx_lld_interface_snmp_t *snmp;
 	}
-	data;
+	lld_row;
 }
 zbx_lld_interface_t;
 
@@ -167,19 +172,19 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 
 	if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 	{
-		zbx_free(interface->data.snmp->community);
-		zbx_free(interface->data.snmp->securityname);
-		zbx_free(interface->data.snmp->authpassphrase);
-		zbx_free(interface->data.snmp->privpassphrase);
-		zbx_free(interface->data.snmp->contextname);
+		zbx_free(interface->lld_row.snmp->community);
+		zbx_free(interface->lld_row.snmp->securityname);
+		zbx_free(interface->lld_row.snmp->authpassphrase);
+		zbx_free(interface->lld_row.snmp->privpassphrase);
+		zbx_free(interface->lld_row.snmp->contextname);
 
-		zbx_free(interface->data.snmp->community_orig);
-		zbx_free(interface->data.snmp->securityname_orig);
-		zbx_free(interface->data.snmp->authpassphrase_orig);
-		zbx_free(interface->data.snmp->privpassphrase_orig);
-		zbx_free(interface->data.snmp->contextname_orig);
+		zbx_free(interface->lld_row.snmp->community_orig);
+		zbx_free(interface->lld_row.snmp->securityname_orig);
+		zbx_free(interface->lld_row.snmp->authpassphrase_orig);
+		zbx_free(interface->lld_row.snmp->privpassphrase_orig);
+		zbx_free(interface->lld_row.snmp->contextname_orig);
 
-		zbx_free(interface->data.snmp);
+		zbx_free(interface->lld_row.snmp);
 	}
 
 	zbx_free(interface);
@@ -288,7 +293,7 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK | ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_PROXY_GROUP | ZBX_FLAG_LLD_HOST_UPDATE_MONITORED_BY)
 	zbx_uint64_t			flags;
-	const zbx_lld_entry_t		*data;
+	const zbx_lld_row_t		*lld_row;
 	signed char			inventory_mode;
 	signed char			inventory_mode_orig;
 	unsigned char			status;
@@ -309,6 +314,7 @@ typedef struct
 	char				tls_accept_orig;
 	zbx_uint64_t			hgsetid_orig;
 	zbx_lld_hgset_t			*hgset;
+	zbx_sync_rowset_t		group_prototypes;		/* discovered group prototypes */
 
 #define ZBX_LLD_HOST_HGSET_ACTION_IDLE		0
 #define ZBX_LLD_HOST_HGSET_ACTION_ADD		1
@@ -332,6 +338,7 @@ static int	lld_host_compare_func(const void *d1, const void *d2)
 
 static void	lld_host_free(zbx_lld_host_t *host)
 {
+	zbx_sync_rowset_clear(&host->group_prototypes);
 	zbx_vector_uint64_destroy(&host->new_groupids);
 	zbx_vector_uint64_destroy(&host->old_groupids);
 	zbx_vector_uint64_destroy(&host->groupids);
@@ -603,7 +610,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 		host->tls_subject_orig = NULL;
 		host->tls_psk_identity_orig = NULL;
 		host->tls_psk_orig = NULL;
-		host->data = NULL;
+		host->lld_row = NULL;
 		host->inventory_mode = HOST_INVENTORY_DISABLED;
 		ZBX_STR2UCHAR(host->status, row[23]);
 		host->custom_interfaces_orig = 0;
@@ -720,6 +727,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 		zbx_vector_lld_hostmacro_ptr_create(&host->new_hostmacros);
 		zbx_vector_db_tag_ptr_create(&host->tags);
 		zbx_vector_lld_interface_ptr_create(&host->interfaces);
+		zbx_sync_rowset_init(&host->group_prototypes, LLD_GROUP_PROTOTYPE_COLS_NUM);
 
 		zbx_vector_lld_host_ptr_append(hosts, host);
 	}
@@ -762,11 +770,12 @@ static int	lld_host_name_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: validates LLD hosts                                               *
  *                                                                            *
- * Parameters: hosts - [IN] list of hosts; should be sorted by hostid         *
- *             error - [OUT]                                                  *
+ * Parameters: hosts  - [IN] list of hosts; should be sorted by hostid        *
+ *             dflags - [IN] discovery flags                                  *
+ *             error  - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
+static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -799,9 +808,12 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
-		/* host name is valid? */
-		if (SUCCEED == zbx_check_hostname(host->host, &ch_error))
+		/* check for valid host name unless it's a prototype */
+		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ||
+				SUCCEED == zbx_check_hostname(host->host, &ch_error))
+		{
 			continue;
+		}
 
 		zbx_strlcpy(name_trunc, host->host, sizeof(name_trunc));
 
@@ -1147,7 +1159,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 			zbx_vector_db_tag_ptr_create(&host->tags);
 			zbx_vector_lld_interface_ptr_create(&host->interfaces);
 			host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
-			host->data = NULL;
+			host->lld_row = NULL;
 			host->inventory_mode_orig = host->inventory_mode;
 			host->custom_interfaces_orig = host->custom_interfaces;
 			host->monitored_by_orig = 0;
@@ -1157,6 +1169,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 			host->ipmi_privilege_orig = 0;
 			host->hgsetid_orig = 0;
 			host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
+
+			zbx_sync_rowset_init(&host->group_prototypes, LLD_GROUP_PROTOTYPE_COLS_NUM);
 
 			zbx_vector_lld_host_ptr_append(hosts, host);
 		}
@@ -1213,7 +1227,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 		host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
-	host->data = lld_row->data;
+	host->lld_row = lld_row;
 
 	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 	{
@@ -1233,8 +1247,10 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 
 		for (int i = 0; i < new_tags.values_num; i++)
 		{
-			zbx_substitute_lld_macros(&new_tags.values[i]->tag, host->data, ZBX_MACRO_FUNC, NULL, 0);
-			zbx_substitute_lld_macros(&new_tags.values[i]->value, host->data, ZBX_MACRO_FUNC, NULL, 0);
+			zbx_substitute_lld_macros(&new_tags.values[i]->tag, host->lld_row->data, ZBX_MACRO_FUNC, NULL,
+					0);
+			zbx_substitute_lld_macros(&new_tags.values[i]->value, host->lld_row->data, ZBX_MACRO_FUNC, NULL,
+					0);
 		}
 
 		if (SUCCEED != zbx_merge_tags(&host->tags, &new_tags, "host", error))
@@ -3121,8 +3137,8 @@ static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros
 			hostmacro->description_orig = NULL;
 			hostmacro->automatic = (hostmacros->values[j])->automatic;
 			hostmacro->flags = 0x00;
-			zbx_substitute_lld_macros(&hostmacro->value, host->data, ZBX_MACRO_ANY, NULL, 0);
-			zbx_substitute_lld_macros(&hostmacro->description, host->data, ZBX_MACRO_ANY,
+			zbx_substitute_lld_macros(&hostmacro->value, host->lld_row->data, ZBX_MACRO_ANY, NULL, 0);
+			zbx_substitute_lld_macros(&hostmacro->description, host->lld_row->data, ZBX_MACRO_ANY,
 					NULL, 0);
 
 			zbx_vector_lld_hostmacro_ptr_append(&host->new_hostmacros, hostmacro);
@@ -3481,6 +3497,9 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
  *             del_hostgroupids - [IN] host groups which should be deleted    *
  *             del_hgsetids     - [IN] host groups sets which should be       *
  *                                     deleted                                *
+ *             dflags           - [IN] discovery flags                        *
+ *             rule_index       - [IN] mapping of lld rows to discovered      *
+ *                                     lld rules                              *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts, const char *host_proto,
@@ -3489,7 +3508,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer, const char *tls_subject,
 		const char *tls_psk_identity, const char *tls_psk, zbx_vector_lld_hgset_ptr_t *hgsets,
 		zbx_vector_lld_permission_t *permissions, const zbx_vector_uint64_t *del_hostgroupids,
-		const zbx_vector_uint64_t *del_hgsetids)
+		const zbx_vector_uint64_t *del_hgsetids, int dflags, zbx_hashset_t *rule_index)
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0,
@@ -3614,11 +3633,11 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 			{
 				if (0 == interface->interfaceid)
-					interface->data.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
+					interface->lld_row.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
 
-				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
+				if (0 != (interface->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
 					new_snmp++;
-				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
+				else if (0 != (interface->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
 					upd_snmp++;
 			}
 		}
@@ -3718,7 +3737,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				"custom_interfaces", "monitored_by", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host",
-				(char *)NULL);
+				"parent_itemid", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available",
 				(char *)NULL);
 	}
@@ -3821,18 +3840,31 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 		if (0 == host->hostid)
 		{
+			zbx_uint64_t	lldrule_itemid = 0;
+
 			host->hostid = hostid++;
 
 			zbx_db_insert_add_values(&db_insert, host->hostid, host->host, host->name, proxyid,
 					proxy_groupid, (int)ipmi_authtype, (int)ipmi_privilege, ipmi_username,
-					ipmi_password, (int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED,
+					ipmi_password, (int)host->status, (int)(ZBX_FLAG_DISCOVERY_CREATED | dflags),
 					(int)tls_connect, (int)tls_accept, tls_issuer, tls_subject, tls_psk_identity,
 					tls_psk, (int)host->custom_interfaces, (int)monitored_by);
 
 			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, host->hostid,
 					host->host);
 
-			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
+			/* In the case of prototype host discovery find the discovered LLD rule id */
+			if (NULL != rule_index)
+			{
+				zbx_lld_row_ruleid_t    row_ruleid_local, *row_ruleid;
+
+				row_ruleid_local.lld_row = host->lld_row;
+				if (NULL != (row_ruleid = zbx_hashset_search(rule_index, &row_ruleid_local)))
+					lldrule_itemid = row_ruleid->ruleid;
+			}
+
+			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto,
+					lldrule_itemid);
 			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
@@ -4163,36 +4195,36 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 			{
-				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
+				if (0 != (interface->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
 				{
 					zbx_db_insert_add_values(&db_insert_snmp, interface->interfaceid,
-							(int)interface->data.snmp->version,
-							(int)interface->data.snmp->bulk,
-							interface->data.snmp->community,
-							interface->data.snmp->securityname,
-							(int)interface->data.snmp->securitylevel,
-							interface->data.snmp->authpassphrase,
-							interface->data.snmp->privpassphrase,
-							(int)interface->data.snmp->authprotocol,
-							(int)interface->data.snmp->privprotocol,
-							interface->data.snmp->contextname);
+							(int)interface->lld_row.snmp->version,
+							(int)interface->lld_row.snmp->bulk,
+							interface->lld_row.snmp->community,
+							interface->lld_row.snmp->securityname,
+							(int)interface->lld_row.snmp->securitylevel,
+							interface->lld_row.snmp->authpassphrase,
+							interface->lld_row.snmp->privpassphrase,
+							(int)interface->lld_row.snmp->authprotocol,
+							(int)interface->lld_row.snmp->privprotocol,
+							interface->lld_row.snmp->contextname);
 					zbx_audit_host_update_json_add_snmp_interface(ZBX_AUDIT_LLD_CONTEXT,
-							host->hostid, interface->data.snmp->version,
-							interface->data.snmp->bulk,
-							interface->data.snmp->community,
-							interface->data.snmp->securityname,
-							interface->data.snmp->securitylevel,
-							interface->data.snmp->authpassphrase,
-							interface->data.snmp->privpassphrase,
-							interface->data.snmp->authprotocol,
-							interface->data.snmp->privprotocol,
-							interface->data.snmp->contextname,
+							host->hostid, interface->lld_row.snmp->version,
+							interface->lld_row.snmp->bulk,
+							interface->lld_row.snmp->community,
+							interface->lld_row.snmp->securityname,
+							interface->lld_row.snmp->securitylevel,
+							interface->lld_row.snmp->authpassphrase,
+							interface->lld_row.snmp->privpassphrase,
+							interface->lld_row.snmp->authprotocol,
+							interface->lld_row.snmp->privprotocol,
+							interface->lld_row.snmp->contextname,
 							interface->interfaceid);
 				}
-				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
+				else if (0 != (interface->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
 				{
 					lld_interface_snmp_prepare_sql(host->hostid, interface->interfaceid,
-							interface->data.snmp, &sql1, &sql1_alloc, &sql1_offset);
+							interface->lld_row.snmp, &sql1, &sql1_alloc, &sql1_offset);
 				}
 			}
 		}
@@ -5131,12 +5163,12 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_lld_interface_ptr_t *
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			snmp->contextname_orig = NULL;
 			snmp->flags = 0;
-			interface->data.snmp = snmp;
+			interface->lld_row.snmp = snmp;
 			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 		}
 		else
 		{
-			interface->data.snmp = NULL;
+			interface->lld_row.snmp = NULL;
 			interface->flags = 0x00;
 		}
 
@@ -5196,34 +5228,34 @@ static zbx_uint64_t	lld_interface_compare(const zbx_lld_interface_t *ifold, cons
 
 	if (INTERFACE_TYPE_SNMP == ifold->type && INTERFACE_TYPE_SNMP == ifnew->type)
 	{
-		if (ifold->data.snmp->version != ifnew->data.snmp->version)
+		if (ifold->lld_row.snmp->version != ifnew->lld_row.snmp->version)
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE;
 
-		if (ifold->data.snmp->bulk != ifnew->data.snmp->bulk)
+		if (ifold->lld_row.snmp->bulk != ifnew->lld_row.snmp->bulk)
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK;
 
-		if (0 != strcmp(ifold->data.snmp->community, ifnew->data.snmp->community))
+		if (0 != strcmp(ifold->lld_row.snmp->community, ifnew->lld_row.snmp->community))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY;
 
-		if (0 != strcmp(ifold->data.snmp->securityname, ifnew->data.snmp->securityname))
+		if (0 != strcmp(ifold->lld_row.snmp->securityname, ifnew->lld_row.snmp->securityname))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME;
 
-		if (ifold->data.snmp->securitylevel != ifnew->data.snmp->securitylevel)
+		if (ifold->lld_row.snmp->securitylevel != ifnew->lld_row.snmp->securitylevel)
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL;
 
-		if (0 != strcmp(ifold->data.snmp->authpassphrase, ifnew->data.snmp->authpassphrase))
+		if (0 != strcmp(ifold->lld_row.snmp->authpassphrase, ifnew->lld_row.snmp->authpassphrase))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS;
 
-		if (0 != strcmp(ifold->data.snmp->privpassphrase, ifnew->data.snmp->privpassphrase))
+		if (0 != strcmp(ifold->lld_row.snmp->privpassphrase, ifnew->lld_row.snmp->privpassphrase))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS;
 
-		if (ifold->data.snmp->authprotocol != ifnew->data.snmp->authprotocol)
+		if (ifold->lld_row.snmp->authprotocol != ifnew->lld_row.snmp->authprotocol)
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL;
 
-		if (ifold->data.snmp->privprotocol != ifnew->data.snmp->privprotocol)
+		if (ifold->lld_row.snmp->privprotocol != ifnew->lld_row.snmp->privprotocol)
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL;
 
-		if (0 != strcmp(ifold->data.snmp->contextname, ifnew->data.snmp->contextname))
+		if (0 != strcmp(ifold->lld_row.snmp->contextname, ifnew->lld_row.snmp->contextname))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
 	}
 
@@ -5282,41 +5314,47 @@ static void	lld_interfaces_link(const zbx_lld_interface_t *ifold, zbx_lld_interf
 
 	if (0 != (ifnew->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 	{
-		ifnew->data.snmp->flags |= (flags >> 32);
+		ifnew->lld_row.snmp->flags |= (flags >> 32);
 
 		if (0 == (ifnew->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
 		{
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE))
-				ifnew->data.snmp->version_orig = ifold->data.snmp->version;
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE))
+				ifnew->lld_row.snmp->version_orig = ifold->lld_row.snmp->version;
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
-				ifnew->data.snmp->bulk_orig = ifold->data.snmp->bulk;
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
+				ifnew->lld_row.snmp->bulk_orig = ifold->lld_row.snmp->bulk;
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY))
-				ifnew->data.snmp->community_orig = zbx_strdup(NULL, ifold->data.snmp->community);
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY))
+				ifnew->lld_row.snmp->community_orig = zbx_strdup(NULL, ifold->lld_row.snmp->community);
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME))
-				ifnew->data.snmp->securityname_orig = zbx_strdup(NULL, ifold->data.snmp->securityname);
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME))
+			{
+				ifnew->lld_row.snmp->securityname_orig = zbx_strdup(NULL,
+						ifold->lld_row.snmp->securityname);
+			}
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL))
-				ifnew->data.snmp->securitylevel_orig = ifold->data.snmp->securitylevel;
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL))
+				ifnew->lld_row.snmp->securitylevel_orig = ifold->lld_row.snmp->securitylevel;
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS))
-				ifnew->data.snmp->authpassphrase_orig = zbx_strdup(NULL,
-						ifold->data.snmp->authpassphrase);
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS))
+				ifnew->lld_row.snmp->authpassphrase_orig = zbx_strdup(NULL,
+						ifold->lld_row.snmp->authpassphrase);
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS))
-				ifnew->data.snmp->privpassphrase_orig = zbx_strdup(NULL,
-						ifold->data.snmp->privpassphrase);
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS))
+				ifnew->lld_row.snmp->privpassphrase_orig = zbx_strdup(NULL,
+						ifold->lld_row.snmp->privpassphrase);
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
-				ifnew->data.snmp->authprotocol_orig = ifold->data.snmp->authprotocol;
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
+				ifnew->lld_row.snmp->authprotocol_orig = ifold->lld_row.snmp->authprotocol;
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
-				ifnew->data.snmp->privprotocol_orig = ifold->data.snmp->privprotocol;
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
+				ifnew->lld_row.snmp->privprotocol_orig = ifold->lld_row.snmp->privprotocol;
 
-			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT))
-				ifnew->data.snmp->contextname_orig = zbx_strdup(NULL, ifold->data.snmp->contextname);
+			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT))
+			{
+				ifnew->lld_row.snmp->contextname_orig = zbx_strdup(NULL,
+						ifold->lld_row.snmp->contextname);
+			}
 		}
 	}
 }
@@ -5463,10 +5501,10 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 			new_interface->port = zbx_strdup(NULL, interface->port);
 			new_interface->port_orig = NULL;
 
-			zbx_substitute_lld_macros(&new_interface->ip, host->data, ZBX_MACRO_ANY, NULL, 0);
-			zbx_substitute_lld_macros(&new_interface->dns, host->data, ZBX_MACRO_ANY, NULL,
+			zbx_substitute_lld_macros(&new_interface->ip, host->lld_row->data, ZBX_MACRO_ANY, NULL, 0);
+			zbx_substitute_lld_macros(&new_interface->dns, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 					0);
-			zbx_substitute_lld_macros(&new_interface->port, host->data, ZBX_MACRO_ANY, NULL,
+			zbx_substitute_lld_macros(&new_interface->port, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 					0);
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
@@ -5474,16 +5512,16 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 				zbx_lld_interface_snmp_t *snmp;
 
 				snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
-				snmp->version = interface->data.snmp->version;
-				snmp->bulk = interface->data.snmp->bulk;
-				snmp->community = zbx_strdup(NULL, interface->data.snmp->community);
-				snmp->securityname = zbx_strdup(NULL, interface->data.snmp->securityname);
-				snmp->securitylevel = interface->data.snmp->securitylevel;
-				snmp->authpassphrase = zbx_strdup(NULL, interface->data.snmp->authpassphrase);
-				snmp->privpassphrase = zbx_strdup(NULL, interface->data.snmp->privpassphrase);
-				snmp->authprotocol = interface->data.snmp->authprotocol;
-				snmp->privprotocol = interface->data.snmp->privprotocol;
-				snmp->contextname = zbx_strdup(NULL, interface->data.snmp->contextname);
+				snmp->version = interface->lld_row.snmp->version;
+				snmp->bulk = interface->lld_row.snmp->bulk;
+				snmp->community = zbx_strdup(NULL, interface->lld_row.snmp->community);
+				snmp->securityname = zbx_strdup(NULL, interface->lld_row.snmp->securityname);
+				snmp->securitylevel = interface->lld_row.snmp->securitylevel;
+				snmp->authpassphrase = zbx_strdup(NULL, interface->lld_row.snmp->authpassphrase);
+				snmp->privpassphrase = zbx_strdup(NULL, interface->lld_row.snmp->privpassphrase);
+				snmp->authprotocol = interface->lld_row.snmp->authprotocol;
+				snmp->privprotocol = interface->lld_row.snmp->privprotocol;
+				snmp->contextname = zbx_strdup(NULL, interface->lld_row.snmp->contextname);
 				snmp->community_orig = NULL;
 				snmp->securityname_orig = NULL;
 				snmp->authpassphrase_orig = NULL;
@@ -5496,18 +5534,23 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 				snmp->bulk_orig = snmp->bulk;
 				snmp->flags = 0x00;
 				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
-				new_interface->data.snmp = snmp;
+				new_interface->lld_row.snmp = snmp;
 
-				zbx_substitute_lld_macros(&snmp->community, host->data, ZBX_MACRO_ANY, NULL, 0);
-				zbx_substitute_lld_macros(&snmp->securityname, host->data, ZBX_MACRO_ANY, NULL, 0);
-				zbx_substitute_lld_macros(&snmp->authpassphrase, host->data, ZBX_MACRO_ANY, NULL, 0);
-				zbx_substitute_lld_macros(&snmp->privpassphrase, host->data, ZBX_MACRO_ANY, NULL, 0);
-				zbx_substitute_lld_macros(&snmp->contextname, host->data, ZBX_MACRO_ANY, NULL, 0);
+				zbx_substitute_lld_macros(&snmp->community, host->lld_row->data, ZBX_MACRO_ANY, NULL,
+						0);
+				zbx_substitute_lld_macros(&snmp->securityname, host->lld_row->data, ZBX_MACRO_ANY, NULL,
+						0);
+				zbx_substitute_lld_macros(&snmp->authpassphrase, host->lld_row->data, ZBX_MACRO_ANY,
+						NULL, 0);
+				zbx_substitute_lld_macros(&snmp->privpassphrase, host->lld_row->data, ZBX_MACRO_ANY,
+						NULL, 0);
+				zbx_substitute_lld_macros(&snmp->contextname, host->lld_row->data, ZBX_MACRO_ANY, NULL,
+						0);
 			}
 			else
 			{
 				new_interface->flags = 0x00;
-				new_interface->data.snmp = NULL;
+				new_interface->lld_row.snmp = NULL;
 			}
 
 			zbx_vector_lld_interface_ptr_append(&host->interfaces, new_interface);
@@ -5585,12 +5628,12 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 
 				snmp->flags = 0x00;
 				interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
-				interface->data.snmp = snmp;
+				interface->lld_row.snmp = snmp;
 			}
 			else
 			{
 				interface->flags = 0x00;
-				interface->data.snmp = NULL;
+				interface->lld_row.snmp = NULL;
 			}
 
 			zbx_vector_lld_interface_ptr_append(&old_interfaces, interface);
@@ -5846,7 +5889,7 @@ static void	lld_host_sync_macros(zbx_hashset_t *host_refs, zbx_uint64_t hostid, 
 	ref_local.host->hostid = hostid;
 
 	if (NULL != (ref = (zbx_lld_host_ref_t *)zbx_hashset_search(host_refs, &ref_local)))
-		lld_sync_exported_macros(ruleids, ref->host->data);
+		lld_sync_exported_macros(ruleids, ref->host->lld_row->data);
 }
 
 /******************************************************************************
@@ -5868,7 +5911,6 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&ruleids);
-
 	zbx_hashset_create(&host_refs, (size_t)hosts->values_num, lld_host_ref_hash, lld_host_ref_compare);
 
 	for (int i = 0; i < hosts->values_num; i++)
@@ -5883,6 +5925,9 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 		ref_local.host = hosts->values[i];
 		zbx_hashset_insert(&host_refs, &ref_local, sizeof(ref_local));
 	}
+
+	if (0 == hostids.values_num)
+		goto out;
 
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -5917,10 +5962,178 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 
 	if (0 != ruleids.values_num)
 		lld_host_sync_macros(&host_refs, last_hostid, &ruleids);
-
+out:
 	zbx_hashset_destroy(&host_refs);
 	zbx_vector_uint64_destroy(&ruleids);
 	zbx_vector_uint64_destroy(&hostids);
+}
+
+static void	lld_group_prototype_prototypes_get(zbx_uint64_t parent_hostid, zbx_sync_rowset_t *group_src)
+{
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = zbx_db_select(
+			"select group_prototypeid,name,groupid"
+			" from group_prototype"
+			" where hostid=" ZBX_FS_UI64,
+			parent_hostid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_sync_rowset_add_row(group_src, row[0], row[1], row[2]);
+	}
+	zbx_db_free_result(result);
+
+	zbx_sync_rowset_sort_by_rows(group_src);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_lld_host_ptr_sort(hosts, lld_host_compare_func);
+
+	result = zbx_db_select(
+			"select gp.group_prototypeid,gp.hostid,gp.name,gp.groupid"
+			" from host_discovery hd"
+				" join group_prototype gp"
+				" on hd.hostid=gp.hostid"
+			" where hd.parent_hostid=" ZBX_FS_UI64,
+			parent_hostid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		int		index;
+		zbx_lld_host_t	host_local;
+
+		ZBX_STR2UINT64(host_local.hostid, row[1]);
+
+		if (FAIL == (index = zbx_vector_lld_host_ptr_bsearch(hosts, &host_local, lld_host_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_sync_rowset_add_row(&hosts->values[index]->group_prototypes, row[0], row[2], row[3]);
+	}
+
+	zbx_db_free_result(result);
+
+}
+
+static void	lld_host_group_prototypes_sync(zbx_lld_host_t *hosts, const zbx_sync_rowset_t *group_src,
+		const zbx_lld_entry_t *lld_obj)
+{
+	zbx_sync_rowset_t	groups;
+
+	zbx_sync_rowset_init(&groups, LLD_GROUP_PROTOTYPE_COLS_NUM);
+
+	zbx_sync_rowset_copy(&groups, group_src);
+
+	for (int i = 0; i < groups.rows.values_num; i++)
+	{
+		zbx_sync_row_t	 *row = groups.rows.values[i];
+
+		zbx_substitute_lld_macros(&row->cols[LLD_GROUP_PROTOTYPE_COL_NAME], lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	}
+
+	zbx_sync_rowset_merge(&hosts->group_prototypes, &groups);
+
+	zbx_sync_rowset_clear(&groups);
+}
+
+static void	lld_group_prototypes_save(zbx_vector_lld_host_ptr_t *hosts)
+{
+	zbx_db_insert_t		db_insert;
+	zbx_vector_uint64_t	deleteids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zbx_vector_uint64_create(&deleteids);
+
+	zbx_db_insert_prepare(&db_insert, "group_prototype", "group_prototypeid", "hostid", "name", "groupid", NULL);
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		zbx_lld_host_t	*host = hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < host->group_prototypes.rows.values_num; j++)
+		{
+			zbx_sync_row_t	*row = host->group_prototypes.rows.values[j];
+
+			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+			{
+				zbx_uint64_t	groupid;
+
+				ZBX_DBROW2UINT64(groupid, row->cols[LLD_GROUP_PROTOTYPE_COL_GROUPID]);
+
+				zbx_db_insert_add_values(&db_insert, UINT64_C(0), host->hostid,
+						row->cols[LLD_GROUP_PROTOTYPE_COL_NAME], groupid);
+				continue;
+			}
+
+			if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
+			{
+				zbx_vector_uint64_append(&deleteids, row->rowid);
+				continue;
+			}
+
+			if (0 == (row->flags & ZBX_SYNC_ROW_UPDATE))
+				continue;
+
+			char	delim = ' ';
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update group_prototype set");
+
+			if (0 != (row->flags & (UINT64_C(1) << LLD_GROUP_PROTOTYPE_COL_NAME)))
+			{
+				char	*value_esc;
+
+				value_esc = zbx_db_dyn_escape_string(row->cols[LLD_GROUP_PROTOTYPE_COL_NAME]);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cname='%s'", delim, value_esc);
+				zbx_free(value_esc);
+				delim = ',';
+			}
+
+			if (0 != (row->flags & (UINT64_C(1) << LLD_GROUP_PROTOTYPE_COL_GROUPID)))
+			{
+				if (NULL != row->cols[LLD_GROUP_PROTOTYPE_COL_GROUPID])
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cgroupid=%s", delim,
+							row->cols[LLD_GROUP_PROTOTYPE_COL_GROUPID]);
+				}
+				else
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cgroupid=null", delim);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where group_prototypeid=" ZBX_FS_UI64 ";\n",
+					row->rowid);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+	}
+
+	zbx_db_flush_overflowed_sql(sql, sql_offset);
+
+	zbx_db_insert_autoincrement(&db_insert, "group_prototypeid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from group_prototype where");
+	zbx_db_execute_multiple_query(sql, "group_prototypeid", &deleteids);
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&deleteids);
 }
 
 /******************************************************************************
@@ -5928,8 +6141,9 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
  * Purpose: adds or updates LLD hosts                                         *
  *                                                                            *
  ******************************************************************************/
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, zbx_lld_lifetime_t *lifetime, zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
+		int dflags, zbx_hashset_t *rule_index)
 {
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
@@ -6029,6 +6243,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		zbx_lld_host_t			*host;
 		unsigned char			status, discover, use_custom_interfaces;
 		zbx_vector_lld_interface_ptr_t	interfaces_custom;
+		zbx_sync_rowset_t		group_proto_prototypes;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
 		host_proto = row[1];
@@ -6054,11 +6269,19 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 		lld_proto_tags_get(parent_hostid, &tags);
 
-		lld_simple_groups_get(parent_hostid, &groupids);
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			lld_simple_groups_get(parent_hostid, &groupids);
+			lld_group_prototypes_get(parent_hostid, &group_prototypes);
+			lld_groups_get(parent_hostid, &groups);
+		}
+		else
+		{
+			zbx_sync_rowset_init(&group_proto_prototypes, LLD_GROUP_PROTOTYPE_COLS_NUM);
 
-		lld_group_prototypes_get(parent_hostid, &group_prototypes);
-
-		lld_groups_get(parent_hostid, &groups);
+			lld_group_prototype_prototypes_get(parent_hostid, &group_proto_prototypes);
+			lld_host_group_prototypes_get(parent_hostid, &hosts);
+		}
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
 
@@ -6073,13 +6296,18 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 				continue;
 			}
 
-			lld_groups_make(host, &groups_in, &group_prototypes, lld_row->data);
+			if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+				lld_groups_make(host, &groups_in, &group_prototypes, lld_row->data);
+			else
+				lld_host_group_prototypes_sync(host, &group_proto_prototypes, lld_row->data);
 		}
 
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
 
-		lld_groups_validate(&group_prototypes, &groups, &groups_in, &groups_out, error);
-		lld_hosts_validate(&hosts, error);
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			lld_groups_validate(&group_prototypes, &groups, &groups_in, &groups_out, error);
+
+		lld_hosts_validate(&hosts, dflags, error);
 
 		if (ZBX_HOST_PROT_INTERFACES_CUSTOM == use_custom_interfaces)
 		{
@@ -6092,15 +6320,19 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 		lld_interfaces_validate(&hosts, error);
 
-		/* save groups before making hosts_groups links because groupids could be updated during save */
-		lld_groups_save(&groups_out, &group_prototypes, error);
-
-		lld_hostgroups_make(&groupids, &hosts, &groups_out, &del_hostgroupids);
-
-		if (0 != hosts.values_num)
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
-			lld_hgsets_make(parent_hostid, &hosts, &hgsets, &del_hgsetids);
-			lld_permissions_make(&permissions, &hgsets);
+			/* save groups before making hosts_groups links  */
+			/* because groupids could be updated during save */
+			lld_groups_save(&groups_out, &group_prototypes, error);
+
+			lld_hostgroups_make(&groupids, &hosts, &groups_out, &del_hostgroupids);
+
+			if (0 != hosts.values_num)
+			{
+				lld_hgsets_make(parent_hostid, &hosts, &hgsets, &del_hgsetids);
+				lld_permissions_make(&permissions, &hgsets);
+			}
 		}
 
 		lld_templates_make(parent_hostid, &hosts);
@@ -6110,7 +6342,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		lld_hosts_save(parent_hostid, &hosts, host_proto, monitored_by, proxyid, proxy_groupid, ipmi_authtype,
 				ipmi_privilege, ipmi_username, ipmi_password, tls_connect, tls_accept, tls_issuer,
 				tls_subject, tls_psk_identity, tls_psk, &hgsets, &permissions, &del_hostgroupids,
-				&del_hgsetids);
+				&del_hgsetids, dflags, rule_index);
+
+		lld_group_prototypes_save(&hosts);
 
 		/* linking of the templates */
 		lld_templates_link(&hosts, error);
@@ -6140,6 +6374,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 			zbx_vector_lld_interface_ptr_clear_ext(&interfaces_custom, lld_interface_free);
 			zbx_vector_lld_interface_ptr_destroy(&interfaces_custom);
 		}
+
+		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			zbx_sync_rowset_clear(&group_proto_prototypes);
 	}
 	zbx_db_free_result(result);
 
