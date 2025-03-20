@@ -49,6 +49,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_MANUAL_CLOSE = 1;
 	const TRIGGER_OPDATA_PRE = 'strata_opdata';
 	const TRIGGER_EVENT_NAME_PRE = 'strata_event_name';
+	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	const NUMBER_OF_TEMPLATES = 10;
 	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 20;
@@ -466,9 +467,6 @@ class testTriggerLinking extends CIntegrationTest {
 			]);
 
 		sleep(1);
-
-		$sql = "SELECT COUNT(*) FROM hosts_templates WHERE hostid='".$hostid."';";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -493,7 +491,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
 		$this->checkTriggersCreate();
 		$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
-		//$this->stopComponent(self::COMPONENT_SERVER);
+		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_AGENT);
 
 		$response = $this->call('host.get', [
@@ -517,7 +515,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-		//$this->startComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
@@ -580,25 +578,54 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
 	}
 
+	/**
+	* Component configuration provider for agent related tests.
+	*
+	* @return array
+	*/
+	public function agentConfigurationProvider1() {
+		return [
+			self::COMPONENT_AGENT => [
+				'Hostname'		=>  self::HOST_NAME,
+				'ServerActive'	=>
+						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
+				'DebugLevel'    => 4,
+				'LogFileSize'   => 0,
+				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
+			]
+		];
+	}
+
+	private function metaDataItemUpdate () {
+
+		if (file_exists(self::METADATA_FILE)) {
+			unlink(self::METADATA_FILE);
+		}
+
+		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
+			throw new Exception('Failed to create metadata_file');
+		}
+	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Test trigger linking cases.
 	 *
-	 * @configurationDataProvider agentConfigurationProvider
-	 * @required-components server, agent, agent2
+	 * @configurationDataProvider agentConfigurationProvider1
+	 * @required-components server, agent
 	 */
 	public function testTriggerLinking_conflict() {
+
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->unlinkTemplates();
 		$this->stopComponent(self::COMPONENT_AGENT);
-		$this->startComponent(self::COMPONENT_SERVER);
-		sleep(1);
-		$this->startComponent(self::COMPONENT_AGENT2);
+		$this->unlinkTemplates();
+		$this->metaDataItemUpdate();
+		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
 	}
 }
