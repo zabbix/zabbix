@@ -590,10 +590,14 @@ class testTriggerLinking extends CIntegrationTest {
 	public function testTriggerLinking_conflict() {
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->killComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
-		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->unlinkTemplates();
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT2);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
