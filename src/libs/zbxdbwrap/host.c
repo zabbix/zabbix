@@ -1410,6 +1410,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 		goto out;
 
 	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid");
+	db_get_linked_items(itemids, "item_discovery i where", "i.lldrule_itemid");
 	db_get_linked_items(itemids, "items i where", "i.master_itemid");
 
 	zbx_audit_item_delete(audit_context_mode, itemids);

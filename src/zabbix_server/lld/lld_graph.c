@@ -1056,7 +1056,8 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr_t *graphs,
 		int width, int height, double yaxismin, double yaxismax, unsigned char show_work_period,
 		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
-		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
+		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type,
+		int dflags)
 {
 	int				ret = SUCCEED, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
 	zbx_vector_lld_gitem_ptr_t	upd_gitems;	/* the ordered list of graphs_items which will be updated */
@@ -1170,7 +1171,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			zbx_db_insert_add_values(&db_insert, graphid, graph->name, width, height, yaxismin, yaxismax,
 					(int)show_work_period, (int)show_triggers, (int)graphtype, (int)show_legend,
 					(int)show_3d, percent_left, percent_right, (int)ymin_type, graph->ymin_itemid,
-					(int)ymax_type, graph->ymax_itemid, (int)ZBX_FLAG_DISCOVERY_CREATED);
+					(int)ymax_type, graph->ymax_itemid, (int)(ZBX_FLAG_DISCOVERY_CREATED | dflags));
 
 			zbx_audit_graph_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, graphid, graph->name,
 					ZBX_FLAG_DISCOVERY_CREATED);
@@ -1559,7 +1560,7 @@ static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zb
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck)
+		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;
@@ -1583,7 +1584,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
 				" and i.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
+				" and id.lldrule_itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
@@ -1631,7 +1632,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
-				percent_right, ymin_type, ymax_type);
+				percent_right, ymin_type, ymax_type, dflags);
 
 		lld_process_lost_graphs(&graphs, lifetime, lastcheck);
 

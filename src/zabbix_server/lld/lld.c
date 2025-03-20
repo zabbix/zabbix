@@ -1107,14 +1107,16 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
+	if (SUCCEED != lld_update_triggers(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
+			ZBX_FLAG_DISCOVERY_NORMAL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, item->itemid, &lld_rows, error, &lifetime, now))
+	if (SUCCEED != lld_update_graphs(hostid, item->itemid, &lld_rows, error, &lifetime, now,
+			ZBX_FLAG_DISCOVERY_NORMAL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");

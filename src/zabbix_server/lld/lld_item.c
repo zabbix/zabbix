@@ -407,8 +407,8 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 					"enabled_lifetime_type,evaltype"
 				" from items"
 				" where"
-					" flags&%d=0 and",
-					ZBX_FLAG_DISCOVERY_PROTOTYPE);
+					" flags&%d=%d&%d and",
+					ZBX_FLAG_DISCOVERY_PROTOTYPE, item_flags, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
 
@@ -2745,7 +2745,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	if (0 == item->itemid)
 	{
 		const zbx_lld_item_prototype_t	*item_prototype = item_prototypes->values[index];
-		zbx_uint64_t 			parent_itemid = item->parent_itemid;
+		zbx_uint64_t 			lldrule_itemid = 0, parent_itemid = item->parent_itemid;
 
 		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
@@ -2755,7 +2755,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item->params, item->ipmi_sensor, item->snmp_oid, (int)item_prototype->authtype,
 				item->username, item->password, item_prototype->publickey, item_prototype->privatekey,
 				item->description, item_prototype->interfaceid,
-				item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED,
+				item_prototype->dflags | ZBX_FLAG_DISCOVERY_CREATED,
 				item->jmx_endpoint, item->master_itemid,
 				item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
 				item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
@@ -2766,19 +2766,18 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
 				item_prototype->evaltype);
 
-		/* In the case of prototype items being discovered for LLD rule the parent_itemid refers */
-		/* to it's prototype itemid. Change it to the corresponding discovered LLD rule itemid.  */
+		/* In the case of prototype item discovery find the discovered LLD rule id */
 		if (NULL != rule_index)
 		{
-			zbx_lld_row_ruleid_t	row_ruleid_local, *row_ruleid;
+			zbx_lld_row_ruleid_t    row_ruleid_local, *row_ruleid;
 
 			row_ruleid_local.lld_row = item->lld_row;
 			if (NULL != (row_ruleid = zbx_hashset_search(rule_index, &row_ruleid_local)))
-				parent_itemid = row_ruleid->ruleid;
+				lldrule_itemid = row_ruleid->ruleid;
 		}
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
-				parent_itemid, item_prototype->key, item->lastcheck);
+				parent_itemid, item_prototype->key, item->lastcheck, lldrule_itemid);
 
 		if (NULL != db_insert_irtdata)
 			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
@@ -2787,7 +2786,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
 		zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, *itemid, item->name,
-				item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED);
+				item_prototype->dflags | ZBX_FLAG_DISCOVERY_CREATED);
 		zbx_audit_item_update_json_add_lld_data(*itemid, item, item_prototype, hostid);
 		item->itemid = (*itemid)++;
 	}
@@ -3358,7 +3357,7 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 
 			zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, item->itemid,
 					(NULL == item->name_proto) ? item->name : item->name_proto,
-					item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED);
+					item_prototype->dflags | ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
 		if (0 != item->itemid && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
@@ -3421,7 +3420,7 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 				"evaltype", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
-				"parent_itemid", "key_", "lastcheck", (char *)NULL);
+				"parent_itemid", "key_", "lastcheck", "lldrule_itemid", (char *)NULL);
 
 		if (NULL != pdb_insert_irtdata)
 			zbx_db_insert_prepare(pdb_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
@@ -4122,13 +4121,13 @@ void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows)
  *                                                                            *
  * Parameters: lld_ruleid      - [IN]                                         *
  *             item_prototypes - [OUT]                                        *
- *             item_flags      - [IN] item discovery flags:                   *
+ *             dflags          - [IN] discovery flags:                        *
  *                                     ZBX_FLAG_DISCOVERY_NORMAL              *
  *                                     ZBX_FLAG_DISCOVERY_RULE                *
  *                                                                            *
  ******************************************************************************/
 void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		int item_flags)
+		int dflags)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -4157,15 +4156,15 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 				"i.lifetime,i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime_type,i.evaltype"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64
+				" and id.lldrule_itemid=" ZBX_FS_UI64
 				" and i.flags&%d=%d&%d",
-			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, item_flags, ZBX_FLAG_DISCOVERY_RULE);
+			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, dflags, ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		item_prototype = (zbx_lld_item_prototype_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_prototype_t));
 
-		item_prototype->item_flags = item_flags;
+		item_prototype->dflags = dflags;
 		ZBX_STR2UINT64(item_prototype->itemid, row[0]);
 		item_prototype->name = zbx_strdup(NULL, row[1]);
 		item_prototype->key = zbx_strdup(NULL, row[2]);
@@ -4304,7 +4303,7 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 
 	/* get item prototype tags */
 
-	if (ZBX_FLAG_DISCOVERY_NORMAL == item_flags)
+	if (ZBX_FLAG_DISCOVERY_NORMAL == dflags)
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
@@ -4530,7 +4529,7 @@ void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
 			item_prototype->verify_peer, item_prototype->verify_host);
 	zabbix_log(LOG_LEVEL_TRACE, "  discover:%u", item_prototype->discover);
 
-	if (0 != (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	if (0 != (item_prototype->dflags & ZBX_FLAG_DISCOVERY_RULE))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "  evaltype:%d formula:%s", item_prototype->evaltype,
 				item_prototype->formula);
@@ -4599,9 +4598,9 @@ void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
  *               FAIL    - items cannot be added/updated                      *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck, int item_flags, zbx_hashset_t *rule_index)
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
+		int item_flags, zbx_hashset_t *rule_index)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;

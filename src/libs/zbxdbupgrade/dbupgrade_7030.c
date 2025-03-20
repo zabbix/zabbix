@@ -275,6 +275,48 @@ static int	DBpatch_7030016(void)
 	return DBadd_foreign_key("lld_macro", 1, &field);
 }
 
+static int	DBpatch_7030017(void)
+{
+	const zbx_db_field_t	field = {"lldrule_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_7030018(void)
+{
+	return DBcreate_index("item_discovery", "item_discovery_3", "lldrule_itemid", 0);
+}
+
+static int	DBpatch_7030019(void)
+{
+	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("item_discovery", 3, &field);
+}
+
+static int	DBpatch_7030020(void)
+{
+	const zbx_db_field_t	field = {"parent_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("item_discovery", &field);
+}
+
+static int	DBpatch_7030021(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update item_discovery id"
+					" set lldrule_itemid=parent_itemid,parent_itemid=NULL"
+					" where exists ("
+						"select null from items i"
+						" where i.itemid=id.itemid"
+							" and i.flags=%d"
+					");", ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -298,5 +340,10 @@ DBPATCH_ADD(7030013, 0, 1)
 DBPATCH_ADD(7030014, 0, 1)
 DBPATCH_ADD(7030015, 0, 1)
 DBPATCH_ADD(7030016, 0, 1)
+DBPATCH_ADD(7030017, 0, 1)
+DBPATCH_ADD(7030018, 0, 1)
+DBPATCH_ADD(7030019, 0, 1)
+DBPATCH_ADD(7030020, 0, 1)
+DBPATCH_ADD(7030021, 0, 1)
 
 DBPATCH_END()

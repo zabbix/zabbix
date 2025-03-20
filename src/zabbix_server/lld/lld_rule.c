@@ -2762,9 +2762,8 @@ static void	lld_prototype_items_clear(void *v)
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck)
+int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;
@@ -2900,7 +2899,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		else
 			rule_index = NULL;
 
-		if (FAIL == lld_update_items(hostid, item_prototype->itemid, lld_rows, error, lifetime,
+		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  lld_rows, error, lifetime,
 				enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
@@ -2911,12 +2910,21 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		lld_item_links_sort(lld_rows);
 
 		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, lld_rows, error, lifetime,
-				enabled_lifetime, lastcheck))
+				enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 					" processing lld rule");
 			goto clean;
 		}
+
+		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, lld_rows, error, lifetime, lastcheck,
+				ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
+					" processing lld rule");
+			goto out;
+		}
+
 	}
 
 	ret = SUCCEED;

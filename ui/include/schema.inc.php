@@ -5205,6 +5205,13 @@ return [
 				'ref_table' => 'graphs',
 				'ref_field' => 'graphid'
 			],
+			'lldrule_itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
 			'lastcheck' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -5736,6 +5743,13 @@ return [
 				'ref_field' => 'itemid'
 			],
 			'parent_itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'lldrule_itemid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -5797,7 +5811,7 @@ return [
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
 			],
-			'parent_itemid' => [
+			'lldrule_itemid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -5972,6 +5986,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'triggers',
 				'ref_field' => 'triggerid'
+			],
+			'lldrule_itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
 			],
 			'lastcheck' => [
 				'null' => false,

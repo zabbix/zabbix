@@ -384,12 +384,11 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid,
-		zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
-		char **error)
+		zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes, char **error)
 {
-	zbx_db_result_t			result;
-	zbx_db_row_t			row;
-	char				*errmsg = NULL;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*errmsg = NULL;
 
 	result = zbx_db_select(
 			"select t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
@@ -401,7 +400,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid,
 				" where tg.triggerid=f.triggerid"
 					" and f.itemid=i.itemid"
 					" and i.itemid=id.itemid"
-					" and id.parent_itemid=" ZBX_FS_UI64 ")",
+					" and id.lldrule_itemid=" ZBX_FS_UI64 ")",
 			lld_ruleid);
 
 	/* run through trigger prototypes */
@@ -2566,6 +2565,7 @@ out:
  * Parameters: hostid             - [IN] parent host id                       *
  *             trigger_prototypes - [IN]                                      *
  *             triggers           - [IN/OUT] triggers to save                 *
+ *             dflags             - [IN] discovery flags                      *
  *                                                                            *
  * Return value: SUCCEED - if triggers was successfully saved or saving       *
  *                         was not necessary                                  *
@@ -2573,7 +2573,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
-		const zbx_vector_lld_trigger_ptr_t *triggers)
+		const zbx_vector_lld_trigger_ptr_t *triggers, int dflags)
 {
 	int					ret = SUCCEED, new_triggers = 0, upd_triggers = 0,
 						new_functions = 0, new_dependencies = 0, new_tags = 0, upd_tags = 0;
@@ -2804,7 +2804,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 					(int)trigger->priority, (int)trigger->status,
 					trigger->comments, trigger->url, trigger->url_name,
 					(int)trigger_prototype->type, (int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
-					(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger_prototype->recovery_mode,
+					(int)(ZBX_FLAG_DISCOVERY_CREATED | dflags),
+					(int)trigger_prototype->recovery_mode,
 					trigger->recovery_expression, (int)trigger_prototype->correlation_mode,
 					trigger->correlation_tag, (int)trigger_prototype->manual_close,
 					trigger->opdata, trigger->event_name);
@@ -3833,7 +3834,7 @@ static void	lld_process_lost_triggers(zbx_vector_lld_trigger_ptr_t *triggers, co
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck)
+		int lastcheck, int dflags)
 {
 	zbx_vector_lld_trigger_prototype_ptr_t	trigger_prototypes;
 	zbx_vector_lld_trigger_ptr_t		triggers;
@@ -3886,7 +3887,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, error);
 	lld_trigger_dependencies_validate(&triggers, error);
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, error);
-	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
+	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers, dflags);
 	lld_process_lost_triggers(&triggers, lifetime, enabled_lifetime, lastcheck);
 
 	/* cleaning */

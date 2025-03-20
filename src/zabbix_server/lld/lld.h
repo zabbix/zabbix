@@ -250,7 +250,7 @@ typedef struct
 	int					lifetime_type;
 	int					enabled_lifetime_type;
 	int					evaltype;
-	int					item_flags;
+	int					dflags;
 
 	zbx_sync_rowset_t			macro_paths;
 	zbx_sync_rowset_t                       filters;
@@ -435,25 +435,24 @@ void	lld_override_graph(const zbx_vector_lld_override_ptr_t *overrides, const ch
 int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		unsigned char override_default);
 
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck, int item_flags, zbx_hashset_t *rule_index);
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
+		int item_flags, zbx_hashset_t *rule_index);
 
 void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows);
 
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck);
+		int lastcheck, int dflags);
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck);
+		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags);
 
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, zbx_lld_lifetime_t *lifetime, zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
 
-int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck);
+int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 
