@@ -1114,7 +1114,7 @@ class testFormValueMappings extends CWebTest {
 		$update_form->selectTab('Value mapping');
 		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
 		$update_form->query('id:valuemap_add')->one()->click();
-		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		$mapping_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 
 		// Take a screenshot to test draggable object position of value mapping field.
 		$this->page->removeFocus();

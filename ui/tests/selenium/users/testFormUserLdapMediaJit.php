@@ -451,6 +451,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['message']);
 			$dialog->close();
 		}
+		$dialog->ensureNotPresent();
 
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
