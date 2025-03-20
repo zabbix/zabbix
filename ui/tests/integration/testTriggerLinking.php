@@ -644,6 +644,41 @@ class testTriggerLinking extends CIntegrationTest {
 		$templateidsX = [];
 		array_push($templateidsX, ['templateid' => self::$templateX_ID]);
 
+		$response = $this->call('item.create', [
+			'hostid' => self::$templateX_ID,
+			'name' => "templateX_item_name",
+			'key_' => "templateX_item_key",
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+
+		$response = $this->call('trigger.create', [
+			'description' =>  self::TRIGGER_DESCRIPTION_SAME_ALL,
+			'priority' => self::TRIGGER_PRIORITY,
+			'status' => self::TRIGGER_STATUS,
+			'type' => self::TRIGGER_TYPE,
+			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
+			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+			'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE,
+			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
+			'expression' => 'last(/test_template/' .
+			"templateX_item_key" . ')=99',
+			'recovery_expression' => 'last(/test_template/' .
+			"templateX_item_key" . ')=999',
+			'tags' => [
+				[
+					'tag' => "templateX_tag",
+					'value' => "templateX_value"
+				]
+			]
+		]);
+
+	$this->assertArrayHasKey('triggerids', $response['result']);
+	$this->assertArrayHasKey(0, $response['result']['triggerids']);
+
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
