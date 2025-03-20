@@ -358,16 +358,20 @@ class CForm {
 				this.addGeneralErrors(field.getGlobalErrors());
 			}
 			else {
-				this.addGeneralErrors({[key]: errors});
+				errors.forEach((error) => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + key + '": ' + error.message);
+					}
+				});
 			}
 		});
 
 		Object.entries(general_errors).forEach(([key, errors]) => {
-			errors
-				.filter(({message}) => message !== '')
-				.forEach(({message}) => {
-					this.addGeneralErrors({[key]: message});
-				});
+			errors.forEach((error) => {
+				if (error.message !== '') {
+					console.log('Validation error for missing field "' + key + '": ' + error.message);
+				}
+			});
 		});
 
 		if ('' in raw_errors) {

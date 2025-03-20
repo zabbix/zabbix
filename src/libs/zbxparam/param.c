@@ -739,8 +739,11 @@ void	zbx_unquote_key_param(char *param)
  * Purpose: quotes special symbols in item key parameter                      *
  *                                                                            *
  * Parameters: param   - [IN/OUT] item key parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
+ *             forced  - [IN] 2 - enclose parameter in " even if it does not  *
  *                                contain any special characters              *
+ *                            1 - enclose parameter in " even if it does not  *
+ *                                contain any special characters, except case *
+ *                                when parameter ends with backslash          *
  *                            0 - do nothing if the parameter does not        *
  *                                contain any special characters              *
  *                                                                            *
@@ -753,18 +756,21 @@ void	zbx_unquote_key_param(char *param)
 int	zbx_quote_key_param(char **param, int forced)
 {
 	size_t	sz_src, sz_dst;
+	int	req;
 
-	if (0 == forced)
-	{
-		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']'))
-		{
-			return SUCCEED;
-		}
-	}
+	req = ('"' == **param || ' ' == **param || '[' == **param || NULL != strchr(*param, ',') ||
+			NULL != strchr(*param, ']')) ? 1 : 0;
+
+	if (0 == req && 0 == forced)
+		return SUCCEED;
 
 	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
+	{
+		if (0 == req && 2 != forced)
+			return SUCCEED;
+		else
+			return FAIL;
+	}
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 

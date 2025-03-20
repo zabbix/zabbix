@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CBehavior.php';
+require_once __DIR__.'/../../include/CBehavior.php';
 
 /**
  * Behavior for global messages.
@@ -74,7 +74,8 @@ class CMessageBehavior extends CBehavior {
 			}
 			else {
 				$this->test->assertEquals($error_text, $field->query('xpath:./../span[@class="error"]|./../../span[@class="error"]')
-						->waitUntilPresent()->one()->getText());
+						->waitUntilPresent()->one()->getText()
+				);
 			}
 		}
 	}
