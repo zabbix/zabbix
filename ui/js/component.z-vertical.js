@@ -19,6 +19,9 @@
 
 class ZVertical extends HTMLElement {
 
+	/**
+	 * @type {HTMLElement|null};
+	 */
 	#inner_container = null;
 
 	constructor() {
@@ -28,10 +31,9 @@ class ZVertical extends HTMLElement {
 
 		const container_styles = window.getComputedStyle(this);
 
-		const div = document.createElement('div');
-		this.#inner_container = div;
+		this.#inner_container = document.createElement('div');
 
-		Object.assign(div.style, {
+		Object.assign(this.#inner_container.style, {
 			display: 'inline-block',
 			position: 'absolute',
 			bottom: 0,
@@ -51,28 +53,27 @@ class ZVertical extends HTMLElement {
 		}
 
 		for (const prop in props_to_inherit) {
-			if (container_styles[prop] !== 'auto' && container_styles[prop] !== 'none'
-					&& container_styles[prop] !== '0px') {
-				div.style[props_to_inherit[prop]] = container_styles[prop];
+			if (!['auto', 'none', '0px'].includes(container_styles[prop])) {
+				this.#inner_container.style[props_to_inherit[prop]] = container_styles[prop];
 			}
 		}
 
 		const slot = document.createElement('slot');
-		div.append(slot);
+		this.#inner_container.append(slot);
 
-		this.shadowRoot.append(div);
+		this.shadowRoot.append(this.#inner_container);
 	}
 
 	connectedCallback() {
 		this.registerEvents();
-		this._refresh();
+		this.#refresh();
 	}
 
 	disconnectedCallback() {
 		this.unregisterEvents();
 	}
 
-	_refresh() {
+	#refresh() {
 		if (this.#inner_container === null) {
 			return;
 		}
@@ -80,7 +81,7 @@ class ZVertical extends HTMLElement {
 		this.style.width = `${this.#inner_container.scrollHeight}px`;
 		this.style.height = `${this.#inner_container.scrollWidth}px`;
 
-		const anchor_position = this.#inner_container.scrollHeight / 2;
+		const anchor_position = Math.min(this.#inner_container.scrollHeight, this.#inner_container.scrollWidth) / 2;
 
 		this.#inner_container.style.transformOrigin = `${anchor_position}px ${anchor_position}px`;
 	}
@@ -88,11 +89,11 @@ class ZVertical extends HTMLElement {
 	registerEvents() {
 		this._events = {
 			resize: () => {
-				this._refresh();
+				this.#refresh();
 			},
 
 			update: () => {
-				this._refresh();
+				this.#refresh();
 			}
 		}
 
