@@ -471,11 +471,10 @@ function saveItemTestInputs() {
 		});
 	<?php endif ?>
 
-	jQuery('[name^=macros]').each(function(i, macro) {
-		var name = macro.name.toString();
-		macros[name.substr(7, name.length - 8)] = macro.value;
-	});
-	input_values.macros = macros;
+	for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+		macros[macro_name] = form_data.macro_values[macro_index];
+	}
+	input_values.macros = JSON.stringify(macros);
 
 	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.overlay-dialogue-footer');
