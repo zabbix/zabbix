@@ -2700,7 +2700,7 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
 		'filter' => [
-			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP],
+			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMP],
 			'status' => ITEM_STATUS_ACTIVE
 		]
 	]);
