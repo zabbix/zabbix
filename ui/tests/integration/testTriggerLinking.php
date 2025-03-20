@@ -655,6 +655,12 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
+		$response = $this->call('usermacro.create', [
+			'hostid' => self::$templateX_ID,
+			'macro' => "{#MACROTEST}",
+			'value' => 99
+		]);
+
 		$response = $this->call('trigger.create', [
 			'description' =>  self::TRIGGER_DESCRIPTION_SAME_ALL,
 			'priority' => self::TRIGGER_PRIORITY,
@@ -665,7 +671,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE,
 			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 			'expression' => 'last(/test_template/' .
-			"templateX_item_key" . ')= {#MACRO}',
+			"templateX_item_key" . ')={#MACROTEST}',
 			'recovery_expression' => 'last(/test_template/' .
 			"templateX_item_key" . ')=999',
 			'tags' => [
