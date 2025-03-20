@@ -518,8 +518,6 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	else
 		zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
 
-	redirect->revision = hpi->host_proxy->revision;
-	redirect->reset = ZBX_REDIRECT_NONE;
 
 	unsigned char	tls_accept;
 
@@ -577,6 +575,9 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 		return FAIL;
 	}
 #endif
+
+	redirect->revision = hpi->host_proxy->revision;
+	redirect->reset = ZBX_REDIRECT_NONE;
 
 	return SUCCEED;
 }

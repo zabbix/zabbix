@@ -14,6 +14,9 @@
 
 #include "zbxregexp.h"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxlog.h"
+#endif
 #include "zbxstr.h"
 #include "zbxtime.h"
 
@@ -253,7 +256,7 @@ void	zbx_init_regexp_env(void)
 #endif
 }
 
-static unsigned long int	compute_recursion_limit(void)
+static unsigned long	compute_match_recursion_limit(void)
 {
 	if (0 == rxp_stacklimit)
 	{
@@ -266,13 +269,41 @@ static unsigned long int	compute_recursion_limit(void)
 			if (REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP < (rxp_stacklimit = rlim.rlim_cur))
 				rxp_stacklimit = REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP;
 		}
-
-		if (0 == rxp_stacklimit)
 #else
-#	define REGEXP_RECURSION_DEFAULT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+	/* https://learn.microsoft.com/en-us/windows/win32/procthread/thread-stack-size */
+	/* The default stack reservation size used by the linker is 1 MB.               */
+	/* If it is not possible to detect current thread stack limits,                 */
+	/* assume ~1 MB stack and ~800 bytes per recursion, add some additional margin. */
+	/* Recursion limit 2000 seems to bee too large and it might cause Zabbix agent  */
+	/* crash while executing prce_exec() (see ZBX-22900).                           */
+#	define REGEXP_RECURSION_DEFAULT	1000
+		typedef void (WINAPI *GetStackLimits)(PULONG_PTR, PULONG_PTR);
+		static ZBX_THREAD_LOCAL GetStackLimits	get_stack_limits;
+
+		if (NULL == get_stack_limits)
+		{
+			/* GetCurrentThreadStackLimits() is supported by Windows 8, Windows Server 2012 and newer */
+			get_stack_limits = (GetStackLimits)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+					"GetCurrentThreadStackLimits");
+		}
+
+		if (NULL != get_stack_limits)
+		{
+			ULONG_PTR	lo, hi;
+
+			get_stack_limits(&lo, &hi);
+			rxp_stacklimit = (unsigned long)(hi - lo);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): GetCurrentThreadStackLimits() is not available on this"
+					" system, %s", __func__, zbx_strerror_from_system(GetLastError()));
+		}
 #endif
-			rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
 	}
+
+	if (0 == rxp_stacklimit)
+		rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
 
 	return rxp_stacklimit / REGEXP_RECURSION_STEP;
 #undef REGEXP_RECURSION_DEFAULT
@@ -327,7 +358,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
 
-	pcre2_set_recursion_limit(regexp->match_ctx, (uint32_t)compute_recursion_limit());
+	pcre2_set_recursion_limit(regexp->match_ctx, (uint32_t)compute_match_recursion_limit());
 	match_data = pcre2_match_data_create((uint32_t)count, NULL);
 
 	if (NULL == match_data)
@@ -366,8 +397,18 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		}
 		else
 		{
+			char	*err_tmp = NULL;
+
+			if (NULL != err_msg || SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+				err_tmp = decode_pcre2_match_error(r);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() pcre2_match() returned error %d '%s' while matching"
+					" against subject string '%s'", __func__, r, err_tmp, string);
+
 			if (NULL != err_msg)
-				*err_msg = decode_pcre2_match_error(r);
+				*err_msg = err_tmp;
+			else
+				zbx_free(err_tmp);
 
 			result = FAIL;
 		}

@@ -13,6 +13,7 @@
 **/
 
 #include "zbxdbhigh.h"
+#include "zbxdbwrap.h"
 
 #include "template.h"
 
@@ -1013,16 +1014,27 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	zbx_uint64_t		itemid = 0;
 	zbx_db_insert_t		db_insert_items, db_insert_irtdata, db_insert_irtname;
 	zbx_template_item_t	*item;
+	zbx_vector_uint64_t	itemids_value_type_diff;
 
 	if (0 == items->values_num)
 		return;
+
+	zbx_vector_uint64_create(&itemids_value_type_diff);
 
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_template_item_t *)items->values[i];
 
 		if (NULL == item->key_)
+		{
 			upd_items++;
+
+			if (SUCCEED == zbx_db_item_value_type_changed_category(item->value_type,
+					item->value_type_orig))
+			{
+				zbx_vector_uint64_append(&itemids_value_type_diff, item->itemid);
+			}
+		}
 		else
 			new_items++;
 	}
@@ -1077,11 +1089,14 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 	if (0 != upd_items)
 	{
+		zbx_db_update_item_map_links(&itemids_value_type_diff);
+
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}
 
+	zbx_vector_uint64_destroy(&itemids_value_type_diff);
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
