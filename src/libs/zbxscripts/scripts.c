@@ -429,13 +429,16 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 		int config_timeout, const char *config_source_ip, unsigned char program_type, char *error,
 		size_t max_error_len)
 {
-	int		ret;
-	AGENT_RESULT	agent_result;
-	char		*param = NULL, *port = NULL;
-	zbx_dc_item_t	item;
-	int		version;
+	int			ret;
+	AGENT_RESULT		agent_result;
+	char			*param = NULL, *port = NULL;
+	zbx_dc_item_t		item;
+	int			version;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros_masked();
 
 	*error = '\0';
 	memset(&item, 0, sizeof(item));
@@ -449,9 +452,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	port = zbx_strdup(port, item.interface.port_orig);
 
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 	zbx_dc_expand_user_and_func_macros(um_handle, &port, &host->hostid, 1, NULL);
-	zbx_dc_close_user_macros(um_handle);
 
 	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
@@ -491,6 +492,8 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 fail:
 	zbx_free(port);
 	zbx_free(param);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
