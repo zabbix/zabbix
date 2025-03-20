@@ -76,13 +76,18 @@ class CControllerHostDashboardView extends CController {
 
 			$db_dashboards = API::HostDashboard()->get([
 				'output' => ['dashboardid', 'name', 'display_period', 'auto_start'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'hostids' => $this->getInput('hostid'),
-				'dashboardids' => $dashboardid,
-				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets']
+				'dashboardids' => $dashboardid
 			]);
 
 			if ($db_dashboards) {
-				$dashboard = reset($db_dashboards);
+				$dashboard = $db_dashboards[0];
+
+				$dashboard['templateid'] = API::TemplateDashboard()->get([
+					'output' => ['templateid'],
+					'dashboardids' => $dashboardid
+				])[0]['templateid'];
 
 				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
 					$this->getInput('hostid')
@@ -92,9 +97,12 @@ class CControllerHostDashboardView extends CController {
 
 				$configuration_hash = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
 
-				$dashboard['pages']
-					= CDashboardHelper::preparePages($dashboard['pages'], null, true);
-				$broadcast_requirements = CDashboardHelper::getBroadcastRequirements($dashboard['pages']);
+				$pages_raw = $dashboard['pages'];
+				$pages_prepared = CDashboardHelper::preparePages($pages_raw, $dashboard['templateid'], true);
+
+				$dashboard['pages'] = $pages_prepared;
+
+				$broadcast_requirements = CDashboardHelper::getBroadcastRequirements($pages_prepared);
 
 				$time_selector_options = [
 					'profileIdx' => 'web.dashboard.filter',
