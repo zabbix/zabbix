@@ -203,9 +203,11 @@
 				document.getElementById('update')
 			].forEach((button) => {
 				if (button) {
-					button.classList.add('is-loading');
-					button.classList.add('is-loading-fadein');
 					button.setAttribute('disabled', true);
+
+					if (button.id === 'add' || button.id === 'update') {
+						button.classList.add('is-loading');
+					}
 				}
 			});
 		}
@@ -219,7 +221,6 @@
 			].forEach((button) => {
 				if (button) {
 					button.classList.remove('is-loading');
-					button.classList.remove('is-loading-fadein');
 					button.removeAttribute('disabled');
 				}
 			});
