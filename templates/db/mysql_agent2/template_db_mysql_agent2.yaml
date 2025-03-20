@@ -1248,7 +1248,6 @@ zabbix_export:
           value: information_schema
           description: 'Filter to exclude discovered databases.'
         - macro: '{$MYSQL.DSN}'
-          value: '<Put your DSN>'
           description: 'System data source name such as <tcp://host:port or unix:/path/to/socket)/>.'
         - macro: '{$MYSQL.INNODB_LOG_FILES}'
           value: '2'
