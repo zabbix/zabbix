@@ -588,11 +588,14 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @required-components server, agent, agent2
 	 */
 	public function testTriggerLinking_conflict() {
-
+		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->startComponent(self::COMPONENT_AGENT);
+		sleep(1);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT2);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
 	}
 }
