@@ -3737,7 +3737,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				"custom_interfaces", "monitored_by", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host",
-				"parent_itemid", (char *)NULL);
+				"lldrule_itemid", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available",
 				(char *)NULL);
 	}
@@ -6233,7 +6233,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 				" left join host_inventory hi"
 					" on hd.hostid=hi.hostid"
 			" where h.hostid=hd.hostid"
-				" and hd.parent_itemid=" ZBX_FS_UI64,
+				" and hd.lldrule_itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = zbx_db_fetch(result)))

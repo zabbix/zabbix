@@ -317,6 +317,13 @@ static int	DBpatch_7030021(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030022(void)
+{
+	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBrename_field("host_discovery", "parent_itemid", &field);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -345,5 +352,6 @@ DBPATCH_ADD(7030018, 0, 1)
 DBPATCH_ADD(7030019, 0, 1)
 DBPATCH_ADD(7030020, 0, 1)
 DBPATCH_ADD(7030021, 0, 1)
+DBPATCH_ADD(7030022, 0, 1)
 
 DBPATCH_END()

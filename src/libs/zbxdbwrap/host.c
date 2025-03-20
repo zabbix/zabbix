@@ -1873,10 +1873,10 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, const zbx_vec
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hp.hostid,hp.name"
 			" from items hi,host_discovery hhd,hosts hp,host_discovery thd,items ti"
-			" where hi.itemid=hhd.parent_itemid"
+			" where hi.itemid=hhd.lldrule_itemid"
 				" and hhd.hostid=hp.hostid"
 				" and hp.templateid=thd.hostid"
-				" and thd.parent_itemid=ti.itemid"
+				" and thd.lldrule_itemid=ti.itemid"
 				" and hi.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
@@ -2279,7 +2279,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 			" from items hi,items ti,host_discovery thd,hosts th"
 			" left join host_inventory hinv on hinv.hostid=th.hostid"
 			" where hi.templateid=ti.itemid"
-				" and ti.itemid=thd.parent_itemid"
+				" and ti.itemid=thd.lldrule_itemid"
 				" and thd.hostid=th.hostid"
 				" and hi.hostid=" ZBX_FS_UI64
 				" and",
@@ -2343,7 +2343,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					"h.templateid,hinv.inventory_mode"
 				" from items i,host_discovery hd,hosts h"
 				" left join host_inventory hinv on hinv.hostid=h.hostid"
-				" where i.itemid=hd.parent_itemid"
+				" where i.itemid=hd.lldrule_itemid"
 					" and hd.hostid=h.hostid"
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
@@ -3504,7 +3504,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "status", "flags", "templateid",
 				"discover", "custom_interfaces", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "lldrule_itemid",
+				(char *)NULL);
 	}
 
 	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros ||
@@ -5918,7 +5919,7 @@ void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, con
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hd.hostid,h.name"
 			" from items i,host_discovery hd, hosts h"
-			" where hd.hostid=h.hostid and i.itemid=hd.parent_itemid"
+			" where hd.hostid=h.hostid and i.itemid=hd.lldrule_itemid"
 				" and");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
 
@@ -6927,7 +6928,7 @@ void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldrule_itemids, i
 			" from host_discovery hd,hosts h"
 			" where hd.hostid=h.hostid"
 				" and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.parent_itemid", lldrule_itemids->values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.lldrule_itemid", lldrule_itemids->values,
 			lldrule_itemids->values_num);
 	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
 		goto clean;
