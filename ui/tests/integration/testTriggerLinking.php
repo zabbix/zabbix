@@ -665,7 +665,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE,
 			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 			'expression' => 'last(/test_template/' .
-			"templateX_item_key" . ')=99',
+			"templateX_item_key" . ')= {#MACRO}',
 			'recovery_expression' => 'last(/test_template/' .
 			"templateX_item_key" . ')=999',
 			'tags' => [
