@@ -64,7 +64,8 @@ $html_page->addItem(
 		->addFilterTab(_('Filter'), [
 			(new CFormGrid())
 				->addItem([
-					new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'),
+					new CLabel(
+						$data['context'] === 'host' ? _('Host groups') : _('Template groups'),
 						'filter_groupids__ms'
 					),
 					(new CMultiSelect([
@@ -73,7 +74,7 @@ $html_page->addItem(
 						'data' => $data['filter']['groups'],
 						'popup' => [
 							'parameters' => [
-									'srctbl' =>  $data['context'] === 'host' ? 'host_groups' : 'template_groups',
+									'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groupids_',
@@ -84,7 +85,7 @@ $html_page->addItem(
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				])
 				->addItem([
-					(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
+					new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms'),
 					(new CMultiSelect([
 						'name' => 'filter_hostids[]',
 						'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -117,7 +118,7 @@ $graphs_form = (new CForm('post', $url))
 	->setName('graph_form')
 	->addVar('context', $data['context'], 'form_context');
 
-$info_column = ($data['context'] === 'host') ? _('Info') : null;
+$info_column = $data['context'] === 'host' ? _('Info') : null;
 
 $graphs_table = (new CTableInfo())
 	->setHeader([
@@ -201,24 +202,20 @@ foreach ($data['graphs'] as $graph) {
 	]);
 }
 
-$buttons = 	new CActionButtonList('action', 'group_graphid',
-	[
-		'graph.masscopyto' => [
-			'content' => (new CSimpleButton(_('Copy')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-copy')
-		],
-		'graph.massdelete' => [
-			'content' => (new CSimpleButton(_('Delete')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-no-chkbxrange')
-				->setId('js-massdelete-graph')
-		]
+$buttons = new CActionButtonList('action', 'group_graphid', [
+	'graph.masscopyto' => [
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-copy')
 	],
-	'graph'
-);
+	'graph.massdelete' => [
+		'content' => (new CSimpleButton(_('Delete')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-no-chkbxrange')
+			->setId('js-massdelete-graph')
+	]
+], 'graph');
 
-// append table to form
 $graphs_form->addItem([$graphs_table, $buttons]);
 
 $html_page

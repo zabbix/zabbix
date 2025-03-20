@@ -17,6 +17,20 @@
 class CGraphHelper extends CGraphGeneralHelper {
 
 	/**
+	 * Validates that a number is within a given range and has the correct decimal precision.
+	 *
+	 * @param mixed $string  Value to check.
+	 * @param int   $min     Minimum allowed value.
+	 * @param int   $max     Maximum allowed value.
+	 * @param int   $scale   Number of decimal places.
+	 *
+	 * @return bool
+	 */
+	public static function validateNumberRangeWithPrecision($value, $min, $max, $scale): bool {
+		return !(!is_numeric($value) || $value < $min || $value > $max || round($value, $scale) != $value);
+	}
+
+	/**
 	 * @param string $src_templateid
 	 * @param string $dst_templateid
 	 *

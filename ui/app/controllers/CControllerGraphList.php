@@ -25,8 +25,8 @@ class CControllerGraphList extends CController {
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
 			'filter_set' =>			'in 1',
 			'filter_rst' =>			'in 1',
-			'filter_groupids' =>	'array_id',
-			'filter_hostids' =>		'array_id',
+			'filter_groupids' =>	'array_db hosts_groups.groupid',
+			'filter_hostids' =>		'array_db hosts.hostid',
 			'sort' =>				'in '.implode(',', ['graphtype', 'name']),
 			'sortorder' =>			'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
 			'page' =>				'ge 1'
@@ -48,7 +48,7 @@ class CControllerGraphList extends CController {
 	}
 
 	protected function doAction(): void {
-		// Update profiles
+		// Update profile keys.
 		$context = $this->getInput('context');
 		$prefix = $context === 'host' ? 'web.hosts.' : 'web.templates.';
 
@@ -150,6 +150,17 @@ class CControllerGraphList extends CController {
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 
+		// Pager.
+		$page_num = $this->getInput('page', 1);
+
+		CPagerHelper::savePage('graph.list', $page_num);
+
+		$paging = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order,
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'graph.list')
+				->setArgument('context', $context)
+		);
+
 		// Get graphs after paging.
 		$options = [
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
@@ -173,16 +184,6 @@ class CControllerGraphList extends CController {
 			}
 			unset($graph);
 		}
-
-		// pager
-		$page_num = $this->getInput('page', 1);
-
-		CPagerHelper::savePage('graph.list', $page_num);
-
-		$paging = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, (new CUrl('zabbix.php'))
-			->setArgument('action', 'graph.list')
-			->setArgument('context', $context)
-		);
 
 		$data += [
 			'filter' => $filter,

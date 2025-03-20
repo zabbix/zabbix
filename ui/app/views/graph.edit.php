@@ -91,10 +91,12 @@ $graph_form
 	->addItem(
 		(new CTabView())
 			->addTab('graph-tab',_('Graph'),
-				new CPartial('graph.edit.graph.tab', $data + [
-						'readonly' => $readonly,
-						'form_name' => $graph_form->getName()
-					])
+				new CPartial('graph.edit.graph.tab', array_merge($data,[
+					'readonly' => $readonly,
+					'is_templated' => $is_templated,
+					'discovered_graph' => $discovered_graph,
+					'form_name' => $graph_form->getName()
+				]))
 			)
 			->addTab('preview-tab', _('Preview'), $preview_table)
 			->setSelected(0)

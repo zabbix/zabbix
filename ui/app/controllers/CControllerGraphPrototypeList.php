@@ -16,6 +16,11 @@
 
 class CControllerGraphPrototypeList extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $discovery_rule = [];
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -23,7 +28,7 @@ class CControllerGraphPrototypeList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
-			'parent_discoveryid' =>	'required|id',
+			'parent_discoveryid' =>	'required|db items.itemid',
 			'sort' =>				'in '.implode(',', ['graphtype', 'name', 'discover']),
 			'sortorder' =>			'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
 			'page' =>				'ge 1'
@@ -41,7 +46,7 @@ class CControllerGraphPrototypeList extends CController {
 	protected function checkPermissions(): bool {
 		$discovery_rule = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
-			'itemids' => getRequest('parent_discoveryid'),
+			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
 
@@ -57,10 +62,8 @@ class CControllerGraphPrototypeList extends CController {
 	}
 
 	protected function doAction(): void {
+		// Update profile keys.
 		$context = $this->getInput('context');
-		$hostid = $this->discovery_rule['hostid'];
-
-		// Update profiles
 		$prefix = $context === 'host' ? 'web.hosts.' : 'web.templates.';
 		$sort_field = $this->getInput('sort', CProfile::get($prefix.'graph.prototype.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder',
@@ -70,6 +73,7 @@ class CControllerGraphPrototypeList extends CController {
 		CProfile::update($prefix.'graph.prototype.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update($prefix.'graph.prototype.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
+		$hostid = $this->discovery_rule['hostid'];
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		$graphs = API::GraphPrototype()->get([
@@ -103,6 +107,16 @@ class CControllerGraphPrototypeList extends CController {
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 
+		// Pager.
+		$page_num = $this->getInput('page', 1);
+
+		CPagerHelper::savePage('graph.list', $page_num);
+		$paging = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, (new CUrl('zabbix.php'))
+			->setArgument('action', 'graph.prototype.list')
+			->setArgument('context', $context)
+			->setArgument('parent_discoveryid', $this->discovery_rule['itemid'])
+		);
+
 		// Get graphs after paging.
 		$options = [
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
@@ -119,15 +133,6 @@ class CControllerGraphPrototypeList extends CController {
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 
-		// pager
-		$page_num = $this->getInput('page', 1);
-
-		CPagerHelper::savePage('graph.list', $page_num);
-		$paging = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, (new CUrl('zabbix.php'))
-			->setArgument('action', 'graph.list')
-			->setArgument('context', $context)
-		);
-
 		$data += [
 			'parent_discoveryid' => $this->discovery_rule['itemid'],
 			'sort' => $sort_field,
@@ -142,7 +147,7 @@ class CControllerGraphPrototypeList extends CController {
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of graphs'));
+		$response->setTitle(_('Configuration of graph prototypes'));
 		$this->setResponse($response);
 	}
 }

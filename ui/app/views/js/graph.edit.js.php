@@ -43,13 +43,15 @@ window.graph_edit_popup = new class {
 			this.addPopupValues(data.values);
 		}
 
-		this.items = Array.isArray(items) ? items : Object.values(items);
+		const graph_type = this.graph_type == <?= GRAPH_TYPE_EXPLODED ?> ? <?= GRAPH_TYPE_PIE ?> : this.graph_type;
+		const item_row_template = new Template(document.getElementById(`tmpl-item-row-${graph_type}`).innerHTML);
 
+		this.items = Array.isArray(items) ? items : Object.values(items);
 		this.items.forEach((item, i) => {
 			item.number = i;
 			item.name = item.host + '<?= NAME_DELIMITER ?>' + item.name;
 
-			this.#loadItem(item);
+			this.#loadItem(item, item_row_template);
 		});
 
 		this.#initActions();
@@ -60,47 +62,6 @@ window.graph_edit_popup = new class {
 		this.initial_form_fields = getFormFields(this.form);
 	}
 
-	#recalculateSortOrder() {
-		let i = 0;
-
-		$('#items-table tbody tr.graph-item').find('*[id]').each(function() {
-			const $obj = $(this);
-
-			$obj.attr('id', 'tmp' + $obj.attr('id'));
-		});
-
-		$('#items-table tbody tr.graph-item').each(function() {
-			const $obj = $(this);
-
-			$obj.attr('id', 'tmp' + $obj.attr('id'));
-		});
-
-		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
-			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
-
-			row.querySelectorAll('[id]').forEach(element => {
-				element.id = element.id.substring(3).replace(/\d+/, `${index}`);
-
-				if (element.id.includes('sortorder')) {
-					element.value = index;
-				}
-			});
-
-			row.querySelectorAll('[name]').forEach(element => {
-				element.name = element.name.replace(/\d+/, `${index}`);
-			});
-		}
-
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
-			const remove_element = document.getElementById('items_' + index + '_remove');
-
-			if (remove_element) {
-				remove_element.setAttribute('data-remove', index);
-			}
-		});
-
-	}
-
 	#initActions() {
 		this.form.querySelector('#graphtype').addEventListener('change', (e) => {
 			this.#toggleGraphTypeFields(e.target.value);
@@ -109,50 +70,7 @@ window.graph_edit_popup = new class {
 			this.graph_type = e.target.value;
 		});
 
-		this.#toggleGraphTypeFields(this.form.querySelector('#graphtype').value);
-
-		// todo - move to 1 method?
-		const ymin_type = this.form.querySelector('#ymin_type');
-
-		if (ymin_type) {
-			ymin_type.addEventListener('change', (e) => {
-				this.#toggleYAxisFields(e.target, 'min');
-			});
-		}
-
-		const ymax_type = this.form.querySelector('#ymax_type');
-
-		if (ymax_type) {
-			ymax_type.addEventListener('change', (e) => {
-				this.#toggleYAxisFields(e.target, 'max');
-			});
-		}
-
-		this.#toggleYAxisFields(ymin_type, 'min');
-		this.#toggleYAxisFields(ymax_type, 'max');
-
-		// Percent fields
-		this.form.querySelector('#visible_percent_left').addEventListener('change', () => {
-			this.#togglePercentField('left');
-		});
-
-		this.form.querySelector('#visible_percent_right').addEventListener('change', () => {
-			this.#togglePercentField('right');
-		});
-
-		this.#togglePercentField('left');
-		this.#togglePercentField('right');
-
-		// Initialize sortable instance for items table.
-		if (this.form.querySelector('#items-table tbody')) {
-			new CSortable(this.form.querySelector('#items-table tbody'), {
-				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				freeze_end: 1,
-				enable_sorting: !this.readonly
-			}).on(CSortable.EVENT_SORT, this.#recalculateSortOrder);
-		}
-
-		document.getElementById('items-table').addEventListener('click', (e) => {
+		this.form.querySelector('#items-table').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-item-name')) {
 				this.#openItemPopup(e.target);
 			}
@@ -173,189 +91,29 @@ window.graph_edit_popup = new class {
 			}
 		});
 
-		this.#toggleColorPickerStatus();
-	}
+		this.#toggleGraphTypeFields(this.form.querySelector('#graphtype').value);
+		this.#toggleYaxisTypeFields();
 
-	#openItemPopup(target) {
-		const item_num = target.id.match(/\d+/g);
-		const parameters = {
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			dstfld1: 'items_' + item_num + '_itemid',
-			dstfld2: 'items_' + item_num + '_name',
-			numeric: 1,
-			writeonly: 1,
-			normal_only: 1
-		};
-
-		if ($('#items_' + item_num + '_flags') == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
-			parameters['srctbl'] = 'item_prototypes';
-			parameters['srcfld3'] = 'flags';
-			parameters['dstfld3'] = 'items_' + item_num + '_flags';
-			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
-		}
-		else {
-			parameters['srctbl'] = 'items';
-		}
-
-		if (!this.graph.parent_discoveryid && this.graph.hostid) {
-			parameters['hostid'] = this.graph.hostid;
-		}
-
-		if (this.graph.is_template) {
-			parameters['only_hostid'] = this.graph.hostid
-		}
-		else {
-			parameters['real_hosts'] = '1';
-			parameters['hostid'] = this.graph.hostid;
-		}
-
-		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
-	}
-
-	#toggleColorPickerStatus() {
-		if (this.graph.readonly) {
-			const size = $('#items-table tbody tr.graph-item').length;
-
-			for (let i = 0; i < size; i++) {
-				$('#items_' + i + '_color')
-					.removeAttr('onchange')
-					.prop('readonly', true);
-				$('#lbl_items_' + i + '_color')
-					.removeAttr('onclick')
-					.prop('readonly', true);
-			}
-		}
-	}
-
-	#removeItem(target) {
-		const number = target.dataset.remove;
-		this.form.querySelector(`#items_${number}`).remove();
-
-		this.#recalculateSortOrder();
-	}
-
-	#updateItemsTable(graph_type) {
-		const tbody = this.form.querySelector('#items-table tbody');
-		const item_row_template = new Template($('#tmpl-item-row-' + graph_type).html());
-		const rows = [...tbody.querySelectorAll('tr.graph-item')];
-
-		rows.forEach((row, index) => {
-			let row_data = {};
-
-			row.querySelectorAll('input[type="hidden"]').forEach(input => {
-				const match = input.name.match(/\[(\w+)\]$/);
-				if (match) {
-					const key = match[1];
-					row_data[key] = input.value;
-				}
-			});
-
-			row_data.number = index;
-
-			const name_element = row.querySelector('[id^="items_"][id$="_name"]');
-			row_data.name = name_element.textContent;
-
-			const new_row_html = item_row_template.evaluate(row_data);
-
-			const temp = document.createElement('tbody');
-			temp.innerHTML = new_row_html.trim();
-			const new_row = temp.firstElementChild;
-
-			// Replace the old row with the new row.
-			tbody.replaceChild(new_row, row);
-
-			const $row = $(new_row);
-			$row.find('#items_' + index + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
-			$(`#items_${index}_color`).colorpicker();
-		});
-	}
-
-	#loadItem(item) {
-		const item_template = new Template($('#tmpl-item-row-' + this.graph_type).html());
-
-		const $row = $(item_template.evaluate(item));
-
-		$('#item-buttons-row').before($row);
-		$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
-	}
-
-	#togglePercentField(type) {
-		const percent_field = this.form.querySelector(`#percent_${type}`);
-
-		if (this.form.querySelector(`input[name="visible[percent_${type}]"]:checked`)) {
-			percent_field.style.display = '';
-			percent_field.disabled = false;
-		}
-		else {
-			percent_field.style.display = 'none';
-			percent_field.disabled = true;
-		}
-	}
-
-	#openItemSelectPopup() {
-		const parameters = {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			hostid: this.hostid
-		};
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
-
-		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
-	}
-
-	#openItemPrototypeSelectPopup(popup_parameters = {}) {
-		const parameters = {
-			srctbl: 'item_prototypes',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			numeric: '1',
-			parent_discoveryid: this.graph.parent_discoveryid
-		}
-
-		Object.assign(parameters, popup_parameters);
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
-
-		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
-	}
-
-	#toggleYAxisFields(target, yaxis) {
-		const text_field = this.form.querySelector(`#yaxis_${yaxis}_value`);
-		const ms_field = this.form.querySelector(`#yaxis_${yaxis}_ms`);
-		const ms_prototype_button = this.form.querySelector(`#yaxis_${yaxis}_prototype_ms`);
-
-		const display_text_field = target.value == <?= GRAPH_YAXIS_TYPE_FIXED ?>;
-		const display_ms_field = target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>;
-		const display_ms_prototype = display_ms_field && this.graph.parent_discoveryid;
-
-		text_field.style.display = display_text_field ? '' : 'none';
-		text_field.querySelectorAll('input').forEach(input => {
-			input.disabled = !display_text_field;
+		// Percent fields.
+		this.form.querySelector('#visible_percent_left').addEventListener('change', () => {
+			this.#togglePercentField('left');
 		});
 
-		ms_field.style.display = display_ms_field ? '' : 'none';
-		ms_field.querySelectorAll('input').forEach(input => {
-			input.disabled = !display_ms_field;
+		this.form.querySelector('#visible_percent_right').addEventListener('change', () => {
+			this.#togglePercentField('right');
 		});
 
-		ms_prototype_button.style.display = display_ms_prototype ? '' : 'none';
+		this.#togglePercentField('left');
+		this.#togglePercentField('right');
 
-		this.form.querySelector(`label[for="y${yaxis}_type_label"]`)
-			.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>
-		);
+		// Initialize sortable instance for items table.
+		if (this.form.querySelector('#items-table tbody')) {
+			new CSortable(this.form.querySelector('#items-table tbody'), {
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1,
+				enable_sorting: !this.readonly
+			}).on(CSortable.EVENT_SORT, this.#recalculateSortOrder);
+		}
 	}
 
 	#toggleGraphTypeFields(graph_type) {
@@ -372,7 +130,9 @@ window.graph_edit_popup = new class {
 				break;
 
 			case <?= GRAPH_TYPE_STACKED ?>:
-				show_fields = ['#show_work_period_field', '#show_triggers_field', '#yaxis_min_field', '#yaxis_max_field'];
+				show_fields = ['#show_work_period_field', '#show_triggers_field', '#yaxis_min_field',
+					'#yaxis_max_field'
+				];
 				hide_fields = ['#percent_left_field', '#percent_right_field', '#show_3d_field'];
 				break;
 
@@ -428,6 +188,35 @@ window.graph_edit_popup = new class {
 			: 'none';
 	}
 
+	#toggleYaxisTypeFields() {
+		const ymin_type = this.form.querySelector('#ymin_type');
+		const ymax_type = this.form.querySelector('#ymax_type');
+
+		ymin_type.addEventListener('change', (e) => {
+			this.#toggleYAxisFields(e.target, 'min');
+		});
+
+		ymax_type.addEventListener('change', (e) => {
+			this.#toggleYAxisFields(e.target, 'max');
+		});
+
+		this.#toggleYAxisFields(ymin_type, 'min');
+		this.#toggleYAxisFields(ymax_type, 'max');
+	}
+
+	#togglePercentField(type) {
+		const percent_field = this.form.querySelector(`#percent_${type}`);
+
+		if (this.form.querySelector(`input[name="visible[percent_${type}]"]:checked`)) {
+			percent_field.style.display = '';
+			percent_field.disabled = false;
+		}
+		else {
+			percent_field.style.display = 'none';
+			percent_field.disabled = true;
+		}
+	}
+
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;;
@@ -449,7 +238,7 @@ window.graph_edit_popup = new class {
 				src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
-						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
+					|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
 
 					src.setPath('chart7.php');
 					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
@@ -517,19 +306,218 @@ window.graph_edit_popup = new class {
 					});
 			}
 		});
+	}
+
+	#recalculateSortOrder() {
+		document.querySelectorAll('#items-table tbody tr.graph-item [id]').forEach(element => {
+			element.id = 'tmp' + element.id;
+		});
+
+		document.querySelectorAll('#items-table tbody tr.graph-item').forEach(element => {
+			element.id = 'tmp' + element.id;
+		});
+
+		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
+			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
+
+			row.querySelectorAll('[id]').forEach(element => {
+				element.id = element.id.substring(3).replace(/\d+/, `${index}`);
+
+				if (element.id.includes('sortorder')) {
+					element.value = index;
+				}
+			});
+
+			row.querySelectorAll('[name]').forEach(element => {
+				element.name = element.name.replace(/\d+/, `${index}`);
+			});
+		}
+
+		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
+			const remove_element = document.getElementById('items_' + index + '_remove');
+
+			if (remove_element) {
+				remove_element.setAttribute('data-remove', index);
+			}
+		});
+	}
+
+	#openItemPopup(target) {
+		const item_num = target.id.match(/\d+/g);
+		const parameters = {
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_name,
+			dstfld1: 'items_' + item_num + '_itemid',
+			dstfld2: 'items_' + item_num + '_name',
+			numeric: 1,
+			writeonly: 1,
+			normal_only: 1
+		};
+
+		if (document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
+			parameters['srctbl'] = 'item_prototypes';
+			parameters['srcfld3'] = 'flags';
+			parameters['dstfld3'] = 'items_' + item_num + '_flags';
+			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
+		}
+		else {
+			parameters['srctbl'] = 'items';
+		}
+
+		if (!this.graph.parent_discoveryid && this.graph.hostid) {
+			parameters['hostid'] = this.graph.hostid;
+		}
+
+		if (this.graph.is_template) {
+			parameters['only_hostid'] = this.graph.hostid
+		}
+		else {
+			parameters['real_hosts'] = '1';
+			parameters['hostid'] = this.graph.hostid;
+		}
+
+		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+	}
+
+	#toggleColorPickerStatus() {
+		const size = document.querySelectorAll('#items-table tbody tr.graph-item').length;
+
+		for (let i = 0; i < size; i++) {
+			const color_element = document.getElementById('items_' + i + '_color');
+
+			color_element.removeAttribute('onchange');
+			color_element.readOnly = true;
+
+			const lbl_color_elem = document.getElementById('lbl_items_' + i + '_color');
+
+			lbl_color_elem.removeAttribute('onclick');
+			lbl_color_elem.readOnly = true;
+		}
+	}
+
+	#removeItem(target) {
+		const number = target.dataset.remove;
+
+		this.form.querySelector(`#items_${number}`).remove();
+		this.#recalculateSortOrder();
+	}
+
+	#updateItemsTable(graph_type) {
+		const tbody = this.form.querySelector('#items-table tbody');
+		let template_type = graph_type;
+
+		if (graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
+			template_type = <?= GRAPH_TYPE_PIE ?>;
+		}
+		const template = new Template(document.getElementById(`tmpl-item-row-${template_type}`).innerHTML);
+		const rows = [...tbody.querySelectorAll('tr.graph-item')];
+
+		rows.forEach((row, index) => {
+			let row_data = {};
+
+			row.querySelectorAll('input[type="hidden"]').forEach(input => {
+				const match = input.name.match(/\[(\w+)\]$/);
+				if (match) {
+					const key = match[1];
+					row_data[key] = input.value;
+				}
+			});
+
+			row_data.number = index;
+
+			const name_element = row.querySelector('[id^="items_"][id$="_name"]');
+			row_data.name = name_element.textContent;
+
+			const new_row_html = template.evaluate(row_data);
+
+			const temp = document.createElement('tbody');
+			temp.innerHTML = new_row_html.trim();
+			const new_row = temp.firstElementChild;
+
+			// Replace the old row with the new row.
+			tbody.replaceChild(new_row, row);
+
+			const $row = $(new_row);
+			$row.find('#items_' + index + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
+			$(`#items_${index}_color`).colorpicker();
+		});
+	}
+
+	#loadItem(item, template) {
+		const $row = $(template.evaluate(item));
+
+		$('#item-buttons-row').before($row);
+		$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
 		if (this.readonly) {
-			const size = $('#items-table tbody tr.graph-item').length;
-
-			for (let i = 0; i < size; i++) {
-				$('#items_' + i + '_color')
-					.removeAttr('onchange')
-					.prop('readonly', true);
-				$('#lbl_items_' + i + '_color')
-					.removeAttr('onclick')
-					.prop('readonly', true);
-			}
+			this.#toggleColorPickerStatus();
 		}
+	}
+
+	#openItemSelectPopup() {
+		const parameters = {
+			srctbl: 'items',
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_name,
+			numeric: 1,
+			writeonly: 1,
+			multiselect: 1,
+			hostid: this.hostid
+		};
+
+		if (this.graph.normal_only == 1) {
+			parameters['normal_only'] = this.graph.normal_only;
+		}
+
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
+	}
+
+	#openItemPrototypeSelectPopup(popup_parameters = {}) {
+		const parameters = {
+			srctbl: 'item_prototypes',
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_name,
+			numeric: '1',
+			parent_discoveryid: this.graph.parent_discoveryid
+		}
+
+		Object.assign(parameters, popup_parameters);
+
+		if (this.graph.normal_only == 1) {
+			parameters['normal_only'] = this.graph.normal_only;
+		}
+
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
+	}
+
+	#toggleYAxisFields(target, yaxis) {
+		const text_field = this.form.querySelector(`#yaxis_${yaxis}_value`);
+		const ms_field = this.form.querySelector(`#yaxis_${yaxis}_ms`);
+		const ms_prototype_button = this.form.querySelector(`#yaxis_${yaxis}_prototype_ms`);
+
+		const display_text_field = target.value == <?= GRAPH_YAXIS_TYPE_FIXED ?>;
+		const display_ms_field = target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>;
+		const display_ms_prototype = display_ms_field && this.graph.parent_discoveryid;
+
+		text_field.style.display = display_text_field ? '' : 'none';
+		text_field.querySelectorAll('input').forEach(input => {
+			input.disabled = !display_text_field;
+		});
+
+		ms_field.style.display = display_ms_field ? '' : 'none';
+		ms_field.querySelectorAll('input').forEach(input => {
+			input.disabled = !display_ms_field;
+		});
+
+		ms_prototype_button.style.display = display_ms_prototype ? '' : 'none';
+
+		this.form.querySelector(`label[for="y${yaxis}_type_label"]`)
+			.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>',
+				target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>
+			);
 	}
 
 	addPopupValues(list) {
@@ -537,7 +525,12 @@ window.graph_edit_popup = new class {
 			return false;
 		}
 
-		const item_row_template = new Template($('#tmpl-item-row-' + this.graph_type).html());
+		let template_type = this.graph_type;
+
+		if (this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
+			template_type = <?= GRAPH_TYPE_PIE ?>;
+		}
+		const template = new Template(document.getElementById(`tmpl-item-row-${template_type}`).innerHTML);
 
 		for (let i = 0; i < list.length; i++) {
 			const used_colors = [];
@@ -565,7 +558,7 @@ window.graph_edit_popup = new class {
 
 			this.items.push(item);
 
-			const $row = $(item_row_template.evaluate(item));
+			const $row = $(template.evaluate(item));
 
 			$('#item-buttons-row').before($row);
 			$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
@@ -578,7 +571,7 @@ window.graph_edit_popup = new class {
 
 		form_refresh.setAttribute('type', 'hidden');
 		form_refresh.setAttribute('name', 'clone');
-		form_refresh.setAttribute('value', 1);
+		form_refresh.setAttribute('value', '1');
 		this.form.append(form_refresh);
 
 		this.form.querySelector('[name="graphid"]').remove();
@@ -591,6 +584,7 @@ window.graph_edit_popup = new class {
 		const action = this.action === 'graph.edit' ? 'graph.delete' : 'graph.prototype.delete';
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', action);
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('graph')) ?>);
 
@@ -603,6 +597,7 @@ window.graph_edit_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+
 		fields.name = fields.name.trim();
 
 		const curl = new Curl('zabbix.php');
@@ -658,6 +653,11 @@ window.graph_edit_popup = new class {
 			});
 	}
 
+	#isConfirmed() {
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
+	}
+
 	#initPopupListeners() {
 		const subscriptions = [];
 
@@ -692,10 +692,5 @@ window.graph_edit_popup = new class {
 				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
 			})
 		);
-	}
-
-	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
-			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 }

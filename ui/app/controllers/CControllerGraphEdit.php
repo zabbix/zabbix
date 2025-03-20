@@ -23,12 +23,12 @@ class CControllerGraphEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>			'in '.implode(',', ['host', 'template']),
-			'hostid' =>				'id',
+			'context' =>			'required|in '.implode(',', ['host', 'template']),
+			'hostid' =>				'db hosts.hostid',
 			'graphid' =>			'db graphs.graphid',
 			'name' =>				'string',
-			'width' =>				'db graphs.width|ge 20|le 65535',
-			'height' => 			'db graphs.height|ge 20|le 65535',
+			'width' =>				'db graphs.width',
+			'height' => 			'db graphs.height',
 			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),
@@ -50,9 +50,9 @@ class CControllerGraphEdit extends CController {
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
 			'normal_only' =>		'in 1',
-			'clone' =>				'in 1'
+			'clone' =>				'in 1',
+			'visible' =>			'array'
 		];
-		// todo - add additional validation rules for dbl
 
 		$ret = $this->validateInput($fields);
 
@@ -70,7 +70,20 @@ class CControllerGraphEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// todo - check if user has permissions to edit specific graph, if graphid is passed
+		$graphid = $this->getInput('graphid');
+
+		if ($graphid) {
+			$graph = (bool) API::Graph()->get([
+				'output' => [],
+				'graphids' => $graphid,
+				'editable' => true
+			]);
+
+			if (!$graph) {
+				return false;
+			}
+		}
+
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -79,7 +92,6 @@ class CControllerGraphEdit extends CController {
 	protected function doAction() {
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
-			'group_gid' => $this->getInput('group_gid', []),
 			'hostid' => $this->getInput('hostid', 0),
 			'context' => $this->getInput('context'),
 			'normal_only' => $this->getInput('normal_only', 0)
@@ -89,8 +101,8 @@ class CControllerGraphEdit extends CController {
 
 		foreach ($this->getInput('items', []) as $gitem) {
 			if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-				&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-				&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
 				$gitems[] = $gitem;
 			}
 		}
@@ -122,6 +134,13 @@ class CControllerGraphEdit extends CController {
 			$data['percent_left'] = $this->getInput('percent_left', 0);
 			$data['percent_right'] = $this->getInput('percent_right', 0);
 			$data['items'] = $gitems;
+
+			if (array_key_exists('percent_left', $data['visible'])) {
+				$data['percent_left'] = $this->getInput('percent_left', 0);
+			}
+			if (array_key_exists('percent_right', $data['visible'])) {
+				$data['percent_right'] = $this->getInput('percent_right', 0);
+			}
 		}
 		elseif ($data['graphid'] != 0) {
 			$options = [
@@ -156,8 +175,6 @@ class CControllerGraphEdit extends CController {
 			$data['discoveryRule'] = $graph['discoveryRule'];
 			$data['graphDiscovery'] = $graph['graphDiscovery'];
 
-			// todo - check if still relevant
-			// if no host has been selected for the navigation panel, use the first graph host
 			if ($data['hostid'] == 0) {
 				$host = reset($graph['hosts']);
 				$data['hostid'] = $host['hostid'];
@@ -203,7 +220,7 @@ class CControllerGraphEdit extends CController {
 			$data['show_3d'] = $this->getInput('show_3d', 0);
 			$data['visible'] = $this->getInput('visible', []);
 			$data['percent_left'] = 0;
-			$data['percent_right'] =0;
+			$data['percent_right'] = 0;
 			$data['items'] = $gitems;
 			$data['discover'] = $this->getInput('discover', DB::getDefault('graphs', 'discover'));
 			$data['templates'] = [];
@@ -285,8 +302,8 @@ class CControllerGraphEdit extends CController {
 		$item_count = count($data['items']);
 
 		for ($i = 0; $i < $item_count - 1;) {
-			// Check if we delete an item.
 			$next = $i + 1;
+
 			while (!isset($data['items'][$next]) && $next < ($item_count - 1)) {
 				$next++;
 			}
@@ -301,6 +318,7 @@ class CControllerGraphEdit extends CController {
 
 			$i = $next;
 		}
+
 		CArrayHelper::sort($data['items'], ['sortorder']);
 		$data['items'] = array_values($data['items']);
 

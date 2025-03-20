@@ -18,14 +18,10 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 class CControllerGraphPrototypeEdit extends CController {
 
 	/**
-	 * @var mixed
-	 */
-	private $hostid = 0;
-
-	/**
 	 * @var array
 	 */
 	private $discovery_rule = [];
+
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -33,13 +29,13 @@ class CControllerGraphPrototypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>			'in '.implode(',', ['host', 'template']),
-			'hostid' =>				'id',
-			'parent_discoveryid'=>	'id',
+			'context' =>			'required|in '.implode(',', ['host', 'template']),
+			'hostid' =>				'db hosts.hostid',
+			'parent_discoveryid'=>	'required|db items.itemid',
 			'graphid' =>			'db graphs.graphid',
 			'name' =>				'string',
-			'width' =>				'db graphs.width|ge 20|le 65535',
-			'height' => 			'db graphs.height|ge 20|le 65535',
+			'width' =>				'db graphs.width',
+			'height' => 			'db graphs.height',
 			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),
@@ -60,11 +56,13 @@ class CControllerGraphPrototypeEdit extends CController {
 			'ymin_itemid' =>		'db graphs.ymin_itemid',
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
-			'discover' =>			'db graphs.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
+			'discover' =>			'db graphs.discover|in '.implode(',', [
+				ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER
+			]),
 			'normal_only' =>		'in 1',
-			'clone' =>				'in 1'
+			'clone' =>				'in 1',
+			'visible' =>			'array'
 		];
-		// todo - add additional validation rules for dbl
 
 		$ret = $this->validateInput($fields);
 
@@ -82,7 +80,33 @@ class CControllerGraphPrototypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// todo - add validation to specific graph prototype
+		$discovery_rule = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid'],
+			'itemids' => $this->getInput('parent_discoveryid'),
+			'editable' => true
+		]);
+
+		$this->discovery_rule = reset($discovery_rule);
+
+		if (!$discovery_rule) {
+			return false;
+		}
+
+		$graphid = $this->getInput('graphid');
+
+		// Check whether graph prototype is editable by user.
+		if ($graphid) {
+			$graph_prototype = (bool) API::GraphPrototype()->get([
+				'output' => [],
+				'graphids' => $graphid,
+				'editable' => true
+			]);
+
+			if (!$graph_prototype) {
+				return false;
+			}
+		}
+
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -99,19 +123,10 @@ class CControllerGraphPrototypeEdit extends CController {
 			}
 		}
 
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'hostid'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
-		$discovery_rule = reset($discovery_rule);
-
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
-			'parent_discoveryid' => $this->hasInput('parent_discoveryid') ? $this->getInput('parent_discoveryid') : null,
-			// todo - check this param:
-			'group_gid' => $this->getInput('group_gid', []),
-			'hostid' => $discovery_rule['hostid'],
+			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
+			'hostid' => $this->discovery_rule['hostid'],
 			'context' => $this->getInput('context'),
 			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => $this->getInput('readonly', 0)
@@ -144,7 +159,7 @@ class CControllerGraphPrototypeEdit extends CController {
 			$data['percent_left'] = 0;
 			$data['percent_right'] = 0;
 			$data['items'] = $gitems;
-			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;;
+			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;
 
 			if (array_key_exists('percent_left', $data['visible'])) {
 				$data['percent_left'] = $this->getInput('percent_left', 0);
@@ -181,19 +196,12 @@ class CControllerGraphPrototypeEdit extends CController {
 			$data['percent_left'] = $graph['percent_left'];
 			$data['percent_right'] = $graph['percent_right'];
 			$data['templateid'] = $graph['templateid'];
-			$data['templates'] = [];
 			$data['discover'] = $graph['discover'];
 
-			// if no host has been selected for the navigation panel, use the first graph host
-			if ($data['hostid'] == 0) {
-				$host = reset($graph['hosts']);
-				$data['hostid'] = $host['hostid'];
-			}
-
 			// templates
-			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-				$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'],
+				getGraphParentTemplates([$graph], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+				ZBX_FLAG_DISCOVERY_PROTOTYPE, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
 
 			// items
@@ -314,10 +322,9 @@ class CControllerGraphPrototypeEdit extends CController {
 		$data['items'] = array_values($data['items']);
 		$item_count = count($data['items']);
 
-		// todo - double check this part:
 		for ($i = 0; $i < $item_count - 1;) {
-			// Check if we delete an item.
 			$next = $i + 1;
+
 			while (!isset($data['items'][$next]) && $next < ($item_count - 1)) {
 				$next++;
 			}
@@ -332,11 +339,12 @@ class CControllerGraphPrototypeEdit extends CController {
 
 			$i = $next;
 		}
+
 		CArrayHelper::sort($data['items'], ['sortorder']);
 		$data['items'] = array_values($data['items']);
 
 		$data += [
-			'is_template' => $this->hostid == 0 ? false : isTemplate($data['hostid']),
+			'is_template' => $data['hostid'] == 0 ? false : isTemplate($data['hostid']),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 

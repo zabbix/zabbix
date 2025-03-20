@@ -23,12 +23,12 @@ class CControllerGraphUpdate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'graphid' =>			'fatal|required|db graphs.graphid',
-			'context' =>			'in '.implode(',', ['host', 'template']),
+			'context' =>			'required|in '.implode(',', ['host', 'template']),
 			'hostid' =>				'db hosts.hostid',
-			'name' =>				'required|not_empty|string',
-			'width' =>				'required|not_empty|db graphs.width|ge 20|le 65535',
-			'height' => 			'required|not_empty|db graphs.height|ge 20|le 65535',
-			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
+			'name' =>				'required|db graphs.name|not_empty',
+			'width' =>				'required|db graphs.width|not_empty|ge 20|le 65535',
+			'height' => 			'required|db graphs.height|not_empty|ge 20|le 65535',
+			'graphtype' =>			'required|db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),
 			'show_legend' =>		'db graphs.show_legend|in 0,1',
@@ -78,6 +78,16 @@ class CControllerGraphUpdate extends CController {
 
 	protected function checkPermissions(): bool {
 		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
+			return false;
+		}
+
+		$graph = (bool) API::Graph()->get([
+			'output' => [],
+			'graphids' => $this->getInput('graphid'),
+			'editable' => true
+		]);
+
+		if (!$graph) {
 			return false;
 		}
 
@@ -166,13 +176,21 @@ class CControllerGraphUpdate extends CController {
 
 	private function validateYAxisFields(): bool {
 		$fields = [];
+		$ymin_type = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$ymax_type = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
 
-		if ($this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED) == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$fields['ymin_itemid'] = 'required|not_empty|db graphs.ymin_itemid';
+		if ($ymin_type == GRAPH_YAXIS_TYPE_FIXED) {
+			$fields['yaxismin'] = 'required|string|not_empty';
+		}
+		elseif ($ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$fields['ymin_itemid'] = 'required|db graphs.ymin_itemid|not_empty';
 		}
 
-		if ($this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED) == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$fields['ymax_itemid'] = 'required|not_empty|db graphs.ymax_itemid';
+		if ($ymax_type == GRAPH_YAXIS_TYPE_FIXED) {
+			$fields['yaxismax'] = 'required|string|not_empty';
+		}
+		elseif ($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$fields['ymax_itemid'] = 'required|db graphs.ymax_itemid|not_empty';
 		}
 
 		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
@@ -185,15 +203,10 @@ class CControllerGraphUpdate extends CController {
 	}
 
 	private function validatePercentFields(): bool {
-		$fields = [
-			'percent_left'  => 'Percentile line (left)',
-			'percent_right' => 'Percentile line (right)'
-		];
-
-		foreach ($fields as $field => $label) {
+		foreach (['percent_left', 'percent_right'] as $field) {
 			if ($this->hasInput($field)
-					&& !self::validateNumberRangeWithPrecision($this->getInput($field), 0, 100, 4)) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', $label,
+					&& !CGraphHelper::validateNumberRangeWithPrecision($this->getInput($field), 0, 100, 4)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', $field,
 					_s('value must be between "%1$s" and "%2$s", and have no more than "%3$s" digits after the decimal point',
 						'0', '100', '4'
 					)
@@ -204,19 +217,5 @@ class CControllerGraphUpdate extends CController {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Validates that a number is within a given range and has the correct decimal precision.
-	 *
-	 * @param mixed $string  Value to check.
-	 * @param int   $min     Minimum allowed value.
-	 * @param int   $max     Maximum allowed value.
-	 * @param int   $scale   Number of decimal places.
-	 *
-	 * @return bool
-	 */
-	private static function validateNumberRangeWithPrecision($value, $min, $max, $scale): bool {
-		return !(!is_numeric($value) || $value < $min || $value > $max || round($value, $scale) != $value);
 	}
 }

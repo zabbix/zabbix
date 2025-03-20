@@ -77,6 +77,28 @@
 			}
 		}
 
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
+
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
+
+						url.searchParams.set('action', 'graph.prototype.list');
+						url.searchParams.set('context', this.context);
+						url.searchParams.set('parent_discoveryid', this.parent_discoveryid);
+
+						event.setRedirectUrl(url.href);
+					}
+				}
+			});
+		}
+
 		#updateDiscover(target, graphid) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'graph.prototype.updatediscover');
@@ -167,28 +189,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		#initPopupListeners() {
-			ZABBIX.EventHub.subscribe({
-				require: {
-					context: CPopupManager.EVENT_CONTEXT,
-					event: CPopupManagerEvent.EVENT_SUBMIT
-				},
-				callback: ({data, event}) => {
-					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
-
-					if (data.submit.success.action === 'delete') {
-						const url = new URL('zabbix.php', location.href);
-
-						url.searchParams.set('action', 'graph.prototype.list');
-						url.searchParams.set('context', this.context);
-						url.searchParams.set('parent_discoveryid', this.parent_discoveryid);
-
-						event.setRedirectUrl(url.href);
-					}
-				}
-			});
 		}
 	};
 </script>
