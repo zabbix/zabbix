@@ -29,8 +29,6 @@ class ZVertical extends HTMLElement {
 
 		this.attachShadow({mode: 'open'});
 
-		const container_styles = window.getComputedStyle(this);
-
 		this.#inner_container = document.createElement('div');
 
 		Object.assign(this.#inner_container.style, {
@@ -41,6 +39,13 @@ class ZVertical extends HTMLElement {
 			transform: `rotate(270deg)`
 		});
 
+		const slot = document.createElement('slot');
+		this.#inner_container.append(slot);
+
+		this.shadowRoot.append(this.#inner_container);
+	}
+
+	connectedCallback() {
 		const props_to_inherit = {
 			maxHeight: 'maxWidth',
 			maxWidth: 'maxHeight',
@@ -49,8 +54,10 @@ class ZVertical extends HTMLElement {
 			minWidth: 'minHeight',
 			minHeight: 'minWidth',
 			textOverflow: 'textOverflow',
-			overflow: 'overflow',
+			overflow: 'overflow'
 		}
+
+		const container_styles = window.getComputedStyle(this);
 
 		for (const prop in props_to_inherit) {
 			if (!['auto', 'none', '0px'].includes(container_styles[prop])) {
@@ -58,13 +65,6 @@ class ZVertical extends HTMLElement {
 			}
 		}
 
-		const slot = document.createElement('slot');
-		this.#inner_container.append(slot);
-
-		this.shadowRoot.append(this.#inner_container);
-	}
-
-	connectedCallback() {
 		this.registerEvents();
 		this.#refresh();
 	}
