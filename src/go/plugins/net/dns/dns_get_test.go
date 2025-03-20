@@ -37,6 +37,39 @@ func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
 		err      error
 	}{
 		{
+			"+emptyParamsExceptIPAddressAndDNSQuery",
+			[]string{
+				"1.1.1.1",
+				"example.com",
+				"",
+				"",
+				"",
+				"",
+				"",
+			},
+			false,
+			&dnsGetOptions{
+				options{
+					"1.1.1.1:53",
+					"example.com",
+					udpProtocol,
+					defaultRecordType,
+					defaultCount,
+					time.Second,
+				},
+				map[string]bool{
+					"aaflag": false,
+					"adflag": false,
+					"cdflag": false,
+					"dnssec": false,
+					"edns0":  true,
+					"nsid":   false,
+					"rdflag": true,
+				},
+			},
+			nil,
+		},
+		{
 			"+emptyParamsRecordTypeDNSServerSpecified",
 			[]string{
 				"1.1.1.1",

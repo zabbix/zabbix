@@ -38,6 +38,7 @@ const (
 	inAddrV6Suffix = ".ip6.arpa"
 
 	defaultCount = 2
+	defaultRecordType = dns.TypeSOA
 )
 
 const (
@@ -491,7 +492,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.dnsType == dns.TypeNone {
-		o.dnsType = dns.TypeSOA
+		o.dnsType = defaultRecordType
 	}
 
 	if o.timeout < 1 {
