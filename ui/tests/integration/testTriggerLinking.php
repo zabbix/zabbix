@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_trigger_linking
- * @backup history
+ * @backup history, autoreg_host
  */
 class testTriggerLinking extends CIntegrationTest {
 	const HOST_NAME = 'test_trigger_linking';
@@ -476,6 +476,7 @@ class testTriggerLinking extends CIntegrationTest {
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent, agent2
+	 * @backup autoreg_host
 	 */
 	public function testTriggerLinking_checkMe() {
 
@@ -590,8 +591,6 @@ class testTriggerLinking extends CIntegrationTest {
 	public function testTriggerLinking_conflict() {
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
 		$this->stopComponent(self::COMPONENT_SERVER);
