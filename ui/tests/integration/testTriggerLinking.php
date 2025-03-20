@@ -492,7 +492,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
 		$this->checkTriggersCreate();
 		$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
-		$this->stopComponent(self::COMPONENT_SERVER);
+		//$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_AGENT);
 
 		$response = $this->call('host.get', [
@@ -516,7 +516,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-		$this->startComponent(self::COMPONENT_SERVER);
+		//$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
