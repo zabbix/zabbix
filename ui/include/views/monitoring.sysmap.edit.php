@@ -120,6 +120,13 @@ foreach ($data['images'] as $image) {
 
 $map_tab->addRow(new CLabel(_('Background image'), $background->getFocusableElementId()), $background);
 
+$map_tab->addRow(_('Background scale'),
+	(new CRadioButtonList('background_scale', (int) $data['sysmap']['background_scale']))
+		->addValue(_('None'), SYSMAP_BACKGROUND_SCALE_NONE)
+		->addValue(_('Proportionally'), SYSMAP_BACKGROUND_SCALE_COVER)
+		->setModern(true)
+);
+
 // Append iconmapping to form list.
 $icon_mapping = (new CSelect('iconmapid'))
 	->setValue($data['sysmap']['iconmapid'])
@@ -255,6 +262,20 @@ $map_tab->addRow(new CLabel(_('Map element label location'), 'label-label-locati
 			2 => _('Right'),
 			3 => _('Top')
 		]))
+);
+
+$map_tab->addRow(_('Show map element labels'),
+	(new CRadioButtonList('show_element_label', (int) $data['sysmap']['show_element_label']))
+		->addValue(_('Always'), MAP_SHOW_LABEL_ALWAYS)
+		->addValue(_('Auto hide'), MAP_SHOW_LABEL_AUTO_HIDE)
+		->setModern(true)
+);
+
+$map_tab->addRow(_('Show link labels'),
+	(new CRadioButtonList('show_link_label', (int) $data['sysmap']['show_link_label']))
+		->addValue(_('Always'), MAP_SHOW_LABEL_ALWAYS)
+		->addValue(_('Auto hide'), MAP_SHOW_LABEL_AUTO_HIDE)
+		->setModern(true)
 );
 
 // Append show unack to form list.
