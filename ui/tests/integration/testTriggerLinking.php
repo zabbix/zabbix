@@ -589,9 +589,9 @@ class testTriggerLinking extends CIntegrationTest {
 	 */
 	public function testTriggerLinking_conflict() {
 
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->stopComponent(self::COMPONENT_AGENT2);
+		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT2);
