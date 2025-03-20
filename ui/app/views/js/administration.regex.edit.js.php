@@ -96,6 +96,7 @@
 							if ('form_errors' in response) {
 								this.form.setErrors(response.form_errors, true, true);
 								this.form.renderErrors();
+								this.#unsetLoadingStatus();
 							}
 							else if ('error' in response) {
 								throw {error: response.error};
@@ -111,8 +112,7 @@
 								location.href = curl.getUrl();
 							}
 						})
-						.catch((exception) => this.#ajaxExceptionHandler(exception))
-						.finally(() => this.#unsetLoadingStatus());
+						.catch((exception) => this.#ajaxExceptionHandler(exception));
 				});
 		}
 
@@ -128,6 +128,7 @@
 			}
 
 			addMessage(makeMessageBox('bad', messages, title));
+			this.#unsetLoadingStatus();
 		}
 
 		#clone() {
