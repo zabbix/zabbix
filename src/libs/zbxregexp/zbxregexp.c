@@ -14,7 +14,9 @@
 
 #include "zbxregexp.h"
 
-#include "zbxlog.h"
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxlog.h"
+#endif
 #include "zbxstr.h"
 #include "zbxtime.h"
 
