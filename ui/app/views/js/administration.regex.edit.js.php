@@ -69,9 +69,11 @@
 		}
 
 		submit() {
+			this.#setLoadingStatus();
+			clearMessages();
+
 			const fields = this.form.getAllValues();
 
-			this.#setLoadingStatus();
 			this.form.validateSubmit(fields)
 				.then((result) => {
 					if (!result) {
@@ -79,8 +81,6 @@
 
 						return;
 					}
-
-					clearMessages();
 
 					const curl = new Curl(this.form_element.getAttribute('action'));
 
