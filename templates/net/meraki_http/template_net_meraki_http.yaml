@@ -354,24 +354,6 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: 2280b9212c474d99835ec1334ff780eb
-          name: 'public IP'
-          type: DEPENDENT
-          key: meraki.device.public.ip
-          value_type: CHAR
-          description: |
-            Device public IP
-            Network: {$NETWORK.ID}
-            MAC: {$MAC}
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.publicIp
-          master_item:
-            key: meraki.device.get.status
-          tags:
-            - tag: component
-              value: network
         - uuid: 324b748bfe2e4383927176046e246acb
           name: status
           type: DEPENDENT
