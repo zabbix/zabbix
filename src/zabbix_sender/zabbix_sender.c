@@ -620,7 +620,7 @@ static char	*connect_callback(void *data)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	zbx_thread_sendval_args	*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
-	int			ret;
+	int			ret, ret_resp;
 	char			*data = NULL;
 #if !defined(_WINDOWS)
 	zbx_addr_t		*last_addr;
@@ -642,10 +642,13 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, sendval_args->json->buffer,
 			connect_callback, sendval_args->json, &data, NULL);
 
+
 	if (SUCCEED == ret)
 	{
-		if (FAIL == check_response(data, sendval_args->addrs->values[0]->ip,
-				sendval_args->addrs->values[0]->port))
+		ret_resp = check_response(data, sendval_args->addrs->values[0]->ip,
+						sendval_args->addrs->values[0]->port);
+
+		if (FAIL == ret_resp)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
 					sendval_args->addrs->values[0]->ip, sendval_args->addrs->values[0]->port,
@@ -653,6 +656,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 			zbx_addrs_failover(sendval_args->addrs);
 		}
+		else if (SUCCEED_PARTIAL == ret_resp)
+			ret = ret_resp;
 
 		zbx_free(data);
 	}
@@ -748,15 +753,11 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
  *                                                                            *
  * Purpose: add server or proxy to the list of destinations                   *
  *                                                                            *
- * Parameters:                                                                *
- *      host - [IN] IP or hostname                                            *
- *      port - [IN] port number                                               *
- *                                                                            *
  * Return value:  SUCCEED - destination added successfully                    *
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+static int	add_serveractive_host_sender_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
 		void *data)
 {
 	ZBX_UNUSED(hostnames);
@@ -873,7 +874,7 @@ static void	zbx_load_config(const char *config_file_in)
 
 			if (FAIL == zbx_set_data_destination_hosts(cfg_active_hosts,
 					(unsigned short)ZBX_DEFAULT_SERVER_PORT, "ServerActive",
-					sender_add_serveractive_host_cb, NULL, NULL, &error))
+					add_serveractive_host_sender_cb, NULL, NULL, &error))
 			{
 				zbx_error("%s", error);
 				exit(EXIT_FAILURE);
@@ -1078,7 +1079,7 @@ static void	parse_commandline(int argc, char **argv)
 			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
 		if (FAIL == zbx_set_data_destination_hosts(ZABBIX_SERVER, port, "-z",
-				sender_add_serveractive_host_cb, NULL, NULL, &error))
+				add_serveractive_host_sender_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
 			exit(EXIT_FAILURE);

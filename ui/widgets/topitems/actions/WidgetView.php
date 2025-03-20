@@ -406,8 +406,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				$columns = [];
 				$values_size = count($type_values);
-				foreach ($type_values as $value_index => $type_value) {
-					$result = $type_value;
+				foreach (array_keys($type_values) as $value_index) {
+					$result = [];
 					for ($next_index = $value_index; $next_index < $values_size; $next_index++) {
 						if (!array_intersect_key($result, $type_values[$next_index])) {
 							$result += $type_values[$next_index];
@@ -829,8 +829,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$result = [];
 
 		foreach ($patterns as $pattern) {
+			$pattern = preg_quote($pattern, '/');
 			$result[] = [
-				'regex' => '/^'.strtr($pattern, ['*' => '.*?']).'$/',
+				'regex' => '/^'.strtr($pattern, ['\\*' => '.*?']).'$/',
 				'pattern' => $pattern
 			];
 		}

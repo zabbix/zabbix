@@ -66,6 +66,9 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	const char	*p, *p_ip, *p_dns;
 	int		now;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' ip:'%s' connection_type:%u", __func__, host, ip,
+			connection_type);
+
 	p_ip = ip;
 	p_dns = dns;
 
@@ -97,6 +100,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 
 	autoreg_update_host_func_cb(NULL, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
 			now, events_cbs);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
@@ -107,7 +112,7 @@ static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, 
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT);
 
-	if (0 == (cfg.autoreg_tls_accept & sock->connection_type))
+	if (0 == ((unsigned int)cfg.autoreg_tls_accept & sock->connection_type))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
 				" port:%hu): connection type \"%s\" is not allowed for autoregistration",

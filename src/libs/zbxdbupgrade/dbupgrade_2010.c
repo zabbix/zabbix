@@ -1702,6 +1702,9 @@ static int	DBpatch_2010195_replace_key_param_cb(const char *data, int key_type, 
 
 	zbx_free(param);
 
+	if (0 != quoted)
+		quoted = 2;
+
 	if (FAIL == (ret = zbx_quote_key_param(new_param, quoted)))
 		zbx_free(new_param);
 

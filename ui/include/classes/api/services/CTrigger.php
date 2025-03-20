@@ -593,7 +593,7 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array &$triggerids, array &$db_triggers = null) {
+	protected function validateDelete(array &$triggerids, ?array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $triggerids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

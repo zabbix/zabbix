@@ -26,14 +26,18 @@ class CControllerGeomapsUpdate extends CController {
 
 	static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'geomaps_tile_provider' => ['db config.geomaps_tile_provider', 'required'],
-			'geomaps_tile_url' => ['db config.geomaps_tile_url', 'required', 'not_empty',
+			'geomaps_tile_provider' => ['string', 'required',
+				'length' => CSettingsSchema::getFieldLength('geomaps_tile_provider')
+			],
+			'geomaps_tile_url' => ['string', 'required', 'not_empty',
+				'length' => CSettingsSchema::getFieldLength('geomaps_tile_url'),
 				'when' => ['geomaps_tile_provider', 'in' => ['']]
 			],
-			'geomaps_max_zoom' => [['db config.geomaps_max_zoom', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
-				['db config.geomaps_max_zoom', 'required', 'when' => ['geomaps_tile_provider', 'in' => ['']]]
+			'geomaps_max_zoom' => [
+				['integer', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
+				['integer', 'required', 'when' => ['geomaps_tile_provider', 'in' => ['']]]
 			],
-			'geomaps_attribution' => ['db config.geomaps_attribution',
+			'geomaps_attribution' => ['string', 'length' => CSettingsSchema::getFieldLength('geomaps_attribution'),
 				'when' => ['geomaps_tile_provider', 'in' => ['']]
 			]
 		]];

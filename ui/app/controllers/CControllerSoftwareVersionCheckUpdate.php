@@ -135,10 +135,8 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			'versions' => $versions
 		]];
 
-		$delay = CSettings::updatePrivate($settings) ? $delay : self::NEXTCHECK_DELAY_ON_FAIL;
-
 		$output = [
-			'delay' => $delay + random_int(1, SEC_PER_MIN)
+			'delay' => CSettings::updatePrivate($settings) ? $delay : self::NEXTCHECK_DELAY_ON_FAIL
 		];
 
 		if ($errors = array_column(get_and_clear_messages(), 'message')) {

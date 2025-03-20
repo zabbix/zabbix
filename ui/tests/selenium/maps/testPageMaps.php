@@ -14,12 +14,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource Maps, CopyWidgetsDashboards
+ * @dataSource Maps, CopyWidgetsDashboards, WidgetCommunication
  *
  * @backup sysmaps
  *
@@ -296,6 +296,8 @@ class testPageMaps extends CWebTest {
 						self::SYSMAP_FIRST_A,
 						'Local network',
 						'Map for form testing',
+						'Map for testing feedback',
+						'Map for widget communication test',
 						'Map for widget copies',
 						self::SYSMAP_SPACES_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
@@ -527,7 +529,7 @@ class testPageMaps extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageMaps_Delete($data) {
-		$this->page->login()->open('sysmaps.php');
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 
 		// Sysmap count that will be selected before delete action.
 		$map_names = CTestArrayHelper::get($data, 'name', []);
@@ -556,7 +558,7 @@ class testPageMaps extends CWebTest {
 		// Count of the maps that will be selected before delete action.
 		$sysmap_count = ($sysmaps === []) ? CDBHelper::getCount(self::SYSMAPS_SQL) : count($sysmaps);
 
-		$this->page->login()->open('sysmaps.php?filter_rst=1');
+		$this->page->login()->open('sysmaps.php?filter_rst=1')->waitUntilReady();
 		$this->selectTableRows($sysmaps);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->assertEquals('Delete selected map'.(($sysmap_count > 1) ? 's?' : '?'), $this->page->getAlertText());

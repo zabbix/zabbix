@@ -25,6 +25,7 @@ class HttpResponse {
 
 	protected $http_codes = [
 		ZBX_API_ERROR_INTERNAL		=> 500,
+		ZBX_API_ERROR_DB			=> 500,
 		ZBX_API_ERROR_PARAMETERS	=> 400,
 		ZBX_API_ERROR_NO_ENTITY		=> 404,
 		ZBX_API_ERROR_PERMISSIONS	=> 403,

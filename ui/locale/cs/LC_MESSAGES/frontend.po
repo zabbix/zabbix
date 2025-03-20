@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-16 09:22+0000\n"
+"PO-Revision-Date: 2025-02-24 22:24+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -2730,6 +2730,11 @@ msgstr "Nelze odstranit výchozí metodu MFA."
 msgid "Cannot delete default user directory."
 msgstr "Nelze odstranit výchozí adresář uživatele."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "Nelze odstranit kontrolu objevováni „%1$s“ v pravidle objevováni \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2737,6 +2742,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Nelze smazat pravidlo nálezu"
 msgstr[1] "Nelze smazat pravidla nálezu"
 msgstr[2] "Nelze smazat pravidlo nálezu"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "Nelze smazat pravidlo objevování „%1$s“: %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2766,6 +2776,11 @@ msgstr[0] "Nelze smazat hostitele"
 msgstr[1] "Nelze smazat hostitele"
 msgstr[2] "Nelze smazat hostitele"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2780,6 +2795,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Nelze odstranit skupinu hostitelů"
 msgstr[1] "Nelze odstranit skupiny hostitelů"
 msgstr[2] "Nelze odstranit skupinu hostitelů"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2938,6 +2958,11 @@ msgstr[0] "Nelze smazat šablonu"
 msgstr[1] "Nelze smazat šablony"
 msgstr[2] "Nelze smazat šablony"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2975,6 +3000,11 @@ msgstr[0] "Nelze smazat trigger"
 msgstr[1] "Nelze smazat triggery"
 msgstr[2] "Nelze smazat triggery"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -3004,12 +3034,12 @@ msgstr[2] "Nelze smazat skupiny uživatelů"
 #: include/classes/api/services/CUserGroup.php:1330
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "Skupinu uživatelů \"%1$s\" nelze smazat, protože je použita adresářem uživatelů LDAP \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1325
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "Skupinu uživatelů \"%1$s\" nelze smazat, protože je použita adresářem uživatelů SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -4031,6 +4061,11 @@ msgstr "Nelze aktualizovat \"%1$s\" pro šablonu spouštěče \"%2$s\"."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Nelze aktualizovat \"%1$s\" pro prototyp šablony spouštěče \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4536,6 +4571,10 @@ msgstr "Kontrola DNS. Vráti 0 - DNS je nedostupné (server neodpovídá nebo DN
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Zkontroluje, zda soubor existuje. Vrací 0 - nenalezeno; 1 - soubor zadaného typu existuje"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6738,6 +6777,22 @@ msgstr "Smazat web scénář?"
 msgid "Deleted"
 msgstr "Smazáno"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Smazaný host"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Smazaná skupina hostů"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Oddělovač"
@@ -7374,7 +7429,7 @@ msgstr "Zobrazení místního času"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Zobrazit čas protokolu"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9553,7 +9608,7 @@ msgstr "Funkce historie"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Komprese historie, trendov a protokolu auditu"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13675,6 +13730,10 @@ msgstr "Název položky menu se používá jako popisek pro URL triggeru v konte
 msgid "Menu path"
 msgstr "Cesta v menu"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "Sloučit sektory menší než"
@@ -17792,7 +17851,7 @@ msgstr "Obnovit výchozí zobrazení"
 
 #: app/views/administration.miscconfig.edit.php:103
 msgid "Resolve secret vault macros by"
-msgstr ""
+msgstr "Získání makra tajného trezoru (Vaultu) pomocí"
 
 #: jsLoader.php:283
 msgid "Resolved"
@@ -18045,6 +18104,11 @@ msgstr "Spusťit skript \"%1$s\" na Zabbix serveru"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Spusť skript \"%1$s\" na aktuálním hostovi"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20727,6 +20791,14 @@ msgstr "Téma"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Tyto parametry budou předány do skriptu jako argumenty příkazového řádku ve specifikovaném pořadí."
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20780,7 +20852,7 @@ msgstr "Toto nastavení zobrazí místo časového razítka místní čas. V pok
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Toto nastavení zobrazí čas protokolu namísto časového razítka položky. V pokročilé konfiguraci je také nutné zaškrtnout \"Zobrazit časové razítko\"."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -23016,7 +23088,7 @@ msgstr "Stav spuštění virtuálního stroje hypervisoru VMWare, \"url\" - URL 
 
 #: include/classes/data/CItemData.php:2498
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Velikost privátní paměti virtuálního stroje VMware, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -24085,11 +24157,11 @@ msgstr "Zabbix server (proxy)"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
-msgstr ""
+msgstr "Zabbix server a proxy"
 
 #: app/views/administration.miscconfig.edit.php:107
 msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
-msgstr ""
+msgstr "Server Zabbix a proxy: Tajné informace (secrets) jsou získávány z Vaultu serverem Zabbix i proxy, což jim umožňuje nezávisle získávat makra."
 
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
@@ -24110,7 +24182,7 @@ msgstr "Verze serveru Zabbix"
 
 #: app/views/administration.miscconfig.edit.php:105
 msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
-msgstr ""
+msgstr "Server Zabbix: Tajné informace (secrets) získává server Zabbix z trezoru (Vaultu) a v případě potřeby je předává proxy."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24279,6 +24351,41 @@ msgstr "abs() - Absolutní hodnota"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Arckosinus hodnoty, kde hodnota je úhel vyjádřený v radiánech"
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -25051,6 +25158,10 @@ msgstr "první"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Nejstarší hodnota v zadaném časovém intervalu"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Zaokrouhlí dolů na nejbližší menší celé číslo"
@@ -25448,6 +25559,10 @@ msgstr "poslední"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Poslední (aktuální) T hodnota"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "levá"
@@ -25483,6 +25598,10 @@ msgstr "logseverity() - Severita posledního zápisu do logu pro periodu T"
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Zdroj log z posledního vstupu logu je v souladu s parametrem V pro periodu T (1 - soulad, 0 - nesoulad)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
