@@ -629,7 +629,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 
 		$response = $this->call('template.create', [
-			'host' =>  self::$templateX_name,
+			'host' => 'test_template',
 				'groups' => [
 					'groupid' => 1
 				]
@@ -639,6 +639,10 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->assertArrayHasKey('templateids', $response['result'], $ep);
 		$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
+		self::$templateX_ID = $response['result']['templateids'][0];
+
+		$templateidsX = [];
+		array_push($templateidsX, ['templateid' => self::$templateX_ID]);
 
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
@@ -648,7 +652,7 @@ class testTriggerLinking extends CIntegrationTest {
 				[
 					'operationtype' => 6,
 					'optemplate' =>
-					$templateX_name
+					$templateidsX
 				]
 			]
 		]);
