@@ -74,7 +74,8 @@ class CMessageBehavior extends CBehavior {
 			}
 			else {
 				$this->test->assertEquals($error_text, $field->query('xpath:./../span[@class="error"]|./../../span[@class="error"]')
-						->waitUntilPresent()->one()->getText());
+						->waitUntilPresent()->one()->getText()
+				);
 			}
 		}
 	}
