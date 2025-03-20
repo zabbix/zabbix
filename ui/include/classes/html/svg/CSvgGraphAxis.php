@@ -111,28 +111,23 @@ class CSvgGraphAxis extends CSvgGroup {
 
 	private function getAxis(): array {
 		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
-			$x = $this->x + $this->width;
-			$y = $this->y;
-
-			return [
-				// Draw axis line.
-				(new CSvgPath())
-					->setAttribute('shape-rendering', 'crispEdges')
-					->moveTo($this->x, $y)
-					->lineTo($x, $y)
-					->closePath()
-			];
+			$x_from = $this->x;
+			$y_from = $this->y;
+			$x_to = $x_from + $this->width;
+			$y_to = $y_from;
+		}
+		else {
+			$x_from = $this->type == GRAPH_YAXIS_SIDE_RIGHT ? $this->x : $this->x + $this->width;
+			$y_from = $this->y;
+			$x_to = $x_from;
+			$y_to = $y_from + $this->height;
 		}
 
-		$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
-		$y = $this->y;
-
 		return [
-			// Draw axis line.
 			(new CSvgPath())
 				->setAttribute('shape-rendering', 'crispEdges')
-				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y)
+				->moveTo($x_from, $y_from)
+				->lineTo($x_to, $y_to)
 				->closePath()
 		];
 	}
