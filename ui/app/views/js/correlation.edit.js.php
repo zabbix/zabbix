@@ -360,7 +360,7 @@ window.correlation_edit_popup = new class {
 					}
 					else {
 						overlayDialogueDestroy(this.overlay.dialogueid);
-						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 					}
 				});
 		});
