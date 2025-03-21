@@ -27,7 +27,8 @@ $graph_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('context', $data['context'])
 	->addVar('graphid', $data['graphid'])
-	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
 $discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
@@ -113,7 +114,7 @@ $graph_form
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
 					'normal_only' => $data['normal_only'],
-					'parent_discoveryid' => $data['parent_discoveryid']
+					'parent_discoveryid' => null
 				],
 				'readonly' => $readonly,
 				'items' => $data['items'],

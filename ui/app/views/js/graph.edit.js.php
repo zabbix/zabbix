@@ -54,6 +54,8 @@ window.graph_edit_popup = new class {
 			this.#loadItem(item, item_row_template);
 		});
 
+		this.form.style.display = '';
+
 		this.#initActions();
 		this.#initPreviewTab();
 		this.#initPopupListeners();

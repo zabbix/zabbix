@@ -28,7 +28,8 @@ $graph_form = (new CForm())
 	->addVar('context', $data['context'])
 	->addVar('graphid', $data['graphid'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid'])
-	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
 $discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;

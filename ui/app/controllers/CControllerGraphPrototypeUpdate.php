@@ -51,7 +51,7 @@ class CControllerGraphPrototypeUpdate extends CController {
 			'items' =>				'required|array',
 			'discover' =>			'db graphs.discover|in '.implode(',', [
 				ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER
-			]),
+			])
 		];
 
 		$ret = $this->validateInput($fields);

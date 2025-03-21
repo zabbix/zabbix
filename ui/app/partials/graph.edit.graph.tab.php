@@ -349,7 +349,7 @@ $items_table->addRow(
 				(new CButton('add_item', _('Add')))
 					->addClass('js-add-item')
 					->addClass(ZBX_STYLE_BTN_LINK),
-				$data['parent_discoveryid']
+				array_key_exists('parent_discoveryid', $data) && $data['parent_discoveryid']
 					? (new CButton('add_item_prototype', _('Add prototype')))
 						->addClass('js-add-item-prototype')
 						->addClass(ZBX_STYLE_BTN_LINK)

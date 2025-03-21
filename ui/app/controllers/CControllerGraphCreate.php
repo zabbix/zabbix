@@ -75,7 +75,6 @@ class CControllerGraphCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// todo - check if permissions to edit host/template
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);

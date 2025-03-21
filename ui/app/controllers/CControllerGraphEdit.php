@@ -70,17 +70,19 @@ class CControllerGraphEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$graphid = $this->getInput('graphid');
+		if ($this->hasInput('graphid')) {
+			$graphid = $this->getInput('graphid');
 
-		if ($graphid) {
-			$graph = (bool) API::Graph()->get([
-				'output' => [],
-				'graphids' => $graphid,
-				'editable' => true
-			]);
+			if ($graphid) {
+				$graph = (bool) API::Graph()->get([
+					'output' => [],
+					'graphids' => $graphid,
+					'editable' => true
+				]);
 
-			if (!$graph) {
-				return false;
+				if (!$graph) {
+					return false;
+				}
 			}
 		}
 
@@ -97,52 +99,7 @@ class CControllerGraphEdit extends CController {
 			'normal_only' => $this->getInput('normal_only', 0)
 		];
 
-		$gitems = [];
-
-		foreach ($this->getInput('items', []) as $gitem) {
-			if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
-				$gitems[] = $gitem;
-			}
-		}
-
-		if ($this->hasInput('clone')) {
-			$data['name'] = $this->getInput('name', '');
-			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
-
-			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$data['width'] = $this->getInput('width', 400);
-				$data['height'] = $this->getInput('height', 300);
-			}
-			else {
-				$data['width'] = $this->getInput('width', 900);
-				$data['height'] = $this->getInput('height', 200);
-			}
-
-			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$data['yaxismin'] = $this->getInput('yaxismin', 0);
-			$data['yaxismax'] = $this->getInput('yaxismax', 100);
-			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
-			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
-			$data['show_work_period'] = $this->hasInput('show_work_period');
-			$data['show_triggers'] = $this->hasInput('show_triggers');
-			$data['show_legend'] = $this->hasInput('show_legend');
-			$data['show_3d'] = $this->hasInput('show_3d');
-			$data['visible'] = $this->getInput('visible', []);
-			$data['percent_left'] = $this->getInput('percent_left', 0);
-			$data['percent_right'] = $this->getInput('percent_right', 0);
-			$data['items'] = $gitems;
-
-			if (array_key_exists('percent_left', $data['visible'])) {
-				$data['percent_left'] = $this->getInput('percent_left', 0);
-			}
-			if (array_key_exists('percent_right', $data['visible'])) {
-				$data['percent_right'] = $this->getInput('percent_right', 0);
-			}
-		}
-		elseif ($data['graphid'] != 0) {
+		if ($data['graphid'] != 0) {
 			$options = [
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => ['hostid'],
@@ -154,26 +111,17 @@ class CControllerGraphEdit extends CController {
 			$graph = API::Graph()->get($options);
 			$graph = reset($graph);
 
-			$data['name'] = $graph['name'];
-			$data['width'] = $graph['width'];
-			$data['height'] = $graph['height'];
-			$data['ymin_type'] = $graph['ymin_type'];
-			$data['ymax_type'] = $graph['ymax_type'];
+			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
+				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
+				'percent_right', 'templateid', 'flags', 'discoveryRule', 'graphDiscovery'
+			];
+
+			foreach ($fields as $field) {
+				$data[$field] = $graph[$field];
+			}
+
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
-			$data['ymin_itemid'] = $graph['ymin_itemid'];
-			$data['ymax_itemid'] = $graph['ymax_itemid'];
-			$data['show_work_period'] = $graph['show_work_period'];
-			$data['show_triggers'] = $graph['show_triggers'];
-			$data['graphtype'] = $graph['graphtype'];
-			$data['show_legend'] = $graph['show_legend'];
-			$data['show_3d'] = $graph['show_3d'];
-			$data['percent_left'] = $graph['percent_left'];
-			$data['percent_right'] = $graph['percent_right'];
-			$data['templateid'] = $graph['templateid'];
-			$data['flags'] = $graph['flags'];
-			$data['discoveryRule'] = $graph['discoveryRule'];
-			$data['graphDiscovery'] = $graph['graphDiscovery'];
 
 			if ($data['hostid'] == 0) {
 				$host = reset($graph['hosts']);
@@ -198,6 +146,7 @@ class CControllerGraphEdit extends CController {
 		else {
 			$data['name'] = $this->getInput('name', '');
 			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
+			$data['templates'] = [];
 
 			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
 				$data['width'] = $this->getInput('width', 400);
@@ -208,22 +157,15 @@ class CControllerGraphEdit extends CController {
 				$data['height'] = $this->getInput('height', 200);
 			}
 
+			$data['percent_left'] = $this->getInput('percent_left', 0);
+			$data['percent_right'] = $this->getInput('percent_right', 0);
 			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$data['yaxismin'] = $this->getInput('yaxismin', 0);
 			$data['yaxismax'] = $this->getInput('yaxismax', 100);
 			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
 			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
-			$data['show_work_period'] = $this->getInput('show_work_period', 1);
-			$data['show_triggers'] = $this->getInput('show_triggers', 1);
-			$data['show_legend'] = $this->getInput('show_legend', 1);
-			$data['show_3d'] = $this->getInput('show_3d', 0);
 			$data['visible'] = $this->getInput('visible', []);
-			$data['percent_left'] = 0;
-			$data['percent_right'] = 0;
-			$data['items'] = $gitems;
-			$data['discover'] = $this->getInput('discover', DB::getDefault('graphs', 'discover'));
-			$data['templates'] = [];
 
 			if (array_key_exists('percent_left', $data['visible'])) {
 				$data['percent_left'] = $this->getInput('percent_left', 0);
@@ -231,6 +173,31 @@ class CControllerGraphEdit extends CController {
 			if (array_key_exists('percent_right', $data['visible'])) {
 				$data['percent_right'] = $this->getInput('percent_right', 0);
 			}
+
+			if ($this->hasInput('clone')) {
+				$data['show_work_period'] = $this->hasInput('show_work_period');
+				$data['show_triggers'] = $this->hasInput('show_triggers');
+				$data['show_legend'] = $this->hasInput('show_legend');
+				$data['show_3d'] = $this->hasInput('show_3d');
+			}
+			else {
+				$data['show_work_period'] = $this->getInput('show_work_period', 1);
+				$data['show_triggers'] = $this->getInput('show_triggers', 1);
+				$data['show_legend'] = $this->getInput('show_legend', 1);
+				$data['show_3d'] = $this->getInput('show_3d', 0);
+			}
+
+			$gitems = [];
+
+			foreach ($this->getInput('items', []) as $gitem) {
+				if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+						&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+						&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+					$gitems[] = $gitem;
+				}
+			}
+
+			$data['items'] = $gitems;
 		}
 
 		if ($data['ymax_itemid'] || $data['ymin_itemid']) {
@@ -243,6 +210,8 @@ class CControllerGraphEdit extends CController {
 			];
 
 			$data['yaxis_items'] = API::Item()->get($options);
+
+			$data['items'] = $gitems;
 		}
 
 		// items
@@ -304,7 +273,7 @@ class CControllerGraphEdit extends CController {
 		for ($i = 0; $i < $item_count - 1;) {
 			$next = $i + 1;
 
-			while (!isset($data['items'][$next]) && $next < ($item_count - 1)) {
+			while (!array_key_exists($next, $data['items']) && $next < ($item_count - 1)) {
 				$next++;
 			}
 

@@ -1738,6 +1738,7 @@ function getItemTemplateNameColumn($readonly): CTag {
 	return new CCol($readonly
 		? (new CSpan('#{name}'))->setId('items_#{number}_name')
 		: (new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDBREAK)
 			->addClass('js-item-name')
 			->setId('items_#{number}_name')
 	);

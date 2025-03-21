@@ -50,7 +50,7 @@ class CControllerGraphPrototypeCreate extends CController {
 			'items' =>				'required|array',
 			'discover' =>			'db graphs.discover|in '.implode(',', [
 				ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER
-			]),
+			])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -109,7 +109,7 @@ class CControllerGraphPrototypeCreate extends CController {
 
 			$graph_prototype = $this->getInputAll();
 
-			$graph_prototype['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
+			$graph_prototype['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
 			$graph_prototype['gitems'] = $gitems;
 			unset ($graph_prototype['items']);
 

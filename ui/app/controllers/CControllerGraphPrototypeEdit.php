@@ -86,24 +86,25 @@ class CControllerGraphPrototypeEdit extends CController {
 			'editable' => true
 		]);
 
-		$this->discovery_rule = reset($discovery_rule);
-
 		if (!$discovery_rule) {
 			return false;
 		}
 
-		$graphid = $this->getInput('graphid');
+		$this->discovery_rule = reset($discovery_rule);
 
-		// Check whether graph prototype is editable by user.
-		if ($graphid) {
-			$graph_prototype = (bool) API::GraphPrototype()->get([
-				'output' => [],
-				'graphids' => $graphid,
-				'editable' => true
-			]);
+		if ($this->hasInput('graphid')) {
+			$graphid = $this->getInput('graphid');
 
-			if (!$graph_prototype) {
-				return false;
+			if ($graphid) {
+				$graph_prototype = (bool) API::GraphPrototype()->get([
+					'output' => [],
+					'graphids' => $graphid,
+					'editable' => true
+				]);
+
+				if (!$graph_prototype) {
+					return false;
+				}
 			}
 		}
 
@@ -113,16 +114,6 @@ class CControllerGraphPrototypeEdit extends CController {
 	}
 
 	protected function doAction() {
-		$gitems = [];
-
-		foreach ($this->getInput('items', []) as $gitem) {
-			if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
-				$gitems[] = $gitem;
-			}
-		}
-
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
@@ -132,43 +123,7 @@ class CControllerGraphPrototypeEdit extends CController {
 			'readonly' => $this->getInput('readonly', 0)
 		];
 
-		if ($this->hasInput('clone')) {
-			$data['name'] = $this->getInput('name');
-			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
-
-			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$data['width'] = $this->getInput('width', 400);
-				$data['height'] = $this->getInput('height', 300);
-			}
-			else {
-				$data['width'] = $this->getInput('width', 900);
-				$data['height'] = $this->getInput('height', 200);
-			}
-
-			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$data['yaxismin'] = $this->getInput('yaxismin', 0);
-			$data['yaxismax'] = $this->getInput('yaxismax', 100);
-			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
-			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
-			$data['show_work_period'] = $this->hasInput('show_work_period');
-			$data['show_triggers'] = $this->hasInput('show_triggers');
-			$data['show_legend'] = $this->hasInput('show_legend');
-			$data['show_3d'] = $this->hasInput('show_3d');
-			$data['visible'] = $this->getInput('visible', []);
-			$data['percent_left'] = 0;
-			$data['percent_right'] = 0;
-			$data['items'] = $gitems;
-			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;
-
-			if (array_key_exists('percent_left', $data['visible'])) {
-				$data['percent_left'] = $this->getInput('percent_left', 0);
-			}
-			if (array_key_exists('percent_right', $data['visible'])) {
-				$data['percent_right'] = $this->getInput('percent_right', 0);
-			}
-		}
-		elseif ($data['graphid'] != 0) {
+		if ($data['graphid'] != 0) {
 			$options = [
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => ['hostid'],
@@ -178,25 +133,17 @@ class CControllerGraphPrototypeEdit extends CController {
 			$graph = API::GraphPrototype()->get($options);
 			$graph = reset($graph);
 
-			// todo - check if this can be written shorter:
-			$data['name'] = $graph['name'];
-			$data['width'] = $graph['width'];
-			$data['height'] = $graph['height'];
-			$data['ymin_type'] = $graph['ymin_type'];
-			$data['ymax_type'] = $graph['ymax_type'];
+			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
+				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
+				'percent_right', 'templateid', 'discover'
+			];
+
+			foreach ($fields as $field) {
+				$data[$field] = $graph[$field];
+			}
+
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
-			$data['ymin_itemid'] = $graph['ymin_itemid'];
-			$data['ymax_itemid'] = $graph['ymax_itemid'];
-			$data['show_work_period'] = $graph['show_work_period'];
-			$data['show_triggers'] = $graph['show_triggers'];
-			$data['graphtype'] = $graph['graphtype'];
-			$data['show_legend'] = $graph['show_legend'];
-			$data['show_3d'] = $graph['show_3d'];
-			$data['percent_left'] = $graph['percent_left'];
-			$data['percent_right'] = $graph['percent_right'];
-			$data['templateid'] = $graph['templateid'];
-			$data['discover'] = $graph['discover'];
 
 			// templates
 			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'],
@@ -206,8 +153,8 @@ class CControllerGraphPrototypeEdit extends CController {
 
 			// items
 			$data['items'] = API::GraphItem()->get([
-				'output' => [
-					'gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color', 'sortorder'
+				'output' => ['gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color',
+					'sortorder'
 				],
 				'graphids' => $data['graphid'],
 				'sortfield' => 'gitemid'
@@ -216,6 +163,7 @@ class CControllerGraphPrototypeEdit extends CController {
 		else {
 			$data['name'] = $this->getInput('name', '');
 			$data['graphtype'] = $this->getInput('graphtype', GRAPH_TYPE_NORMAL);
+			$data['templates'] = [];
 
 			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
 				$data['width'] = $this->getInput('width', 400);
@@ -226,22 +174,16 @@ class CControllerGraphPrototypeEdit extends CController {
 				$data['height'] = $this->getInput('height', 200);
 			}
 
+			$data['percent_left'] = $this->getInput('percent_left', 0);
+			$data['percent_right'] = $this->getInput('percent_right', 0);
 			$data['ymin_type'] = $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$data['ymax_type'] = $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$data['yaxismin'] = $this->getInput('yaxismin', 0);
 			$data['yaxismax'] = $this->getInput('yaxismax', 100);
 			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
 			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
-			$data['show_work_period'] = $this->getInput('show_work_period', 1);
-			$data['show_triggers'] = $this->getInput('show_triggers', 1);
-			$data['show_legend'] = $this->getInput('show_legend', 1);
-			$data['show_3d'] = $this->getInput('show_3d', 0);
+			$data['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
 			$data['visible'] = $this->getInput('visible', []);
-			$data['percent_left'] = 0;
-			$data['percent_right'] = 0;
-			$data['items'] = $gitems;
-			$data['discover'] = $this->getInput('discover', DB::getDefault('graphs', 'discover'));
-			$data['templates'] = [];
 
 			if (array_key_exists('percent_left', $data['visible'])) {
 				$data['percent_left'] = $this->getInput('percent_left', 0);
@@ -249,6 +191,31 @@ class CControllerGraphPrototypeEdit extends CController {
 			if (array_key_exists('percent_right', $data['visible'])) {
 				$data['percent_right'] = $this->getInput('percent_right', 0);
 			}
+
+			if ($this->hasInput('clone')) {
+				$data['show_work_period'] = $this->hasInput('show_work_period');
+				$data['show_triggers'] = $this->hasInput('show_triggers');
+				$data['show_legend'] = $this->hasInput('show_legend');
+				$data['show_3d'] = $this->hasInput('show_3d');
+			}
+			else {
+				$data['show_work_period'] = $this->getInput('show_work_period', 1);
+				$data['show_triggers'] = $this->getInput('show_triggers', 1);
+				$data['show_legend'] = $this->getInput('show_legend', 1);
+				$data['show_3d'] = $this->getInput('show_3d', 0);
+			}
+
+			$gitems = [];
+
+			foreach ($this->getInput('items', []) as $gitem) {
+				if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+					$gitems[] = $gitem;
+				}
+			}
+
+			$data['items'] = $gitems;
 		}
 
 		if ($data['ymax_itemid'] || $data['ymin_itemid']) {
