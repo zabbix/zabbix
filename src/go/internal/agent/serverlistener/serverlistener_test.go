@@ -15,11 +15,17 @@
 package serverlistener
 
 import (
+	"fmt"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/internal/agent"
+	mockscheduler "golang.zabbix.com/agent2/internal/agent/scheduler/mocks"
+	"golang.zabbix.com/agent2/pkg/version"
+	mockcomms "golang.zabbix.com/agent2/pkg/zbxcomms/mocks"
+	"golang.zabbix.com/sdk/errs"
 )
 
 //nolint:tparallel
@@ -85,8 +91,8 @@ func Test_ParseListenIP(t *testing.T) {
 	}
 
 	for _, tt := range tests { //nolint:paralleltest
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			// Should not run in parallel, accesses global getLocalIPs.
 			getLocalIPs = func() []net.IP {
 				return tt.mockIPs
 			}
@@ -111,4 +117,223 @@ func Test_getListLocalIP(t *testing.T) {
 	t.Parallel()
 
 	_ = getListLocalIP()
+}
+
+func Test_processPlainTextRequest(t *testing.T) {
+	t.Parallel()
+
+	type helperFunc func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler)
+
+	type testCase struct {
+		name  string
+		key   string
+		setup helperFunc
+	}
+
+	tests := []testCase{
+		{
+			name: "+successfulWrite",
+			key:  "system.hostname",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				result := "zabbix-agent"
+				sched.
+					On("PerformTask", "system.hostname", time.Minute, uint64(agent.PassiveChecksClientID)).
+					Return(&result, nil)
+
+				conn.On("Write", []byte(result)).Return(nil)
+			},
+		},
+		{
+			name: "-failedPerformTaskReturnsError",
+			key:  "system.uptime",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				sched.
+					On("PerformTask", "system.uptime", time.Minute, uint64(agent.PassiveChecksClientID)).
+					Return(nil, errs.New("task failed"))
+
+				conn.On("Write", formatError("Task failed.")).Return(nil)
+			},
+		},
+		{
+			name: "-failedPerformTaskReturnsNil",
+			key:  "system.cpu.load",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				sched.
+					On("PerformTask", "system.cpu.load", time.Minute, uint64(agent.PassiveChecksClientID)).
+					Return(nil, nil)
+			},
+		},
+		{
+			name: "-failedWrite",
+			key:  "system.hostname",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				result := "zabbix-agent"
+				sched.
+					On("PerformTask", "system.hostname", time.Minute, uint64(agent.PassiveChecksClientID)).
+					Return(&result, nil)
+				conn.On("Write", []byte(result)).Return(errs.New("write failed"))
+				conn.On("RemoteIP").Return("127.0.0.1")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockSched := mockscheduler.NewScheduler(t)
+			mockConn := mockcomms.NewConnectionInterface(t)
+
+			tt.setup(t, mockConn, mockSched)
+
+			processPlainTextRequest(mockConn, mockSched, tt.key)
+
+			mockSched.AssertExpectations(t)
+			mockConn.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_sendJSONParsingErrorResponse(t *testing.T) {
+	t.Parallel()
+
+	type helperFunc func(t *testing.T, conn *mockcomms.ConnectionInterface)
+
+	type testCase struct {
+		name    string
+		errText string
+		setup   helperFunc
+	}
+
+	expectedJSON := func(errorMsg string) []byte {
+		return []byte(fmt.Sprintf(
+			`{"version":"%s","variant":%d,"error":"%s"}`,
+			version.Long(),
+			agent.Variant,
+			errorMsg,
+		))
+	}
+
+	tests := []testCase{
+		{
+			name:    "+valid",
+			errText: "invalid JSON syntax",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
+				t.Helper()
+				conn.On("Write", expectedJSON("invalid JSON syntax")).Return(nil)
+			},
+		},
+		{
+			name:    "+emptyErrorString",
+			errText: "",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
+				t.Helper()
+				conn.On("Write", expectedJSON("")).Return(nil)
+			},
+		},
+		{
+			name:    "-failedWrite",
+			errText: "server-side issue",
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
+				t.Helper()
+
+				conn.On("Write", expectedJSON("server-side issue")).Return(errs.New("write failed"))
+				conn.On("RemoteIP").Return("127.0.0.1")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			conn := mockcomms.NewConnectionInterface(t)
+			tt.setup(t, conn)
+
+			sendJSONParsingErrorResponse(conn, tt.errText)
+
+			conn.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_sendTaskErrorResponse(t *testing.T) {
+	t.Parallel()
+
+	type helperFunc func(t *testing.T, conn *mockcomms.ConnectionInterface)
+
+	type testCase struct {
+		name    string
+		errText string
+		isJSON  bool
+		setup   helperFunc
+	}
+
+	expectedPayload := func(errText string, isJSON bool) []byte {
+		if isJSON {
+			return []byte(fmt.Sprintf(
+				`{"version":"%s","variant":%d,"data":[{"error":"%s"}]}`,
+				version.Long(),
+				agent.Variant,
+				errText,
+			))
+		}
+
+		return append([]byte("ZBX_NOTSUPPORTED\x00"), []byte(errText)...)
+	}
+
+	tests := []testCase{
+		{
+			name:    "+plaintext",
+			errText: "invalid item key",
+			isJSON:  false,
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
+				t.Helper()
+				conn.On("Write", expectedPayload("invalid item key", false)).Return(nil)
+			},
+		},
+		{
+			name:    "+json",
+			errText: "timeout reached",
+			isJSON:  true,
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
+				t.Helper()
+				conn.On("Write", expectedPayload("timeout reached", true)).Return(nil)
+			},
+		},
+		{
+			name:    "-write fails",
+			errText: "write error",
+			isJSON:  true,
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
+				t.Helper()
+				conn.On("Write", expectedPayload("write error", true)).Return(errs.New("write failed"))
+				conn.On("RemoteIP").Return("127.0.0.1")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt // capture range variable
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			conn := mockcomms.NewConnectionInterface(t)
+			tt.setup(t, conn)
+
+			sendTaskErrorResponse(conn, tt.errText, tt.isJSON)
+
+			conn.AssertExpectations(t)
+		})
+	}
 }

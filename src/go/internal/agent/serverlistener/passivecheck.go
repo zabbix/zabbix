@@ -248,8 +248,9 @@ func sendJSONParsingErrorResponse(conn zbxcomms.ConnectionInterface, errText str
 		return
 	}
 
-	if wErr := conn.Write(payload); wErr != nil {
-		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), wErr.Error())
+	err = conn.Write(payload)
+	if err != nil {
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
 	}
 }
 

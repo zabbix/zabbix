@@ -307,13 +307,16 @@ func (c *Connection) RemoteIP() string {
 	return addr
 }
 
+// Accept waits for and accepts an incoming connection using net.Accept.
+// It applies the given read timeout and timeout mode to the resulting connection.
 func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (*Connection, error) {
 	conn, err := l.listener.Accept()
 	if err != nil {
 		return nil, err
 	}
 
-	c := &Connection{conn: conn,
+	c := &Connection{
+		conn:        conn,
 		tlsConfig:   l.tlsconfig,
 		state:       connStateAccept,
 		timeout:     timeout,
