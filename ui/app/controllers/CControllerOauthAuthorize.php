@@ -93,7 +93,11 @@ class CControllerOauthAuthorize extends CController {
 		$oauth += array_intersect_key($state, array_flip(['client_id', 'client_secret']));
 
 		if (!array_key_exists('client_secret', $oauth)) {
-			// Get client_secret from database using $state['mediaid']
+			$mediatype = API::MediaType()->get([
+				'output' => ['client_secret'],
+				'mediatypeids' => [$state['mediatypeid']]
+			]);
+			$oauth['client_secret'] = $mediatype ? $mediatype[0]['client_secret'] : '';
 		}
 
 		if (array_key_exists('token_url_parameters', $state)) {
@@ -126,7 +130,7 @@ class CControllerOauthAuthorize extends CController {
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2,
-			// CURLOPT_SSL_VERIFYSTATUS => true // this one options is very tricky to setup apache2 and php correctly
+			// CURLOPT_SSL_VERIFYSTATUS => true // this option is very tricky to setup apache2 and php correctly
 		]);
 
 		$raw_response = curl_exec($handle);

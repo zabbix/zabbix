@@ -62,8 +62,9 @@ window.oauth_edit_popup = new class {
 
 		this.#getTokensFromOauthService(this.oauth_popup)
 			.then((tokens) => this.#addTokenFormFields(tokens), (reject) => {
-				if (this.advanced_form && oauth.authorization_mode !== 'manual') {
+				if (this.advanced_form) {
 					this.form.querySelector('[name="authorization_mode"][value="manual"]').click();
+					this.form.querySelector('[name="code"]').focus();
 
 					throw new Error(this.messages.authorization_error);
 				}
@@ -206,7 +207,7 @@ window.oauth_edit_popup = new class {
 				}
 
 				clearInterval(oauth_popup_guard);
-				reject({closed: true});
+				reject({error: this.messages.popup_closed});
 			}, 500);
 		});
 	}

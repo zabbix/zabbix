@@ -28,6 +28,7 @@ class CControllerOauthEdit extends CController {
 			'client_secret' =>		'string',
 			'authorization_url' =>	'string',
 			'token_url' =>			'string',
+			'token_status' =>		'in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
 			'update' =>				'in 0,1',
 			'advanced_form' =>		'in 0,1'
 		];
@@ -58,28 +59,23 @@ class CControllerOauthEdit extends CController {
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
-		$oauth = [
-			'redirection_url' => '',
-			'client_id' => '',
-			'client_secret' => '',
-			'authorization_url' => '',
-			'token_url' => '',
-			'token_status' => 0
-		];
-		$this->getInputs($oauth, array_keys($oauth));
-
-		if ($this->hasInput('mediatypeid')) {
-			// TODO: add tokens data from db: token_status, access_token_updated, refresh_access_after
-		}
-
 		$data = [
-			'update' => $this->hasInput('mediatypeid') ? 1 : 0,
+			'update' => $this->getInput('update', 0),
 			'advanced_form' => $this->getInput('advanced_form', 0),
-			'oauth' => $oauth,
+			'mediatypeid' => $this->hasInput('mediatypeid') ? $this->getInput('mediatypeid') : null,
+			'oauth' => [
+				'redirection_url' => '',
+				'client_id' => '',
+				'client_secret' => '',
+				'authorization_url' => '',
+				'token_url' => '',
+				'token_status' => 0
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+		$this->getInputs($data['oauth'], array_keys($data['oauth']));
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

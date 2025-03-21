@@ -170,6 +170,12 @@ class CControllerMediatypeEdit extends CController {
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['provider_oauth_defaults'] = CMediatypeHelper::getOauthDefaultsByProvider();
+		$curl_status = (new CFrontendSetup())->checkPhpCurlModule();
+
+		if ($curl_status['result'] != CFrontendSetup::CHECK_OK) {
+			$data['curl_error'] = $curl_status['error'];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

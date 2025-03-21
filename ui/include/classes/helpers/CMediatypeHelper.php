@@ -405,4 +405,41 @@ class CMediatypeHelper {
 			'message' => $message_templates[$message_type]['template']['text']
 		];
 	}
+
+	/**
+	 * Get OAuth defaults as array with provider as a key and oauth defaults as value.
+	 *
+	 * @return array
+	 */
+	public static function getOauthDefaultsByProvider(): array {
+		$redirection_url = '';
+		$base_url = CSettingsHelper::get(CSettingsHelper::URL);
+
+		if ($base_url !== '') {
+			$url = new CUrl($base_url);
+			$url->setArgument('action', 'oauth.authorize');
+			$redirection_url = $url->getUrl();
+		}
+
+		return [
+			self::EMAIL_PROVIDER_SMTP => [
+				'redirection_url' => $redirection_url
+			],
+			self::EMAIL_PROVIDER_GMAIL => [
+				'redirection_url' => $redirection_url,
+				'authorization_url' => 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=https://mail.google.com/&prompt=consent&access_type=offline',
+				'token_url' => 'https://oauth2.googleapis.com/token?grant_type=authorization_code'
+			],
+			self::EMAIL_PROVIDER_GMAIL_RELAY => [
+				'redirection_url' => $redirection_url,
+				'authorization_url' => 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=https://mail.google.com/&prompt=consent&access_type=offline',
+				'token_url' => 'https://oauth2.googleapis.com/token?grant_type=authorization_code'
+			],
+			self::EMAIL_PROVIDER_OFFICE365 => [
+				'redirection_url' => $redirection_url,
+				'authorization_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?scope=https://outlook.office.com/SMTP.Send, offline_access',
+				'token_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/token?grant_type=authorization_code'
+			]
+		];
+	}
 }

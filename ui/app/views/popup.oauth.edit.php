@@ -21,6 +21,7 @@
 
 
 $form = (new CForm('post'))
+	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -193,8 +194,9 @@ $form_grid->addItem(
 			'advanced_form' => $data['advanced_form'] == 1,
 			'oauth' => $data['oauth'],
 			'messages' => [
+				'popup_closed' => _('Please complete authentication to get tokens'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),
-				'authorization_error' => _('Please enter authorization code manually and try again.')
+				'authorization_error' => _('Authorization code is empty or incorrect.')
 			]
 		], JSON_FORCE_OBJECT) .');
 	'))->setOnDocumentReady()

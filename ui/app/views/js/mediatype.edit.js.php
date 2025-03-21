@@ -98,6 +98,26 @@ window.mediatype_edit_popup = new class {
 				event_menu_url.disabled = true;
 			}
 		}
+
+		this.form.querySelector('#js-oauth-configure').addEventListener('click', () => {
+			const mediatype = getFormFields(this.form);
+			let data = {
+				...mediatype.oauth,
+				update: 0,
+				advanced_form: mediatype.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
+			};
+
+			if ('mediatypeid' in mediatype) {
+				data.update = 'oauth' in mediatype ? 1 : 0;
+				data.mediatypeid = mediatype.mediatypeid;
+			}
+
+			if (!data.update) {
+				data = {...data, ...this.mediatype.provider_oauth_defaults[mediatype.provider]}
+			}
+
+			PopUp('oauth.edit', data, {dialogue_class: 'modal-popup-generic'});
+		});
 	}
 
 	clone({title, buttons}) {
@@ -559,6 +579,7 @@ window.mediatype_edit_popup = new class {
 			this.form.querySelector(
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 			).checked = true;
+			this.form.querySelector('#js-oauth-status')?.remove();
 		}
 
 		const authentication = this.form.querySelector('#smtp_authentication');
@@ -585,7 +606,8 @@ window.mediatype_edit_popup = new class {
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
 				show_fields = ['#smtp-email-label', '#smtp-email-field', '#passwd_label', '#passwd_field',
-					'#message_format_label', '#message_format_field'
+					'#message_format_label', '#message_format_field', '#smtp-authentication-label',
+					'#smtp-authentication-field'
 				];
 				break;
 
@@ -641,11 +663,16 @@ window.mediatype_edit_popup = new class {
 		const passwd_label = this.form.querySelector('#passwd_label');
 		const passwd = this.form.querySelector('#passwd');
 		const smtp_auth_1 = this.form.querySelector('label[for="smtp_authentication_1"]');
+		const smtp_none = this.form.querySelector('[name="smtp_authentication"][value="<?= SMTP_AUTHENTICATION_NONE ?>"]');
+		const smtp_oauth = this.form.querySelector('[name="smtp_authentication"][value="<?= SMTP_AUTHENTICATION_OAUTH ?>"]');
 
 		passwd_label.setAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		passwd.setAttribute('aria-required', 'true');
 
 		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
+			smtp_oauth.removeAttribute('disabled');
+			smtp_none.removeAttribute('disabled');
+
 			switch (parseInt(provider)) {
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>:
 					smtp_auth_1.innerHTML = <?= json_encode(_('Username and password')) ?>;
@@ -658,7 +685,7 @@ window.mediatype_edit_popup = new class {
 							this.form.querySelector('#smtp_username').value = '';
 
 							const hide_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field'
+								'#passwd_field', '#oauth-token-label', '#oauth-token-field'
 							];
 
 							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
@@ -670,13 +697,61 @@ window.mediatype_edit_popup = new class {
 							];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+
+							['#oauth-token-label', '#oauth-token-field'].forEach(
+								(field) => this.form.querySelector(field).style.display = 'none'
+							);
+							break;
+
+						case <?= SMTP_AUTHENTICATION_OAUTH ?>:
+							['#smtp-username-label', '#smtp-username-field', '#passwd_label', '#passwd_field'].forEach(
+								(field) => this.form.querySelector(field).style.display = 'none'
+							);
+							['#oauth-token-label', '#oauth-token-field'].forEach(
+								(field) => this.form.querySelector(field).style.display = ''
+							);
+
 							break;
 					}
 					break;
 
+				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
+				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
+					smtp_none.setAttribute('disabled', 'disabled');
+
+					switch (parseInt(authentication)) {
+						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+							const show_fields = ['#passwd_label', '#passwd_field'];
+
+							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+
+							['#oauth-token-label', '#oauth-token-field'].forEach(
+								(field) => this.form.querySelector(field).style.display = 'none'
+							);
+							break;
+
+						case <?= SMTP_AUTHENTICATION_OAUTH ?>:
+							['#smtp-username-label', '#smtp-username-field', '#passwd_label', '#passwd_field'].forEach(
+								(field) => this.form.querySelector(field).style.display = 'none'
+							);
+							['#oauth-token-label', '#oauth-token-field'].forEach(
+								(field) => this.form.querySelector(field).style.display = ''
+							);
+
+							break;
+					}
+
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
 					smtp_auth_1.innerHTML = <?= json_encode(_('Email and password')) ?>;
+
+					if (parseInt(provider) == <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>) {
+						smtp_oauth.setAttribute('disabled', 'disabled');
+					}
+
+					['#oauth-token-label', '#oauth-token-field'].forEach(
+						(field) => this.form.querySelector(field).style.display = 'none'
+					);
 
 					switch (parseInt(authentication)) {
 						case <?= SMTP_AUTHENTICATION_NONE ?>:
@@ -693,6 +768,16 @@ window.mediatype_edit_popup = new class {
 							const show_fields = ['#passwd_label', '#passwd_field'];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+							break;
+
+						case <?= SMTP_AUTHENTICATION_OAUTH ?>:
+							['#smtp-username-label', '#smtp-username-field', '#passwd_label', '#passwd_field'].forEach(
+								(field) => this.form.querySelector(field).style.display = 'none'
+							);
+							['#oauth-token-label', '#oauth-token-field'].forEach(
+								(field) => this.form.querySelector(field).style.display = ''
+							);
+
 							break;
 					}
 			}
@@ -727,7 +812,7 @@ window.mediatype_edit_popup = new class {
 				'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
 				'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',
 				'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
-				'#webhook_event_menu_url_field'
+				'#webhook_event_menu_url_field', '#oauth-token-label', '#oauth-token-field'
 			];
 		}
 
