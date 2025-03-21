@@ -49,7 +49,7 @@ window.module_edit = new class {
 
 					overlayDialogueDestroy(this.overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				});
 			})
 			.finally(() => this.overlay.unsetLoading());
@@ -64,7 +64,8 @@ window.module_edit = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				if ('form_errors' in response) {
-					this.form.renderErrors(response.form_errors, true, true);
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
 
 					return false;
 				}
