@@ -445,7 +445,8 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 			zbx_vector_am_db_mediatype_ptr_append(mediatypes, mediatype);
 
 		if (NULL != auth_email_mediatypeids && MEDIA_TYPE_EMAIL == type &&
-				SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+				(SMTP_AUTHENTICATION_PASSWORD == smtp_authentication ||
+				SMTP_AUTHENTICATION_OAUTH2 == smtp_authentication))
 		{
 			zbx_vector_uint64_append(auth_email_mediatypeids, mediatypeid);
 		}

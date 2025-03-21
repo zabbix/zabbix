@@ -1512,12 +1512,13 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 				message_format = mediatype->message_format;
 
 			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->mediatypeid,
-					p_eventid, alert->source, alert->object, alert->objectid, alert->sendto,
-					alert->subject, alert->message, mediatype->smtp_server, mediatype->smtp_port,
-					mediatype->smtp_helo, mediatype->smtp_email, mediatype->smtp_security,
-					mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
-					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
-					message_format, alert->expression, alert->recovery_expression);
+					mediatype->maxattempts, p_eventid, alert->source, alert->object,
+					alert->objectid, alert->sendto, alert->subject, alert->message,
+					mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
+					mediatype->smtp_email, mediatype->smtp_security, mediatype->smtp_verify_peer,
+					mediatype->smtp_verify_host, mediatype->smtp_authentication,
+					mediatype->username, mediatype->passwd, message_format, alert->expression,
+					alert->recovery_expression);
 			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;
