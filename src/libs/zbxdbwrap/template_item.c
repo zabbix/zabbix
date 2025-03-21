@@ -2193,12 +2193,12 @@ static void	lld_override_free(lld_override_t *override)
 static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
 {
-	size_t			sql_offset = 0;
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_uint64_t		overrideid;
-	int			i;
-	lld_override_t		*override;
+	size_t				sql_offset = 0;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	zbx_uint64_t			overrideid;
+	int				i;
+	lld_override_t			*override;
 	lld_override_condition_t	*override_condition;
 
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
