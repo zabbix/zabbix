@@ -37,11 +37,8 @@ class CControllerCorrelationUpdate extends CController {
 				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 			],
 			'op_close_new' => ['boolean'],
-			'op_close_old' => [
-				['boolean'],
-				['boolean', 'required', 'when' => ['op_close_new', false]]
-			],
-			'conditions' =>	['objects', 'required', 'uniq' => [['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid']], 'not_empty', 'fields' => [
+			'op_close_old' => ['boolean', 'required', 'when' => ['op_close_new', false]],
+			'conditions' => ['objects', 'required', 'uniq' => ['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid'], 'not_empty', 'fields' => [
 				'type' => ['db corr_condition.type', 'required', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
 				'operator' => [
 					['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
