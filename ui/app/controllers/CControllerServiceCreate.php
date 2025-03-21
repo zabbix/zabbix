@@ -21,7 +21,7 @@ class CControllerServiceCreate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		$api_uniq = [
 			['service.get', ['name' => '{name}']]
 		];
@@ -94,15 +94,12 @@ class CControllerServiceCreate extends CController {
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
 
-			$response = array_filter([
-				'form_errors' => $form_errors ?? null,
-				'error' => !$form_errors
-					? [
-						'title' => _('Cannot create service'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-					: null
-			]);
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot create service'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
