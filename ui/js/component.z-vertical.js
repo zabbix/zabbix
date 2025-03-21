@@ -26,13 +26,11 @@ class ZVertical extends HTMLElement {
 	#inner_container = null;
 
 	/**
-	 *
 	 * @type {Object}
 	 */
 	#events = {};
 
 	/**
-	 *
 	 * @type {Object}
 	 */
 	#events_data = {};
