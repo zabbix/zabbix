@@ -3299,7 +3299,8 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
  *             item_flags      - [IN] item flags                              *
- *             rule_index      - [IN] mappiong of                               *
+ *             rule_index      - [IN] mapping of LLD rows to discovered LLD   *
+ *                                    rules                                   *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully saved or saving was not *
  *                         necessary                                          *

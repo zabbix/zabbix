@@ -2757,13 +2757,16 @@ static void	lld_prototype_items_clear(void *v)
  *             lifetime         - [IN] item lifetime period                   *
  *             enabled_lifetime - [IN] enabled item lifetime period           *
  *             lastcheck        - [IN] timestamp of the last check            *
+ *             rule_index       - [IN] mapping of LLD rows to discovered LLD  *
+ *                                    rules                                   *
  *                                                                            *
  * Return value: SUCCEED - rules updated successfully                         *
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
 int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
-		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
+		zbx_hashset_t *rule_index)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;
@@ -2833,7 +2836,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_begin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
-			ZBX_FLAG_DISCOVERY_RULE, NULL) &&
+			ZBX_FLAG_DISCOVERY_RULE, rule_index) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_rule_macro_paths_save(hostid, &items, &host_record_is_locked) &&
@@ -2893,17 +2896,17 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	for (int i = 0; i < item_prototypes.values_num; i++)
 	{
 		zbx_lld_prototype_rules_t	prules_local, *prules;
-		zbx_hashset_t			*rule_index;
+		zbx_hashset_t			*proto_rule_index;
 		zbx_lld_item_prototype_t	*item_prototype = item_prototypes.values[i];
 
 		prules_local.itemid = item_prototypes.values[i]->itemid;
 		if (NULL != (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_search(&prototype_rules, &prules_local)))
-			rule_index = &prules->rule_index;
+			proto_rule_index = &prules->rule_index;
 		else
-			rule_index = NULL;
+			proto_rule_index = NULL;
 
 		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  lld_rows, error, lifetime,
-				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index))
+				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
@@ -2932,7 +2935,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index);
 
 		if (SUCCEED != lld_update_rules(hostid, item_prototype->itemid, lld_rows, error, lifetime,
-				&proto_enabled_lifetime, lastcheck))
+				&proto_enabled_lifetime, lastcheck, proto_rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add lld rule because parent host was removed while"
 					" processing lld rule");

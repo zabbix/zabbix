@@ -1126,7 +1126,8 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now, ZBX_FLAG_DISCOVERY_NORMAL,
 			NULL);
 
-	if (SUCCEED != lld_update_rules(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
+	if (SUCCEED != lld_update_rules(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
+			NULL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add lld rule because parent host was removed while"
 				" processing lld rule");
