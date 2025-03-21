@@ -289,7 +289,7 @@ static int	DBpatch_7030018(void)
 
 static int	DBpatch_7030019(void)
 {
-	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("item_discovery", 3, &field);
 }
