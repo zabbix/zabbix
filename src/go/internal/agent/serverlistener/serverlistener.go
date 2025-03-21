@@ -26,10 +26,12 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
 	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxnet"
 )
 
+// ServerListener handles passive check requests on dedicated port.
 type ServerListener struct {
 	listenerID   int
 	listener     *zbxcomms.Listener
@@ -37,11 +39,11 @@ type ServerListener struct {
 	options      *agent.AgentOptions
 	allowedPeers *zbxnet.AllowedPeers
 	bindIP       string
-	last_err     string
+	lastErr      string
 	stopped      bool
 }
 
-func (c *ServerListener) handleError(err error) error {
+func (sl *ServerListener) handleError(err error) error {
 	var netErr net.Error
 
 	if !errors.As(err, &netErr) {
@@ -56,7 +58,7 @@ func (c *ServerListener) handleError(err error) error {
 		return nil
 	}
 
-	if c.stopped {
+	if sl.stopped {
 		return err
 	}
 
@@ -69,10 +71,11 @@ func (c *ServerListener) handleError(err error) error {
 	}
 
 	/* sleep to avoid high CPU usage on surprising temporary errors */
-	if c.last_err == se.Err.Error() {
+	if sl.lastErr == se.Err.Error() {
 		time.Sleep(time.Second)
 	}
-	c.last_err = se.Err.Error()
+
+	sl.lastErr = se.Err.Error()
 
 	return nil
 }
@@ -108,43 +111,54 @@ func isAllowedConnection(remoteIP string, allowedPeers *zbxnet.AllowedPeers) boo
 	return allowedPeers.CheckPeer(parsedIP)
 }
 
-func New(listenerID int, s scheduler.Scheduler, bindIP string, options *agent.AgentOptions) (sl *ServerListener) {
-	sl = &ServerListener{listenerID: listenerID, scheduler: s, bindIP: bindIP, options: options}
-	return
+// New sets up and returns new server listener instance to handle passive checks.
+func New(listenerID int, sched scheduler.Scheduler, bindIP string, options *agent.AgentOptions) *ServerListener {
+	return &ServerListener{
+		listenerID: listenerID,
+		scheduler:  sched,
+		bindIP:     bindIP,
+		options:    options,
+	}
 }
 
-func (sl *ServerListener) Start() (err error) {
+// Start sets up and launches listener for passive check handling.
+func (sl *ServerListener) Start() error {
 	tlsConfig, err := agent.GetTLSConfig(sl.options)
 	if err != nil {
-		return
+		return errs.Wrap(err, "failed getting tls config")
 	}
 
 	sl.allowedPeers, err = zbxnet.GetAllowedPeers(sl.options.Server)
 	if err != nil {
-		return
+		return errs.Wrap(err, "failed getting allowed peers")
 	}
 
 	address := fmt.Sprintf("[%s]:%d", sl.bindIP, sl.options.ListenPort)
 
 	sl.listener, err = zbxcomms.Listen(address, tlsConfig)
 	if err != nil {
-		return
+		return errs.Wrap(err, "failed getting listener")
 	}
 
 	monitor.Register(monitor.Input)
+
 	go sl.run()
 
-	return
+	return nil
 }
 
+// Stop terminates listener for passive check handling.
 func (sl *ServerListener) Stop() {
 	sl.stopped = true
 	if sl.listener != nil {
-		sl.listener.Close()
+		err := sl.listener.Close()
+		if err != nil {
+			log.Errf("failed to stop pasive check listener: %s", err.Error())
+		}
 	}
 }
 
-// ParseListenIP validate ListenIP value
+// ParseListenIP validate ListenIP value.
 func ParseListenIP(options *agent.AgentOptions) (ips []string, err error) {
 	if 0 == len(options.ListenIP) || options.ListenIP == "0.0.0.0" {
 		return []string{"0.0.0.0"}, nil

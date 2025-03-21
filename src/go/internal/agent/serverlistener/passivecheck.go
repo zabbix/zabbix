@@ -69,8 +69,8 @@ func handleConnection(
 	allowedPeers *zbxnet.AllowedPeers,
 	agentOptions *agent.AgentOptions,
 ) {
-	defer conn.Close()
-	// Check if IP is whitelisted
+	defer conn.Close() //nolint:errcheck
+
 	if !isAllowedConnection(conn.RemoteIP(), allowedPeers) {
 		log.Warningf(
 			"connection from %q rejected, allowed hosts: %q",

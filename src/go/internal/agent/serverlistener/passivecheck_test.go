@@ -25,22 +25,31 @@ import (
 )
 
 func TestFormatError(t *testing.T) {
-	const notsupported = "ZBX_NOTSUPPORTED"
-	const message = "error message"
+	t.Parallel()
+
+	const (
+		notsupported = "ZBX_NOTSUPPORTED"
+		message      = "error message"
+	)
+
 	result := formatError(message)
 
 	if string(result[:len(notsupported)]) != notsupported {
 		t.Errorf("Expected error message to start with '%s' while got '%s'", notsupported,
 			string(result[:len(notsupported)]))
+
 		return
 	}
+
 	if result[len(notsupported)] != 0 {
 		t.Errorf("Expected terminating zero after ZBX_NOTSUPPORTED error prefix")
+
 		return
 	}
 
 	if string(result[len(notsupported)+1:]) != message {
 		t.Errorf("Expected error description '%s' while got '%s'", message, string(result[len(notsupported)+1:]))
+
 		return
 	}
 }
