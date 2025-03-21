@@ -216,14 +216,13 @@ abstract class CControllerHost extends CController {
 		}
 
 		if ($hosts) {
-			$dashboards = API::HostDashboard()->get([
+			$dashboard_count = API::HostDashboard()->get([
 				'countOutput' => true,
 				'groupCount' => true,
 				'hostids' => array_keys($hosts)
 			]);
-			$dashboard_count = array_combine(array_column($dashboards, 'hostid'),
-				array_column($dashboards, 'rowscount')
-			);
+
+			$dashboard_count = array_column($dashboard_count, 'rowscount', 'hostid');
 		}
 
 		foreach ($hosts as &$host) {
