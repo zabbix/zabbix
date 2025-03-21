@@ -16,9 +16,9 @@ package serverlistener
 
 import (
 	"net"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/internal/agent"
 )
 
@@ -85,8 +85,8 @@ func Test_ParseListenIP(t *testing.T) {
 	}
 
 	for _, tt := range tests { //nolint:paralleltest
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			// Should not run in parallel. Accesses global getLocalIPs.
 			getLocalIPs = func() []net.IP {
 				return tt.mockIPs
 			}
@@ -98,8 +98,10 @@ func Test_ParseListenIP(t *testing.T) {
 				t.Fatalf("ParseListenIP() error = %v, expectErr = %v", err, tt.expectErr)
 			}
 
-			if !tt.expectErr && !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ParseListenIP() = %v, want = %v", got, tt.want)
+			if !tt.expectErr {
+				if diff := cmp.Diff(tt.want, got); diff != "" {
+					t.Errorf("ParseListenIP() mismatch (-want +got):\n%s", diff)
+				}
 			}
 		})
 	}
