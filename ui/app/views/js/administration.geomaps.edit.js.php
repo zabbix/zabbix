@@ -46,8 +46,8 @@
 			document.getElementById('geomaps-form').addEventListener('submit', (e) => {
 				e.preventDefault();
 
-				const fields = this.form.getAllValues();
-				const curl = new Curl(this.form_element.getAttribute('action'));
+				const fields = this.form.getAllValues(),
+					curl = new Curl(this.form_element.getAttribute('action'));
 
 				this.form.validateSubmit(fields)
 					.then((result) => {
@@ -102,7 +102,8 @@
 				.then((response) => response.json())
 				.then((response) => {
 					if ('form_errors' in response) {
-						this.form.renderErrors(response.form_errors, true, true);
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
 					}
 					else if ('error' in response) {
 						throw {error: response.error};

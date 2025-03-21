@@ -24,22 +24,16 @@ class CControllerGeomapsUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'geomaps_tile_provider' => ['string', 'required',
 				'length' => CSettingsSchema::getFieldLength('geomaps_tile_provider')
 			],
 			'geomaps_tile_url' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('geomaps_tile_url'),
-				'when' => ['geomaps_tile_provider', 'in' => ['']]
+				'length' => CSettingsSchema::getFieldLength('geomaps_tile_url')
 			],
-			'geomaps_max_zoom' => [
-				['integer', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
-				['integer', 'required', 'when' => ['geomaps_tile_provider', 'in' => ['']]]
-			],
-			'geomaps_attribution' => ['string', 'length' => CSettingsSchema::getFieldLength('geomaps_attribution'),
-				'when' => ['geomaps_tile_provider', 'in' => ['']]
-			]
+			'geomaps_max_zoom' => ['integer', 'required', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
+			'geomaps_attribution' => ['string', 'length' => CSettingsSchema::getFieldLength('geomaps_attribution')]
 		]];
 	}
 
@@ -48,17 +42,15 @@ class CControllerGeomapsUpdate extends CController {
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update configuration'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode(array_filter([
-					'form_errors' => $form_errors ?? null,
-					'error' => !$form_errors
-						? [
-							'title' => _('Cannot update configuration'),
-							'messages' => array_column(get_and_clear_messages(), 'message')
-						]
-						: null
-				]))])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
