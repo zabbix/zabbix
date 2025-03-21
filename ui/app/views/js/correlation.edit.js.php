@@ -102,7 +102,7 @@ window.correlation_edit_popup = new class {
 		[...labels].forEach((label) => {
 			conditions.push({
 				id: label.dataset.formulaid,
-				type: label.dataset.type
+				type: label.dataset.conditiontype
 			});
 		});
 
