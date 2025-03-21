@@ -366,7 +366,7 @@ else {
 }
 
 $output = [
-	'header' => $data['correlationid'] === null ? _('New event correlation') : _('Event correlation'),
+	'header' => $data['correlation']['correlationid'] === null ? _('New event correlation') : _('Event correlation'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
