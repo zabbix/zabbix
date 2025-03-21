@@ -199,6 +199,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$messageFalse = _('Cannot add web scenario');
 	}
 
+	$result = false;
+
 	try {
 		DBstart();
 
@@ -316,11 +318,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			$httpTest['httptestid'] = $httpTestId = $_REQUEST['httptestid'];
+			$httpTest['httptestid'] = $_REQUEST['httptestid'];
 
-			$result = API::HttpTest()->update($httpTest);
+			$result = (bool) API::HttpTest()->update($httpTest);
+
 			if (!$result) {
-
 				throw new Exception();
 			}
 			else {
@@ -333,30 +335,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 			unset($step);
 
-			$result = API::HttpTest()->create($httpTest);
+			$result = (bool) API::HttpTest()->create($httpTest);
+
 			if (!$result) {
 				throw new Exception();
 			}
 			else {
 				uncheckTableRows(getRequest('hostid'));
 			}
-			$httpTestId = reset($result['httptestids']);
 		}
 
 		unset($_REQUEST['form']);
 		show_messages(true, $messageTrue);
-		DBend(true);
 	}
 	catch (Exception $e) {
-		DBend(false);
-
-
 		$msg = $e->getMessage();
-		if (!empty($msg)) {
+
+		if ($msg !== '') {
 			error($msg);
 		}
+
 		show_messages(false, null, $messageFalse);
 	}
+
+	$result = DBend($result);
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.massenable', 'httptest.massdisable'])
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
@@ -392,7 +394,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.ma
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

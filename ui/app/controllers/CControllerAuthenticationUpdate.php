@@ -26,9 +26,8 @@ class CControllerAuthenticationUpdate extends CController {
 	];
 
 	protected function init() {
-		$this->response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'authentication.edit')
-			->getUrl()
+		$this->response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'authentication.edit')
 		);
 	}
 
@@ -45,7 +44,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array_id',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'jit_provision_interval' =>			'db config.jit_provision_interval|time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
+			'jit_provision_interval' =>			'time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
@@ -81,7 +80,7 @@ class CControllerAuthenticationUpdate extends CController {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-				'http_strip_domains' =>		'db config.http_strip_domains',
+				'http_strip_domains' =>		'setting http_strip_domains',
 				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
 			];
 		}
@@ -109,8 +108,8 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateLdap(): bool {
-		if ($this->getInput('ldap_auth_enabled', DB::getDefault('config', 'ldap_auth_enabled')) ==
-				ZBX_AUTH_LDAP_ENABLED) {
+		if ($this->getInput('ldap_auth_enabled', CSettingsSchema::getDefault('ldap_auth_enabled'))
+				== ZBX_AUTH_LDAP_ENABLED) {
 			$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
@@ -155,8 +154,8 @@ class CControllerAuthenticationUpdate extends CController {
 				}
 			}
 		}
-		elseif ($this->getInput('authentication_type', DB::getDefault('config', 'authentication_type')) ==
-				ZBX_AUTH_LDAP) {
+		elseif ($this->getInput('authentication_type', CSettingsSchema::getDefault('authentication_type'))
+				== ZBX_AUTH_LDAP) {
 			error(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type', _('LDAP is not configured')));
 
 			return false;
@@ -364,8 +363,8 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
-			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
-			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
+			'passwd_min_length' => CSettingsSchema::getDefault('passwd_min_length'),
+			'passwd_check_rules' => CSettingsSchema::getDefault('passwd_check_rules'),
 			'mfa_status' => MFA_DISABLED,
 			'mfaid' => $mfaid
 		];
@@ -396,7 +395,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 
 			if ($this->getInput('ldap_jit_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-				$fields['jit_provision_interval'] = DB::getDefault('config', 'jit_provision_interval');
+				$fields['jit_provision_interval'] = CSettingsSchema::getDefault('jit_provision_interval');
 			}
 		}
 

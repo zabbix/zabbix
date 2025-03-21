@@ -1131,7 +1131,7 @@ int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stat
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error)
+int	zbx_get_usage_stats_preprocessor(zbx_vector_dbl_t *usage, int *count, char **error)
 {
 	unsigned char	*result;
 
@@ -1161,7 +1161,7 @@ void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info)
 
 	memset(info, 0, sizeof(zbx_process_info_t));
 
-	if (SUCCEED != zbx_preprocessor_get_usage_stats(&usage, &info->count, &error))
+	if (SUCCEED != zbx_get_usage_stats_preprocessor(&usage, &info->count, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get preprocessor usage statistics: %s", error);
 		zbx_free(error);
