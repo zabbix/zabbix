@@ -25,6 +25,18 @@ class ZVertical extends HTMLElement {
 	 */
 	#inner_container = null;
 
+	/**
+	 *
+	 * @type {Object}
+	 */
+	#events = {};
+
+	/**
+	 *
+	 * @type {Object}
+	 */
+	#events_data = {};
+
 	constructor() {
 		super();
 
@@ -37,7 +49,7 @@ class ZVertical extends HTMLElement {
 			position: 'absolute',
 			bottom: 0,
 			left: 0,
-			transform: `rotate(270deg)`
+			transform: 'rotate(270deg)'
 		});
 
 		const slot = document.createElement('slot');
@@ -58,20 +70,21 @@ class ZVertical extends HTMLElement {
 			overflow: 'overflow'
 		}
 
-		const container_styles = window.getComputedStyle(this);
+		const container_styles = getComputedStyle(this);
 
 		for (const prop in props_to_inherit) {
+			// Skip property that is not set or set to default value, as it is already inherited.
 			if (!['auto', 'none', '0px'].includes(container_styles[prop])) {
 				this.#inner_container.style[props_to_inherit[prop]] = container_styles[prop];
 			}
 		}
 
-		this.registerEvents();
+		this.#registerEvents();
 		this.#refresh();
 	}
 
 	disconnectedCallback() {
-		this.unregisterEvents();
+		this.#unregisterEvents();
 	}
 
 	#refresh() {
@@ -87,8 +100,8 @@ class ZVertical extends HTMLElement {
 		this.#inner_container.style.transformOrigin = `${anchor_position}px ${anchor_position}px`;
 	}
 
-	registerEvents() {
-		this._events = {
+	#registerEvents() {
+		this.#events = {
 			resize: () => {
 				this.#refresh();
 			},
@@ -98,18 +111,18 @@ class ZVertical extends HTMLElement {
 			}
 		}
 
-		this._events_data = {
-			resize_observer: new ResizeObserver(this._events.resize),
-			mutation_observer: new MutationObserver(this._events.update)
+		this.#events_data = {
+			resize_observer: new ResizeObserver(this.#events.resize),
+			mutation_observer: new MutationObserver(this.#events.update)
 		}
 
-		this._events_data.resize_observer.observe(this);
-		this._events_data.mutation_observer.observe(this, {childList: true});
+		this.#events_data.resize_observer.observe(this);
+		this.#events_data.mutation_observer.observe(this, {childList: true});
 	}
 
-	unregisterEvents() {
-		this._events_data.resize_observer.disconnect();
-		this._events_data.mutation_observer.disconnect();
+	#unregisterEvents() {
+		this.#events_data.resize_observer.disconnect();
+		this.#events_data.mutation_observer.disconnect();
 	}
 }
 
