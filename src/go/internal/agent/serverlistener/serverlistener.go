@@ -31,6 +31,8 @@ import (
 	"golang.zabbix.com/sdk/zbxnet"
 )
 
+var getLocalIPs localIPgetter = getListLocalIP //nolint:gochecknoglobals
+
 // ServerListener handles passive check requests on dedicated port.
 type ServerListener struct {
 	listenerID   int
@@ -42,6 +44,8 @@ type ServerListener struct {
 	lastErr      string
 	stopped      bool
 }
+
+type localIPgetter func() []net.IP
 
 func (sl *ServerListener) handleError(err error) error {
 	var netErr net.Error
@@ -159,50 +163,61 @@ func (sl *ServerListener) Stop() {
 }
 
 // ParseListenIP validate ListenIP value.
-func ParseListenIP(options *agent.AgentOptions) (ips []string, err error) {
-	if 0 == len(options.ListenIP) || options.ListenIP == "0.0.0.0" {
+func ParseListenIP(options *agent.AgentOptions) ([]string, error) {
+	if options.ListenIP == "" || options.ListenIP == "0.0.0.0" {
 		return []string{"0.0.0.0"}, nil
 	}
-	lips := getListLocalIP()
+
+	lips := getLocalIPs()
+
 	opts := strings.Split(options.ListenIP, ",")
+	ips := make([]string, 0, len(opts))
+
 	for _, o := range opts {
 		addr := strings.Trim(o, " \t")
-		if err = validateLocalIP(addr, lips); nil != err {
+
+		err := validateLocalIP(addr, lips)
+		if err != nil {
 			return nil, err
 		}
+
 		ips = append(ips, addr)
 	}
+
 	return ips, nil
 }
 
-func validateLocalIP(addr string, lips *[]net.IP) (err error) {
-	if ip := net.ParseIP(addr); nil != ip {
-		if ip.IsLoopback() || 0 == len(*lips) {
+func validateLocalIP(addr string, lips []net.IP) error {
+	ip := net.ParseIP(addr)
+	if ip == nil {
+		return errs.Errorf("incorrect value of ListenIP: %q", addr)
+	}
+
+	if ip.IsLoopback() || len(lips) == 0 {
+		return nil
+	}
+
+	for _, lip := range lips {
+		if lip.Equal(ip) {
 			return nil
 		}
-		for _, lip := range *lips {
-			if lip.Equal(ip) {
-				return nil
-			}
-		}
-	} else {
-		return fmt.Errorf("incorrect value of ListenIP: \"%s\"", addr)
 	}
-	return fmt.Errorf("value of ListenIP not present on the host: \"%s\"", addr)
+
+	return errs.Errorf("value of ListenIP not present on the host: %q", addr)
 }
 
-func getListLocalIP() *[]net.IP {
+func getListLocalIP() []net.IP {
 	var ips []net.IP
 
 	ifaces, err := net.Interfaces()
-	if nil != err {
-		return &ips
+	if err != nil {
+		return ips
 	}
 
 	for _, i := range ifaces {
 		addrs, err := i.Addrs()
-		if nil != err {
-			return &ips
+		if err != nil {
+			return ips
 		}
 
 		for _, addr := range addrs {
@@ -213,9 +228,10 @@ func getListLocalIP() *[]net.IP {
 			case *net.IPAddr:
 				ip = v.IP
 			}
+
 			ips = append(ips, ip)
 		}
 	}
 
-	return &ips
+	return ips
 }
