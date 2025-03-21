@@ -498,7 +498,8 @@ window.service_edit_popup = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				if ('form_errors' in response) {
-					this.form.renderErrors(response.form_errors, true, true);
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
 				}
 				else if ('error' in response) {
 					throw {error: response.error};
