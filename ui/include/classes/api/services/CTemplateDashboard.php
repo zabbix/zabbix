@@ -65,7 +65,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$sql_parts = [
 			'select' => ['dashboard' => 'd.dashboardid'],
 			'from' => ['dashboard' => 'dashboard d'],
-			'where' => [],
+			'where' => ['templateids' => 'd.templateid IS NOT NULL'],
 			'order' => [],
 			'group' => []
 		];
@@ -110,10 +110,10 @@ class CTemplateDashboard extends CDashboardGeneral {
 					$templateids[$db_host_template['templateid']] = true;
 				}
 
-				$all_templateids = [];
+				$templateids_of_accessible_hosts = [];
 
 				while ($templateids) {
-					$all_templateids += $templateids;
+					$templateids_of_accessible_hosts += $templateids;
 
 					$db_parent_templates = DBselect(
 						'SELECT ht.templateid'.
@@ -128,21 +128,55 @@ class CTemplateDashboard extends CDashboardGeneral {
 					}
 				}
 
-				$options['templateids'] = $options['templateids'] !== null
-					? array_intersect($options['templateids'], array_keys($all_templateids))
-					: array_keys($all_templateids);
+				$templateids_of_accessible_hosts = $options['templateids'] !== null
+					? array_intersect($options['templateids'], array_keys($templateids_of_accessible_hosts))
+					: array_keys($templateids_of_accessible_hosts);
+
+				$templateids_without_hosts = $options['templateids'] !== null
+					? array_diff($options['templateids'], $templateids_of_accessible_hosts)
+					: [];
+
+				if ($templateids_of_accessible_hosts) {
+					$templateids_condition = $templateids_without_hosts
+						? dbConditionId('d.templateid', $templateids_without_hosts)
+						: dbConditionId('d.templateid', $templateids_of_accessible_hosts, true);
+
+					$sql_parts['where']['templateids'] = '('.
+						dbConditionId('d.templateid', $templateids_of_accessible_hosts).
+						' OR ('.$templateids_condition.
+							' AND EXISTS('.
+								'SELECT NULL'.
+								' FROM host_hgset hh,permission p'.
+								' WHERE d.templateid=hh.hostid'.
+									' AND hh.hgsetid=p.hgsetid'.
+									' AND p.ugsetid='.self::$userData['ugsetid'].
+							')'.
+						')'.
+					')';
+				}
+				else {
+					$sql_parts['from'][] = 'host_hgset hh';
+					$sql_parts['from'][] = 'permission p';
+					$sql_parts['where'][] = 'd.templateid=hh.hostid';
+					$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+					$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+					if ($options['templateids'] !== null) {
+						$sql_parts['where']['templateids'] = dbConditionId('d.templateid', $options['templateids']);
+					}
+				}
 			}
+		}
+
+		// Template IDs for super admins or if editable template dashboards is requested.
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || $options['editable']) {
+			$sql_parts['where']['templateids'] = dbConditionId('d.templateid', $options['templateids']);
 		}
 
 		// dashboardids
 		if ($options['dashboardids'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('d.dashboardid', $options['dashboardids']);
 		}
-
-		// dashboardids
-		$sql_parts['where'][] = ($options['templateids'] !== null)
-			? dbConditionInt('d.templateid', $options['templateids'])
-			: 'd.templateid IS NOT NULL';
 
 		// filter
 		if ($options['filter'] !== null) {
