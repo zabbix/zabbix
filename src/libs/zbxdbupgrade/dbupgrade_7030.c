@@ -388,7 +388,7 @@ static int	DBpatch_7030028(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_70300295(void)
+static int	DBpatch_7030029(void)
 {
 	int		i;
 	const char	*values[] = {
