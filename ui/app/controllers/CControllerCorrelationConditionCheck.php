@@ -47,12 +47,16 @@ class CControllerCorrelationConditionCheck extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode(array_filter([
-				'form_errors' => $form_errors ?? null,
-				'error' => !$form_errors
-					? ['messages' => array_column(get_and_clear_messages(), 'message')]
-					: null
-			]))]));
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
