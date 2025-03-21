@@ -2887,6 +2887,8 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	/* discovery corresponding LLD rule prototypes */
 
+	/* TODO: create 'delete immediately' lifetime for prototpes ? */
+
 	for (int i = 0; i < item_prototypes.values_num; i++)
 	{
 		zbx_lld_prototype_rules_t	prules_local, *prules;

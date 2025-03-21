@@ -1358,7 +1358,8 @@ out:
  * Purpose: gets linked (discovered, dependent, etc) items                    *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter, const char *field)
+static void	db_get_linked_items(const zbx_vector_uint64_t *itemids, const char *filter, const char *field,
+		zbx_vector_uint64_t *itemids_linked)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1375,16 +1376,40 @@ static void	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter
 	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(itemids, itemid);
+		zbx_vector_uint64_append(itemids_linked, itemid);
 
 	}
 	zbx_db_large_query_clear(&query);
-	zbx_free(sql);
-
-	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: recursively retrieve all linked (dependent, prototypes,           *
+ *          discovered) items                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_discovered_items(zbx_vector_uint64_t *itemids)
+{
+	zbx_vector_uint64_t	itemids_linked;
+
+	zbx_vector_uint64_create(&itemids_linked);
+
+	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
+	db_get_linked_items(itemids, "item_discovery i where", "i.lldrule_itemid", &itemids_linked);
+	db_get_linked_items(itemids, "items i where", "i.master_itemid", &itemids_linked);
+
+	if (0 != itemids_linked.values_num)
+	{
+		zbx_vector_uint64_sort(&itemids_linked, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&itemids_linked, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		db_get_discovered_items(&itemids_linked);
+		zbx_vector_uint64_append_array(itemids, itemids_linked.values, itemids_linked.values_num);
+	}
+
+	zbx_vector_uint64_destroy(&itemids_linked);
 }
 
 /******************************************************************************
@@ -1409,9 +1434,9 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	if (0 == itemids->values_num)
 		goto out;
 
-	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid");
-	db_get_linked_items(itemids, "item_discovery i where", "i.lldrule_itemid");
-	db_get_linked_items(itemids, "items i where", "i.master_itemid");
+	db_get_discovered_items(itemids);
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_audit_item_delete(audit_context_mode, itemids);
 
@@ -1461,6 +1486,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_db_execute_multiple_query("delete from functions where", "itemid", itemids);
 	zbx_db_execute_multiple_query("update items set master_itemid=null where master_itemid is not null and",
 			"itemid", itemids);
+	zbx_db_execute_multiple_query("delete from item_discovery where", "lldrule_itemid", itemids);
 	zbx_db_execute_multiple_query("delete from items where", "itemid", itemids);
 
 	zbx_vector_uint64_destroy(&profileids);
