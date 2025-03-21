@@ -106,10 +106,34 @@ class CControllerGraphPrototypeCreate extends CController {
 				}
 			}
 
-			$graph_prototype = $this->getInputAll();
+			$graph_prototype = [
+				'name' => $this->getInput('name'),
+				'width' => $this->getInput('width'),
+				'height' => $this->getInput('height'),
+				'ymin_type' => $this->getInput('ymin_type', 0),
+				'ymax_type' => $this->getInput('ymax_type', 0),
+				'yaxismin' => $this->getInput('yaxismin', 0),
+				'yaxismax' => $this->getInput('yaxismax', 0),
+				'show_work_period' => $this->getInput('show_work_period', 0),
+				'show_triggers' => $this->getInput('show_triggers', 0),
+				'graphtype' => $this->getInput('graphtype'),
+				'show_legend' => $this->getInput('show_legend', 0),
+				'show_3d' => $this->getInput('show_3d', 0),
+				'percent_left' => $this->getInput('percent_left', 0),
+				'percent_right' => $this->getInput('percent_right', 0),
+				'gitems' => $gitems,
+				'discover' => $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER
+			];
 
-			$graph_prototype['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
-			$graph_prototype['gitems'] = $gitems;
+			if ($graph_prototype['graphtype'] == GRAPH_TYPE_NORMAL
+					|| $graph_prototype['graphtype'] == GRAPH_TYPE_STACKED) {
+				if ($graph_prototype['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph_prototype['ymin_itemid'] = $this->getInput('ymin_itemid');
+				}
+				if ($graph_prototype['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph_prototype['ymax_itemid'] = $this->getInput('ymax_itemid');
+				}
+			}
 
 			unset ($graph_prototype['items']);
 
