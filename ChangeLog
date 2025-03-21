@@ -1,6 +1,7 @@
 Changes for 7.4.0beta1
 
 New features:
+A.F.I..... [ZBXNEXT-8784] added the ability to show map element and link labels only on hover, scale the map background image proportionally, and set item thresholds and highlights for map links (agriscenko, dfofanovs, dgoloscapov)
 .........T [ZBXNEXT-9271] added Azure MSSQL DTU database by HTTP template (abrosimovs)
 ..F....... [ZBXNEXT-9029] added a button for copying values to clipboard in item test form (esekace)
 ...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Zabbix Agent 2 Smart plugin (lsurvilo)
@@ -11,6 +12,8 @@ New features:
 A.F.I..PS. [ZBXNEXT-7048] converted the settings table to a key-value format (askolmeisters, jfreibergs, vmaksimovs)
 
 Bug fixes:
+...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
+.......PS. [ZBX-26042] fixed agent redirection if host encryption settings are wrong (sboidenko)
 ........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
 A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when the database transaction commit fails; fixed inability to identify the interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
