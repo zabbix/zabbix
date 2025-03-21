@@ -204,6 +204,8 @@ class CRouter {
 		'notifications.mute'						=> ['CControllerNotificationsMute',						'layout.json',			null],
 		'notifications.read'						=> ['CControllerNotificationsRead',						'layout.json',			null],
 		'notifications.snooze'						=> ['CControllerNotificationsSnooze',					'layout.json',			null],
+		'oauth.edit'								=> ['CControllerOauthEdit',								'layout.json',			'popup.oauth.edit'],
+		'oauth.authorize'							=> ['CControllerOauthAuthorize',						'layout.htmlpage',		'popup.oauth.authorize'],
 		'popup'										=> ['CControllerPopup',									'layout.htmlpage',		'popup.view'],
 		'popup.acknowledge.create'					=> ['CControllerPopupAcknowledgeCreate',				'layout.json',			null],
 		'popup.action.operation.edit'				=> ['CControllerPopupActionOperationEdit',				'layout.json',			'popup.operation.edit'],
