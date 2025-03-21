@@ -25,7 +25,6 @@ class CControllerCorrelationConditionCheck extends CController {
 	protected function checkInput(): bool {
 		$rules = CControllerCorrelationCreate::getValidationRulesForConditionPopup();
 		$ret = $this->validateInput($rules);
-		$form_errors = $this->getValidationError();
 
 		if ($ret) {
 			$validator = new CEventCorrCondValidator();
