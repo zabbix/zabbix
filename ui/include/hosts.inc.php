@@ -1189,19 +1189,6 @@ function renderInterfaceHeaders() {
 		);
 }
 
-function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
-	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
-	$dashboard_fields = array_keys(array_flip($dashboard_fields));
-
-	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
-
-	return API::TemplateDashboard()->get([
-		'output' => $dashboard_fields,
-		'templateids' => $templateids,
-		'preservekeys' => true
-	]);
-}
-
 /**
  * Return macro value to display in the list of inherited macros.
  *

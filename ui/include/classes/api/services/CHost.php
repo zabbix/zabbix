@@ -1833,46 +1833,39 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($options['selectDashboards'] !== null) {
-			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
-
 			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
-				$dashboards = API::TemplateDashboard()->get([
-					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
-					'templateids' => $templateids
+				foreach ($result as &$host) {
+					$host['dashboards'] = [];
+				}
+				unset($host);
+
+				$dashboards = API::HostDashboard()->get([
+					'output' => $options['selectDashboards'],
+					'hostids' => $hostids
 				]);
 
-				if (!is_null($options['limitSelects'])) {
+				if ($options['limitSelects'] !== null) {
 					order_result($dashboards, 'name');
 				}
 
-				foreach ($result as &$host) {
-					foreach ($hosts_templates[$host['hostid']] as $templateid) {
-						foreach ($dashboards as $dashboard) {
-							if ($dashboard['templateid'] == $templateid) {
-								$host['dashboards'][] = $dashboard;
-							}
-						}
-					}
+				foreach ($dashboards as $dashboard) {
+					$result[$dashboard['hostid']]['dashboards'][] = $dashboard;
 				}
-				unset($host);
 			}
 			else {
-				$dashboards = API::TemplateDashboard()->get([
-					'templateids' => $templateids,
+				foreach ($result as $hostid => &$host) {
+					$host['dashboards'] = '0';
+				}
+				unset($host);
+
+				$dashboards = API::HostDashboard()->get([
 					'countOutput' => true,
-					'groupCount' => true
+					'groupCount' => true,
+					'hostids' => $hostids
 				]);
 
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['dashboards'] = 0;
-
-					foreach ($dashboards as $dashboard) {
-						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
-							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
-						}
-					}
-
-					$result[$hostid]['dashboards'] = (string) $result[$hostid]['dashboards'];
+				foreach ($dashboards as $dashboard) {
+					$result[$dashboard['hostid']]['dashboards'] = $dashboard['rowscount'];
 				}
 			}
 		}

@@ -41,6 +41,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'graphprototype' => CGraphPrototype::class,
 		'hanode' => CHaNode::class,
 		'host' => CHost::class,
+		'hostdashboard' => CHostDashboard::class,
 		'hostgroup' => CHostGroup::class,
 		'hostprototype' => CHostPrototype::class,
 		'history' => CHistory::class,
