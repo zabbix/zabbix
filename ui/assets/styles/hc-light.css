@@ -7749,9 +7749,7 @@ svg {
   width: 55px; }
 #graph-tab #items-table .table-col-action {
   width: 55px; }
-#graph-tab #ymax_type {
-  margin-right: 3px; }
-#graph-tab #ymin_type {
+#graph-tab .yaxis-select {
   margin-right: 3px; }
 #graph-tab .graph-items {
   max-width: 750px; }

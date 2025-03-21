@@ -43,8 +43,8 @@ window.graph_edit_popup = new class {
 			this.addPopupValues(data.values);
 		}
 
-		const graph_type = this.graph_type == <?= GRAPH_TYPE_EXPLODED ?> ? <?= GRAPH_TYPE_PIE ?> : this.graph_type;
-		const item_row_template = new Template(document.getElementById(`tmpl-item-row-${graph_type}`).innerHTML);
+		const template_type = this.graph_type == <?= GRAPH_TYPE_EXPLODED ?> ? <?= GRAPH_TYPE_PIE ?> : this.graph_type;
+		const item_row_template = new Template(document.getElementById(`tmpl-item-row-${template_type}`).innerHTML);
 
 		this.items = Array.isArray(items) ? items : Object.values(items);
 		this.items.forEach((item, i) => {
@@ -221,7 +221,11 @@ window.graph_edit_popup = new class {
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;;
+			document.querySelector('#preview-tab').style.overflow = this.form.querySelector('#width').value > 900
+				? 'auto'
+				: ''
+
+			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if ($panel.attr('id') === 'preview-tab') {
 				const $preview_chart = $('#preview-chart');
@@ -240,8 +244,7 @@ window.graph_edit_popup = new class {
 				src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
-					|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
-
+						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
 					src.setPath('chart7.php');
 					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
 				}
@@ -250,6 +253,7 @@ window.graph_edit_popup = new class {
 						src.setArgument('percent_left', $('#percent_left').val());
 						src.setArgument('percent_right', $('#percent_right').val());
 					}
+
 					src.setArgument('ymin_type', $('#ymin_type').val());
 					src.setArgument('ymax_type', $('#ymax_type').val());
 					src.setArgument('yaxismin', $('#yaxismin').val());
@@ -407,11 +411,7 @@ window.graph_edit_popup = new class {
 
 	#updateItemsTable(graph_type) {
 		const tbody = this.form.querySelector('#items-table tbody');
-		let template_type = graph_type;
-
-		if (graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
-			template_type = <?= GRAPH_TYPE_PIE ?>;
-		}
+		const template_type = graph_type == <?= GRAPH_TYPE_EXPLODED ?> ?  <?= GRAPH_TYPE_PIE ?> : graph_type;
 		const template = new Template(document.getElementById(`tmpl-item-row-${template_type}`).innerHTML);
 		const rows = [...tbody.querySelectorAll('tr.graph-item')];
 
@@ -527,11 +527,7 @@ window.graph_edit_popup = new class {
 			return false;
 		}
 
-		let template_type = this.graph_type;
-
-		if (this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
-			template_type = <?= GRAPH_TYPE_PIE ?>;
-		}
+		const template_type = this.graph_type == <?= GRAPH_TYPE_EXPLODED ?> ? <?= GRAPH_TYPE_PIE ?> : this.graph_type;
 		const template = new Template(document.getElementById(`tmpl-item-row-${template_type}`).innerHTML);
 
 		for (let i = 0; i < list.length; i++) {

@@ -113,7 +113,7 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('context', $data['context'])
 	->getUrl();
 
-// create form
+// Create form.
 $graphs_form = (new CForm('post', $url))
 	->setName('graph_form')
 	->addVar('context', $data['context'], 'form_context');

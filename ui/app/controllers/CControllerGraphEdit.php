@@ -128,13 +128,11 @@ class CControllerGraphEdit extends CController {
 				$data['hostid'] = $host['hostid'];
 			}
 
-			// templates
 			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'],
 				getGraphParentTemplates([$graph], ZBX_FLAG_DISCOVERY_NORMAL), ZBX_FLAG_DISCOVERY_NORMAL,
 				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
 
-			// items
 			$data['items'] = API::GraphItem()->get([
 				'output' => ['gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color',
 					'sortorder'
@@ -210,8 +208,6 @@ class CControllerGraphEdit extends CController {
 			];
 
 			$data['yaxis_items'] = API::Item()->get($options);
-
-			$data['items'] = $gitems;
 		}
 
 		// items

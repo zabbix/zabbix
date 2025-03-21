@@ -163,7 +163,8 @@ $yaxis_min_type = (new CSelect('ymin_type'))
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 	]))
 	->setReadonly($data['readonly'])
-	->setFocusableElementId('ymin_type_label');
+	->setFocusableElementId('ymin_type_label')
+	->addClass('yaxis-select');
 
 $yaxis_min_value = (new CDiv(
 	(new CTextBox('yaxismin', $data['yaxismin'], $data['readonly']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -243,7 +244,8 @@ $yaxis_max_type = (new CSelect('ymax_type'))
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 	]))
 	->setReadonly($data['readonly'])
-	->setFocusableElementId('ymax_type_label');
+	->setFocusableElementId('ymax_type_label')
+	->addClass('yaxis-select');
 
 $yaxis_max_value = (new CDiv(
 	(new CTextBox('yaxismax', $data['yaxismax'], $data['readonly']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

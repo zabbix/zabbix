@@ -145,13 +145,11 @@ class CControllerGraphPrototypeEdit extends CController {
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 
-			// templates
 			$data['templates'] = makeGraphTemplatesHtml($graph['graphid'],
 				getGraphParentTemplates([$graph], ZBX_FLAG_DISCOVERY_PROTOTYPE),
 				ZBX_FLAG_DISCOVERY_PROTOTYPE, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
 
-			// items
 			$data['items'] = API::GraphItem()->get([
 				'output' => ['gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color',
 					'sortorder'

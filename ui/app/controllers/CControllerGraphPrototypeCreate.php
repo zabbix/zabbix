@@ -23,7 +23,6 @@ class CControllerGraphPrototypeCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
-		//	'hostid' =>				'db hosts.hostid',
 			'parent_discoveryid'=>	'required|db items.itemid',
 			'name' =>				'required|db graphs.name|not_empty',
 			'width' =>				'required|db graphs.width|not_empty|ge 20|le 65535',
@@ -111,6 +110,7 @@ class CControllerGraphPrototypeCreate extends CController {
 
 			$graph_prototype['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
 			$graph_prototype['gitems'] = $gitems;
+
 			unset ($graph_prototype['items']);
 
 			DBstart();

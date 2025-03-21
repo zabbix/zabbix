@@ -130,7 +130,6 @@ foreach ($data['graphs'] as $graph) {
 	]);
 }
 
-// buttons
 $buttons = [
 	'graph.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
@@ -140,9 +139,7 @@ $buttons = [
 	]
 ];
 
-// append table to form
 $graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, 'graph_prototypes')]);
-
 $html_page
 	->addItem($graphs_form)
 	->show();
