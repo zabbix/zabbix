@@ -778,14 +778,14 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (130, 'Selenium user group');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (140, 'Selenium user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (150, 'Selenium user group in configuration');
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (5, 0, 'Selenium script','test',2,140,NULL,'selenium script description', 1);
-UPDATE config SET alert_usrgrpid = 150 WHERE configid = 1;
+UPDATE settings SET value_usrgrpid = 150 WHERE name='alert_usrgrpid';
 
 -- Disable warning if Zabbix server is down
-UPDATE config SET server_check_interval = 0 WHERE configid = 1;
+UPDATE settings SET value_int= 0 WHERE name='server_check_interval';
 -- Super admin rows per page
 UPDATE users SET rows_per_page = 100 WHERE userid = 1;
 -- Set default language to EN_gb to display the date/time in the 24-hour format
-UPDATE config SET default_lang='en_GB' WHERE configid=1;
+UPDATE settings SET value_str='en_GB' WHERE name='default_lang';
 
 -- test data for testPageAdministrationGeneralIconMapping and testFormAdministrationGeneralIconMapping
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (100, 'Icon mapping one', 10);
@@ -1487,7 +1487,7 @@ INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_ope
 
 INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (40000, 0);
 
-UPDATE config SET session_key='caf1c06dcf802728c4cfc24d645e1e73' WHERE configid = 1;
+UPDATE settings SET value_str='caf1c06dcf802728c4cfc24d645e1e73' WHERE name='session_key';
 
 -- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-17 01:54+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2025-03-06 03:49+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -3872,6 +3872,11 @@ msgstr "テンプレートのトリガー\"%2$s\"の\"%1$s\"を更新できま�
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "テンプレートのトリガーのプロトタイプ\"%2$s\"の\"%1$s\"を更新できません。"
+
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:2344
 #, c-format
@@ -9578,7 +9583,7 @@ msgstr "ホストグループ内のホスト"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "ホストグループが選択されていません。"
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9661,7 +9666,7 @@ msgstr "ホストインベントリの概要"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "ホストが選択されていません。"
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -10204,7 +10209,7 @@ msgstr "イメージラベルのタイプ"
 
 #: widgets/itemhistory/Widget.php:33
 msgid "Image loading error."
-msgstr ""
+msgstr "画像の読み込みエラーです。"
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -11794,7 +11799,7 @@ msgstr "インベントリフィールド"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 #: widgets/hostcard/includes/WidgetForm.php:50
 msgid "Inventory fields"
-msgstr ""
+msgstr "インベントリフィールド"
 
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
@@ -13017,7 +13022,7 @@ msgstr "アイコンのラベルのタイプ"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "マップが選択されていません。"
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -13323,7 +13328,7 @@ msgstr "管理者によってメディアタイプを無効にされました。
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "メディアタイプの編集"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -16214,11 +16219,11 @@ msgstr "2つの要素を選択してください"
 
 #: jsLoader.php:194
 msgid "Please update configuration"
-msgstr ""
+msgstr "設定を更新してください"
 
 #: app/partials/administration.system.info.php:47
 msgid "Please upgrade to latest major release."
-msgstr ""
+msgstr "最新のメジャーリリースにアップグレードしてください。"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -16715,7 +16720,7 @@ msgstr[0] "プロキシを削除しました"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "プロキシの編集"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -16752,7 +16757,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "プロキシグループの編集"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -17870,7 +17875,7 @@ msgstr[0] "SLAを無効にしました"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "SLAの編集"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -18308,7 +18313,7 @@ msgstr "スクリプトにはパラメータがありません。"
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "スクリプトの編集"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -18644,7 +18649,7 @@ msgstr[0] "サービスを削除しました"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "サービスの編集"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -20042,7 +20047,7 @@ msgstr[0] "テンプレートを削除しました"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "テンプレートの編集"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -20068,7 +20073,7 @@ msgstr[0] "テンプレートグループを削除しました"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "テンプレートグループの編集"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20747,7 +20752,7 @@ msgstr "今日(現在まで)"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "トークンの編集"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21009,7 +21014,7 @@ msgstr "イベントのステータス"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "トリガーの編集"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -21032,7 +21037,7 @@ msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"�
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "トリガーが選択されていません。"
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21150,7 +21155,7 @@ msgstr[0] "トリガーのプロトタイプを削除しました"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "トリガーのプロトタイプの編集"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -21509,7 +21514,7 @@ msgstr "ブロックを解除"
 
 #: app/views/administration.user.list.php:310
 msgid "Unblock selected user?"
-msgstr ""
+msgstr "選択したユーザーのブロックを解除しますか？"
 
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
@@ -22237,7 +22242,7 @@ msgstr "ユーザーマクロ"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr ""
+msgstr "ユーザーメディア"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -23104,7 +23109,7 @@ msgstr "表示形式"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "関連するレポートの表示"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23776,7 +23781,7 @@ msgstr "Zabbixサーバーまたはプロキシ"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
-msgstr ""
+msgstr "Zabbix サーバーとプロキシ"
 
 #: app/views/administration.miscconfig.edit.php:107
 msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
@@ -24453,7 +24458,7 @@ msgstr "リンクを削除できません"
 
 #: include/classes/api/services/CDiscoveryRule.php:3034
 msgid "cannot delete inherited LLD rule"
-msgstr ""
+msgstr "継承された LLD ルールを削除できません"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -24662,7 +24667,7 @@ msgstr "ホスト\"%2$s\"上のディスカバリルール\"%1$s\"は監視さ�
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "すべてのアクションを表示"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"

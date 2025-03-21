@@ -17,8 +17,9 @@
 
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
+#include "zbxcachehistory.h"
 
-void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
+void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
 
 #endif

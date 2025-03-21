@@ -17,7 +17,7 @@
 require_once dirname(__FILE__) . '/../include/CAPITest.php';
 
 /**
- * @backup mfa, config, usrgrp, users, mfa_totp_secret
+ * @backup mfa, settings, usrgrp, users, mfa_totp_secret
  *
  * @onBefore prepareTestData
  *

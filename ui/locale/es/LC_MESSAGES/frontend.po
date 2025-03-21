@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-09 22:16+0000\n"
+"PO-Revision-Date: 2025-03-09 18:58+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2699,7 +2699,7 @@ msgstr "No se puede borrar el directorio del usuario por defecto."
 #: include/classes/api/services/CDRule.php:772
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "No se puede eliminar la comprobacion de descubrimiento \"%1$s\" de la regla de descubrimiento \"%2$s\": %3$s."
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2711,7 +2711,7 @@ msgstr[1] "No es posible eliminar las reglas de descubrimiento"
 #: include/classes/api/services/CDRule.php:979
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede eliminar la regla de descubrimiento \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2740,7 +2740,7 @@ msgstr[1] "No se pueden eliminar los equipos"
 #: include/classes/api/services/CHost.php:1631
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede eliminar el equipo \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2758,7 +2758,7 @@ msgstr[1] "No se pueden eliminar los grupos de equipos"
 #: include/classes/api/services/CHostGroup.php:767
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede eliminar el grupo de equipos \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2905,7 +2905,7 @@ msgstr[1] "No se pueden eliminar las plantillas"
 #: include/classes/api/services/CTemplate.php:805
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede eliminar la plantilla \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2945,7 +2945,7 @@ msgstr[1] "No se pueden eliminar los iniciadores"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede eliminar el iniciador \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -3967,6 +3967,11 @@ msgstr "No se puede actualizar \"%1$s\" para la plantilla de iniciador \"%2$s\".
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "No se puede actualizar \"%1$s\" para el prototipo de iniciador con plantilla \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr "No se puede actualizar el parámetro \"%1$s\" porque actualmente es de solo lectura. Considere actualizar Zabbix para eliminar esta limitación."
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4466,7 +4471,7 @@ msgstr "Comprueba si el archivo existe. Devuelve 0: no se encuentra; 1: existe u
 
 #: include/classes/data/CItemData.php:1115
 msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Comprueba si el equipo es accesible mediante ping ICMP con reintentos. 0: el ping ICMP falla. 1: el ping ICMP es exitoso."
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6664,19 +6669,19 @@ msgstr "Eliminado"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "Equipo eliminado"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "Grupo de equipos eliminado"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "Grupo(s) de equipos eliminado(s)"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "Iniciador eliminado"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -13579,7 +13584,7 @@ msgstr "Ruta del menú"
 
 #: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
-msgstr ""
+msgstr "Fusionar sectores más pequeños que"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -17945,7 +17950,7 @@ msgstr "Ejecutar el comando \"%1$s\" en el equipo actual"
 #: include/actions.inc.php:601
 #, c-format
 msgid "Run script \"%1$s\" on deleted object(s)"
-msgstr ""
+msgstr "Ejecutar el script \"%1$s\" en los objetos eliminados"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20617,11 +20622,11 @@ msgstr "Estos parámetros se pasarán al script como argumentos de línea de com
 
 #: app/views/action.list.php:163
 msgid "This action has conditions or operations referencing deleted object(s)."
-msgstr ""
+msgstr "Esta acción tiene condiciones u operaciones que hacen referencia a los objetos eliminados."
 
 #: app/views/action.list.php:158
 msgid "This action has missing conditions or operations due to previously deleted object(s)."
-msgstr ""
+msgstr "A esta acción le faltan condiciones u operaciones debido a objetos eliminados previamente."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -24162,37 +24167,37 @@ msgstr "acos() - El arcocoseno de un valor como ángulo, expresado en radianes"
 #: include/classes/api/services/CDRule.php:773
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "la acción \"%1$s\" utiliza esta comprobación de descubrimiento"
 
 #: include/classes/api/services/CDRule.php:980
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "la acción \"%1$s\" utiliza esta regla de descubrimiento"
 
 #: include/classes/api/services/CHost.php:1632
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "la acción \"%1$s\" usa este equipo"
 
 #: include/classes/api/services/CHostGroup.php:768
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "la acción \"%1$s\" usa este grupo de equipos"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "la acción \"%1$s\" usa este servicio"
 
 #: include/classes/api/services/CTemplate.php:806
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "la acción \"%1$s\" usa esta plantilla"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "la acción \"%1$s\" usa este iniciador"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

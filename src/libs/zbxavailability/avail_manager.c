@@ -25,6 +25,8 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxthreads.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
 
 #define AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
 
@@ -439,6 +441,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_AVAILMAN, 0, NULL, 0, SEC_PER_MIN, ZBX_IPC_SERVICE_AVAILABILITY);
+
 	/* initialize statistics */
 	time_stat = last_proxy_flush = zbx_time();
 	time_flush = time_stat;
@@ -507,6 +511,9 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 				case ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE:
 					update_proxy_heartbeat(&active_hb_cache, message);
 					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					goto out;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
@@ -563,7 +570,7 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 			last_proxy_flush = time_now;
 		}
 	}
-
+out:
 	zbx_block_signals(&orig_mask);
 	if (0 != interface_availabilities.values_num)
 	{

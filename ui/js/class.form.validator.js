@@ -688,25 +688,27 @@ class CFormValidator {
 	#getRelatedRules(fields) {
 		fields = fields.map((field) => field.split('/').filter(part => /^\d+$/.test(part) === false).join('/'));
 
-		const getRules = (rules, rule_path, is_matching = false) => {
+		const getRules = (rules, rule_path, parent_matching = false) => {
 			const rule = {};
+			let path_matching = false;
 
 			Object.entries(rules).forEach(([key, value]) => {
 				if (key === 'fields') {
 					Object.entries(value).forEach(([field_name, rule_sets]) => {
-						const matching = fields.includes(rule_path + '/' + field_name);
+						const child_matching = parent_matching || fields.includes(rule_path + '/' + field_name);
 
 						rule_sets = [...rule_sets].map(rule_set => {
-							return getRules(rule_set, rule_path + '/' + field_name, matching);
-						}).filter(rule_set => rule_set);
+							return getRules(rule_set, rule_path + '/' + field_name, child_matching);
+						});
 
+						rule_sets = rule_sets.filter(rule_set => rule_set);
 						if (rule_sets.length) {
 							if (!('fields' in rule)) {
 								rule.fields = {};
 							}
 
 							rule.fields[field_name] = rule_sets;
-							is_matching = true;
+							path_matching = true;
 						}
 					});
 				}
@@ -717,7 +719,7 @@ class CFormValidator {
 				}
 			});
 
-			return is_matching ? rule : false;
+			return parent_matching || path_matching ? rule : false;
 		};
 
 		return getRules(this.#rules, '');
