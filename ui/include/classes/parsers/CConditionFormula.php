@@ -314,4 +314,8 @@ class CConditionFormula {
 	protected function isOperatorChar($c) {
 		return ($c >= 'a' && $c <= 'z');
 	}
+
+	public function getPosition(): int {
+		return $this->pos;
+	}
 }
