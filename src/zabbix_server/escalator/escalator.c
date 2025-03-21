@@ -990,7 +990,7 @@ static void	add_sentusers_msg_esc_cancel(zbx_user_msg_t **user_msg, zbx_uint64_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct userid,mediatypeid,subject,message,esc_step"
+			"select userid,mediatypeid,subject,message,esc_step"
 			" from alerts"
 			" where actionid=" ZBX_FS_UI64
 				" and mediatypeid is not null"
