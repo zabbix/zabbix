@@ -2888,6 +2888,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	/* discovery corresponding LLD rule prototypes */
 
 	/* TODO: create 'delete immediately' lifetime for prototpes ? */
+	zbx_lld_lifetime_t	proto_enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
 
 	for (int i = 0; i < item_prototypes.values_num; i++)
 	{
@@ -2902,7 +2903,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 			rule_index = NULL;
 
 		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  lld_rows, error, lifetime,
-				enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index))
+				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
@@ -2912,23 +2913,31 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		lld_item_links_sort(lld_rows);
 
 		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, lld_rows, error, lifetime,
-				enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
+				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 					" processing lld rule");
 			goto clean;
 		}
 
-		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, lld_rows, error, lifetime, lastcheck,
-				ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, lld_rows, error, lifetime,
+				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 					" processing lld rule");
 			goto out;
 		}
 
-		lld_update_hosts(item_prototype->itemid, lld_rows, error, lifetime, enabled_lifetime, lastcheck,
-				ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index);
+		lld_update_hosts(item_prototype->itemid, lld_rows, error, lifetime, &proto_enabled_lifetime,
+				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index);
+
+		if (SUCCEED != lld_update_rules(hostid, item_prototype->itemid, lld_rows, error, lifetime,
+				&proto_enabled_lifetime, lastcheck))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add lld rule because parent host was removed while"
+					" processing lld rule");
+			goto out;
+		}
 	}
 
 	ret = SUCCEED;
