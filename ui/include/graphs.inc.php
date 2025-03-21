@@ -35,28 +35,28 @@ function graphType($type = null) {
 
 function graph_item_drawtypes() {
 	return [
-		GRAPH_ITEM_DRAWTYPE_LINE,
-		GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
-		GRAPH_ITEM_DRAWTYPE_BOLD_LINE,
-		GRAPH_ITEM_DRAWTYPE_DOT,
-		GRAPH_ITEM_DRAWTYPE_DASHED_LINE,
-		GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE
+		DRAWTYPE_LINE,
+		DRAWTYPE_FILLED_REGION,
+		DRAWTYPE_BOLD_LINE,
+		DRAWTYPE_DOT,
+		DRAWTYPE_DASHED_LINE,
+		DRAWTYPE_GRADIENT_LINE
 	];
 }
 
 function graph_item_drawtype2str($drawtype) {
 	switch ($drawtype) {
-		case GRAPH_ITEM_DRAWTYPE_LINE:
+		case DRAWTYPE_LINE:
 			return _('Line');
-		case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+		case DRAWTYPE_FILLED_REGION:
 			return _('Filled region');
-		case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
+		case DRAWTYPE_BOLD_LINE:
 			return _('Bold line');
-		case GRAPH_ITEM_DRAWTYPE_DOT:
+		case DRAWTYPE_DOT:
 			return _('Dot');
-		case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
+		case DRAWTYPE_DASHED_LINE:
 			return _('Dashed line');
-		case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
+		case DRAWTYPE_GRADIENT_LINE:
 			return _('Gradient line');
 		default:
 			return _('Unknown');
@@ -1692,7 +1692,7 @@ function getItemTemplatePieAndExploded($readonly): CTag {
 						->setId('items_#{number}_type'),
 					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
 						->setId('items_#{number}_calc_fnc'),
-					(new CInput('hidden', 'items[#{number}][drawtype]', GRAPH_ITEM_DRAWTYPE_LINE))
+					(new CInput('hidden', 'items[#{number}][drawtype]', DRAWTYPE_LINE))
 						->setId('items_#{number}_drawtype'),
 					(new CInput('hidden', 'items[#{number}][yaxisside]', GRAPH_YAXIS_SIDE_LEFT))
 						->setId('items_#{number}_yaxisside')

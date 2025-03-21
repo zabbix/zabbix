@@ -61,9 +61,9 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'error_handler',
-				'selector'	=> 'xpath:.//ul[contains(@id, "_error_handler")]',
-				'class'		=> 'CSegmentedRadioElement',
-				'value'		=> ['getText']
+				'selector'	=> 'xpath:.//z-select[contains(@id, "-error-handler")]',
+				'detect'	=> true,
+				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'error_handler_params',
