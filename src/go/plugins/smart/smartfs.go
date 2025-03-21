@@ -34,7 +34,6 @@ import (
 const (
 	supportedSmartctl = 7.1
 
-	satType     = "sat"
 	nvmeType    = "nvme"
 	unknownType = "unknown"
 	ssdType     = "ssd"
@@ -122,7 +121,7 @@ type healthLog struct {
 	PowerOnTime     int `json:"power_on_hours"`
 	CriticalWarning int `json:"critical_warning"`
 	MediaErrors     int `json:"media_errors"`
-	Percentage_used int `json:"percentage_used"`
+	PercentageUsed  int `json:"percentage_used"`
 }
 
 type temperature struct {
@@ -138,13 +137,15 @@ type singelRequestTables struct {
 }
 
 type singelRequestRaw struct {
-	Name string   `json:"name"`
-	Raw  rawField `json:"raw"`
+	Name            string   `json:"name"`
+	Raw             rawField `json:"raw"`
+	NormalizedValue *int     `json:"value"` // pointer type because it may not be present in raw json
 }
 
 type singleRequestAttribute struct {
-	Value int    `json:"value"`
-	Raw   string `json:"raw"`
+	Value           int    `json:"value"`
+	Raw             string `json:"raw"`
+	NormalizedValue *int   `json:"normalized_value,omitempty"` // if it isn't present in raw json, omit in the result
 }
 
 type rawField struct {

@@ -40,7 +40,7 @@ typedef struct
 }
 discovery_async_result_t;
 
-void	process_http_result(void *data);
+void	process_result_http(void *data);
 int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error);
 int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,

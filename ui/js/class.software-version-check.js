@@ -17,16 +17,40 @@ class CSoftwareVersionCheck {
 
 	static URL = 'https://services.zabbix.com/updates/v1';
 	static TYPE = 'software_update_check';
+	static DELAY_ON_PAGE_LOAD = 5; // 5 seconds
 	static DELAY_ON_ERROR = 60; // 1 minute
 
-	#data = {};
+	#versions = [];
+	#csrf_token;
 
 	constructor() {
-		this.#startUpdating(ZBX_SOFTWARE_VERSION_CHECK_DELAY);
+		this.#startUpdating(CSoftwareVersionCheck.DELAY_ON_PAGE_LOAD);
 	}
 
 	#startUpdating(delay) {
-		setTimeout(() => this.#getSavedData(), delay * 1000);
+		const update_interval = 60;
+
+		if (delay > update_interval) {
+			const next_check_time = Math.round(Date.now() / 1000) + delay;
+			let remaining_delay = delay;
+			const interval_id = setInterval(() => {
+				if (Math.round(Date.now() / 1000) >= next_check_time) {
+					clearInterval(interval_id);
+					this.#getSavedData();
+				}
+				else {
+					remaining_delay -= update_interval;
+
+					if (remaining_delay < update_interval) {
+						clearInterval(interval_id);
+						setTimeout(() => this.#getSavedData(), remaining_delay * 1000);
+					}
+				}
+			}, update_interval * 1000);
+		}
+		else {
+			setTimeout(() => this.#getSavedData(), delay * 1000);
+		}
 	}
 
 	#getSavedData() {
@@ -49,12 +73,10 @@ class CSoftwareVersionCheck {
 					this.#startUpdating(response.delay);
 				}
 				else {
-					this.#data.versions = [];
-					this.#data.version = response.version;
-					this.#data.check_hash = response.check_hash;
-					this.#data.csrf_token = response.csrf_token;
+					this.#versions = [];
+					this.#csrf_token = response.csrf_token;
 
-					this.#getCurrentData();
+					this.#getCurrentData(response.version, response.check_hash);
 				}
 			})
 			.catch(exception => {
@@ -64,18 +86,18 @@ class CSoftwareVersionCheck {
 			});
 	}
 
-	#getCurrentData() {
+	#getCurrentData(version, check_hash) {
 		const curl = new Curl(CSoftwareVersionCheck.URL);
 
 		curl.setArgument('type', CSoftwareVersionCheck.TYPE);
-		curl.setArgument('version', this.#data.version);
-		curl.setArgument('software_update_check_hash', this.#data.check_hash);
+		curl.setArgument('version', version);
+		curl.setArgument('software_update_check_hash', check_hash);
 
 		fetch(curl.getUrl(), {cache: 'no-store'})
 			.then(response => response.json())
 			.then(response => {
 				if ('versions' in response) {
-					this.#data.versions = response.versions;
+					this.#versions = response.versions;
 				}
 			})
 			.catch(exception => {
@@ -95,8 +117,8 @@ class CSoftwareVersionCheck {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				versions: this.#data.versions,
-				[CSRF_TOKEN_NAME]: this.#data.csrf_token
+				versions: this.#versions,
+				[CSRF_TOKEN_NAME]: this.#csrf_token
 			})
 		})
 			.then(response => response.json())

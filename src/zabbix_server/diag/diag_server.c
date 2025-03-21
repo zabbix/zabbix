@@ -512,16 +512,16 @@ out:
  *                                                                            *
  * Purpose: add requested section diagnostic information                      *
  *                                                                            *
- * Parameters: section - [IN] the section name                                *
- *             jp      - [IN] the request                                     *
- *             json    - [IN/OUT] the json to update                          *
- *             error   - [OUT] the error message                              *
+ * Parameters: section - [IN] section name                                    *
+ *             jp      - [IN] request                                         *
+ *             json    - [IN/OUT] JSON to update                              *
+ *             error   - [OUT] error message                                  *
  *                                                                            *
- * Return value: SUCCEED - the information was retrieved successfully         *
+ * Return value: SUCCEED - information was retrieved successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
+int	diag_add_section_info_server(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error)
 {
 	int	ret = FAIL;

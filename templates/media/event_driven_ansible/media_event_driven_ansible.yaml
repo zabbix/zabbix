@@ -1,84 +1,59 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    -
-      name: 'Event-Driven Ansible'
+    - name: 'Event-Driven Ansible'
       type: WEBHOOK
       parameters:
-        -
-          name: acknowledged
+        - name: acknowledged
           value: '{EVENT.ACK.STATUS}'
-        -
-          name: endpoint
+        - name: endpoint
           value: /endpoint
-        -
-          name: event_date
+        - name: event_date
           value: '{EVENT.DATE}'
-        -
-          name: event_id
+        - name: event_id
           value: '{EVENT.ID}'
-        -
-          name: event_name
+        - name: event_name
           value: '{EVENT.NAME}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_object
+        - name: event_object
           value: '{EVENT.OBJECT}'
-        -
-          name: event_severity
+        - name: event_severity
           value: '{EVENT.SEVERITY}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_tags
+        - name: event_tags
           value: '{EVENT.TAGSJSON}'
-        -
-          name: event_time
+        - name: event_time
           value: '{EVENT.TIME}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: host_groups
+        - name: host_groups
           value: '{TRIGGER.HOSTGROUP.NAME}'
-        -
-          name: host_host
+        - name: host_host
           value: '{HOST.HOST}'
-        -
-          name: host_id
+        - name: host_id
           value: '{HOST.ID}'
-        -
-          name: host_ip
+        - name: host_ip
           value: '{HOST.IP}'
-        -
-          name: host_port
+        - name: host_port
           value: '{HOST.PORT}'
-        -
-          name: HTTPProxy
-        -
-          name: monitoring_source
+        - name: HTTPProxy
+        - name: monitoring_source
           value: 'Zabbix sever'
-        -
-          name: operation_data
+        - name: operation_data
           value: '{EVENT.OPDATA}'
-        -
-          name: send_to
+        - name: send_to
           value: '{ALERT.SENDTO}'
-        -
-          name: subject
+        - name: subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: trigger_description
+        - name: trigger_description
           value: '{TRIGGER.DESCRIPTION}'
-        -
-          name: trigger_id
+        - name: trigger_id
           value: '{TRIGGER.ID}'
-        -
-          name: trigger_name
+        - name: trigger_name
           value: '{TRIGGER.NAME}'
+      status: DISABLED
       script: |
         var Eda = {
             params: {},
@@ -217,7 +192,6 @@ zabbix_export:
             throw 'Sending failed: ' + error;
         }
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Event ID: {EVENT.ID}, Host: {HOST.HOST}, Problem: {EVENT.NAME}'

@@ -23,7 +23,6 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxdbschema.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
 #include "zbxnix.h"
@@ -1159,27 +1158,49 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
+	const char	*severities[TRIGGER_SEVERITY_COUNT] = {0};
 
-	result = zbx_db_select("select severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,"
-				"severity_name_5 from config");
+	result = zbx_db_select(
+			"select name, value_str from settings"
+			" where name in ('severity_name_0','severity_name_1','severity_name_2','severity_name_3',"
+			"'severity_name_4','severity_name_5')");
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
-			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], row[i]);
+		if (0 == strcmp("severity_name_0", row[0]))
+			severities[0] = row[1];
+		else if (0 == strcmp("severity_name_1", row[0]))
+			severities[1] = row[1];
+		else if (0 == strcmp("severity_name_2", row[0]))
+			severities[2] = row[1];
+		else if (0 == strcmp("severity_name_3", row[0]))
+			severities[3] = row[1];
+		else if (0 == strcmp("severity_name_4", row[0]))
+			severities[4] = row[1];
+		else if (0 == strcmp("severity_name_5", row[0]))
+			severities[5] = row[1];
 	}
-	else
+
+	for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
 	{
-		const zbx_db_table_t	*table;
-		char			field[16];
-
-		table = zbx_db_get_table("config");
-
-		for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+		if (NULL != severities[i])
 		{
+			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], severities[i]);
+		}
+		else
+		{
+			char				field[16]; /* buffer length to fit "severity_name_1" + '\0' */
+			const zbx_setting_entry_t	*e;
+
 			zbx_snprintf(field, sizeof(field), "severity_name_%d", i);
-			service_manager->severities[i] = zbx_strdup(service_manager->severities[i],
-					zbx_db_get_field(table, field)->default_value);
+
+			if (NULL == (e = zbx_settings_descr_get(field, NULL)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], e->default_value);
 		}
 	}
 
@@ -3492,13 +3513,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	int				ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
 					service_update_num = 0, service_cache_reload_requested = 0,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
-					process_num = ((zbx_thread_args_t *)args)->info.process_num, services_num;
+					process_num = ((zbx_thread_args_t *)args)->info.process_num, services_num,
+					running = 1;
 	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t		service_manager;
 	zbx_timespec_t			timeout = {1, 0};
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_ipc_async_socket_t		rtc;
 	zbx_thread_service_manager_args *service_manager_args_in = (zbx_thread_service_manager_args *)
 			(((zbx_thread_args_t *)args)->args);
 
@@ -3531,8 +3552,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		zbx_dc_set_itservices_num(services_num);
 		db_get_events(&service_manager.problem_events);
 	}
-
-	zbx_rtc_subscribe(process_type, process_num, NULL, 0, service_manager_args_in->config_timeout, &rtc);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -3600,12 +3619,26 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				/* load service problems once during startup */
 				if (0 == (int)time_flush)
 				{
+					zbx_ipc_async_socket_t	rtc;
+
 					sync_service_problems(&service_manager.services,
 							&service_manager.service_problems_index);
+
+					if (FAIL == zbx_ipc_async_socket_open(&rtc, ZBX_IPC_SERVICE_RTC, 30, &error))
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "cannot open socket from service manager to"
+								" rtc: %s", error);
+						zbx_free(error);
+						goto out;
+					}
 
 					zbx_rtc_notify_finished_sync(30,
 							ZBX_RTC_SERVICE_SYNC_NOTIFY,
 							get_process_type_string(process_type), &rtc);
+					zbx_ipc_async_socket_close(&rtc);
+
+					zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_SERVICEMAN, 0, NULL, 0, SEC_PER_MIN,
+						ZBX_IPC_SERVICE_SERVICE);
 				}
 			}
 			while (ZBX_DB_DOWN == zbx_db_commit());
@@ -3694,6 +3727,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					else
 						service_cache_reload_requested = 1;
 					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					timeout.sec = 0;
+					timeout.ns = 1e8;
+					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
@@ -3710,13 +3748,16 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		if (NULL != message)
 			continue;
 
-		if (0 == timeout.sec)
+		if (0 == running)
 			break;
 
 		if (!ZBX_IS_RUNNING())
-			timeout.sec = 0;
+		{
+			running = 0;
+			timeout.ns = 0;
+		}
 	}
-
+out:
 	service_manager_free(&service_manager);
 
 	zbx_db_close();

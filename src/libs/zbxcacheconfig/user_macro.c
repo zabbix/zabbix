@@ -1024,9 +1024,8 @@ static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *
 		const char *macro, const zbx_um_macro_t **um_macro)
 {
 	char		*name = NULL, *context = NULL;
-	unsigned char	context_op;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, &context_op))
+	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, NULL))
 		return;
 
 	/* User macros should be expanded according to the following priority: */

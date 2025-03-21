@@ -159,7 +159,7 @@ class CRegexp extends CApiService {
 	 *
 	 * @throws APIException if global regular expression names are not unique.
 	 */
-	protected static function checkDuplicates(array $regexs, array $db_regexs = null): void {
+	protected static function checkDuplicates(array $regexs, ?array $db_regexs = null): void {
 		$names = [];
 
 		foreach ($regexs as $regex) {
@@ -191,7 +191,7 @@ class CRegexp extends CApiService {
 	 * @param array $regexs
 	 * @param string $method
 	 */
-	protected function updateExpressions(array &$regexs, string $method, array $db_regexs = null): void {
+	protected function updateExpressions(array &$regexs, string $method, ?array $db_regexs = null): void {
 		$ins_expressions = [];
 		$upd_expressions = [];
 		$del_expressionids = [];
@@ -320,7 +320,7 @@ class CRegexp extends CApiService {
 	 *
 	 * @throws APIException  if the input is invalid
 	 */
-	protected function validateUpdate(array &$regexs, array &$db_regexs = null): void {
+	protected function validateUpdate(array &$regexs, ?array &$db_regexs = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['regexpid'], ['name']], 'fields' => [
 			'regexpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],

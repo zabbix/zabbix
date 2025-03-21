@@ -621,7 +621,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(bgp);
-                  
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2067,7 +2066,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(ospf);
-                  
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h

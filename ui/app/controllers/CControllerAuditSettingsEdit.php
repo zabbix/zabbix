@@ -22,10 +22,10 @@ class CControllerAuditSettingsEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'auditlog_enabled'	=> 'db config.auditlog_enabled',
-			'auditlog_mode'		=> 'db config.auditlog_mode',
-			'hk_audit_mode'		=> 'db config.hk_audit_mode',
-			'hk_audit'			=> 'db config.hk_audit'
+			'auditlog_enabled'	=> 'setting auditlog_enabled',
+			'auditlog_mode'		=> 'setting auditlog_mode',
+			'hk_audit_mode'		=> 'setting hk_audit_mode',
+			'hk_audit'			=> 'setting hk_audit'
 		];
 
 		$ret = $this->validateInput($fields);

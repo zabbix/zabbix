@@ -66,7 +66,6 @@ zabbix_export:
           description: |
             It is calculated as a rate of change for total bytes statistics.
             `BytesPerSec` is not used, as it counts the average since the last Apache server start.
-            
           preprocessing:
             - type: JSONPATH
               parameters:

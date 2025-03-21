@@ -29,7 +29,7 @@ struct zbx_async_manager
 	zbx_async_queue_t		queue;
 };
 
-zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t finished_cb,
+zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t async_notify_cb,
 		void *finished_data, zbx_thread_poller_args *poller_args_in, char **error)
 {
 	int			ret = FAIL, started_num = 0;
@@ -56,7 +56,7 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 			goto out;
 		}
 
-		async_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
+		async_worker_set_async_notify_cb(&manager->workers[i], async_notify_cb, finished_data);
 	}
 
 	/* wait for threads to start */

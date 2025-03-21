@@ -13,13 +13,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users
  *
- * @backup config
+ * @backup settings
  */
 class testLanguage extends CWebTest {
 
@@ -160,7 +160,7 @@ class testLanguage extends CWebTest {
 	public function testLanguage_User($data) {
 		$this->page->userLogin('user-zabbix', 'zabbix');
 		$this->page->open('zabbix.php?action=userprofile.edit');
-		$form = $this->query('name:user_form')->one()->asForm();
+		$form = $this->query('id:userprofile-form')->one()->asForm();
 
 		// Yellow info icon check.
 		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
@@ -258,7 +258,7 @@ class testLanguage extends CWebTest {
 		$this->assertEquals($data['html_lang'], $this->query('xpath://html')->one()->getAttribute('lang'));
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
-		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
+		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT value_str FROM settings WHERE name=\'default_lang\''));
 		$this->page->logout();
 	}
 
@@ -266,6 +266,6 @@ class testLanguage extends CWebTest {
 		$this->assertMessage(TEST_GOOD, $message);
 		$this->page->assertTitle($page_title);
 		$this->assertEquals($html_lang, $this->query('xpath://html')->one()->getAttribute('lang'));
-		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT default_lang FROM config'));
+		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT value_str FROM settings WHERE name=\'default_lang\''));
 	}
 }

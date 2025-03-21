@@ -29,7 +29,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 	 *
 	 * @param array  $values key/value pairs of radio button values. Key - saved in DB. Value - visible to user.
 	 */
-	public function __construct(string $name, string $label = null, array $values = []) {
+	public function __construct(string $name, ?string $label = null, array $values = []) {
 		parent::__construct($name, $label);
 
 		$this->values = $values;

@@ -321,12 +321,12 @@ foreach ($data['discoveries'] as $discovery) {
 		->setArgument($data['context'] === 'host' ? 'hostid' : 'templateid', $discovery['hosts'][0]['hostid'])
 		->getUrl();
 
-	$host = (new CLink($discovery['hosts'][0]['name'], $host_url))->addClass(ZBX_STYLE_WORDBREAK);
+	$host = new CLink($discovery['hosts'][0]['name'], $host_url);
 
 	$discoveryTable->addRow([
 		$checkbox,
 		$host,
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		$description,
 		[
 			new CLink(_('Item prototypes'),
 				(new CUrl('zabbix.php'))

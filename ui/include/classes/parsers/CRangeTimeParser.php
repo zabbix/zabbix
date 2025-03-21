@@ -86,7 +86,7 @@ class CRangeTimeParser extends CParser {
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime(bool $is_start, DateTimeZone $timezone = null): ?DateTime {
+	public function getDateTime(bool $is_start, ?DateTimeZone $timezone = null): ?DateTime {
 		switch ($this->time_type) {
 			case self::ZBX_TIME_ABSOLUTE:
 				return $this->absolute_time_parser->getDateTime($is_start, $timezone);

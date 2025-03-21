@@ -265,7 +265,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 	}
 
-	private function getConfig(string $widgetid = null): array {
+	private function getConfig(?string $widgetid = null): array {
 		$open_groups = [];
 
 		if ($widgetid !== null) {

@@ -69,7 +69,7 @@ class CAPITest extends CTest {
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public function callRaw($data, string $sessionid = null) {
+	public function callRaw($data, ?string $sessionid = null) {
 		return CAPIHelper::callRaw($data, $sessionid);
 	}
 

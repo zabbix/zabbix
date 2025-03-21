@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
+require_once __DIR__.'/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts

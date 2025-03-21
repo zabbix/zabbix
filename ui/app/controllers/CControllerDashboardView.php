@@ -92,9 +92,13 @@ class CControllerDashboardView extends CController {
 		}
 
 		if ($dashboard === null) {
-			$this->setResponse(new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list')
-				->setArgument('page', $this->hasInput('cancel') ? CPagerHelper::loadPage('dashboard.list', null) : null)
+			$this->setResponse(new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.list')
+					->setArgument('page', $this->hasInput('cancel')
+						? CPagerHelper::loadPage('dashboard.list', null)
+						: null
+					)
 			));
 
 			return;

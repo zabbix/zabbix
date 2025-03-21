@@ -552,7 +552,7 @@ class CMap extends CMapElement {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $sysmapids, array &$db_maps = null) {
+	protected function validateDelete(array $sysmapids, ?array &$db_maps = null) {
 		if (!$sysmapids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}

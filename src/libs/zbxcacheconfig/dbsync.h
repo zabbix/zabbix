@@ -40,9 +40,32 @@
 
 #define ZBX_DBSYNC_TRIGGER_ERROR	0x80
 
-
 #define ZBX_DBSYNC_TYPE_DIFF		0
 #define ZBX_DBSYNC_TYPE_CHANGELOG	1
+
+#define ZBX_DBSYNC_OBJ_HOST		1
+#define ZBX_DBSYNC_OBJ_HOST_TAG		2
+#define ZBX_DBSYNC_OBJ_ITEM		3
+#define ZBX_DBSYNC_OBJ_ITEM_TAG		4
+#define ZBX_DBSYNC_OBJ_TRIGGER		5
+#define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
+#define ZBX_DBSYNC_OBJ_FUNCTION		7
+#define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
+#define ZBX_DBSYNC_OBJ_DRULE		9
+#define ZBX_DBSYNC_OBJ_DCHECK		10
+#define ZBX_DBSYNC_OBJ_HTTPTEST		11
+#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
+#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM	13
+#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
+#define ZBX_DBSYNC_OBJ_CONNECTOR	17
+#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
+#define ZBX_DBSYNC_OBJ_PROXY		19
+#define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
+#define ZBX_DBSYNC_OBJ_HOST_PROXY	21
+/* number of dbsync objects - keep in sync with above defines */
+#define ZBX_DBSYNC_OBJ_COUNT		21
 
 /******************************************************************************
  *                                                                            *
@@ -112,6 +135,50 @@ struct zbx_dbsync
 	zbx_int64_t	sync_size;
 };
 
+typedef struct
+{
+	zbx_uint64_t	changelogid;
+	int		clock;
+}
+zbx_dbsync_changelog_t;
+
+ZBX_VECTOR_DECL(dbsync_changelog, zbx_dbsync_changelog_t)
+
+typedef struct
+{
+	zbx_uint64_t		objectid;
+	zbx_dbsync_changelog_t	changelog;
+}
+zbx_dbsync_obj_changelog_t;
+
+ZBX_VECTOR_DECL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
+ZBX_PTR_VECTOR_DECL(dbsync, zbx_dbsync_t *)
+
+typedef struct
+{
+	zbx_vector_uint64_t			inserts;
+	zbx_vector_uint64_t			updates;
+	zbx_vector_uint64_t			deletes;
+
+	zbx_vector_dbsync_t 			syncs;
+	zbx_vector_dbsync_obj_changelog_t	changelog;
+}
+zbx_dbsync_journal_t;
+
+typedef struct
+{
+	zbx_hashset_t			strpool;
+	zbx_dc_config_t			*cache;
+
+	zbx_hashset_t			changelog;
+
+	zbx_dbsync_journal_t		journals[ZBX_DBSYNC_OBJ_COUNT];
+
+	zbx_vector_dbsync_t		changelog_dbsyncs;
+	zbx_vector_dbsync_t		dbsyncs;
+}
+zbx_dbsync_env_t;
+
 void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
 int	zbx_dbsync_env_prepare(unsigned char mode);
 void	zbx_dbsync_env_flush_changelog(void);
@@ -125,7 +192,8 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
 
-int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);
+void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_preproc_row_func_t preproc_row_func);
+
 int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync);
@@ -159,6 +227,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_settings(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync);
@@ -173,6 +242,8 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
+
+void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision);
 
 int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);

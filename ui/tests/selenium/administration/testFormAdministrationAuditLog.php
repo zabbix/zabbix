@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 
@@ -128,9 +128,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => false
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '0',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 0,
 						'hk_audit' => '31d'
 					]
 				]
@@ -143,9 +143,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => false
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '0',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 0,
 						'hk_audit' => '31d'
 					]
 				]
@@ -160,9 +160,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '365d'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '0',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 0,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '365d'
 					]
 				]
@@ -176,9 +176,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '365d'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '365d'
 					]
 				]
@@ -193,9 +193,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '1440m'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '1440m'
 					]
 				]
@@ -209,8 +209,8 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '13140000m'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '13140000m'
 					]
 				]
@@ -225,9 +225,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '13139999m'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '13139999m'
 					]
 				]
@@ -241,9 +241,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '24h'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '24h'
 					]
 				]
@@ -258,9 +258,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '219000h'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '219000h'
 					]
 				]
@@ -274,9 +274,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '218999h'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '218999h'
 					]
 				]
@@ -291,9 +291,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '1d'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '0',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 0,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '1d'
 					]
 				]
@@ -307,9 +307,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '1w'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '1w'
 					]
 				]
@@ -324,9 +324,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '86400s'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '86400s'
 					]
 				]
@@ -341,9 +341,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '788400000s'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '788400000s'
 					]
 				]
@@ -357,9 +357,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '788400000s'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '788400000s'
 					]
 				]
@@ -373,9 +373,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '788399999s'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '788399999s'
 					]
 				]
@@ -389,9 +389,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '9125d'
 					],
 					'db' => [
-						'auditlog_enabled' => '0',
-						'auditlog_mode' => '1',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 0,
+						'auditlog_mode' => 1,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '9125d'
 					]
 				]
@@ -406,9 +406,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Data storage period' => '1303w'
 					],
 					'db' => [
-						'auditlog_enabled' => '1',
-						'auditlog_mode' => '0',
-						'hk_audit_mode' => '1',
+						'auditlog_enabled' => 1,
+						'auditlog_mode' => 0,
+						'hk_audit_mode' => 1,
 						'hk_audit' => '1303w'
 					]
 				]

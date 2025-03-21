@@ -42,7 +42,6 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexec/libzbxexec.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxjson/libzbxjson.a
-#cgo pcre  LDFLAGS: -lz -lpcre -lresolv
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -Wl,--end-group
 

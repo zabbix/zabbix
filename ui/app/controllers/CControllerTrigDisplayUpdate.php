@@ -18,36 +18,36 @@ class CControllerTrigDisplayUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'custom_color' =>			'required|db config.custom_color|in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
-			'problem_unack_color' =>	'db config.problem_unack_color|rgb',
-			'problem_ack_color' =>		'db config.problem_ack_color|rgb',
-			'ok_unack_color' =>			'db config.ok_unack_color|rgb',
-			'ok_ack_color' =>			'db config.ok_ack_color|rgb',
-			'problem_unack_style' =>	'required|db config.problem_unack_style|in 0,1',
-			'problem_ack_style' =>		'required|db config.problem_ack_style|in 0,1',
-			'ok_unack_style' =>			'required|db config.ok_unack_style|in 0,1',
-			'ok_ack_style' =>			'required|db config.ok_ack_style|in 0,1',
-			'ok_period' =>				'required|db config.ok_period|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
-			'blink_period' =>			'required|db config.blink_period|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
-			'severity_name_0' =>		'required|db config.severity_name_0|not_empty',
-			'severity_color_0' =>		'required|db config.severity_color_0|rgb',
-			'severity_name_1' =>		'required|db config.severity_name_1|not_empty',
-			'severity_color_1' =>		'required|db config.severity_color_1|rgb',
-			'severity_name_2' =>		'required|db config.severity_name_2|not_empty',
-			'severity_color_2' =>		'required|db config.severity_color_2|rgb',
-			'severity_name_3' =>		'required|db config.severity_name_3|not_empty',
-			'severity_color_3' =>		'required|db config.severity_color_3|rgb',
-			'severity_name_4' =>		'required|db config.severity_name_4|not_empty',
-			'severity_color_4' =>		'required|db config.severity_color_4|rgb',
-			'severity_name_5' =>		'required|db config.severity_name_5|not_empty',
-			'severity_color_5' =>		'required|db config.severity_color_5|rgb'
+			'custom_color' =>			'required|in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
+			'problem_unack_color' =>	'rgb',
+			'problem_ack_color' =>		'rgb',
+			'ok_unack_color' =>			'rgb',
+			'ok_ack_color' =>			'rgb',
+			'problem_unack_style' =>	'required|in 0,1',
+			'problem_ack_style' =>		'required|in 0,1',
+			'ok_unack_style' =>			'required|in 0,1',
+			'ok_ack_style' =>			'required|in 0,1',
+			'ok_period' =>				'required|time_unit '.implode(':', [0, SEC_PER_DAY]),
+			'blink_period' =>			'required|time_unit '.implode(':', [0, SEC_PER_DAY]),
+			'severity_name_0' =>		'required|not_empty|setting severity_name_0',
+			'severity_color_0' =>		'required|rgb',
+			'severity_name_1' =>		'required|not_empty|setting severity_name_1',
+			'severity_color_1' =>		'required|rgb',
+			'severity_name_2' =>		'required|not_empty|setting severity_name_2',
+			'severity_color_2' =>		'required|rgb',
+			'severity_name_3' =>		'required|not_empty|setting severity_name_3',
+			'severity_color_3' =>		'required|rgb',
+			'severity_name_4' =>		'required|not_empty|setting severity_name_4',
+			'severity_color_4' =>		'required|rgb',
+			'severity_name_5' =>		'required|not_empty|setting severity_name_5',
+			'severity_color_5' =>		'required|rgb'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'trigdisplay.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'trigdisplay.edit')
 			);
 
 			$response->setFormData($this->getInputAll());
@@ -95,8 +95,8 @@ class CControllerTrigDisplayUpdate extends CController {
 
 		$result = API::Settings()->update($settings);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'trigdisplay.edit')
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'trigdisplay.edit')
 		);
 
 		if ($result) {

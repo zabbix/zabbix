@@ -47,7 +47,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, err
 	}
 
-	uri, err := uri.NewWithCreds(params["URI"], "zabbix", params["Password"], uriDefaults)
+	redisURI, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(*redisURI)
 	if err != nil {
 		// Special logic of processing connection errors is used if redis.ping is requested
 		// because it must return pingFailed if any error occurred.

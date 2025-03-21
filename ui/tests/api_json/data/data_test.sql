@@ -97,7 +97,7 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (31, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (21, 31, 20);
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (4, 'API script', 'test', 2, 21, NULL, 'api script description', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
-UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
+UPDATE settings SET value_usrgrpid = 22 WHERE name = 'alert_usrgrpid';
 
 -- users
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'api-user-for-update', '$2a$10$dP76CSji4ozQxSxLQeUGc.sJgSPuwN8b4pjnKIoOeQXts2Wm86ige', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);

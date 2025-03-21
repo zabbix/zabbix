@@ -42,7 +42,6 @@ Refer to the vendor documentation.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
-|{$CPU.UTIL.CRIT}||`90`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -66,7 +65,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU utilization|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>5 minute load average of processor load.</p>|SNMP agent|system.cpu.util[loadValue.2]|
+|Load average (5m avg)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>5 minute load average of processor load.</p>|SNMP agent|system.cpu.load.avg5[loadValue.2]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Load average (1m avg)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>1 minute load average of processor load.</p>|SNMP agent|system.cpu.load.avg1[loadValue.1]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Load average (15m avg)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>15 minute load average of processor load.</p>|SNMP agent|system.cpu.load.avg15[loadValue.3]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Free memory|<p>MIB: FROGFOOT-RESOURCES-MIB</p>|SNMP agent|vm.memory.free[memFree.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Total memory|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>The total memory expressed in bytes.</p>|SNMP agent|vm.memory.total[memTotal.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Memory (buffers)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Memory used by kernel buffers (Buffers in /proc/meminfo).</p>|SNMP agent|vm.memory.buffers[memBuffer.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
@@ -91,7 +92,6 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ubiquiti AirOS: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ubiquiti AirOS by SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}`|Warning||
 |Ubiquiti AirOS: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Ubiquiti AirOS by SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}`|Average||
 |Ubiquiti AirOS: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS by SNMP/system.hw.firmware))>0`|Info|**Manual close**: Yes|
 |Ubiquiti AirOS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ubiquiti AirOS: No SNMP data collection</li></ul>|

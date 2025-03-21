@@ -83,6 +83,7 @@ int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const ch
 
 typedef int	(*add_serveractive_host_f)(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data);
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
-		add_serveractive_host_f cb, zbx_vector_str_t *hostnames, void *data, char **error);
+		add_serveractive_host_f add_serveractive_host_cb, zbx_vector_str_t *hostnames, void *data,
+		char **error);
 
 #endif

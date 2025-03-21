@@ -29,7 +29,7 @@ unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+static int	add_serveractive_host_sender_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
 		void *data)
 {
 	ZBX_UNUSED(hostnames);
@@ -75,7 +75,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 
 		zbx_vector_addr_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
 
-		if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", sender_add_serveractive_host_cb,
+		if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", add_serveractive_host_sender_cb,
 				NULL, &zbx_addrs, result))
 		{
 			zbx_free(last_address);

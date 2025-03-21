@@ -55,8 +55,8 @@ static zbx_history_table_compression_options_t	compression_tables[] = {
 	{"auditlog",		"auditid",	"clock",	POLICY_COMPRESS_CREATED_BEFORE}
 };
 
-static unsigned char	compression_status_cache = 0;
-static int		compress_older_cache = 0;
+static int	compression_status_cache = 0;
+static int	compress_older_cache = 0;
 
 /******************************************************************************
  *                                                                            *
@@ -276,6 +276,7 @@ void	hk_history_compression_init(void)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
+
 	compression_status_cache = cfg.db.history_compression_status;
 	compress_older_cache = cfg.db.history_compress_older;
 
@@ -311,8 +312,11 @@ void	hk_history_compression_init(void)
 	else if (ON == cfg.db.history_compression_status)
 		disable_compression = 1;
 
-	if (0 != disable_compression && ZBX_DB_OK > zbx_db_execute("update config set compression_status=0"))
+	if (0 != disable_compression &&
+			ZBX_DB_OK > zbx_db_execute("update settings set value_int=0 where name='compression_status'"))
+	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");
+	}
 
 	zbx_config_clean(&cfg);
 
@@ -354,6 +358,7 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 
 	compression_status_cache = cfg->history_compression_status;
 	compress_older_cache = cfg->history_compress_older;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 #else
 	ZBX_UNUSED(cfg);

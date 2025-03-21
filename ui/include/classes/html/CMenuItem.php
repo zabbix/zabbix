@@ -289,7 +289,7 @@ class CMenuItem extends CTag {
 	 *
 	 * @return CMenuItem
 	 */
-	public function setUrl(CUrl $url, string $action_name = null): self {
+	public function setUrl(CUrl $url, ?string $action_name = null): self {
 		$action = null;
 
 		if ($action_name !== null) {

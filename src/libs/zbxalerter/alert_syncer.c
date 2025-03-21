@@ -916,10 +916,11 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: updates watchdog recipients                                       *
  *                                                                            *
- * Parameters: amdb - [IN] alert manager cache                                *
+ * Parameters: amdb           - [IN] alert manager cache                      *
+ *             alert_usrgrpid - [IN] "Database down" user group id            *
  *                                                                            *
  ******************************************************************************/
-static void	am_db_update_watchdog(zbx_am_db_t *amdb)
+static void	am_db_update_watchdog(zbx_am_db_t *amdb, uint64_t alert_usrgrpid)
 {
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
@@ -934,13 +935,14 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 	result = zbx_db_select(
 			"select m.mediaid,m.mediatypeid,m.sendto"
-			" from media m,users_groups u,config c,media_type mt"
+			" from media m,users_groups u,media_type mt"
 			" where m.userid=u.userid"
-				" and u.usrgrpid=c.alert_usrgrpid"
+				" and u.usrgrpid=" ZBX_FS_UI64
 				" and m.mediatypeid=mt.mediatypeid"
 				" and m.active=%d"
 				" and mt.status=%d"
 				" and mt.type<>%d",
+				alert_usrgrpid,
 				MEDIA_STATUS_ACTIVE,
 				MEDIA_TYPE_STATUS_ACTIVE,
 				MEDIA_TYPE_WEBHOOK);
@@ -1080,7 +1082,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 					results_num = am_db_flush_results(&amdb.mediatypes, message->data);
 					break;
 				default:
-					zabbix_log(LOG_LEVEL_WARNING, "unrecognized message in alert syncer %d",
+					zabbix_log(LOG_LEVEL_WARNING, "unrecognized message in alert syncer %u",
 							message->code);
 					break;
 			}
@@ -1104,7 +1106,11 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 		if (time_watchdog + freq_watchdog < sec1)
 		{
-			am_db_update_watchdog(&amdb);
+			zbx_config_t	cfg;
+
+			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_ALERT_USRGRPID);
+
+			am_db_update_watchdog(&amdb, cfg.alert_usrgrpid);
 			time_watchdog = sec1;
 		}
 

@@ -42,7 +42,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const SINGLE_LINE_LENGTH_MAX = 500;
 	public const SINGLE_LINE_LENGTH_DEFAULT = 100;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setDefault(self::DEFAULT_VALUE);

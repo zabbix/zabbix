@@ -133,6 +133,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessEventLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, isCountItem)
+	runtime.KeepAlive(grxp)
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))

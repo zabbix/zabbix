@@ -14,15 +14,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
  *
  * @dataSource AllItemValueTypes
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testItemTypeSelection extends CWebTest {
 

@@ -118,7 +118,11 @@ class CLocalApiClient extends CApiClient {
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {
-				DBend(true);
+				$committed = DBend(true);
+
+				if (!$committed && APP::getMode() === APP::EXEC_MODE_API) {
+					throw new DBException(_('Database error occurred.'), DB::DBEXECUTE_ERROR);
+				}
 			}
 
 			$response->data = $result;
@@ -128,7 +132,11 @@ class CLocalApiClient extends CApiClient {
 				// if we're calling user.login and authentication failed - commit the transaction to save the
 				// failed attempt data
 				if ($api === 'user' && $method === 'login') {
-					DBend(true);
+					$committed = DBend(true);
+
+					if (!$committed) {
+						$e = new DBException(_('Database error occurred.'), DB::DBEXECUTE_ERROR);
+					}
 				}
 				// otherwise - revert the transaction
 				else {
@@ -136,11 +144,16 @@ class CLocalApiClient extends CApiClient {
 				}
 			}
 
-			if ($e instanceof DBException) {
-				throw $e;
+			if ($e instanceof APIException) {
+				$response->errorCode = $e->getCode();
+			}
+			elseif ($e instanceof DBException) {
+				$response->errorCode = ZBX_API_ERROR_DB;
+			}
+			else {
+				$response->errorCode = ZBX_API_ERROR_INTERNAL;
 			}
 
-			$response->errorCode = ($e instanceof APIException) ? $e->getCode() : ZBX_API_ERROR_INTERNAL;
 			$response->errorMessage = $e->getMessage();
 
 			// add debug data

@@ -202,11 +202,9 @@ foreach ($data['groups'] as $group) {
 
 	$table->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
-		(new CCol($name))
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->setWidth('15%'),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$hosts_output ? (new CCol($hosts_output))->addClass(ZBX_STYLE_WORDBREAK) : '',
+		$hosts_output ?: '',
 		makeInformationList($info_icons)
 	]);
 }

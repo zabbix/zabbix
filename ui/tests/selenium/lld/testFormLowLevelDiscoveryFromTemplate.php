@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testLowLevelDiscovery.php';
+require_once __DIR__.'/../common/testLowLevelDiscovery.php';
 
 /**
  * @onBefore prepareLLDTemplateData

@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormValueMappings.php';
+require_once __DIR__.'/../common/testFormValueMappings.php';
 
 /**
  * @backup valuemap, hosts

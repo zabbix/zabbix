@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup profiles

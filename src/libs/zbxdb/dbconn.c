@@ -255,11 +255,8 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, const PGresult *pg_resu
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == db->config->read_only_recoverable &&
-			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
-	{
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
-	}
 
 	return FAIL;
 }
@@ -632,6 +629,26 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+
+	zbx_db_free_result(result);
+
+	result = dbconn_select(db, "show default_transaction_read_only");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
 
 	zbx_db_free_result(result);
 
@@ -1116,8 +1133,16 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
+		zbx_err_codes_t	errcode;
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result->pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
+		else
+			errcode = ERR_Z3005;
+
 		db_get_postgresql_error(&error, result->pg_result);
-		dbconn_errlog(db, ERR_Z3005, 0, error, sql);
+		dbconn_errlog(db, errcode, 0, error, sql);
+
 		zbx_free(error);
 
 		if (SUCCEED == dbconn_is_recoverable_error(db, result->pg_result))
@@ -1303,7 +1328,8 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  ******************************************************************************/
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
-	int	err;
+#define ZBX_DB_WAIT_RETRY_COUNT	6
+	int	err, retries = ZBX_DB_WAIT_RETRY_COUNT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
@@ -1318,7 +1344,13 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	while (ZBX_DB_OK != (err = dbconn_open(db)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
+		{
+#if defined(HAVE_POSTGRESQL)
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
+#endif
 			break;
+		}
 
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
 		{
@@ -1326,7 +1358,24 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == db->config->read_only_recoverable && 0 >= retries--)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
+
 		db->connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
@@ -1335,11 +1384,15 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		db->connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		db->last_db_errcode = 0;
+#endif
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
+#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 /******************************************************************************
@@ -2223,6 +2276,39 @@ void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+static int	dbconn_prepare_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+#define ZBX_MAX_IDS	950
+	int			i, j, ret = SUCCEED;
+	zbx_vector_str_t	str_ids;
+
+	zbx_vector_str_create(&str_ids);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		int	batch_size = MIN(ZBX_MAX_IDS, ids->values_num - i);
+
+		for (j = i; j < i + batch_size; j++)
+			zbx_vector_str_append(&str_ids, zbx_dsprintf(NULL, ZBX_FS_UI64, ids->values[j]));
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
+		zbx_db_add_str_condition_alloc(sql, sql_alloc, sql_offset, field_name, (const char**)str_ids.values,
+				batch_size);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+
+		zbx_vector_str_clear_ext(&str_ids, zbx_str_free);
+
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL)))
+			break;
+	}
+
+	zbx_vector_str_destroy(&str_ids);
+
+	return ret;
+#undef ZBX_MAX_IDS
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: execute query with large number of primary key matches in smaller *
@@ -2230,7 +2316,7 @@ void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
-		zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
+		const zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	i, ret = SUCCEED;
 
@@ -2241,9 +2327,33 @@ int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const
 				MIN(ZBX_DB_LARGE_QUERY_BATCH_SIZE, ids->values_num - i));
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
-		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset)))
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL)))
 			break;
 	}
+
+	return ret;
+}
+
+static int	dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids, int as_str)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	if (1 == as_str)
+	{
+		ret = dbconn_prepare_multiple_query_str(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+	}
+	else
+		ret = zbx_dbconn_prepare_multiple_query(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset))
+		ret = FAIL;
+
+	zbx_free(sql);
 
 	return ret;
 }
@@ -2255,22 +2365,21 @@ int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
-		zbx_vector_uint64_t *ids)
+		const zbx_vector_uint64_t *ids)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-	int	ret = SUCCEED;
+	return dbconn_execute_multiple_query(db, query, field_name, ids, 0);
+}
 
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	ret = zbx_dbconn_prepare_multiple_query(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && ZBX_DB_OK > zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset))
-		ret = FAIL;
-
-	zbx_free(sql);
-
-	return ret;
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches, values will be passed as strings                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids)
+{
+	return dbconn_execute_multiple_query(db, query, field_name, ids, 1);
 }
 
 /******************************************************************************

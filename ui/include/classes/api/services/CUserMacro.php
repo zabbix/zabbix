@@ -311,7 +311,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private function validateUpdateGlobal(array &$globalmacros, array &$db_globalmacros = null) {
+	private function validateUpdateGlobal(array &$globalmacros, ?array &$db_globalmacros = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['globalmacroid'], ['macro']], 'fields' => [
 			'globalmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('globalmacro', 'macro')],
@@ -373,7 +373,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if macros already exists.
 	 */
-	private function checkDuplicates(array $globalmacros, array $db_globalmacros = null): void {
+	private function checkDuplicates(array $globalmacros, ?array $db_globalmacros = null): void {
 		$macros = [];
 
 		foreach ($globalmacros as $globalmacro) {
@@ -424,7 +424,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDeleteGlobal(array &$globalmacroids, array &$db_globalmacros = null) {
+	private function validateDeleteGlobal(array &$globalmacroids, ?array &$db_globalmacros = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacroids, '/', $error)) {
@@ -503,7 +503,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$hostmacros, array &$db_hostmacros = null) {
+	protected function validateUpdate(array &$hostmacros, ?array &$db_hostmacros = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
 			'hostmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
@@ -597,7 +597,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if any of the given macros already exist.
 	 */
-	private function checkHostDuplicates(array $hostmacros, array $db_hostmacros = null) {
+	private function checkHostDuplicates(array $hostmacros, ?array $db_hostmacros = null) {
 		$macro_names = [];
 		$existing_macros = [];
 
@@ -710,7 +710,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array &$hostmacroids, array &$db_hostmacros = null) {
+	protected function validateDelete(array &$hostmacroids, ?array &$db_hostmacros = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacroids, '/', $error)) {
@@ -808,7 +808,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function getMacrosToInherit(array $hostmacros, array $db_hostmacros = null): array {
+	private function getMacrosToInherit(array $hostmacros, ?array $db_hostmacros = null): array {
 		$templated_host_prototypeids = DBfetchColumn(DBselect(
 			'SELECT hd.hostid'.
 			' FROM host_discovery hd,items i,hosts h'.
@@ -858,8 +858,8 @@ class CUserMacro extends CApiService {
 	 * @param array  $upd_hostmacros
 	 * @param array  $db_hostmacros
 	 */
-	private function prepareInheritedObjects(array $tpl_hostmacros, array &$ins_hostmacros = null,
-			array &$upd_hostmacros = null, array &$db_hostmacros = null): void {
+	private function prepareInheritedObjects(array $tpl_hostmacros, ?array &$ins_hostmacros = null,
+			?array &$upd_hostmacros = null, ?array &$db_hostmacros = null): void {
 		$ins_hostmacros = [];
 		$upd_hostmacros = [];
 		$db_hostmacros = [];

@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * Test suite for data collection using both active and passive agents.
  *
- * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, config, ha_node, changelog, config
+ * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, settings, ha_node, changelog
  * @backup config_autoreg_tls, expressions, globalmacro, hosts, interface, item_preproc, item_rtdata, items, regexps
  */
 class testBinaryValueTypeDataCollection extends CIntegrationTest {

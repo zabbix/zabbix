@@ -47,7 +47,7 @@ zbx_interface_status_t;
 
 ZBX_PTR_VECTOR_DECL(interface_status, zbx_interface_status_t *)
 
-zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t finished_cb,
+zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t async_notify_func,
 					void *finished_data, zbx_thread_poller_args *poller_args_in, char **error);
 void			zbx_async_manager_free(zbx_async_manager_t *manager);
 void			zbx_async_manager_queue_sync(zbx_async_manager_t *manager);

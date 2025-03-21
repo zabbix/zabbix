@@ -181,7 +181,7 @@ function getRowClock(array $columns, array $row): string | int {
 }
 
 function makeValueCell(array $column, array $item_value, bool $text_wordbreak = false,
-		string $cell_class = null): array {
+		?string $cell_class = null): array {
 	$color = $column['base_color'];
 
 	switch ($column['item_value_type']) {

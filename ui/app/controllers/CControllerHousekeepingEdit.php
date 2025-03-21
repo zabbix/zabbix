@@ -22,24 +22,24 @@ class CControllerHousekeepingEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'hk_events_mode'			=> 'db config.hk_events_mode',
-			'hk_events_trigger'			=> 'db config.hk_events_trigger',
-			'hk_events_service'			=> 'db config.hk_events_service',
-			'hk_events_internal'		=> 'db config.hk_events_internal',
-			'hk_events_discovery'		=> 'db config.hk_events_discovery',
-			'hk_events_autoreg'			=> 'db config.hk_events_autoreg',
-			'hk_services_mode'			=> 'db config.hk_services_mode',
-			'hk_services'				=> 'db config.hk_services',
-			'hk_sessions_mode'			=> 'db config.hk_sessions_mode',
-			'hk_sessions'				=> 'db config.hk_sessions',
-			'hk_history_mode'			=> 'db config.hk_history_mode',
-			'hk_history_global'			=> 'db config.hk_history_global',
-			'hk_history'				=> 'db config.hk_history',
-			'hk_trends_mode'			=> 'db config.hk_trends_mode',
-			'hk_trends_global'			=> 'db config.hk_trends_global',
-			'hk_trends'					=> 'db config.hk_trends',
-			'compression_status'		=> 'db config.compression_status',
-			'compress_older'			=> 'db config.compress_older'
+			'hk_events_mode'			=> 'setting hk_events_mode',
+			'hk_events_trigger'			=> 'setting hk_events_trigger',
+			'hk_events_service'			=> 'setting hk_events_service',
+			'hk_events_internal'		=> 'setting hk_events_internal',
+			'hk_events_discovery'		=> 'setting hk_events_discovery',
+			'hk_events_autoreg'			=> 'setting hk_events_autoreg',
+			'hk_services_mode'			=> 'setting hk_services_mode',
+			'hk_services'				=> 'setting hk_services',
+			'hk_sessions_mode'			=> 'setting hk_sessions_mode',
+			'hk_sessions'				=> 'setting hk_sessions',
+			'hk_history_mode'			=> 'setting hk_history_mode',
+			'hk_history_global'			=> 'setting hk_history_global',
+			'hk_history'				=> 'setting hk_history',
+			'hk_trends_mode'			=> 'setting hk_trends_mode',
+			'hk_trends_global'			=> 'setting hk_trends_global',
+			'hk_trends'					=> 'setting hk_trends',
+			'compression_status'		=> 'setting compression_status',
+			'compress_older'			=> 'setting compress_older'
 		];
 
 		$ret = $this->validateInput($fields);

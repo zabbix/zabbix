@@ -14,11 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testUsersAuthentication extends CWebTest {
 
@@ -98,18 +98,14 @@ class testUsersAuthentication extends CWebTest {
 		}
 
 		// Check default values in DB.
-		$db_values = [
-			[
-				'authentication_type' => 0,
-				'disabled_usrgrpid' => 0,
-				'passwd_min_length' => 8,
-				'passwd_check_rules' => 8
-			]
+		$expected_values = [
+			'authentication_type' => 0,
+			'disabled_usrgrpid' => 0,
+			'passwd_min_length' => 8,
+			'passwd_check_rules' => 8
 		];
 
-		$this->assertEquals($db_values, CDBHelper::getAll('SELECT authentication_type, disabled_usrgrpid,'.
-				' passwd_min_length, passwd_check_rules FROM config')
-		);
+		$this->assertEquals($expected_values, CTestDBSettingsHelper::getParameters(array_keys($expected_values)));
 	}
 
 	public function getFormData() {
@@ -118,12 +114,10 @@ class testUsersAuthentication extends CWebTest {
 			[
 				[
 					'db_check' => [
-						[
-							'authentication_type' => 0,
-							'disabled_usrgrpid' => 0,
-							'passwd_min_length' => 8,
-							'passwd_check_rules' => 8
-						]
+						'authentication_type' => 0,
+						'disabled_usrgrpid' => 0,
+						'passwd_min_length' => 8,
+						'passwd_check_rules' => 8
 					]
 				]
 			],
@@ -132,12 +126,10 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'fields' => ['Deprovisioned users group' => 'Disabled'],
 					'db_check' => [
-						[
-							'authentication_type' => 0,
-							'disabled_usrgrpid' => 9,
-							'passwd_min_length' => 8,
-							'passwd_check_rules' => 8
-						]
+						'authentication_type' => 0,
+						'disabled_usrgrpid' => 9,
+						'passwd_min_length' => 8,
+						'passwd_check_rules' => 8
 					]
 				]
 			],
@@ -146,12 +138,10 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'fields' => ['Deprovisioned users group' => ''],
 					'db_check' => [
-						[
-							'authentication_type' => 0,
-							'disabled_usrgrpid' => 0,
-							'passwd_min_length' => 8,
-							'passwd_check_rules' => 8
-						]
+						'authentication_type' => 0,
+						'disabled_usrgrpid' => 0,
+						'passwd_min_length' => 8,
+						'passwd_check_rules' => 8
 					]
 				]
 			],
@@ -173,7 +163,7 @@ class testUsersAuthentication extends CWebTest {
 	 */
 	public function testUsersAuthentication_Form($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+			$old_hash = CDBHelper::getHash('SELECT * FROM settings');
 		}
 
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -197,15 +187,15 @@ class testUsersAuthentication extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error_message']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check length fields saved in db.
-			$this->assertEquals($data['db_check'], CDBHelper::getAll('SELECT authentication_type, disabled_usrgrpid, passwd_min_length,'.
-					'passwd_check_rules FROM config')
-			);
+			$this->assertEquals($data['db_check'], CTestDBSettingsHelper::getParameters([
+				'authentication_type', 'disabled_usrgrpid', 'passwd_min_length', 'passwd_check_rules'
+			]));
 		}
 
 		/*

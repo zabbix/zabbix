@@ -59,6 +59,7 @@ void	test_process_fping_statistics_line(void)
 	fping_args.requests_count = (int)zbx_mock_get_parameter_uint64("in.requests_count");
 	fping_args.allow_redirect = (unsigned char)zbx_mock_get_parameter_uint64("in.allow_redirect");
 	fping_args.rdns = 0;
+	fping_args.retries = zbx_mock_get_parameter_int("in.retries");
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = (int)zbx_mock_get_parameter_uint64("in.fping_existence");
 #endif
@@ -102,6 +103,7 @@ void test_process_response_to_individual_fping_request(void)
 	fping_args.requests_count = (int)zbx_mock_get_parameter_uint64("in.requests_count");
 	fping_args.allow_redirect = (unsigned char)zbx_mock_get_parameter_uint64("in.allow_redirect");
 	fping_args.rdns = 0;
+	fping_args.retries = zbx_mock_get_parameter_int("in.retries");
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = (int)zbx_mock_get_parameter_uint64("in.fping_existence");
 #endif

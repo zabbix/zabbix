@@ -167,10 +167,6 @@ class CAlert extends CApiService {
 			}
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sql_parts['where'][] = '(a.userid IS NULL OR a.userid='.self::$userData['userid'].')';
-		}
-
 		// add filter options
 		$sql_parts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sql_parts);
 

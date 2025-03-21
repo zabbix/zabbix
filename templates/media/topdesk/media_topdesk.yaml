@@ -1,73 +1,52 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    -
-      name: TOPdesk
+    - name: TOPdesk
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: event_id
+        - name: event_id
           value: '{EVENT.ID}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: severity_average
+        - name: severity_average
           value: P3
-        -
-          name: severity_default
+        - name: severity_default
           value: P5
-        -
-          name: severity_disaster
+        - name: severity_disaster
           value: P1
-        -
-          name: severity_high
+        - name: severity_high
           value: P2
-        -
-          name: severity_information
+        - name: severity_information
           value: P5
-        -
-          name: severity_not_classified
+        - name: severity_not_classified
           value: P5
-        -
-          name: severity_warning
+        - name: severity_warning
           value: P4
-        -
-          name: topdesk_api
+        - name: topdesk_api
           value: '<put your TOPdesk API URL>'
-        -
-          name: topdesk_issue_key
+        - name: topdesk_issue_key
           value: '{EVENT.TAGS.__zbx_tpd_issuekey}'
-        -
-          name: topdesk_password
+        - name: topdesk_password
           value: '<put your TOPdesk application password>'
-        -
-          name: topdesk_status
+        - name: topdesk_status
           value: '<put default status for new tickets>'
-        -
-          name: topdesk_user
+        - name: topdesk_user
           value: '<put your TOPdesk username>'
-        -
-          name: trigger_id
+        - name: trigger_id
           value: '{TRIGGER.ID}'
-        -
-          name: zbxurl
+        - name: zbxurl
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         var Media = {
             params: {},
@@ -316,8 +295,7 @@ zabbix_export:
         Add a dedicated user with the media type "TOPdesk".
         Change the values of the variables topdesk_api (URL), topdesk_password, topdesk_user. The topdesk_status is the default status for creating a new TOPdesk ticket.
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -328,8 +306,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
@@ -340,8 +317,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
@@ -349,8 +325,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -365,8 +340,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

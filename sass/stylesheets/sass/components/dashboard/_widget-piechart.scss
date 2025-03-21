@@ -1,7 +1,9 @@
 // Widget configuration.
 
 form.dashboard-widget-piechart {
-	width: 1110px;
+	max-width: 1330px;
+	min-width: 1110px;
+	width: 100vw;
 
 	.pie-chart-widget-config-tabs {
 		grid-column: 1 / -1;
@@ -214,6 +216,10 @@ form.dashboard-widget-piechart {
 		display: none;
 		line-height: 24px;
 		color: $font-alt-color;
+	}
+
+	#merge_percent {
+		margin-left: 5px;
 	}
 }
 

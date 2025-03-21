@@ -29,8 +29,8 @@ abstract class CHostGeneral extends CHostBase {
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected function checkGroups(array $hosts, array $db_hosts = null, string $path = null,
-			array $group_indexes = null): void {
+	protected function checkGroups(array $hosts, ?array $db_hosts = null, ?string $path = null,
+			?array $group_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_group_indexes = [];
@@ -111,7 +111,7 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @throws APIException if host names are not unique.
 	 */
-	protected function checkDuplicates(array $hosts, array $db_hosts = null): void {
+	protected function checkDuplicates(array $hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$h_names = [];
@@ -178,7 +178,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
-	protected function updateGroups(array &$hosts, array $db_hosts = null): void {
+	protected function updateGroups(array &$hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hosts_groups = [];
@@ -238,7 +238,7 @@ abstract class CHostGeneral extends CHostBase {
 		unset($host);
 	}
 
-	protected function updateHgSets(array $hosts, array $db_hosts = null): void {
+	protected function updateHgSets(array $hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$hgsets = [];
@@ -493,7 +493,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTemplates(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);
@@ -597,7 +597,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $hostids
 	 * @param bool       $clear
 	 */
-	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null,
+	protected static function unlinkTemplatesObjects(array $templateids, ?array $hostids = null,
 			bool $clear = false): void {
 		$flags = ($clear)
 			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]

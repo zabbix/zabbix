@@ -154,7 +154,7 @@ class CWidgetTopHosts extends CWidget {
 			urls.push(url);
 		}
 
-		return urls;
+		return [...new Set(urls)];
 	}
 
 	#loadThumbnails(urls) {

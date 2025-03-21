@@ -12,7 +12,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/go-ldap/ldap v3.0.3+incompatible
-	github.com/go-ole/go-ole v1.2.6
+	github.com/go-ole/go-ole v1.3.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/goburrow/modbus v0.1.0
 	github.com/godbus/dbus/v5 v5.1.0
@@ -24,11 +24,11 @@ require (
 	github.com/miekg/dns v1.1.55
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
-	golang.org/x/net v0.30.0
-	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.26.0
-	golang.org/x/text v0.19.0
-	golang.zabbix.com/sdk v1.2.2-0.20250130124632-436121f05f4e
+	golang.org/x/net v0.34.0
+	golang.org/x/sync v0.10.0
+	golang.org/x/sys v0.29.0
+	golang.org/x/text v0.21.0
+	golang.zabbix.com/sdk v1.2.2-0.20250214072554-abd5e97e6797
 )
 
 require (

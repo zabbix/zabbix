@@ -125,7 +125,8 @@ function make_event_details(array $event, array $allowed) {
 				if ($allowed['ui_correlation']) {
 					$correlation_name = (new CLink($correlations[0]['name'],
 						(new CUrl('zabbix.php'))
-							->setArgument('action', 'correlation.edit')
+							->setArgument('action', 'popup')
+							->setArgument('popup', 'correlation.edit')
 							->setArgument('correlationid', $correlations[0]['correlationid'])
 							->getUrl()
 					))->addClass(ZBX_STYLE_LINK_ALT);

@@ -15,7 +15,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../CElement.php';
+require_once __DIR__.'/../CElement.php';
 
 use Facebook\WebDriver\Exception\TimeoutException;
 
@@ -145,7 +145,8 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashboard-cancel')->one()->click(true);
+			// Added hoverMouse() due to unstable tests on Jenkins.
+			$controls->query('id:dashboard-cancel')->one()->hoverMouse()->click(true);
 
 			if (CElementQuery::getPage()->isAlertPresent()) {
 				CElementQuery::getPage()->acceptAlert();

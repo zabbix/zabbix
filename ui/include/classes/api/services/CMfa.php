@@ -213,7 +213,7 @@ class CMfa extends CApiService {
 	 *
 	 * @throws APIException if MFA method name is not unique.
 	 */
-	private static function checkDuplicates(array $mfas, array $db_mfas = null): void {
+	private static function checkDuplicates(array $mfas, ?array $db_mfas = null): void {
 		$names = [];
 
 		foreach ($mfas as $mfa) {

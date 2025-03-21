@@ -305,7 +305,8 @@ $form_grid
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'groupid'
+						'dstfld1' => 'groupid',
+						'normal_only' => '1'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

@@ -122,6 +122,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, ctx.ItemID())
+	runtime.KeepAlive(grxp)
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))

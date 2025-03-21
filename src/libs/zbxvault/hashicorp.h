@@ -17,12 +17,12 @@
 
 #include "zbxalgo.h"
 
-int	zbx_hashicorp_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
-		long timeout, zbx_hashset_t *kvs, char **error);
+int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const char *token,
+		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
 
-void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const char *ssl_cert_file,
+void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout);
 #endif

@@ -40,7 +40,7 @@ A connection can be configured using either keys' parameters or named sessions.
   
   The correct way is:
     
-      redis.ping[tcp://127.0.0.1,password]
+      redis.ping[tcp://127.0.0.1,password,user]
       
 * The only supported network schemas for a URI are "tcp" and "unix".  
 Examples of valid URIs:
@@ -51,24 +51,31 @@ Examples of valid URIs:
     - /var/run/redis.sock
       
 #### Using keys' parameters
-The common parameters for all keys are: [ConnString][,Password]  
-Where ConnString can be either a URI or a session name.   
-ConnString will be treated as a URI if no session with the given name is found.  
-If you use ConnString as a session name, just skip the rest of the connection parameters.  
+The common parameters for all keys are: [ConnString][,Password][,...][,User]
+Where ConnString can be either a URI or a session name.
+ConnString will be treated as a URI if no session with the given name is found.
+If you use ConnString as a session name, just skip the rest of the connection parameters.
+User name defaults to "default" if not set.
+
+User is added as last parameter to keep backward compatibility. User must be added as the final parameter in the whole
+item and not just last connection parameter if there are more non connection parameters.
  
 #### Using named sessions
-Named sessions allow you to define specific parameters for each Redis instance. Currently, there are only two supported 
-parameters: Uri and Password. It's a bit more secure way to store credentials compared to item keys or macros.  
+Named sessions allow you to define specific parameters for each Redis instance. Currently, there are only three
+supported parameters: Uri, Password and User. It's a bit more secure way to store credentials compared to item keys or
+macros.  
 
 E.g: suppose you have two Redis instances: "Prod" and "Test". 
 You should add the following options to the agent configuration file:   
 
     Plugins.Redis.Sessions.Prod.Uri=tcp://192.168.1.1:6379  
     Plugins.Redis.Sessions.Prod.Password=<PasswordForProd>  
-      
+    Plugins.Redis.Sessions.Prod.User=<UserForProd>
+
     Plugins.Redis.Sessions.Test.Uri=tcp://192.168.0.1:6379   
     Plugins.Redis.Sessions.Test.Password=<PasswordForTest>  
-        
+    Plugins.Redis.Sessions.Test.User=<UserForTest>
+
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 
     redis.ping[Prod]
@@ -77,14 +84,14 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
 *Note*: sessions names are case-sensitive.
 
 ## Supported keys
-**redis.config[\<commonParams\>[,pattern]]** — Gets a configuration parameters of a Redis instance matching pattern.  
+**redis.config[\<commonParams\>[,pattern][,user]]** — Gets a configuration parameters of a Redis instance matching pattern.  
 *Params:*  
 pattern — Glob-style pattern. The default value is "*".  
 *Returns:*
 - JSON if a glob-style pattern is specified.
 - Single value if a pattern did not contain any wildcard character.
 
-**redis.info[\<commonParams\>[,section]]** — Returns an output of the INFO command serialized to JSON.  
+**redis.info[\<commonParams\>[,section][,user]]** — Returns an output of the INFO command serialized to JSON.  
 *Params:*  
 section — Section of information. The default section name is "default".
 

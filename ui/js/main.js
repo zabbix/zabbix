@@ -268,7 +268,7 @@ var hintBox = {
 				: jQuery(this);
 
 			if (e.type === 'keydown') {
-				if (e.which !== 13) {
+				if (e.key !== ' ' && e.key !== 'Enter') {
 					return;
 				}
 
@@ -647,9 +647,9 @@ var hintBox = {
 			css.height = Math.ceil(parseFloat(hint_computed_style.height));
 
 			// Event coordinates relative to host.
-			if ((target.event_x === null || target.event_x === undefined) && e.originalEvent.clientX !== undefined) {
-				target.event_x = e.originalEvent.clientX - host_rect.left + host_x_min;
-				target.event_y = e.originalEvent.clientY - host_rect.top + host_y_min;
+			if ((target.event_x === null || target.event_x === undefined) && e.clientX !== undefined) {
+				target.event_x = e.clientX - host_rect.left + host_x_min;
+				target.event_y = e.clientY - host_rect.top + host_y_min;
 			}
 
 			css.left = target.event_x + event_offset + hint_rect.width <= host_x_max

@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup userdirectory, userdirectory_ldap, userdirectory_saml, userdirectory_idpgroup, userdirectory_usrgrp, userdirectory_media, config, usrgrp
+ * @backup userdirectory, userdirectory_ldap, userdirectory_saml, userdirectory_idpgroup, userdirectory_usrgrp, userdirectory_media, settings, usrgrp
  */
 class testAuthentication extends CAPITest {
 
@@ -542,37 +542,31 @@ class testAuthentication extends CAPITest {
 
 		if ($expected_error === null) {
 			// Before updating, collect old authentication data.
-			$fields = '';
-			foreach ($authentication as $field => $value) {
-				$fields = 'c.'.$field.',';
-			}
-			$fields = substr($fields, 0, -1);
-			$sql = 'SELECT '.$fields.' FROM config c WHERE c.configid=1';
+			$settings = $this->call('authentication.get', ['output' => array_keys($authentication)])['result'];
 
-			$db_authentication = CDBHelper::getAll($sql)[0];
 			$this->call('authentication.update', $authentication, $expected_error);
-			$db_upd_authentication = CDBHelper::getAll($sql)[0];
 
-			$updated = array_intersect_key($authentication, $db_upd_authentication);
-			$unchanged = array_diff_key($db_upd_authentication, $authentication);
+			$upd_settings = $this->call('authentication.get', ['output' => array_keys($authentication)])['result'];
+			$updated = array_intersect_key($authentication, $upd_settings);
+			$unchanged = array_diff_key($upd_settings, $authentication);
 
 			// Check if field values have been updated.
 			foreach ($updated as $field => $value) {
 				if (is_numeric($value)) {
-					$this->assertEquals($value, $db_upd_authentication[$field]);
+					$this->assertEquals($value, $upd_settings[$field]);
 				}
 				else {
-					$this->assertSame($value, $db_upd_authentication[$field]);
+					$this->assertSame($value, $upd_settings[$field]);
 				}
 			}
 
 			// Check if fields that were not given, remain the same.
 			foreach ($unchanged as $field => $value) {
 				if (is_numeric($value)) {
-					$this->assertEquals($value, $db_authentication[$field]);
+					$this->assertEquals($value, $settings[$field]);
 				}
 				else {
-					$this->assertSame($value, $db_authentication[$field]);
+					$this->assertSame($value, $settings[$field]);
 				}
 			}
 		}

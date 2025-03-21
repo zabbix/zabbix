@@ -28,7 +28,7 @@ class CWidgetFieldCheckBox extends CWidgetField {
 	/**
 	 * @param string|null $caption  Text after checkbox.
 	 */
-	public function __construct(string $name, string $label = null, string $caption = null) {
+	public function __construct(string $name, ?string $label = null, ?string $caption = null) {
 		parent::__construct($name, $label);
 
 		$this->caption = $caption;

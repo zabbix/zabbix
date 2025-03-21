@@ -16,8 +16,8 @@
 
 use Facebook\WebDriver\Exception\TimeoutException;
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup hstgrp

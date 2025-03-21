@@ -736,7 +736,7 @@ void	zbx_pb_init(void)
 
 	pb_init_state(pb_data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): state:%d", __func__, pb_data->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): state:%u", __func__, pb_data->state);
 }
 
 /******************************************************************************

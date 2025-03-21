@@ -333,7 +333,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $dashboards, array $db_dashboards = null): void {
+	private static function checkUuidDuplicates(array $dashboards, ?array $db_dashboards = null): void {
 		$dashboard_indexes = [];
 
 		foreach ($dashboards as $i => $dashboard) {
@@ -373,7 +373,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
+	protected function validateUpdate(array &$dashboards, ?array &$db_dashboards = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['dashboardid']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
@@ -453,7 +453,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if dashboard names are not unique.
 	 */
-	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+	protected function checkDuplicates(array $dashboards, ?array $db_dashboards = null): void {
 		$names_by_templateid = [];
 
 		foreach ($dashboards as $dashboard) {

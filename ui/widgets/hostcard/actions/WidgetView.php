@@ -83,8 +83,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldHostSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
-			$options['selectInterfaces'] = ['ip', 'dns', 'port', 'main', 'type', 'useip', 'available', 'error',
-				'details'
+			$options['selectInterfaces'] = ['interfaceid', 'ip', 'dns', 'port', 'main', 'type', 'useip', 'available',
+				'error', 'details'
 			];
 		}
 
@@ -165,39 +165,46 @@ class WidgetView extends CControllerDashboardWidgetView {
 			CArrayHelper::sort($host['hostgroups'], ['name']);
 		}
 
-		if (in_array(CWidgetFieldHostSections::SECTION_MONITORING, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldHostSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
-			$db_items = API::Item()->get([
-				'output' => ['type'],
+		if (in_array(CWidgetFieldHostSections::SECTION_MONITORING, $this->fields_values['sections'])) {
+			$db_items_count = API::Item()->get([
+				'countOutput' => true,
 				'hostids' => [$host['hostid']],
 				'webitems' => true,
 				'monitored' => true
 			]);
 
-			if (in_array(CWidgetFieldHostSections::SECTION_MONITORING, $this->fields_values['sections'])) {
-				$host['dashboard_count'] = count(getHostDashboards($host['hostid']));
-				$host['item_count'] = count($db_items);
-				$host['graph_count'] = $host['graphs'];
-				$host['web_scenario_count'] = $host['httpTests'];
+			$host['dashboard_count'] = count(getHostDashboards($host['hostid']));
+			$host['item_count'] = $db_items_count;
+			$host['graph_count'] = $host['graphs'];
+			$host['web_scenario_count'] = $host['httpTests'];
 
-				unset($host['graphs'], $host['httpTests']);
+			unset($host['graphs'], $host['httpTests']);
+		}
+
+		if (in_array(CWidgetFieldHostSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
+			$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds(
+				array_column($host['interfaces'], 'interfaceid')
+			);
+
+			foreach ($host['interfaces'] as &$interface) {
+				$interfaceid = $interface['interfaceid'];
+				$interface['has_enabled_items'] = array_key_exists($interfaceid, $interface_enabled_items_count)
+					&& $interface_enabled_items_count[$interfaceid] > 0;
+			}
+			unset($interface);
+
+			$enabled_active_items_count = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$host['hostid']]);
+
+			if ($enabled_active_items_count) {
+				$host['interfaces'][] = [
+					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
+					'available' => $host['active_available'],
+					'has_enabled_items' => true,
+					'error' => ''
+				];
 			}
 
-			if (in_array(CWidgetFieldHostSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
-				$item_types = array_flip(array_column($db_items, 'type'));
-
-				if (array_key_exists(ITEM_TYPE_ZABBIX_ACTIVE, $item_types)) {
-					$host['interfaces'][] = [
-						'type' => INTERFACE_TYPE_AGENT_ACTIVE,
-						'available' => $host['active_available'],
-						'error' => ''
-					];
-				}
-
-				unset($host['active_available']);
-
-				$host['has_passive_checks'] = array_key_exists(ITEM_TYPE_ZABBIX, $item_types);
-			}
+			unset($host['active_available']);
 		}
 
 		if (in_array(CWidgetFieldHostSections::SECTION_MONITORED_BY, $this->fields_values['sections'])) {

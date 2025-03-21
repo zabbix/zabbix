@@ -1335,7 +1335,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		}
 		else if (0 != service->eventlog.oom)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "There is no 5% free memory. Reading new events skipped");
+			zabbix_log(LOG_LEVEL_DEBUG, "There is no 5%% free memory. Reading new events skipped");
 		}
 		else
 		{
@@ -1414,7 +1414,7 @@ out:
 	/* statistically we can expect the same number of events next time */
 	if (service->eventlog.top_key < evt_top_key)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() update top_time:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " top_key:"
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() update top_time:" ZBX_FS_UI64 "/" ZBX_FS_TIME_T " top_key:"
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 " last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T,
 				__func__, service->eventlog.top_time, evt_top_time, service->eventlog.top_key,
 				evt_top_key, service->eventlog.last_key, service->eventlog.last_ts);

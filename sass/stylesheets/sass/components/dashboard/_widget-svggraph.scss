@@ -1,6 +1,10 @@
 // Widget configuration.
 
 form.dashboard-widget-svggraph {
+	max-width: 1330px;
+	min-width: 1110px;
+	width: 100vw;
+
 	.svg-graph-preview,
 	.graph-widget-config-tabs {
 		grid-column: 1 / -1;

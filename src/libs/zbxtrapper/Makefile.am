@@ -17,4 +17,5 @@ libzbxtrapper_a_SOURCES = \
 
 libzbxtrapper_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

@@ -13,10 +13,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup profiles
@@ -441,6 +441,9 @@ class testExecuteNow extends CWebTest {
 	 * Check "Execute now" button on Item page.
 	 *
 	 * @dataProvider getItemPageData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testExecuteNow_ItemPage($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');

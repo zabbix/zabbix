@@ -54,6 +54,7 @@ if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'sysmap' && hasRequest('action')) {
 		if (getRequest('action') === 'update') {
 			$sysmapid = getRequest('sysmapid', 0);
+			$result = false;
 
 			@ob_start();
 
@@ -110,26 +111,22 @@ if (isset($_REQUEST['favobj'])) {
 					unset($shape);
 				}
 
-				$result = API::Map()->update($sysmapUpdate);
+				$result = (bool) API::Map()->update($sysmapUpdate);
 
-				if ($result !== false) {
-					$url = (new CUrl('sysmaps.php'))
-						->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
-						->getUrl();
-
-					echo
-						'if (confirm('.json_encode(_('Map is updated! Return to map list?')).')) {'.
-							'location.href = "'.$url.'";'.
-						'}';
-				}
-				else {
+				if (!$result) {
 					throw new Exception(_('Map update failed.'));
 				}
 
-				DBend(true);
+				$url = (new CUrl('sysmaps.php'))
+					->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
+					->getUrl();
+
+				echo
+					'if (confirm('.json_encode(_('Map is updated! Return to map list?')).')) {'.
+						'location.href = "'.$url.'";'.
+					'}';
 			}
 			catch (Exception $e) {
-				DBend(false);
 				$msg = [$e->getMessage()];
 
 				foreach (get_and_clear_messages() as $errMsg) {
@@ -138,8 +135,10 @@ if (isset($_REQUEST['favobj'])) {
 
 				ob_clean();
 
-				echo 'alert('.zbx_jsvalue(implode("\r\n", $msg)).');';
+				echo 'alert('.json_encode(implode("\r\n", $msg)).');';
 			}
+
+			$result = DBend($result);
 
 			@ob_flush();
 			session_write_close();

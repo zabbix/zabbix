@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -5513,7 +5513,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
 			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			foreach ($charts_table->query('class:center')->waitUntilCount($count)->all() as $graph) {
-				$graph->waitUntilClassesNotPresent('is-loading');
+				$graph->waitUntilClassesNotPresent('is-loading', 60);
 			}
 
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
@@ -5680,9 +5680,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$object->asDashboard()->waitUntilReady();
 		}
 
-		$this->query('class:header-kioskmode-controls')->one()
-				->waitUntilAttributesPresent(['class' => 'header-kioskmode-controls hidden']);
-		$this->assertScreenshot($object, $id.'_kiosk');
+		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();

@@ -17,7 +17,7 @@
 
 #include "zbxjson.h"
 
-int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
+int	diag_add_section_info_proxy(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error);
 
 #endif /* ZABBIX_DIAG_PROXY_H */

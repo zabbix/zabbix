@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @onBefore getTemplatedIds
@@ -212,6 +212,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
+		$dashboard->waitUntilReady();
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
 
@@ -220,6 +221,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Map' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
+			COverlayDialogElement::ensureNotPresent();
 
 			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}

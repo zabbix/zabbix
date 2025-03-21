@@ -148,18 +148,18 @@ class CControllerTriggerUpdate extends CController {
 				$trigger['comments'] = $description;
 			}
 
-			$status = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-
-			if ($db_trigger['status'] != $status) {
-				$trigger['status'] = $status;
-			}
-
 			CArrayHelper::sort($db_trigger['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
 
 			if (array_values($db_trigger['tags']) !== array_values($tags)) {
 				$trigger['tags'] = $tags;
 			}
+		}
+
+		$status = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+
+		if ($db_trigger['status'] != $status) {
+			$trigger['status'] = $status;
 		}
 
 		$result = (bool) API::Trigger()->update($trigger);

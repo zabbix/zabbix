@@ -3,7 +3,7 @@
 
 ## Overview
 
-This guide describes how to integrate Zabbix 7.4 with MS Teams Workflow using the Zabbix webhook feature, providing instructions on setting up a media type, a user, and an action in Zabbix.
+This guide describes how to integrate Zabbix with MS Teams Workflow using the Zabbix webhook feature, providing instructions on setting up a media type, a user, and an action in Zabbix.
 
 This integration is supported only on **Teams** as part of Office 365. Note that the **Teams** free plan does not support the [MS Teams Workflow](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a) feature.
 
@@ -12,18 +12,21 @@ This integration is supported only on **Teams** as part of Office 365. Note that
 Zabbix version: 7.4 and higher.
 
 ## Parameters
-### User parameters
 
-User parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
+After importing the webhook, you can configure it using webhook parameters.
+
+### Configurable parameters
+
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
 
 |Name|Value|Description|
 |----|-----|-----------|
 |teams_endpoint|\<PLACE WEBHOOK URL HERE\>|MS Teams workflow-webhook URL.|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 
-### System parameters
+### Internal parameters
 
-System parameters are reserved for predefined macros that are not meant to be changed.
+Internal parameters are reserved for predefined macros that are not meant to be changed.
 
 |Name|Value|Description|
 |----|-----|-----------|
@@ -126,4 +129,3 @@ For more information, see [Zabbix Documentation](https://www.zabbix.com/document
 Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
 
 You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
-

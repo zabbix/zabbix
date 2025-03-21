@@ -27,7 +27,8 @@
 static int	replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
 		char **param)
 {
-	int	ret = SUCCEED;
+	int				ret = SUCCEED;
+	zbx_mock_handle_t		handle;
 
 	ZBX_UNUSED(key_type);
 	ZBX_UNUSED(cb_data);
@@ -37,8 +38,30 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 		return ret;
 
 	*param = zbx_strdup(NULL, data);
-
 	zbx_unquote_key_param(*param);
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.macro", &handle))
+	{
+		const char		*macro_name, *macro_value;
+		char			*p;
+		zbx_mock_error_t	err;
+
+		if (ZBX_MOCK_SUCCESS != (err =zbx_mock_parameter("in.macro.name", &handle)) ||
+				ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &macro_name)))
+		{
+			fail_msg("Cannot read  \"in.macro.name\" parameter: %s", zbx_mock_error_string(err));
+		}
+
+		if (ZBX_MOCK_SUCCESS != (err =zbx_mock_parameter("in.macro.value", &handle)) ||
+				ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &macro_value)))
+		{
+			fail_msg("Cannot read  \"in.macro.value\" parameter: %s", zbx_mock_error_string(err));
+		}
+
+		p = zbx_string_replace(*param, macro_name, macro_value);
+		zbx_free(*param);
+		*param = p;
+	}
 
 	if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
 		zbx_free(*param);

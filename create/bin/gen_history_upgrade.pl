@@ -204,12 +204,12 @@ sub output_tsdb {
 	if ((defined $tsdb_compression) && $tsdb_compression eq 'with_compression')
 	{
 		$tsdb_out =~ s/%COMPRESS/$tsdb_compress_sql/g;
-		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE config SET compression_status=1;/g;
+		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE settings SET value_int=1 WHERE name='compression_status';/g;
 	}
 	else
 	{
 		$tsdb_out =~ s/%COMPRESS//g;
-		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE config SET compression_status=0;/g;
+		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE settings SET value_int=0 WHERE name='compression_status';/g;
 	}
 
 	my $temp_ddl = $postgresql{$tbl};

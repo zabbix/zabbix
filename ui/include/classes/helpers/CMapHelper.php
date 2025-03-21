@@ -580,15 +580,18 @@ class CMapHelper {
 		$areas = [];
 
 		if ($groupids) {
-			$groups = API::HostGroup()->get([
-				'output' => [],
-				'selectHosts' => ['hostid', 'name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
-			]);
+			// Assign the hosts of nested host groups to the top host groups.
+			$groups = [];
+			foreach ($groupids as $groupid => $bar) {
+				$sub_groups = getSubGroups([$groupid]);
+				$groups[$groupid]['hosts'] = API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'groupids' => $sub_groups
+				]);
+			}
 
 			$new_selementid = (count($sysmap['selements']) > 0)
-				? (int) max(zbx_objectValues($sysmap['selements'], 'selementid'))
+				? (int) max(array_column($sysmap['selements'], 'selementid'))
 				: 0;
 
 			$new_linkid = (count($sysmap['links']) > 0) ? (int) max(array_keys($sysmap['links'])) : 0;

@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 class testTriggerDependencies extends CWebTest {
 
@@ -212,6 +212,7 @@ class testTriggerDependencies extends CWebTest {
 
 		if ($button_selector === 'Add host trigger') {
 			$initial_dialog->asForm(['normalized' => true])->fill(['Host' => $host_name]);
+			$initial_dialog->query('class:no-data-message')->waitUntilNotVisible();
 			$table->waitUntilReloaded();
 		}
 

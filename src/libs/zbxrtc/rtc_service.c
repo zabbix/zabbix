@@ -26,9 +26,51 @@
 #include "zbxipcservice.h"
 #include "zbxprof.h"
 #include "zbxtime.h"
+#include "zbxcachehistory.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
+
+
+static int	zbx_json_getuint64(const char *tag, const struct zbx_json_parse *jp, zbx_uint64_t *itemid,
+		char **error)
+{
+	char	buffer[MAX_ID_LEN];
+
+	if (SUCCEED != zbx_json_value_by_name(jp, tag, buffer, sizeof(buffer), NULL) ||
+			SUCCEED != zbx_is_uint64(buffer, itemid))
+	{
+		*error = zbx_dsprintf(NULL, "cannot retrieve value of tag \"%s\"", tag);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process ha_failover_delay runtime command                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_history_cache_clear(const char *data, char **out)
+{
+	struct zbx_json_parse	jp;
+	zbx_uint64_t		itemid;
+	int			num;
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		*out = zbx_dsprintf(NULL, "Invalid parameter format \"%s\"\n", data);
+		return;
+	}
+
+	if (SUCCEED != zbx_json_getuint64(ZBX_PROTO_TAG_ITEMID, &jp, &itemid, out))
+		return;
+
+	if (FAIL == (num = zbx_hc_clear_item_middle(itemid)))
+		*out = zbx_dsprintf(NULL, "Cannot clear item from history cache: item is not in cache\n");
+	else
+		*out = zbx_dsprintf(NULL, "Cleared %d values from history cache\n", num);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -493,6 +535,9 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			zbx_rtc_notify(rtc, process_type, process_num, notify_code, notify_data, notify_size);
 			zbx_free(notify_data);
 			return;
+		case ZBX_RTC_HISTORY_CACHE_CLEAR:
+			rtc_history_cache_clear((const char *)data, result);
+			return;
 		default:
 			*result = zbx_strdup(*result, "Unknown runtime control option\n");
 	}
@@ -643,6 +688,7 @@ int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
 				case ZBX_RTC_LOG_LEVEL_INCREASE:
 				case ZBX_RTC_SUBSCRIBE:
+				case ZBX_RTC_SUBSCRIBE_SERVICE:
 					zbx_rtc_dispatch(rtc, client, message, cb_proc_req);
 					break;
 				default:

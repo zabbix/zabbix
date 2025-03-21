@@ -453,7 +453,7 @@ class CConnector extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDuplicates(array $connectors, array $db_connectors = null): void {
+	private static function checkDuplicates(array $connectors, ?array $db_connectors = null): void {
 		$names = [];
 
 		foreach ($connectors as $connector) {
@@ -486,8 +486,8 @@ class CConnector extends CApiService {
 	 * @param array|null $db_connectors
 	 * @param array|null $upd_connectorids
 	 */
-	private static function updateTags(array &$connectors, array $db_connectors = null,
-			array &$upd_connectorids = null): void {
+	private static function updateTags(array &$connectors, ?array $db_connectors = null,
+			?array &$upd_connectorids = null): void {
 		$ins_tags = [];
 		$del_tagids = [];
 

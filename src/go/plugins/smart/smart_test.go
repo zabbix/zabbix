@@ -173,7 +173,15 @@ const (
 				"value": 10,
 				"string": "10"
 			  }
-			}
+			},
+			{
+ 			  "name": "Zero_Norm_Value",
+			  "value": 0,
+			  "raw": {
+				"value": 15,
+				"string": "15"
+			  }
+			}			
 		  ]
 		},
 		"power_on_time": {
@@ -223,7 +231,7 @@ const (
 		  "ata_smart_attributes": {
 			 "table": [
 			  {
-				 "name": "Raw_Read_Error_Rate",
+				"name": "Raw_Read_Error_Rate",
 				"value": 100,
 				"raw": {
 				  "value": 0,
@@ -264,6 +272,10 @@ var (
 	attrTable = table{"Spin_Up_Time", 5, 55}
 	unknown   = table{"Unknown_Attribute", 0, 0}
 )
+
+func intToPtr(v int) *int {
+	return &v
+}
 
 func Test_setSingleDiskFields(t *testing.T) {
 	var nilReference *bool
@@ -342,12 +354,18 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"serial_number":    "D486530350",
 				"temperature":      18,
 				"raw_read_error_rate": singleRequestAttribute{
-					Value: 0,
-					Raw:   "0",
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
 				},
 				"reallocated_sector_ct": singleRequestAttribute{
 					Value: 10,
 					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
 				},
 			},
 			false,
@@ -369,8 +387,9 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"serial_number":    "D486530350",
 				"temperature":      18,
 				"raw_read_error_rate": singleRequestAttribute{
-					Value: 0,
-					Raw:   "0",
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
 				},
 				"reallocated_sector_ct": singleRequestAttribute{
 					Value: 10,

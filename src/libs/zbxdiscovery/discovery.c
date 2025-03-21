@@ -175,7 +175,7 @@ static void	discovery_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count, co
  * Purpose: gets discovery manager diagnostic statistics                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error)
+int	zbx_get_usage_stats_discovery(zbx_vector_dbl_t *usage, int *count, char **error)
 {
 	unsigned char	*result;
 
@@ -254,7 +254,7 @@ void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
 
 	memset(info, 0, sizeof(zbx_process_info_t));
 
-	if (SUCCEED != zbx_discovery_get_usage_stats(&usage, &info->count, &error))
+	if (SUCCEED != zbx_get_usage_stats_discovery(&usage, &info->count, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get discovery usage statistics: %s", error);
 		zbx_free(error);

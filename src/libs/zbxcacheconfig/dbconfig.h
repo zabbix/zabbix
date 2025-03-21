@@ -632,12 +632,14 @@ ZBX_DC_EXPRESSION;
 
 typedef struct
 {
+	zbx_uint64_t	alert_usrgrpid;
+
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
 	const char	*instanceid;
 	zbx_uint64_t	discovery_groupid;
 	int		default_inventory_mode;
-	unsigned char	snmptrap_logging;
-	unsigned char	autoreg_tls_accept;
+	int		snmptrap_logging;
+	int		autoreg_tls_accept;
 	const char	*default_timezone;
 	int		auditlog_enabled;
 	int		auditlog_mode;
@@ -1066,6 +1068,7 @@ typedef struct
 								/* until it is parsed/converted to integer    */
 								/* value during next configuration sync	      */
 	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
+	zbx_uint32_t		sync_status;
 }
 zbx_dc_config_t;
 

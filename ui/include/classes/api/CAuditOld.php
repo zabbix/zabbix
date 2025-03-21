@@ -130,7 +130,7 @@ class CAuditOld {
 	 * @param array  $objects_old
 	 */
 	public static function addBulk(string $userid, string $ip, string $username, int $action, int $resourcetype,
-			array $objects, array $objects_old = null) {
+			array $objects, ?array $objects_old = null) {
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
 			return;
 		}

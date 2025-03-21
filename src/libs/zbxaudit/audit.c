@@ -308,6 +308,7 @@ void	zbx_audit_prepare(int audit_context_mode)
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, audit_context_mode);
+	zbx_config_clean(&cfg);
 }
 
 static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
@@ -777,6 +778,8 @@ int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const c
 	zbx_db_insert_clean(&db_insert);
 	zbx_json_free(&details_json);
 out:
+	zbx_config_clean(&cfg);
+
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

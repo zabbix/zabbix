@@ -26,6 +26,9 @@ type Session struct {
 
 	// Password to send to a protected Redis server.
 	Password string `conf:"optional"`
+
+	// User to send to a protected Redis server.
+	User string `conf:"optional"`
 }
 
 type PluginOptions struct {

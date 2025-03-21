@@ -27,7 +27,7 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	 * A numeric box widget field.
 	 * Supported signed decimal values with suffix (KMGTsmhdw).
 	 */
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this

@@ -264,9 +264,10 @@
 				jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
 					position: {
 						of: e.target,
-						my: 'left top',
-						at: 'left bottom',
-						within: '.wrapper'
+						my: 'right top',
+						at: 'right bottom',
+						within: '.wrapper',
+						collision: 'fit flip'
 					}
 				});
 			},

@@ -1231,7 +1231,12 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 	int		ret = FAIL;
 
 	if (NULL == data)
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Received empty response.");
+
 		goto out;
+	}
 
 	xmlSetStructuredErrorFunc(NULL, &libxml_handle_error_try_read_value);
 

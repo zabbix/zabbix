@@ -146,7 +146,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::SPACE_DEFAULT)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than '))
+				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than'))
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('merge_percent', null,

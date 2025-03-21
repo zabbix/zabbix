@@ -178,4 +178,43 @@ in:
 out:
   expression: '{?concat(last(/host/key[\]),"\\\\","\\")}'
   return: SUCCEED
+---
+test case: Expand '{?{$MACRO:"{#A}"}}' with {#A}=c:\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c:\\"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  expression: '{?{$MACRO:c:\}}'
+  return: SUCCEED
+---
+test case: 'Expand ''{?{$MACRO:"{#A}"}}'' with {#A}=c:'
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c:"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  expression: '{?{$MACRO:"c:"}}'
+  return: SUCCEED
+---
+test case: Expand '{?{$MACRO:"{#A}"}}' with {#A}=c}:\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c}:\\"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  return: FAIL
+---
+test case: Expand '{?{$MACRO:"{#A}"}}' with {#A}=c:\\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c:\\\\"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  expression: '{?{$MACRO:c:\\}}'
+  return: SUCCEED
 ...

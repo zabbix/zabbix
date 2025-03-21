@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource LoginUsers
@@ -111,7 +111,7 @@ class testFormLogin extends CWebTest {
 	 * @dataProvider getLoginLogoutData
 	 **/
 	public function testFormLogin_LoginLogout($data) {
-		$this->page->userLogin($data['login'], $data['password']);
+		$this->page->userLogin($data['login'], $data['password'], $data['expected']);
 
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals($data['error_message'], $this->query('class:red')->waitUntilVisible()->one()->getText());
@@ -139,7 +139,7 @@ class testFormLogin extends CWebTest {
 
 		$this->page->open('index.php');
 		for ($i = 1; $i < 5; $i++) {
-			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
+			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:', TEST_BAD);
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 					->waitUntilVisible()->one()->getText()
 			);
@@ -148,7 +148,7 @@ class testFormLogin extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE username=".zbx_dbstr($user)." AND attempt_ip<>''"));
 		}
 
-		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
+		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:', TEST_BAD);
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 				->waitUntilVisible()->one()->getText()
 		);
@@ -168,7 +168,7 @@ class testFormLogin extends CWebTest {
 	 **/
 	public function testFormLogin_LoginWithRequest() {
 		foreach (['index.php?request=zabbix.php%3Faction%3Dhost.list', 'index.php?request=zabbix.php%3Faction%3Dproxy.list'] as $url) {
-			$this->page->userLogin('Admin', 'zabbix', $url);
+			$this->page->userLogin('Admin', 'zabbix', TEST_GOOD, $url);
 			$header = ($url === 'index.php?request=zabbix.php%3Faction%3Dhost.list') ? 'Hosts' : 'Proxies';
 			$this->page->assertHeader($header);
 		}

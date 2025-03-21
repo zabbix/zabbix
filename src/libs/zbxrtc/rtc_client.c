@@ -22,6 +22,7 @@
 #include "zbxself.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
+#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *
@@ -218,6 +219,30 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 			zbx_json_addstring(j, ZBX_PROTO_TAG_SECTION, param, ZBX_JSON_TYPE_STRING);
 
 			return SUCCEED;
+		}
+	}
+
+	if (0 == strncmp(opt, ZBX_HISTORY_CACHE_CLEAR, ZBX_CONST_STRLEN(ZBX_HISTORY_CACHE_CLEAR)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_HISTORY_CACHE_CLEAR);
+		zbx_uint64_t	itemid;
+
+		if ('=' == *param)
+			param++;
+		else
+			param = NULL;
+
+		if (NULL != param && FAIL != zbx_is_uint64(param, &itemid))
+		{
+			*code = ZBX_RTC_HISTORY_CACHE_CLEAR;
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, itemid);
+
+			return SUCCEED;
+		}
+		else
+		{
+			*error = zbx_dsprintf(NULL, "invalid history cache clear itemid parameter\n");
+			return FAIL;
 		}
 	}
 

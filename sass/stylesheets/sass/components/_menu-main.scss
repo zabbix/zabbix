@@ -41,11 +41,13 @@
 
 	.has-submenu {
 		& > a {
+			padding-right: 34px;
+
 			&::after {
 				@extend %icons-font;
-				position: relative;
-				float: right;
-				top: 4px;
+				position: absolute;
+				top: 17px;
+				right: 13px;
 				font-size: $icon-medium-size * .5;
 				content: $zi-chevron-down-thin;
 				transform: rotate(0deg);
@@ -240,6 +242,7 @@
 			& > a {
 				&::after {
 					transform: rotate(90deg);
+					top: 11px;
 				}
 			}
 

@@ -11,6 +11,7 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
 #include "user_macro.h"
@@ -31,9 +32,9 @@ static void	DCdump_config(void)
 	if (NULL == config->config)
 		goto out;
 
-	zabbix_log(LOG_LEVEL_TRACE, "revision:" ZBX_FS_UI64, config->revision.config_table);
+	zabbix_log(LOG_LEVEL_TRACE, "revision:" ZBX_FS_UI64, config->revision.settings_table);
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
-	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%hhu", config->config->snmptrap_logging);
+	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%d", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
 
 	zabbix_log(LOG_LEVEL_TRACE, "db:");
@@ -42,31 +43,31 @@ static void	DCdump_config(void)
 			config->config->db.history_compression_status);
 	zabbix_log(LOG_LEVEL_TRACE, "  history_compress_older: %d", config->config->db.history_compress_older);
 
-	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept:%hhu", config->config->autoreg_tls_accept);
+	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept:%d", config->config->autoreg_tls_accept);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
 	for (int i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 		zabbix_log(LOG_LEVEL_TRACE, "  %s", config->config->severity_name[i]);
 
 	zabbix_log(LOG_LEVEL_TRACE, "housekeeping:");
-	zabbix_log(LOG_LEVEL_TRACE, "  events, mode:%u period:[trigger:%d internal:%d autoreg:%d discovery:%d]",
+	zabbix_log(LOG_LEVEL_TRACE, "  events, mode:%d period:[trigger:%d internal:%d autoreg:%d discovery:%d]",
 			config->config->hk.events_mode, config->config->hk.events_trigger,
 			config->config->hk.events_internal, config->config->hk.events_autoreg,
 			config->config->hk.events_discovery);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  audit, mode:%u period:%d", config->config->hk.audit_mode,
+	zabbix_log(LOG_LEVEL_TRACE, "  audit, mode:%d period:%d", config->config->hk.audit_mode,
 			config->config->hk.audit);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  it services, mode:%u period:%d", config->config->hk.services_mode,
+	zabbix_log(LOG_LEVEL_TRACE, "  it services, mode:%d period:%d", config->config->hk.services_mode,
 			config->config->hk.services);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  user sessions, mode:%u period:%d", config->config->hk.sessions_mode,
+	zabbix_log(LOG_LEVEL_TRACE, "  user sessions, mode:%d period:%d", config->config->hk.sessions_mode,
 			config->config->hk.sessions);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  history, mode:%u global:%u period:%d", config->config->hk.history_mode,
+	zabbix_log(LOG_LEVEL_TRACE, "  history, mode:%d global:%d period:%d", config->config->hk.history_mode,
 			config->config->hk.history_global, config->config->hk.history);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  trends, mode:%u global:%u period:%d", config->config->hk.trends_mode,
+	zabbix_log(LOG_LEVEL_TRACE, "  trends, mode:%d global:%d period:%d", config->config->hk.trends_mode,
 			config->config->hk.trends_global, config->config->hk.trends);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  default timezone '%s'", config->config->default_timezone);
@@ -1614,14 +1615,13 @@ static void	DCdump_proxy_groups(void)
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "proxy_groupid:" ZBX_FS_UI64 " failover_delay:%d min_online:%d"
+		zabbix_log(LOG_LEVEL_TRACE, "proxy_groupid:" ZBX_FS_UI64 " failover_delay:%s min_online:%s"
 				" revision:" ZBX_FS_UI64,
 				pg->proxy_groupid, pg->failover_delay, pg->min_online, pg->revision);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
-
 
 static void	DCdump_host_proxy_index(void)
 {

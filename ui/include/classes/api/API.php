@@ -35,7 +35,7 @@ class API {
 	 *
 	 * @param CApiWrapper|null $wrapper
 	 */
-	public static function setWrapper(CApiWrapper $wrapper = null) {
+	public static function setWrapper(?CApiWrapper $wrapper = null) {
 		self::$wrapper = $wrapper;
 	}
 

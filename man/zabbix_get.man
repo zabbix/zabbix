@@ -175,11 +175,8 @@ GnuTLS priority string (for TLS 1.2 and up) or OpenSSL cipher string (only for T
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
 Output version information and exit.
-.SH EXIT CODE
-If an item key is unsupported,
-.B zabbix_get
-will return the exit code
-.B 1.
+.SH EXIT STATUS
+The exit status is 0 if zabbix_get successfully retrieves a value from the Zabbix agent. If value retrieval failed, the exit status is 1.
 .SH "EXAMPLES"
 \fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]"\fR
 .br

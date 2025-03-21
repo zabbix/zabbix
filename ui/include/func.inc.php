@@ -135,7 +135,7 @@ function getDayOfWeekCaption($num) {
  *
  * @return string
  */
-function zbx_date2str($format, $time = null, string $timezone = null) {
+function zbx_date2str($format, $time = null, ?string $timezone = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
 	if ($time === null) {
@@ -1664,7 +1664,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  *
  * @return CTag
  */
-function makeMessageBox(string $class, array $messages, string $title = null, bool $show_close_box = true,
+function makeMessageBox(string $class, array $messages, ?string $title = null, bool $show_close_box = true,
 		bool $show_details = false): CTag {
 
 	$aria_labels = [
@@ -1765,7 +1765,7 @@ function filter_messages(): array {
  *
  * @return CTag|null
  */
-function getMessages(bool $good = false, string $title = null, bool $show_close_box = true): ?CTag {
+function getMessages(bool $good = false, ?string $title = null, bool $show_close_box = true): ?CTag {
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)

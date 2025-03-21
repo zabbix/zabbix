@@ -14,6 +14,7 @@
 
 #include "async_tcpsvc.h"
 
+#include "zbxasyncpoller.h"
 #include "zbxpoller.h"
 #include "zbxtimekeeper.h"
 #include "zbxcomms.h"
@@ -72,8 +73,8 @@ static int	tcpsvc_send_context_init(const unsigned char svc_type, unsigned char 
 	return SUCCEED;
 }
 
-static int	tcpsvc_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	tcpsvc_task_process(short event, void *data, int *fd, zbx_vector_address_t *addresses,
+		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
 #	define	SET_RESULT_SUCCEED								\
 		SET_UI64_RESULT(&tcpsvc_context->item.result, 1);				\
@@ -107,13 +108,14 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
-				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid, addr);
+				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid,
+				0 != addresses->values_num ? addresses->values[0].ip : "");
 
 
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == tcpsvc_context->rdns_step)
 	{
-		if (NULL != addr)
-			tcpsvc_context->reverse_dns = zbx_strdup(NULL, addr);
+		if (NULL != reverse_dns)
+			tcpsvc_context->reverse_dns = zbx_strdup(NULL, reverse_dns);
 
 		goto stop;
 	}
@@ -133,8 +135,8 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 					tcpsvc_context->item.itemid);
 
 			if (SUCCEED != zbx_socket_connect(&tcpsvc_context->s, SOCK_STREAM,
-					tcpsvc_context->config_source_ip, addr, tcpsvc_context->item.interface.port,
-					tcpsvc_context->config_timeout))
+					tcpsvc_context->config_source_ip, addresses->values[0].ip,
+					tcpsvc_context->item.interface.port, tcpsvc_context->config_timeout))
 			{
 				tcpsvc_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
@@ -296,8 +298,8 @@ static int	async_check_service_validate(zbx_tcpsvc_context_t *context, const cha
 }
 
 int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
-		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
-		struct evdns_base *dnsbase, const char *config_source_ip,
+		zbx_async_task_process_result_cb_t async_task_process_result_cb, void *arg, void *arg_action,
+		struct event_base *base, struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	int			ret;
@@ -350,8 +352,8 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	if (SUCCEED == (ret = tcpsvc_send_context_init(tcpsvc_context->svc_type, ZBX_TCP_PROTOCOL,
 			&tcpsvc_context->tcp_send_context, result)))
 	{
-		zbx_async_poller_add_task(base, dnsbase, tcpsvc_context->item.interface.addr, tcpsvc_context,
-				item->timeout + 1, tcpsvc_task_process, clear_cb);
+		zbx_async_poller_add_task(base, NULL, dnsbase, tcpsvc_context->item.interface.addr, tcpsvc_context,
+				item->timeout + 1, tcpsvc_task_process, async_task_process_result_cb);
 	}
 	else
 		zbx_async_check_tcpsvc_free(tcpsvc_context);

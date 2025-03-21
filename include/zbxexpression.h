@@ -36,9 +36,6 @@
 #define ZBX_MACRO_TYPE_LLD_FILTER		0x00002000
 #define ZBX_MACRO_TYPE_JMX_ENDPOINT		0x00008000
 #define ZBX_MACRO_TYPE_MESSAGE_UPDATE		0x00010000
-#define ZBX_MACRO_TYPE_HTTP_RAW			0x00020000
-#define ZBX_MACRO_TYPE_HTTP_JSON		0x00040000
-#define ZBX_MACRO_TYPE_HTTP_XML			0x00080000
 #define ZBX_MACRO_TYPE_ALLOWED_HOSTS		0x00100000
 #define ZBX_MACRO_TYPE_EVENT_NAME		0x00400000	/* event name in trigger configuration */
 #define ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x00800000
@@ -161,10 +158,6 @@ int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *
 		size_t maxerrlen);
 int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item, int macro_type,
 		char *error, size_t maxerrlen);
-int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, zbx_macro_resolver_f macro_resolver_cb,
-		const void *resolver_data, char *error, int maxerrlen);
-int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, char *error, int maxerrlen);
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);

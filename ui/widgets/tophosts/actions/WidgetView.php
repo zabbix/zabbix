@@ -85,7 +85,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		$hosts = API::Host()->get([
-			'output' => ['name', 'maintenance_status', 'maintenanceid'],
+			'output' => ['name', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
 			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
@@ -100,15 +100,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$db_maintenances = $maintenanceids && $maintenance_status === null
 			? API::Maintenance()->get([
-				'output' => ['name', 'maintenance_type', 'description'],
+				'output' => ['name', 'description'],
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => true
 			])
 			: [];
-
-		$db_maintenances = CArrayHelper::renameObjectsKeys($db_maintenances,
-			['name' => 'maintenance_name', 'description' => 'maintenance_description']
-		);
 
 		$has_text_column = false;
 		$show_thumbnail = false;
@@ -403,7 +399,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 						];
 
 						if ($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-							$data = array_merge($data, $db_maintenances[$hosts[$hostid]['maintenanceid']]);
+							$data['maintenance_type'] = $hosts[$hostid]['maintenance_type'];
+
+							if (array_key_exists($hosts[$hostid]['maintenanceid'], $db_maintenances)) {
+								$maintenance = $db_maintenances[$hosts[$hostid]['maintenanceid']];
+
+								$data['maintenance_name'] = $maintenance['name'];
+								$data['maintenance_description'] = $maintenance['description'];
+							}
+							else {
+								$data['maintenance_name'] = _('Inaccessible maintenance');
+								$data['maintenance_description'] = '';
+							}
 						}
 
 						$row[] = $data;

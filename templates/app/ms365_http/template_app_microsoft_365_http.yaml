@@ -737,7 +737,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Accumulated data from the Microsoft Graph API "reports" endpoints.
             More information:
@@ -1257,7 +1256,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Accumulated data from the Microsoft Graph API "reports" endpoints.
             More information:
@@ -1861,7 +1859,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Accumulated data from the Microsoft Graph API "reports" endpoints.
             More information:
@@ -2393,7 +2390,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: |
             The list of Microsoft cloud services and their health statuses subscribed by a tenant.
             More information:
@@ -2841,7 +2837,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Accumulated data from the Microsoft Graph API "reports" endpoints.
             More information:
@@ -4340,7 +4335,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Accumulated data from the Microsoft Graph API "reports" endpoints.
             More information:

@@ -32,7 +32,7 @@ class CWidgetFieldSparkline extends CWidgetField {
 
 	protected array $fields = [];
 
-	public function __construct(string $name, string $label = null, array $options = []) {
+	public function __construct(string $name, ?string $label = null, array $options = []) {
 		parent::__construct($name, $label);
 
 		$options = array_replace_recursive([

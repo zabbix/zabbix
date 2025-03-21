@@ -96,19 +96,19 @@ class testAutoregistration extends CAPITest {
 		return [
 			'Cannot set "tls_accept" to HOST_ENCRYPTION_PSK without tls_psk_identity' => [
 				'data' => ['tls_accept' => HOST_ENCRYPTION_PSK],
-				'expected_error' => 'Invalid parameter "/": the parameter "tls_psk_identity" is missing.'
+				'expected_error' => 'Invalid parameter "/tls_psk_identity": cannot be empty.'
 			],
 			'Cannot set "tls_accept" to HOST_ENCRYPTION_PSK without tls_psk' => [
 				'data' => ['tls_accept' => HOST_ENCRYPTION_PSK, 'tls_psk_identity' => 'uniquestring'],
-				'expected_error' => 'Invalid parameter "/": the parameter "tls_psk" is missing.'
+				'expected_error' => 'Invalid parameter "/tls_psk": cannot be empty.'
 			],
 			'Cannot update "tls_psk_identity" with HOST_ENCRYPTION_NONE' => [
 				'data' => ['tls_psk_identity' => 'uniquestring'],
-				'expected_error' => 'Invalid parameter "/tls_psk_identity": should be empty.'
+				'expected_error' => 'Invalid parameter "/tls_psk_identity": value must be empty.'
 			],
 			'Cannot update "tls_psk" with HOST_ENCRYPTION_NONE' => [
 				'data' => ['tls_psk' => 'aeb34298c6616d479d9a7c0c44e7143b'],
-				'expected_error' => 'Invalid parameter "/tls_psk": should be empty.'
+				'expected_error' => 'Invalid parameter "/tls_psk": value must be empty.'
 			]
 		];
 	}

@@ -193,22 +193,16 @@ foreach ($data['scripts'] as $script) {
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))
-			->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
 		$scope,
 		(new CCol($action_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
-		(new CCol($actions))->addClass(ZBX_STYLE_WORDBREAK),
+		$actions,
 		$type,
 		$execute_on,
-		(new CCol(zbx_nl2br($script['command'])))
-			->addClass(ZBX_STYLE_MONOSPACE_FONT)
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-		(new CCol($script['userGroupName'] === null ? _('All') : $script['userGroupName']))
-			->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($script['hostGroupName'] === null ? _('All') : $script['hostGroupName']))
-			->addClass(ZBX_STYLE_WORDBREAK),
-		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
+		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+		$script['userGroupName'] === null ? _('All') : $script['userGroupName'],
+		$script['hostGroupName'] === null ? _('All') : $script['hostGroupName'],
+		$script['host_access'] == PERM_READ_WRITE ? _('Write') : _('Read')
 	]);
 }
 

@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -23,6 +23,9 @@ use Facebook\WebDriver\WebDriverBy;
  * @onBefore prepareHTTPItemData
  *
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormItemHttpAgent extends CLegacyWebTest {
 

@@ -233,7 +233,7 @@ static unsigned char	get_host_monitored_by(zbx_uint64_t src_proxyid, zbx_uint64_
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, zbx_config_t *cfg)
+static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, const zbx_config_t *cfg)
 {
 	zbx_db_result_t		result, result2;
 	zbx_db_row_t		row, row2;
@@ -694,6 +694,18 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
+				if (HOST_MONITORED_BY_PROXY_GROUP == new_monitored_by)
+				{
+					/* if host was monitored by the same proxy, then it should be left  */
+					/* monitored by this proxy instead of assigning it to a proxy group */
+					if (proxyid == host_proxyid && HOST_MONITORED_BY_PROXY == monitored_by)
+					{
+						new_monitored_by = HOST_MONITORED_BY_PROXY;
+						new_proxyid = proxyid;
+						new_proxy_groupid = 0;
+					}
+				}
+
 				if (host_proxyid != new_proxyid || proxy_groupid != new_proxy_groupid ||
 						monitored_by != new_monitored_by)
 				{
@@ -754,7 +766,6 @@ out:
 		zbx_db_free_result(result);
 	}
 clean:
-	zbx_config_clean(cfg);
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_free(hostname);
 
@@ -961,7 +972,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
  *             cfg   - [IN] global configuration data                         *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const zbx_db_event *event, zbx_config_t *cfg)
+void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg)
 {
 	int	status;
 
@@ -1271,7 +1282,7 @@ out:
  *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
+void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error = NULL;

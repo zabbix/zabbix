@@ -111,9 +111,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_ACTION => 'actions',
-		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
@@ -121,7 +119,6 @@ class CAudit {
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
-		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_ITEM => 'items',
@@ -138,7 +135,6 @@ class CAudit {
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'scripts',
-		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
@@ -155,7 +151,6 @@ class CAudit {
 	 * @var array
 	 */
 	private const ID_FIELD_NAMES = [
-		self::RESOURCE_PROXY => 'proxyid',
 		self::RESOURCE_TEMPLATE => 'templateid'
 	];
 
@@ -167,9 +162,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_ACTION => 'name',
-		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
-		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
@@ -177,7 +170,6 @@ class CAudit {
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
-		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_ITEM => 'name',
@@ -194,7 +186,6 @@ class CAudit {
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SCRIPT => 'name',
-		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_SLA => 'name',
 		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
@@ -644,18 +635,41 @@ class CAudit {
 				break;
 
 			default:
-				$table_key = array_key_exists($resource, self::ID_FIELD_NAMES)
-					? self::ID_FIELD_NAMES[$resource]
-					: DB::getPk(self::TABLE_NAMES[$resource]);
+				if (array_key_exists($resource, self::ID_FIELD_NAMES)) {
+					$pk = self::ID_FIELD_NAMES[$resource];
+				}
+				elseif (array_key_exists($resource, self::TABLE_NAMES)) {
+					$pk = DB::getPk(self::TABLE_NAMES[$resource]);
+				}
+				else {
+					$diff = self::handleObjectDiff($resource, $action, reset($objects), reset($db_objects));
+
+					if (!$diff) {
+						return;
+					}
+
+					$auditlog[] = [
+						'userid' => $userid,
+						'username' => $username,
+						'clock' => $clock,
+						'ip' => $ip,
+						'action' => $action,
+						'resourcetype' => $resource,
+						'resourceid' => null,
+						'resourcename' => '',
+						'recordsetid' => $recordsetid,
+						'details' => json_encode($diff)
+					];
+
+					break;
+				}
 
 				foreach ($objects as $object) {
-					$resourceid = $object[$table_key];
-					$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
-					$resource_name = self::getResourceName($resource, $action, $object, $db_object);
-
+					$resourceid = $object[$pk];
+					$db_object = $action == self::ACTION_UPDATE ? $db_objects[$resourceid] : [];
 					$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
 
-					if ($action == self::ACTION_UPDATE && count($diff) === 0) {
+					if ($action == self::ACTION_UPDATE && !$diff) {
 						continue;
 					}
 
@@ -667,9 +681,9 @@ class CAudit {
 						'action' => $action,
 						'resourcetype' => $resource,
 						'resourceid' => $resourceid,
-						'resourcename' => $resource_name,
+						'resourcename' => self::getResourceName($resource, $action, $object, $db_object),
 						'recordsetid' => $recordsetid,
-						'details' => (count($diff) == 0) ? '' : json_encode($diff)
+						'details' => $diff ? json_encode($diff) : ''
 					];
 				}
 		}

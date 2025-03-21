@@ -549,26 +549,26 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate filter function.                                         *
+ * Purpose: evaluate filter function                                          *
  *                                                                            *
  * Parameters: name     - [IN] function name (not zero terminated)            *
  *             len      - [IN] function name length                           *
  *             args_num - [IN] number of function arguments                   *
- *             args     - [IN] an array of function arguments                 *
+ *             args     - [IN] array of function arguments                    *
  *             data     - [IN] caller data used for function evaluation       *
  *             ts       - [IN] function execution time                        *
  *             value    - [OUT] function return value                         *
  *             error    - [OUT]                                               *
  *                                                                            *
- * Return value: SUCCEED - the function was evaluated successfully            *
+ * Return value: SUCCEED - function was evaluated successfully                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: the group/tag comparisons in filter are converted to function    *
+ * Comments: group/tag comparisons in filter are converted to function        *
  *           calls that are evaluated by this callback.                       *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_filter(const char *name, size_t len, int args_num, zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+static int	eval_function_filter(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	zbx_expression_eval_many_t	*many = (zbx_expression_eval_many_t *)data;
 
@@ -687,7 +687,7 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 			eval_data.itemid = itemhosts.values[i].first;
 			eval_data.hostid = itemhosts.values[i].second;
 
-			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, expression_eval_filter, NULL,
+			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, eval_function_filter, NULL,
 					(void *)&eval_data, &filter_value, &errmsg))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "failed to evaluate item query filter: %s", errmsg);
@@ -1834,7 +1834,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate historical function.                                     *
+ * Purpose: evaluate historical function                                      *
  *                                                                            *
  * Parameters: name     - [IN] function name (not zero terminated)            *
  *             len      - [IN] function name length                           *
@@ -1849,8 +1849,8 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_history(const char *name, size_t len, int args_num, zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+static int	eval_function_history(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	int			ret = FAIL;
 	zbx_expression_eval_t	*eval;
@@ -1930,8 +1930,8 @@ out:
  *           it's used to check for /host/key query quoting errors instead.   *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_common(const char *name, size_t len, int args_num, zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+static int	eval_function_common(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(ts);
@@ -2279,8 +2279,8 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 
 	zbx_variant_set_none(value);
 
-	ret = zbx_eval_execute_ext(eval->ctx, ts, expression_eval_common, expression_eval_history, (void *)eval, value,
-			error);
+	ret = zbx_eval_execute_ext(eval->ctx, ts, eval_function_common, eval_function_history,
+			(void *)eval, value, error);
 
 	zbx_vc_flush_stats();
 
