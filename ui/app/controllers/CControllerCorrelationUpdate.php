@@ -21,7 +21,7 @@ class CControllerCorrelationUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		$api_uniq = [
 			['correlation.get', ['name' => '{name}'], 'correlationid']
 		];

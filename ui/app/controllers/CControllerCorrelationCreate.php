@@ -21,7 +21,7 @@ class CControllerCorrelationCreate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		$api_uniq = [
 			['correlation.get', ['name' => '{name}']]
 		];
@@ -60,7 +60,7 @@ class CControllerCorrelationCreate extends CController {
 		]];
 	}
 
-	static function getValidationRulesForConditionPopup() {
+	public static function getValidationRulesForConditionPopup() {
 		$rules = self::getValidationRules();
 
 		$rules['fields']['conditions']['fields']['groupid'] = ['array', 'field' => [
