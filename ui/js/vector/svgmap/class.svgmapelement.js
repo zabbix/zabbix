@@ -38,6 +38,9 @@ class SVGMapElement {
 	static LABEL_POSITION_RIGHT = MAP_LABEL_LOC_RIGHT;
 	static LABEL_POSITION_TOP = MAP_LABEL_LOC_TOP;
 
+	static SHOW_LABEL_AUTO_HIDE = MAP_SHOW_LABEL_AUTO_HIDE;
+	static SHOW_LABEL_DEFAULT = MAP_SHOW_LABEL_DEFAULT;
+
 	// Predefined element types and subtypes.
 	static TYPE_HOST = SYSMAP_ELEMENT_TYPE_HOST;
 	static TYPE_MAP = SYSMAP_ELEMENT_TYPE_MAP;
@@ -255,10 +258,27 @@ class SVGMapElement {
 				this.removeItem('image');
 				this.image = image;
 
-				if (this.map.can_select_element && (this.options.elementtype == this.constructor.TYPE_HOST
-						|| this.options.elementtype == this.constructor.TYPE_HOST_GROUP)) {
-					this.image.element.addEventListener('mouseover', (e) => this.#onMouseOver(e));
-					this.image.element.addEventListener('mouseout', (e) => this.#onMouseOut(e));
+				// if (this.map.can_select_element && (this.options.elementtype == this.constructor.TYPE_HOST
+				// 		|| this.options.elementtype == this.constructor.TYPE_HOST_GROUP)) {
+				// 	this.image.element.addEventListener('mouseover', (e) => this.#onMouseOver(e));
+				// 	this.image.element.addEventListener('mouseout', (e) => this.#onMouseOut(e));
+				// 	this.image.element.addEventListener('click', () => this.#onClick());
+				// }
+				const is_selectable = this.map.can_select_element
+						&& (this.options.elementtype == this.constructor.TYPE_HOST
+							|| this.options.elementtype == this.constructor.TYPE_HOST_GROUP),
+					label_auto_hide = this.options.show_label == this.constructor.SHOW_LABEL_AUTO_HIDE;
+
+				if (is_selectable || label_auto_hide) {
+					this.image.element.addEventListener('mouseover', (e) => this.#onMouseOver(e, is_selectable,
+						label_auto_hide
+					));
+					this.image.element.addEventListener('mouseout', (e) => this.#onMouseOut(e, is_selectable,
+						label_auto_hide
+					));
+				}
+
+				if (is_selectable) {
 					this.image.element.addEventListener('click', () => this.#onClick());
 				}
 			}
@@ -316,7 +336,8 @@ class SVGMapElement {
 				background: {
 					fill: `#${this.map.options.theme.backgroundcolor}`,
 					opacity: 0.7
-				}
+				},
+				'data-parent': `selement_${this.options.selementid}`
 			}, this.options.label);
 
 			if (this.label !== null) {
@@ -324,6 +345,10 @@ class SVGMapElement {
 			}
 			else {
 				this.label = element;
+			}
+
+			if (this.options.show_label == this.constructor.SHOW_LABEL_AUTO_HIDE) {
+				this.#toggleLabel(false);
 			}
 		}
 		else {
@@ -344,7 +369,7 @@ class SVGMapElement {
 		}
 
 		// Data type normalization.
-		['x', 'y', 'width', 'height', 'label_location'].forEach((name) => {
+		['x', 'y', 'width', 'height', 'label_location', 'show_label'].forEach((name) => {
 			if (options[name] !== undefined) {
 				options[name] = parseInt(options[name]);
 			}
@@ -353,6 +378,10 @@ class SVGMapElement {
 		// Inherit label location from map options.
 		if (options.label_location == this.constructor.LABEL_POSITION_DEFAULT) {
 			options.label_location = parseInt(this.map.options.label_location);
+		}
+
+		if (options.show_label == this.constructor.SHOW_LABEL_DEFAULT) {
+			options.show_label = parseInt(this.map.options.show_element_label);
 		}
 
 		if (options.width !== undefined && options.height !== undefined) {
@@ -396,24 +425,36 @@ class SVGMapElement {
 
 	/**
 	 * Element mouse over event.
+	 *
+	 * @param {Event}   e                Mouse over event.
+	 * @param {boolean} is_selectable    True if element is selectable.
+	 * @param {boolean} label_auto_hide  True if label should be toggled.
 	 */
-	#onMouseOver(e) {
-		if (e.target.classList.contains('selected')) {
-			return;
+	#onMouseOver(e, is_selectable, label_auto_hide) {
+		if (is_selectable && !e.target.classList.contains('selected')) {
+			this.selection.element.classList.remove('display-none');
 		}
 
-		this.selection.element.classList.remove('display-none');
+		if (label_auto_hide) {
+			this.#toggleLabel(true);
+		}
 	}
 
 	/**
 	 * Element mouse out event.
+	 *
+	 * @param {Event}   e                Mouse out event.
+	 * @param {boolean} is_selectable    True if element is selectable.
+	 * @param {boolean} label_auto_hide  True if label should be toggled.
 	 */
-	#onMouseOut(e) {
-		if (e.target.classList.contains('selected')) {
-			return;
+	#onMouseOut(e, is_selectable, label_auto_hide) {
+		if (is_selectable && !e.target.classList.contains('selected')) {
+			this.selection.element.classList.add('display-none');
 		}
 
-		this.selection.element.classList.add('display-none');
+		if (label_auto_hide) {
+			this.#toggleLabel(false);
+		}
 	}
 
 	/**
@@ -431,6 +472,41 @@ class SVGMapElement {
 					: null
 			}
 		}));
+	}
+
+	/**
+	 * Show or hide element label.
+	 *
+	 * @param {boolean} show
+	 */
+	#toggleLabel(show) {
+		if (this.map.container === null) {
+			return;
+		}
+
+		const label = this.map.container.querySelector(`text[data-parent=selement_${this.options.selementid}]`);
+
+		if (label === null) {
+			return;
+		}
+
+		const trigger_label = label.querySelector('tspan[data-type=trigger]');
+
+		if (trigger_label !== null) {
+			const label_parts = label.querySelectorAll('tspan[data-type=label]');
+
+			if (label_parts.length > 0) {
+				label_parts.forEach((label_part, index) => {
+					label_part.style.display = show ? '' : 'none';
+					label_part.setAttribute('dy', show ? (index == 0 ? '0.9em' : '1.2em') : '0');
+				});
+
+				trigger_label.setAttribute('dy', show ? '1.2em' : '0.9em');
+			}
+		}
+		else {
+			label.parentElement.style.display = show ? '' : 'none';
+		}
 	}
 
 	/**

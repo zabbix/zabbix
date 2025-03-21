@@ -27,10 +27,10 @@ class SVGMapLink {
 	}
 
 	// Predefined set of line styles
-	static LINE_STYLE_DEFAULT = MAP_LINK_DRAWTYPE_LINE;
-	static LINE_STYLE_BOLD = MAP_LINK_DRAWTYPE_BOLD_LINE;
-	static LINE_STYLE_DOTTED = MAP_LINK_DRAWTYPE_DOT;
-	static LINE_STYLE_DASHED = MAP_LINK_DRAWTYPE_DASHED_LINE;
+	static LINE_STYLE_DEFAULT = DRAWTYPE_LINE;
+	static LINE_STYLE_BOLD = DRAWTYPE_BOLD_LINE;
+	static LINE_STYLE_DOTTED = DRAWTYPE_DOT;
+	static LINE_STYLE_DASHED = DRAWTYPE_DASHED_LINE;
 
 	/**
 	 * Update link.
@@ -77,24 +77,31 @@ class SVGMapLink {
 
 		this.options = options;
 
-		const attributes = {
-			stroke: `#${options.color}`,
-			'stroke-width': 1,
-			fill: `#${this.map.options.theme.backgroundcolor}`
-		};
+		const attributes = {};
 
-		switch (options.drawtype) {
-			case this.constructor.LINE_STYLE_BOLD:
-				attributes['stroke-width'] = 2;
-				break;
+		if (options.hover_link) {
+			attributes['stroke'] = 'transparent';
+			attributes['stroke-width'] = 10;
+			attributes['opacity'] = 0;
+		}
+		else {
+			attributes['stroke'] = `#${options.color}`;
+			attributes['stroke-width'] = 1;
+			attributes['fill'] = `#${this.map.options.theme.backgroundcolor}`;
 
-			case this.constructor.LINE_STYLE_DOTTED:
-				attributes['stroke-dasharray'] = '1,2';
-				break;
+			switch (options.drawtype) {
+				case this.constructor.LINE_STYLE_BOLD:
+					attributes['stroke-width'] = 2;
+					break;
 
-			case this.constructor.LINE_STYLE_DASHED:
-				attributes['stroke-dasharray'] = '4,4';
-				break;
+				case this.constructor.LINE_STYLE_DOTTED:
+					attributes['stroke-dasharray'] = '1,2';
+					break;
+
+				case this.constructor.LINE_STYLE_DASHED:
+					attributes['stroke-dasharray'] = '4,4';
+					break;
+			}
 		}
 
 		const element = this.map.layers.elements.add('g', attributes, [
@@ -109,16 +116,44 @@ class SVGMapLink {
 			}
 		]);
 
-		element.add('textarea', {
-				x: options.center.x,
-				y: options.center.y,
-				fill: `#${this.map.options.theme.textcolor}`,
-				'font-size': '10px',
-				'stroke-width': 0,
-				anchor: {horizontal: 'center', vertical: 'middle'},
-				background: {}
-			}, options.label
-		);
+		if (options.hover_link) {
+			let rows = '';
+
+			for (const link of options.links) {
+				const link_row = document.createElement('div');
+
+				link_row.classList.add('map-link-hintbox-row');
+
+				const color_box = document.createElement('div');
+
+				color_box.classList.add('map-link-hintbox-row-color-box');
+				color_box.style.backgroundColor = '#' + link.color;
+				link_row.append(color_box);
+
+				const label_box = document.createElement('div');
+
+				label_box.innerText = link.label;
+				link_row.append(label_box);
+				rows += link_row.outerHTML;
+			}
+
+			element.element.dataset.hintbox = '1';
+			element.element.dataset.hintboxStatic = '1';
+			element.element.dataset.hintboxContents = rows;
+			element.element.style.cursor = 'pointer';
+		}
+		else {
+			element.add('textarea',{
+					x: options.center.x,
+					y: options.center.y,
+					fill: `#${this.map.options.theme.textcolor}`,
+					'font-size': '10px',
+					'stroke-width': 0,
+					anchor: {horizontal: 'center', vertical: 'middle'},
+					background: {}
+				}, options.label
+			);
+		}
 
 		if (this.element !== null) {
 			this.element.replace(element);

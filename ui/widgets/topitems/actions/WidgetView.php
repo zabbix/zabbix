@@ -829,8 +829,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$result = [];
 
 		foreach ($patterns as $pattern) {
+			$pattern = preg_quote($pattern, '/');
 			$result[] = [
-				'regex' => '/^'.strtr($pattern, ['*' => '.*?']).'$/',
+				'regex' => '/^'.strtr($pattern, ['\\*' => '.*?']).'$/',
 				'pattern' => $pattern
 			];
 		}

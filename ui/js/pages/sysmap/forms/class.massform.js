@@ -39,6 +39,13 @@ class MassForm {
 				},
 				{
 					action: 'enable',
+					value: '#mass_show_label [name=show_label]',
+					cond: [{
+						checkbox_show_label: 'checked'
+					}]
+				},
+				{
+					action: 'enable',
 					value: '#massUseIconmap',
 					cond: [{
 						chkboxMassUseIconmap: 'checked'

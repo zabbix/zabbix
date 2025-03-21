@@ -155,6 +155,13 @@ function createFontSelect(string $name): CSelect {
 								MAP_LABEL_LOC_TOP => _('Top')
 							]))
 					)
+					->addRow(_('Show label'),
+						(new CRadioButtonList('show_label', MAP_SHOW_LABEL_DEFAULT))
+							->addValue(_('Default'), MAP_SHOW_LABEL_DEFAULT)
+							->addValue(_('Always'), MAP_SHOW_LABEL_ALWAYS)
+							->addValue(_('Auto hide'), MAP_SHOW_LABEL_AUTO_HIDE)
+							->setModern(true)
+					)
 					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
@@ -687,6 +694,19 @@ function createFontSelect(string $name): CSelect {
 							->setId('massLabelLocation')
 					)
 					->addRow(
+						(new CCheckBox('checkbox-show-label'))
+							->setId('checkbox_show_label')
+							->setLabel(_('Show label')),
+						(new CRadioButtonList('show_label', MAP_SHOW_LABEL_DEFAULT))
+							->addValue(_('Default'), MAP_SHOW_LABEL_DEFAULT, 'mass_show_label_'.MAP_SHOW_LABEL_DEFAULT)
+							->addValue(_('Always'), MAP_SHOW_LABEL_ALWAYS, 'mass_show_label_'.MAP_SHOW_LABEL_ALWAYS)
+							->addValue(_('Auto hide'), MAP_SHOW_LABEL_AUTO_HIDE,
+								'mass_show_label_'.MAP_SHOW_LABEL_AUTO_HIDE
+							)
+							->setModern(true)
+							->setId('mass_show_label')
+					)
+					->addRow(
 						(new CCheckBox('chkbox_use_iconmap'))
 							->setId('chkboxMassUseIconmap')
 							->setLabel(_('Automatic icon selection'))
@@ -791,6 +811,16 @@ function createFontSelect(string $name): CSelect {
 							->setMaxlength(DB::getFieldLength('sysmaps_links', 'label'))
 							->disableSpellcheck()
 					)
+					->addRow(_('Show label'),
+						(new CRadioButtonList('show_label', MAP_SHOW_LABEL_DEFAULT))
+							->setId('show_link_label')
+							->addValue(_('Default'), MAP_SHOW_LABEL_DEFAULT, 'show_link_label_'.MAP_SHOW_LABEL_DEFAULT)
+							->addValue(_('Always'), MAP_SHOW_LABEL_ALWAYS, 'show_link_label_'.MAP_SHOW_LABEL_ALWAYS)
+							->addValue(_('Auto hide'), MAP_SHOW_LABEL_AUTO_HIDE,
+								'show_link_label_'.MAP_SHOW_LABEL_AUTO_HIDE
+							)
+							->setModern(true)
+					)
 					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))
 							->setFocusableElementId('label-selementid2')
 							->setId('selementid2'),
@@ -800,19 +830,48 @@ function createFontSelect(string $name): CSelect {
 						(new CSelect('drawtype'))
 							->setFocusableElementId('label-drawtype')
 							->addOptions(CSelect::createOptionsFromArray([
-								GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-								GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-								GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-								GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+								DRAWTYPE_LINE => _('Line'),
+								DRAWTYPE_BOLD_LINE => _('Bold line'),
+								DRAWTYPE_DOT => _('Dot'),
+								DRAWTYPE_DASHED_LINE => _('Dashed line')
 							]))
 					)
 					->addRow(_('Color (OK)'),
 						(new CColor('color', '#{color}'))->appendColorPickerJs(false)
 					)
-					->addRow(_('Link indicators'),
+					->addRow(_('Indicator type'),
+						(new CRadioButtonList('indicator_type', MAP_INDICATOR_TYPE_TRIGGER))
+							->addValue(_('Static link'), MAP_INDICATOR_TYPE_STATIC_LINK)
+							->addValue(_('Trigger'), MAP_INDICATOR_TYPE_TRIGGER)
+							->addValue(_('Item value'), MAP_INDICATOR_TYPE_ITEM_VALUE)
+							->setModern(true),
+						'indicator-type-field'
+					)
+					->addRow(
+						(new CLabel(_('Item'), 'itemid_ms'))->setAsteriskMark(),
+						[
+							(new CMultiSelect([
+								'name' => 'itemid',
+								'object_name' => 'items',
+								'multiple' => false,
+								'popup' => [
+									'parameters' => [
+										'srctbl' => 'items',
+										'srcfld1' => 'itemid',
+										'dstfrm' => 'linkForm',
+										'dstfld1' => 'itemid',
+										'editable' => 1,
+										'real_hosts' => true
+									]
+								]
+							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						],
+						'item-value-field'
+					)
+					->addRow((new CLabel(_('Indicators')))->setAsteriskMark(),
 						(new CDiv([
 							(new CTable())
-								->setHeader([_('Trigger'), _('Type'), _('Color'), ''])
+								->setHeader(['', _('Trigger'), _('Type'), ''])
 								->setAttribute('style', 'width: 100%;')
 								->setId('linkTriggerscontainer'),
 							(new CButtonLink(_('Add')))->onClick(
@@ -827,7 +886,32 @@ function createFontSelect(string $name): CSelect {
 							)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'link-indicators-field'
+					)
+					->addRow((new CLabel(_('Indicators')))->setAsteriskMark(),
+						(new CDiv([
+							(new CTable())
+								->setHeader(['', _('Threshold'), _('Type'), ''])
+								->setAttribute('style', 'width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;')
+								->setId('link-thresholds-container'),
+							(new CButtonLink(_('Add')))->setId('threshold-add')
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'link-thresholds-field'
+					)
+					->addRow((new CLabel(_('Indicators')))->setAsteriskMark(),
+						(new CDiv([
+							(new CTable())
+								->setHeader(['', _('Pattern'), _('Type'), ''])
+								->setAttribute('style', 'width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;')
+								->setId('link-highlights-container'),
+							(new CButtonLink(_('Add')))->setId('highlight-add')
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'link-highlights-field'
 					)
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -851,7 +935,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<?= (new CRow([
-			'#{toElementName}',
+			'#{to_element_name}',
 			(new CCol())->addClass('element-urls'),
 			(new CCol(
 				(new CButtonLink(_('Edit')))
@@ -864,8 +948,8 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
 	<?= (new CRow([
-			'#{fromElementName}',
-			'#{toElementName}',
+			'#{from_element_name}',
+			'#{to_element_name}',
 			(new CCol())->addClass('element-urls'),
 			(new CCol(
 				(new CButtonLink(_('Edit')))
@@ -878,29 +962,79 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="linkTriggerRow">
 	<?= (new CRow([
+			(new CColor('linktrigger_#{index}_color', '#{color}'))->appendColorPickerJs(false),
 			'#{desc_exp}',
 			[
-				new CVar('linktrigger_#{linktriggerid}_desc_exp', '#{desc_exp}'),
-				new CVar('linktrigger_#{linktriggerid}_triggerid', '#{triggerid}'),
-				new CVar('linktrigger_#{linktriggerid}_linktriggerid', '#{linktriggerid}'),
-				(new CSelect('linktrigger_#{linktriggerid}_drawtype'))
-					->setId('linktrigger_#{linktriggerid}_drawtype')
+				new CVar('linktrigger_#{index}_desc_exp', '#{desc_exp}'),
+				new CVar('linktrigger_#{index}_triggerid', '#{triggerid}'),
+				(new CSelect('linktrigger_#{index}_drawtype'))
+					->setId('linktrigger_#{index}_drawtype')
 					->addOptions(CSelect::createOptionsFromArray([
-						GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-						GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-						GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-						GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+						DRAWTYPE_LINE => _('Line'),
+						DRAWTYPE_BOLD_LINE => _('Bold line'),
+						DRAWTYPE_DOT => _('Dot'),
+						DRAWTYPE_DASHED_LINE => _('Dashed line')
 					]))
 			],
-			(new CColor('linktrigger_#{linktriggerid}_color', '#{color}'))->appendColorPickerJs(false),
 			(new CCol(
 				(new CButtonLink(_('Remove')))
 					->addClass('triggerRemove')
-					->setAttribute('data-linktriggerid', '#{linktriggerid}')
+					->setAttribute('data-index', '#{index}')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->setId('linktrigger_#{linktriggerid}')
+			->setId('linktrigger_#{index}')
 			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="threshold-row">
+	<?= (new CRow([
+		(new CColor('threshold_#{index}_color', '#{color}'))->appendColorPickerJs(false),
+		(new CTextBox('threshold_#{index}_threshold', '#{threshold}', false))
+			->addClass('js-threshold-input')
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
+		(new CSelect('threshold_#{index}_drawtype'))
+			->setId('threshold_#{index}_drawtype')
+			->addOptions(CSelect::createOptionsFromArray([
+				DRAWTYPE_LINE => _('Line'),
+				DRAWTYPE_BOLD_LINE => _('Bold line'),
+				DRAWTYPE_DOT => _('Dot'),
+				DRAWTYPE_DASHED_LINE => _('Dashed line')
+			])),
+		(new CCol(
+			(new CButtonLink(_('Remove')))
+				->addClass('threshold-remove')
+				->setAttribute('data-index', '#{index}')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('threshold_#{index}')
+		->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="highlight-row">
+	<?= (new CRow([
+		(new CColor('highlight_#{index}_color', '#{color}'))->appendColorPickerJs(false),
+		(new CTextBox('highlight_#{index}_pattern', '#{pattern}', false))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
+		(new CSelect('highlight_#{index}_drawtype'))
+			->setId('highlight_#{index}_drawtype')
+			->addOptions(CSelect::createOptionsFromArray([
+				DRAWTYPE_LINE => _('Line'),
+				DRAWTYPE_BOLD_LINE => _('Bold line'),
+				DRAWTYPE_DOT => _('Dot'),
+				DRAWTYPE_DASHED_LINE => _('Dashed line')
+			])),
+		(new CCol(
+			(new CButtonLink(_('Remove')))
+				->addClass('highlight-remove')
+				->setAttribute('data-index', '#{index}')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('highlight_#{index}')
+		->toString()
 	?>
 </script>
 
@@ -939,4 +1073,15 @@ function createFontSelect(string $name): CSelect {
 			->setId('triggerrow_#{triggerid}')
 			->toString()
 	?>
+</script>
+
+<script type="text/javascript">
+	/**
+	 * @see init.js add.popup event
+	 */
+	function addPopupValues(data) {
+		if (data.object === 'linktrigger') {
+			ZABBIX.apps.map.object.linkForm.addNewTriggers(data.values);
+		}
+	}
 </script>

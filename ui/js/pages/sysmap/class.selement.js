@@ -38,6 +38,7 @@ class Selement {
 				iconid_off: this.sysmap.defaultIconId, // first imageid
 				label: t('S_NEW_ELEMENT'),
 				label_location: -1, // set default map label location
+				show_label: SVGMapElement.SHOW_LABEL_DEFAULT,
 				x: 0,
 				y: 0,
 				urls: {},
@@ -222,8 +223,9 @@ class Selement {
 	 */
 	update(data, unset_undefined = false) {
 		const data_fields = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
-				'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-				'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'evaltype', 'tags'
+				'iconid_disabled', 'label', 'label_location', 'show_label', 'x', 'y', 'elementsubtype',
+				'areatype', 'width', 'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'evaltype',
+				'tags'
 			],
 			fields_unsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'];
 

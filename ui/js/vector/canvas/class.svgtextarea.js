@@ -25,6 +25,7 @@ class SVGTextArea {
 	constructor(canvas) {
 		this.canvas = canvas;
 		this.element = null;
+		this.resize_observer = null;
 	}
 
 	/**
@@ -162,7 +163,7 @@ class SVGTextArea {
 	#getHorizontalOffset() {
 		switch (this.anchor.horizontal) {
 			case 'center':
-				return Math.floor(this.width/2);
+				return Math.floor(this.width / 2);
 
 			case 'right':
 				return this.width;
@@ -239,9 +240,6 @@ class SVGTextArea {
 
 					skip = 1.2;
 				});
-			}
-			else {
-				skip += 1.2;
 			}
 		});
 	}
@@ -339,6 +337,11 @@ class SVGTextArea {
 			return null;
 		}
 
+		if (this.resize_observer !== null) {
+			this.resize_observer.unobserve(this.text.element);
+			this.resize_observer = null;
+		}
+
 		if (Array.isArray(content)) {
 			let i;
 
@@ -374,33 +377,47 @@ class SVGTextArea {
 			this.background = null;
 		}
 
+		this.initial_x = this.x;
+		this.initial_y = this.y;
+
 		this.parseContent(content, parse_links);
 		this.text = this.element.add('text', attributes, this.lines);
 
-		const size = this.text.element.getBBox();
+		const onResize = () => {
+			if (this.text.element === null) {
+				return;
+			}
 
-		this.width = Math.ceil(size.width);
-		this.height = Math.ceil(size.height + size.y);
+			this.y = this.initial_y;
 
-		// Workaround for EDGE for proper text height calculation.
-		if (ED && this.lines.length > 0
-				&& attributes['font-size'] !== undefined && parseInt(attributes['font-size']) > 16) {
-			this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+			const size = this.text.element.getBBox();
+
+			this.width = Math.ceil(size.width);
+			this.height = Math.ceil(size.height + size.y);
+
+			this.#alignToAnchor();
+
+			if (this.background !== null) {
+				this.background.update({
+					width: this.width + (this.canvas.textPadding * 2),
+					height: this.height + (this.canvas.textPadding * 2)
+				});
+			}
+
+			this.#createClipping();
+
+			this.text.element.setAttribute('transform', `translate(${this.#getHorizontalOffset()} ${this.offset})`);
+			this.element.element.setAttribute('transform',
+				`translate(${(this.initial_x - this.#getHorizontalOffset())} ${this.y})`
+			);
+		};
+
+		if (this.text !== null && this.text.element !== null && 'data-parent' in this.text.attributes) {
+			this.resize_observer = new ResizeObserver(onResize);
+			this.resize_observer.observe(this.text.element);
 		}
 
-		this.#alignToAnchor();
-
-		if (this.background !== null) {
-			this.background.update({
-				width: this.width + (this.canvas.textPadding * 2),
-				height: this.height + (this.canvas.textPadding * 2)
-			});
-		}
-
-		this.#createClipping();
-
-		this.text.element.setAttribute('transform', `translate(${this.#getHorizontalOffset()} ${this.offset})`);
-		this.element.element.setAttribute('transform', `translate(${this.x} ${this.y})`);
+		onResize();
 
 		return this.element;
 	}

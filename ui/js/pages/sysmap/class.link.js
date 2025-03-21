@@ -32,11 +32,17 @@ class Link {
 		if (!linkData) {
 			linkData = {
 				label: '',
+				show_label: SVGMapElement.SHOW_LABEL_DEFAULT,
 				selementid1: null,
 				selementid2: null,
-				linktriggers: {},
 				drawtype: 0,
-				color: '00CC00'
+				color: '00CC00',
+				indicator_type: Link.INDICATOR_TYPE_STATIC_LINK,
+				linktriggers: {},
+				itemid: null,
+				item: {},
+				thresholds: {},
+				highlights: {}
 			};
 
 			for (const selementid in this.sysmap.selection.selements) {
@@ -49,7 +55,7 @@ class Link {
 			}
 
 			// Generate unique linkid.
-			linkData.linkid =  getUniqueId();
+			linkData.linkid = getUniqueId();
 		}
 		else {
 			if ($.isArray(linkData.linktriggers)) {
@@ -62,13 +68,13 @@ class Link {
 		this.expanded = this.data.expanded;
 		delete this.data.expanded;
 
-		for (const linktrigger in this.data.linktriggers) {
-			this.sysmap.allLinkTriggerIds[linktrigger.triggerid] = true;
-		}
-
 		// Assign by reference.
 		this.sysmap.data.links[this.id] = this.data;
 	}
+
+	static INDICATOR_TYPE_STATIC_LINK = MAP_INDICATOR_TYPE_STATIC_LINK;
+	static INDICATOR_TYPE_TRIGGER = MAP_INDICATOR_TYPE_TRIGGER;
+	static INDICATOR_TYPE_ITEM_VALUE = MAP_INDICATOR_TYPE_ITEM_VALUE;
 
 	/**
 	 * Return label based on map constructor configuration.

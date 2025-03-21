@@ -274,10 +274,20 @@ $translate_strings = [
 		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short')
 	],
 	'class.linkform.js' => [
+		'S_CANNOT_BE_EMPTY' => _('cannot be empty'),
 		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
+		'S_EXPECTING_COLOR_CODE' => _('expecting hexadecimal color code (6 symbols)'),
 		'S_HOST' => _('Host'),
 		'S_HOST_GROUP' => _('Host group'),
 		'S_IMAGE' => _('Image'),
+		'S_INCORRECT_ITEM_VALUE_TYPE' =>  _('incorrect item value type'),
+		'S_INCORRECT_VALUE' => _('Incorrect value for field "%1$s": %2$s.'),
+		'S_INDICATORS' => _('Indicators'),
+		'S_INVALID_PARAMETER' => _('Invalid parameter "%1$s": %2$s.'),
+		'S_ITEM' => _('Item'),
+		'S_LINK_HIGHLIGHT_IS_REQUIRED' => _('at least 1 link highlight is required'),
+		'S_LINK_THRESHOLD_IS_REQUIRED' => _('at least 1 link threshold is required'),
+		'S_LINK_TRIGGER_IS_REQUIRED' => _('at least 1 link trigger is required'),
 		'S_MAP' => _('Map'),
 		'S_TRIGGER' => _('Trigger')
 	],
@@ -312,9 +322,9 @@ $translate_strings = [
 		'S_DELETE_SELECTED_SHAPES_Q' => _('Delete selected shapes?'),
 		'S_HIDDEN' => _('Hidden'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
-		'S_OFF' => _('Off'),
 		'S_NO_IMAGES' =>
 			_('You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.'),
+		'S_OFF' => _('Off'),
 		'S_ON' => _('On'),
 		'S_PASTE' => _('Paste'),
 		'S_PASTE_SIMPLE' => _('Paste without external links'),

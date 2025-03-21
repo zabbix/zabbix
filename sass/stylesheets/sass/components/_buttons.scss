@@ -227,6 +227,20 @@ button {
 	}
 }
 
+.btn-grey-icon {
+	@extend %button;
+	@extend %button-form-colors;
+	@extend %button-disabled;
+
+	&::before {
+		color: $icon-color;
+	}
+
+	&[disabled]::before {
+		color: $btn-icon-disabled-color;
+	}
+}
+
 .btn-link {
 	@extend %button;
 	@extend %button-link-colors;

@@ -22,12 +22,134 @@
 class LinkForm {
 	constructor(formContainer, sysmap) {
 		this.sysmap = sysmap;
-		this.formContainer = formContainer;
 		this.triggerids = {};
+		this.item_type = null;
 		this.domNode = $(new Template(document.getElementById('linkFormTpl').innerHTML).evaluate())
 			.appendTo(formContainer);
 
+		document.getElementById('indicator_type').addEventListener('change', () => {
+			this.#handleIndicatorTypeChange();
+		});
+
+		document.getElementById('link-thresholds-field').addEventListener('change', e => {
+			const input = e.target.closest('.js-threshold-input');
+
+			if (input !== null) {
+				input.value = input.value.trim();
+			}
+		});
+
+		const allowed_item_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG,
+			ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR
+		];
+
+		$('#itemid')
+			.multiSelectHelper({
+				id: 'itemid',
+				object_name: 'items',
+				name: 'itemid',
+				selectedLimit: 1,
+				objectOptions: {
+					filter: {
+						value_type: allowed_item_value_types
+					},
+					real_hosts: true,
+					resolve_macros: true
+				},
+				popup: {
+					parameters: {
+						srctbl: 'items',
+						srcfld1: 'itemid',
+						dstfrm: 'linkForm',
+						dstfld1: 'itemid',
+						value_types: allowed_item_value_types,
+						real_hosts: 1,
+						resolve_macros: 1
+					}
+				}
+			})
+			.on('change', () => this.#onMultiSelectChange());
+
+		document.getElementById('threshold-add').addEventListener('click', () => this.#addNewThreshold());
+		document.getElementById('highlight-add').addEventListener('click', () => this.#addNewHighlight());
+
 		this.domNode.find('.color-picker input').colorpicker();
+		colorPalette.setThemeColors(LinkForm.DEFAULT_COLOR_PALETTE);
+	}
+
+	static DEFAULT_COLOR_PALETTE = [
+		'E65660', 'FCCB1D', '3BC97D', '2ED3B7', '19D0D7', '29C2FA', '58B0FE', '5D98FE', '859AFA', 'E580FA',
+		'F773C7', 'FC5F7E', 'FC738E', 'FF6D2E', 'F48D48', 'F89C3A', 'FBB318', 'FECF62', '87CE40', 'A3E86D'
+	];
+
+	/**
+	 * Fetch type of item by itemid.
+	 *
+	 * @param {string|null} itemid
+	 *
+	 * @returns {Promise<any>}  Resolved promise will contain item type, or null in case of error or if no item is
+	 *                          currently selected.
+	 */
+	static promiseGetItemType(itemid) {
+		if (itemid === null) {
+			return Promise.resolve(null);
+		}
+
+		const url_params = objectToSearchParams({
+			method: 'item_value_type.get',
+			type: PAGE_TYPE_TEXT_RETURN_JSON,
+			itemid
+		});
+
+		const url = new URL(`jsrpc.php?${url_params}`, location.href);
+
+		return fetch(url)
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return parseInt(response.result);
+			})
+			.catch((exception) => {
+				console.log('Could not get item type', exception);
+
+				return null;
+			});
+	}
+
+	/**
+	 * @param {array} threshold_values
+	 *
+	 * @returns {Promise<any>}  Resolved promise will contain object with error or empty object if thresholds are
+	 *                          correct.
+	 */
+	static promiseValidateThresholdValues(threshold_values) {
+		const url_params = objectToSearchParams({
+			method: 'link_thresholds.validate',
+			type: PAGE_TYPE_TEXT_RETURN_JSON,
+			thresholds: threshold_values
+		});
+
+		const url = new URL(`jsrpc.php?${url_params}`, location.href);
+
+		return fetch(url)
+			.then((response) => response.json())
+			.then((response) => {
+				if ('result' in response) {
+					return response.result;
+				}
+
+				throw response;
+			})
+			.catch((exception) => {
+				console.log('Could not validate link thresholds', exception);
+
+				return {
+					error: 'Could not validate link thresholds'
+				};
+			});
 	}
 
 	/**
@@ -43,37 +165,149 @@ class LinkForm {
 	 */
 	hide() {
 		$('#linkForm').hide();
-		document.querySelectorAll('.element-edit-control').forEach((element) =>
-			element.removeAttribute('disabled')
-		);
+		document.querySelectorAll('.element-edit-control').forEach((element) => element.removeAttribute('disabled'));
+		$('#itemid').multiSelect('addData', [], false);
 	}
 
 	/**
 	 * Get form values for link fields.
 	 */
 	getValues() {
-		const data = {linktriggers: {}},
-			link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/;
+		return new Promise((resolve, reject) => {
+			const values = $('#linkForm').serializeArray(),
+				link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|drawtype|color|desc_exp)$/,
+				link_threshold_pattern = /^threshold_(\w+)_(linkid|drawtype|color|threshold)$/,
+				link_highlights_pattern = /^highlight_(\w+)_(linkid|drawtype|color|pattern)$/;
 
-		$('#linkForm').serializeArray().forEach(({name, value}) => {
-			const link_trigger = link_trigger_pattern.exec(name);
+			let data = {
+					indicator_type: Link.INDICATOR_TYPE_STATIC_LINK,
+					linktriggers: {},
+					itemid: null,
+					thresholds: {},
+					highlights: {}
+				},
+				link_trigger,
+				link_threshold,
+				link_highlight;
 
-			value = value.toString();
+			const ms_data = $('#itemid').multiSelect('getData');
 
-			if ((name === 'color' || link_trigger?.[2] === 'color') && !isColorHex(`#${value}`)) {
-				throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), value);
+			if (ms_data.length > 0) {
+				this.sysmap.items[ms_data[0].id] = ms_data[0];
 			}
 
-			if (link_trigger) {
-				data.linktriggers[link_trigger[1]] ??= {};
-				data.linktriggers[link_trigger[1]][link_trigger[2]] = value;
+			for (let i = 0, ln = values.length; i < ln; i++) {
+				link_trigger = link_trigger_pattern.exec(values[i].name);
+				link_threshold = link_threshold_pattern.exec(values[i].name);
+				link_highlight = link_highlights_pattern.exec(values[i].name);
+
+				if (link_highlight !== null) {
+					if (data.highlights[link_highlight[1]] === undefined) {
+						data.highlights[link_highlight[1]] = {};
+					}
+
+					if (link_highlight[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+						throw sprintf(t('S_INCORRECT_VALUE'),
+							`/highlights/${Object.keys(data.highlights).length}/color`,
+							t('S_EXPECTING_COLOR_CODE')
+						);
+					}
+
+					if (link_highlight[2] === 'pattern' && !values[i].value) {
+						throw sprintf(t('S_INCORRECT_VALUE'),
+							`/highlights/${Object.keys(data.highlights).length}/pattern`,
+							t('S_CANNOT_BE_EMPTY')
+						);
+					}
+
+					data.highlights[link_highlight[1]][link_highlight[2]] = values[i].value.toString();
+				}
+				else if (link_threshold !== null) {
+					if (data.thresholds[link_threshold[1]] === undefined) {
+						data.thresholds[link_threshold[1]] = {};
+					}
+
+					if (link_threshold[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+						throw sprintf(t('S_INCORRECT_VALUE'),
+							`/thresholds/${Object.keys(data.thresholds).length}/color`,
+							t('S_EXPECTING_COLOR_CODE')
+						);
+					}
+
+					if (link_threshold[2] === 'threshold') {
+						if (!values[i].value) {
+							throw sprintf(t('S_INCORRECT_VALUE'),
+								`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
+								t('S_CANNOT_BE_EMPTY')
+							);
+						}
+					}
+
+					data.thresholds[link_threshold[1]][link_threshold[2]] = values[i].value.toString();
+				}
+				else if (link_trigger !== null) {
+					if (link_trigger[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+						throw sprintf(t('S_INCORRECT_VALUE'),
+							`/linktriggers/${Object.keys(data.linktriggers).length}/color`,
+							t('S_EXPECTING_COLOR_CODE')
+						);
+					}
+
+					if (data.linktriggers[link_trigger[1]] === undefined) {
+						data.linktriggers[link_trigger[1]] = {};
+					}
+
+					data.linktriggers[link_trigger[1]][link_trigger[2]] = values[i].value.toString();
+				}
+				else {
+					if (values[i].name === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+						throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+					}
+
+					data[values[i].name] = values[i].value.toString();
+				}
 			}
-			else {
-				data[name] = value;
+
+			if (data.indicator_type == Link.INDICATOR_TYPE_TRIGGER) {
+				if (Object.keys(data.linktriggers).length == 0) {
+					throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'), t('S_LINK_TRIGGER_IS_REQUIRED'));
+				}
 			}
+			else if (data.indicator_type == Link.INDICATOR_TYPE_ITEM_VALUE) {
+				if (data.itemid == null) {
+					throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'), t('S_CANNOT_BE_EMPTY'));
+				}
+
+				if (this.item_type == ITEM_VALUE_TYPE_LOG || this.item_type == ITEM_VALUE_TYPE_TEXT
+						|| this.item_type == ITEM_VALUE_TYPE_STR) {
+					if (Object.keys(data.highlights).length === 0) {
+						throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'), t('S_LINK_HIGHLIGHT_IS_REQUIRED'));
+					}
+				}
+				else if (this.item_type == ITEM_VALUE_TYPE_FLOAT || this.item_type == ITEM_VALUE_TYPE_UINT64) {
+					if (Object.keys(data.thresholds).length === 0) {
+						throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'), t('S_LINK_THRESHOLD_IS_REQUIRED'));
+					}
+
+					this.#checkThresholds(data.thresholds)
+						.then(response => {
+							if ('error' in response) {
+								throw response.error;
+							}
+
+							resolve(data);
+						})
+						.catch((e) => reject(e));
+
+					return;
+				}
+				else {
+					throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'), t('S_INCORRECT_ITEM_VALUE_TYPE'));
+				}
+			}
+
+			resolve(data);
 		});
-
-		return data;
 	}
 
 	/**
@@ -146,12 +380,36 @@ class LinkForm {
 		$('#selementid2').replaceWith(connect_to_select);
 
 		// Set values for form elements.
-		Object.keys(link).forEach((name) => $(`[name=${name}]`, this.domNode).val(link[name]));
+		Object.keys(link).forEach((name) => {
+			if (name === 'itemid') {
+				return;
+			}
+
+			$(`[name=${name}]`, this.domNode).val([link[name]]);
+		});
+
+		let item_data = [];
+
+		if ('itemid' in link && link.itemid !== '' && link.itemid in this.sysmap.items) {
+			item_data = [this.sysmap.items[link.itemid]];
+		}
+
+		$('#itemid').multiSelect('addData', item_data, false);
+
+		this.#handleIndicatorTypeChange();
 
 		// Clear triggers.
 		this.triggerids = {};
 		document.querySelectorAll('#linkTriggerscontainer tbody tr').forEach((tr) => tr.remove());
 		this.#addLinkTriggers(link.linktriggers);
+
+		// Clear thresholds.
+		document.querySelectorAll('#link-thresholds-container tbody tr').forEach((tr) => tr.remove());
+		this.#addLinkThresholds(link.thresholds);
+
+		// Clear highlights.
+		document.querySelectorAll('#link-highlights-container tbody tr').forEach((tr) => tr.remove());
+		this.#addLinkHighlights(link.highlights);
 	}
 
 	/**
@@ -163,10 +421,49 @@ class LinkForm {
 		const tpl = new Template(document.getElementById('linkTriggerRow').innerHTML),
 			$table = $('#linkTriggerscontainer tbody');
 
-		Object.values(triggers).forEach((trigger) => {
-			this.triggerids[trigger.triggerid] = true;
+		Object.values(triggers).forEach((trigger, index) => {
+			this.triggerids[trigger.triggerid] = index;
+			trigger.index = index;
 			$(tpl.evaluate(trigger)).appendTo($table);
-			$(`#linktrigger_${trigger.linktriggerid}_drawtype`).val(trigger.drawtype);
+			$(`#linktrigger_${index}_drawtype`).val(trigger.drawtype);
+		});
+
+		$table.find('.color-picker input').colorpicker();
+		$('.color-picker input', this.domNode).change();
+	}
+
+	/**
+	 * Add link thresholds to link form.
+	 *
+	 * @param {object} thresholds
+	 */
+	#addLinkThresholds(thresholds) {
+		const tpl = new Template(document.getElementById('threshold-row').innerHTML),
+			$table = $('#link-thresholds-container tbody');
+
+		Object.values(thresholds).forEach((threshold, index) => {
+			threshold.index = index;
+			$(tpl.evaluate(threshold)).appendTo($table);
+			$(`#threshold_${index}_drawtype`).val(threshold.drawtype);
+		});
+
+		$table.find('.color-picker input').colorpicker();
+		$('.color-picker input', this.domNode).change();
+	}
+
+	/**
+	 * Add link highlights to link form.
+	 *
+	 * @param {object} highlights
+	 */
+	#addLinkHighlights(highlights) {
+		const tpl = new Template(document.getElementById('highlight-row').innerHTML),
+			$table = $('#link-highlights-container tbody');
+
+		Object.values(highlights).forEach((highlight, index) => {
+			highlight.index = index;
+			$(tpl.evaluate(highlight)).appendTo($table);
+			$(`#highlight_${index}_drawtype`).val(highlight.drawtype);
 		});
 
 		$table.find('.color-picker input').colorpicker();
@@ -180,30 +477,80 @@ class LinkForm {
 	 */
 	addNewTriggers(triggers) {
 		const tpl = new Template(document.getElementById('linkTriggerRow').innerHTML),
-			linkTrigger = {color: 'DD0000'},
 			$table = $('#linkTriggerscontainer tbody');
 
-		for (let i = 0, ln = triggers.length; i < ln; i++) {
-			if (this.triggerids[triggers[i].triggerid] !== undefined) {
+		for (const trigger of triggers) {
+			if (this.triggerids[trigger.triggerid] !== undefined) {
 				continue;
 			}
 
-			const linktriggerid = getUniqueId();
-
-			// Store linktriggerid to generate every time unique one.
-			this.sysmap.allLinkTriggerIds[linktriggerid] = true;
+			const index = getUniqueId();
 
 			// Store triggerid to forbid selecting same trigger twice.
-			this.triggerids[triggers[i].triggerid] = linktriggerid;
-			linkTrigger.linktriggerid = linktriggerid;
-			linkTrigger.desc_exp = triggers[i].description;
-			linkTrigger.triggerid = triggers[i].triggerid;
+			this.triggerids[trigger.triggerid] = index;
 
-			$(tpl.evaluate(linkTrigger)).appendTo($table);
+			const link_trigger = {
+				index,
+				desc_exp: trigger.description,
+				triggerid: trigger.triggerid,
+				color: this.#getNextColor()
+			};
+
+			$(tpl.evaluate(link_trigger)).appendTo($table);
 		}
 
 		$table.find('.color-picker input').colorpicker();
 		$('.color-picker input', this.domNode).change();
+	}
+
+	/**
+	 * Add new threshold.
+	 */
+	#addNewThreshold() {
+		const tpl = new Template(document.getElementById('threshold-row').innerHTML),
+			$table = $('#link-thresholds-container tbody');
+
+		$(tpl.evaluate({
+			index: getUniqueId(),
+			color: this.#getNextColor()
+		})).appendTo($table);
+
+		$table.find('.color-picker input').colorpicker();
+		$('.color-picker input', this.domNode).change();
+	}
+
+	/**
+	 * Add new highlight.
+	 */
+	#addNewHighlight() {
+		const tpl = new Template(document.getElementById('#highlight-row').innerHTML),
+			$table = $('#link-highlights-container tbody');
+
+		$(tpl.evaluate({
+			index: getUniqueId(),
+			color: this.#getNextColor(),
+		})).appendTo($table);
+
+		$table.find('.color-picker input').colorpicker();
+		$('.color-picker input', this.domNode).change();
+	}
+
+	/**
+	 * Returns color picker next color.
+	 *
+	 * @returns {string}
+	 */
+	#getNextColor() {
+		const colors = this.domNode[2].querySelectorAll('.color-picker input:not([disabled])'),
+			used_colors = [];
+
+		for (const color of colors) {
+			if (color.value !== '') {
+				used_colors.push(color.value);
+			}
+		}
+
+		return colorPalette.getNextColor(used_colors);
 	}
 
 	/**
@@ -250,16 +597,28 @@ class LinkForm {
 					}
 				}
 
-				const linktriggers = Object.values(link.linktriggers).map((trigger) => trigger.desc_exp),
-					fromElementName = this.sysmap.selements[link.selementid1].getName(),
-					toElementName = this.sysmap.selements[link.selementid2].getName();
+				let link_indicators = [];
 
-				list.push({fromElementName, toElementName, linkid: link.linkid, linktriggers});
+				if (link.indicator_type == Link.INDICATOR_TYPE_TRIGGER) {
+					for (const key in link.linktriggers) {
+						link_indicators.push(link.linktriggers[key].desc_exp);
+					}
+				}
+				else if (link.indicator_type == Link.INDICATOR_TYPE_ITEM_VALUE && link.itemid && link.itemid != 0) {
+					const item = this.sysmap.items[link.itemid];
+
+					link_indicators.push(`${item.prefix}${item.name}`);
+				}
+
+				const from_element_name = this.sysmap.selements[link.selementid1].getName(),
+					to_element_name = this.sysmap.selements[link.selementid2].getName();
+
+				list.push({from_element_name, to_element_name, linkid: link.linkid, link_indicators});
 			});
 
 			// Sort by "From" element, then by "To" element and then by "linkid".
-			list.sort((a, b) => a.fromElementName.toLowerCase().localeCompare(b.fromElementName.toLowerCase())
-					|| a.toElementName.toLowerCase().localeCompare(b.toElementName.toLowerCase())
+			list.sort((a, b) => a.from_element_name.toLowerCase().localeCompare(b.from_element_name.toLowerCase())
+					|| a.to_element_name.toLowerCase().localeCompare(b.to_element_name.toLowerCase())
 					|| a.linkid.localeCompare(b.linkid)
 			);
 
@@ -267,12 +626,12 @@ class LinkForm {
 				const row = $(row_tpl.evaluate(item)),
 					row_urls = $('.element-urls', row);
 
-				item.linktriggers.forEach((trigger, index) => {
+				item.link_indicators.forEach((indicator, index) => {
 					if (index != 0) {
 						row_urls.append($('<br>'));
 					}
 
-					row_urls.append($('<span>').text(trigger));
+					row_urls.append($('<span>').text(indicator));
 				});
 
 				row.appendTo($link_table.find('tbody'));
@@ -283,5 +642,102 @@ class LinkForm {
 		else {
 			$('#mapLinksContainer').hide();
 		}
+	}
+
+	#handleIndicatorTypeChange() {
+		const indicator_type = document.getElementById('indicator-type-field')
+			.querySelector('[name=indicator_type]:checked').value;
+
+		if (indicator_type == Link.INDICATOR_TYPE_ITEM_VALUE) {
+			this.#onMultiSelectChange(this);
+		}
+		else {
+			this.#toggleItemValueRelatedObjects();
+		}
+
+		const item_value_row = document.getElementById('item-value-field');
+
+		item_value_row.style.display = indicator_type == Link.INDICATOR_TYPE_ITEM_VALUE ? '' : 'none';
+
+		for (const input of item_value_row.querySelectorAll('input')) {
+			if (indicator_type == Link.INDICATOR_TYPE_ITEM_VALUE) {
+				input.removeAttribute('disabled');
+			}
+			else {
+				input.setAttribute('disabled', 'disabled');
+			}
+		}
+
+		const link_indicators_field = document.getElementById('link-indicators-field');
+
+		link_indicators_field.style.display = indicator_type == Link.INDICATOR_TYPE_TRIGGER ? '' : 'none';
+
+		for (const input of link_indicators_field.querySelectorAll('input')) {
+			if (indicator_type == Link.INDICATOR_TYPE_TRIGGER) {
+				input.removeAttribute('disabled');
+			}
+			else {
+				input.setAttribute('disabled', 'disabled');
+			}
+		}
+	}
+
+	#onMultiSelectChange() {
+		const ms_item_data = $('#itemid').multiSelect('getData');
+
+		this.item_type = null;
+		this.#toggleItemValueRelatedObjects();
+
+		if (ms_item_data.length > 0) {
+			const map_window = document.getElementById('map-window');
+
+			map_window.classList.add('is-loading', 'is-loading-fadein');
+
+			this.constructor.promiseGetItemType(ms_item_data[0].id)
+				.then((type) => {
+					this.item_type = type;
+					this.#toggleItemValueRelatedObjects(this.item_type);
+				})
+				.finally(() => map_window.classList.remove('is-loading', 'is-loading-fadein'));
+		}
+	}
+
+	#toggleItemValueRelatedObjects(type = null) {
+		const is_numeric = type == ITEM_VALUE_TYPE_FLOAT || type == ITEM_VALUE_TYPE_UINT64,
+			is_text = type == ITEM_VALUE_TYPE_STR || type == ITEM_VALUE_TYPE_LOG || type == ITEM_VALUE_TYPE_TEXT,
+			thresholds_field = document.getElementById('link-thresholds-field'),
+			highlights_field = document.getElementById('link-highlights-field');
+
+		thresholds_field.style.display = is_numeric ? '' : 'none';
+
+		for (const input of thresholds_field.querySelectorAll('input')) {
+			if (is_numeric) {
+				input.removeAttribute('disabled');
+			}
+			else {
+				input.setAttribute('disabled', 'disabled');
+			}
+		}
+
+		highlights_field.style.display = is_text ? '' : 'none';
+
+		for (const input of highlights_field.querySelectorAll('input')) {
+			if (is_text) {
+				input.removeAttribute('disabled');
+			}
+			else {
+				input.setAttribute('disabled', 'disabled');
+			}
+		}
+	}
+
+	#checkThresholds(link_thresholds) {
+		const threshold_values = Object.values(link_thresholds).map((link_threshold) => {
+			return {
+				threshold: link_threshold.threshold
+			};
+		});
+
+		return this.constructor.promiseValidateThresholdValues(threshold_values);
 	}
 }

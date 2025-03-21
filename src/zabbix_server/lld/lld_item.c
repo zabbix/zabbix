@@ -1442,6 +1442,20 @@ static int	substitute_formula_macros(char **data, const zbx_lld_entry_t *lld_obj
 	return ret;
 }
 
+static int	lld_resolver(char **data, char *error, size_t maxerrlen, va_list args)
+{
+	/* Passed arguments */
+	const zbx_lld_entry_t	*lld_obj = va_arg(args, const zbx_lld_entry_t *);
+
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	/* error message in substitution is being ignored */
+	zbx_substitute_lld_macros(data, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+
+	return SUCCEED;
+}
+
 /*******************************************************************************
  *                                                                             *
  * Purpose: Creates a new item based on item prototype and LLD data row.       *
@@ -1605,8 +1619,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 			zbx_substitute_lld_macros(&item->posts, lld_obj, ZBX_MACRO_JSON, NULL, 0);
 			break;
 		case ZBX_POSTTYPE_XML:
-			if (SUCCEED == ret && FAIL == (ret = zbx_substitute_macros_xml(&item->posts, NULL,
-					lld_resolve_macros, lld_obj, err, sizeof(err))))
+			if (SUCCEED == ret && FAIL == (ret = zbx_xml_traverse(&item->posts, err, sizeof(err),
+					lld_resolver, lld_obj)))
 			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
 				*error = zbx_strdcatf(*error, "Cannot create item, error in XML: %s.\n", err);
@@ -1936,7 +1950,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
 	{
-		if (FAIL == zbx_substitute_macros_xml(&buffer, NULL, lld_resolve_macros, lld_obj, err, sizeof(err)))
+		if (FAIL == zbx_xml_traverse(&buffer, err, sizeof(err), lld_resolver, lld_obj))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
 			*error = zbx_strdcatf(*error, "Cannot update item, error in XML: %s.\n", err);
@@ -2600,22 +2614,25 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: prepares SQL to update LLD item                                   *
- *                                                                            *
- * Parameters: item_prototype       - [IN]                                    *
- *             item                 - [IN] item to be updated                 *
- *             sql                  - [IN/OUT] SQL buffer pointer used for    *
- *                                             update operations              *
- *             sql_alloc            - [IN/OUT] SQL buffer already allocated   *
- *                                             memory                         *
- *             sql_offset           - [IN/OUT] offset for writing within SQL  *
- *                                             buffer                         *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: prepares SQL to update LLD item                                      *
+ *                                                                               *
+ * Parameters: item_prototype          - [IN]                                    *
+ *             item                    - [IN] item to be updated                 *
+ *             itemids_value_type_diff - [OUT] items with changed type requiring *
+ *                                             sysmap link indicator to be set   *
+ *                                             to 'static' type                  *
+ *             sql                     - [IN/OUT] SQL buffer pointer used for    *
+ *                                             update operations                 *
+ *             sql_alloc               - [IN/OUT] SQL buffer already allocated   *
+ *                                             memory                            *
+ *             sql_offset              - [IN/OUT] offset for writing within SQL  *
+ *                                             buffer                            *
+ *                                                                               *
+ *********************************************************************************/
 static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_item_full_t *item,
-		char **sql, size_t *sql_alloc, size_t *sql_offset)
+		zbx_vector_uint64_t *itemids_value_type_diff, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	char				*value_esc;
 	const char			*d = "";
@@ -2654,6 +2671,12 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_audit_item_update_json_update_value_type(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, item->value_type_orig,
 				(int)item_prototype->value_type);
+
+		if (SUCCEED == zbx_db_item_value_type_changed_category(item_prototype->value_type,
+				item->value_type_orig))
+		{
+			zbx_vector_uint64_append(itemids_value_type_diff, item->itemid);
+		}
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))
 	{
@@ -3200,9 +3223,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 	if (0 != upd_items)
 	{
-		int	index;
+		int			index;
+		zbx_vector_uint64_t	itemids_value_type_diff;
 
 		sql_offset = 0;
+		zbx_vector_uint64_create(&itemids_value_type_diff);
 
 		for (int i = 0; i < items->values_num; i++)
 		{
@@ -3225,11 +3250,17 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 			item_prototype = item_prototypes->values[index];
 
-			lld_item_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
+			lld_item_prepare_update(item_prototype, item, &itemids_value_type_diff, &sql, &sql_alloc,
+					&sql_offset);
+
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
+		zbx_db_update_item_map_links(&itemids_value_type_diff);
+
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
+
+		zbx_vector_uint64_destroy(&itemids_value_type_diff);
 	}
 out:
 	zbx_free(sql);
@@ -4152,6 +4183,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
+
 	lld_items_preproc_make(&item_prototypes, &items);
 	lld_items_param_make(&item_prototypes, &items, error);
 	lld_items_tags_make(&item_prototypes, &items, error);

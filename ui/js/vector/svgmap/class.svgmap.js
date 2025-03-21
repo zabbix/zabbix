@@ -25,6 +25,7 @@ class SVGMap {
 		this.elements = {};
 		this.shapes = {};
 		this.links = {};
+		this.duplicated_links = {};
 		this.background = null;
 		this.container = null;
 		this.imageUrl = 'imgstore.php?iconid=';
@@ -155,6 +156,8 @@ class SVGMap {
 
 	static EVENT_ELEMENT_SELECT = 'element.select';
 
+	static BACKGROUND_SCALE_COVER = SYSMAP_BACKGROUND_SCALE_COVER;
+
 	/**
 	 * Get rendered promise.
 	 *
@@ -206,11 +209,28 @@ class SVGMap {
 
 			const image = this.getImage(background);
 
+			let width = image.naturalWidth,
+				height = image.naturalHeight;
+
+			if (this.options.background_scale == this.constructor.BACKGROUND_SCALE_COVER) {
+				const canvas_aspect_ratio = this.options.canvas.width / this.options.canvas.height,
+					image_aspect_ratio = width / height;
+
+				if (image_aspect_ratio > canvas_aspect_ratio) {
+					width = this.options.canvas.height * image_aspect_ratio;
+					height = this.options.canvas.height;
+				}
+				else {
+					width = this.options.canvas.width;
+					height = this.options.canvas.width / image_aspect_ratio;
+				}
+			}
+
 			element = this.layers.background.add('image', {
 				x: 0,
 				y: 0,
-				width: image.naturalWidth,
-				height: image.naturalHeight,
+				width,
+				height,
 				'xlink:href': this.getImageUrl(background)
 			});
 		}
@@ -398,7 +418,7 @@ class SVGMap {
 	 * @param {boolean}      incremental  Update method. If set to true, items are added to the existing set of map
 	 *                                    objects.
 	 */
-	updateOrderedItems(type, id_field, Class, items, incremental) {
+	updateItems(type, id_field, Class, items, incremental) {
 		if (incremental !== true) {
 			Object.keys(this[type]).forEach((key) => {
 				if (items.filter((item) => item[id_field] === key).length == 0) {
@@ -533,10 +553,10 @@ class SVGMap {
 			this.imageCache.preload(images, () => {
 				try {
 					/*
-					 * Shapes must be drawn fist as host group element links depend on shape around it and its
+					 * Shapes must be drawn first as host group element links depend on shape around it and its
 					 * positioning.
 					 */
-					this.updateOrderedItems('shapes', 'sysmap_shapeid', SVGMapShape, options.shapes, incremental);
+					this.updateItems('shapes', 'sysmap_shapeid', SVGMapShape, options.shapes, incremental);
 					this.updateElements({
 						elements: {
 							class: SVGMapElement,
@@ -550,6 +570,13 @@ class SVGMap {
 						}},
 						incremental
 					);
+
+					if (options.duplicated_links) {
+						this.updateItems('duplicated_links', 'linkid', SVGMapLink, options.duplicated_links,
+							incremental
+						);
+					}
+					this.options.background_scale = options.background_scale;
 					this.updateBackground(options.background);
 				}
 				catch(exception) {

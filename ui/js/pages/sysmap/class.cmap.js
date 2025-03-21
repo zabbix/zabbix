@@ -27,7 +27,7 @@ class CMap {
 			shapes: {} // selected shapes
 		};
 		this.current_linkid = '0'; // linkid of currently edited link
-		this.allLinkTriggerIds = {};
+		this.items = mapData.sysmap.items;
 		this.sysmapid = mapData.sysmap.sysmapid;
 		this.data = mapData.sysmap;
 		this.background = null;
@@ -307,6 +307,7 @@ class CMap {
 
 		this.map.update({
 			background: this.data.backgroundid,
+			background_scale: this.data.background_scale,
 			elements,
 			links,
 			shapes,
@@ -828,38 +829,58 @@ class CMap {
 
 		// Apply link changes via link form.
 		document.getElementById('formLinkApply').addEventListener('click', () => {
-			try {
-				const link_data = this.linkForm.getValues();
+			const map_window = document.getElementById('map-window');
+				map_window.classList.add('is-loading', 'is-loading-fadein');
 
-				this.map.invalidate('selements');
-				this.links[this.current_linkid].update(link_data);
-				this.linkForm.updateList(this.selection.selements);
-			}
-			catch (err) {
-				alert(err);
-			}
+			this.linkForm
+				.getValues()
+				.then((values) => {
+					this.map.invalidate('selements');
+					this.links[this.current_linkid].update(values);
+					this.linkForm.updateList(this.selection.selements);
+				})
+				.catch((exception) => {
+					// Timeout for removing spinner.
+					setTimeout(() => alert(exception), 50);
+				})
+				.finally(() => map_window.classList.remove('is-loading', 'is-loading-fadein'));
 		});
 
 		// Close link form.
 		document.getElementById('formLinkClose').addEventListener('click', () => this.linkForm.hide());
 
-		// Add event listener on link indicator "Remove" button.
+		// Add event listeners on link indicator, threshold and highlight "Remove" buttons.
 		Array.from(this.linkForm.domNode).forEach((container) => {
 			if (container.nodeType == Node.ELEMENT_NODE) {
 				container.addEventListener('click', (e) => {
-					const element = e.target.closest('.triggerRemove');
+					const trigger_remove = e.target.closest('.triggerRemove'),
+						threshold_remove = e.target.closest('.threshold-remove'),
+						highlight_remove = e.target.closest('.highlight-remove');
 
-					if (element && container.contains(element)) {
-						const linktriggerid = e.target.dataset.linktriggerid,
-							triggerid = document.getElementById(`linktrigger_${linktriggerid}_triggerid`).value;
+					if (trigger_remove && container.contains(trigger_remove)) {
+						const id = e.target.dataset.index,
+							triggerid = document.getElementById(`linktrigger_${id}_triggerid`).value;
 
-						document.getElementById(`linktrigger_${linktriggerid}`).remove();
+						document.getElementById(`linktrigger_${id}`).remove();
 
 						for (const _triggerid in this.linkForm.triggerids) {
 							if (_triggerid === triggerid) {
 								delete this.linkForm.triggerids[_triggerid];
 							}
 						}
+					}
+
+					if (threshold_remove && container.contains(threshold_remove)) {
+						const id = e.target.dataset.index;
+
+						document.getElementById(`threshold_${id}`).remove();
+
+					}
+
+					if (highlight_remove && container.contains(highlight_remove)) {
+						const id = e.target.dataset.index;
+
+						document.getElementById(`highlight_${id}`).remove();
 					}
 				});
 			}

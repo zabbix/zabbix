@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -605,8 +605,8 @@ class testAlarmNotification extends CWebTest {
 	 */
 	public function testAlarmNotification_NotificationSettings($data) {
 		// Set checked trigger severity in messaging settings.
-		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
-		$form = $this->query('id:user-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
+		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
 		$form->fill($data['profile_setting']);
 		$form->submit();
