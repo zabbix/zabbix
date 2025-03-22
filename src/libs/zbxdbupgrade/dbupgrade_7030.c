@@ -308,7 +308,7 @@ static int	DBpatch_7030021(void)
 					" where exists ("
 						"select null from items i"
 						" where i.itemid=id.itemid"
-							" and i.flags=%d"
+							" and i.flags&%d<>0"
 					");", ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		return FAIL;
