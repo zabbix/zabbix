@@ -111,6 +111,13 @@ static void	lld_rule_merge_exported_macros(zbx_lld_rule_macros_t *rule_macros,
 		zbx_sync_rowset_add_row(&src, NULL, macro->macro, macro->value);
 	}
 
+	for (int i = 0; i < entry->macros.values_num; i++)
+	{
+		const zbx_lld_macro_t	*macro = &entry->macros.values[i];
+
+		zbx_sync_rowset_add_row(&src, NULL, macro->macro, macro->value);
+	}
+
 	zbx_sync_rowset_sort_by_rows(&src);
 	zbx_sync_rowset_sort_by_rows(&rule_macros->macros);
 
@@ -130,6 +137,8 @@ static void	lld_rule_merge_exported_macros(zbx_lld_rule_macros_t *rule_macros,
 	}
 
 	zbx_sync_rowset_sort_by_id(&rule_macros->macros);
+
+	zbx_sync_rowset_clear(&src);
 }
 
 /******************************************************************************
@@ -2721,7 +2730,7 @@ zbx_hash_t	lld_row_index_hash(const void *v)
 {
 	const zbx_lld_row_ruleid_t	*index = (const zbx_lld_row_ruleid_t *)v;
 
-	return ZBX_DEFAULT_STRING_HASH_ALGO(index->lld_row, sizeof(index->lld_row), 0);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(&index->lld_row, sizeof(index->lld_row), 0);
 }
 
 int	lld_row_index_compare(const void *v1, const void *v2)
@@ -2748,6 +2757,66 @@ static void	lld_prototype_items_clear(void *v)
 	zbx_hashset_destroy(&pi->rule_index);
 }
 
+typedef struct
+{
+	const zbx_lld_row_t	*lld_row;
+	zbx_vector_uint64_t	itemids;
+}
+zbx_lld_row_itemids_t;
+
+zbx_hash_t	lld_row_itemids_hash(const void *v)
+{
+	const zbx_lld_row_itemids_t	*index = (const zbx_lld_row_itemids_t *)v;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(&index->lld_row, sizeof(index->lld_row), 0);
+}
+
+int	lld_row_itemids_compare(const void *v1, const void *v2)
+{
+	const zbx_lld_row_itemids_t        *index1 = (const zbx_lld_row_itemids_t *)v1;
+	const zbx_lld_row_itemids_t        *index2 = (const zbx_lld_row_itemids_t *)v2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(index1->lld_row, index2->lld_row);
+
+	return 0;
+}
+
+static void	lld_rule_export_lld_macros(zbx_uint64_t hostid, const zbx_vector_lld_item_full_ptr_t *items)
+{
+	zbx_hashset_t		exported;
+	zbx_hashset_iter_t	iter;
+	zbx_lld_row_itemids_t	index_local, *index;
+
+	zbx_hashset_create(&exported, (size_t )items->values_num, lld_row_itemids_hash, lld_row_itemids_compare);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		const zbx_lld_item_full_t	*item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		index_local.lld_row = item->lld_row;
+		if (NULL == (index = (zbx_lld_row_itemids_t *)zbx_hashset_search(&exported, &index_local)))
+		{
+			index = (zbx_lld_row_itemids_t *)zbx_hashset_insert(&exported, &index_local,
+					sizeof(index_local));
+			zbx_vector_uint64_create(&index->itemids);
+		}
+
+		zbx_vector_uint64_append(&index->itemids, item->itemid);
+	}
+
+	zbx_hashset_iter_reset(&exported, &iter);
+	while (NULL != (index = (zbx_lld_row_itemids_t *)zbx_hashset_iter_next(&iter)))
+	{
+		lld_sync_exported_macros(&index->itemids, index->lld_row->data);
+		zbx_vector_uint64_destroy(&index->itemids);
+	}
+
+	zbx_hashset_destroy(&exported);
+}
+
 static void	lld_rule_process_derived_items(zbx_uint64_t hostid,
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		const zbx_vector_lld_item_full_ptr_t *items)
@@ -2757,9 +2826,6 @@ static void	lld_rule_process_derived_items(zbx_uint64_t hostid,
 		const zbx_lld_item_full_t	*item = items->values[i];
 		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
 		int				index;
-
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-			continue;
 
 		item_prototype_local.itemid = item->parent_itemid;
 
@@ -2891,6 +2957,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		goto clean;
 	}
 
+	lld_rule_export_lld_macros(hostid, &items);
 	lld_rule_process_derived_items(hostid, &item_prototypes, &items);
 
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);

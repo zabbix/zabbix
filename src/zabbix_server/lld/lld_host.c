@@ -5932,7 +5932,7 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,itemid from items where flags=%d and",
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,itemid from items where flags&%d<>0 and",
 			ZBX_FLAG_DISCOVERY_RULE);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
