@@ -95,6 +95,7 @@ typedef struct
 {
 	zbx_vector_lld_macro_t	macros;
 	zbx_vector_lld_macro_t	*exported_macros;
+	const zbx_jsonobj_t	*source;
 }
 zbx_lld_entry_t;
 
@@ -586,5 +587,6 @@ void	lld_rule_get_prototype_overrides(zbx_vector_lld_item_prototype_ptr_t *item_
 		zbx_vector_uint64_t *protoids);
 void	lld_rule_fetch_override_data(zbx_vector_lld_override_data_ptr_t *overrides);
 void	lld_override_dump(zbx_sync_rowset_t *rowset);
+void	lld_rule_process_derived_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row);
 
 #endif

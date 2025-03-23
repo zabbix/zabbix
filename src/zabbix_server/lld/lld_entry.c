@@ -142,6 +142,8 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 	}
 
 	zbx_vector_lld_macro_sort(&entry->macros, lld_macro_compare);
+
+	entry->source = obj;
 }
 
 /******************************************************************************

@@ -19,6 +19,8 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 #include "zbxdbhigh.h"
+#include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0
@@ -2746,6 +2748,40 @@ static void	lld_prototype_items_clear(void *v)
 	zbx_hashset_destroy(&pi->rule_index);
 }
 
+static void	lld_rule_process_derived_items(zbx_uint64_t hostid,
+		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		const zbx_vector_lld_item_full_ptr_t *items)
+{
+	for (int i = 0; i < items->values_num; i++)
+	{
+		const zbx_lld_item_full_t	*item = items->values[i];
+		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
+		int				index;
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		item_prototype_local.itemid = item->parent_itemid;
+
+		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
+				lld_item_prototype_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item_prototype = item_prototypes->values[index];
+
+		if (ITEM_TYPE_DERIVED != item_prototype->type ||
+				0 == (item_prototype->dflags & ZBX_FLAG_DISCOVERY_RULE))
+		{
+			continue;
+		}
+
+		lld_rule_process_derived_rule(hostid, item->itemid, item->lld_row);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: perform LLD rule discovery                                        *
@@ -2855,6 +2891,8 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		goto clean;
 	}
 
+	lld_rule_process_derived_items(hostid, &item_prototypes, &items);
+
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 
 	for (int i = 0; i < lld_rows->values_num; i++)
@@ -2962,4 +3000,33 @@ out:
 	zabbix_decrease_log_level();
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Process a derived LLD rule                                        *
+ *                                                                            *
+ * Parameters: itemid  - [IN] ID of the item to process                       *
+ *             lld_row - [IN] LLD row containing discovery data               *
+ *                                                                            *
+ ******************************************************************************/
+void	lld_rule_process_derived_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row)
+{
+	char		*value = NULL;
+	size_t		value_alloc = 0, value_offset = 0;
+	AGENT_RESULT	result;
+	zbx_timespec_t	ts;
+
+	zbx_jsonobj_to_string(&value, &value_alloc, &value_offset, lld_row->data->source);
+
+	zbx_init_agent_result(&result);
+	SET_TEXT_RESULT(&result, value);
+
+	zbx_timespec(&ts);
+
+	zbx_preprocess_item_value(itemid, hostid, ITEM_VALUE_TYPE_TEXT, ZBX_FLAG_DISCOVERY_RULE, &result, &ts,
+			ITEM_STATE_NORMAL, NULL);
+	zbx_preprocessor_flush();
+
+	zbx_free(value);
 }

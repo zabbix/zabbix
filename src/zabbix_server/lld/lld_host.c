@@ -32,6 +32,7 @@
 #include "zbxhash.h"
 #include "zbxinterface.h"
 #include "../server_constants.h"
+#include "zbx_item_constants.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0
@@ -6136,6 +6137,60 @@ static void	lld_group_prototypes_save(zbx_vector_lld_host_ptr_t *hosts)
 	zbx_vector_uint64_destroy(&deleteids);
 }
 
+static void	lld_host_process_derived_items(const zbx_vector_lld_host_ptr_t *hosts)
+{
+	zbx_vector_uint64_t	hostids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	zbx_vector_uint64_create(&hostids);
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		const zbx_lld_host_t	*host = hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		zbx_vector_uint64_append(&hostids, host->hostid);
+	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hostid,itemid"
+			" from items"
+			" where type=%d"
+				" and status=%d"
+				" and",
+			ITEM_TYPE_DERIVED, ITEM_STATUS_ACTIVE);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+
+	result = zbx_db_select("%s", sql);
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_lld_host_t	host_local;
+		zbx_uint64_t	itemid;
+		int		index;
+
+		ZBX_STR2UINT64(host_local.hostid, row[0]);
+		if (FAIL == (index = zbx_vector_lld_host_ptr_bsearch(hosts, &host_local, lld_host_compare_func)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		ZBX_STR2UINT64(itemid, row[1]);
+
+		lld_rule_process_derived_rule(host_local.hostid, itemid, hosts->values[index]->lld_row);
+	}
+	zbx_db_free_result(result);
+
+out:
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&hostids);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds or updates LLD hosts                                         *
@@ -6349,7 +6404,10 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		/* linking of the templates */
 		lld_templates_link(&hosts, error);
 
+		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
+
 		lld_host_export_lld_macros(&hosts);
+		lld_host_process_derived_items(&hosts);
 
 		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);

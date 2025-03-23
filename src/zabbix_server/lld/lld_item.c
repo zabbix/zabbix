@@ -1048,6 +1048,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					case ITEM_TYPE_TRAPPER:
 					case ITEM_TYPE_SNMPTRAP:
 					case ITEM_TYPE_DEPENDENT:
+					case ITEM_TYPE_DERIVED:
 						return;
 					case ITEM_TYPE_ZABBIX_ACTIVE:
 						if (0 == strncmp(item->key_, "mqtt.get[",

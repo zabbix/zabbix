@@ -2853,6 +2853,8 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint6
 
 			__config_shmem_free_func(item->itemtype.browseritem);
 			break;
+		case ITEM_TYPE_DERIVED:
+			break;
 	}
 }
 
@@ -3107,6 +3109,8 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 					parameters = NULL;
 				}
 			}
+			break;
+		case ITEM_TYPE_DERIVED:
 			break;
 	}
 

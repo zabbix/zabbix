@@ -714,6 +714,8 @@ static void	DCdump_items(void)
 			case ITEM_TYPE_BROWSER:
 				DCdump_browseritem(item->itemtype.browseritem);
 				break;
+			case ITEM_TYPE_DERIVED:
+				break;
 		}
 
 		if (NULL != item->master_item)
