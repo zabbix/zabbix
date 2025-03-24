@@ -675,3 +675,55 @@ func Test_getTypeByRateAndAttr(t *testing.T) {
 		})
 	}
 }
+
+func Test_validateParams(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		key    string
+		params []string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"+valid", args{"smart.disk.get", []string{"/dev/sda"}}, false},
+		{"+keyNoParams", args{"", []string{}}, false},
+
+		{"+spaceHypen", args{"smart.disk.get", []string{"/dev/sda -B/some/file/path"}}, false},
+		{"+manySpacesHypen", args{"smart.disk.get", []string{"/dev/sda    -B/some/file/path"}}, false},
+		{"+tabHypen", args{"smart.disk.get", []string{"/dev/sda\t-B/some/file/path"}}, false},
+		{"+noSpacesHypen", args{"smart.disk.get", []string{"/dev/sda-B/some/file/path"}}, false},
+		{"+hypenInSpaces", args{"smart.disk.get", []string{"/dev/sda - B/some/file/path"}}, false},
+		{"+hypenEnd", args{"smart.disk.get", []string{"/dev/sda-"}}, false},
+		{"+empty", args{"smart.disk.get", []string{""}}, false},
+		{"+twoParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid"}}, false},
+		{"+threeParams", args{"smart.disk.get", []string{"/dev/sda", "megaraid", "three"}}, false},
+
+		{"-keyTabHypen", args{"any.other.key", []string{"smth"}}, true},
+		{"-hypenStart", args{"smart.disk.get", []string{"-B/some/file/path"}}, true},
+		{"-hypenStartSpace", args{"smart.disk.get", []string{"- B/some/file/path"}}, true},
+		{"-hypenStartApostr", args{"smart.disk.get", []string{"'-B/some/file/path'"}}, true},
+		{"-hypenStartApostrSpace", args{"smart.disk.get", []string{"'   -B/some/file/path'"}}, true},
+		{"-hypenStartApostrTab", args{"smart.disk.get", []string{"'\t-B/some/file/path'"}}, true},
+		{"-hypenStartApostrTabSpace", args{"smart.disk.get", []string{"'\t -B/some/file/path'"}}, true},
+		{"-hypenStart2Apostr", args{"smart.disk.get", []string{"''-B/some/file/path''"}}, true},
+		{"-hypenStart3Apostr", args{"smart.disk.get", []string{"'''-B/some/file/path'''"}}, true},
+		{"-hypenStartApostrQuote", args{"smart.disk.get", []string{"\"-B/some/file/path\""}}, true},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := validateParams(tt.args.key, tt.args.params)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("validateParams() error = %s, wantErr %t", err.Error(), tt.wantErr)
+			}
+		})
+	}
+}

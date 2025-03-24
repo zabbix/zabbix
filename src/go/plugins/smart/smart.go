@@ -21,7 +21,6 @@ package smart
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -43,6 +42,8 @@ const (
 	attributeDiscovery = "smart.attribute.discovery"
 )
 
+var pathRegex = regexp.MustCompile(`^(?:\s*-|'*"*\s*-)`)
+
 // Options -
 type Options struct {
 	Timeout int    `conf:"optional,range=1:30"`
@@ -53,11 +54,10 @@ type Options struct {
 type Plugin struct {
 	plugin.Base
 	options Options
+	ctl     smartCtl
 }
 
 var impl Plugin
-
-var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -68,6 +68,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
+
+	p.ctl = newSmartCtl(p.options.Path, p.options.Timeout)
 }
 
 // Validate -
@@ -77,17 +79,15 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 && key != diskGet {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	var err error
 
-	if err = p.checkVersion(); err != nil {
-		return
+	err = p.validateExport(key, params)
+	if err != nil {
+		return nil, zbxerr.New("export validation failed").Wrap(err)
 	}
 
 	var jsonArray []byte
-
 	switch key {
 	case diskDiscovery:
 		jsonArray, err = p.diskDiscovery()
@@ -143,13 +143,6 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
-	for _, v := range params {
-		err := clearString(v)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	switch len(params) {
 	case twoParameters:
 		return p.diskGetSingle(params[firstParameter], params[secondParameter])
@@ -163,13 +156,13 @@ func (p *Plugin) diskGet(params []string) ([]byte, error) {
 }
 
 func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
-	executable := path
+	args := []string{"-a", path, "-j"}
 
 	if raidType != "" {
-		executable = fmt.Sprintf("%s -d %s", executable, raidType)
+		args = []string{"-a", path, "-d", raidType, "-j"}
 	}
 
-	device, err := p.executeSingle(executable)
+	device, err := p.ctl.execute(args...)
 	if err != nil {
 		return nil, err
 	}
@@ -280,7 +273,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 		out["power_on_time"] = sd.HealthLog.PowerOnTime
 		out["critical_warning"] = sd.HealthLog.CriticalWarning
 		out["media_errors"] = sd.HealthLog.MediaErrors
-		out["percentage_used"] = sd.HealthLog.Percentage_used
+		out["percentage_used"] = sd.HealthLog.PercentageUsed
 	} else {
 		out["temperature"] = sd.Temperature.Current
 		out["power_on_time"] = sd.PowerOnTime.Hours
@@ -436,18 +429,40 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	return ssdType
 }
 
-func clearString(str string) error {
-	if !cleanRegex.MatchString(str) {
-		return zbxerr.New(fmt.Sprintf("invalid characters found in parameter '%s'", str))
-	}
-
-	return nil
-}
-
 func init() {
 	plugin.RegisterMetrics(&impl, "Smart",
 		"smart.disk.discovery", "Returns JSON array of smart devices.",
 		"smart.disk.get", "Returns JSON data of smart device.",
 		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
 	)
+}
+
+// validateExport function validates key, export params and version.
+func (p *Plugin) validateExport(key string, params []string) error {
+	err := validateParams(key, params)
+	if err != nil {
+		return err
+	}
+
+	return p.checkVersion()
+}
+
+// validateParams validates the key's params quantity aspect.
+func validateParams(key string, params []string) error {
+	// No params - nothing to validate.
+	if len(params) == all {
+		return nil
+	}
+
+	// The params can only be for a specific function.
+	if key != diskGet {
+		return zbxerr.ErrorTooManyParameters
+	}
+
+	//Validates the param disk path in the context of an input sanitization.
+	if pathRegex.MatchString(params[0]) {
+		return zbxerr.New("invalid disk descriptor format")
+	}
+
+	return nil
 }
