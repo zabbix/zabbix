@@ -388,6 +388,114 @@ static int	DBpatch_7030028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030029(void)
+{
+	const zbx_db_table_t	table =
+			{"host_tag_cache", "hostid,tag_hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030030(void)
+{
+	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_tag_cache", 1, &field);
+}
+
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_field_t	field = {"tag_hostid", NULL, "hosts", "hostid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_tag_cache", 2, &field);
+}
+
+static int	DBpatch_7030032(void)
+{
+	return DBcreate_index("host_tag_cache", "host_tag_cache_3", "tag_hostid", 0);
+}
+
+static int	DBpatch_7030033(void)
+{
+	const zbx_db_table_t	table =
+			{"item_tag_cache", "itemid,tag_hostid", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030034(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "hostid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_tag_cache", 1, &field);
+}
+
+static int	DBpatch_7030035(void)
+{
+	const zbx_db_field_t	field = {"tag_hostid", NULL, "hosts", "hostid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_tag_cache", 2, &field);
+}
+
+static int	DBpatch_7030036(void)
+{
+	return DBcreate_index("item_tag_cache", "item_tag_cache_3", "tag_hostid", 0);
+}
+
+static int	DBpatch_7030037(void)
+{
+	const zbx_db_table_t	table =
+			{"httptest_tag_cache", "httptestid,tag_hostid", 0,
+				{
+					{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030038(void)
+{
+	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "htpttestid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("httptest_tag_cache", 1, &field);
+}
+
+static int	DBpatch_7030039(void)
+{
+	const zbx_db_field_t	field = {"tag_hostid", NULL, "hosts", "hostid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("httptest_tag_cache", 2, &field);
+}
+
+static int  DBpatch_7030040(void)
+{
+	return DBcreate_index("httptest_tag_cache", "httptest_tag_cache_3", "tag_hostid", 0);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -423,5 +531,17 @@ DBPATCH_ADD(7030025, 0, 1)
 DBPATCH_ADD(7030026, 0, 1)
 DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
+DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
+DBPATCH_ADD(7030032, 0, 1)
+DBPATCH_ADD(7030033, 0, 1)
+DBPATCH_ADD(7030034, 0, 1)
+DBPATCH_ADD(7030035, 0, 1)
+DBPATCH_ADD(7030036, 0, 1)
+DBPATCH_ADD(7030037, 0, 1)
+DBPATCH_ADD(7030038, 0, 1)
+DBPATCH_ADD(7030039, 0, 1)
+DBPATCH_ADD(7030040, 0, 1)
 
 DBPATCH_END()
