@@ -30,6 +30,7 @@ zabbix_export:
           value: '{EVENT.UPDATE.STATUS}'
         - name: event_value
           value: '{EVENT.VALUE}'
+      status: DISABLED
       script: |
         const CLogger = function(serviceName) {
         	this.serviceName = serviceName;

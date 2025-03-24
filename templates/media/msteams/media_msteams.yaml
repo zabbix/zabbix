@@ -62,6 +62,7 @@ zabbix_export:
           value: 'false'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         const CLogger = function(serviceName) {
         	this.serviceName = serviceName;
