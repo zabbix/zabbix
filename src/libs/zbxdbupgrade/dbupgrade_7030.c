@@ -421,7 +421,7 @@ static int	DBpatch_7030031(void)
 
 static int	DBpatch_7030032(void)
 {
-	return DBcreate_index("host_tag_cache", "host_tag_cache_3", "tag_hostid", 0);
+	return DBcreate_index("host_tag_cache", "host_tag_cache_1", "tag_hostid", 0);
 }
 
 static int	DBpatch_7030033(void)
@@ -457,7 +457,7 @@ static int	DBpatch_7030035(void)
 
 static int	DBpatch_7030036(void)
 {
-	return DBcreate_index("item_tag_cache", "item_tag_cache_3", "tag_hostid", 0);
+	return DBcreate_index("item_tag_cache", "item_tag_cache_1", "tag_hostid", 0);
 }
 
 static int	DBpatch_7030037(void)
@@ -493,7 +493,7 @@ static int	DBpatch_7030039(void)
 
 static int  DBpatch_7030040(void)
 {
-	return DBcreate_index("httptest_tag_cache", "httptest_tag_cache_3", "tag_hostid", 0);
+	return DBcreate_index("httptest_tag_cache", "httptest_tag_cache_1", "tag_hostid", 0);
 }
 
 #endif
