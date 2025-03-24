@@ -441,7 +441,7 @@ static int	DBpatch_7030033(void)
 
 static int	DBpatch_7030034(void)
 {
-	const zbx_db_field_t	field = {"itemid", NULL, "items", "hostid", 0, 0, 0,
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_tag_cache", 1, &field);
@@ -477,7 +477,7 @@ static int	DBpatch_7030037(void)
 
 static int	DBpatch_7030038(void)
 {
-	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "htpttestid", 0, 0, 0,
+	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("httptest_tag_cache", 1, &field);
