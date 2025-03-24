@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-13 09:34+0000\n"
-"Last-Translator: Kirill <kzabogonski@gmail.com>\n"
+"PO-Revision-Date: 2025-03-21 17:27+0000\n"
+"Last-Translator: Aleksei <suineglive13@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -6054,7 +6054,7 @@ msgstr "Файл TLS ключа базы данных"
 #: include/classes/api/clients/CLocalApiClient.php:133
 #: include/classes/api/clients/CLocalApiClient.php:147
 msgid "Database error occurred."
-msgstr ""
+msgstr "Произошла ошибка базы данных."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
