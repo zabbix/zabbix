@@ -7645,6 +7645,25 @@ return [
 			]
 		]
 	],
+	'host_tag_cache' => [
+		'key' => 'hostid,tag_hostid',
+		'fields' => [
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			],
+			'tag_hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			]
+		]
+	],
 	'config_autoreg_tls' => [
 		'key' => 'autoreg_tlsid',
 		'fields' => [
@@ -8286,6 +8305,25 @@ return [
 			]
 		]
 	],
+	'item_tag_cache' => [
+		'key' => 'itemid,tag_hostid',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'tag_hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			]
+		]
+	],
 	'httptest_tag' => [
 		'key' => 'httptesttagid',
 		'fields' => [
@@ -8312,6 +8350,25 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			]
+		]
+	],
+	'httptest_tag_cache' => [
+		'key' => 'httptestid,tag_hostid',
+		'fields' => [
+			'httptestid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'httptest',
+				'ref_field' => 'httptestid'
+			],
+			'tag_hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
 			]
 		]
 	],
