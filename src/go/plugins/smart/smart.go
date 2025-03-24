@@ -281,7 +281,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 
 	diskType := getType(getTypeFromJSON(attr), getRateFromJSON(attr), getTablesFromJSON(attr))
 
-	out := make(map[string]any)
+	out = make(map[string]any)
 	out["disk_type"] = diskType
 	out["firmware_version"] = sd.Firmware
 	out["model_name"] = sd.ModelName
