@@ -348,6 +348,7 @@ void	zbx_mock_test_entry(void **state)
 	for (i = 0; i < 4; i++)
 	{
 		zbx_variant_t	history_value_out;
+		char		*error = NULL;
 
 		zbx_variant_set_none(&history_value_out);
 
@@ -361,13 +362,15 @@ void	zbx_mock_test_entry(void **state)
 			step_cache = cache;
 
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
-				&history_value_in, &history_value_out, &history_ts, get_zbx_config_source_ip())))
+				&history_value_in, &history_value_out, &history_ts, get_zbx_config_source_ip(),
+				&error)))
 		{
-			pp_error_on_fail(NULL, 0, &value, &step);
+			pp_error_on_fail(NULL, 0, &value, error, &step);
 
 			if (ZBX_VARIANT_ERR != value.type)
 				returned_ret = SUCCEED;
 		}
+		zbx_free(error);
 
 		if (SUCCEED != returned_ret && ZBX_VARIANT_ERR == value.type)
 		{
