@@ -31,21 +31,20 @@ import (
 	"golang.zabbix.com/sdk/zbxnet"
 )
 
-var getLocalIPs localIPgetter = getListLocalIP //nolint:gochecknoglobals
+var getLocalIPs localIPGetter = getListLocalIP //nolint:gochecknoglobals
 
 // ServerListener handles passive check requests on dedicated port.
 type ServerListener struct {
-	listenerID   int
-	listener     *zbxcomms.Listener
-	scheduler    scheduler.Scheduler
-	options      *agent.AgentOptions
-	allowedPeers *zbxnet.AllowedPeers
-	bindIP       string
-	lastErr      string
-	stopped      bool
+	listenerID int
+	listener   *zbxcomms.Listener
+	scheduler  scheduler.Scheduler
+	options    *agent.AgentOptions
+	bindIP     string
+	lastErr    string
+	stopped    bool
 }
 
-type localIPgetter func() []net.IP
+type localIPGetter func() []net.IP
 
 func (sl *ServerListener) handleError(err error) error {
 	var netErr net.Error
@@ -84,7 +83,7 @@ func (sl *ServerListener) handleError(err error) error {
 	return nil
 }
 
-func (sl *ServerListener) run() {
+func (sl *ServerListener) run(allowedPeers *zbxnet.AllowedPeers) {
 	defer log.PanicHook()
 
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
@@ -102,7 +101,27 @@ func (sl *ServerListener) run() {
 			continue
 		}
 
-		go handleConnection(sl.scheduler, conn, sl.allowedPeers, sl.options)
+		remoteIP := conn.RemoteIP()
+
+		if !isAllowedConnection(remoteIP, allowedPeers) {
+			err = conn.Close()
+			if err != nil {
+				log.Warningf(
+					"failed to close connection to rejected host %q",
+					remoteIP,
+				)
+			}
+
+			log.Warningf(
+				"connection from %q rejected, allowed hosts: %q",
+				remoteIP,
+				sl.options.Server,
+			)
+
+			continue
+		}
+
+		go handleConnection(sl.scheduler, conn)
 	}
 
 	log.Debugf("listener has been stopped")
@@ -132,7 +151,7 @@ func (sl *ServerListener) Start() error {
 		return errs.Wrap(err, "failed getting tls config")
 	}
 
-	sl.allowedPeers, err = zbxnet.GetAllowedPeers(sl.options.Server)
+	allowedPeers, err := zbxnet.GetAllowedPeers(sl.options.Server)
 	if err != nil {
 		return errs.Wrap(err, "failed getting allowed peers")
 	}
@@ -146,7 +165,7 @@ func (sl *ServerListener) Start() error {
 
 	monitor.Register(monitor.Input)
 
-	go sl.run()
+	go sl.run(allowedPeers)
 
 	return nil
 }

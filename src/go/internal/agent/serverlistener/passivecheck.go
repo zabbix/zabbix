@@ -24,7 +24,6 @@ import (
 	"golang.zabbix.com/agent2/pkg/zbxcomms"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
-	"golang.zabbix.com/sdk/zbxnet"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"
@@ -41,20 +40,8 @@ func formatError(msg string) []byte {
 func handleConnection(
 	sched scheduler.Scheduler,
 	conn zbxcomms.ConnectionInterface,
-	allowedPeers *zbxnet.AllowedPeers,
-	agentOptions *agent.AgentOptions,
 ) {
 	defer conn.Close() //nolint:errcheck
-
-	if !isAllowedConnection(conn.RemoteIP(), allowedPeers) {
-		log.Warningf(
-			"connection from %q rejected, allowed hosts: %q",
-			conn.RemoteIP(),
-			agentOptions.Server,
-		)
-
-		return
-	}
 
 	rawRequest, err := conn.Read()
 	if err != nil {
