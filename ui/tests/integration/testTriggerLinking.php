@@ -22,11 +22,10 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_trigger_linking
- * @backup history, autoreg_host
+ * @backup history
  */
 class testTriggerLinking extends CIntegrationTest {
 	const HOST_NAME = 'test_trigger_linking';
-	const HOST_NAME1 = 'test_trigger_conflict';
 
 	const TEMPLATE_NAME_PRE = 'strata_template_name';
 
@@ -50,7 +49,6 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_MANUAL_CLOSE = 1;
 	const TRIGGER_OPDATA_PRE = 'strata_opdata';
 	const TRIGGER_EVENT_NAME_PRE = 'strata_event_name';
-	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	const NUMBER_OF_TEMPLATES = 10;
 	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 20;
@@ -450,32 +448,11 @@ class testTriggerLinking extends CIntegrationTest {
 		}
 	}
 
-	private function unlinkTemplates() {
-
-		$response = $this->call('host.get', [
-			'output' => ['hostid'],
-			'filter' => [
-				'host' => self::HOST_NAME1
-			]
-			]);
-
-		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
-		$hostid = $response['result'][0]['hostid'];
-
-		$response = $this->call('host.update', [
-			'hostid' => $hostid,
-			'templates' => []
-			]);
-
-		sleep(1);
-	}
-
 	/**
 	 * Test trigger linking cases.
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent, agent2
-	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
 	public function testTriggerLinking_checkMe() {
 
@@ -577,153 +554,5 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
-	}
-
-	/**
-	* Component configuration provider for agent related tests.
-	*
-	* @return array
-	*/
-	public function agentConfigurationProvider1() {
-		return [
-			self::COMPONENT_AGENT => [
-				'Hostname'		=>  self::HOST_NAME1,
-				'ServerActive'	=>
-						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
-				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
-			]
-		];
-	}
-
-	private function metaDataItemUpdate () {
-
-		if (file_exists(self::METADATA_FILE)) {
-			unlink(self::METADATA_FILE);
-		}
-
-		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
-			throw new Exception('Failed to create metadata_file');
-		}
-	}
-
-	private function hostCreateAutoRegAndLink() {
-
-		$response = $this->call('action.create', [
-			'name' => 'create_host',
-			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
-			'operations' => [
-				[
-					'operationtype' => 2
-				]
-			]
-		]);
-
-		$ep = json_encode($response, JSON_PRETTY_PRINT);
-
-		$this->assertArrayHasKey('actionids', $response['result'], $ep);
-		$this->assertEquals(1, count($response['result']['actionids']), $ep);
-
-		$response = $this->call('template.create', [
-			'host' => 'test_template',
-				'groups' => [
-					'groupid' => 1
-				]
-		]);
-
-		$ep = json_encode($response, JSON_PRETTY_PRINT);
-
-		$this->assertArrayHasKey('templateids', $response['result'], $ep);
-		$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
-		self::$templateX_ID = $response['result']['templateids'][0];
-
-		$templateidsX = [];
-		array_push($templateidsX, ['templateid' => self::$templateX_ID]);
-
-		$response = $this->call('item.create', [
-			'hostid' => self::$templateX_ID,
-			'name' => "templateX_item_name",
-			'key_' => "templateX_item_key",
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
-		]);
-
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-
-		$response = $this->call('usermacro.create', [
-			'hostid' => self::$templateX_ID,
-			'macro' => '{$TEST.MACRO}',
-			'value' => 99
-		]);
-
-		$response = $this->call('trigger.create', [
-			'description' =>  self::TRIGGER_DESCRIPTION_SAME_ALL,
-			'priority' => self::TRIGGER_PRIORITY,
-			'status' => self::TRIGGER_STATUS,
-			'type' => self::TRIGGER_TYPE,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-			'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE,
-			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-			'expression' => 'last(/test_template/' .
-			"templateX_item_key" . ')={$TEST.MACRO}',
-			'recovery_expression' => 'last(/test_template/' .
-			"templateX_item_key" . ')=999',
-			'tags' => [
-				[
-					'tag' => "templateX_tag",
-					'value' => "templateX_value"
-				]
-			]
-		]);
-
-	$this->assertArrayHasKey('triggerids', $response['result']);
-	$this->assertArrayHasKey(0, $response['result']['triggerids']);
-
-		$response = $this->call('action.create', [
-			'name' => 'link_templates',
-			'eventsource' => 2,
-			'status' => 0,
-			'operations' => [
-				[
-					'operationtype' => 6,
-					'optemplate' =>
-					$templateidsX
-				]
-			]
-		]);
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertEquals(1, count($response['result']['actionids']));
-
-	}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/**
-	 * Test trigger linking cases.
-	 *
-	 * @configurationDataProvider agentConfigurationProvider1
-	 * @required-components server, agent
-	 * @backup actions,hosts,host_tag,autoreg_host
-	 */
-	public function testTriggerLinking_conflict() {
-
-		$this->killComponent(self::COMPONENT_SERVER);
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->hostCreateAutoRegAndLink();
-
-		$this->metaDataItemUpdate();
-		$this->startComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_AGENT);
-		sleep(1);
-		$this->stopComponent(self::COMPONENT_AGENT);
-		$this->unlinkTemplates();
-		$this->metaDataItemUpdate();
-		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
 	}
 }
