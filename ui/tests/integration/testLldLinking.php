@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testLldLinking extends CIntegrationTest {
 
+	const HOST_NAME = 'test_lld_linking';
+
 	private static $templateX_ID;
 
 	/**
