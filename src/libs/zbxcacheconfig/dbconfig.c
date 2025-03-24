@@ -1488,6 +1488,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 		host->revision = revision;
+		ZBX_STR2UINT64(host->flags, row[21]);
 
 		/* see whether we should and can update 'hosts_h' and 'proxies_p' indexes at this point */
 
@@ -3537,6 +3538,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			item->nextcheck = 0;
 			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 			item->poller_type = ZBX_NO_POLLER;
+		}
+
+		if (ITEM_TYPE_DERIVED == item->type && (0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
+				|| 0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)))
+		{
+			zbx_timespec_t	ts = {now, 0};
+
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+					ITEM_STATE_NOTSUPPORTED, "Derived LLD rules is supported only for discovered"
+							" LLD rules or hosts.");
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);

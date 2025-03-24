@@ -404,6 +404,7 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
+	zbx_uint64_t	flags;
 	zbx_uint64_t	revision;
 
 	unsigned char	maintenance_status;

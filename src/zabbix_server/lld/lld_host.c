@@ -6186,7 +6186,6 @@ static void	lld_host_process_derived_items(const zbx_vector_lld_host_ptr_t *host
 	}
 	zbx_db_free_result(result);
 
-out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&hostids);
 }
