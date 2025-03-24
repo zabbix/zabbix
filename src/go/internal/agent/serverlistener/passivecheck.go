@@ -29,31 +29,6 @@ import (
 
 const notsupported = "ZBX_NOTSUPPORTED"
 
-type passiveCheckRequestData struct {
-	Key     string `json:"key"`
-	Timeout any    `json:"timeout"`
-}
-
-type passiveChecksRequest struct {
-	Request string                    `json:"request"`
-	Data    []passiveCheckRequestData `json:"data"`
-}
-
-type passiveChecksResponseData struct {
-	Value *string `json:"value"`
-}
-
-type passiveChecksErrorResponseData struct {
-	Error *string `json:"error"`
-}
-
-type passiveChecksResponse struct {
-	Version string  `json:"version"`
-	Variant int     `json:"variant"`
-	Data    []any   `json:"data,omitempty"`
-	Error   *string `json:"error,omitempty"`
-}
-
 func formatError(msg string) []byte {
 	data := make([]byte, 0, len(notsupported)+len(msg)+1)
 	data = append(data, notsupported...)
@@ -102,6 +77,16 @@ func handleConnection(
 }
 
 func parsePassiveCheckJSONRequest(rawRequest []byte) (string, time.Duration, error) {
+	type passiveCheckRequestData struct {
+		Key     string `json:"key"`
+		Timeout any    `json:"timeout"`
+	}
+
+	type passiveChecksRequest struct {
+		Request string                    `json:"request"`
+		Data    []passiveCheckRequestData `json:"data"`
+	}
+
 	var request passiveChecksRequest
 
 	err := json.Unmarshal(rawRequest, &request)
@@ -130,12 +115,22 @@ func formatCheckDataPayload(checkResult string, isJSON bool) ([]byte, error) {
 		return []byte(checkResult), nil
 	}
 
-	response := passiveChecksResponse{
+	type valueData struct {
+		Value string `json:"value"`
+	}
+
+	type passiveCheckError struct {
+		Version string      `json:"version"`
+		Variant int         `json:"variant"`
+		Data    []valueData `json:"data"`
+	}
+
+	response := passiveCheckError{
 		Version: version.Long(),
 		Variant: agent.Variant,
-		Data: []any{
-			passiveChecksResponseData{
-				Value: &checkResult,
+		Data: []valueData{
+			{
+				Value: checkResult,
 			},
 		},
 	}
@@ -153,12 +148,22 @@ func formatCheckErrorPayload(errText string, isJSON bool) ([]byte, error) {
 		return formatError(errText), nil
 	}
 
-	response := passiveChecksResponse{
+	type errorData struct {
+		Error string `json:"error"`
+	}
+
+	type passiveCheckError struct {
+		Version string      `json:"version"`
+		Variant int         `json:"variant"`
+		Data    []errorData `json:"data"`
+	}
+
+	response := passiveCheckError{
 		Version: version.Long(),
 		Variant: agent.Variant,
-		Data: []any{
-			passiveChecksErrorResponseData{
-				Error: &errText,
+		Data: []errorData{
+			{
+				Error: errText,
 			},
 		},
 	}
@@ -172,10 +177,16 @@ func formatCheckErrorPayload(errText string, isJSON bool) ([]byte, error) {
 }
 
 func formatJSONParsingError(errText string) ([]byte, error) {
-	response := passiveChecksResponse{
+	type parsingError struct {
+		Version string `json:"version"`
+		Variant int    `json:"variant"`
+		Error   string `json:"error"`
+	}
+
+	response := parsingError{
 		Version: version.Long(),
 		Variant: agent.Variant,
-		Error:   &errText,
+		Error:   errText,
 	}
 
 	out, err := json.Marshal(response)
