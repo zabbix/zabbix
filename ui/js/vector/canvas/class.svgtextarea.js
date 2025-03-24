@@ -241,6 +241,9 @@ class SVGTextArea {
 					skip = 1.2;
 				});
 			}
+			else {
+				skip += 1.2;
+			}
 		});
 	}
 

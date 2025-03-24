@@ -121,7 +121,7 @@ class CMapHelper {
 			'show_link_label' => $map['show_link_label'],
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
-			'duplicated_links' => array_key_exists('duplicated_links', $map) ? $map['duplicated_links'] : [],
+			'duplicated_links' => array_values($map['duplicated_links']),
 			'shapes' => array_values($map['shapes']),
 			'aria_label' => $map['aria_label'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
@@ -238,7 +238,7 @@ class CMapHelper {
 						$trigger_pos = 0;
 
 						foreach ($element['elements'] as $i => $trigger) {
-							if ($trigger['triggerid'] == $map_info[$id]['triggerid']) {
+							if (bccomp($trigger['triggerid'], $map_info[$id]['triggerid']) == 0) {
 								$trigger_pos = $i;
 								break;
 							}
@@ -347,6 +347,8 @@ class CMapHelper {
 			'is_binary_size' => true
 		]);
 
+		$linkid = 1;
+
 		foreach ($sysmap['links'] as &$link) {
 			if ($link['permission'] < PERM_READ) {
 				continue;
@@ -359,18 +361,13 @@ class CMapHelper {
 			$hint_label = $link['label'];
 
 			if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER && $link['linktriggers']) {
-				$existing_link_triggers = array_filter($link['linktriggers'],
-					function ($link_trigger) use ($link_triggers_info) {
-						return (array_key_exists($link_trigger['triggerid'], $link_triggers_info));
-					}
+				$existing_link_triggers = array_filter($link['linktriggers'], static fn($link_trigger) =>
+					array_key_exists($link_trigger['triggerid'], $link_triggers_info)
 				);
-
-				$triggered_link_triggers = array_filter($existing_link_triggers,
-					function ($link_trigger) use ($link_triggers_info, $options) {
-						return ($link_triggers_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
-							&& $link_triggers_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
-							&& $link_triggers_info[$link_trigger['triggerid']]['priority'] >= $options['severity_min']);
-					}
+				$triggered_link_triggers = array_filter($existing_link_triggers, static fn($link_trigger) =>
+					$link_triggers_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
+						&& $link_triggers_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
+						&& $link_triggers_info[$link_trigger['triggerid']]['priority'] >= $options['severity_min']
 				);
 
 				// Link-trigger with highest severity or lower triggerid defines link color and drawtype.
@@ -464,13 +461,10 @@ class CMapHelper {
 			$is_duplicate = false;
 
 			foreach ($duplicated_links as &$duplicated_link) {
-				if ($link['selementid1'] !== $duplicated_link['selementid1']
-						&& $link['selementid1'] !== $duplicated_link['selementid2']) {
-					continue;
-				}
-
-				if ($link['selementid2'] !== $duplicated_link['selementid1']
-						&& $link['selementid2'] !== $duplicated_link['selementid2']) {
+				if ((bccomp($link['selementid1'], $duplicated_link['selementid1'], 0) != 0
+							&& bccomp($link['selementid1'], $duplicated_link['selementid2'], 0) != 0)
+						|| (bccomp($link['selementid2'], $duplicated_link['selementid1'], 0) != 0
+							&& bccomp($link['selementid2'], $duplicated_link['selementid2'], 0) != 0)) {
 					continue;
 				}
 
@@ -487,6 +481,7 @@ class CMapHelper {
 
 			if (!$is_duplicate) {
 				$duplicated_links[] = [
+					'linkid' => 'hover'.$linkid,
 					'selementid1' => $link['selementid1'],
 					'selementid2' => $link['selementid2'],
 					'hover_link' => true,
@@ -501,16 +496,13 @@ class CMapHelper {
 			if ($link['show_label'] == MAP_SHOW_LABEL_AUTO_HIDE) {
 				$link['label'] = '';
 			}
+			$linkid++;
 		}
 		unset($link);
 
-		$sysmap['duplicated_links'] = array_filter($duplicated_links, function($duplicated_link) {
-			foreach ($duplicated_link['links'] as $link) {
-				if ($link['show_label'] == MAP_SHOW_LABEL_AUTO_HIDE) {
-					return true;
-				}
-			}
-		});
+		$sysmap['duplicated_links'] = array_filter($duplicated_links, static fn($duplicated_link) =>
+			in_array(MAP_SHOW_LABEL_AUTO_HIDE, array_column($duplicated_link['links'], 'show_label'))
+		);
 	}
 
 	/**

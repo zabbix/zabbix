@@ -127,7 +127,7 @@ class SVGMapLink {
 				const color_box = document.createElement('div');
 
 				color_box.classList.add('map-link-hintbox-row-color-box');
-				color_box.style.backgroundColor = '#' + link.color;
+				color_box.style.backgroundColor = `#${link.color}`;
 				link_row.append(color_box);
 
 				const label_box = document.createElement('div');

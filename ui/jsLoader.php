@@ -275,7 +275,7 @@ $translate_strings = [
 	],
 	'class.linkform.js' => [
 		'S_CANNOT_BE_EMPTY' => _('cannot be empty'),
-		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
+		'S_COLOR_OK' => _('Color (OK)'),
 		'S_EXPECTING_COLOR_CODE' => _('expecting hexadecimal color code (6 symbols)'),
 		'S_HOST' => _('Host'),
 		'S_HOST_GROUP' => _('Host group'),

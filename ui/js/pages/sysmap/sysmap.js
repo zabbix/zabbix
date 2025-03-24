@@ -16,15 +16,14 @@
 ZABBIX.namespace('apps.map');
 
 ZABBIX.apps.map = (function($) {
-	// dependencies
-	var Observer = ZABBIX.classes.Observer;
+	const Observer = ZABBIX.classes.Observer;
 
-	function createMap(containerid, mapData) {
+	function createMap(containerid, data) {
 		Observer.makeObserver(Link.prototype);
 		Observer.makeObserver(Shape.prototype);
 		Observer.makeObserver(Selement.prototype);
 
-		const sysmap = new CMap(containerid, mapData);
+		const sysmap = new CMap(containerid, data);
 
 		Shape.prototype.bind('afterMove', function(e, element) {
 			if (sysmap.selection.count.shapes == 1 && sysmap.selection.count.selements == 0
@@ -74,7 +73,7 @@ ZABBIX.apps.map = (function($) {
 
 			this.object = createMap(containerid, mapData);
 		}
-	};
+	}
 }(jQuery));
 
 jQuery(function ($) {
@@ -88,7 +87,7 @@ jQuery(function ($) {
 	 * or too wide.
 	 */
 	$.fn.positionOverlayDialogue = function () {
-		var $map = $('#map-area'),
+		const $map = $('#map-area'),
 			map_offset = $map.offset(),
 			map_margin = 10,
 			$dialogue = $(this),
@@ -111,5 +110,5 @@ jQuery(function ($) {
 			left: Math.max(dialogue_host_x_min, Math.min(dialogue_host_x_max - $dialogue.outerWidth(), pos_x)),
 			top: Math.max(dialogue_host_y_min, Math.min(dialogue_host_y_max - $dialogue.outerHeight(), pos_y))
 		});
-	};
+	}
 });

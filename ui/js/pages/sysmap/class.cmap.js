@@ -311,6 +311,7 @@ class CMap {
 			elements,
 			links,
 			shapes,
+			duplicated_links: [],
 			label_location: this.data.label_location
 		});
 	}
@@ -850,40 +851,35 @@ class CMap {
 		document.getElementById('formLinkClose').addEventListener('click', () => this.linkForm.hide());
 
 		// Add event listeners on link indicator, threshold and highlight "Remove" buttons.
-		Array.from(this.linkForm.domNode).forEach((container) => {
-			if (container.nodeType == Node.ELEMENT_NODE) {
-				container.addEventListener('click', (e) => {
-					const trigger_remove = e.target.closest('.triggerRemove'),
-						threshold_remove = e.target.closest('.threshold-remove'),
-						highlight_remove = e.target.closest('.highlight-remove');
-
-					if (trigger_remove && container.contains(trigger_remove)) {
-						const id = e.target.dataset.index,
-							triggerid = document.getElementById(`linktrigger_${id}_triggerid`).value;
-
-						document.getElementById(`linktrigger_${id}`).remove();
-
-						for (const _triggerid in this.linkForm.triggerids) {
-							if (_triggerid === triggerid) {
-								delete this.linkForm.triggerids[_triggerid];
-							}
-						}
-					}
-
-					if (threshold_remove && container.contains(threshold_remove)) {
-						const id = e.target.dataset.index;
-
-						document.getElementById(`threshold_${id}`).remove();
-
-					}
-
-					if (highlight_remove && container.contains(highlight_remove)) {
-						const id = e.target.dataset.index;
-
-						document.getElementById(`highlight_${id}`).remove();
-					}
-				});
+		Array.from(this.linkForm.domNode).forEach(container => {
+			if (container.nodeType !== Node.ELEMENT_NODE) {
+				return;
 			}
+
+			container.addEventListener('click', (e) => {
+				const {index} = e.target.dataset,
+					handleRemove = (selector, prefix) => {
+						const element = e.target.closest(selector);
+
+						if (element && container.contains(element)) {
+							if (prefix === 'linktrigger') {
+								const triggerid = document.getElementById(`${prefix}_${index}_triggerid`).value;
+
+								document.getElementById(`${prefix}_${index}`).remove();
+								delete this.linkForm.triggerids[triggerid];
+							}
+							else {
+								document.getElementById(`${prefix}_${index}`).remove();
+							}
+
+							return true;
+						}
+					};
+
+				handleRemove('.trigger-remove', 'linktrigger');
+				handleRemove('.threshold-remove', 'threshold');
+				handleRemove('.highlight-remove', 'highlight');
+			});
 		});
 
 		// Add event listener on shape border type change in single shape form.
@@ -1231,7 +1227,7 @@ class CMap {
 				const data = $.extend({}, that[type][id].getData(), false),
 					dimensions = that[type][id].getDimensions(),
 					dom_node = that[type][id].domNode,
-					x = dimensions.x;
+					x = dimensions.x,
 					y = dimensions.y;
 
 				left = Math.min(x, left === null ? x : left);

@@ -196,23 +196,29 @@ class SVGMap {
 	/**
 	 * Update background image.
 	 *
-	 * @param {string} background  Background image ID.
+	 * @param {object} options                   Options object.
+	 * @param {string} options.background        Background image ID.
+	 * @param {string} options.background_scale  Background scale type.
 	 */
-	updateBackground(background) {
-		let element = null;
-
+	#updateBackground({background, background_scale}) {
 		if (background && background != 0) {
-			if (this.background !== null && background === this.options.background) {
+			const is_bg_changed = this.background === null || background !== this.options.background,
+				is_bg_scale_changed = this.options.background_scale != background_scale;
+
+			if (!is_bg_changed && !is_bg_scale_changed) {
 				// Background was not changed.
 				return;
 			}
 
 			const image = this.getImage(background);
 
-			let width = image.naturalWidth,
-				height = image.naturalHeight;
+			let width,
+				height;
 
-			if (this.options.background_scale == this.constructor.BACKGROUND_SCALE_COVER) {
+			width = image.naturalWidth;
+			height = image.naturalHeight;
+
+			if (background_scale == this.constructor.BACKGROUND_SCALE_COVER) {
 				const canvas_aspect_ratio = this.options.canvas.width / this.options.canvas.height,
 					image_aspect_ratio = width / height;
 
@@ -226,20 +232,29 @@ class SVGMap {
 				}
 			}
 
-			element = this.layers.background.add('image', {
-				x: 0,
-				y: 0,
-				width,
-				height,
-				'xlink:href': this.getImageUrl(background)
-			});
-		}
+			if (!is_bg_changed && is_bg_scale_changed) {
+				this.background.update({width, height});
+			}
+			else {
+				const element = this.layers.background.add('image', {
+					x: 0,
+					y: 0,
+					width,
+					height,
+					'xlink:href': this.getImageUrl(background)
+				});
 
-		if (this.background !== null) {
+				if (this.background !== null) {
+					this.background.replace(element);
+				}
+				else {
+					this.background = element;
+				}
+			}
+		}
+		else if (this.background !== null) {
 			this.background.remove();
 		}
-
-		this.background = element;
 	}
 
 	/**
@@ -449,12 +464,12 @@ class SVGMap {
 		// Check for element and link changes only on map or widget refresh. Similar to edit mode when re-ordering.
 		if (options.caller !== undefined) {
 			/*
-			* Adding new or removing existing elements means that display the order of elements have changed. This
-			* includes highlights, links and selections. Changing an element type to a "host group elements" type can
-			* also trigger this. If element count is the same check only if order (zindex) has changed for element. If
-			* so, draw elements again. Other element properties like coordinates, image URL, width or height are checked
-			* later and complete redrawing is not necessary.
-			*/
+			 * Adding new or removing existing elements means that display the order of elements have changed. This
+			 * includes highlights, links and selections. Changing an element type to a "host group elements" type can
+			 * also trigger this. If element count is the same check only if order (zindex) has changed for element. If
+			 * so, draw elements again. Other element properties like coordinates, image URL, width or height are
+			 * checked later and complete redrawing is not necessary.
+			 */
 			invalidate = options.elements.length != this.options.elements.length;
 
 			if (!invalidate) {
@@ -474,12 +489,21 @@ class SVGMap {
 			}
 
 			/*
-			* If no changes in element properties, check if links are added or removed. This also should trigger a
-			* complete element redrawing. If link count is the same, check if selement IDs have changed for same link.
-			* Meaning that a different node could be connected. In that case also draw elements again. Other link
-			* properties like color, draw style are checked later and can be applied in real time and redrawing is not
-			* necessary.
-			*/
+			 * Check changes in link properties like show label always or auto hide. That generates changes in
+			 * "options.duplicated_links". Usually enough with just checking if duplicated link count has changed. If a
+			 * different node is connected, it can be checked using changes in "options.links".
+			 */
+			if (!invalidate) {
+				invalidate = options.duplicated_links.length != this.options.duplicated_links.length;
+			}
+
+			/*
+			 * If no changes in element properties or duplicated links, check if links are added or removed. This also
+			 * should trigger a complete element redrawing. If link count is the same, check if selement IDs have
+			 * changed for same link. Meaning that a different node could be connected. In that case also draw elements
+			 * again. Other link properties like color, draw style are checked later and can be applied in real time and
+			 * redrawing is not necessary.
+			 */
 			if (!invalidate) {
 				invalidate = options.links.length != this.options.links.length;
 
@@ -489,15 +513,19 @@ class SVGMap {
 					for (const link of options.links) {
 						const ex = existing_links.get(link.linkid);
 
-						if (ex) {
-							const [a1, a2] = [link.selementid1, link.selementid2].sort();
-							const [b1, b2] = [ex.selementid1, ex.selementid2].sort();
+						if (!ex) {
+							invalidate = true;
 
-							if (a1 !== b1 || a2 !== b2) {
-								invalidate = true;
+							break;
+						}
 
-								break;
-							}
+						const [a1, a2] = [link.selementid1, link.selementid2].sort();
+						const [b1, b2] = [ex.selementid1, ex.selementid2].sort();
+
+						if (a1 !== b1 || a2 !== b2) {
+							invalidate = true;
+
+							break;
 						}
 					}
 				}
@@ -557,6 +585,7 @@ class SVGMap {
 					 * positioning.
 					 */
 					this.updateItems('shapes', 'sysmap_shapeid', SVGMapShape, options.shapes, incremental);
+
 					this.updateElements({
 						elements: {
 							class: SVGMapElement,
@@ -566,18 +595,12 @@ class SVGMap {
 						links: {
 							class: SVGMapLink,
 							id_field: 'linkid',
-							items: options.links
+							items: options.links.concat(options.duplicated_links)
 						}},
 						incremental
 					);
 
-					if (options.duplicated_links) {
-						this.updateItems('duplicated_links', 'linkid', SVGMapLink, options.duplicated_links,
-							incremental
-						);
-					}
-					this.options.background_scale = options.background_scale;
-					this.updateBackground(options.background);
+					this.#updateBackground(options);
 				}
 				catch(exception) {
 					resolve();

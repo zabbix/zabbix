@@ -978,7 +978,7 @@ function createFontSelect(string $name): CSelect {
 			],
 			(new CCol(
 				(new CButtonLink(_('Remove')))
-					->addClass('triggerRemove')
+					->addClass('trigger-remove')
 					->setAttribute('data-index', '#{index}')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))

@@ -246,6 +246,10 @@ class LinkForm {
 					data.thresholds[link_threshold[1]][link_threshold[2]] = values[i].value.toString();
 				}
 				else if (link_trigger !== null) {
+					if (data.linktriggers[link_trigger[1]] === undefined) {
+						data.linktriggers[link_trigger[1]] = {};
+					}
+
 					if (link_trigger[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
 						throw sprintf(t('S_INCORRECT_VALUE'),
 							`/linktriggers/${Object.keys(data.linktriggers).length}/color`,
@@ -253,15 +257,11 @@ class LinkForm {
 						);
 					}
 
-					if (data.linktriggers[link_trigger[1]] === undefined) {
-						data.linktriggers[link_trigger[1]] = {};
-					}
-
 					data.linktriggers[link_trigger[1]][link_trigger[2]] = values[i].value.toString();
 				}
 				else {
 					if (values[i].name === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-						throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+						throw sprintf(t('S_INCORRECT_VALUE'), t('S_COLOR_OK'), t('S_EXPECTING_COLOR_CODE'));
 					}
 
 					data[values[i].name] = values[i].value.toString();
@@ -280,17 +280,17 @@ class LinkForm {
 
 				if (this.item_type == ITEM_VALUE_TYPE_LOG || this.item_type == ITEM_VALUE_TYPE_TEXT
 						|| this.item_type == ITEM_VALUE_TYPE_STR) {
-					if (Object.keys(data.highlights).length === 0) {
+					if (Object.keys(data.highlights).length == 0) {
 						throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'), t('S_LINK_HIGHLIGHT_IS_REQUIRED'));
 					}
 				}
 				else if (this.item_type == ITEM_VALUE_TYPE_FLOAT || this.item_type == ITEM_VALUE_TYPE_UINT64) {
-					if (Object.keys(data.thresholds).length === 0) {
+					if (Object.keys(data.thresholds).length == 0) {
 						throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'), t('S_LINK_THRESHOLD_IS_REQUIRED'));
 					}
 
 					this.#checkThresholds(data.thresholds)
-						.then(response => {
+						.then((response) => {
 							if ('error' in response) {
 								throw response.error;
 							}
@@ -523,7 +523,7 @@ class LinkForm {
 	 * Add new highlight.
 	 */
 	#addNewHighlight() {
-		const tpl = new Template(document.getElementById('#highlight-row').innerHTML),
+		const tpl = new Template(document.getElementById('highlight-row').innerHTML),
 			$table = $('#link-highlights-container tbody');
 
 		$(tpl.evaluate({

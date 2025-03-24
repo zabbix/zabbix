@@ -20,6 +20,28 @@
  * @param {object} options  Element attributes (match field names in data source).
  */
 class SVGMapElement {
+
+	/**
+	 * Stores mouse over event handler.
+	 *
+	 * @type {function}
+	 */
+	#mouse_over_handler;
+
+	/**
+	 * Stores mouse out event handler.
+	 *
+	 * @type {function}
+	 */
+	#mouse_out_handler;
+
+	/**
+	 * Stores mouse click event handler.
+	 *
+	 * @type {function}
+	 */
+	#click_handler;
+
 	constructor (map, options) {
 		this.map = map;
 		this.options = options;
@@ -252,39 +274,23 @@ class SVGMapElement {
 
 			options['xlink:href'] = href;
 
+			const is_selectable = this.map.can_select_element
+					&& (this.options.elementtype == this.constructor.TYPE_HOST
+						|| this.options.elementtype == this.constructor.TYPE_HOST_GROUP),
+				label_auto_hide = this.options.show_label == this.constructor.SHOW_LABEL_AUTO_HIDE;
+
 			if (this.image === null || this.image.invalid) {
 				const image = this.map.layers.elements.add('image', options);
 
 				this.removeItem('image');
 				this.image = image;
-
-				// if (this.map.can_select_element && (this.options.elementtype == this.constructor.TYPE_HOST
-				// 		|| this.options.elementtype == this.constructor.TYPE_HOST_GROUP)) {
-				// 	this.image.element.addEventListener('mouseover', (e) => this.#onMouseOver(e));
-				// 	this.image.element.addEventListener('mouseout', (e) => this.#onMouseOut(e));
-				// 	this.image.element.addEventListener('click', () => this.#onClick());
-				// }
-				const is_selectable = this.map.can_select_element
-						&& (this.options.elementtype == this.constructor.TYPE_HOST
-							|| this.options.elementtype == this.constructor.TYPE_HOST_GROUP),
-					label_auto_hide = this.options.show_label == this.constructor.SHOW_LABEL_AUTO_HIDE;
-
-				if (is_selectable || label_auto_hide) {
-					this.image.element.addEventListener('mouseover', (e) => this.#onMouseOver(e, is_selectable,
-						label_auto_hide
-					));
-					this.image.element.addEventListener('mouseout', (e) => this.#onMouseOut(e, is_selectable,
-						label_auto_hide
-					));
-				}
-
-				if (is_selectable) {
-					this.image.element.addEventListener('click', () => this.#onClick());
-				}
 			}
 			else {
 				this.image.update(options);
 			}
+
+			this.#addEventListeners(is_selectable, label_auto_hide);
+			this.#removeEventListeners(is_selectable, label_auto_hide);
 		}
 		else {
 			this.removeItem('image');
@@ -414,6 +420,58 @@ class SVGMapElement {
 	}
 
 	/**
+	 * Create event handlers and add event listeners to created image object. On map refresh event handlers will already
+	 * exist. In case some element properties have changed, no new event handlers are created.
+	 *
+	 * @param {boolean} is_selectable    True if element is selectable.
+	 * @param {boolean} label_auto_hide  True if element has auto-hide label.
+	 */
+	#addEventListeners(is_selectable, label_auto_hide) {
+		if (is_selectable || label_auto_hide) {
+			if (this.#mouse_over_handler === undefined) {
+				this.#mouse_over_handler = (e) => this.#onMouseOver(e, is_selectable, label_auto_hide);
+			}
+
+			if (this.#mouse_out_handler === undefined) {
+				this.#mouse_out_handler = (e) => this.#onMouseOut(e, is_selectable, label_auto_hide);
+			}
+
+			this.image.element.addEventListener('mouseover', this.#mouse_over_handler);
+			this.image.element.addEventListener('mouseout', this.#mouse_out_handler);
+		}
+
+		if (is_selectable) {
+			if (this.#click_handler === undefined) {
+				this.#click_handler = () => this.#onClick();
+			}
+
+			this.image.element.addEventListener('click', this.#click_handler);
+		}
+	}
+
+	/**
+	 * Remove event listeners on created image object based on previously set event handlers.
+	 *
+	 * @param {boolean} is_selectable    True if element is selectable.
+	 * @param {boolean} label_auto_hide  True if element has auto-hide label.
+	 */
+	#removeEventListeners(is_selectable, label_auto_hide) {
+		if (!is_selectable && !label_auto_hide) {
+			if (this.#mouse_over_handler !== undefined) {
+				this.image.element.removeEventListener('mouseover', this.#mouse_over_handler);
+			}
+
+			if (this.#mouse_out_handler !== undefined) {
+				this.image.element.removeEventListener('mouseout', this.#mouse_out_handler);
+			}
+		}
+
+		if (!is_selectable && this.#click_handler !== undefined) {
+			this.image.element.removeEventListener('click', this.#click_handler);
+		}
+	}
+
+	/**
 	 * Update element selection, highlight, image and label.
 	 */
 	update() {
@@ -426,7 +484,7 @@ class SVGMapElement {
 	/**
 	 * Element mouse over event.
 	 *
-	 * @param {Event}   e                Mouse over event.
+	 * @param {event}   e                Mouse over event.
 	 * @param {boolean} is_selectable    True if element is selectable.
 	 * @param {boolean} label_auto_hide  True if label should be toggled.
 	 */
@@ -443,7 +501,7 @@ class SVGMapElement {
 	/**
 	 * Element mouse out event.
 	 *
-	 * @param {Event}   e                Mouse out event.
+	 * @param {event}   e                Mouse out event.
 	 * @param {boolean} is_selectable    True if element is selectable.
 	 * @param {boolean} label_auto_hide  True if label should be toggled.
 	 */
