@@ -129,7 +129,7 @@ $graph_form
 
 $output = [
 	'header' => $data['graphid'] == 0 ? _('New graph prototype') : _('Graph prototype'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_GRAPH_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT),
 	'body' => $graph_form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('graph.edit.js.php'),
