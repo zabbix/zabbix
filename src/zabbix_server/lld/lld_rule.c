@@ -1384,6 +1384,23 @@ static void	lld_override_data_save_optemplates(zbx_uint64_t itemid, zbx_uint64_t
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: save or update integer operation data for LLD override            *
+ *                                                                            *
+ * Parameters: itemid     - [IN] associated item ID                           *
+ *             overrideid - [IN] override ID                                  *
+ *             row        - [IN] row data                                     *
+ *             col        - [IN] column index                                 *
+ *             table_name - [IN] target table name                            *
+ *             field_name - [IN] field name in the target table               *
+ *             resource   - [IN] resource name for auditing                   *
+ *             db_insert  - [IN] database insert object                       *
+ *             sql        - [IN/OUT] SQL query buffer                         *
+ *             sql_alloc  - [IN/OUT] allocated SQL buffer size                *
+ *             sql_offset - [IN/OUT] current position in SQL buffer           *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_override_data_save_opint(zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_sync_row_t *row,
 		int col, const char *table_name, const char *field_name, const char *resource,
 		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset)
@@ -1423,6 +1440,23 @@ static void	lld_override_data_save_opint(zbx_uint64_t itemid, zbx_uint64_t overr
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: save or update string operation data for LLD override             *
+ *                                                                            *
+ * Parameters: itemid     - [IN] associated item ID                           *
+ *             overrideid - [IN] override ID                                  *
+ *             row        - [IN] row data                                     *
+ *             col        - [IN] column index                                 *
+ *             table_name - [IN] target table name                            *
+ *             field_name - [IN] field name in the target table               *
+ *             resource   - [IN] resource name for auditing                   *
+ *             db_insert  - [IN] database insert object                       *
+ *             sql        - [IN/OUT] SQL query buffer                         *
+ *             sql_alloc  - [IN/OUT] allocated SQL buffer size                *
+ *             sql_offset - [IN/OUT] current position in SQL buffer           *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_override_data_save_opstr(zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_sync_row_t *row,
 		int col, const char *table_name, const char *field_name, const char *resource,
 		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset)
@@ -1533,6 +1567,17 @@ static void 	lld_override_data_save(zbx_uint64_t itemid, const zbx_lld_override_
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update LLD override in database                                   *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] SQL string buffer                        *
+ *             sql_alloc  - [IN/OUT] allocated size of SQL string buffer      *
+ *             sql_offset - [IN/OUT] current position in SQL string buffer    *
+ *             itemid     - [IN] LLD rule ID                                  *
+ *             row        - [IN] override row                                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t itemid,
 		zbx_sync_row_t *row)
 {
@@ -2757,6 +2802,7 @@ static void	lld_prototype_items_clear(void *v)
 	zbx_hashset_destroy(&pi->rule_index);
 }
 
+/* lld rule index by lld rows for macro export */
 typedef struct
 {
 	const zbx_lld_row_t	*lld_row;
@@ -2781,6 +2827,13 @@ int	lld_row_itemids_compare(const void *v1, const void *v2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: export LLD macros for discovered LLD rules                        *
+ *                                                                            *
+ * Parameters: items - [IN] vector of discovered LLD rules                    *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *items)
 {
 	zbx_hashset_t		exported;
@@ -2817,6 +2870,15 @@ static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *ite
 	zbx_hashset_destroy(&exported);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process derived LLD rules                                         *
+ *                                                                            *
+ * Parameters: hostid          - [IN] host identifier                         *
+ *             item_prototypes - [IN] vector of LLD item prototypes           *
+ *             items           - [IN] vector of discovered LLD items          *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_rule_process_derived_items(zbx_uint64_t hostid,
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		const zbx_vector_lld_item_full_ptr_t *items)
@@ -2876,10 +2938,6 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_vector_lld_item_full_ptr_t		items;
 	zbx_hashset_t				prototype_rules;
 	zbx_hashset_iter_t			iter;
-
-	// WDN
-	zabbix_increase_log_level();
-	zabbix_increase_log_level();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2995,7 +3053,6 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	/* discovery corresponding LLD rule prototypes */
 
-	/* TODO: create 'delete immediately' lifetime for prototpes ? */
 	zbx_lld_lifetime_t	proto_enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
 
 	for (int i = 0; i < item_prototypes.values_num; i++)
@@ -3062,9 +3119,6 @@ out:
 	zbx_vector_lld_item_prototype_ptr_destroy(&item_prototypes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	zabbix_decrease_log_level();
-	zabbix_decrease_log_level();
 
 	return ret;
 }

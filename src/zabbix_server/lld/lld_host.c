@@ -5969,6 +5969,14 @@ out:
 	zbx_vector_uint64_destroy(&hostids);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve group prototypes for a given host prototype              *
+ *                                                                            *
+ * Parameters: parent_hostid - [IN] ID of the parent host                     *
+ *             group_src     - [OUT] rowset to store retrieved group data     *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_group_prototype_prototypes_get(zbx_uint64_t parent_hostid, zbx_sync_rowset_t *group_src)
 {
 	zbx_db_result_t			result;
@@ -5993,6 +6001,14 @@ static void	lld_group_prototype_prototypes_get(zbx_uint64_t parent_hostid, zbx_s
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve group prototypes for discovered hosts                    *
+ *                                                                            *
+ * Parameters: parent_hostid - [IN] host prototype ID                         *
+ *             hosts         - [IN/OUT] vector of discovered hosts            *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts)
 {
 	zbx_db_result_t		result;
@@ -6030,6 +6046,16 @@ static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector
 
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: synchronize group prototypes for a discovered hosts with host     *
+ *          prototype group prototypes                                        *
+ *                                                                            *
+ * Parameters: hosts     - [IN/OUT] discovered host                           *
+ *             group_src - [IN] group prototypes of host prototype            *
+ *             lld_obj   - [IN] LLD data row                                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_host_group_prototypes_sync(zbx_lld_host_t *hosts, const zbx_sync_rowset_t *group_src,
 		const zbx_lld_entry_t *lld_obj)
 {
@@ -6051,6 +6077,13 @@ static void	lld_host_group_prototypes_sync(zbx_lld_host_t *hosts, const zbx_sync
 	zbx_sync_rowset_clear(&groups);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: save group prototypes for discovered host prototypes              *
+ *                                                                            *
+ * Parameters: hosts - [IN/OUT] vector of discovered hosts                    *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_group_prototypes_save(zbx_vector_lld_host_ptr_t *hosts)
 {
 	zbx_db_insert_t		db_insert;
@@ -6137,7 +6170,14 @@ static void	lld_group_prototypes_save(zbx_vector_lld_host_ptr_t *hosts)
 	zbx_vector_uint64_destroy(&deleteids);
 }
 
-static void	lld_host_process_derived_items(const zbx_vector_lld_host_ptr_t *hosts)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process derived LLD rules for discovered hosts                    *
+ *                                                                            *
+ * Parameters: hosts - [IN] vector of discovered hosts                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *hosts)
 {
 	zbx_vector_uint64_t	hostids;
 	char			*sql = NULL;
@@ -6398,7 +6438,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 				tls_subject, tls_psk_identity, tls_psk, &hgsets, &permissions, &del_hostgroupids,
 				&del_hgsetids, dflags, rule_index);
 
-		lld_group_prototypes_save(&hosts);
+		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			lld_group_prototypes_save(&hosts);
 
 		/* linking of the templates */
 		lld_templates_link(&hosts, error);
@@ -6406,7 +6447,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
 
 		lld_host_export_lld_macros(&hosts);
-		lld_host_process_derived_items(&hosts);
+		lld_host_process_derived_lld_rules(&hosts);
 
 		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);
