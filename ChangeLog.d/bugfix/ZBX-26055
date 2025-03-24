@@ -1,1 +1,0 @@
-...G...... [ZBX-26055] fixed failing to refresh active checks when next refresh was faster than 60 seconds (sboidenko)

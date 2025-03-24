@@ -12,6 +12,8 @@ A.F.I..... [ZBXNEXT-8784] added the ability to show map element and link labels 
 A.F.I..PS. [ZBXNEXT-7048] converted the settings table to a key-value format (askolmeisters, jfreibergs, vmaksimovs)
 
 Bug fixes:
+.......PS. [ZBX-26211] fixed crash on check for not supported value (vso)
+...G...... [ZBX-26055] fixed failing to refresh active checks when next refresh was faster than 60 seconds (sboidenko)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
 .......PS. [ZBX-26042] fixed agent redirection if host encryption settings are wrong (sboidenko)
 ........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
@@ -74,6 +76,7 @@ Changes for 7.2.5rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-26211] fixed crash on check for not supported value (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.5rc1
@@ -437,6 +440,7 @@ Changes for 7.0.11rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-26211] fixed crash on check for not supported value (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.11rc1
