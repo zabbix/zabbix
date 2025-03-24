@@ -1309,7 +1309,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Discord mapping (disable)',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => 'test discord',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -2025,7 +2025,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'кириллица1',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => 'кириллица'
 							],
 							[
@@ -2175,7 +2175,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '~`!@#$%^7*()_+=/1',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							],
 							[
@@ -2323,7 +2323,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'leading.trailing',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => 'leading.trailing'
 							]
 						]
@@ -2476,7 +2476,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_long_valu',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => STRING_255
 							],
 							[
@@ -2667,7 +2667,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Create Test Discord mapping with default values',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => 'test discord',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,

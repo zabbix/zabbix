@@ -471,7 +471,7 @@ class Actions {
 				'\'Command: H1:ls -la\', 1, 0, \'\', 1, 1, \'\'),'.
 				'(130, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 9, 1597440000, 3, \'igor.danoshaites@zabbix.com\','.
 				'\'time_subject_2\', \'time_message_\', 1, 0, \'\', 1, 0, \'\'),'.
-				'(131, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 1, 1329724870, 10, \'test.test@zabbix.com\','.
+				'(131, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 1, 1329724870, 39, \'test.test@zabbix.com\','.
 				'\'subject here\', \'message here\', 1, 0, \'\', 1, 0, \'\'),'.
 				'(132, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 9, 1329724880, 3, \'77777777\', \'subject here\','.
 				'\'message here\', 1, 0, \'\', 1, 0, \'\'),'.
