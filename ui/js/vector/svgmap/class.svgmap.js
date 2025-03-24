@@ -480,7 +480,7 @@ class SVGMap {
 				for (const element of options.elements) {
 					const ex = existing_elements.get(element.selementid);
 
-					if (ex && ex.zindex != element.zindex) {
+					if (!ex || ex.zindex != element.zindex) {
 						invalidate = true;
 
 						break;

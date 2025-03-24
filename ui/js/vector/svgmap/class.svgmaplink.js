@@ -143,7 +143,7 @@ class SVGMapLink {
 			element.element.style.cursor = 'pointer';
 		}
 		else {
-			element.add('textarea',{
+			element.add('textarea', {
 					x: options.center.x,
 					y: options.center.y,
 					fill: `#${this.map.options.theme.textcolor}`,
