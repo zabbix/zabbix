@@ -152,7 +152,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$graph = reset($graph);
 
 				// If all items are from one host we change them, or set calculated if not exist on that host.
-				if ($graph && ($this->isTemplateDashboard() || count($graph['hosts']) == 1)) {
+				if ($graph && count($graph['hosts']) == 1) {
 					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
 						$ymax_item = ['itemid' => $graph['ymax_itemid']];
 
