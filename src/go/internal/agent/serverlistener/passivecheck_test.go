@@ -21,7 +21,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/internal/agent"
+	mockscheduler "golang.zabbix.com/agent2/internal/agent/scheduler/mocks"
 	"golang.zabbix.com/agent2/pkg/version"
+	mockcomms "golang.zabbix.com/agent2/pkg/zbxcomms/mocks"
+	"golang.zabbix.com/sdk/errs"
 )
 
 func TestFormatError(t *testing.T) {
@@ -393,6 +396,133 @@ func Test_formatJSONParsingError(t *testing.T) {
 			if diff := cmp.Diff(tt.expect.expectedOutput, output); diff != "" {
 				t.Errorf("formatJSONParsingError(): output mismatch (-want +got):\n%s", diff)
 			}
+		})
+	}
+}
+
+func Test_processJSONRequest(t *testing.T) {
+	t.Parallel()
+
+	type helperFunc func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler)
+
+	type testCase struct {
+		name       string
+		rawRequest []byte
+		setup      helperFunc
+	}
+
+	expectedJSONError := func(errorMsg string) []byte {
+		return []byte(fmt.Sprintf(
+			`{"version":"%s","variant":%d,"error":"%s"}`,
+			version.Long(),
+			agent.Variant,
+			errorMsg,
+		))
+	}
+
+	expectedJSONErrorPayload := func(errText string) []byte {
+		return []byte(fmt.Sprintf(
+			`{"version":"%s","variant":%d,"data":[{"error":"%s"}]}`,
+			version.Long(),
+			agent.Variant,
+			errText,
+		))
+	}
+
+	expectedJSONValuePayload := func(value string) []byte {
+		return []byte(fmt.Sprintf(
+			`{"version":"%s","variant":%d,"data":[{"value":"%s"}]}`,
+			version.Long(),
+			agent.Variant,
+			value,
+		))
+	}
+
+	tests := []testCase{
+		{
+			name:       "+successResponse",
+			rawRequest: []byte(`{"request":"passive checks","data":[{"key":"system.uptime","timeout":1}]}`),
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				successResult := "some-result"
+
+				sched.
+					On("PerformTask", "system.uptime", time.Second, uint64(agent.PassiveChecksClientID)).
+					Return(&successResult, nil)
+
+				conn.On("Write", expectedJSONValuePayload(successResult)).Return(nil)
+			},
+		},
+		{
+			name:       "-invalidJSONRequest",
+			rawRequest: []byte(`{"invalid`),
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				errString := errs.New("failed to unmarshall json request into passiveChecksRequest").Error()
+				conn.On("Write", expectedJSONError(errString)).Return(nil)
+			},
+		},
+		{
+			name:       "-performTaskFails",
+			rawRequest: []byte(`{"request":"passive checks","data":[{"key":"system.uptime","timeout":1}]}`),
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				errReturn := errs.New("task failure")
+
+				sched.
+					On("PerformTask", "system.uptime", time.Second, uint64(agent.PassiveChecksClientID)).
+					Return(nil, errReturn)
+
+				conn.On("Write", expectedJSONErrorPayload(errReturn.Error())).Return(nil)
+			},
+		},
+		{
+			name:       "-nilResult",
+			rawRequest: []byte(`{"request":"passive checks","data":[{"key":"system.uptime","timeout":1}]}`),
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				sched.
+					On("PerformTask", "system.uptime", time.Second, uint64(agent.PassiveChecksClientID)).
+					Return(nil, nil)
+			},
+		},
+		{
+			name:       "-resultWriteFails",
+			rawRequest: []byte(`{"request":"passive checks","data":[{"key":"system.uptime","timeout":1}]}`),
+			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface, sched *mockscheduler.Scheduler) {
+				t.Helper()
+
+				successResult := "some-result"
+
+				sched.
+					On("PerformTask", "system.uptime", time.Second, uint64(agent.PassiveChecksClientID)).
+					Return(&successResult, nil)
+
+				conn.On("Write", expectedJSONValuePayload(successResult)).Return(errs.New("write failed"))
+
+				conn.On("RemoteIP").Return("127.0.0.1")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			conn := mockcomms.NewConnectionInterface(t)
+			sched := mockscheduler.NewScheduler(t)
+
+			tt.setup(t, conn, sched)
+
+			processJSONRequest(conn, sched, tt.rawRequest)
+
+			conn.AssertExpectations(t)
+			sched.AssertExpectations(t)
 		})
 	}
 }
