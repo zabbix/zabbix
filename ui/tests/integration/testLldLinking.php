@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @hosts test_trigger_linking
  * @backup history, autoreg_host
  */
-class testTriggerLinking extends CIntegrationTest {
+class testLldLinking extends CIntegrationTest {
 
 	private static $templateX_ID;
 
@@ -159,7 +159,7 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @required-components server, agent
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
-	public function testTriggerLinking_conflict() {
+	public function testLinkingLinking_conflict() {
 
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
