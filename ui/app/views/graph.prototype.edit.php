@@ -62,7 +62,7 @@ if ($data['graphid'] != 0) {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete graph?'),
+			'confirmation' => _('Delete graph prototype?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
