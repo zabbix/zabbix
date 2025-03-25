@@ -29,8 +29,6 @@ class testLldLinking extends CIntegrationTest {
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
-
-	private static $templateX_ID;
 	private static $actionId;
 	private static $templateids = array();
 
@@ -180,9 +178,9 @@ class testLldLinking extends CIntegrationTest {
 
 		$response = $this->call('action.delete',[self::$actionId]);
 
-		//for ($i = 0; $i < count(self::$templateids); $i++) {
-			$response = $this->call('host.delete', [self::$templateids]);
-	//	}
+		for ($i = 0; $i < count(self::$templateids); $i++) {
+			$response = $this->call('template.delete', [self::$templateids[$i]]);
+		}
 	}
 
 	/**
