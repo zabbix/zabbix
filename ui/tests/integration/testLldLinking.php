@@ -31,6 +31,7 @@ class testLldLinking extends CIntegrationTest {
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	private static $templateX_ID;
+	private static $actionId;
 	private static $templateids = array();
 
 	/**
@@ -95,6 +96,7 @@ class testLldLinking extends CIntegrationTest {
 			]
 		]);
 
+		self::$actionId = $response['result']['actionids'][0];
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
 		$this->assertArrayHasKey('actionids', $response['result'], $ep);
@@ -175,6 +177,11 @@ class testLldLinking extends CIntegrationTest {
 		sleep(1);
 	}
 
+	private function deleteAction() {
+
+		$response = $this->call('action.delete',self::$actionId);
+	}
+
 	/**
 	 * Test LLD linking cases.
 	 *
@@ -196,6 +203,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
+		$this->deleteAction();
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
