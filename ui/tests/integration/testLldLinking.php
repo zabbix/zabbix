@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testLldLinking extends CIntegrationTest {
 	const NUMBER_OF_TEMPLATES_SAME_LLD = 2;
+	const NUMBER_OF_TEMPLATES_ONE = 1;
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
@@ -151,6 +152,7 @@ class testLldLinking extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
+		self::$templateids = [];
 	}
 
 	private function unlinkTemplates() {
@@ -191,10 +193,16 @@ class testLldLinking extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": conflicting item key "lld" found', true, 120);
-		/*$this->stopComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->unlinkTemplates();
+		$this->metaDataItemUpdate();
+		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
+		$this->startComponent(self::COMPONENT_AGENT);
+		sleep(1);
+		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);*/
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements(): SUCCEED', true, 120);
 	}
 }
