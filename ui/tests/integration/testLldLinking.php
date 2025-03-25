@@ -216,6 +216,6 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements(): SUCCEED', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 	}
 }
