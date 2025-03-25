@@ -2713,7 +2713,9 @@ static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
 	zbx_template_lld_macro_t	*ip1 = *(zbx_template_lld_macro_t * const *)d1;
 	zbx_template_lld_macro_t	*ip2 = *(zbx_template_lld_macro_t * const *)d2;
 
-	return strcmp(ip1->lld_macro, ip2->lld_macro);
+	ZBX_RETURN_IF_NOT_EQUAL(ip1->lld_macro, ip2->lld_macro);
+
+	return 0;
 }
 /******************************************************************************
  *                                                                            *
