@@ -126,12 +126,12 @@ class testLldLinking extends CIntegrationTest {
 				'delay' => '30s',
 				'lld_macro_paths' => [
 					[
-						'lld_macro' => '{#MACRO1}',
-						'path' => '$.path1'
+						'lld_macro' => '{#FSNAME}',
+						'path' => '$.fsname'
 					],
 					[
-						'lld_macro' => '{#MACRO2}',
-						'path' => '$.path2'
+						'lld_macro' => '{#FSTYPE}',
+						'path' => '$.fstype'
 					]
 				]
 			]);
