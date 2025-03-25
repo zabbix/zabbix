@@ -272,7 +272,7 @@ static int	DBpatch_7030015(void)
 					{"redirection_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"client_id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"client_secret", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"authorization_url", NULL, NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"authorization_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"tokens_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"access_token", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"access_token_updated", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -285,6 +285,13 @@ static int	DBpatch_7030015(void)
 			};
 
 	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030016(void)
+{
+	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("settings", 2, &field);
 }
 
 #endif
@@ -309,5 +316,6 @@ DBPATCH_ADD(7030012, 0, 1)
 DBPATCH_ADD(7030013, 0, 1)
 DBPATCH_ADD(7030014, 0, 1)
 DBPATCH_ADD(7030015, 0, 1)
+DBPATCH_ADD(7030016, 0, 1)
 
 DBPATCH_END()
