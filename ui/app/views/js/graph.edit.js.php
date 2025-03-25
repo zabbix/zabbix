@@ -65,14 +65,14 @@ window.graph_edit_popup = new class {
 	}
 
 	#initActions() {
-		this.form.querySelector('#graphtype').addEventListener('change', (e) => {
+		document.getElementById('graphtype').addEventListener('change', (e) => {
 			this.#toggleGraphTypeFields(e.target.value);
 			this.#updateItemsTable(e.target.value);
 
 			this.graph_type = e.target.value;
 		});
 
-		this.form.querySelector('#items-table').addEventListener('click', (e) => {
+		document.getElementById('items-table').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-item-name')) {
 				this.#openItemPopup(e.target);
 			}
@@ -93,15 +93,15 @@ window.graph_edit_popup = new class {
 			}
 		});
 
-		this.#toggleGraphTypeFields(this.form.querySelector('#graphtype').value);
+		this.#toggleGraphTypeFields(document.getElementById('graphtype').value);
 		this.#toggleYaxisTypeFields();
 
 		// Percent fields.
-		this.form.querySelector('#visible_percent_left').addEventListener('change', () => {
+		document.getElementById('visible_percent_left').addEventListener('change', () => {
 			this.#togglePercentField('left');
 		});
 
-		this.form.querySelector('#visible_percent_right').addEventListener('change', () => {
+		document.getElementById('visible_percent_right').addEventListener('change', () => {
 			this.#togglePercentField('right');
 		});
 
@@ -164,7 +164,7 @@ window.graph_edit_popup = new class {
 		});
 
 		// Update items table columns and update column classes.
-		const table = this.form.querySelector('#items-table');
+		const table = document.getElementById('items-table');
 		let name_column = table.querySelector('#name-column');
 
 		if (graph_type == <?= GRAPH_TYPE_NORMAL ?>) {
@@ -191,8 +191,8 @@ window.graph_edit_popup = new class {
 	}
 
 	#toggleYaxisTypeFields() {
-		const ymin_type = this.form.querySelector('#ymin_type');
-		const ymax_type = this.form.querySelector('#ymax_type');
+		const ymin_type = document.getElementById('ymin_type');
+		const ymax_type = document.getElementById('ymax_type');
 
 		ymin_type.addEventListener('change', (e) => {
 			this.#toggleYAxisFields(e.target, 'min');
@@ -221,7 +221,7 @@ window.graph_edit_popup = new class {
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			document.querySelector('#preview-tab').style.overflow = this.form.querySelector('#width').value > 900
+			document.querySelector('#preview-tab').style.overflow = document.getElementById('width').value > 900
 				? 'auto'
 				: ''
 

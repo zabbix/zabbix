@@ -229,7 +229,7 @@ $yaxis_min_item_prototpye = (new CDiv(
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 $graph_tab->addItem([
-	(new CLabel(_('Y axis MIN value'),'ymin_type_label')),
+	(new CLabel(_('Y axis MIN value'), 'ymin_type_label')),
 	(new CFormField([
 		$yaxis_min_type, $yaxis_min_value, $yaxis_min_itemid, $yaxis_min_item_prototpye
 	]))->setId('yaxis_min_field')

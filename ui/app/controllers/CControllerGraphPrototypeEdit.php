@@ -22,7 +22,6 @@ class CControllerGraphPrototypeEdit extends CController {
 	 */
 	private $discovery_rule = [];
 
-
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -185,6 +184,7 @@ class CControllerGraphPrototypeEdit extends CController {
 			if (array_key_exists('percent_left', $data['visible'])) {
 				$data['percent_left'] = $this->getInput('percent_left', 0);
 			}
+
 			if (array_key_exists('percent_right', $data['visible'])) {
 				$data['percent_right'] = $this->getInput('percent_right', 0);
 			}
@@ -209,8 +209,8 @@ class CControllerGraphPrototypeEdit extends CController {
 
 			foreach ($this->getInput('items', []) as $gitem) {
 				if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-					&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-					&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+						&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+						&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
 					$gitems[] = $gitem;
 				}
 			}

@@ -168,6 +168,7 @@ class CControllerGraphEdit extends CController {
 			if (array_key_exists('percent_left', $data['visible'])) {
 				$data['percent_left'] = $this->getInput('percent_left', 0);
 			}
+
 			if (array_key_exists('percent_right', $data['visible'])) {
 				$data['percent_right'] = $this->getInput('percent_right', 0);
 			}

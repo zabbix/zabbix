@@ -20,7 +20,6 @@
  */
 
 $this->includeJsFile('graph.list.js.php');
-$this->addJsFile('colorpicker.js');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Graphs'))
@@ -126,7 +125,7 @@ $graphs_table = (new CTableInfo())
 			(new CCheckBox('all_graphs'))
 				->onClick("checkAll('".$graphs_form->getName()."', 'all_graphs', 'group_graphid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$data['hostid'] == 0 ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
+		($data['hostid'] == 0) ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Width'),
 		_('Height'),

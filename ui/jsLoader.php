@@ -489,6 +489,7 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'main.js',
+		'colorpicker.js',
 		'common.js',
 		'component.z-bar-gauge.js',
 		'component.z-select.js',

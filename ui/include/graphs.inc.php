@@ -1603,19 +1603,14 @@ function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTa
 				new CCol(
 					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
 				),
-				getItemTemplateRemoveColumn($readonly)
+				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
 				->addClass('graph-item')
 				->setId('items_#{number}')
 		]);
 }
 
-/**
- * @param bool $readonly Indicator whether form is readonly.
- *
- * @return CTag
- */
-function getItemTemplateStacked($readonly): CTag {
+function getItemTemplateStacked(bool $readonly): CTag {
 	return (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_STACKED))
 		->addItem([
 			(new CRow([
@@ -1662,19 +1657,14 @@ function getItemTemplateStacked($readonly): CTag {
 				new CCol(
 					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
 				),
-				getItemTemplateRemoveColumn($readonly)
+				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
 				->addClass('graph-item')
 				->setId('items_#{number}')
 		]);
 }
 
-/**
- * @param bool $readonly Indicator whether form is readonly.
- *
- * @return CTag
- */
-function getItemTemplatePieAndExploded($readonly): CTag {
+function getItemTemplatePieAndExploded(bool $readonly): CTag {
 	return (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_PIE))
 		->addItem([
 			(new CRow([
@@ -1722,19 +1712,14 @@ function getItemTemplatePieAndExploded($readonly): CTag {
 				new CCol(
 					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
 				),
-				getItemTemplateRemoveColumn($readonly)
+				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
 				->addClass('graph-item')
 				->setId('items_#{number}')
 		]);
 }
 
-/**
- * @param bool $readonly Indicator whether form is readonly.
- *
- * @return CTag
- */
-function getItemTemplateNameColumn($readonly): CTag {
+function getItemTemplateNameColumn(bool $readonly): CTag {
 	return new CCol($readonly
 		? (new CSpan('#{name}'))->setId('items_#{number}_name')
 		: (new CLink('#{name}', 'javascript:void(0);'))
@@ -1744,19 +1729,12 @@ function getItemTemplateNameColumn($readonly): CTag {
 	);
 }
 
-/**
- * @param bool $readonly Indicator whether form is readonly.
- *
- * @return CTag|null
- */
-function getItemTemplateRemoveColumn($readonly): ?Ctag {
-	return $readonly
-		? null
-		: (new CCol(
-			(new CButton('remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-remove')
-				->setAttribute('data-remove', '#{number}')
-				->setId('items_#{number}_remove')
-		))->addClass(ZBX_STYLE_NOWRAP);
+function getItemTemplateRemoveColumn(): Ctag {
+	return (new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('js-remove')
+			->setAttribute('data-remove', '#{number}')
+			->setId('items_#{number}_remove')
+	))->addClass(ZBX_STYLE_NOWRAP);
 }

@@ -24,7 +24,7 @@ class CControllerGraphUpdate extends CController {
 		$fields = [
 			'graphid' =>			'fatal|required|db graphs.graphid',
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
-			'hostid' =>				'db hosts.hostid',
+			'hostid' =>				'required|db hosts.hostid',
 			'name' =>				'required|db graphs.name|not_empty',
 			'width' =>				'required|db graphs.width|not_empty|ge 20|le 65535',
 			'height' => 			'required|db graphs.height|not_empty|ge 20|le 65535',
@@ -116,8 +116,8 @@ class CControllerGraphUpdate extends CController {
 				'name' => $this->getInput('name'),
 				'width' => $this->getInput('width'),
 				'height' => $this->getInput('height'),
-				'ymin_type' => $this->getInput('ymin_type', 0),
-				'ymax_type' => $this->getInput('ymax_type', 0),
+				'ymin_type' => $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED),
+				'ymax_type' => $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED),
 				'yaxismin' => $this->getInput('yaxismin', 0),
 				'yaxismax' => $this->getInput('yaxismax', 0),
 				'show_work_period' => $this->getInput('show_work_period', 0),
@@ -149,7 +149,7 @@ class CControllerGraphUpdate extends CController {
 
 			$result = DBend();
 		}
-		catch (Exception $e) {
+		catch (Exception) {
 			$result = false;
 
 			DBend(false);
@@ -196,7 +196,7 @@ class CControllerGraphUpdate extends CController {
 		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 		foreach ($validator->getAllErrors() as $error) {
-			info($error);
+			error($error);
 		}
 
 		return !$validator->isErrorFatal() && !$validator->isError();

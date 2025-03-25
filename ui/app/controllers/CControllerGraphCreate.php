@@ -96,8 +96,8 @@ class CControllerGraphCreate extends CController {
 				'name' => $this->getInput('name'),
 				'width' => $this->getInput('width'),
 				'height' => $this->getInput('height'),
-				'ymin_type' => $this->getInput('ymin_type', 0),
-				'ymax_type' => $this->getInput('ymax_type', 0),
+				'ymin_type' => $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED),
+				'ymax_type' => $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED),
 				'yaxismin' => $this->getInput('yaxismin', 0),
 				'yaxismax' => $this->getInput('yaxismax', 0),
 				'show_work_period' => $this->getInput('show_work_period', 0),
@@ -129,7 +129,7 @@ class CControllerGraphCreate extends CController {
 
 			$result = DBend();
 		}
-		catch (Exception $e) {
+		catch (Exception) {
 			$result = false;
 
 			DBend(false);
@@ -176,7 +176,7 @@ class CControllerGraphCreate extends CController {
 		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 		foreach ($validator->getAllErrors() as $error) {
-			info($error);
+			error($error);
 		}
 
 		return !$validator->isErrorFatal() && !$validator->isError();
