@@ -1275,17 +1275,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 
+		if (-1 == ret && EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			break;
+		}
+
 		/* check if the wait was interrupted because of diaginfo remote command */
 		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
 		{
 			zbx_diag_log_info(zbx_diaginfo_scope);
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
-		}
-
-		if (-1 == ret && EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			break;
 		}
 	}
 
