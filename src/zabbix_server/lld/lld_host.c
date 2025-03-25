@@ -5910,6 +5910,8 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 	zbx_uint64_t		last_hostid = 0;
 	zbx_hashset_t		host_refs;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&ruleids);
 	zbx_hashset_create(&host_refs, (size_t)hosts->values_num, lld_host_ref_hash, lld_host_ref_compare);
@@ -5967,6 +5969,8 @@ out:
 	zbx_hashset_destroy(&host_refs);
 	zbx_vector_uint64_destroy(&ruleids);
 	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -6185,6 +6189,8 @@ static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&hostids);
 
 	for (int i = 0; i < hosts->values_num; i++)
@@ -6196,6 +6202,9 @@ static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *
 
 		zbx_vector_uint64_append(&hostids, host->hostid);
 	}
+
+	if (0 == hostids.values_num)
+		goto out;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,itemid"
@@ -6225,9 +6234,11 @@ static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *
 		lld_rule_process_derived_rule(host_local.hostid, itemid, hosts->values[index]->lld_row);
 	}
 	zbx_db_free_result(result);
-
+out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
