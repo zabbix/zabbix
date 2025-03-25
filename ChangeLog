@@ -73,8 +73,6 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 --------------------------------------------------------------------------------
 Changes for 7.2.5rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-26211] fixed a crash when checking for not supported value (vso)
 
