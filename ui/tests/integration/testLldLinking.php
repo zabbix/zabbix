@@ -154,7 +154,6 @@ class testLldLinking extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
-		self::$templateids = [];
 	}
 
 	private function unlinkTemplates() {
@@ -177,9 +176,13 @@ class testLldLinking extends CIntegrationTest {
 		sleep(1);
 	}
 
-	private function deleteAction() {
+	private function fullClear() {
 
 		$response = $this->call('action.delete',[self::$actionId]);
+
+		for ($i = 0; $i < count(self::$templateids); $i++) {
+			$response = $this->call('host.delete', self::$templateids[$i]);
+		}
 	}
 
 	/**
@@ -203,7 +206,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
-		$this->deleteAction();
+		$this->fullClear();
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
