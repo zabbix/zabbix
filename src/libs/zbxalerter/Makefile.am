@@ -8,6 +8,7 @@ libzbxalerter_a_SOURCES = \
 	alert_syncer.c \
 	alerter.c \
 	alerter_defs.h \
+	alerter_internal.h \
 	alerter_protocol.c \
 	alerter_protocol.h \
 	oauth2.c
