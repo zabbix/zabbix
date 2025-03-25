@@ -14,28 +14,33 @@
 
 
 class CMap {
-	constructor(containerid, mapData) {
-		this.selements = {}; // element objects
-		this.shapes = {}; // shape objects
-		this.links = {}; // map links array
+	constructor(containerid, map_data) {
+		this.selements = {};
+		this.shapes = {};
+		this.links = {};
+
+		// Number of selected items.
 		this.selection = {
-			count: { // number of selected items
+			count: {
 				selements: 0,
 				shapes: 0
 			},
-			selements: {}, // selected elements
-			shapes: {} // selected shapes
+			selements: {},
+			shapes: {}
 		};
-		this.current_linkid = '0'; // linkid of currently edited link
-		this.items = mapData.sysmap.items;
-		this.sysmapid = mapData.sysmap.sysmapid;
-		this.data = mapData.sysmap;
+
+		// Linkid of currently edited link.
+		this.current_linkid = '0';
+
+		this.items = map_data.sysmap.items;
+		this.sysmapid = map_data.sysmap.sysmapid;
+		this.data = map_data.sysmap;
 		this.background = null;
-		this.iconList = mapData.iconList;
-		this.defaultAutoIconId = mapData.defaultAutoIconId;
-		this.defaultIconId = mapData.defaultIconId;
-		this.defaultIconName = mapData.defaultIconName;
-		this.csrf_token = mapData.csrf_token;
+		this.iconList = map_data.iconList;
+		this.defaultAutoIconId = map_data.defaultAutoIconId;
+		this.defaultIconId = map_data.defaultIconId;
+		this.defaultIconName = map_data.defaultIconName;
+		this.csrf_token = map_data.csrf_token;
 		this.containerid = containerid;
 		this.container = $(`#${containerid}`);
 
@@ -47,7 +52,7 @@ class CMap {
 		Object.values(this.iconList).forEach((item) => this.images[item.imageid] = item);
 
 		this.map = new SVGMap({
-			theme: mapData.theme,
+			theme: map_data.theme,
 			canvas: {
 				width: this.data.width,
 				height: this.data.height,
@@ -81,7 +86,7 @@ class CMap {
 		processItems('links', this.links, Link, 'linkid');
 
 		// Create container for forms.
-		this.formContainer = $('<div>', {
+		this.form_container = $('<div>', {
 				id: 'map-window',
 				class: 'overlay-dialogue',
 				style: 'display: none; top: 0; left: 0; padding-top: 13px;'
@@ -92,11 +97,11 @@ class CMap {
 			});
 
 		this.updateImage();
-		this.form = new SelementForm(this.formContainer, this);
-		this.massForm = new MassForm(this.formContainer, this);
-		this.linkForm = new LinkForm(this.formContainer, this);
-		this.shapeForm = new ShapeForm(this.formContainer, this);
-		this.massShapeForm = new MassShapeForm(this.formContainer, this);
+		this.form = new SelementForm(this.form_container, this);
+		this.massForm = new MassForm(this.form_container, this);
+		this.linkForm = new LinkForm(this.form_container, this);
+		this.shapeForm = new ShapeForm(this.form_container, this);
+		this.massShapeForm = new MassShapeForm(this.form_container, this);
 
 		this.#addMapActionsEventListeners();
 		this.#addMapElementEventListeners();

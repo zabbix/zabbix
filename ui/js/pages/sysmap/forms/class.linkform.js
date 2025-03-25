@@ -16,16 +16,16 @@
 /**
  * Form for editing links.
  *
- * @param {object} formContainer jQuery object.
+ * @param {object} form_container  jQuery object.
  * @param {object} sysmap
  */
 class LinkForm {
-	constructor(formContainer, sysmap) {
+	constructor(form_container, sysmap) {
 		this.sysmap = sysmap;
 		this.triggerids = {};
 		this.item_type = null;
 		this.domNode = $(new Template(document.getElementById('linkFormTpl').innerHTML).evaluate())
-			.appendTo(formContainer);
+			.appendTo(form_container);
 
 		document.getElementById('indicator_type').addEventListener('change', () => {
 			this.#handleIndicatorTypeChange();

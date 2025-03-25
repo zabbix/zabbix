@@ -16,11 +16,11 @@
 /**
  * Form for shape editing.
  *
- * @param {object} formContainer jQuery object
+ * @param {object} form_container jQuery object.
  * @param {object} sysmap
  */
 class MassShapeForm {
-	constructor(formContainer, sysmap) {
+	constructor(form_container, sysmap) {
 		const form_actions = [],
 			mapping = {
 				chkboxType: '[name="mass_type"]',
@@ -43,10 +43,10 @@ class MassShapeForm {
 		}));
 
 		this.sysmap = sysmap;
-		this.formContainer = formContainer;
+		this.form_container = form_container;
 		this.triggerids = {};
 		this.domNode = $(new Template(document.getElementById('mapMassShapeFormTpl').innerHTML).evaluate())
-			.appendTo(formContainer);
+			.appendTo(form_container);
 
 		this.domNode.find('.color-picker input').colorpicker();
 		this.actionProcessor = new ActionProcessor(form_actions);
@@ -66,11 +66,11 @@ class MassShapeForm {
 				: element.dataset.value;
 		});
 
-		this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
-		this.formContainer.show();
+		this.form_container.draggable('option', 'handle', '#massShapeDragHandler');
+		this.form_container.show();
 		this.domNode.show();
 		// Element must first be visible so that outerWidth() and outerHeight() are correct.
-		this.formContainer.positionOverlayDialogue();
+		this.form_container.positionOverlayDialogue();
 		this.active = true;
 
 		addToOverlaysStack('map-window', document.activeElement, 'map-window');

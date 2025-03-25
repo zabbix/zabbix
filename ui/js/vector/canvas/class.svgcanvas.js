@@ -113,27 +113,18 @@ class SVGCanvas {
 	 *
 	 * SVG elements with specified attributes are returned as array of SVGElement (if any).
 	 *
-	 * @return {array} Elements that match specified attributes.
+	 * @return {array}  Elements that match specified attributes.
 	 */
 	getElementsByAttributes(attributes) {
-		var names = Object.keys(attributes),
-			elements = this.elements.filter(function (item) {
-				for (var i = 0; i < names.length; i++) {
-					if (item.attributes[names[i]] !== attributes[names[i]]) {
-						return false;
-					}
-				}
+		const names = Object.keys(attributes);
 
-				return true;
-			});
-
-		return elements;
+		return this.elements.filter((item) => names.every((name) => item.attributes[name] === attributes[name]));
 	}
 
 	/**
-	 * Add element to the SVG root element (svg tag).
+	 * Add element to the SVG root element (SVG tag).
 	 *
-	 * @return {SVGElement} Created element.
+	 * @return {SVGElement}  Created element.
 	 */
 	add(type, attributes, content) {
 		return this.root.add(type, attributes, content);

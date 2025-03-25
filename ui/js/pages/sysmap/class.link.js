@@ -16,21 +16,21 @@
 /**
  * Creates a new Link.
  *
- * @class represents connector between two Elements
+ * @class represents connector between two Elements.
  *
  * @property {object} sysmap  Reference to Map object.
  * @property {object} data    Link db values.
  * @property {string} id      Link ID (linkid).
  *
- * @param {object} sysmap     Map object.
- * @param {object} linkData   Link data from DB.
+ * @param {object} sysmap  Map object.
+ * @param {object} data    Link data from DB.
  */
 class Link {
-	constructor(sysmap, linkData) {
+	constructor(sysmap, data) {
 		this.sysmap = sysmap;
 
-		if (!linkData) {
-			linkData = {
+		if (!data) {
+			data = {
 				label: '',
 				show_label: SVGMapElement.SHOW_LABEL_DEFAULT,
 				selementid1: null,
@@ -46,24 +46,24 @@ class Link {
 			};
 
 			for (const selementid in this.sysmap.selection.selements) {
-				if (linkData.selementid1 === null) {
-					linkData.selementid1 = selementid;
+				if (data.selementid1 === null) {
+					data.selementid1 = selementid;
 				}
 				else {
-					linkData.selementid2 = selementid;
+					data.selementid2 = selementid;
 				}
 			}
 
 			// Generate unique linkid.
-			linkData.linkid = getUniqueId();
+			data.linkid = getUniqueId();
 		}
 		else {
-			if ($.isArray(linkData.linktriggers)) {
-				linkData.linktriggers = {};
+			if ($.isArray(data.linktriggers)) {
+				data.linktriggers = {};
 			}
 		}
 
-		this.data = linkData;
+		this.data = data;
 		this.id = this.data.linkid;
 		this.expanded = this.data.expanded;
 		delete this.data.expanded;

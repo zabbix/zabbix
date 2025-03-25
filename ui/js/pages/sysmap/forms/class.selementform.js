@@ -16,11 +16,11 @@
 /**
  * Form for elements.
  *
- * @param {object} formContainer  jQuery object.
+ * @param {object} form_container  jQuery object.
  * @param {object} sysmap
  */
 class SelementForm {
-	constructor(formContainer, sysmap) {
+	constructor(form_container, sysmap) {
 		const formTplData = {sysmapid: sysmap.sysmapid},
 			tpl = new Template(document.getElementById('mapElementFormTpl').innerHTML),
 			formActions = [
@@ -120,10 +120,10 @@ class SelementForm {
 
 		this.active = false;
 		this.sysmap = sysmap;
-		this.formContainer = formContainer;
+		this.form_container = form_container;
 
 		// create form
-		this.domNode = $(tpl.evaluate(formTplData)).appendTo(formContainer);
+		this.domNode = $(tpl.evaluate(formTplData)).appendTo(form_container);
 
 		// populate icons selects
 		const select_icon_off = document.getElementById('iconid_off'),
@@ -252,11 +252,11 @@ class SelementForm {
 	 * Shows element form.
 	 */
 	show() {
-		this.formContainer.draggable('option', 'handle', '#formDragHandler');
-		this.formContainer.show();
+		this.form_container.draggable('option', 'handle', '#formDragHandler');
+		this.form_container.show();
 		this.domNode.show();
 		// Element must first be visible so that outerWidth() and outerHeight() are correct.
-		this.formContainer.positionOverlayDialogue();
+		this.form_container.positionOverlayDialogue();
 		this.active = true;
 
 		addToOverlaysStack('map-window', document.activeElement, 'map-window');

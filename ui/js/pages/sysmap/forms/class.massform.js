@@ -16,11 +16,11 @@
 /**
  * Elements mass update form.
  *
- * @param {object} formContainer jQuery object
+ * @param {object} form_container  jQuery object.
  * @param {object} sysmap
  */
 class MassForm {
-	constructor(formContainer, sysmap) {
+	constructor(form_container, sysmap) {
 		const tpl = new Template(document.getElementById('mapMassFormTpl').innerHTML),
 			formActions = [
 				{
@@ -82,10 +82,10 @@ class MassForm {
 			];
 
 		this.sysmap = sysmap;
-		this.formContainer = formContainer;
+		this.form_container = form_container;
 
 		// create form
-		this.domNode = $(tpl.evaluate()).appendTo(formContainer);
+		this.domNode = $(tpl.evaluate()).appendTo(form_container);
 
 		// populate icons selects
 		const select_icon_off = document.getElementById('massIconidOff'),
@@ -123,12 +123,12 @@ class MassForm {
 	 * Show mass update form.
 	 */
 	show() {
-		this.formContainer.draggable('option', 'handle', '#massDragHandler');
-		this.formContainer.show();
+		this.form_container.draggable('option', 'handle', '#massDragHandler');
+		this.form_container.show();
 		this.domNode.show();
 
 		// Element must first be visible so that outerWidth() and outerHeight() are correct.
-		this.formContainer.positionOverlayDialogue();
+		this.form_container.positionOverlayDialogue();
 		this.#updateList();
 
 		addToOverlaysStack('map-window', document.activeElement, 'map-window');

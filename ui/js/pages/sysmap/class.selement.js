@@ -16,22 +16,22 @@
 /**
  * @class Creates a new Selement.
  *
- * @property {object} sysmap     Reference to Map object.
- * @property {object} data       Selement DB values.
- * @property {bool}   selected   If element is now selected by user.
- * @property {string} id         Element ID.
- * @property {object} domNode    Reference to related DOM element.
+ * @property {object} sysmap      Reference to Map object.
+ * @property {object} data        Selement DB values.
+ * @property {bool}   selected    If element is now selected by user.
+ * @property {string} id          Element ID.
+ * @property {object} domNode     Reference to related DOM element.
  *
- * @param {object} sysmap        Reference to Map object.
- * @param {object} selementData  Element DB values.
+ * @param {object} sysmap  Reference to Map object.
+ * @param {object} data    Element DB values.
  */
 class Selement {
-	constructor(sysmap, selementData) {
+	constructor(sysmap, data) {
 		this.sysmap = sysmap;
 		this.selected = false;
 
-		if (!selementData) {
-			selementData = {
+		if (!data) {
+			data = {
 				selementid: getUniqueId(),
 				elementtype: SVGMapElement.TYPE_IMAGE,
 				elements: {},
@@ -51,12 +51,12 @@ class Selement {
 			};
 		}
 		else {
-			if ($.isArray(selementData.urls)) {
-				selementData.urls = {};
+			if ($.isArray(data.urls)) {
+				data.urls = {};
 			}
 		}
 
-		this.data = selementData;
+		this.data = data;
 		this.updateLabel();
 		this.id = this.data.selementid;
 		this.expanded = this.data.expanded;

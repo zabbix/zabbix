@@ -16,17 +16,17 @@
 /**
  * Creates a new Shape.
  *
- * @class represents shape (static) element
+ * @class represents shape (static) element.
  *
- * @property {object} sysmap     Reference to Map object
- * @property {object} data       Shape values from DB.
- * @property {string} id         Shape ID (shapeid).
+ * @property {object} sysmap   Reference to Map object
+ * @property {object} data     Shape values from DB.
+ * @property {string} id       Shape ID (shapeid).
  *
- * @param {object} sysmap        Map object
- * @param {object} [shape_data]  shape data from db
+ * @param {object} sysmap  Map object.
+ * @param {object} data    Shape data from DB.
  */
 class Shape {
-	constructor(sysmap, shape_data) {
+	constructor(sysmap, data) {
 		const default_data = {
 			type: SVGMapShape.TYPE_RECTANGLE,
 			x: 10,
@@ -36,7 +36,8 @@ class Shape {
 			border_color: '000000',
 			background_color: '',
 			border_width: 2,
-			font: 9, // Helvetica
+			// Helvetica
+			font: 9,
 			font_size: 11,
 			font_color: '000000',
 			text_valign: 0,
@@ -47,22 +48,22 @@ class Shape {
 
 		this.sysmap = sysmap;
 
-		if (!shape_data) {
-			shape_data = default_data;
+		if (!data) {
+			data = default_data;
 
 			// Generate unique sysmap_shapeid.
-			shape_data.sysmap_shapeid = getUniqueId();
-			shape_data.zindex = Object.keys(sysmap.shapes).length;
+			data.sysmap_shapeid = getUniqueId();
+			data.zindex = Object.keys(sysmap.shapes).length;
 		}
 		else {
 			Object.keys(default_data).forEach((field) => {
-				if (shape_data[field] === undefined) {
-					shape_data[field] = default_data[field];
+				if (data[field] === undefined) {
+					data[field] = default_data[field];
 				}
 			});
 		}
 
-		this.data = shape_data;
+		this.data = data;
 		this.id = this.data.sysmap_shapeid;
 		this.expanded = this.data.expanded;
 		delete this.data.expanded;
@@ -170,8 +171,8 @@ class Shape {
 				dy = Math.max(dimensions.y, dimensions.height) - y;
 
 			dimensions = {
-				x: x,
-				y: y,
+				x,
+				y,
 				width: Math.min(Math.max(0, dx), width - x),
 				height: Math.min(Math.max(0, dy), height - y)
 			};
