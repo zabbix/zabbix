@@ -229,7 +229,7 @@ zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vect
 	return data_len;
 }
 
-void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
+void zbx_discovery_stats_ext_get_data(struct zbx_json *json, const void *arg)
 {
 	zbx_uint64_t	size;
 
@@ -245,7 +245,7 @@ void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
  * Purpose: gets discovery worker usage statistics                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
+void	zbx_discovery_stats_procinfo(zbx_process_info_t *info)
 {
 	zbx_vector_dbl_t	usage;
 	char			*error = NULL;

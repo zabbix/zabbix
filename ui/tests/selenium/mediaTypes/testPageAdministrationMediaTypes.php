@@ -757,10 +757,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #1 Used in action operation directly.
 			[
 				[
-					'name' => 'Github',
+					'name' => 'GitHub',
 					'actions' => [
 						[
-							'name' => 'Github action operation',
+							'name' => 'GitHub action operation',
 							'operation' => 'operations'
 						]
 					]
@@ -809,14 +809,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #5 Used in two actions update operations directly.
 			[
 				[
-					'name' => 'OTRS',
+					'name' => 'OTRS CE',
 					'actions' => [
 						[
-							'name' => 'OTRS acton update operation 1',
+							'name' => 'OTRS CE acton update operation 1',
 							'operation' => 'update_operations'
 						],
 						[
-							'name' => 'OTRS acton update operation 2',
+							'name' => 'OTRS CE acton update operation 2',
 							'operation' => 'update_operations'
 						]
 					]
