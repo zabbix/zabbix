@@ -180,9 +180,9 @@ class testLldLinking extends CIntegrationTest {
 
 		$response = $this->call('action.delete',[self::$actionId]);
 
-		for ($i = 0; $i < count(self::$templateids); $i++) {
-			$response = $this->call('host.delete', [self::$templateids[$i]]);
-		}
+		//for ($i = 0; $i < count(self::$templateids); $i++) {
+			$response = $this->call('host.delete', [self::$templateids]);
+	//	}
 	}
 
 	/**
