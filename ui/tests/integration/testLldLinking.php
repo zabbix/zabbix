@@ -29,7 +29,8 @@ class testLldLinking extends CIntegrationTest {
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
-	private static $actionId;
+	private static $hostCreateId;
+	private static $actionLinkTemplateId;
 	private static $templateids = array();
 
 	/**
@@ -94,7 +95,7 @@ class testLldLinking extends CIntegrationTest {
 			]
 		]);
 
-		self::$actionId = $response['result']['actionids'][0];
+		self::$hostCreateId = $response['result']['actionids'][0];
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
 		$this->assertArrayHasKey('actionids', $response['result'], $ep);
@@ -150,6 +151,7 @@ class testLldLinking extends CIntegrationTest {
 				]
 			]
 		]);
+		self::$actionLinkTemplateId = $response['result']['actionids'][0];
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
 	}
@@ -176,7 +178,8 @@ class testLldLinking extends CIntegrationTest {
 
 	private function fullClear() {
 
-		$response = $this->call('action.delete',[self::$actionId]);
+		$response = $this->call('action.delete',[self::$hostCreateId]);
+		$response = $this->call('action.delete',[self::$actionLinkTemplateId]);
 
 		for ($i = 0; $i < count(self::$templateids); $i++) {
 			$response = $this->call('template.delete', [self::$templateids[$i]]);
