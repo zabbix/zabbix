@@ -139,7 +139,7 @@ class testLldLinking extends CIntegrationTest {
 				[
 					'operationtype' => 6,
 					'optemplate' =>
-					$templateids
+					self::$templateids
 				]
 			]
 		]);
