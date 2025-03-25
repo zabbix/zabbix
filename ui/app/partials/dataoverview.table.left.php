@@ -27,9 +27,7 @@ $table = (new CTableInfo())->setHeadingColumn(0);
 $header = [_('Hosts')];
 foreach ($data['items'] as $item_name => $item_data) {
 	foreach ($item_data as $columns_data) {
-		$header[] = (new CSpan($item_name))
-			->addClass(ZBX_STYLE_TEXT_VERTICAL)
-			->setTitle($item_name);
+		$header[] = (new CVertical($item_name))->setTitle($item_name);
 	}
 }
 $table->setHeader($header);
