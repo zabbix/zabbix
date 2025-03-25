@@ -180,7 +180,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			$data['yaxismax'] = $this->getInput('yaxismax', 100);
 			$data['ymin_itemid'] = $this->getInput('ymin_itemid', 0);
 			$data['ymax_itemid'] = $this->getInput('ymax_itemid', 0);
-			$data['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
 			$data['visible'] = $this->getInput('visible', []);
 
 			if (array_key_exists('percent_left', $data['visible'])) {
@@ -195,12 +194,15 @@ class CControllerGraphPrototypeEdit extends CController {
 				$data['show_triggers'] = $this->hasInput('show_triggers');
 				$data['show_legend'] = $this->hasInput('show_legend');
 				$data['show_3d'] = $this->hasInput('show_3d');
+				$data['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
+
 			}
 			else {
 				$data['show_work_period'] = $this->getInput('show_work_period', 1);
 				$data['show_triggers'] = $this->getInput('show_triggers', 1);
 				$data['show_legend'] = $this->getInput('show_legend', 1);
 				$data['show_3d'] = $this->getInput('show_3d', 0);
+				$data['discover'] = $this->getInput('discover', GRAPH_DISCOVER);
 			}
 
 			$gitems = [];
