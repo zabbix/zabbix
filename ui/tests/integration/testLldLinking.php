@@ -24,11 +24,13 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup history, autoreg_host
  */
 class testLldLinking extends CIntegrationTest {
+	const NUMBER_OF_TEMPLATES = 2;
 
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	private static $templateX_ID;
+	private static $templateids = array();
 
 	/**
 	* Component configuration provider for server related tests.
@@ -97,46 +99,37 @@ class testLldLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result'], $ep);
 		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 
-		$response = $this->call('template.create', [
-			'host' => 'test_template',
-				'groups' => [
-					'groupid' => 1
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
+			$response = $this->call('template.create', [
+				'host' => 'test_template',
+					'groups' => [
+						'groupid' => 1
+					]
+			]);
+
+			$ep = json_encode($response, JSON_PRETTY_PRINT);
+
+			$this->assertArrayHasKey('templateids', $response['result'], $ep);
+			$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
+			self::$templateX_ID = $response['result']['templateids'][0];
+			array_push($templateids, ['templateid' => self::$templateX_ID]);
+		}
+
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
+			$response = $this->call('discoveryrule.create', [
+				'name' => 'LLD rule with LLD macro paths',
+				'key_' => 'lld',
+				'hostid' => self::$templateids[$i],
+				'type' => 0,
+				'delay' => '30s',
+				'lld_macro_paths' => [
+					[
+						'lld_macro' => '{#MACRO1}',
+						'path' => '$.path.1'
+					]
 				]
-		]);
-
-		$ep = json_encode($response, JSON_PRETTY_PRINT);
-
-		$this->assertArrayHasKey('templateids', $response['result'], $ep);
-		$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
-		self::$templateX_ID = $response['result']['templateids'][0];
-
-		$templateidsX = [];
-		array_push($templateidsX, ['templateid' => self::$templateX_ID]);
-
-		$response = $this->call('item.create', [
-			'hostid' => self::$templateX_ID,
-			'name' => "templateX_item_name",
-			'key_' => "templateX_item_key",
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
-		]);
-
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-
-		$response = $this->call('discoveryrule.create', [
-			'name' => 'LLD rule with LLD macro paths',
-			'key_' => 'lld',
-			'hostid' => self::$templateX_ID,
-			'type' => 0,
-			'delay' => '30s',
-			'lld_macro_paths' => [
-				[
-					'lld_macro' => '{#MACRO1}',
-					'path' => '$.path.1'
-				]
-			]
-		]);
+			]);
+		}
 
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
@@ -146,13 +139,12 @@ class testLldLinking extends CIntegrationTest {
 				[
 					'operationtype' => 6,
 					'optemplate' =>
-					$templateidsX
+					$templateids
 				]
 			]
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
-
 	}
 
 	private function unlinkTemplates() {
@@ -192,10 +184,11 @@ class testLldLinking extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
-		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
+		/*$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);*/
 	}
 }
