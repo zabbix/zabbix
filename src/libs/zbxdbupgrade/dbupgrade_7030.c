@@ -426,6 +426,28 @@ static int	DBpatch_7030032(void)
 
 static int	DBpatch_7030033(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute(
+			" insert into host_tag_cache"
+				" (with recursive cte as"
+					" ("
+					" select h0.templateid, h0.hostid from hosts_templates h0"
+						" union all"
+					" select h1.templateid, c.hostid from cte c join hosts_templates h1 on"
+						" c.templateid=h1.hostid"
+					" )"
+			" select hostid,templateid from cte)"))
+	{
+		return FAIL;
+	}
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into host_tag_cache (select hostid,hostid from hosts)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030034(void)
+{
 	const zbx_db_table_t	table =
 			{"item_tag_cache", "itemid,tag_hostid", 0,
 				{
@@ -439,7 +461,7 @@ static int	DBpatch_7030033(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030034(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -447,7 +469,7 @@ static int	DBpatch_7030034(void)
 	return DBadd_foreign_key("item_tag_cache", 1, &field);
 }
 
-static int	DBpatch_7030035(void)
+static int	DBpatch_7030036(void)
 {
 	const zbx_db_field_t	field = {"tag_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -455,12 +477,41 @@ static int	DBpatch_7030035(void)
 	return DBadd_foreign_key("item_tag_cache", 2, &field);
 }
 
-static int	DBpatch_7030036(void)
+static int	DBpatch_7030037(void)
 {
 	return DBcreate_index("item_tag_cache", "item_tag_cache_1", "tag_hostid", 0);
 }
 
-static int	DBpatch_7030037(void)
+static int	DBpatch_7030038(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			" insert into item_tag_cache"
+				" (with recursive cte as"
+					" ("
+						"select i0.templateid, i0.itemid from items i0"
+						" union all"
+						" select i1.templateid, c.itemid from cte c join items i1 on"
+							" c.templateid=i1.itemid"
+							" where i1.templateid is not null"
+					" )"
+			" select cte.itemid,h.hostid from cte,hosts h,items i where"
+				" cte.templateid=i.itemid and i.hostid=h.hostid)"))
+	{
+		return FAIL;
+	}
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"insert into item_tag_cache"
+				" (select i.itemid,h.hostid from items i,hosts h"
+				" where i.hostid=h.hostid)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030039(void)
 {
 	const zbx_db_table_t	table =
 			{"httptest_tag_cache", "httptestid,tag_hostid", 0,
@@ -475,7 +526,7 @@ static int	DBpatch_7030037(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030038(void)
+static int	DBpatch_7030040(void)
 {
 	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -483,7 +534,7 @@ static int	DBpatch_7030038(void)
 	return DBadd_foreign_key("httptest_tag_cache", 1, &field);
 }
 
-static int	DBpatch_7030039(void)
+static int	DBpatch_7030041(void)
 {
 	const zbx_db_field_t	field = {"tag_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -491,11 +542,39 @@ static int	DBpatch_7030039(void)
 	return DBadd_foreign_key("httptest_tag_cache", 2, &field);
 }
 
-static int  DBpatch_7030040(void)
+static int  DBpatch_7030042(void)
 {
 	return DBcreate_index("httptest_tag_cache", "httptest_tag_cache_1", "tag_hostid", 0);
 }
 
+static int	DBpatch_7030043(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			" insert into httptest_tag_cache"
+				" (with recursive cte as"
+					" ("
+						" select ht0.templateid, ht0.httptestid from httptest ht0"
+						" union all"
+						" select ht1.templateid, c.httptestid from cte c join httptest ht1 on"
+							" c.templateid=ht1.httptestid"
+							" where ht1.templateid is not null"
+					" )"
+			" select cte.httptestid,ht.hostid from cte,hosts h,httptest ht where"
+			"	cte.templateid=ht.httptestid and ht.hostid=h.hostid)"))
+	{
+		return FAIL;
+	}
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"insert into httptest_tag_cache"
+				" (select ht.httptestid,h.hostid from httptest ht,hosts h"
+					" where ht.hostid=h.hostid)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(7030)
@@ -543,5 +622,7 @@ DBPATCH_ADD(7030037, 0, 1)
 DBPATCH_ADD(7030038, 0, 1)
 DBPATCH_ADD(7030039, 0, 1)
 DBPATCH_ADD(7030040, 0, 1)
+DBPATCH_ADD(7030042, 0, 1)
+DBPATCH_ADD(7030043, 0, 1)
 
 DBPATCH_END()
