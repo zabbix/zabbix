@@ -155,6 +155,26 @@ class testLldLinking extends CIntegrationTest {
 
 	}
 
+	private function unlinkTemplates() {
+
+		$response = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => [
+				'host' => self::HOST_NAME
+			]
+			]);
+
+		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
+		$hostid = $response['result'][0]['hostid'];
+
+		$response = $this->call('host.update', [
+			'hostid' => $hostid,
+			'templates' => []
+			]);
+
+		sleep(1);
+	}
+
 	/**
 	 * Test LLD linking cases.
 	 *
