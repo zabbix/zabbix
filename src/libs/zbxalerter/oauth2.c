@@ -12,14 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxalerter.h"
-
 #include "alerter_internal.h"
 
 #include "zbxdb.h"
 #include "zbxhttp.h"
 #include "audit/zbxaudit.h"
 #include "zbxcacheconfig.h"
+#include "zbxalgo.h"
+#include "zbxstr.h"
 
 int	zbx_oauth2_fetch(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, char **error)
 {
