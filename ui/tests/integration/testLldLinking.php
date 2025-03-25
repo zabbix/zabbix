@@ -55,7 +55,7 @@ class testLldLinking extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname'		=>  self::HOST_NAME1,
+				'Hostname'		=> self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
 				'DebugLevel'    => 4,
