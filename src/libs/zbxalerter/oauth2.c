@@ -18,6 +18,8 @@
 
 #include "zbxdb.h"
 #include "zbxhttp.h"
+#include "audit/zbxaudit.h"
+#include "zbxcacheconfig.h"
 
 int	zbx_oauth2_fetch(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, char **error)
 {
@@ -59,7 +61,7 @@ int	zbx_oauth2_fetch(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, char **e
 	data->access_token = zbx_strdup(NULL, row[4]);
 	data->access_token_updated = (time_t)atoi(row[5]);
 	data->access_expires_in = (time_t)atoi(row[6]);
-	data->token_status = atoi(row[7]);
+	data->tokens_status = atoi(row[7]);
 
 	ret = SUCCEED;
 out:
@@ -130,7 +132,7 @@ int	zbx_oauth2_access_refresh(zbx_oauth2_data_t *data, long timeout, const char 
 
 		*error = zbx_dsprintf(NULL, "Access token retrieval failed: %s", tmp);
 
-		data->token_status = (data->token_status & ~ZBX_OAUTH2_TOKEN_ACCESS_VALID) & ZBX_OAUTH2_TOKEN_VALID;
+		data->tokens_status = (data->tokens_status & ~ZBX_OAUTH2_TOKEN_ACCESS_VALID) & ZBX_OAUTH2_TOKEN_VALID;
 	}
 	else
 	{
@@ -152,7 +154,8 @@ int	zbx_oauth2_access_refresh(zbx_oauth2_data_t *data, long timeout, const char 
 			goto out;
 		}
 
-		data->access_token = zbx_strdup(data->access_token, tmp);
+		data->old_access_token = data->access_token;
+		data->access_token = zbx_strdup(NULL, tmp);
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "expires_in", &tmp, &tmp_alloc, NULL))
 		{
@@ -160,12 +163,17 @@ int	zbx_oauth2_access_refresh(zbx_oauth2_data_t *data, long timeout, const char 
 			goto out;
 		}
 
+		data->old_access_expires_in = data->access_expires_in;
 		data->access_expires_in = atoi(tmp);
 
 		/* request may return the new refresh token */
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp, "refresh_token", &tmp, &tmp_alloc, NULL))
-			data->refresh_token = zbx_strdup(data->refresh_token, tmp);
+		{
+			data->old_refresh_token = data->refresh_token;
+			data->refresh_token = zbx_strdup(NULL, tmp);
+		}
 
+		data->old_access_token_updated = data->access_token_updated;
 		data->access_token_updated = sec;
 		ret = SUCCEED;
 	}
@@ -182,23 +190,58 @@ out:
 #endif
 }
 
-void	zbx_oauth2_update(zbx_uint64_t mediatypeid, const zbx_oauth2_data_t *data, int fetch_result)
+void	zbx_oauth2_update(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, int fetch_result)
 {
+	data->old_tokens_status = data->tokens_status;
+
 	if (SUCCEED != fetch_result)
 	{
-		zbx_db_execute("update media_type_oauth set tokens_status=tokens_status&2"
-				" where mediatypeid="ZBX_FS_UI64, mediatypeid);
+		data->tokens_status &= ZBX_OAUTH2_TOKEN_REFRESH_VALID;
+
+		zbx_db_execute("update media_type_oauth set tokens_status=%d"
+				" where mediatypeid="ZBX_FS_UI64, data->tokens_status, mediatypeid);
 	}
 	else
 	{
+		data->tokens_status |= ZBX_OAUTH2_TOKEN_ACCESS_VALID;
+
 		zbx_db_execute("update media_type_oauth"
 				" set access_token='%s',access_token_updated=%d,access_expires_in=%d,"
-				"refresh_token='%s',tokens_status=tokens_status|1"
+				"refresh_token='%s',tokens_status=%d"
 				" where mediatypeid="ZBX_FS_UI64,
 				data->access_token, data->access_token_updated, data->access_expires_in,
-				data->refresh_token,
+				data->refresh_token, data->tokens_status,
 				mediatypeid);
 	}
+}
+
+void	zbx_oauth2_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
+		const zbx_oauth2_data_t *data, int fetch_result)
+{
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+
+	zbx_audit_entry_t	*entry = zbx_audit_entry_init(mediatypeid, AUDIT_MEDIATYPE_ID, mediatype_name,
+							ZBX_AUDIT_ACTION_UPDATE, ZBX_AUDIT_RESOURCE_MEDIATYPE);
+
+	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.tokens_status", data->old_tokens_status,
+			data->tokens_status);
+
+	if (SUCCEED == fetch_result)
+	{
+		zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_token",
+				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);
+		zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_expires_in",
+				data->old_access_expires_in, data->access_expires_in);
+		zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_token_updated",
+				data->old_access_token_updated, data->access_token_updated);
+		if (NULL != data->old_refresh_token)
+		{
+			zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.refresh_token",
+					ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);
+		}
+	}
+
+	zbx_hashset_insert(zbx_get_audit_hashset(), &entry, sizeof(entry));
 }
 
 void	zbx_oauth2_clean(zbx_oauth2_data_t *data)
@@ -206,6 +249,8 @@ void	zbx_oauth2_clean(zbx_oauth2_data_t *data)
 	zbx_free(data->token_url);
 	zbx_free(data->client_id);
 	zbx_free(data->client_secret);
+	zbx_free(data->old_refresh_token);
 	zbx_free(data->refresh_token);
+	zbx_free(data->old_access_token);
 	zbx_free(data->access_token);
 }

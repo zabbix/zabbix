@@ -18,6 +18,7 @@
 
 void 	zbx_db_mediatype_clean(zbx_db_mediatype *mt)
 {
+	zbx_free(mt->name);
 	zbx_free(mt->smtp_server);
 	zbx_free(mt->smtp_helo);
 	zbx_free(mt->smtp_email);
@@ -34,11 +35,12 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 		const zbx_db_mediatype *mt)
 {
 	zbx_uint32_t	data_len = 0, smtp_server_len, smtp_helo_len, smtp_email_len, exec_path_len, gsm_modem_len,
-			username_len, passwd_len, script_len, attempt_interval_len, timeout_len;
+			username_len, passwd_len, script_len, attempt_interval_len, timeout_len, name_len;
 	unsigned char	*ptr, type = mt->type;
 
 	zbx_serialize_prepare_value(data_len, mt->mediatypeid);
 	zbx_serialize_prepare_value(data_len, type);
+	zbx_serialize_prepare_str_len(data_len, mt->name, name_len);
 	zbx_serialize_prepare_str_len(data_len, mt->smtp_server, smtp_server_len);
 	zbx_serialize_prepare_str_len(data_len, mt->smtp_helo, smtp_helo_len);
 	zbx_serialize_prepare_str_len(data_len, mt->smtp_email, smtp_email_len);
@@ -67,6 +69,7 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 	ptr = *data + *data_offset;
 	ptr += zbx_serialize_value(ptr, mt->mediatypeid);
 	ptr += zbx_serialize_value(ptr, type);
+	ptr += zbx_serialize_str(ptr, mt->name, name_len);
 	ptr += zbx_serialize_str(ptr, mt->smtp_server, smtp_server_len);
 	ptr += zbx_serialize_str(ptr, mt->smtp_helo, smtp_helo_len);
 	ptr += zbx_serialize_str(ptr, mt->smtp_email, smtp_email_len);
@@ -97,6 +100,7 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, zbx_db_mediaty
 
 	data += zbx_deserialize_value(data, &mt->mediatypeid);
 	data += zbx_deserialize_value(data, &type);
+	data += zbx_deserialize_str(data, &mt->name, len);
 	data += zbx_deserialize_str(data, &mt->smtp_server, len);
 	data += zbx_deserialize_str(data, &mt->smtp_helo, len);
 	data += zbx_deserialize_str(data, &mt->smtp_email, len);

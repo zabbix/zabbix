@@ -35,6 +35,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
+#include "audit/zbxaudit.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -162,7 +163,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 {
 	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *inreplyto = NULL,
-			*expression, *recovery_expression, *error = NULL;
+			*expression, *recovery_expression, *mediatype_name, *error = NULL;
 	unsigned short	smtp_port;
 	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
 	int		maxattempts, object, source, ret;
@@ -171,9 +172,9 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &maxattempts, &eventid, &source,
-			&object, &objectid, &sendto, &subject, &message, &smtp_server, &smtp_port, &smtp_helo,
-			&smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host, &mailauth.type,
+	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &mediatype_name, &maxattempts,
+			&eventid, &source, &object, &objectid, &sendto, &subject, &message, &smtp_server, &smtp_port,
+			&smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host, &mailauth.type,
 			&mailauth.username, &mailauth.password, &message_format, &expression, &recovery_expression);
 
 	switch (mailauth.type)
@@ -221,6 +222,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 				while (0 < maxattempts-- && NETWORK_ERROR == ret);
 
 				zbx_oauth2_update(mediatypeid, &data, ret);
+				zbx_oauth2_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
 
 				if (SUCCEED != ret)
 				{
@@ -254,6 +256,7 @@ out:
 	zbx_free(inreplyto);
 	zbx_free(sendto);
 	zbx_free(subject);
+	zbx_free(mediatype_name);
 	zbx_free(message);
 	zbx_free(smtp_server);
 	zbx_free(smtp_helo);
@@ -458,6 +461,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
+		zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
+
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 		zbx_update_env(get_process_type_string(process_type), time_read);
@@ -480,6 +485,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
+
+		zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
 		zbx_db_close();
 	}
 

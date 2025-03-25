@@ -94,12 +94,12 @@ int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatyp
 int	zbx_alerter_get_top_sources(int limit, zbx_vector_am_source_stats_ptr_t *sources, char **error);
 
 zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, unsigned char type,
-		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
-		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
-		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, int maxsessions, int maxattempts, const char *attempt_interval,
-		unsigned char message_format, const char *script, const char *timeout, const char *sendto,
-		const char *subject, const char *message, const char *params);
+		const char *name, const char *smtp_server, const char *smtp_helo, const char *smtp_email,
+		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
+		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
+		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
+		const char *attempt_interval, unsigned char message_format, const char *script, const char *timeout,
+		const char *sendto, const char *subject, const char *message, const char *params);
 
 void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipient, char **value, int *errcode,
 		char **error, char **debug);
