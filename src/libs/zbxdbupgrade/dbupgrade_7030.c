@@ -289,7 +289,8 @@ static int	DBpatch_7030015(void)
 
 static int	DBpatch_7030016(void)
 {
-	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, 0};
+	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0,
+						ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("media_type_oauth", 1, &field);
 }
