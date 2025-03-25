@@ -214,7 +214,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->fullClear();*/
 
-
+		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
