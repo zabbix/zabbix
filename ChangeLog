@@ -1,7 +1,5 @@
 Changes for 7.0.11rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-26211] fixed a crash when checking for not supported value (vso)
 
