@@ -291,7 +291,7 @@ static int	DBpatch_7030016(void)
 {
 	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, 0};
 
-	return DBadd_foreign_key("settings", 2, &field);
+	return DBadd_foreign_key("media_type_oauth", 2, &field);
 }
 
 #endif
