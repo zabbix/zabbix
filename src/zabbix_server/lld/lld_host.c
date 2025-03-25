@@ -6176,12 +6176,14 @@ static void	lld_group_prototypes_save(zbx_vector_lld_host_ptr_t *hosts)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process derived LLD rules for discovered hosts                    *
+ * Purpose: process nested LLD rules for discovered hosts                     *
  *                                                                            *
  * Parameters: hosts - [IN] vector of discovered hosts                        *
  *                                                                            *
+ * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
+ *                                                                            *
  ******************************************************************************/
-static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *hosts)
+static void	lld_host_process_nested_lld_rules(const zbx_vector_lld_host_ptr_t *hosts)
 {
 	zbx_vector_uint64_t	hostids;
 	char			*sql = NULL;
@@ -6212,7 +6214,7 @@ static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *
 			" where type=%d"
 				" and status=%d"
 				" and",
-			ITEM_TYPE_DERIVED, ITEM_STATUS_ACTIVE);
+			ITEM_TYPE_NESTED_LLD, ITEM_STATUS_ACTIVE);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
 	result = zbx_db_select("%s", sql);
@@ -6231,7 +6233,7 @@ static void	lld_host_process_derived_lld_rules(const zbx_vector_lld_host_ptr_t *
 
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		lld_rule_process_derived_rule(host_local.hostid, itemid, hosts->values[index]->lld_row);
+		lld_rule_process_nested_rule(host_local.hostid, itemid, hosts->values[index]->lld_row);
 	}
 	zbx_db_free_result(result);
 out:
@@ -6458,7 +6460,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
 
 		lld_host_export_lld_macros(&hosts);
-		lld_host_process_derived_lld_rules(&hosts);
+		lld_host_process_nested_lld_rules(&hosts);
 
 		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);

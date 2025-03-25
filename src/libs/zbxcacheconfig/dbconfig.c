@@ -2854,7 +2854,7 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint6
 
 			__config_shmem_free_func(item->itemtype.browseritem);
 			break;
-		case ITEM_TYPE_DERIVED:
+		case ITEM_TYPE_NESTED_LLD:
 			break;
 	}
 }
@@ -3111,7 +3111,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 				}
 			}
 			break;
-		case ITEM_TYPE_DERIVED:
+		case ITEM_TYPE_NESTED_LLD:
 			break;
 	}
 
@@ -3540,13 +3540,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			item->poller_type = ZBX_NO_POLLER;
 		}
 
-		if (ITEM_TYPE_DERIVED == item->type && (0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
+		if (ITEM_TYPE_NESTED_LLD == item->type && (0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
 				|| 0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)))
 		{
 			zbx_timespec_t	ts = {now, 0};
 
 			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-					ITEM_STATE_NOTSUPPORTED, "Derived LLD rules is supported only for discovered"
+					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
 							" LLD rules or hosts.");
 		}
 

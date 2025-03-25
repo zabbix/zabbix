@@ -714,7 +714,7 @@ static void	DCdump_items(void)
 			case ITEM_TYPE_BROWSER:
 				DCdump_browseritem(item->itemtype.browseritem);
 				break;
-			case ITEM_TYPE_DERIVED:
+			case ITEM_TYPE_NESTED_LLD:
 				break;
 		}
 

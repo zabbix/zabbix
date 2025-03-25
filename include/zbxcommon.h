@@ -142,7 +142,7 @@ typedef enum
 	ITEM_TYPE_SNMP,
 	ITEM_TYPE_SCRIPT,
 	ITEM_TYPE_BROWSER,
-	ITEM_TYPE_DERIVED 	/* 23 */
+	ITEM_TYPE_NESTED_LLD 	/* 23 */
 }
 zbx_item_type_t;
 

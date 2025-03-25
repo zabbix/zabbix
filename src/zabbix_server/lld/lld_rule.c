@@ -2872,14 +2872,16 @@ static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *ite
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process derived LLD rules                                         *
+ * Purpose: process nested LLD rules                                          *
  *                                                                            *
  * Parameters: hostid          - [IN] host identifier                         *
  *             item_prototypes - [IN] vector of LLD item prototypes           *
  *             items           - [IN] vector of discovered LLD items          *
  *                                                                            *
+ * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
+ *                                                                            *
  ******************************************************************************/
-static void	lld_rule_process_derived_items(zbx_uint64_t hostid,
+static void	lld_rule_process_nested_rules(zbx_uint64_t hostid,
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		const zbx_vector_lld_item_full_ptr_t *items)
 {
@@ -2900,13 +2902,13 @@ static void	lld_rule_process_derived_items(zbx_uint64_t hostid,
 
 		item_prototype = item_prototypes->values[index];
 
-		if (ITEM_TYPE_DERIVED != item_prototype->type ||
+		if (ITEM_TYPE_NESTED_LLD != item_prototype->type ||
 				0 == (item_prototype->dflags & ZBX_FLAG_DISCOVERY_RULE))
 		{
 			continue;
 		}
 
-		lld_rule_process_derived_rule(hostid, item->itemid, item->lld_row);
+		lld_rule_process_nested_rule(hostid, item->itemid, item->lld_row);
 	}
 }
 
@@ -3016,7 +3018,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	}
 
 	lld_rule_export_lld_macros(&items);
-	lld_rule_process_derived_items(hostid, &item_prototypes, &items);
+	lld_rule_process_nested_rules(hostid, &item_prototypes, &items);
 
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 
@@ -3125,13 +3127,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Process a derived LLD rule                                        *
+ * Purpose: Process a nseted LLD rule                                         *
  *                                                                            *
  * Parameters: itemid  - [IN] ID of the item to process                       *
  *             lld_row - [IN] LLD row containing discovery data               *
  *                                                                            *
+ * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
+ *                                                                            *
  ******************************************************************************/
-void	lld_rule_process_derived_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row)
+void	lld_rule_process_nested_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row)
 {
 	char		*value = NULL;
 	size_t		value_alloc = 0, value_offset = 0;
