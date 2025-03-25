@@ -73,7 +73,7 @@ class testFormUserMedia extends CWebTest {
 						'period' => '1-7,00:00-24:00'
 					],
 					[
-						'mediatypeid' => 10, // Discord.
+						'mediatypeid' => 39, // Discord.
 						'sendto' => 'user@test.domain1.com',
 						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 16,
