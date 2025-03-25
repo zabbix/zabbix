@@ -247,6 +247,149 @@ out:
 
 static int	DBpatch_7030014(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 2 - SYSMAP_ELEMENT_TYPE_TRIGGER */
+	if (ZBX_DB_OK > zbx_db_execute("delete from sysmaps_elements"
+			" where elementtype=2"
+				" and selementid not in ("
+					"select distinct selementid from sysmap_element_trigger"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030015(void)
+{
+	const zbx_db_table_t	table =
+			{"sysmap_link_threshold", "linkthresholdid", 0,
+				{
+					{"linkthresholdid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"linkid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"drawtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"threshold", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"pattern", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030016(void)
+{
+	const zbx_db_field_t	field = {"linkid", NULL, "sysmaps_links", "linkid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_link_threshold", 1, &field);
+}
+
+static int	DBpatch_7030017(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_link_threshold", "sysmap_link_threshold_1"))
+		return DBcreate_index("sysmap_link_threshold", "sysmap_link_threshold_1", "linkid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030018(void)
+{
+	const zbx_db_field_t	field = {"background_scale", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_7030019(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps set background_scale=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030020(void)
+{
+	const zbx_db_field_t	field = {"show_element_label", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_7030021(void)
+{
+	const zbx_db_field_t	field = {"show_link_label", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_7030022(void)
+{
+	const zbx_db_field_t	field = {"show_label", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_7030023(void)
+{
+	const zbx_db_field_t	field = {"show_label", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_links", &field);
+}
+
+static int	DBpatch_7030024(void)
+{
+	const zbx_db_field_t	field = {"indicator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_links", &field);
+}
+
+static int	DBpatch_7030025(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps_links sl set indicator_type = 1 "
+			"where exists (select null from sysmaps_link_triggers slt where slt.linkid = sl.linkid)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030026(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("sysmaps_links", &field);
+}
+
+static int	DBpatch_7030027(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("sysmaps_links", 4, &field);
+}
+
+static int	DBpatch_7030028(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmaps_links", "sysmaps_links_4"))
+		return DBcreate_index("sysmaps_links", "sysmaps_links_4", "itemid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030029(void)
+{
 	const zbx_db_table_t	table =
 			{"lld_macro", "lld_macroid", 0,
 				{
@@ -262,12 +405,12 @@ static int	DBpatch_7030014(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030015(void)
+static int	DBpatch_7030030(void)
 {
 	return DBcreate_index("lld_macro", "lld_macro_1", "itemid", 0);
 }
 
-static int	DBpatch_7030016(void)
+static int	DBpatch_7030031(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -275,33 +418,33 @@ static int	DBpatch_7030016(void)
 	return DBadd_foreign_key("lld_macro", 1, &field);
 }
 
-static int	DBpatch_7030017(void)
+static int	DBpatch_7030032(void)
 {
 	const zbx_db_field_t	field = {"lldrule_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("item_discovery", &field);
 }
 
-static int	DBpatch_7030018(void)
+static int	DBpatch_7030033(void)
 {
 	return DBcreate_index("item_discovery", "item_discovery_3", "lldrule_itemid", 0);
 }
 
-static int	DBpatch_7030019(void)
+static int	DBpatch_7030034(void)
 {
 	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("item_discovery", 3, &field);
 }
 
-static int	DBpatch_7030020(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"parent_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("item_discovery", &field);
 }
 
-static int	DBpatch_7030021(void)
+static int	DBpatch_7030036(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update item_discovery id"
 					" set lldrule_itemid=parent_itemid,parent_itemid=NULL"
@@ -317,12 +460,13 @@ static int	DBpatch_7030021(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030022(void)
+static int	DBpatch_7030037(void)
 {
 	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("host_discovery", "parent_itemid", &field);
 }
+
 
 #endif
 
@@ -353,5 +497,20 @@ DBPATCH_ADD(7030019, 0, 1)
 DBPATCH_ADD(7030020, 0, 1)
 DBPATCH_ADD(7030021, 0, 1)
 DBPATCH_ADD(7030022, 0, 1)
+DBPATCH_ADD(7030023, 0, 1)
+DBPATCH_ADD(7030024, 0, 1)
+DBPATCH_ADD(7030025, 0, 1)
+DBPATCH_ADD(7030026, 0, 1)
+DBPATCH_ADD(7030027, 0, 1)
+DBPATCH_ADD(7030028, 0, 1)
+DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
+DBPATCH_ADD(7030032, 0, 1)
+DBPATCH_ADD(7030033, 0, 1)
+DBPATCH_ADD(7030034, 0, 1)
+DBPATCH_ADD(7030035, 0, 1)
+DBPATCH_ADD(7030036, 0, 1)
+DBPATCH_ADD(7030037, 0, 1)
 
 DBPATCH_END()

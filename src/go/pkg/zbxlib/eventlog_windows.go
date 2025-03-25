@@ -129,7 +129,7 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
+int	process_value_eventlog_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
@@ -153,7 +153,7 @@ int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 
 	return SUCCEED;
 }
-int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
+int	process_value_eventlog_count_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
@@ -282,9 +282,9 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, nextcheck int
 		ctlsConfig_p = &ctlsConfig
 	}
 
-	procValueFunc := C.process_eventlog_value_cb
+	procValueFunc := C.process_value_eventlog_cb
 	if isCountItem {
-		procValueFunc = C.process_eventlog_count_value_cb
+		procValueFunc = C.process_value_eventlog_count_cb
 	}
 
 	var cerrmsg *C.char

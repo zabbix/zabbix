@@ -1,0 +1,27 @@
+---
+test case: All ids replaced
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '{3}+{3}+{3}'
+  oldid: 3
+  newid: 5
+out:
+  result: SUCCEED
+---
+test case: Part of ids replaced
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '{3}+{3}+{5}'
+  oldid: 3
+  newid: 6
+out:
+  result: FAIL
+---
+test case: None of ids replaced
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '{3}+{3}+{5}'
+  oldid: 100
+  newid: 5
+out:
+  result: FAIL

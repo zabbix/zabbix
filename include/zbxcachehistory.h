@@ -111,6 +111,26 @@ typedef struct
 }
 zbx_pp_value_opt_t;
 
+typedef struct
+{
+	/* flag indicating the cache emptiness:         */
+	/*     ZBX_SYNC_DONE - nothing to sync, go idle */
+	/*     ZBX_SYNC_MORE - more data to sync        */
+	int	more;
+
+	/* processing statistics in seconds */
+	double	time_write_history;
+	double	time_write_trends;
+	double	time_update_items;
+	double	time_calculate_triggers;
+	double	time_process_events;
+
+	int	values_num;
+	int	triggers_num;
+	int	timers_num;
+}
+zbx_history_sync_stats_t;
+
 void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
 void	*zbx_dc_get_stats(int request);
@@ -119,6 +139,7 @@ void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff);
 void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
 void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age);
+void	zbx_dc_sync_trends(int parallel_num);
 int	zbx_trend_compare(const void *d1, const void *d2);
 void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
@@ -131,7 +152,7 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 		const zbx_vector_inventory_value_ptr_t *inventory_values);
 void	zbx_log_sync_history_cache_progress(void);
 void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, int *values_num, int *triggers_num, int *more);
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
 void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
@@ -146,8 +167,8 @@ int	zbx_hc_get_history_compression_age(void);
 double	zbx_hc_mem_pused(void);
 double	zbx_hc_mem_pused_lock(void);
 
-typedef void (*zbx_sync_history_cache_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
+typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
 
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
@@ -177,4 +198,7 @@ zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
 
 void	zbx_dbcache_setproxyqueue_state(int proxyqueue_state);
 int	zbx_dbcache_getproxyqueue_state(void);
+void	zbx_hc_acquire(void);
+int	zbx_hc_release(void);
+int	zbx_hc_refcount_peek(void);
 #endif

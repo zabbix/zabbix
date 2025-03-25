@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup users
@@ -449,6 +449,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['message']);
 			$dialog->close();
 		}
+		$dialog->ensureNotPresent();
 
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
