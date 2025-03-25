@@ -204,6 +204,8 @@ void	zbx_oauth2_update(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, int fe
 	else
 	{
 		data->tokens_status |= ZBX_OAUTH2_TOKEN_ACCESS_VALID;
+		if (NULL != data->old_refresh_token)
+			data->tokens_status |= ZBX_OAUTH2_TOKEN_REFRESH_VALID;
 
 		zbx_db_execute("update media_type_oauth"
 				" set access_token='%s',access_token_updated=%d,access_expires_in=%d,"
