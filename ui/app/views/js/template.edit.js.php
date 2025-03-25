@@ -103,8 +103,7 @@ window.template_edit_popup = new class {
 				});
 
 				this.form.validateChanges(fields, true);
-			},
-			source: 'template'
+			}
 		});
 
 		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');

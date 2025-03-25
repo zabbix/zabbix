@@ -173,11 +173,6 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'has_inline_validation' => true
 ]);
 
-$form->addItem(
-	(new CTemplateTag('tag-row-tmpl'))
-		->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
-);
-
 // Macros tab.
 $macros_tmpl = $data['show_inherited_template_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 
