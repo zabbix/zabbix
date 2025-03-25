@@ -99,7 +99,7 @@ class Shape {
 	 */
 	update(data) {
 		const invalidate = (data.type != SVGMapShape.TYPE_LINE && data.text !== undefined
-					&& this.data.text !== data.text);
+				&& this.data.text !== data.text);
 
 		if (data.type !== undefined && /^[0-9]+$/.test(this.data.sysmap_shapeid) === true
 				&& (data.type == SVGMapShape.TYPE_LINE) != (this.data.type == SVGMapShape.TYPE_LINE)) {
@@ -132,9 +132,9 @@ class Shape {
 	/**
 	 * Return label based on map constructor configuration.
 	 *
-	 * @param {boolean} return label with expanded macros.
+	 * @param {boolean} expand
 	 *
-	 * @return {string}
+	 * @return {string}  Return label with expanded macros.
 	 */
 	getLabel(expand) {
 		let label = this.data.text;
@@ -143,8 +143,7 @@ class Shape {
 			expand = true;
 		}
 
-		if (expand && typeof(this.expanded) === 'string'
-				&& this.sysmap.data.expand_macros == SYSMAP_EXPAND_MACROS_ON) {
+		if (expand && typeof(this.expanded) === 'string' && this.sysmap.data.expand_macros == SYSMAP_EXPAND_MACROS_ON) {
 			label = this.expanded;
 		}
 
@@ -220,13 +219,13 @@ class Shape {
 		}
 
 		this.handles[0].css({
-			left: (this.data.x - 3) + 'px',
-			top: (this.data.y - 3) + 'px'
+			left: `${this.data.x - 3}px`,
+			top: `${this.data.y - 3}px`
 		});
 
 		this.handles[1].css({
-			left: (this.data.width - 3) + 'px',
-			top: (this.data.height - 3) + 'px'
+			left: `${this.data.width - 3}px`,
+			top: `${this.data.height - 3}px`
 		});
 	}
 
