@@ -50,7 +50,7 @@ $form_grid = (new CFormGrid())
 			->setId('oauth-redirection-label')
 			->setAsteriskMark(),
 		(new CFormField([
-			(new CTextBox('redirection_url', $data['oauth']['redirection_url']))
+			(new CTextBox('redirection_url', $data['redirection_url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -70,7 +70,8 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('oauth-clientid-label'),
 		(new CFormField(
-			(new CTextBox('client_id', $data['oauth']['client_id']))
+			(new CTextBox('client_id', $data['client_id']))
+				->disableAutocomplete()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('oauth-clientid-field')
@@ -83,7 +84,8 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('oauth-client-secret-label'),
 		(new CFormField(
-			(new CTextBox('client_secret', $data['oauth']['client_secret']))
+			(new CTextBox('client_secret', $data['client_secret']))
+				->disableAutocomplete()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('oauth-client-secret-field')
@@ -114,7 +116,7 @@ if ($data['advanced_form']) {
 			->setAsteriskMark()
 			->setId('oauth-auth-endpoint-label'),
 		(new CFormField([
-			(new CTextBox('authorization_url', $data['oauth']['authorization_url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('authorization_url', $data['authorization_url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		]))->setId('oauth-auth-endpoint-field')
 	])
 	->addItem([
@@ -163,7 +165,7 @@ if ($data['advanced_form']) {
 			->setAsteriskMark()
 			->setId('oauth-token-endpoint-label'),
 		(new CFormField(
-			(new CTextBox('token_url', $data['oauth']['token_url']))
+			(new CTextBox('token_url', $data['token_url']))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('oauth-token-endpoint-field')
@@ -186,13 +188,16 @@ if ($data['advanced_form']) {
 		))->setId('oauth-token-parameters-field')
 	]);
 }
+else {
+	$form->addVar('authorization_url', $data['authorization_url']);
+	$form->addVar('token_url', $data['token_url']);
+}
 
 $form_grid->addItem(
 	(new CScriptTag('
 		oauth_edit_popup.init('.json_encode([
 			'update' => $data['update'] == 0,
 			'advanced_form' => $data['advanced_form'] == 1,
-			'oauth' => $data['oauth'],
 			'messages' => [
 				'popup_closed' => _('Please complete authentication to get tokens'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),

@@ -60,22 +60,21 @@ class CControllerOauthEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'update' => $this->getInput('update', 0),
-			'advanced_form' => $this->getInput('advanced_form', 0),
-			'mediatypeid' => $this->hasInput('mediatypeid') ? $this->getInput('mediatypeid') : null,
-			'oauth' => [
-				'redirection_url' => '',
-				'client_id' => '',
-				'client_secret' => '',
-				'authorization_url' => '',
-				'token_url' => '',
-				'token_status' => 0
-			],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
+			'update' => 0,
+			'advanced_form' => 0,
+			'mediatypeid' => null,
+			'redirection_url' => '',
+			'client_id' => '',
+			'client_secret' => '',
+			'authorization_url' => '',
+			'token_url' => '',
+			'token_status' => 0
 		];
-		$this->getInputs($data['oauth'], array_keys($data['oauth']));
+		$this->getInputs($data, array_keys($data));
+
+		$data['user'] = [
+			'debug_mode' => $this->getDebugMode()
+		];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

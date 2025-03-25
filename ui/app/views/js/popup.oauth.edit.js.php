@@ -137,6 +137,8 @@ window.oauth_edit_popup = new class {
 		options.rows = options.rows.map(row => ({...row, input_name}));
 		url_element.value = url.url;
 
+		options.dataCallback = (row) => ({...row, input_name});
+
 		jQuery(parameters_selector).dynamicRows(
 			options.rows.length ? options : {...options, rows: [{name: '', value: '', input_name}]}
 		);
