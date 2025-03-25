@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testLldLinking extends CIntegrationTest {
 
 	const HOST_NAME = 'test_lld_linking';
+	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	private static $templateX_ID;
 
