@@ -1300,13 +1300,13 @@ TABLE|item_discovery|itemdiscoveryid|ZBX_TEMPLATE
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|parent_itemid	|t_id		|	|NULL		|0			|2|items	|itemid
-FIELD		|lldrule_itemid	|t_id		|	|NULL		|0 			|3|items	|itemid		|RESTRICT
 FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|disable_source	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_disable	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|lldrule_itemid	|t_id		|	|NULL		|0 			|3|items	|itemid		|RESTRICT
 UNIQUE		|1		|itemid,parent_itemid
 INDEX		|2		|parent_itemid
 INDEX		|3		|lldrule_itemid
