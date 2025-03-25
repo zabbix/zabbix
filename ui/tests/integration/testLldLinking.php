@@ -30,7 +30,7 @@ class testLldLinking extends CIntegrationTest {
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	private static $templateX_ID;
-	private static $templateids = array();
+	private static $templateids = [];
 
 	/**
 	* Component configuration provider for server related tests.
