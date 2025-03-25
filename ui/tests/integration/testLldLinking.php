@@ -179,7 +179,7 @@ class testLldLinking extends CIntegrationTest {
 
 	private function deleteAction() {
 
-		$response = $this->call('action.delete',self::$actionId);
+		$response = $this->call('action.delete',[self::$actionId]);
 	}
 
 	/**
