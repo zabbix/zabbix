@@ -76,7 +76,7 @@ Changes for 7.2.5rc2
 New features:
 
 Bug fixes:
-.......PS. [ZBX-26211] fixed crash on check for not supported value (vso)
+.......PS. [ZBX-26211] fixed a crash when checking for not supported value (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.5rc1
@@ -440,7 +440,7 @@ Changes for 7.0.11rc2
 New features:
 
 Bug fixes:
-.......PS. [ZBX-26211] fixed crash on check for not supported value (vso)
+.......PS. [ZBX-26211] fixed a crash when checking for not supported value (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.11rc1
