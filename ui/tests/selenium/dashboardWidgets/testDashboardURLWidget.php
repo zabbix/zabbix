@@ -14,13 +14,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * The ignore browser errors annotation is required due to the errors coming from the URL opened in the URL widget.
  * @ignoreBrowserErrors
  *
  * @backup dashboard
+ * @dataSource DynamicItemWidgets
  * @onBefore prepareData
  */
 class testDashboardURLWidget extends CWebTest {
@@ -595,22 +596,21 @@ class testDashboardURLWidget extends CWebTest {
 
 	public static function getWidgetMacroData() {
 		return [
-			// TODO: test should be rewritten. Will be fixed in terms of DEV-4107.
-//			[
-//				[
-//					'popup' => true,
-//					'fields' => [
-//						'Name' => 'ЗАББИКС Сервер',
-//						'Override host' => 'Dashboard',
-//						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={HOST.ID}'
-//					],
-//					'result' => [
-//						'element' => 'id:visiblename',
-//						'value' => 'ЗАББИКС Сервер',
-//						'src' => 'zabbix.php?action=popup&popup=host.edit&hostid=10084'
-//					]
-//				]
-//			],
+			[
+				[
+					'popup' => true,
+					'fields' => [
+						'Name' => 'ЗАББИКС Сервер',
+						'Override host' => 'Dashboard',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={HOST.ID}'
+					],
+					'result' => [
+						'element' => 'id:visiblename',
+						'value' => 'ЗАББИКС Сервер',
+						'src' => 'zabbix.php?action=popup&popup=host.edit&hostid=10084'
+					]
+				]
+			],
 			[
 				[
 					'fields' => [
@@ -672,7 +672,21 @@ class testDashboardURLWidget extends CWebTest {
 	 * @dataProvider getWidgetMacroData
 	 */
 	public function testDashboardURLWidget_ResolvedMacro($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		// Use iframe sandboxing exceptions in case of popup form.
+		if (array_key_exists('popup', $data)) {
+			$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+			$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
+			$other_form->fill([
+				'id:iframe_sandboxing_enabled' => true,
+				'id:iframe_sandboxing_exceptions' => 'allow-scripts allow-same-origin allow-forms'
+			]);
+			$other_form->submit();
+			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		}
+		else {
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		}
+
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget(self::$default_widget)->edit();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
@@ -686,12 +700,20 @@ class testDashboardURLWidget extends CWebTest {
 		// Check widget content when the host match dynamic option criteria.
 		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
 		$this->page->switchTo($widget->query('id:iframe')->one());
+		COverlayDialogElement::find()->waitUntilReady();
 		$this->assertEquals($data['result']['value'], $this->query($data['result']['element'])->one()->getValue());
 
-		// Check iframe source link
+		// Check iframe source link.
 		$this->page->switchTo();
 		$this->assertEquals($data['result']['src'], $widget->query('xpath://iframe')->one()->getAttribute('src'));
 		$host->clear();
+
+		// Revert changes made in 'Other configuration parameters'.
+		if (array_key_exists('popup', $data)) {
+			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+			$other_form->fill(['id:iframe_sandboxing_exceptions' => ' ']);
+			$other_form->submit();
+		}
 	}
 
 	/**
@@ -699,7 +721,7 @@ class testDashboardURLWidget extends CWebTest {
 	 * should be put into the sandbox or not.
 	 */
 	public function testDashboardURLWidget_IframeSandboxing() {
-		// TODO: test scenario should be changed regarding decision made in ZBXNEXT-9340 subissue #18. Will be implemented in DEV-4107.
+		// TODO: test scenario should be changed regarding decision made in ZBX-25566.
 		// Check that host in widget can be updated via iframe if necessary sandboxing exceptions are set.
 		$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
@@ -716,6 +738,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Update host in widget.
 		foreach ([true, false] as $state) {
 			$this->page->switchTo($widget->query('id:iframe')->one());
+			COverlayDialogElement::find()->waitUntilReady();
 			$this->query('button:Update')->one()->click();
 			CMessageElement::find()->one()->waitUntilVisible();
 			$this->assertTrue($this->query('class:msg-good')->one()->isVisible());
@@ -771,7 +794,7 @@ class testDashboardURLWidget extends CWebTest {
 		$this->query('button:Save changes')->one()->click();
 
 		// Check that Dashboard can't be saved and returns error regarding invalid parameter.
-		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one();
+		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one()->waitUntilVisible();
 		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": cannot be empty.');
 		$message->close();
 
@@ -800,7 +823,7 @@ class testDashboardURLWidget extends CWebTest {
 	 * @param string $expected		expected result after widget form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		foreach ($data as $scheme) {
 			$dashboard->getWidget(self::$default_widget)->edit();
 			COverlayDialogElement::find()->one()->waitUntilReady();
@@ -903,7 +926,7 @@ class testDashboardURLWidget extends CWebTest {
 		}
 		else {
 			// Assert the iframe with Host form loaded.
-			$this->assertEquals('Host', COverlayDialogElement::find()->one()->getTitle());
+			$this->assertEquals('Host', COverlayDialogElement::find()->waitUntilReady()->one()->getTitle());
 		}
 
 		$this->page->switchTo();

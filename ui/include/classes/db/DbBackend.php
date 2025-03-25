@@ -133,13 +133,14 @@ abstract class DbBackend {
 	}
 
 	/**
-	 * Check the integrity of the table "config".
+	 * Check the integrity of the settings table.
 	 *
 	 * @return bool
 	 */
 	public function checkConfig() {
-		if (!DBfetch(DBselect('SELECT NULL FROM config c'))) {
+		if (!DBfetch(DBselect('SELECT NULL FROM settings s LIMIT 1'))) {
 			$this->setError(_('Unable to select configuration.'));
+
 			return false;
 		}
 

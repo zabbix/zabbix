@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once __DIR__.'/../include/CLegacyWebTest.php';
 
 /**
  * @backup profiles
@@ -100,7 +100,7 @@ class testGeneric extends CLegacyWebTest {
 
 			// Misc
 			['zabbix.php?action=search&search=server',		'Search'],
-			['zabbix.php?action=userprofile.edit',			'User profile']
+			['zabbix.php?action=userprofile.edit',			'Profile']
 		];
 	}
 

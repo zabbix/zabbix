@@ -69,12 +69,13 @@ function validateMedia(overlay) {
 				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
 
 				message_box.insertBefore($form);
-
-				overlay.unsetLoading();
 			}
 			else {
-				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
+				overlayDialogueDestroy(overlay.dialogueid);
+				overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: ret}));
 			}
+
+			overlay.unsetLoading();
 		},
 		dataType: 'json',
 		type: 'post'

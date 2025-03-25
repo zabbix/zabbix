@@ -462,6 +462,8 @@ class CMenuHelper {
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Profile')))
 							->setAction('userprofile.edit'),
+						(new CMenuItem(_('Notifications')))
+							->setAction('userprofile.notification.edit'),
 						(new CMenuItem(_('API tokens')))
 							->setAction('user.token.list')
 					]))
@@ -471,8 +473,13 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
 					->setIcon(ZBX_ICON_USER_SETTINGS)
-					->setAction('userprofile.edit')
 					->setTitle(getUserFullname($user))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Profile')))
+							->setAction('userprofile.edit'),
+						(new CMenuItem(_('Notifications')))
+							->setAction('userprofile.notification.edit')
+					]))
 			);
 		}
 

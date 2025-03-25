@@ -175,7 +175,7 @@ static void	discovery_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count, co
  * Purpose: gets discovery manager diagnostic statistics                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error)
+int	zbx_get_usage_stats_discovery(zbx_vector_dbl_t *usage, int *count, char **error)
 {
 	unsigned char	*result;
 
@@ -229,7 +229,7 @@ zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vect
 	return data_len;
 }
 
-void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
+void zbx_discovery_stats_ext_get_data(struct zbx_json *json, const void *arg)
 {
 	zbx_uint64_t	size;
 
@@ -245,7 +245,7 @@ void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
  * Purpose: gets discovery worker usage statistics                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
+void	zbx_discovery_stats_procinfo(zbx_process_info_t *info)
 {
 	zbx_vector_dbl_t	usage;
 	char			*error = NULL;
@@ -254,7 +254,7 @@ void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
 
 	memset(info, 0, sizeof(zbx_process_info_t));
 
-	if (SUCCEED != zbx_discovery_get_usage_stats(&usage, &info->count, &error))
+	if (SUCCEED != zbx_get_usage_stats_discovery(&usage, &info->count, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get discovery usage statistics: %s", error);
 		zbx_free(error);

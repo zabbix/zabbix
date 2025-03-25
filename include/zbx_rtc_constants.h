@@ -34,6 +34,7 @@
 #define ZBX_RTC_PROXYPOLLER_PROCESS		19
 #define ZBX_RTC_PROF_ENABLE			20
 #define ZBX_RTC_PROF_DISABLE			21
+#define ZBX_RTC_HISTORY_CACHE_CLEAR		22
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -67,5 +68,6 @@
 #define ZBX_PROXY_CONFIG_CACHE_RELOAD	"proxy_config_cache_reload"
 #define ZBX_PROF_ENABLE			"prof_enable"
 #define ZBX_PROF_DISABLE		"prof_disable"
+#define ZBX_HISTORY_CACHE_CLEAR		"history_cache_clear"
 
 #endif

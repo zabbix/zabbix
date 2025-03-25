@@ -1399,6 +1399,14 @@ msgstr "Użyte również jako etykieta legendy dla zagregowanych zbiorów danych
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatywnie, można zainstalować to ręcznie:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Ilość fizycznej pamięci, która jest zamieniona na przestrzeń pliku wymiany, \"url\" - URL usługi VMware, \"uuid\" - unikalny globalny identyfikator wirtualnej maszyny VMware"
@@ -1854,6 +1862,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Auto"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr ""
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "Automatyczne logowanie"
@@ -1975,6 +1991,10 @@ msgstr "Kolor tla"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Obraz tła"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2730,6 +2750,11 @@ msgstr "Nie można usunąć domyślnej metody MFA."
 msgid "Cannot delete default user directory."
 msgstr "Nie można usunąć domyślnego katalogu użytkownika."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2737,6 +2762,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Nie można usunąć reguły wykrywania"
 msgstr[1] "Nie można usunąć reguł wykrywania"
 msgstr[2] "Nie można usunąć reguł wykrywania"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2766,6 +2796,11 @@ msgstr[0] "Nie można usunąć hosta"
 msgstr[1] "Nie można usunąć hostów"
 msgstr[2] "Nie można usunąć hostów"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2780,6 +2815,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Nie można usunąć grupy hostów"
 msgstr[1] "Nie można usunąć grup hostów"
 msgstr[2] "Nie można usunąć grup hostów"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2938,6 +2978,11 @@ msgstr[0] "Nie można usunąć szablonu"
 msgstr[1] "Nie można usunąć szablonów"
 msgstr[2] "Nie można usunąć szablonów"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2974,6 +3019,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "Nie można usunąć wyzwalacza"
 msgstr[1] "Nie można usunąć wyzwalaczy"
 msgstr[2] "Nie można usunąć wyzwalaczy"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -3346,6 +3396,11 @@ msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość MIN osi Y dla prototypu wykresu \"%3$s\" dla reguły wykrywania \"%4$s\" w \"%5$s\"."
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -4031,6 +4086,11 @@ msgstr "Nie można zaktualizować \"%1$s\" w szablonowym wyzwalaczu \"%2$s\"."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Nie można zaktualizować \"%1$s\" w szablonowym prototypie wyzwalacza \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4536,6 +4596,10 @@ msgstr "Sprawdza, czy usługa DNS działa. Zwraca 0 - DNS nie działa (serwer ni
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Sprawdza, czy plik istnieje. Zwraca 0 - nie znaleziono; 1 - plik określonego typu istnieje"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6042,6 +6106,11 @@ msgstr "Szyfrowanie bazy danych TLS"
 msgid "Database TLS key file"
 msgstr "Plik klucza TLS bazy danych"
 
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Tabele historyczne w bazie danych używają kluczy głównych"
@@ -6737,6 +6806,22 @@ msgstr "Usunąć scenariusz sieci www?"
 #: app/controllers/CControllerAuditLogList.php:382
 msgid "Deleted"
 msgstr "Usunięto"
+
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -11299,6 +11384,10 @@ msgstr "Zwiększ o"
 msgid "Indefinitely"
 msgstr "Bez końca"
 
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
 msgstr "Wskaźniki"
@@ -13674,6 +13763,10 @@ msgstr "Nazwa elementu menu jest używana jako etykieta adresu URL wyzwalacza w 
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
 msgstr "Ścieżka menu"
+
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -16859,6 +16952,10 @@ msgstr "Prometeusz na JSON"
 msgid "Properties"
 msgstr "Właściwości"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "Protokół"
@@ -17790,6 +17887,10 @@ msgstr "Przywróć domyślne"
 msgid "Reset to initial view"
 msgstr "Przywróć widok początkowy"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Rozwiązane"
@@ -18041,6 +18142,11 @@ msgstr "Uruchom skrypt \"%1$s\" na serwerze Zabbix"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Uruchom skrypt \"%1$s\" na bieżącym hoście"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:622
 #, c-format
@@ -19204,6 +19310,12 @@ msgstr "Pokaż nagłówek"
 msgid "Show hosts in maintenance"
 msgstr "Wyświetl hosty w utrzymaniu"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "Pokaż etykiety"
@@ -19221,6 +19333,14 @@ msgstr "Wyświetl legendę"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Wyświetl linie"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19677,6 +19797,10 @@ msgstr "Stan bufora pamięci proxy."
 msgctxt "history source selection method"
 msgid "Static"
 msgstr "Statyczny"
+
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
@@ -20722,6 +20846,14 @@ msgstr "Motyw"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Parametry zostaną przekazane do skryptu jako argumenty wiersza poleceń, zgodnie z podaną kolejnością."
+
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -24079,6 +24211,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix serwer (proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Serwer Zabbix nie działa: wyświetlane informacje mogą być nieaktualne."
@@ -24095,6 +24235,10 @@ msgstr "Nazwa serwera Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Wersja serwera Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24264,6 +24408,41 @@ msgstr "abs() - Wartość bezwzględna"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - arcus cosinus z wartości jako kąta wyrażonego w radianach"
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24430,6 +24609,18 @@ msgstr "ascii() - Zwraca kod ASCII skrajnie lewego znaku podanej wartości"
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "acsin() - arcus sinus z wartości jako kąta wyrażonego w radianach"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24485,6 +24676,10 @@ msgstr "baselinewma() - Oblicza linię bazową przez uśrednienie okresów w dan
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Sprawdza czy dana wartość mieści się we wskazanym przedziale (1 - tak, 0 - nie)"
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -25004,6 +25199,10 @@ msgstr "istnieje"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - Liczba Eulera podniesiona do potęgi wyznaczonej przez wartość"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - Liczba Eulera podniesiona do potęgi wyznaczonej przez wartość minus 1"
@@ -25034,6 +25233,10 @@ msgstr "pierwszy"
 #: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Najstarsza wartość we wskazanym przedziale czasu"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -25124,6 +25327,10 @@ msgstr "grupa hostów"
 msgid "host group with the same UUID already exists"
 msgstr "grupa hostów o tym samym identyfikatorze UUID już istnieje"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -25141,6 +25348,10 @@ msgstr "wzorce hosta"
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "prototyp hosta o tym samym identyfikatorze UUID już istnieje"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25201,6 +25412,10 @@ msgstr "nieprawidłowa liczność elementu"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "nieprawidłowe wyrażenie zaczynając od \"%1$s\""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25432,6 +25647,10 @@ msgstr "ostatni"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Ostatnia (najnowsza) wartość T"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "lewy"
@@ -25467,6 +25686,10 @@ msgstr "logseverity() - Poziom zdarzenia z ostatniego wpisu dziennika w okresie 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Źródło zdarzenia dla ostatniego wpisu dziennika w okresie T pasującego do wyrażenia V (1 - pasuje, 0 - nie pasuje)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

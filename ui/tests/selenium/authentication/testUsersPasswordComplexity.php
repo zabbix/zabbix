@@ -14,13 +14,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @onBefore prepareUserData
  *
- * @backup config, users
+ * @backup settings, users
  */
 class testUsersPasswordComplexity extends CWebTest {
 
@@ -148,7 +148,7 @@ class testUsersPasswordComplexity extends CWebTest {
 	 */
 	public function testUsersPasswordComplexity_FormValidation($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+			$old_hash = CDBHelper::getHash('SELECT * FROM settings');
 		}
 
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -160,15 +160,18 @@ class testUsersPasswordComplexity extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Cannot update authentication',
 					'Invalid parameter "/passwd_min_length": value must be one of 1-70.'
 			);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 			// Check length fields saved in db, other fields remained default.
-			$db_expected = ['passwd_min_length' => $data['db_passwd_min_length'], 'passwd_check_rules' => 8];
-			$this->assertEquals([$db_expected],
-					CDBHelper::getAll('SELECT passwd_min_length, passwd_check_rules FROM config')
-			);
+			$db_expected = [
+				'passwd_check_rules' => 8,
+				'passwd_min_length' => $data['db_passwd_min_length']
+			];
+			$this->assertEquals(array_values($db_expected), CDBHelper::getColumn('SELECT name,value_int FROM settings WHERE name IN'.
+					' (\'passwd_min_length\', \'passwd_check_rules\') ORDER BY name', 'value_int'
+			));
 		}
 	}
 
@@ -977,7 +980,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->assertEquals($data['db_passwd_check_rules'],
-				CDBHelper::getValue('SELECT passwd_check_rules FROM config')
+				CDBHelper::getValue('SELECT value_int FROM settings WHERE name=\'passwd_check_rules\'')
 		);
 
 		if ($update) {
@@ -999,7 +1002,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		}
 
 		// Check user password creation accordingly to complexity settings.
-		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
+		$user_form = $this->query('name', $own ? 'userprofile_form' : 'user_form')->asForm()->waitUntilPresent()->one();
 		$username = ($userid === 1)
 			? 'Admin'
 			: ($update ? 'update-user' : 'username'.time());

@@ -82,9 +82,7 @@
 									.change();
 								$('#uri_valid_schemes').val(uri_valid_schemes);
 								$('#x_frame_header_enabled')
-									.prop('checked',
-										<?= DB::getDefault('config', 'x_frame_options') === 'null' ? 'false' : 'true' ?>
-									)
+									.prop('checked', x_frame_options !== 'null')
 									.change();
 								$('#x_frame_options').val(x_frame_options);
 								$('#iframe_sandboxing_enabled')
