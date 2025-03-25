@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup history, autoreg_host
  */
 class testLldLinking extends CIntegrationTest {
-	const NUMBER_OF_TEMPLATES = 2;
+	const NUMBER_OF_TEMPLATES_SAME_LLD = 2;
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
@@ -81,7 +81,7 @@ class testLldLinking extends CIntegrationTest {
 		}
 	}
 
-	private function hostCreateAutoRegAndLink() {
+	private function hostCreateAutoRegAndLink($templateNumber) {
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -99,7 +99,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result'], $ep);
 		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 
-		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
+		for ($i = 0; $i < $templateNumber; $i++) {
 			$response = $this->call('template.create', [
 				'host' => self::TEMPLATE_NAME_PRE . "_" . $i,
 					'groups' => [
@@ -115,7 +115,7 @@ class testLldLinking extends CIntegrationTest {
 			array_push(self::$templateids, $response['result']['templateids'][0]);
 		}
 
-		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
+		for ($i = 0; $i < $templateNumber; $i++) {
 			$response = $this->call('discoveryrule.create', [
 				'name' => 'LLD rule with LLD macro paths',
 				'key_' => 'lld',
@@ -184,13 +184,13 @@ class testLldLinking extends CIntegrationTest {
 
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->hostCreateAutoRegAndLink();
+		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_SAME_LLD);
 
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		sleep(1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": conflicting item key "lld" found', true, 120);
 		/*$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
