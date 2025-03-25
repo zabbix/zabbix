@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testLldLinking extends CIntegrationTest {
 	const NUMBER_OF_TEMPLATES = 2;
-
+	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
@@ -101,7 +101,7 @@ class testLldLinking extends CIntegrationTest {
 
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
 			$response = $this->call('template.create', [
-				'host' => 'test_template',
+				'host' => self::TEMPLATE_NAME_PRE . "_" . $i,
 					'groups' => [
 						'groupid' => 1
 					]
