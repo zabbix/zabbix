@@ -342,7 +342,6 @@ class CForm {
 	 * Sets errors in field objects and in #general_errors array.
 	 */
 	setErrors(raw_errors, focus_error_field, force_display_errors = false) {
-		this.clearGlobalErrors(raw_errors);
 		const {field_errors, general_errors} = this.convertRawErrors(raw_errors);
 
 		Object.entries(field_errors).forEach(([key, errors]) => {
@@ -359,16 +358,20 @@ class CForm {
 				this.addGeneralErrors(field.getGlobalErrors());
 			}
 			else {
-				this.addGeneralErrors({[key]: errors});
+				errors.forEach((error) => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + key + '": ' + error.message);
+					}
+				});
 			}
 		});
 
 		Object.entries(general_errors).forEach(([key, errors]) => {
-			errors
-				.filter(({message}) => message !== '')
-				.forEach(({message}) => {
-					this.addGeneralErrors({[key]: message});
-				});
+			errors.forEach((error) => {
+				if (error.message !== '') {
+					console.log('Validation error for missing field "' + key + '": ' + error.message);
+				}
+			});
 		});
 
 		if ('' in raw_errors) {
@@ -378,17 +381,6 @@ class CForm {
 		if (focus_error_field) {
 			this.focusErrorField();
 		}
-	}
-
-	/**
-	 * Remove global errors for fields that are now being validated.
-	 *
-	 * @param raw_errors
-	 */
-	clearGlobalErrors(raw_errors) {
-		Object.keys(raw_errors).forEach(path => {
-			delete this.#general_errors[path];
-		});
 	}
 
 	/**

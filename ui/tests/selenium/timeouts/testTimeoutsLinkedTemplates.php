@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testTimeoutsDisplay.php';
+require_once __DIR__.'/../common/testTimeoutsDisplay.php';
 
 /**
  * @onBefore prepareTimeoutsData
