@@ -986,7 +986,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
-	int		i, db_type, ret;
+	int		i, db_type;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1343,6 +1343,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())
 	{
+		int	ret;
+
 		zbx_update_env(zbx_time());
 		zbx_sleep(1);
 
