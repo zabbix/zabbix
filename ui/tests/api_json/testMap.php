@@ -352,7 +352,7 @@ class testMap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/zindex": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/selements/1/zindex": an integer is expected.'
 			]
 		];
 	}
