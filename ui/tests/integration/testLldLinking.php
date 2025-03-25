@@ -30,7 +30,7 @@ class testLldLinking extends CIntegrationTest {
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	private static $templateX_ID;
-	private static $templateids = [];
+	private static $templateids = array();
 
 	/**
 	* Component configuration provider for server related tests.
@@ -131,6 +131,12 @@ class testLldLinking extends CIntegrationTest {
 			]);
 		}
 
+		$templateids_for_api_call = [];
+		foreach (self::$templateids as $entry) {
+			$t = ['templateid' => $entry];
+			array_push($templateids_for_api_call, $t);
+		}
+
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
@@ -139,7 +145,7 @@ class testLldLinking extends CIntegrationTest {
 				[
 					'operationtype' => 6,
 					'optemplate' =>
-					self::$templateids
+					$templateids_for_api_call
 				]
 			]
 		]);
