@@ -127,7 +127,11 @@ class testLldLinking extends CIntegrationTest {
 				'lld_macro_paths' => [
 					[
 						'lld_macro' => '{#MACRO1}',
-						'path' => '$.path.1'
+						'path' => '$.path1'
+					],
+					[
+						'lld_macro' => '{#MACRO2}',
+						'path' => '$.path2'
 					]
 				]
 			]);
