@@ -47,7 +47,7 @@ class CControllerTriggerPrototypeCreate extends CController {
 				ZBX_TRIGGER_CORRELATION_TAG
 			]],
 			'correlation_tag' => ['db triggers.correlation_tag', 'required', 'not_empty', 'when' => [
-				['correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_TAG]],
+				['correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_TAG]]
 			]],
 			'manual_close' => ['db triggers.manual_close', 'in' => [ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
