@@ -87,8 +87,6 @@ class CControllerGraphPrototypeUpdate extends CController {
 			'editable' => true
 		]);
 
-		$this->discovery_rule = reset($discovery_rule);
-
 		if (!$discovery_rule) {
 			return false;
 		}
