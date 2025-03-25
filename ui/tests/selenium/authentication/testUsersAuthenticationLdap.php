@@ -911,7 +911,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Test Discord mapping',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => 'test discord',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -919,7 +919,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test iLert mapping (disabled)',
-								'mediatypeid' => 22,
+								'mediatypeid' => 44,
 								'attribute' => 'test iLert',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -927,7 +927,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis - macro',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'test macro',
 								'severity' => 63,
 								'period' => '{$TEST.MACRO}',
@@ -935,7 +935,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis - time period',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'test time period',
 								'severity' => 63,
 								'period' => '1-5,12:00-13:00',
@@ -943,7 +943,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Not classified',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity not classified',
 								'severity' => 1,
 								'period' => '1-7,00:00-24:00',
@@ -951,7 +951,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Information',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity information',
 								'severity' => 2,
 								'period' => '1-7,00:00-24:00',
@@ -959,7 +959,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Warning',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity warning',
 								'severity' => 4,
 								'period' => '1-7,00:00-24:00',
@@ -967,7 +967,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Average',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity average',
 								'severity' => 8,
 								'period' => '1-7,00:00-24:00',
@@ -975,7 +975,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: High',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity high',
 								'severity' => 16,
 								'period' => '1-7,00:00-24:00',
@@ -983,7 +983,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Disaster',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity disaster',
 								'severity' => 32,
 								'period' => '1-7,00:00-24:00',
@@ -991,7 +991,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with no severity',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity none',
 								'severity' => 0,
 								'period' => '1-7,00:00-24:00',
@@ -1301,7 +1301,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Test iLert mapping',
-								'mediatypeid' => 22,
+								'mediatypeid' => 44,
 								'attribute' => 'test iLert',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -2030,7 +2030,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'кириллица2',
-								'mediatypeid' => 22,
+								'mediatypeid' => 44,
 								'attribute' => 'кириллица'
 							]
 						]
@@ -2180,7 +2180,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => '~`!@#$%^7*()_+=/2',
-								'mediatypeid' => 22,
+								'mediatypeid' => 44,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						]
@@ -2481,7 +2481,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => '2ong_value_long_value_long_value_long_value_long_value_long_valu',
-								'mediatypeid' => 22,
+								'mediatypeid' => 44,
 								'attribute' => STRING_255
 							]
 						]
@@ -2675,7 +2675,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test iLert mapping with disabled status',
-								'mediatypeid' => 22,
+								'mediatypeid' => 44,
 								'attribute' => 'test iLert',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -2683,7 +2683,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis mapping with user macro in time period',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'test macro',
 								'severity' => 63,
 								'period' => '{$TEST.MACRO}',
@@ -2691,7 +2691,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis mapping with non-default time period',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'test time period',
 								'severity' => 63,
 								'period' => '1-5,12:00-13:00',
@@ -2699,7 +2699,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Not classified',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity not classified',
 								'severity' => 1,
 								'period' => '1-7,00:00-24:00',
@@ -2707,7 +2707,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Information',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity information',
 								'severity' => 2,
 								'period' => '1-7,00:00-24:00',
@@ -2715,7 +2715,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Warning',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity warning',
 								'severity' => 4,
 								'period' => '1-7,00:00-24:00',
@@ -2723,7 +2723,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Average',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity average',
 								'severity' => 8,
 								'period' => '1-7,00:00-24:00',
@@ -2731,7 +2731,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: High',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity high',
 								'severity' => 16,
 								'period' => '1-7,00:00-24:00',
@@ -2739,7 +2739,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Disaster',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity disaster',
 								'severity' => 32,
 								'period' => '1-7,00:00-24:00',
@@ -2747,7 +2747,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with no severity',
-								'mediatypeid' => 29,
+								'mediatypeid' => 38,
 								'attribute' => 'severity none',
 								'severity' => 0,
 								'period' => '1-7,00:00-24:00',
