@@ -111,8 +111,8 @@ class testLldLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey('templateids', $response['result'], $ep);
 			$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
-			self::$templateX_ID = $response['result']['templateids'][0];
-			array_push($templateids, ['templateid' => self::$templateX_ID]);
+
+			array_push(self::$templateids, $response['result']['templateids'][0]);
 		}
 
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
