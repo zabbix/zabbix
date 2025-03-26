@@ -37,13 +37,13 @@ class testFormMapProperties extends CWebTest {
 		];
 	}
 
-	protected static $map_update = 'Sysmap for Update test';
-	const MAP_ACTIONS = 'Map for simple update, clone and delete test';
+	protected static $map_update = 'Map for update test';
+	const MAP_UPDATE = 'Map for simple update and update test';
+	const MAP_CLONE_DELETE = 'Map for clone and delete test';
 	const HASH_SQL = 'SELECT * FROM sysmaps ORDER BY sysmapid';
 	const ICON_MAPPING = 'Icon mapping for map properties';
 	const XSS_EXAMPLE = '<script>alert(\'XSS\');</script>';
-	public $mapName = 'Test map 1';
-	public $edit_map_name = 'Local network';
+	const BACKGROUND_IMAGE = 'Background image for map properties';
 
 	public function prepareMapsData() {
 		CDataHelper::call('iconmap.create', [
@@ -65,7 +65,19 @@ class testFormMapProperties extends CWebTest {
 			]
 		]);
 
+		CDataHelper::call('image.create', [
+			[
+				'name' => self::BACKGROUND_IMAGE,
+				'imagetype' => 2,
+				'image' => 'iVBORw0KGgoAAAANSUhEUgAAAGkAAAA6CAIAAAA8+uA0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ'.
+					'cEhZcwAAEnQAABJ0Ad5mH3gAAACPSURBVHhe7dChDQAwDMCwft7Xy4emYBsGZpZq3sA37zrvOu867zrvOu867zrvOu867zr'.
+					'vOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867z'.
+					'rvOu867zrvOu867zrvOu867zrvugNJxGmwt/UO4QAAAABJRU5ErkJggg=='
+			]
+		]);
+
 		$id_mapping = CDBHelper::getValue('SELECT iconmapid FROM icon_map WHERE name='.zbx_dbstr(self::ICON_MAPPING));
+		$id_background = CDBHelper::getValue('SELECT imageid FROM images WHERE name='.zbx_dbstr(self::BACKGROUND_IMAGE));
 
 		CDataHelper::call('map.create', [
 			[
@@ -76,7 +88,7 @@ class testFormMapProperties extends CWebTest {
 				'label_type' => 0
 			],
 			[
-				'name' => self::MAP_ACTIONS,
+				'name' => self::MAP_UPDATE,
 				'width' => 10000,
 				'height' => 9000,
 				'iconmapid' => $id_mapping,
@@ -108,6 +120,55 @@ class testFormMapProperties extends CWebTest {
 					[
 						'name' => 'Map URL',
 						'url' => 'test',
+						'elementtype' => 1
+					],
+					[
+						'name' => 'Trigger URL',
+						'url' => 'test',
+						'elementtype' => 2
+					],
+					[
+						'name' => 'Image URL',
+						'url' => 'test',
+						'elementtype' => 4
+					]
+				]
+			],
+			[
+				'name' => self::MAP_CLONE_DELETE,
+				'width' => 1000,
+				'height' => 1000,
+				'backgroundid' => $id_background,
+				'iconmapid' => $id_mapping,
+				'markelements' => 1,
+				'highlight' => 1,
+				'expandproblem' => 2,
+				'label_format' => 1,
+				'label_location' => 3,
+				'label_type_host' => 5,
+				'label_type_hostgroup' => 5,
+				'label_string_host' => STRING_255,
+				'label_string_hostgroup' => 'Host group label 📰📰📰',
+				'label_type_image' => 0,
+				'label_type_map' => 2,
+				'label_type_trigger' => 3,
+				'severity_min' => 4,
+				'show_unack' => 2,
+				'show_suppressed' => 1,
+				'urls' => [
+					[
+						'name' => 'Host URL 📰📰📰',
+						'url' => 'test 📰📰📰',
+						'elementtype' => 0
+					],
+					[
+						'name' => STRING_255,
+						'url' => STRING_2048,
+						'elementtype' => 3
+					],
+					[
+						'name' => self::XSS_EXAMPLE,
+						'url' => self::XSS_EXAMPLE,
 						'elementtype' => 1
 					],
 					[
@@ -196,7 +257,7 @@ class testFormMapProperties extends CWebTest {
 
 		$image_field = $form->getField('Background image');
 		$this->assertEquals('No image', $image_field->getValue());
-		$this->assertEquals(['No image'], $image_field->getOptions()->asText());
+		$this->assertEquals(['No image', self::BACKGROUND_IMAGE], $image_field->getOptions()->asText());
 
 		$background_scale = $form->getField('Background scale');
 		$this->assertEquals('Proportionally', $background_scale->getText());
@@ -334,7 +395,6 @@ class testFormMapProperties extends CWebTest {
 		}
 	}
 
-
 	public function getMapValidationData() {
 		return [
 			// #0 Missing madatory parameter - Name.
@@ -364,9 +424,9 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'map_properties' => [
-						'Name' => self::MAP_ACTIONS
+						'Name' => self::MAP_UPDATE
 					],
-					'error_details' => 'Map "'.self::MAP_ACTIONS.'" already exists.'
+					'error_details' => 'Map "'.self::MAP_UPDATE.'" already exists.'
 				]
 			],
 			// #3 Missing mandatory parameter - Owner.
@@ -853,6 +913,7 @@ class testFormMapProperties extends CWebTest {
 						'Name' => 'Non-default parameters sysmap 1',
 						'Width' => '100',
 						'Height' => '200',
+						'Background image' => self::BACKGROUND_IMAGE,
 						'Background scale' => 'None',
 						'Automatic icon mapping' => self::ICON_MAPPING,
 						'Icon highlight' => true,
@@ -871,7 +932,7 @@ class testFormMapProperties extends CWebTest {
 						'Name' => 'Non-default parameters sysmap 1',
 						'Width' => '100',
 						'Height' => '200',
-						'Background image' => 'No image',
+						'Background image' => self::BACKGROUND_IMAGE,
 						'Background scale' => 'None',
 						'Automatic icon mapping' => self::ICON_MAPPING,
 						'Icon highlight' => true,
@@ -898,6 +959,7 @@ class testFormMapProperties extends CWebTest {
 						'Name' => 'Non-default parameters sysmap 2',
 						'Width' => '100',
 						'Height' => '200',
+						'Background image' => self::BACKGROUND_IMAGE,
 						'Automatic icon mapping' => self::ICON_MAPPING,
 						'Icon highlight' => true,
 						'Mark elements on trigger status change' => true,
@@ -913,7 +975,7 @@ class testFormMapProperties extends CWebTest {
 						'Name' => 'Non-default parameters sysmap 2',
 						'Width' => '100',
 						'Height' => '200',
-						'Background image' => 'No image',
+						'Background image' => self::BACKGROUND_IMAGE,
 						'Background scale' => 'Proportionally',
 						'Automatic icon mapping' => self::ICON_MAPPING,
 						'Icon highlight' => true,
@@ -940,6 +1002,7 @@ class testFormMapProperties extends CWebTest {
 						'Name' => 'Non-default parameters sysmap 3',
 						'Width' => '100',
 						'Height' => '200',
+						'Background scale' => 'None',
 						'Automatic icon mapping' => self::ICON_MAPPING,
 						'Icon highlight' => true,
 						'Mark elements on trigger status change' => true,
@@ -956,7 +1019,7 @@ class testFormMapProperties extends CWebTest {
 						'Width' => '100',
 						'Height' => '200',
 						'Background image' => 'No image',
-						'Background scale' => 'Proportionally',
+						'Background scale' => 'None',
 						'Automatic icon mapping' => self::ICON_MAPPING,
 						'Icon highlight' => true,
 						'Mark elements on trigger status change' => true,
@@ -1506,7 +1569,7 @@ class testFormMapProperties extends CWebTest {
 		$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', self::MAP_ACTIONS)->query('link:Properties')->one()->click();
+		$table->findRow('Name', self::MAP_UPDATE)->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
@@ -1634,7 +1697,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #1 Create with maximum string length, width, height values.
+			// #1 Update with maximum string length, width, height values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1764,7 +1827,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #2 Create with XSS imitation text.
+			// #2 Update with XSS imitation text.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1964,7 +2027,7 @@ class testFormMapProperties extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'map_name' => self::MAP_ACTIONS,
+					'map_name' => self::MAP_UPDATE,
 					'map_properties' => [
 						'Host group label type' => 'Label',
 						'Host label type' => 'IP address',
@@ -1975,7 +2038,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => self::MAP_ACTIONS,
+						'Name' => self::MAP_UPDATE,
 						'Width' => '10000',
 						'Height' => '9000',
 						'Background image' => 'No image',
@@ -2040,9 +2103,11 @@ class testFormMapProperties extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'map_name' => self::MAP_ACTIONS,
+					'map_name' => self::MAP_UPDATE,
+					'remove_urls' => true,
 					'map_properties' => [
 						'Owner' => 'guest',
+						'Background image' => self::BACKGROUND_IMAGE,
 						'Background scale' => 'None',
 						'Display problems' => 'Number of problems',
 						'Automatic icon mapping' => '<manual>',
@@ -2060,10 +2125,10 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['guest'],
-						'Name' => self::MAP_ACTIONS,
+						'Name' => self::MAP_UPDATE,
 						'Width' => '10000',
 						'Height' => '9000',
-						'Background image' => 'No image',
+						'Background image' => self::BACKGROUND_IMAGE,
 						'Background scale' => 'None',
 						'Automatic icon mapping' => '<manual>',
 						'Icon highlight' => false,
@@ -2133,7 +2198,7 @@ class testFormMapProperties extends CWebTest {
 		$form->fill($data['map_properties']);
 		$url_count = $form->query('button:Remove')->count();
 
-		// Add URLS.
+		// Add URLs.
 		if (array_key_exists('urls', $data)) {
 			foreach ($data['urls'] as $url) {
 
@@ -2149,6 +2214,15 @@ class testFormMapProperties extends CWebTest {
 						? $url['Element']
 						: 'Host'
 				);
+			}
+		}
+
+		// Remove URLs.
+		if (array_key_exists('remove_urls', $data)) {
+			foreach ($data['expected_urls'] as $url) {
+				$table = $this->query('class:table-forms-separator')->asTable()->one();
+				$row = $table->query('id:url-row-'.$url['id'])->one();
+				$row->query('button:Remove')->one()->click();
 			}
 		}
 
@@ -2172,7 +2246,7 @@ class testFormMapProperties extends CWebTest {
 			$this->assertEquals($data['result'], $form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 
 			// Check map URLs.
-			if (array_key_exists('expected_urls', $data)) {
+			if (array_key_exists('expected_urls', $data) && array_key_exists('remove_urls', $data) === false) {
 				foreach ($data['expected_urls'] as $expected_url) {
 					$this->assertEquals($expected_url['name'], $form->query('id:urls_'.$expected_url['id'].'_name')
 							->one()->getValue()
@@ -2183,6 +2257,20 @@ class testFormMapProperties extends CWebTest {
 					$this->assertEquals($expected_url['element_type'],
 							$form->query('name:urls['.$expected_url['id'].'][elementtype]')->one()->getValue()
 					);
+				}
+			}
+
+			// Check that only one empty URL row is present, in case if all URLs were removed.
+			if (array_key_exists('remove_urls', $data)) {
+				$url_table = $form->getField('URLs')->asTable();
+				$this->assertEquals(1, $url_table->query('button:Remove')->count());
+				$this->assertEquals('Host', $url_table->query('name:urls[0][elementtype]')->asDropdown()->one()
+						->getText()
+				);
+
+				foreach (['urls_0_name', 'urls_0_url'] as $id) {
+					$url_field = $url_table->query('id:'.$id)->one();
+					$this->assertEquals('', $url_field->getValue());
 				}
 			}
 
@@ -2198,9 +2286,9 @@ class testFormMapProperties extends CWebTest {
 		}
 	}
 
-	public function testFormSysmap_CancelCreate() {
+	public function testFormMapProperties_CancelCreate() {
 		$old_hash = CDBHelper::getHash(self::HASH_SQL);
-		$this->page->login()->open('sysmaps.php');
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$this->query('button:Create map')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
@@ -2209,35 +2297,122 @@ class testFormMapProperties extends CWebTest {
 
 		// Check that user is returned to maps page.
 		$this->page->assertHeader('Maps');
-
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
 	}
 
-	public function testFormSysmap_CloneMap() {
-		$mapName = 'Cloned map';
+	public function testFormMapProperties_Clone() {
+		// Expected parameters of the cloned map.
+		$map_name = 'Clone:'.self::MAP_CLONE_DELETE;
+		$data = [
+			'result' => [
+				'Owner' => ['Admin (Zabbix Administrator)'],
+				'Name' => 'Clone:'.self::MAP_CLONE_DELETE,
+				'Width' => '1000',
+				'Height' => '1000',
+				'Background image' => self::BACKGROUND_IMAGE,
+				'Background scale' => 'Proportionally',
+				'Automatic icon mapping' => self::ICON_MAPPING,
+				'Icon highlight' => true,
+				'Mark elements on trigger status change' => true,
+				'Display problems' => 'Number of problems and expand most critical one',
+				'Advanced labels' => true,
+				'Host group label type' => 'Custom label',
+				'Host label type' => 'Custom label',
+				'Trigger label type' => 'Status only',
+				'Map label type' => 'Element name',
+				'Image label type' => 'Label',
+				'Map element label location' => 'Top',
+				'Show map element labels' => 'Always',
+				'Show link labels' => 'Always',
+				'Problem display' => 'Separated',
+				'Minimum severity' => 'High',
+				'Show suppressed problems' => true,
+				'URLs' => []
+			],
+			'expected_urls' => [
+				[
+					'id' => 2,
+					'name' => STRING_255,
+					'url' => STRING_2048,
+					'element_type' => 3
+				],
+				[
+					'id' => 0,
+					'name' => 'Host URL 📰📰📰',
+					'url' => 'test 📰📰📰',
+					'element_type' => 0
+				],
+				[
+					'id' => 1,
+					'name' => 'Image URL',
+					'url' => 'test',
+					'element_type' => 4
+				],
+				[
+					'id' => 3,
+					'name' => self::XSS_EXAMPLE,
+					'url' => self::XSS_EXAMPLE,
+					'element_type' => 1
+				],
+				[
+					'id' => 4,
+					'name' => 'Trigger URL',
+					'url' => 'test',
+					'element_type' => 2
+				]
+			],
+			'custom_labels' => [
+				'id:label_string_host' => STRING_255,
+				'id:label_string_hostgroup' => 'Host group label 📰📰📰'
+			]
+		];
 
-		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestClickXpathWait("//a[text()='$this->mapName']/../..//a[text()='Properties']");
-		$this->zbxTestClickWait('clone');
-		$this->zbxTestInputTypeOverwrite('name', $mapName);
-		$this->zbxTestClickWait('add');
-		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
-		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
-		$this->zbxTestTextPresent($mapName);
-		return $mapName;
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->findRow('Name', self::MAP_CLONE_DELETE)->query('link:Properties')->one()->click();
+		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
+		$form->query('button:Clone')->one()->click();
+		$form->fill(['Name' => $map_name]);
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Network map added');
+
+		// Re-open cloned map and check configuration.
+		$table->findRow('Name', $map_name)->query('link:Properties')->one()->click();
+		$this->assertEquals($data['result'], $form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+
+		// Check map URLs.
+		foreach ($data['expected_urls'] as $expected_url) {
+			$this->assertEquals($expected_url['name'], $form->query('id:urls_'.$expected_url['id'].'_name')
+					->one()->getValue()
+			);
+			$this->assertEquals($expected_url['url'], $form->query('id:urls_'.$expected_url['id'].'_url')
+					->one()->getValue()
+			);
+			$this->assertEquals($expected_url['element_type'],
+					$form->query('name:urls['.$expected_url['id'].'][elementtype]')->one()->getValue()
+			);
+		}
+
+		foreach ($data['custom_labels'] as $id => $value) {
+			$this->assertEquals($value, $form->query($id)->one()->getValue());
+		}
+
+		// Check that cloned map is present in the database.
+		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$map_name."'"));
 	}
 
-	/**
-	 * @depends testFormSysmap_CloneMap
-	 */
-	public function testFormSysmap_DeleteClonedMap($mapName = 'Cloned map') {
-		// Delete Map if it was created
-		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestClickXpathWait("//a[text()='".$mapName."']/../..//a[text()='Properties']");
-		$this->zbxTestClickWait('delete');
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
-		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
+	public function testFormMapProperties_Delete() {
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->findRow('Name', self::MAP_CLONE_DELETE)->query('link:Properties')->one()->click();
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Network map deleted');
+
+		// Check the pressence of the map in the list and database.
+		$this->assertFalse($table->findRow('Name', self::MAP_CLONE_DELETE, true)->isPresent());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::MAP_CLONE_DELETE.'\''));
 	}
 }
