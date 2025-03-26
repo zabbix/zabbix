@@ -174,7 +174,6 @@ class testLldLinking extends CIntegrationTest {
 			]
 			]);
 
-		$ep = json_encode($response, JSON_PRETTY_PRINT);
 		$this->assertArrayHasKey('result', $response, json_encode($response));
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
@@ -236,7 +235,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
-		sleep(2);
+
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
