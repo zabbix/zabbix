@@ -178,6 +178,8 @@ class testLldLinking extends CIntegrationTest {
 			'templates' => []
 			]);
 
+			$this->assertArrayHasKey('hostids', $response['result']);
+			$this->assertEquals(1, count($response['result']['hostids']));
 		sleep(1);
 	}
 
