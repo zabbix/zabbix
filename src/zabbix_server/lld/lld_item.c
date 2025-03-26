@@ -3219,6 +3219,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_audit_item_update_json_update_allow_traps(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, (int)item->allow_traps_orig,
 				(int)item_prototype->allow_traps);
+		d = ",";
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME))
 	{
@@ -3259,7 +3260,6 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sevaltype=%d", d, item_prototype->evaltype);
-		d = ",";
 		zbx_audit_item_update_json_update_evaltype(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, item->evaltype_orig,
 				item_prototype->evaltype);
