@@ -125,7 +125,7 @@ int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to)
 {
 	zbx_dc_item_t		dc_item;
 	int			ret = FAIL, errcode;
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 
 	zbx_dc_config_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
