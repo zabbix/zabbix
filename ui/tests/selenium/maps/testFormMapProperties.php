@@ -600,7 +600,7 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'map_properties' => [
-						'Name' => 'Empty URL',
+						'Name' => 'Empty URL'
 					],
 					'urls' => [
 						[
@@ -775,7 +775,7 @@ class testFormMapProperties extends CWebTest {
 						'Map label type' => 'Custom label',
 						'id:label_string_map' => STRING_255,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_255,
+						'id:label_string_image' => STRING_255
 					],
 					'urls' => [
 						[
@@ -1294,7 +1294,7 @@ class testFormMapProperties extends CWebTest {
 						[
 							'id' => 0,
 							'Name' => 'Host URL',
-							'URL' => 'http://test1-url@zabbix.com',
+							'URL' => 'http://test1-url@zabbix.com'
 						],
 						[
 							'id' => 1,
@@ -1716,7 +1716,7 @@ class testFormMapProperties extends CWebTest {
 						'Map label type' => 'Custom label',
 						'id:label_string_map' => STRING_255,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_255,
+						'id:label_string_image' => STRING_255
 					],
 					'urls' => [
 						[
@@ -1846,7 +1846,7 @@ class testFormMapProperties extends CWebTest {
 						'Map label type' => 'Custom label',
 						'id:label_string_map' => self::XSS_EXAMPLE,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => self::XSS_EXAMPLE,
+						'id:label_string_image' => self::XSS_EXAMPLE
 					],
 					'urls' => [
 						[
@@ -2034,7 +2034,7 @@ class testFormMapProperties extends CWebTest {
 						'Trigger label type' => 'Status only',
 						'Map label type' => 'Nothing',
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => 'Update labels check',
+						'id:label_string_image' => 'Update labels check'
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
