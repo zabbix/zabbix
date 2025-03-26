@@ -111,6 +111,7 @@ func (p *Plugin) exportRegmatch(params []string, timeout int) (result interface{
 		if curline >= startline {
 			if match := r.Match([]byte(utf8_bufStr)); match {
 				ret = 1
+				break
 			}
 		}
 
