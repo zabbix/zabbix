@@ -170,7 +170,7 @@ class testLldLinking extends CIntegrationTest {
 			]);
 
 		$this->assertArrayHasKey('result', $response, json_encode($response));
-		//$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
+		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
 
 		$response = $this->call('host.update', [
@@ -200,7 +200,7 @@ class testLldLinking extends CIntegrationTest {
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
 	public function testLinkingLinking_conflict() {
-/*
+
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_SAME_LLD);
@@ -213,7 +213,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
-		$this->fullClear();*/
+		$this->fullClear();
 
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
