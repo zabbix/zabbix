@@ -174,5 +174,5 @@
 			target.classList.remove('is-loading');
 			target.removeAttribute('disabled');
 		}
-	};
+	}
 </script>
