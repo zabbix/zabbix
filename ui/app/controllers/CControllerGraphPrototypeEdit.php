@@ -195,7 +195,6 @@ class CControllerGraphPrototypeEdit extends CController {
 				$data['show_legend'] = $this->hasInput('show_legend');
 				$data['show_3d'] = $this->hasInput('show_3d');
 				$data['discover'] = $this->hasInput('discover') ? GRAPH_DISCOVER : GRAPH_NO_DISCOVER;
-
 			}
 			else {
 				$data['show_work_period'] = $this->getInput('show_work_period', 1);
