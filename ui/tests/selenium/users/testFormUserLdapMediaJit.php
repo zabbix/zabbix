@@ -932,7 +932,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		foreach ($data['media_types'] as $media_type) {
 			if (array_key_exists('Attribute', $media_type['update'])) {
-				$this->assertFalse($user_media_table->findRow('Type', '	MantisBT', true)->isPresent());
+				$this->assertFalse($user_media_table->findRow('Type', 'MantisBT', true)->isPresent());
 				$this->assertEquals(self::$provisioned_media_count - 1, $user_media_table->getRows()->count());
 			}
 			else {
