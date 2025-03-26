@@ -191,7 +191,12 @@ class testLldLinking extends CIntegrationTest {
 	private function fullClear() {
 
 		$response = $this->call('action.delete',[self::$hostCreateId]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
+
 		$response = $this->call('action.delete',[self::$actionLinkTemplateId]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
 
 		for ($i = 0; $i < count(self::$templateids); $i++) {
 			$response = $this->call('template.delete', [self::$templateids[$i]]);
