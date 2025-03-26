@@ -503,7 +503,7 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-				zbx_item_key_subst_cb, NULL, &items[i]);
+				zbx_item_key_subst_cb, um_handle, &items[i]);
 
 		if (SUCCEED == rc)
 		{
