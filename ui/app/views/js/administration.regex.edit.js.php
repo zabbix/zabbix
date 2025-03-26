@@ -52,12 +52,12 @@
 			const table = document.getElementById('regular-expressions-table');
 
 			table.querySelector('button[name="add"]').addEventListener('click', () => this.#addRow());
-			table.querySelectorAll('button[name="remove"]').forEach((node) => {
-				node.addEventListener('click', (e) => this.#removeRow(e));
-			})
-			table.querySelectorAll('.js-expression-type-select').forEach((node) => {
-				node.addEventListener('change', (e) => this.#updateRow(e));
-			})
+			table.querySelectorAll('button[name="remove"]').forEach((node) =>
+				node.addEventListener('click', (e) => this.#removeRow(e))
+			);
+			table.querySelectorAll('.js-expression-type-select').forEach((node) =>
+				node.addEventListener('change', (e) => this.#updateRow(e))
+			);
 
 			this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
 
@@ -133,21 +133,19 @@
 
 		#clone() {
 			const curl = new Curl(this.form_element.getAttribute('action')),
-				{name, expressions, test_string} = this.form.getAllValues(),
-				indexes = Object.keys(expressions);
+				{name, expressions, test_string} = this.form.getAllValues();
 
 			curl.setArgument('action', 'regex.edit');
 			curl.setArgument('regexp[name]', name);
 			curl.setArgument('regexp[test_string]', test_string);
 
-			for (let index of indexes) {
-				const {case_sensitive, exp_delimiter, expression, expression_type} = expressions[index];
-
-				curl.setArgument(`regexp[expressions][${index}][case_sensitive]`, case_sensitive);
-				curl.setArgument(`regexp[expressions][${index}][exp_delimiter]`, exp_delimiter);
-				curl.setArgument(`regexp[expressions][${index}][expression]`, expression);
-				curl.setArgument(`regexp[expressions][${index}][expression_type]`, expression_type);
-			}
+			Object.entries(expressions)
+				.forEach(([index, {case_sensitive, exp_delimiter, expression, expression_type}]) => {
+					curl.setArgument(`regexp[expressions][${index}][case_sensitive]`, case_sensitive);
+					curl.setArgument(`regexp[expressions][${index}][exp_delimiter]`, exp_delimiter);
+					curl.setArgument(`regexp[expressions][${index}][expression]`, expression);
+					curl.setArgument(`regexp[expressions][${index}][expression_type]`, expression_type);
+				});
 
 			redirect(curl.getUrl(), 'post', 'action', undefined, true);
 		}
@@ -324,5 +322,5 @@
 				}
 			}
 		}
-	};
+	}
 </script>
