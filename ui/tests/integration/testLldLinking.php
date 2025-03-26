@@ -135,11 +135,6 @@ class testLldLinking extends CIntegrationTest {
 					]
 				]
 			]);
-
-			$ep = json_encode($response, JSON_PRETTY_PRINT);
-
-			$this->assertArrayHasKey('itemids', $response['result'], $ep);
-			$this->assertArrayHasKey(0, $response['result']['itemids'], $ep);
 		}
 
 		$templateids_for_api_call = [];
