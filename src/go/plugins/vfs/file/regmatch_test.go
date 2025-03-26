@@ -257,4 +257,10 @@ func TestFileRegmatch(t *testing.T) {
 			return
 		}
 	}
+
+	// match only first test
+	if _, err := impl.Export("vfs.file.regmatch", []string{"/dev/random", "."}, ctx); err != nil {
+		t.Errorf("vfs.file.regmatch[/dev/random,\".\"] returned error %s", err.Error())
+		return
+	}
 }
