@@ -3096,7 +3096,7 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		}
 
 		lld_update_hosts(item_prototype->itemid, lld_rows, error, lifetime, &proto_enabled_lifetime,
-				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, rule_index);
+				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index);
 
 		if (SUCCEED != lld_update_rules(hostid, item_prototype->itemid, lld_rows, error, lifetime,
 				&proto_enabled_lifetime, lastcheck, proto_rule_index))

@@ -1197,6 +1197,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 	zbx_db_execute_multiple_query("delete from trigger_tag where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
+	zbx_db_execute_multiple_query("delete from trigger_discovery where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
 
 	if (0 != selementids.values_num)
@@ -1353,6 +1354,7 @@ void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
 	zbx_audit_graph_delete(audit_context_mode, graphids);
 
 	/* delete from graphs */
+	zbx_db_execute_multiple_query("delete from graph_discovery where", "graphid", graphids);
 	zbx_db_execute_multiple_query("delete from graphs where", "graphid", graphids);
 
 	zbx_vector_uint64_destroy(&profileids);
@@ -1549,34 +1551,6 @@ static void	db_get_linked_items(const zbx_vector_uint64_t *itemids, const char *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: recursively retrieve all linked (dependent, prototypes,           *
- *          discovered) items                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	db_get_discovered_items(zbx_vector_uint64_t *itemids)
-{
-	zbx_vector_uint64_t	itemids_linked;
-
-	zbx_vector_uint64_create(&itemids_linked);
-
-	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
-	db_get_linked_items(itemids, "item_discovery i where", "i.lldrule_itemid", &itemids_linked);
-	db_get_linked_items(itemids, "items i where", "i.master_itemid", &itemids_linked);
-
-	if (0 != itemids_linked.values_num)
-	{
-		zbx_vector_uint64_sort(&itemids_linked, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&itemids_linked, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		db_get_discovered_items(&itemids_linked);
-		zbx_vector_uint64_append_array(itemids, itemids_linked.values, itemids_linked.values_num);
-	}
-
-	zbx_vector_uint64_destroy(&itemids_linked);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: deletes items from database                                       *
  *                                                                            *
  * Parameters:                                                                *
@@ -1591,15 +1565,31 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	const char		*profile_idx = "web.favorite.graphids";
 	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
+	zbx_vector_uint64_t	itemids_linked;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
 	if (0 == itemids->values_num)
 		goto out;
 
-	db_get_discovered_items(itemids);
-	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&itemids_linked);
+
+	db_get_linked_items(itemids, "item_discovery i where", "i.lldrule_itemid", &itemids_linked);
+	db_get_linked_items(itemids, "items i where", "i.master_itemid", &itemids_linked);
+
+	if (0 != itemids_linked.values_num)
+	{
+		zbx_vector_uint64_append_array(itemids, itemids_linked.values, itemids_linked.values_num);
+		zbx_vector_uint64_clear(&itemids_linked);
+
+		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		/* recursively delete discovered items/lld rules */
+		db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
+		zbx_db_delete_items(&itemids_linked, audit_context_mode);
+	}
+	zbx_vector_uint64_destroy(&itemids_linked);
 
 	zbx_db_update_item_map_links(itemids);
 

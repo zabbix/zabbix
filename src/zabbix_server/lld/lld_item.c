@@ -407,8 +407,8 @@ void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 					"enabled_lifetime_type,evaltype"
 				" from items"
 				" where"
-					" flags&%d=%d&%d and",
-					ZBX_FLAG_DISCOVERY_PROTOTYPE, item_flags, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+					" flags&%d=%d and",
+					ZBX_FLAG_DISCOVERY_PROTOTYPE, item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
 
@@ -4190,8 +4190,8 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.lldrule_itemid=" ZBX_FS_UI64
-				" and i.flags&%d=%d&%d",
-			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, dflags, ZBX_FLAG_DISCOVERY_RULE);
+				" and i.flags&%d=%d",
+			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, dflags & ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
