@@ -2227,6 +2227,60 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 	zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
+
+	{
+	zbx_vector_uint64_t	t_templateids;
+	zbx_db_result_t		t_result;
+	zbx_db_row_t		t_row;
+	size_t	t_sql_alloc = 256, t_sql_offset = 0;
+	char	*t_sql = (char *)zbx_malloc(NULL, t_sql_alloc);
+
+	zbx_vector_uint64_create(&t_templateids);
+
+	zbx_strcpy_alloc(&t_sql, &t_sql_alloc, &t_sql_offset,
+			"with recursive cte as ( select h0.templateid, h0.hostid from hosts_templates h0 "
+				"union all select h1.templateid, c.hostid from cte c "
+				"join hosts_templates h1 on c.templateid=h1.hostid) "
+				"select templateid from cte where ");
+
+	zbx_db_add_condition_alloc(&t_sql, &t_sql_alloc, &t_sql_offset, "hostid", del_templateids->values,
+			del_templateids->values_num);
+
+	if (NULL == (t_result = zbx_db_select("%s", t_sql)))
+	{
+		res = FAIL;
+		goto clean;
+	}
+
+	while (NULL != (t_row = zbx_db_fetch(t_result)))
+	{
+		zbx_uint64_t	t_templateid;
+
+		ZBX_STR2UINT64(t_templateid, t_row[0]);
+		zbx_vector_uint64_append(&t_templateids, t_templateid);
+	}
+
+	zbx_db_free_result(t_result);
+
+	for (int i = 0; i < del_templateids->values_num; i++)
+		zbx_vector_uint64_append(&t_templateids, del_templateids->values[i]);
+
+	zbx_free(t_sql);
+	t_sql_offset = 0;
+	t_sql = (char *)zbx_malloc(NULL, t_sql_alloc);
+
+	zbx_snprintf_alloc(&t_sql, &t_sql_alloc, &t_sql_offset,
+			"delete from host_tag_cache"
+				" where hostid=" ZBX_FS_UI64
+				" and",
+				hostid);
+
+	zbx_db_add_condition_alloc(&t_sql, &t_sql_alloc, &t_sql_offset, "tag_hostid",
+			t_templateids.values, t_templateids.values_num);
+	zbx_db_execute("%s", t_sql);
+
+	zbx_free(t_sql);
+}
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -5687,25 +5741,23 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 	zbx_db_insert_prepare(db_insert_host_tag_cache, "host_tag_cache", "hostid", "tag_hostid", (char *)NULL);
 
 
-	char	*sql = (char *)zbx_malloc(sql, sql_alloc);
+	size_t	t_sql_alloc = 256, t_sql_offset = 0;
+	char	*t_sql = (char *)zbx_malloc(NULL, t_sql_alloc);
 
-	size_t	sql_alloc = 256, sql_offset = 0;
-
-	zbx_vector_uint64_t	t_hostids,t_templateids;
+	zbx_vector_uint64_t	t_hostids, t_templateids;
 	zbx_db_result_t		t_result;
 	zbx_db_row_t		t_row;
 
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&t_sql, &t_sql_alloc, &t_sql_offset,
 			"with recursive cte as ( select h0.templateid, h0.hostid from hosts_templates h0 "
 				"union all select h1.templateid, c.hostid from cte c "
 				"join hosts_templates h1 on c.templateid=h1.hostid) "
 				"select hostid,templateid from cte where");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", lnk_templateids->values,
+	zbx_db_add_condition_alloc(&t_sql, &t_sql_alloc, &t_sql_offset, "hostid", lnk_templateids->values,
 			lnk_templateids->values_num);
 
-	if (NULL == (t_result = zbx_db_select("%s", sql)))
+	if (NULL == (t_result = zbx_db_select("%s", t_sql)))
 	{
 		res = FAIL;
 		goto clean;
@@ -5746,7 +5798,7 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 
 
 	for (i = 0; i < t_hostids.values_num; i++)
-		zbx_db_insert_add_values(db_insert_host_tag_cache, t_hostids.values[i], t_templateids.values[i]);
+		zbx_db_insert_add_values(db_insert_host_tag_cache, hostid, t_templateids.values[i]);
 
 	zbx_db_insert_execute(db_insert_host_tag_cache);
 	zbx_db_insert_clean(db_insert_host_tag_cache);
