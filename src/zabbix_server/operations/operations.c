@@ -241,7 +241,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 	char			*host_visible, *hostname = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
-	zbx_db_insert_t		db_insert, db_insert_host_rtdata;
+	zbx_db_insert_t		db_insert, db_insert_host_rtdata, db_insert_host_tag_cache;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
 
@@ -494,6 +494,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
+				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 1");
+				zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid",
+						"tag_hostid", (char *)NULL);
+				zbx_db_insert_add_values(&db_insert_host_tag_cache, hostid, hostid);
+				zbx_db_insert_execute(&db_insert);
+				zbx_db_insert_clean(&db_insert);
+
 				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 						ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 
@@ -636,6 +643,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							hostname, hostname, tls_accepted, tls_accepted, psk_identity,
 							psk, new_monitored_by);
 
+
 					zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(
@@ -663,6 +671,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
+
+				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 2");
+				zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid",
+						"tag_hostid", (char *)NULL);
+				zbx_db_insert_add_values(&db_insert_host_tag_cache, hostid, hostid);
+				zbx_db_insert_execute(&db_insert);
+				zbx_db_insert_clean(&db_insert);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 				{
