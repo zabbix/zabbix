@@ -3215,20 +3215,20 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 		item = (zbx_template_item_t *)items->values[i];
 
 		zbx_vector_lld_macro_ptr_sort(&item->item_lld_macros, template_lld_macro_sort_by_macro);
-		if (&item->item_lld_macros.values_num != NULL){
+		/*if (&item->item_lld_macros.values_num != NULL){
 		for(int i=0; i < item->item_lld_macros.values_num; i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,"MACRO ON HOST: %s", item->item_lld_macros.values[i]->lld_macro);
 		}
-		}
+		}*/
 		zbx_vector_lld_macro_ptr_sort(&item->template_lld_macros, template_lld_macro_sort_by_macro);
-		if (&item->template_lld_macros != NULL){
+		/*if (&item->template_lld_macros != NULL){
 		for(int i=0; i < item->template_lld_macros.values_num; i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,"MACRO ON TEMPLATE: %s",
 					item->template_lld_macros.values[i]->lld_macro);
 		}
-		}
+		}*/
 
 		lld_macro_num = MAX(item->item_lld_macros.values_num, item->template_lld_macros.values_num);
 
