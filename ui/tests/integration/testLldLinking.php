@@ -230,7 +230,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
-
+		sleep(1);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
