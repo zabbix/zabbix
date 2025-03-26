@@ -169,6 +169,7 @@ class testLldLinking extends CIntegrationTest {
 			]
 			]);
 
+		$this->assertArrayHasKey('result', $response, json_encode($response));
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
 
