@@ -278,7 +278,8 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'graph.list')
-			->setArgument('context', 'template');
+			->setArgument('context', 'template')
+			->setArgument('uncheck', '1');
 
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);

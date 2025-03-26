@@ -21,6 +21,10 @@
 
 $this->includeJsFile('graph.list.js.php');
 
+if ($data['uncheck']) {
+	uncheckTableRows('graph');
+}
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Graphs'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'

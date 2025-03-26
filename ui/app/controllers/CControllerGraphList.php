@@ -29,7 +29,8 @@ class CControllerGraphList extends CController {
 			'filter_hostids' =>		'array_db hosts.hostid',
 			'sort' =>				'in '.implode(',', ['graphtype', 'name']),
 			'sortorder' =>			'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
-			'page' =>				'ge 1'
+			'page' =>				'ge 1',
+			'uncheck' =>            'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -196,7 +197,8 @@ class CControllerGraphList extends CController {
 			'paging' => $paging,
 			'parent_templates' => getGraphParentTemplates($data['graphs'], ZBX_FLAG_DISCOVERY_NORMAL),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'checkbox_hash' => crc32(implode('', $filter_hostids))
+			'checkbox_hash' => crc32(implode('', $filter_hostids)),
+			'uncheck' => $this->hasInput('uncheck')
 		];
 
 		$response = new CControllerResponseData($data);
