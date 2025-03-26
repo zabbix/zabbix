@@ -200,6 +200,8 @@ class testLldLinking extends CIntegrationTest {
 
 		for ($i = 0; $i < count(self::$templateids); $i++) {
 			$response = $this->call('template.delete', [self::$templateids[$i]]);
+			$this->assertArrayHasKey('templateids', $response['result']);
+			$this->assertEquals(1, count($response['result']['templateids']));
 		}
 		self::$templateids = [];
 	}
