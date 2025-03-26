@@ -63,7 +63,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&context=host&graphid='.$data['graphid']);
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.edit&graphid='.$data['graphid'].'&context=host');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
@@ -106,7 +106,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?form=Create+graph&context=template&hostid='.$this->templateid);
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.edit&context=template&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));
@@ -117,17 +117,20 @@ class testInheritanceGraph extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($item['itemName']);
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
-		$this->query('id:add')->one()->click();
+
+		COverlayDialogElement::find()->one()->waitUntilReady()->query('class:overlay-dialogue-footer')
+				->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_GOOD, 'Graph added');
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
 				$this->zbxTestTextNotPresent('Cannot add graph');
-				$filter = $this->query('name:zbx_filter')->asForm()->one();
-				$filter->getField('Templates')->clear()->fill($this->template);
-				$filter->submit();
+				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Templates' => $this->template]);
+				$this->query('button:Apply')->one()->click();
+				$this->page->waitUntilReady();
 				$this->query('link', $data['name'])->one()->waitUntilVisible();
 				break;
 

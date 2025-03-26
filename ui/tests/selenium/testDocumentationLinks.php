@@ -668,21 +668,21 @@ class testDocumentationLinks extends CWebTest {
 			// #62 Template graph list view.
 			[
 				[
-					'url' => 'graphs.php?context=template',
+					'url' => 'zabbix.php?action=graph.list&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/graphs'
 				]
 			],
 			// #63 Template graph create form.
 			[
 				[
-					'url' => 'graphs.php?hostid=15000&form=create&context=template',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&context=template&hostid=15000',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
 			// #64 Template graph update form.
 			[
 				[
-					'url' => 'graphs.php?form=update&graphid=15000&context=template&filter_hostids%5B0%5D=15000',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&context=template&graphid=15000',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
@@ -873,21 +873,21 @@ class testDocumentationLinks extends CWebTest {
 			// #83 Template LLD graph prototype list view.
 			[
 				[
-					'url' => 'graphs.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=graph.prototype.list&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/graph_prototypes'
 				]
 			],
 			// #84 Template LLD graph prototype create form.
 			[
 				[
-					'url' => 'graphs.php?form=create&parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid=15011',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
 			// #85 Template LLD graph prototype edit form.
 			[
 				[
-					'url' => 'graphs.php?form=update&parent_discoveryid=15011&graphid=15008&context=template',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid=15011&graphid=15008',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
@@ -1083,21 +1083,21 @@ class testDocumentationLinks extends CWebTest {
 			// #107 Host graph list view.
 			[
 				[
-					'url' => 'graphs.php?context=host',
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/graphs'
 				]
 			],
 			// #108 Host graph create form.
 			[
 				[
-					'url' => 'graphs.php?hostid=40001&form=create&context=host',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&context=host&hostid=40001',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
 			// #109 Host graph update form.
 			[
 				[
-					'url' => 'graphs.php?form=update&graphid=300000&context=host&filter_hostids%5B0%5D=40001',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&graphid=300000&context=host',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
@@ -1218,21 +1218,21 @@ class testDocumentationLinks extends CWebTest {
 			// #122 Host LLD graph prototype list view.
 			[
 				[
-					'url' => 'graphs.php?parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=graph.prototype.list&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/graph_prototypes'
 				]
 			],
 			// #123 Host LLD graph prototype create form.
 			[
 				[
-					'url' => 'graphs.php?form=create&parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid=133800',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
 			// #124 Host LLD graph prototype edit form.
 			[
 				[
-					'url' => 'graphs.php?form=update&parent_discoveryid=133800&graphid=600000&context=host',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid=133800&graphid=600000',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
