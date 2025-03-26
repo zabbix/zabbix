@@ -1,1 +1,1 @@
-...G...... [ZBX-24969] fixed vfs.file.regmatch item to stop searching after first hit (askolmeisters)
+...G...... [ZBX-24969] fixed vfs.file.regmatch item to stop searching after first match (askolmeisters)
