@@ -133,7 +133,7 @@ int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to)
 	{
 		char	*key = zbx_strdup(NULL, dc_item.key_orig);
 
-		zbx_substitute_item_key_params(&key, NULL, 0, zbx_item_key_subst_cb, um_handle, dc_item);
+		zbx_substitute_item_key_params(&key, NULL, 0, zbx_item_key_subst_cb, um_handle, &dc_item);
 
 		zbx_free(*replace_to);
 		*replace_to = key;
