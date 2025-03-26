@@ -322,7 +322,12 @@ window.template_edit_popup = new class {
 				macro.macro = macro.macro.trim();
 
 				if ('value' in macro) {
-					macro.value = macro.value.trim();
+					if (macro.value === null) {
+						delete macro.value;
+					}
+					else {
+						macro.value = macro.value.trim();
+					}
 				}
 				if ('description' in macro) {
 					macro.description = macro.description.trim();
