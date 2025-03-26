@@ -1508,6 +1508,7 @@ class CConfigurationExport {
 	 */
 	protected function prepareMapExport(array &$exportMaps): array {
 		$sysmapIds = $groupIds = $hostIds = $triggerIds = $imageIds = [];
+		$itemids = [];
 
 		// gather element IDs that must be substituted
 		foreach ($exportMaps as $sysmap) {
@@ -1551,8 +1552,13 @@ class CConfigurationExport {
 			}
 
 			foreach ($sysmap['links'] as $link) {
-				foreach ($link['linktriggers'] as $linktrigger) {
-					$triggerIds[$linktrigger['triggerid']] = $linktrigger['triggerid'];
+				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+					foreach ($link['linktriggers'] as $linktrigger) {
+						$triggerIds[$linktrigger['triggerid']] = $linktrigger['triggerid'];
+					}
+				}
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$itemids[$link['itemid']] = $link['itemid'];
 				}
 			}
 		}
@@ -1560,6 +1566,7 @@ class CConfigurationExport {
 		$sysmaps = $this->getMapsReferences($sysmapIds);
 		$groups = $this->getGroupsReferences($groupIds);
 		$hosts = $this->getHostsReferences($hostIds);
+		$items = $this->getItemsReferences($itemids);
 		$triggers = $this->getTriggersReferences($triggerIds);
 		$images = $this->getImagesReferences($imageIds);
 
@@ -1608,10 +1615,15 @@ class CConfigurationExport {
 			unset($selement);
 
 			foreach ($sysmap['links'] as &$link) {
-				foreach ($link['linktriggers'] as &$linktrigger) {
-					$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
+				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+					foreach ($link['linktriggers'] as &$linktrigger) {
+						$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
+					}
+					unset($linktrigger);
 				}
-				unset($linktrigger);
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$link['item'] = $items[$link['itemid']];
+				}
 			}
 			unset($link);
 		}

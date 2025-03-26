@@ -412,8 +412,8 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			dc_strpool_replace(found, &hp->host, row[2]);
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			ZBX_STR2UCHAR(hp->tls_accept, row[6]);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			dc_strpool_replace(found, &hp->tls_issuer, row[7]);
 			dc_strpool_replace(found, &hp->tls_subject, row[8]);
 			hp->tls_dc_psk = dc_psk_sync(row[9], row[10], hp->host, found, &psk_owners, hp->tls_dc_psk);
@@ -518,8 +518,6 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	else
 		zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
 
-	redirect->revision = hpi->host_proxy->revision;
-	redirect->reset = ZBX_REDIRECT_NONE;
 
 	unsigned char	tls_accept;
 
@@ -577,6 +575,9 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 		return FAIL;
 	}
 #endif
+
+	redirect->revision = hpi->host_proxy->revision;
+	redirect->reset = ZBX_REDIRECT_NONE;
 
 	return SUCCEED;
 }

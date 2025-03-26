@@ -316,6 +316,7 @@ int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_
 		}
 #else
 		ZBX_UNUSED(sql_alloc);
+		ZBX_UNUSED(clause);
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
@@ -825,7 +826,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
- * Return value: license information from datase as string                    *
+ * Return value: license information from database as string                  *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
  *               "timescale" for TimescaleDB Community Edition                *
  *                                                                            *

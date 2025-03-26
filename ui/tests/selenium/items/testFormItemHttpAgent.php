@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -1254,6 +1254,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 			$dialog->getFooter()->query('button:Update')->one()->click();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
+			$dialog->ensureNotPresent();
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

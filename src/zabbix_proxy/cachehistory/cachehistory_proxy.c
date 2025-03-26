@@ -26,6 +26,7 @@
 #include "zbx_item_constants.h"
 #include "zbxproxybuffer.h"
 #include "zbx_host_constants.h"
+#include "zbxtime.h"
 
 static char	*sql = NULL;
 static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
@@ -360,10 +361,9 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	zbx_vector_uint64_destroy(&itemids);
 }
 
-void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
+void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
-	ZBX_UNUSED(triggers_num);
 	ZBX_UNUSED(events_cbs);
 	ZBX_UNUSED(rtc);
 
@@ -372,6 +372,7 @@ void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_
 	zbx_vector_hc_item_ptr_t	history_items;
 	zbx_vector_item_diff_ptr_t	item_diff;
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
+	double				sec1, sec2;
 
 	ZBX_UNUSED(config_history_storage_pipelines);
 	zbx_vector_hc_item_ptr_create(&history_items);
@@ -382,7 +383,7 @@ void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_
 
 	do
 	{
-		*more = ZBX_SYNC_DONE;
+		stats->more = ZBX_SYNC_DONE;
 
 		zbx_dbcache_lock();
 
@@ -395,9 +396,14 @@ void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_
 			break;
 
 		zbx_hc_get_item_values(history, &history_items);	/* copy item data from history cache */
-		proxy_prepare_history(history, history_items.values_num, &item_diff);
 
+		sec1 = zbx_time();
+		proxy_prepare_history(history, history_items.values_num, &item_diff);
 		DBmass_proxy_add_history(history, history_num);
+		sec2 = zbx_time();
+
+		stats->time_write_history += sec2 - sec1;
+		sec1 = sec2;
 
 		if (0 != item_diff.values_num)
 		{
@@ -408,6 +414,9 @@ void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_
 			}
 			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 		}
+
+		sec2 = zbx_time();
+		stats->time_update_items += sec2 - sec1;
 
 		zbx_dbcache_lock();
 
@@ -421,17 +430,17 @@ void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_
 			zbx_dbcache_set_history_num(zbx_dbcache_get_history_num() - history_num);
 
 			if (0 != zbx_hc_queue_get_size())
-				*more = ZBX_SYNC_MORE;
+				stats->more = ZBX_SYNC_MORE;
 
 			zbx_dbcache_unlock();
 
-			*values_num += history_num;
+			stats->values_num += history_num;
 
 			zbx_hc_free_item_values(history, history_num);
 		}
 		else
 		{
-			*more = ZBX_SYNC_MORE;
+			stats->more = ZBX_SYNC_MORE;
 			zbx_dbcache_unlock();
 		}
 
@@ -442,7 +451,7 @@ void	zbx_sync_history_cache_proxy(int *values_num, int *triggers_num, const zbx_
 		/* unless we are doing full sync. This is done to allow    */
 		/* syncer process to update their statistics.              */
 	}
-	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
+	while (ZBX_SYNC_MORE == stats->more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
 	zbx_vector_item_diff_ptr_destroy(&item_diff);
 	zbx_vector_hc_item_ptr_destroy(&history_items);
