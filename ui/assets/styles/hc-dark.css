@@ -2134,8 +2134,9 @@ button {
   border-color: #e0e0e0; }
 
 .overlay-dialogue.modal-popup.modal-widget-configuration {
-  max-width: calc(100vw - 40px);
-  min-width: 650px; }
+  max-width: calc(100vw - 20px);
+  min-width: 650px;
+  box-sizing: border-box; }
   .overlay-dialogue.modal-popup.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 

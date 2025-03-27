@@ -1032,8 +1032,9 @@
 
 .overlay-dialogue {
 	&.modal-popup.modal-widget-configuration {
-		max-width: calc(100vw - 40px);
+		max-width: calc(100vw - 20px);
 		min-width: 650px;
+		box-sizing: border-box;
 
 		.overlay-dialogue-body {
 			overflow-x: auto;
