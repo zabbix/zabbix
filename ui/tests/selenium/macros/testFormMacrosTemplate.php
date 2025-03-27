@@ -19,6 +19,8 @@ require_once __DIR__ . '/../common/testFormMacros.php';
 /**
  * @backup hosts, settings
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareTemplateMacrosData
  */
 class testFormMacrosTemplate extends testFormMacros {
