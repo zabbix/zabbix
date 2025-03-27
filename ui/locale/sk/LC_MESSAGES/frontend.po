@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-27 14:04+0000\n"
+"PO-Revision-Date: 2025-03-24 11:42+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -1406,7 +1406,7 @@ msgstr "Eventuálne to môžete napísať manuálne:"
 #: include/views/monitoring.sysmap.edit.php:269
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Always"
-msgstr ""
+msgstr "Vždy"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1869,7 +1869,7 @@ msgstr "Automaticky"
 #: include/views/monitoring.sysmap.edit.php:270
 #: include/views/monitoring.sysmap.edit.php:277
 msgid "Auto hide"
-msgstr ""
+msgstr "Automatické skrytie"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1995,7 +1995,7 @@ msgstr "Obrázok pozadia"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background scale"
-msgstr ""
+msgstr "Mierka pozadia"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -3401,7 +3401,7 @@ msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú ako minimálna
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
-msgstr ""
+msgstr "Nemožno nájsť položku \"%1$s\" na \"%2$s\" použitom v odkaze mapy \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -6110,7 +6110,7 @@ msgstr "Súbor TLS kľúča databázy "
 #: include/classes/api/clients/CLocalApiClient.php:124
 #: include/classes/api/clients/CLocalApiClient.php:138
 msgid "Database error occurred."
-msgstr ""
+msgstr "Vyskytla sa chyba databázy."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -11387,7 +11387,7 @@ msgstr "na dobu neurčitú"
 
 #: include/views/js/monitoring.sysmaps.js.php:841
 msgid "Indicator type"
-msgstr ""
+msgstr "Typ indikátora"
 
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
@@ -16955,7 +16955,7 @@ msgstr "Vlastnosti"
 
 #: include/views/monitoring.sysmap.edit.php:126
 msgid "Proportionally"
-msgstr ""
+msgstr "Proporcionálne"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
@@ -19315,7 +19315,7 @@ msgstr "Zobraziť hostov v údržbe"
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
 msgid "Show label"
-msgstr ""
+msgstr "Zobraziť štítok"
 
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
@@ -19337,11 +19337,11 @@ msgstr "Zobraziť riadky"
 
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
-msgstr ""
+msgstr "Zobraziť štítky odkazov"
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
-msgstr ""
+msgstr "Zobraziť štítky prvkov mapy"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19801,7 +19801,7 @@ msgstr "Statické"
 
 #: include/views/js/monitoring.sysmaps.js.php:843
 msgid "Static link"
-msgstr ""
+msgstr "Statický odkaz"
 
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
@@ -24612,15 +24612,15 @@ msgstr "asin() – Arkussínus hodnoty ako uhol vyjadrený v radiánoch"
 
 #: jsLoader.php:300
 msgid "at least 1 link highlight is required"
-msgstr ""
+msgstr "vyžaduje sa aspoň 1 zvýraznený odkaz"
 
 #: jsLoader.php:301
 msgid "at least 1 link threshold is required"
-msgstr ""
+msgstr "vyžaduje sa aspoň 1 prah odkazu"
 
 #: jsLoader.php:299
 msgid "at least 1 link trigger is required"
-msgstr ""
+msgstr "vyžaduje sa aspoň 1 spúšťač odkazu"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -24680,7 +24680,7 @@ msgstr "medzi() – kontroluje, či hodnota patrí do daného rozsahu (1 – v r
 
 #: include/classes/api/services/CMap.php:1973
 msgid "binary item is not supported"
-msgstr ""
+msgstr "binárna položka nie je podporovaná"
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -25202,7 +25202,7 @@ msgstr "exp() - Eulerovo číslo v mocnine hodnoty"
 
 #: jsLoader.php:294
 msgid "expecting hexadecimal color code (6 symbols)"
-msgstr ""
+msgstr "očakáva sa hexadecimálny farebný kód (6 symbolov)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
@@ -25330,7 +25330,7 @@ msgstr "skupina hostov s rovnakým UUID už existuje"
 
 #: include/classes/api/services/CMap.php:1967
 msgid "host item ID is expected"
-msgstr ""
+msgstr "očakáva sa ID položky hosta"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
@@ -25352,7 +25352,7 @@ msgstr "prototyp hosta s rovnakým UUID už existuje"
 
 #: include/classes/api/services/CMap.php:2198
 msgid "host trigger ID is expected"
-msgstr ""
+msgstr "očakáva sa ID host spúšťača"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25416,7 +25416,7 @@ msgstr "nesprávny výraz začínajúci od „%1$s“"
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
-msgstr ""
+msgstr "nesprávny typ hodnoty položky"
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
