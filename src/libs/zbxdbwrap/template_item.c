@@ -1098,6 +1098,16 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 			"select cte.itemid,ii.hostid from cte,items ii "
 			"where cte.templateid= ii.itemid and ", "cte.itemid", &new_itemids);
 
+	zbx_db_insert_t	db_insert_item_tag_cache_host_itself;
+	zbx_db_insert_prepare(&db_insert_item_tag_cache_host_itself, "item_tag_cache",
+			"itemid", "tag_hostid",  (char *)NULL);
+
+	for (int i = 0; i < new_itemids.values_num; i++)
+		zbx_db_insert_add_values(&db_insert_item_tag_cache_host_itself, new_itemids.values[i], hostid);
+
+	zbx_db_insert_execute(&db_insert_item_tag_cache_host_itself);
+	zbx_db_insert_clean(&db_insert_item_tag_cache_host_itself);
+
 	zbx_vector_uint64_destroy(&new_itemids);
 
 	if (0 != upd_items)
