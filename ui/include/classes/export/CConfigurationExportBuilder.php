@@ -507,6 +507,15 @@ class CConfigurationExportBuilder {
 
 			if ($media_type['type'] == MEDIA_TYPE_EMAIL) {
 				$result[$i] += ['provider' => $media_type['provider']];
+
+				if ($media_type['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+					$result[$i] += [
+						'redirection_url' => $media_type['redirection_url'],
+						'client_id' => $media_type['client_id'],
+						'authorization_url' => $media_type['authorization_url'],
+						'token_url' => $media_type['token_url']
+					];
+				}
 			}
 		}
 
