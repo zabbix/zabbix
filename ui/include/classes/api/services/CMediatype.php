@@ -39,6 +39,11 @@ class CMediatype extends CApiService {
 
 	public const LIMITED_OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'status', 'description', 'maxattempts'];
 
+	public const OAUTH_OUTPUT_FIELDS = [
+		'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url', 'tokens_status',
+		'access_token', 'access_token_updated', 'access_expires_in', 'refresh_token'
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -86,10 +91,12 @@ class CMediatype extends CApiService {
 		}
 
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$oauth_fields =  self::OAUTH_OUTPUT_FIELDS;
 			$output_fields = self::OUTPUT_FIELDS;
 			$user_output_fields = CUser::OUTPUT_FIELDS;
 		}
 		else {
+			$oauth_fields = [];
 			$output_fields = self::LIMITED_OUTPUT_FIELDS;
 			$user_output_fields = CUser::OWN_LIMITED_OUTPUT_FIELDS;
 		}
@@ -99,7 +106,7 @@ class CMediatype extends CApiService {
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields('media_type', $output_fields)],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields('media_type', $output_fields)],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', array_merge($output_fields, $oauth_fields)), 'default' => API_OUTPUT_EXTEND],
 			'selectMessageTemplates' =>	['type' => API_MULTIPLE, 'rules' => [
 											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['eventsource', 'recovery', 'subject', 'message']), 'default' => null],
 											['else' => true, 'type' => API_UNEXPECTED]
@@ -112,8 +119,8 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = self::LIMITED_OUTPUT_FIELDS;
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_merge($output_fields, $oauth_fields);
 		}
 
 		// mediatypeids
@@ -169,6 +176,20 @@ class CMediatype extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		$request_output = $options['output'];
+		$request_oauth_fields = !$options['countOutput'] && $oauth_fields
+			? array_intersect($oauth_fields, $request_output)
+			: [];
+
+		if ($request_oauth_fields) {
+			$options['output'] = array_diff($options['output'], $request_oauth_fields);
+
+			if (!in_array('smtp_authentication', $options['output'])) {
+				$options['output'][] = 'smtp_authentication';
+			}
+		}
+
+		$oauth_mediatypeids = [];
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -184,6 +205,11 @@ class CMediatype extends CApiService {
 			}
 			else {
 				$result[$mediatype['mediatypeid']] = $mediatype;
+
+				if ($request_oauth_fields
+						&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+					$oauth_mediatypeids[] = $mediatype['mediatypeid'];
+				}
 			}
 		}
 
@@ -192,8 +218,31 @@ class CMediatype extends CApiService {
 		}
 
 		if ($result) {
+			if ($oauth_mediatypeids) {
+				$sql_parts = [
+					'select' => array_merge(['mediatypeid'], $request_oauth_fields),
+					'from' => ['media_type_oauth'],
+					'where' => [dbConditionInt('mediatypeid', $oauth_mediatypeids)]
+				];
+
+				$oauth_result = DBselect($this->createSelectQueryFromParts($sql_parts));
+				while ($row = DBfetch($oauth_result)) {
+					$result[$row['mediatypeid']] += $row;
+				}
+			}
+
+			if ($request_oauth_fields) {
+				$db_oauth_default = array_intersect_key(DB::getDefaults('media_type_oauth'),
+					array_flip($request_oauth_fields)
+				);
+
+				$result = array_map(fn ($row) => $row + $db_oauth_default, $result);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['mediatypeid', 'type'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['mediatypeid', 'type', 'smtp_authentication'],
+				$request_output
+			);
 		}
 
 		if (!$options['preservekeys']) {
@@ -219,11 +268,23 @@ class CMediatype extends CApiService {
 		self::validateCreate($mediatypes);
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
+		$ins_media_type_oauth = [];
 
 		foreach ($mediatypes as $index => &$mediatype) {
 			$mediatype['mediatypeid'] = $mediatypeids[$index];
+
+			if (array_key_exists('smtp_authentication', $mediatype)
+					&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+				$ins_media_type_oauth[] = array_intersect_key($mediatype,
+					array_flip(self::OAUTH_OUTPUT_FIELDS) + ['mediatypeid' => '']
+				);
+			}
 		}
 		unset($mediatype);
+
+		if ($ins_media_type_oauth) {
+			DB::insert('media_type_oauth', $ins_media_type_oauth, false);
+		}
 
 		self::updateParameters($mediatypes, __FUNCTION__);
 		self::updateMessageTemplates($mediatypes, __FUNCTION__);
@@ -254,8 +315,17 @@ class CMediatype extends CApiService {
 			'smtp_security' =>			['type' => API_INT32],
 			'smtp_verify_peer' =>		['type' => API_INT32],
 			'smtp_verify_host' =>		['type' => API_INT32],
-			'smtp_authentication' =>	['type' => API_INT32],
+			'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH])],
 			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
+			'redirection_url' =>		['type' => API_URL],
+			'client_id' =>				['type' => API_STRING_UTF8],
+			'client_secret' =>			['type' => API_STRING_UTF8],
+			'authorization_url' =>		['type' => API_URL],
+			'token_url' =>				['type' => API_URL],
+			'tokens_status' =>			['type' => API_INT32],
+			'access_token' =>			['type' => API_STRING_UTF8],
+			'access_expires_in' =>		['type' => API_UINT64],
+			'refresh_token' =>			['type' => API_STRING_UTF8],
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
 			'attempt_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'attempt_interval'), 'in' => '0:'.SEC_PER_HOUR],
@@ -305,9 +375,12 @@ class CMediatype extends CApiService {
 		self::validateUpdate($mediatypes, $db_mediatypes);
 
 		$upd_mediatypes = [];
+		$upd_media_type_oauth = [];
+		$del_media_type_oauth = [];
 
 		foreach ($mediatypes as $mediatype) {
-			$upd_mediatype = DB::getUpdatedValues('media_type', $mediatype, $db_mediatypes[$mediatype['mediatypeid']]);
+			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
+			$upd_mediatype = DB::getUpdatedValues('media_type', $mediatype, $db_mediatype);
 
 			if ($upd_mediatype) {
 				$upd_mediatypes[] = [
@@ -315,10 +388,33 @@ class CMediatype extends CApiService {
 					'where' => ['mediatypeid' => $mediatype['mediatypeid']]
 				];
 			}
+
+			if (array_key_exists('smtp_authentication', $upd_mediatype)
+					&& $db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+				$del_media_type_oauth[] = $mediatype['mediatypeid'];
+			}
+			else {
+				$oauth_fields = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
+
+				if ($oauth_fields) {
+					$upd_media_type_oauth[] = [
+						'values' => $oauth_fields,
+						'where' => ['mediatypeid' => $mediatype['mediatypeid']]
+					];
+				}
+			}
 		}
 
 		if ($upd_mediatypes) {
 			DB::update('media_type', $upd_mediatypes);
+		}
+
+		if ($upd_media_type_oauth) {
+			DB::update('media_type_oauth', $upd_media_type_oauth);
+		}
+
+		if ($del_media_type_oauth) {
+			DB::delete('media_type_oauth', ['mediatypeid' => $del_media_type_oauth]);
 		}
 
 		$mediatypes = $this->extendObjectsByKey($mediatypes, $db_mediatypes, 'mediatypeid', ['type']);
@@ -354,8 +450,17 @@ class CMediatype extends CApiService {
 			'smtp_security' =>			['type' => API_INT32],
 			'smtp_verify_peer' =>		['type' => API_INT32],
 			'smtp_verify_host' =>		['type' => API_INT32],
-			'smtp_authentication' =>	['type' => API_INT32],
+			'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH])],
 			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
+			'redirection_url' =>		['type' => API_URL],
+			'client_id' =>				['type' => API_STRING_UTF8],
+			'client_secret' =>			['type' => API_STRING_UTF8],
+			'authorization_url' =>		['type' => API_URL],
+			'token_url' =>				['type' => API_URL],
+			'tokens_status' =>			['type' => API_INT32],
+			'access_token' =>			['type' => API_STRING_UTF8],
+			'access_expires_in' =>		['type' => API_UINT64],
+			'refresh_token' =>			['type' => API_STRING_UTF8],
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
 			'attempt_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'attempt_interval'), 'in' => '0:'.SEC_PER_HOUR],
@@ -400,6 +505,21 @@ class CMediatype extends CApiService {
 		}
 
 		self::checkDuplicates($mediatypes, $db_mediatypes);
+
+		$db_mediatypes_oauth = DB::select('media_type_oauth', [
+			'output' => ['redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
+				'tokens_status', 'access_token', 'access_expires_in', 'refresh_token'
+			],
+			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
+			'preservekeys' => true
+		]);
+		$db_oauth_default = DB::getDefaults('media_type_oauth');
+
+		foreach ($db_mediatypes as &$db_mediatype) {
+			$db_mediatype += $db_mediatypes_oauth[$db_mediatype['mediatypeid']] ?? $db_oauth_default;
+		}
+		unset($db_mediatype);
+
 		self::validateByType($mediatypes, $db_mediatypes);
 
 		self::addAffectedObjects($mediatypes, $db_mediatypes);
@@ -452,14 +572,17 @@ class CMediatype extends CApiService {
 	private static function validateByType(array &$mediatypes, ?array $db_mediatypes = null): void {
 		$method = ($db_mediatypes === null) ? 'create' : 'update';
 
-		$db_defaults = DB::getDefaults('media_type');
+		$db_defaults = DB::getDefaults('media_type') + DB::getDefaults('media_type_oauth');
 		$db_defaults['parameters'] = [];
+		$token_reset_fields = array_flip(['client_id', 'client_secret', 'token_url']);
 
 		if ($method === 'update') {
 			$type_fields = [
 				MEDIA_TYPE_EMAIL => [
 					'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security', 'smtp_verify_peer',
-					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'message_format', 'provider'
+					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'message_format', 'provider',
+					'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url', 'tokens_status',
+					'access_token', 'access_token_updated', 'access_expires_in', 'refresh_token'
 				],
 				MEDIA_TYPE_EXEC => [
 					'exec_path', 'parameters'
@@ -494,7 +617,7 @@ class CMediatype extends CApiService {
 			if ($method === 'update') {
 				switch ($type) {
 					case MEDIA_TYPE_EMAIL:
-						if (array_key_exists('smtp_authentication', $mediatype)
+						if (array_key_exists('smtp_security', $mediatype)
 								&& $mediatype['smtp_security'] == SMTP_SECURITY_NONE) {
 							$mediatype += [
 								'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
@@ -508,6 +631,21 @@ class CMediatype extends CApiService {
 								'username' => $db_defaults['username'],
 								'passwd' => $db_defaults['passwd']
 							];
+						}
+
+						$changed_fields = array_diff_assoc(
+							array_intersect_key($mediatype, $token_reset_fields),
+							$db_mediatype,
+						);
+
+						if ($changed_fields) {
+							$mediatype += array_intersect_key(DB::getDefaults('media_type_oauth'), array_flip([
+								'tokens_status', 'access_token', 'access_token_updated', 'access_expires_in',
+								'refresh_token'
+							]));
+						}
+						else if (array_key_exists('access_token', $mediatype)) {
+							$mediatype['access_token_updated'] = time();
 						}
 						break;
 
@@ -548,18 +686,26 @@ class CMediatype extends CApiService {
 
 		switch ($type) {
 			case MEDIA_TYPE_EMAIL:
+				$mediatype += array_intersect_key($db_mediatype, array_flip([
+					'smtp_security', 'smtp_authentication', 'provider', 'tokens_status'
+				]));
+				$provider_smtp_authentication = [
+					CMediatypeHelper::EMAIL_PROVIDER_SMTP => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_GMAIL => [SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL]
+				][$mediatype['provider']];
 				$api_input_rules['fields'] = [
 					'smtp_server' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_server')],
 					'smtp_helo' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
 					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
 					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_SECURITY_NONE, SMTP_SECURITY_STARTTLS, SMTP_SECURITY_SSL])],
-					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
+					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', $provider_smtp_authentication)],
 					'message_format' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_MESSAGE_FORMAT_TEXT, ZBX_MEDIA_MESSAGE_FORMAT_HTML])],
 					'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))]
 				];
-
-				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication', 'provider']));
 
 				if ($mediatype['smtp_security'] == SMTP_SECURITY_STARTTLS
 						|| $mediatype['smtp_security'] == SMTP_SECURITY_SSL) {
@@ -569,7 +715,48 @@ class CMediatype extends CApiService {
 					];
 				}
 
-				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+				if (!in_array($mediatype['smtp_authentication'], $provider_smtp_authentication)) {
+					$api_input_rules['fields']['smtp_authentication']['flags'] = API_REQUIRED;
+				}
+
+				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH
+						&& $mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
+					$api_required_flag = 0;
+
+					if ($method === 'create' || $type != $db_mediatype['type']
+							|| $mediatype['smtp_authentication'] != $db_mediatype['smtp_authentication']) {
+						$api_required_flag = API_REQUIRED;
+					}
+
+					$api_input_rules['fields'] += [
+						'redirection_url' =>		['type' => API_URL, 'flags' => $api_required_flag | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
+						'client_id' =>				['type' => API_STRING_UTF8, 'flags' => $api_required_flag | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_id')],
+						'client_secret' =>			['type' => API_STRING_UTF8, 'flags' => $api_required_flag | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_secret')],
+						'authorization_url' =>		['type' => API_URL, 'flags' => $api_required_flag | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
+						'token_url' =>				['type' => API_URL, 'flags' => $api_required_flag | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
+						'tokens_status' =>			['type' => API_INT32, 'in' => implode(':', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID])],
+						'access_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'access_token')],
+						'access_expires_in' =>		['type' => API_INT32],
+						'refresh_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'refresh_token')]
+					];
+
+					if ($db_mediatype['access_token'] === ''
+							&& $mediatype['tokens_status'] & OAUTH_ACCESS_TOKEN_VALID
+							&& !($db_mediatype['tokens_status'] & OAUTH_ACCESS_TOKEN_VALID)) {
+						$api_input_rules['fields']['access_token']['flags'] |= API_REQUIRED;
+					}
+
+					if (array_key_exists('access_token', $mediatype)) {
+						$api_input_rules['fields']['access_expires_in']['flags'] = API_REQUIRED;
+					}
+
+					if ($db_mediatype['refresh_token'] === ''
+							&& $mediatype['tokens_status'] & OAUTH_REFRESH_TOKEN_VALID
+							&& !($db_mediatype['tokens_status'] & OAUTH_REFRESH_TOKEN_VALID)) {
+						$api_input_rules['fields']['refresh_token']['flags'] |= API_REQUIRED;
+					}
+				}
+				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
 					if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 						$api_input_rules['fields'] += [
 							'username' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'username')],
@@ -669,7 +856,16 @@ class CMediatype extends CApiService {
 			'show_event_menu' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'show_event_menu')],
 			'event_menu_url' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_url')],
 			'event_menu_name' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_name')],
-			'parameters' =>				['type' => API_OBJECT, 'fields' => []]
+			'parameters' =>				['type' => API_OBJECT, 'fields' => []],
+			'redirection_url' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'redirection_url')],
+			'client_id' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'client_id')],
+			'client_secret' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'client_secret')],
+			'authorization_url' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'authorization_url')],
+			'token_url' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'token_url')],
+			'tokens_status' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type_oauth', 'tokens_status')],
+			'access_token' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'access_token')],
+			'access_expires_in' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type_oauth', 'access_expires_in')],
+			'refresh_token' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type_oauth', 'refresh_token')],
 		];
 
 		return $api_input_rules;
