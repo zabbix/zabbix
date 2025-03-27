@@ -126,15 +126,20 @@ class testLldLinking extends CIntegrationTest {
 				'delay' => '30s',
 				'lld_macro_paths' => [
 					[
-						'lld_macro' => '{#FSTYPE}',
-						'path' => '$.fstype'
-					],
-					[
 						'lld_macro' => '{#FSNAME}',
 						'path' => '$.fsname'
+					],
+					[
+						'lld_macro' => '{#FSTYPE}',
+						'path' => '$.fstype'
 					]
 				]
 			]);
+
+			$ep = json_encode($response, JSON_PRETTY_PRINT);
+
+			$this->assertArrayHasKey('itemids', $response['result'], $ep);
+			$this->assertArrayHasKey(0, $response['result']['itemids'], $ep);
 		}
 
 		$templateids_for_api_call = [];
@@ -206,6 +211,7 @@ class testLldLinking extends CIntegrationTest {
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent
+	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
 	public function testLinkingLinking_conflict() {
 /*
@@ -223,8 +229,8 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->fullClear();*/
 
-		//$this->killComponent(self::COMPONENT_SERVER);
-		//$this->killComponent(self::COMPONENT_AGENT);
+		$this->killComponent(self::COMPONENT_SERVER);
+		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_SERVER);
