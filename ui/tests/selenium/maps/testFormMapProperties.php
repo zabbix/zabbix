@@ -109,27 +109,27 @@ class testFormMapProperties extends CWebTest {
 				'show_suppressed' => 1,
 				'urls' => [
 					[
-						'name' => 'Host URL',
+						'name' => '1 Host URL',
 						'url' => 'test',
 						'elementtype' => 0
 					],
 					[
-						'name' => 'Host group URL',
+						'name' => '2 Host group URL',
 						'url' => 'test',
 						'elementtype' => 3
 					],
 					[
-						'name' => 'Map URL',
+						'name' => '3 Map URL',
 						'url' => 'test',
 						'elementtype' => 1
 					],
 					[
-						'name' => 'Trigger URL',
+						'name' => '5 Trigger URL',
 						'url' => 'test',
 						'elementtype' => 2
 					],
 					[
-						'name' => 'Image URL',
+						'name' => '4 Image URL',
 						'url' => 'test',
 						'elementtype' => 4
 					]
@@ -168,7 +168,7 @@ class testFormMapProperties extends CWebTest {
 						'elementtype' => 3
 					],
 					[
-						'name' => self::XSS_EXAMPLE,
+						'name' => '4 Host group - xss',
 						'url' => self::XSS_EXAMPLE,
 						'elementtype' => 1
 					],
@@ -1299,7 +1299,7 @@ class testFormMapProperties extends CWebTest {
 						],
 						[
 							'id' => 1,
-							'Name' => 'Host group URL',
+							'Name' => 'Group URL',
 							'URL' => 'http://test2-url@zabbix.com',
 							'Element' => 'Host group'
 						],
@@ -1352,7 +1352,7 @@ class testFormMapProperties extends CWebTest {
 						],
 						[
 							'id' => 0,
-							'name' => 'Host group URL',
+							'name' => 'Group URL',
 							'url' => 'http://test2-url@zabbix.com',
 							'element_type' => 3
 						],
@@ -2065,32 +2065,32 @@ class testFormMapProperties extends CWebTest {
 					],
 					'expected_urls' => [
 						[
-							'id' => 0,
-							'name' => 'Host group URL',
+							'id' => 1,
+							'name' => '2 Host group URL',
 							'url' => 'test',
 							'element_type' => 3
 						],
 						[
-							'id' => 1,
-							'name' => 'Host URL',
+							'id' => 0,
+							'name' => '1 Host URL',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 2,
-							'name' => 'Image URL',
+							'id' => 3,
+							'name' => '4 Image URL',
 							'url' => 'test',
 							'element_type' => 4
 						],
 						[
-							'id' => 3,
-							'name' => 'Map URL',
+							'id' => 2,
+							'name' => '3 Map URL',
 							'url' => 'test',
 							'element_type' => 1
 						],
 						[
 							'id' => 4,
-							'name' => 'Trigger URL',
+							'name' => '5 Trigger URL',
 							'url' => 'test',
 							'element_type' => 2
 						]
@@ -2147,32 +2147,32 @@ class testFormMapProperties extends CWebTest {
 					],
 					'expected_urls' => [
 						[
-							'id' => 0,
-							'name' => 'Host group URL',
+							'id' => 1,
+							'name' => '2 Host group URL',
 							'url' => 'test',
 							'element_type' => 3
 						],
 						[
-							'id' => 1,
-							'name' => 'Host URL',
+							'id' => 0,
+							'name' => '1 Host URL',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 2,
-							'name' => 'Image URL',
+							'id' => 3,
+							'name' => '4 Image URL',
 							'url' => 'test',
 							'element_type' => 4
 						],
 						[
-							'id' => 3,
-							'name' => 'Map URL',
+							'id' => 2,
+							'name' => '3 Map URL',
 							'url' => 'test',
 							'element_type' => 1
 						],
 						[
 							'id' => 4,
-							'name' => 'Trigger URL',
+							'name' => '5 Trigger URL',
 							'url' => 'test',
 							'element_type' => 2
 						]
@@ -2331,7 +2331,7 @@ class testFormMapProperties extends CWebTest {
 			],
 			'expected_urls' => [
 				[
-					'id' => 3,
+					'id' => 4,
 					'name' => STRING_255,
 					'url' => STRING_2048,
 					'element_type' => 3
@@ -2349,8 +2349,8 @@ class testFormMapProperties extends CWebTest {
 					'element_type' => 4
 				],
 				[
-					'id' => 4,
-					'name' => self::XSS_EXAMPLE,
+					'id' => 3,
+					'name' => '4 Host group - xss',
 					'url' => self::XSS_EXAMPLE,
 					'element_type' => 1
 				],
