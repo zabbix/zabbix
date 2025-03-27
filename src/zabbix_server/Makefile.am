@@ -128,6 +128,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
+	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade_server.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \

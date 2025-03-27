@@ -96,6 +96,9 @@ void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, con
 void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 
+void	zbx_db_copy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+		int audit_context_mode, zbx_db_insert_t *db_insert_htemplates);
+
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
 void	zbx_host_groups_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids, int audit_context_mode);

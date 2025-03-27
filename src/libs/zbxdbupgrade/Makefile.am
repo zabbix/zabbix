@@ -1,6 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxdbupgrade.a
+noinst_LIBRARIES = \
+	libzbxdbupgrade.a \
+	libzbxdbupgrade_server.a \
+	libzbxdbupgrade_proxy.a
 
 libzbxdbupgrade_a_SOURCES = \
 	dbupgrade.c \
@@ -42,3 +45,14 @@ libzbxdbupgrade_a_SOURCES = \
 	dbupgrade_common.c \
 	dbupgrade_common.h \
 	dbupgrade.h
+
+libzbxdbupgrade_server_a_SOURCES = \
+	dbupgrade_component.c
+	
+libzbxdbupgrade_server_a_CFLAGS = -DZABBIX_SERVER
+		
+
+libzbxdbupgrade_proxy_a_SOURCES = \
+	dbupgrade_component.c	
+	
+libzbxdbupgrade_proxy_a_CFLAGS = -DZABBIX_PROXY
