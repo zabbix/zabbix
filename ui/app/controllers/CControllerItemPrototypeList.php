@@ -38,20 +38,12 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		return $ret;
 	}
 
-	public function checkPermissions(): bool {
-		$discovery_rule = (bool) API::DiscoveryRule()->get([
-			'output' => ['itemid'],
+	protected function checkPermissions(): bool {
+		return parent::checkPermissions() && (bool) API::DiscoveryRule()->get([
+			'output' => [],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
-
-		if (!$discovery_rule) {
-			return false;
-		}
-
-		return $this->getInput('context') === 'host'
-			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	public function doAction() {
