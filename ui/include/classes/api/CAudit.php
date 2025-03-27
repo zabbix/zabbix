@@ -330,17 +330,22 @@ class CAudit {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_MEDIA_TYPE => [
-			'paths' => ['mediatype.passwd'],
-			'conditions' => [
-				[
-					'provider' => [CMediatypeHelper::EMAIL_PROVIDER_SMTP, CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY,
-						CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY
+			[
+				'paths' => ['mediatype.passwd'],
+				'conditions' => [
+					[
+						'provider' => [CMediatypeHelper::EMAIL_PROVIDER_SMTP, CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY,
+							CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY
+						],
+						'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL
 					],
-					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL
-				],
-				[
-					'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365]
+					[
+						'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365]
+					]
 				]
+			],
+			[
+				'paths' => ['mediatype.client_secret', 'mediatype.access_token', 'mediatype.refresh_token']
 			]
 		],
 		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],
