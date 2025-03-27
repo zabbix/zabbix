@@ -1019,6 +1019,9 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	if (0 == items->values_num)
 		return;
 
+	zbx_vector_uint64_t new_itemids;
+	zbx_vector_uint64_create(&new_itemids);
+
 	zbx_vector_uint64_create(&itemids_value_type_diff);
 
 	for (i = 0; i < items->values_num; i++)
@@ -1071,6 +1074,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		/* dependent items are saved within recursive save_template_item calls while saving master */
 		if (0 == item->master_itemid)
 		{
+			zbx_vector_uint64_append(&new_itemids, itemid);
 			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
 					&db_insert_irtname, audit_context_mode, &sql, &sql_alloc, &sql_offset);
 		}
@@ -1086,6 +1090,15 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 	}
+
+	zbx_db_execute_multiple_query("insert into item_tag_cache with recursive cte as "
+			"( select i0.templateid, i0.itemid, i0.hostid from items i0 "
+			"union all select i1.templateid, c.itemid, c.hostid from cte c "
+			"join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL) "
+			"select cte.itemid,ii.hostid from cte,items ii "
+			"where cte.templateid= ii.itemid and ", "cte.itemid", &new_itemids);
+
+	zbx_vector_uint64_destroy(&new_itemids);
 
 	if (0 != upd_items)
 	{
