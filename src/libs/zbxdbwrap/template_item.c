@@ -3225,8 +3225,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 		if (&item->template_lld_macros != NULL){
 		for(int i=0; i < item->template_lld_macros.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"MACRO ON TEMPLATE: %s",
-					item->template_lld_macros.values[i]->lld_macro);
+		zabbix_log(LOG_LEVEL_DEBUG,"MACRO ON TEMPLATE: %s",item->template_lld_macros.values[i]->lld_macro);
 		}
 		}
 
