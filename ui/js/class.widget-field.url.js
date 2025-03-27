@@ -29,6 +29,6 @@ class CWidgetFieldUrl extends CWidgetField {
 	}
 
 	#initField() {
-		this.#input.addEventListener('change', () => this.dispatchInputEvent({immediate: true}));
+		this.#input.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }

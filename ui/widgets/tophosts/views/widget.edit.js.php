@@ -47,7 +47,7 @@ window.widget_form = new class extends CWidgetForm {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			freeze_end: 1
 		})
-			.on(CSortable.EVENT_SORT, () => this.registerInputEvent({immediate: true}));
+			.on(CSortable.EVENT_SORT, () => this.registerUpdateEvent({immediate: true}));
 
 		this.#list_columns.addEventListener('click', (e) => this.#processColumnsAction(e));
 	}

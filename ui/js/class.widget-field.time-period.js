@@ -190,20 +190,20 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				this.#data_source = e.target.value;
 				this.#updateField();
 
-				this.dispatchInputEvent({immediate: true});
+				this.dispatchUpdateEvent({immediate: true});
 			});
 		}
 
 		if (this.#reference_multiselect !== null) {
-			this.#reference_multiselect.on('change', () => this.dispatchInputEvent({immediate: true}));
+			this.#reference_multiselect.on('change', () => this.dispatchUpdateEvent({immediate: true}));
 		}
 
-		this.#date_from_input.addEventListener('input', () => this.dispatchInputEvent());
-		this.#date_to_input.addEventListener('input', () => this.dispatchInputEvent());
+		this.#date_from_input.addEventListener('input', () => this.dispatchUpdateEvent());
+		this.#date_to_input.addEventListener('input', () => this.dispatchUpdateEvent());
 
 		// jQuery events can only be caught by jQuery.
-		jQuery(this.#date_from_input).on('change', () => this.dispatchInputEvent({immediate: true}));
-		jQuery(this.#date_to_input).on('change', () => this.dispatchInputEvent({immediate: true}));
+		jQuery(this.#date_from_input).on('change', () => this.dispatchUpdateEvent({immediate: true}));
+		jQuery(this.#date_to_input).on('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 
 	#updateField() {

@@ -63,13 +63,13 @@ class CWidgetField {
 	}
 
 	/**
-	 * Inform the framework about the input event on the field level.
+	 * Inform the framework about the update event on the field level.
 	 *
 	 * The framework will validate the configuration and update the widget on the fly.
 	 *
-	 * @param {boolean} immediate  Whether the input event is final (will cause immediate update) or throttled.
+	 * @param {boolean} immediate  Whether the update event is final (will cause immediate update) or throttled.
 	 */
-	dispatchInputEvent({immediate = false} = {}) {
+	dispatchUpdateEvent({immediate = false} = {}) {
 		ZABBIX.EventHub.publish(new CWidgetFieldEvent({
 			data: {
 				name: this.getName(),
@@ -77,7 +77,7 @@ class CWidgetField {
 			},
 			descriptor: {
 				context: CWidgetField.EVENT_CONTEXT,
-				event: CWidgetFieldEvent.EVENT_INPUT,
+				event: CWidgetFieldEvent.EVENT_UPDATE,
 				form_name: this.getFormName()
 			}
 		}));

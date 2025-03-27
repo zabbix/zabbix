@@ -30,7 +30,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 
 	#initField() {
 		for (const radio_button of this.#radio_buttons) {
-			radio_button.addEventListener('change', () => this.dispatchInputEvent({immediate: true}));
+			radio_button.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 		}
 	}
 }

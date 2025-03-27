@@ -58,11 +58,11 @@ class ItemNavigator_CWidgetFieldItemGrouping extends CWidgetField {
 				}
 			})
 			.on('afteradd.dynamicRows, tableupdate.dynamicRows', () => this.#update())
-			.on('tableupdate.dynamicRows', () => this.dispatchInputEvent({immediate: true}));
+			.on('tableupdate.dynamicRows', () => this.dispatchUpdateEvent({immediate: true}));
 
 		this.#table.addEventListener('change', () => {
 			this.#update();
-			this.dispatchInputEvent({immediate: true});
+			this.dispatchUpdateEvent({immediate: true});
 		});
 	}
 

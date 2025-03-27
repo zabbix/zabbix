@@ -58,12 +58,12 @@ class HostNavigator_CWidgetFieldHostGrouping extends CWidgetField {
 			})
 			.on('afteradd.dynamicRows, tableupdate.dynamicRows', () => {
 				this.#update();
-				this.dispatchInputEvent({immediate: true});
+				this.dispatchUpdateEvent({immediate: true});
 			});
 
 		this.#table.addEventListener('change', () => {
 			this.#update();
-			this.dispatchInputEvent({immediate: true});
+			this.dispatchUpdateEvent({immediate: true});
 		});
 	}
 

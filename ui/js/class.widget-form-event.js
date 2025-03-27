@@ -15,5 +15,5 @@
 
 class CWidgetFormEvent extends CEventHubEvent {
 
-	static EVENT_INPUT = 'input';
+	static EVENT_UPDATE = 'update';
 }

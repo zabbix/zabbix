@@ -1523,7 +1523,7 @@ class CDashboard {
 		this.#widget_form_input_subscription = ZABBIX.EventHub.subscribe({
 			require: {
 				context: CWidgetForm.EVENT_CONTEXT,
-				event: CWidgetFormEvent.EVENT_INPUT,
+				event: CWidgetFormEvent.EVENT_UPDATE,
 				form_name: CWidgetForm.FORM_NAME_PRIMARY
 			},
 			callback: () => console.log('WIDGET UPDATE REQUEST'),

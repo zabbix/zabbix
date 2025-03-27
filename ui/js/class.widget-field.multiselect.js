@@ -185,7 +185,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 					this.#multiselect_list.innerHTML = '';
 				}
 			})
-			.on('change', () => this.dispatchInputEvent({immediate: true}));
+			.on('change', () => this.dispatchUpdateEvent({immediate: true}));
 
 		this.#multiselect_list = this.#multiselect[0].querySelector('.multiselect-list');
 

@@ -29,12 +29,12 @@ class CWidgetFieldRangeControl extends CWidgetField {
 	}
 
 	#initField() {
-		this.#input.addEventListener('input', () => this.dispatchInputEvent());
+		this.#input.addEventListener('input', () => this.dispatchUpdateEvent());
 
 		jQuery(this.#input).rangeControl();
 
 		const range_control = this.#input.closest('div.range-control');
 
-		range_control.addEventListener('change', () => this.dispatchInputEvent({immediate: true}));
+		range_control.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }

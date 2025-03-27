@@ -29,7 +29,7 @@ class CWidgetFieldTextArea extends CWidgetField {
 	}
 
 	#initField() {
-		this.#textarea.addEventListener('input', () => this.dispatchInputEvent());
-		this.#textarea.addEventListener('change', () => this.dispatchInputEvent({immediate: true}));
+		this.#textarea.addEventListener('input', () => this.dispatchUpdateEvent());
+		this.#textarea.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }

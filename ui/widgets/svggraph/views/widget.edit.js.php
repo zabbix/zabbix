@@ -68,7 +68,7 @@ window.widget_form = new class extends CWidgetForm {
 
 		this._dataset_wrapper.addEventListener('input', e => {
 			if (e.target.matches('input[name$="[data_set_label]"]') || e.target.matches('input[name$="[timeshift]"]')) {
-				this.registerInputEvent();
+				this.registerUpdateEvent();
 			}
 		});
 
@@ -80,7 +80,7 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	onGraphConfigChange() {
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 
 		this._updateForm();
 		this._updatePreview();
@@ -368,7 +368,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._initDataSetSortable();
 		this._updateForm();
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	_cloneDataset() {
@@ -466,7 +466,7 @@ window.widget_form = new class extends CWidgetForm {
 				this._updateDatasetsLabel();
 				this._updatePreview();
 
-				this.registerInputEvent({immediate: true});
+				this.registerUpdateEvent({immediate: true});
 			});
 		}
 	}
@@ -664,7 +664,7 @@ window.widget_form = new class extends CWidgetForm {
 			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	_removeSingleItem(element) {
@@ -676,7 +676,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._initSingleItemSortable(dataset);
 		this._updatePreview();
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	_initSingleItemSortable(dataset) {
@@ -698,7 +698,7 @@ window.widget_form = new class extends CWidgetForm {
 			this._updateSingleItemsOrder(dataset);
 			this._updatePreview();
 
-			this.registerInputEvent({immediate: true});
+			this.registerUpdateEvent({immediate: true});
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);

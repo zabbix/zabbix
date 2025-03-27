@@ -27,7 +27,7 @@ class CWidgetForm {
 	static EVENT_RELOAD_REQUEST = 'dialogue.reload-request';
 	static EVENT_SUBMIT_REQUEST = 'dialogue.submit-request';
 
-	static INPUT_THROTTLE_TIMEOUT_MS = 1000;
+	static UPDATE_THROTTLE_TIMEOUT_MS = 1000;
 
 	/**
 	 * Add widget form field to the respective widget form.
@@ -52,7 +52,7 @@ class CWidgetForm {
 	/**
 	 * @type {number|null}
 	 */
-	#fields_input_throttle_timeout = null;
+	#fields_update_throttle_timeout = null;
 
 	/**
 	 * @type {AbortController}
@@ -79,10 +79,10 @@ class CWidgetForm {
 		ZABBIX.EventHub.subscribe({
 			require: {
 				context: CWidgetField.EVENT_CONTEXT,
-				event: CWidgetFieldEvent.EVENT_INPUT,
+				event: CWidgetFieldEvent.EVENT_UPDATE,
 				form_name
 			},
-			callback: ({data}) => this.registerInputEvent({immediate: data.immediate}),
+			callback: ({data}) => this.registerUpdateEvent({immediate: data.immediate}),
 			signal
 		});
 
@@ -149,30 +149,30 @@ class CWidgetForm {
 	}
 
 	/**
-	 * Inform the framework about the input event on the form level.
+	 * Inform the framework about the update event on the form level.
 	 *
 	 * The framework will validate the configuration and update the widget on the fly.
 	 *
-	 * @param {boolean} immediate  Whether the input event is final (will cause immediate update) or throttled.
+	 * @param {boolean} immediate  Whether the update event is final (will cause immediate update) or throttled.
 	 */
-	registerInputEvent({immediate = false} = {}) {
-		if (this.#fields_input_throttle_timeout !== null) {
-			clearTimeout(this.#fields_input_throttle_timeout);
+	registerUpdateEvent({immediate = false} = {}) {
+		if (this.#fields_update_throttle_timeout !== null) {
+			clearTimeout(this.#fields_update_throttle_timeout);
 		}
 
-		this.#fields_input_throttle_timeout = setTimeout(() => {
-			this.#fields_input_throttle_timeout = null;
+		this.#fields_update_throttle_timeout = setTimeout(() => {
+			this.#fields_update_throttle_timeout = null;
 
 			ZABBIX.EventHub.publish(new CWidgetFormEvent({
 				descriptor: {
 					context: CWidgetForm.EVENT_CONTEXT,
-					event: CWidgetFormEvent.EVENT_INPUT,
+					event: CWidgetFormEvent.EVENT_UPDATE,
 					form_name: this.getForm().getAttribute('name')
 				}
 			}));
 
 			// Zero time-out is by design for grouping multiple events within the same micro-task.
-		}, immediate ? 0 : CWidgetForm.INPUT_THROTTLE_TIMEOUT_MS);
+		}, immediate ? 0 : CWidgetForm.UPDATE_THROTTLE_TIMEOUT_MS);
 	}
 
 	#initialize({tab_indicators_tabs_id}) {
@@ -203,16 +203,16 @@ class CWidgetForm {
 		const form = this.getForm();
 
 		form.querySelector('[name="type"]').addEventListener('change', () => this.reload());
-		form.querySelector('[name="show_header"]').addEventListener('change', () => this.registerInputEvent());
-		form.querySelector('[name="name"]').addEventListener('input', () => this.registerInputEvent());
+		form.querySelector('[name="show_header"]').addEventListener('change', () => this.registerUpdateEvent());
+		form.querySelector('[name="name"]').addEventListener('input', () => this.registerUpdateEvent());
 
 		this.overlay.$dialogue.$footer[0].querySelector('.js-button-submit')
 			.addEventListener('click', () => this.submit());
 	}
 
 	#endScripting() {
-		if (this.#fields_input_throttle_timeout !== null) {
-			clearTimeout(this.#fields_input_throttle_timeout);
+		if (this.#fields_update_throttle_timeout !== null) {
+			clearTimeout(this.#fields_update_throttle_timeout);
 		}
 
 		this.#events_abort_controller.abort();

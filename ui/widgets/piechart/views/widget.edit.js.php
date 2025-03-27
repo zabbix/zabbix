@@ -73,12 +73,12 @@ window.widget_form = new class extends CWidgetForm {
 			.on('change', 'input, z-select, .multiselect', () => {
 				this.#updateForm();
 
-				this.registerInputEvent({immediate: true});
+				this.registerUpdateEvent({immediate: true});
 			});
 
 		this.#dataset_wrapper.addEventListener('input', e => {
 			if (e.target.matches('input[name$="[data_set_label]"]')) {
-				this.registerInputEvent();
+				this.registerUpdateEvent();
 			}
 		});
 
@@ -305,7 +305,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#initDataSetSortable();
 		this.#updateForm();
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	#cloneDataset() {
@@ -383,7 +383,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.updateSingleItemsReferences();
 		this.#updateForm();
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	#getOpenedDataset() {
@@ -416,7 +416,7 @@ window.widget_form = new class extends CWidgetForm {
 				this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this.#updateDatasetsLabel();
 
-				this.registerInputEvent({immediate: true});
+				this.registerUpdateEvent({immediate: true});
 			});
 		}
 	}
@@ -617,7 +617,7 @@ window.widget_form = new class extends CWidgetForm {
 			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	#removeSingleItem(element) {
@@ -628,7 +628,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#updateSingleItemsOrder(dataset);
 		this.#initSingleItemSortable(dataset);
 
-		this.registerInputEvent({immediate: true});
+		this.registerUpdateEvent({immediate: true});
 	}
 
 	#initSingleItemSortable(dataset) {
@@ -649,7 +649,7 @@ window.widget_form = new class extends CWidgetForm {
 		sortable.on(CSortable.EVENT_SORT, () => {
 			this.#updateSingleItemsOrder(dataset);
 
-			this.registerInputEvent({immediate: true});
+			this.registerUpdateEvent({immediate: true});
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);

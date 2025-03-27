@@ -29,6 +29,6 @@ class CWidgetFieldSelect extends CWidgetField {
 	}
 
 	#initField() {
-		this.#z_select.addEventListener('change', () => this.dispatchInputEvent({immediate: true}));
+		this.#z_select.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }

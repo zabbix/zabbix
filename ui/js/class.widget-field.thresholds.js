@@ -44,9 +44,9 @@ class CWidgetFieldThresholds extends CWidgetField {
 						appendTo: '.overlay-dialogue-body'
 					});
 			})
-			.on('tableupdate.dynamicRows', () => this.dispatchInputEvent({immediate: true}));
+			.on('tableupdate.dynamicRows', () => this.dispatchUpdateEvent({immediate: true}));
 
-		const observer = new MutationObserver(() => this.dispatchInputEvent({immediate: true}));
+		const observer = new MutationObserver(() => this.dispatchUpdateEvent({immediate: true}));
 
 		observer.observe(thresholds_table, {
 			subtree: true,
@@ -54,7 +54,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 			attributeFilter: ['value']
 		});
 
-		thresholds_table.addEventListener('input', () => this.dispatchInputEvent());
-		thresholds_table.addEventListener('change', () => this.dispatchInputEvent({immediate: true}));
+		thresholds_table.addEventListener('input', () => this.dispatchUpdateEvent());
+		thresholds_table.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }
