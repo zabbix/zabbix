@@ -208,7 +208,7 @@ class testLldLinking extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testLinkingLinking_conflict() {
-/*
+
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_SAME_LLD);
@@ -221,10 +221,10 @@ class testLldLinking extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
-		$this->fullClear();*/
+		$this->fullClear();
 
-		$this->killComponent(self::COMPONENT_SERVER);
-		$this->killComponent(self::COMPONENT_AGENT);
+		//$this->killComponent(self::COMPONENT_SERVER);
+		//$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_SERVER);
