@@ -39,7 +39,7 @@ class testFormMapProperties extends CWebTest {
 
 	protected static $map_update = 'Map for update test';
 	const MAP_UPDATE = 'Map for simple update and update test';
-	const MAP_CLONE_DELETE = 'Map for clone and delete test';
+	const MAP_CLONE = 'Map for clone and delete test';
 	const CLONED_MAP = 'Cloned map';
 	const HASH_SQL = 'SELECT * FROM sysmaps ORDER BY sysmapid';
 	const ICON_MAPPING = 'Icon mapping for map properties';
@@ -136,7 +136,7 @@ class testFormMapProperties extends CWebTest {
 				]
 			],
 			[
-				'name' => self::MAP_CLONE_DELETE,
+				'name' => self::MAP_CLONE,
 				'width' => 1000,
 				'height' => 1000,
 				'backgroundid' => $id_background,
@@ -158,7 +158,7 @@ class testFormMapProperties extends CWebTest {
 				'show_suppressed' => 1,
 				'urls' => [
 					[
-						'name' => 'Host URL 📰📰📰',
+						'name' => '1 Host URL 📰📰📰',
 						'url' => 'test 📰📰📰',
 						'elementtype' => 0
 					],
@@ -173,12 +173,12 @@ class testFormMapProperties extends CWebTest {
 						'elementtype' => 1
 					],
 					[
-						'name' => 'Trigger URL',
+						'name' => '3 Trigger URL',
 						'url' => 'test',
 						'elementtype' => 2
 					],
 					[
-						'name' => 'Image URL',
+						'name' => '2 Image URL',
 						'url' => 'test',
 						'elementtype' => 4
 					]
@@ -2331,32 +2331,32 @@ class testFormMapProperties extends CWebTest {
 			],
 			'expected_urls' => [
 				[
-					'id' => 1,
+					'id' => 3,
 					'name' => STRING_255,
 					'url' => STRING_2048,
 					'element_type' => 3
 				],
 				[
 					'id' => 0,
-					'name' => 'Host URL 📰📰📰',
+					'name' => '1 Host URL 📰📰📰',
 					'url' => 'test 📰📰📰',
 					'element_type' => 0
 				],
 				[
-					'id' => 4,
-					'name' => 'Image URL',
+					'id' => 1,
+					'name' => '2 Image URL',
 					'url' => 'test',
 					'element_type' => 4
 				],
 				[
-					'id' => 2,
+					'id' => 4,
 					'name' => self::XSS_EXAMPLE,
 					'url' => self::XSS_EXAMPLE,
 					'element_type' => 1
 				],
 				[
-					'id' => 3,
-					'name' => 'Trigger URL',
+					'id' => 2,
+					'name' => '3 Trigger URL',
 					'url' => 'test',
 					'element_type' => 2
 				]
@@ -2369,7 +2369,7 @@ class testFormMapProperties extends CWebTest {
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', self::MAP_CLONE_DELETE)->query('link:Properties')->one()->click();
+		$table->findRow('Name', self::MAP_CLONE)->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->query('button:Clone')->one()->click();
 		$form->fill(['Name' => self::CLONED_MAP]);
@@ -2399,20 +2399,20 @@ class testFormMapProperties extends CWebTest {
 		}
 
 		// Check that cloned map is present in the database.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name='.self::CLONED_MAP));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::CLONED_MAP.'\''));
 	}
 
 	public function testFormMapProperties_Delete() {
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', self::MAP_CLONE_DELETE)->query('link:Properties')->one()->click();
+		$table->findRow('Name', self::MAP_CLONE)->query('link:Properties')->one()->click();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Network map deleted');
 
 		// Check the pressence of the map in the list and database.
-		$this->assertFalse($table->findRow('Name', self::MAP_CLONE_DELETE, true)->isPresent());
-		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name='.self::MAP_CLONE_DELETE));
+		$this->assertFalse($table->findRow('Name', self::MAP_CLONE, true)->isPresent());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::MAP_CLONE.'\''));
 	}
 }
