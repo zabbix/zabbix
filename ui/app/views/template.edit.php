@@ -196,16 +196,21 @@ if (!$data['readonly']) {
 			(new CRow([
 				(new CCol([
 					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Macro'))
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}')
 						->disableSpellcheck()
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+					(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 						->setAttribute('placeholder', _('description'))
@@ -217,13 +222,23 @@ if (!$data['readonly']) {
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]))
 				->addClass('form_row')
-		);
+		)
+	->addItem(
+		new CRow(
+			(new CCol())
+				->setId('macros_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(4)
+		)
+	);
 
 	$macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 		->addItem(
 			(new CRow([
 				(new CCol([
 					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Macro'))
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}')
@@ -231,7 +246,9 @@ if (!$data['readonly']) {
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+					(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
@@ -262,6 +279,14 @@ if (!$data['readonly']) {
 						->setAttribute('placeholder', _('description'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
 			]))->addClass('form_row')
+		)
+		->addItem(
+			new CRow(
+				(new CCol())
+					->setId('macros_#{rowNum}_error_container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setColSpan(4)
+			)
 		);
 
 	$macros_tab
