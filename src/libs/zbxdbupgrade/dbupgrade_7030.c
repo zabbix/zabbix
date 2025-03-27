@@ -391,12 +391,12 @@ static int	DBpatch_7030028(void)
 static int	DBpatch_7030029(void)
 {
 	const zbx_db_table_t	table =
-			{"lld_macro", "lld_macroid", 0,
+			{"lld_macro_export", "lld_macro_exportid", 0,
 				{
-					{"lld_macroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"lld_macro_exportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"name", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"value", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lld_macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -407,7 +407,7 @@ static int	DBpatch_7030029(void)
 
 static int	DBpatch_7030030(void)
 {
-	return DBcreate_index("lld_macro", "lld_macro_1", "itemid", 0);
+	return DBcreate_index("lld_macro_export", "lld_macro_export_1", "itemid", 0);
 }
 
 static int	DBpatch_7030031(void)
@@ -415,24 +415,24 @@ static int	DBpatch_7030031(void)
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("lld_macro", 1, &field);
+	return DBadd_foreign_key("lld_macro_export", 1, &field);
 }
 
 static int	DBpatch_7030032(void)
 {
-	const zbx_db_field_t	field = {"lldrule_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+	const zbx_db_field_t	field = {"lldruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("item_discovery", &field);
 }
 
 static int	DBpatch_7030033(void)
 {
-	return DBcreate_index("item_discovery", "item_discovery_3", "lldrule_itemid", 0);
+	return DBcreate_index("item_discovery", "item_discovery_3", "lldruleid", 0);
 }
 
 static int	DBpatch_7030034(void)
 {
-	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("item_discovery", 3, &field);
 }
@@ -447,7 +447,7 @@ static int	DBpatch_7030035(void)
 static int	DBpatch_7030036(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update item_discovery id"
-					" set lldrule_itemid=parent_itemid,parent_itemid=NULL"
+					" set lldruleid=parent_itemid,parent_itemid=NULL"
 					" where exists ("
 						"select null from items i"
 						" where i.itemid=id.itemid"
@@ -462,7 +462,7 @@ static int	DBpatch_7030036(void)
 
 static int	DBpatch_7030037(void)
 {
-	const zbx_db_field_t	field = {"lldrule_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("host_discovery", "parent_itemid", &field);
 }

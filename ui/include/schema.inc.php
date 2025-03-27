@@ -5838,13 +5838,6 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid'
 			],
-			'lldrule_itemid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'items',
-				'ref_field' => 'itemid'
-			],
 			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -5880,6 +5873,13 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'lldruleid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
 			]
 		]
 	],
@@ -5900,7 +5900,7 @@ return [
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
 			],
-			'lldrule_itemid' => [
+			'lldruleid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -9989,10 +9989,10 @@ return [
 			]
 		]
 	],
-	'lld_macro' => [
-		'key' => 'lld_macroid',
+	'lld_macro_export' => [
+		'key' => 'lld_macro_exportid',
 		'fields' => [
-			'lld_macroid' => [
+			'lld_macro_exportid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -10004,15 +10004,17 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid'
 			],
-			'name' => [
+			'lld_macro' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255
+				'length' => 255,
+				'default' => ''
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],

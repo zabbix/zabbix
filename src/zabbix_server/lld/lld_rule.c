@@ -205,7 +205,8 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 	zbx_vector_uint64_create(&deleted_ids);
 
-	zbx_db_insert_prepare(&db_insert, "lld_macro", "lld_macroid", "itemid", "name", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "lld_macro_export", "lld_macro_exportid", "itemid", "lld_macro", "value",
+			NULL);
 
 	zbx_hashset_iter_reset(lld_rules, &iter);
 	while (NULL != (rule_macros = (zbx_lld_rule_macros_t *)zbx_hashset_iter_next(&iter)))
@@ -230,10 +231,10 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 				continue;
 			}
 
-			const char	*fields[] = {"name", "value"};
+			const char	*fields[] = {"lld_macro", "value"};
 			char		delim = ' ';
 
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro set");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro_export set");
 
 			for (int j = 0; j < row->cols_num; j++)
 			{
@@ -251,8 +252,8 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 				zbx_free(value_esc);
 			}
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macroid=" ZBX_FS_UI64 ";\n",
-					row->rowid);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macro_exportid=" ZBX_FS_UI64
+					";\n", row->rowid);
 
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -261,11 +262,11 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 	zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != deleted_ids.values_num)
-		zbx_db_execute_multiple_query("delete from lld_macro where", "lld_macroid", &deleted_ids);
+		zbx_db_execute_multiple_query("delete from lld_macro_export where", "lld_macro_exportid", &deleted_ids);
 
 	if (0 != zbx_db_insert_get_row_count(&db_insert))
 	{
-		zbx_db_insert_autoincrement(&db_insert, "lld_macroid");
+		zbx_db_insert_autoincrement(&db_insert, "lld_macro_exportid");
 		zbx_db_insert_execute(&db_insert);
 	}
 
@@ -322,7 +323,7 @@ void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *m
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
 
-	result = zbx_db_select("select name,value from lld_macro where itemid=" ZBX_FS_UI64, ruleid);
+	result = zbx_db_select("select lld_macro,value from lld_macro_export where itemid=" ZBX_FS_UI64, ruleid);
 
 	while (NULL!= (row = zbx_db_fetch(result)))
 	{
@@ -2967,13 +2968,6 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 		for (int i = 0; i < item_prototypes.values_num; i++)
 			lld_item_prototype_dump(item_prototypes.values[i]);
-
-		for (int i = 0; i < items.values_num; i++)
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "existing item " ZBX_FS_UI64, items.values[i]->itemid);
-
-			lld_override_dump(&items.values[i]->overrides);
-		}
 	}
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
