@@ -17,6 +17,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
  * Test suite for testing -T, --test-config option of Server, Proxy, Agent, Agent2 and Web Service.
+ *
+ * @onBefore prepareTestEnv
+ * @onAfter cleanupTestEnv
  */
 class testConfigTestOption extends CIntegrationTest {
 	private static $components = [
@@ -28,6 +31,17 @@ class testConfigTestOption extends CIntegrationTest {
 
 	// override CIntegrationTest::startComponent(), we want to prepare the configuration but not start the component
 	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {}
+
+
+	public static function prepareTestEnv(): void {
+		putenv('TestDebugLevel=5');
+		putenv('TestStringVar=test_string_value');
+	}
+
+	public static function cleanupTestEnv(): void {
+		putenv('TestDebugLevel');
+		putenv('TestStringVar');
+	}
 
 	/**
 	 * This function will perform the actual test of specified component.
@@ -60,10 +74,14 @@ class testConfigTestOption extends CIntegrationTest {
 	 *
 	 * @return array
 	 */
-	public function validConfigurationProvider() {
+	public function validConfigurationProvider($useConfigVars) {
 		$config = [];
 		foreach (self::$components as $component) {
-			$config[$component] = ['DebugLevel' => 5];
+			if ($useConfigVars) {
+				$config[$component] = ['DebugLevel' => '${TestDebugLevel}'];
+			} else {
+				$config[$component] = ['DebugLevel' => 5];
+			}
 		}
 		return $config;
 	}
@@ -73,20 +91,29 @@ class testConfigTestOption extends CIntegrationTest {
 	 *
 	 * @return array
 	 */
-	public function invalidConfigurationProvider() {
+	public function invalidConfigurationProvider($useConfigVars) {
 		$config = [];
+
 		foreach (self::$components as $component) {
-			$config[$component] = ['DebugLeve' => 5];
+			if ($useConfigVars) {
+				$config[$component] = ['DebugLevel' => '${TestStringVar}']; // wrong type
+			} else {
+				$config[$component] = ['DebugLeve' => 5];
+			}
 		}
 		return $config;
 	}
 
 	/**
 	 * Test each component with valid configuration. Must exit with 0 exit code.
+	 *
+	 * @testWith [false]
+	 *           [true]
 	 */
-	public function testConfigTestOption_checkingValidServerConfig() {
+	public function testConfigTestOption_checkingValidServerConfig($useConfigVars) {
 		foreach (self::$components as $component) {
-			self::prepareComponentConfiguration($component, self::validConfigurationProvider());
+			self::prepareComponentConfiguration($component,
+					self::validConfigurationProvider($useConfigVars));
 
 			foreach (['-T', '--test-config'] as $options) {
 				self::testComponent($component, $options, 0, true);
@@ -96,10 +123,14 @@ class testConfigTestOption extends CIntegrationTest {
 
 	/**
 	 * Test each component with invalid configuration. Must exit with non-zero exit code.
+	 *
+	 * @testWith [false]
+	 *           [true]
 	 */
-	public function testConfigTestOption_checkingInvalidServerConfig() {
+	public function testConfigTestOption_checkingInvalidServerConfig($useConfigVars) {
 		foreach (self::$components as $component) {
-			self::prepareComponentConfiguration($component, self::invalidConfigurationProvider());
+			self::prepareComponentConfiguration($component,
+					self::invalidConfigurationProvider($useConfigVars));
 
 			foreach (['-T', '--test-config'] as $options) {
 				self::testComponent($component, $options, 0, false);
@@ -109,10 +140,14 @@ class testConfigTestOption extends CIntegrationTest {
 
 	/**
 	 * Test each component with invalid command-line parameters. Must exit with non-zero exit code.
+	 *
+	 * @testWith [false]
+	 *           [true]
 	 */
-	public function testConfigTestOption_checkingInvalidOptions() {
+	public function testConfigTestOption_checkingInvalidOptions($useConfigVars) {
 		foreach (self::$components as $component) {
-			self::prepareComponentConfiguration($component, self::validConfigurationProvider());
+			self::prepareComponentConfiguration($component,
+					self::validConfigurationProvider($useConfigVars));
 
 			foreach (['-T -R log_level_decrease'] as $options) {
 				self::testComponent($component, $options, 0, false);

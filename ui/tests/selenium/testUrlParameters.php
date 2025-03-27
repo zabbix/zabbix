@@ -14,9 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once __DIR__.'/../include/CLegacyWebTest.php';
 
 class testUrlParameters extends CLegacyWebTest {
+
+	const POPUP = 'zabbix.php?action=popup&popup=';
 
 	public static function data() {
 		return [
@@ -26,11 +28,11 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=4',
+						'url' => self::POPUP.'hostgroup.edit&groupid=4',
 						'text_present' => 'Host groups'
 					],
 					[
-						'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=9999999',
+						'url' => self::POPUP.'hostgroup.edit&groupid=9999999',
 						'text_not_present' => 'Host groups',
 						'access_denied' => true,
 						'text_present' => [
@@ -45,80 +47,75 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=hostgroup.edit&groupid=abc',
+						'url' => self::POPUP.'hostgroup.edit&groupid=abc',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "abc" for "groupid" field.',
-							'Controller: hostgroup.edit',
-							'action: hostgroup.edit',
-							'groupid: abc'
+							'Controller: popup',
+							'action: popup',
+							'groupid: abc',
+							'popup: hostgroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=hostgroup.edit&groupid[]=1',
+						'url' => self::POPUP.'hostgroup.edit&groupid[]=1',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value for "groupid" field.',
-							'Controller: hostgroup.edit',
-							'action: hostgroup.edit',
-							'groupid: array'
+							'Controller: popup',
+							'action: popup',
+							'groupid: array',
+							'popup: hostgroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=hostgroup.edit&name[]=name',
+						'url' => self::POPUP.'hostgroup.edit&name[]=name',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value for field "name": a character string is expected.',
-							'Controller: hostgroup.edit',
-							'action: hostgroup.edit',
-							'name: array'
+							'Controller: popup',
+							'action: popup',
+							'name: array',
+							'popup: hostgroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=hostgroup.edit&subgroups[]=1',
+						'url' => self::POPUP.'hostgroup.edit&subgroups[]=1',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value for "subgroups" field.',
-							'Controller: hostgroup.edit',
-							'action: hostgroup.edit',
-							'subgroups: array'
+							'Controller: popup',
+							'action: popup',
+							'subgroups: array',
+							'popup: hostgroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=hostgroup.edit&groupid=',
+						'url' => self::POPUP.'hostgroup.edit&groupid=',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "" for "groupid" field.',
-							'Controller: hostgroup.edit',
-							'action: hostgroup.edit',
-							'groupid:'
+							'Controller: popup',
+							'action: popup',
+							'groupid:',
+							'popup: hostgroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=templategroup.edit&groupid[]=1',
-						'text_not_present' => 'Template groups',
-						'fatal_error' => true,
-						'text_present' => [
-							'Incorrect value for "groupid" field.',
-							'Controller: templategroup.edit',
-							'action: templategroup.edit',
-							'groupid: array'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=hostgroup.edit&groupid=-1',
+						'url' => self::POPUP.'hostgroup.edit&groupid=-1',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "-1" for "groupid" field.',
-							'Controller: hostgroup.edit',
-							'action: hostgroup.edit',
-							'groupid: -1'
+							'Controller: popup',
+							'action: popup',
+							'groupid: -1',
+							'popup: hostgroup.edit'
 						]
 					]
 				]
@@ -129,11 +126,11 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=1',
+						'url' => self::POPUP.'templategroup.edit&groupid=1',
 						'text_present' => 'Template groups'
 					],
 					[
-						'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=9999999',
+						'url' => self::POPUP.'templategroup.edit&groupid=9999999',
 						'text_not_present' => 'Template groups',
 						'access_denied' => true,
 						'text_present' => [
@@ -148,36 +145,51 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=templategroup.edit&groupid=abc',
+						'url' => self::POPUP.'templategroup.edit&groupid=abc',
 						'text_not_present' => 'Template groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "abc" for "groupid" field.',
-							'Controller: templategroup.edit',
-							'action: templategroup.edit',
-							'groupid: abc'
+							'Controller: popup',
+							'action: popup',
+							'groupid: abc',
+							'popup: templategroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=templategroup.edit&groupid=',
+						'url' => self::POPUP.'templategroup.edit&groupid=',
 						'text_not_present' => 'Template groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "" for "groupid" field.',
-							'Controller: templategroup.edit',
-							'action: templategroup.edit',
-							'groupid:'
+							'Controller: popup',
+							'action: popup',
+							'groupid:',
+							'popup: templategroup.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=templategroup.edit&groupid=-1',
+						'url' => self::POPUP.'templategroup.edit&groupid=-1',
 						'text_not_present' => 'Template groups',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "-1" for "groupid" field.',
-							'Controller: templategroup.edit',
-							'action: templategroup.edit',
-							'groupid: -1'
+							'Controller: popup',
+							'action: popup',
+							'groupid: -1',
+							'popup: templategroup.edit'
+						]
+					],
+					[
+						'url' => self::POPUP.'templategroup.edit&groupid[]=1',
+						'text_not_present' => 'Template groups',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value for "groupid" field.',
+							'Controller: popup',
+							'action: popup',
+							'groupid: array',
+							'popup: templategroup.edit'
 						]
 					]
 				]
@@ -188,11 +200,11 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=popup&popup=host.edit&hostid=10084',
+						'url' => self::POPUP.'host.edit&hostid=10084',
 						'text_present' => 'Host'
 					],
 					[
-						'url' => 'zabbix.php?action=popup&popup=host.edit&hostid=9999999',
+						'url' => self::POPUP.'host.edit&hostid=9999999',
 						'text_not_present' => 'Host',
 						'access_denied' => true,
 						'text_present' => [
@@ -208,58 +220,63 @@ class testUrlParameters extends CLegacyWebTest {
 				'test_cases' => [
 
 					[
-						'url' => 'zabbix.php?action=host.edit&hostid=abc',
+						'url' => self::POPUP.'host.edit&hostid=abc',
 						'text_not_present' => 'Host',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "abc" for "hostid" field.',
-							'Controller: host.edit',
-							'action: host.edit',
-							'hostid: abc'
+							'Controller: popup',
+							'action: popup',
+							'hostid: abc',
+							'popup: host.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=host.edit&hostid= ',
+						'url' => self::POPUP.'host.edit&hostid= ',
 						'text_not_present' => 'Host',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "" for "hostid" field.',
-							'Controller: host.edit',
-							'action: host.edit',
-							'hostid:'
+							'Controller: popup',
+							'action: popup',
+							'hostid:',
+							'popup: host.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=host.edit&hostid=-1',
+						'url' => self::POPUP.'host.edit&hostid=-1',
 						'text_not_present' => 'Host',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "-1" for "hostid" field.',
-							'Controller: host.edit',
-							'action: host.edit',
-							'hostid: -1'
+							'Controller: popup',
+							'action: popup',
+							'hostid: -1',
+							'popup: host.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=host.edit&hostid[]=1',
+						'url' => self::POPUP.'host.edit&hostid[]=1',
 						'text_not_present' => 'Host',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value for "hostid" field.',
-							'Controller: host.edit',
-							'action: host.edit',
-							'hostid: array'
+							'Controller: popup',
+							'action: popup',
+							'hostid: array',
+							'popup: host.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=host.edit&hostid=',
+						'url' => self::POPUP.'host.edit&hostid=',
 						'text_not_present' => 'Host',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "" for "hostid" field.',
-							'Controller: host.edit',
-							'action: host.edit',
-							'hostid:'
+							'Controller: popup',
+							'action: popup',
+							'hostid:',
+							'popup: host.edit'
 						]
 					]
 				]
@@ -270,51 +287,159 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=action.list&eventsource=99999',
+						'url' => self::POPUP.'action.edit&eventsource=99999',
 						'text_not_present' => 'Trigger actions',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "99999" for "eventsource" field.',
-							'Controller: action.list',
-							'action: action.list',
-							'eventsource: 99999'
+							'Controller: popup',
+							'action: popup',
+							'eventsource: 99999',
+							'popup: action.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=action.list&eventsource=abc',
+						'url' => self::POPUP.'action.edit&eventsource=abc',
 						'text_not_present' => 'Trigger actions',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "abc" for "eventsource" field.',
-							'Controller: action.list',
-							'action: action.list',
-							'eventsource: abc'
+							'Controller: popup',
+							'action: popup',
+							'eventsource: abc',
+							'popup: action.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=action.list&eventsource=-1',
+						'url' => self::POPUP.'action.edit&eventsource=-1',
 						'text_not_present' => 'Trigger actions',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value "-1" for "eventsource" field.',
-							'Controller: action.list',
-							'action: action.list',
-							'eventsource: -1'
+							'Controller: popup',
+							'action: popup',
+							'eventsource: -1',
+							'popup: action.edit'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=action.list&eventsource[]=0',
+						'url' => self::POPUP.'action.edit&eventsource[]=0',
 						'text_not_present' => 'Trigger actions',
 						'fatal_error' => true,
 						'text_present' => [
 							'Incorrect value for "eventsource" field.',
-							'Controller: action.list',
-							'action: action.list',
-							'eventsource: array'
+							'Controller: popup',
+							'action: popup',
+							'eventsource: array',
+							'popup: action.edit'
 						]
 					]
 				]
 			],
+			[
+				'title' => 'Item edit',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => self::POPUP.'item.edit&context=template&itemid=46050',
+						'text_present' => 'Item'
+					],
+					[
+						'url' => self::POPUP.'item.edit&context=host&itemid=1',
+						'text_not_present' => 'Item',
+						'access_denied' => true,
+						'text_present' => [
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			// TODO: uncomment after ZBX-25928 fix.
+//			[
+//				'title' => 'Fatal error, please report to the Zabbix team',
+//				'check_server_name' => true,
+//				'server_name_on_page' => false,
+//				'test_cases' => [
+//					[
+//						'url' => self::POPUP.'item.edit&context=host&itemid=46050',
+//						'text_not_present' => 'Item',
+//						'fatal_error' => true,
+//						'text_present' => [
+//							'Incorrect value "host" for "context" field.',
+//							'Controller: popup',
+//							'action: popup',
+//							'context: host',
+//							'popup: item.edit'
+//						]
+//					]
+//				]
+//			],
+			[
+				'title' => 'Item prototype edit',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					// context=template.
+					[
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067&parent_discoveryid=46063',
+						'text_present' => 'Item prototype'
+					],
+					[
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=1&parent_discoveryid=46063',
+						'text_not_present' => 'Item prototype',
+						'access_denied' => true,
+						'text_present' => [
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					],
+					// context=host.
+					[
+						'url' => self::POPUP.'item.prototype.edit&item.prototype.edit&itemid=400610&parent_discoveryid=400590&context=host',
+						'text_present' => 'Item prototype'
+					],
+					[
+						'url' => self::POPUP.'item.prototype.edit&itemid=1&parent_discoveryid=400590&context=host',
+						'text_not_present' => 'Item prototype',
+						'access_denied' => true,
+						'text_present' => [
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			// TODO: uncomment after ZBX-25928 fix.
+//			[
+//				'title' => 'Fatal error, please report to the Zabbix team',
+//				'check_server_name' => true,
+//				'server_name_on_page' => false,
+//				'test_cases' => [
+//					[
+//						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067',
+//						'text_not_present' => 'Item prototype',
+//						'fatal_error' => true,
+//						'text_present' => [
+//							'Incorrect value "" for "parent_discoveryid" field.',
+//							'Controller: popup',
+//							'action: popup',
+//							'context: template',
+//							'popup: item.prototype.edit'
+//						]
+//					],
+//					[
+//						'url' => self::POPUP.'item.prototype.edit&item.prototype.edit&itemid=400610&context=host',
+//						'text_not_present' => 'Item',
+//						'fatal_error' => true,
+//						'text_present' => [
+//							'Incorrect value "" for "parent_discoveryid" field.',
+//							'Controller: popup',
+//							'action: popup',
+//							'context: host',
+//							'popup: item.prototype.edit'
+//						]
+//					]
+//				]
+//			],
 			[
 				'title' => 'Configuration of network maps',
 				'check_server_name' => true,

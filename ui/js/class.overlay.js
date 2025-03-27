@@ -183,6 +183,8 @@ Overlay.prototype.fixPosition = function() {
 
 	const dialogue = this.$dialogue[0];
 
+	const width_original = dialogue.style.width;
+
 	dialogue.style.width = '';
 	dialogue.style.height = '';
 	dialogue.style.left = '0';
@@ -190,6 +192,8 @@ Overlay.prototype.fixPosition = function() {
 
 	const client_rect = dialogue.getBoundingClientRect();
 	const style = getComputedStyle(dialogue);
+
+	const width_delta = width_original !== '' ? parseFloat(style.width) - parseFloat(width_original) : 0;
 
 	// Fix overlay size to prevent shrinking when dragged beyond screen border.
 	dialogue.style.width = style.width;
@@ -213,6 +217,17 @@ Overlay.prototype.fixPosition = function() {
 			const min_visible_x_max = visible_x_max + client_rect.width - this.MIN_VISIBLE_PX;
 
 			this._position_fix.x = Math.max(Math.min(this._position_fix.x, min_visible_x_max), min_visible_x_min);
+
+			// Overlay has resized on X axis - compensate position to persist the visual part of the overlay.
+			if (this._position_fix.x > (visible_x_min + visible_x_max) / 2) {
+				this._position_fix.x += width_delta / 2;
+			}
+			else {
+				this._position_fix.x -= width_delta / 2;
+			}
+
+			// Overlay became fully visible on X axis - ensure it's fully visible on next updates.
+			this._force_visible_x = this._position_fix.x >= visible_x_min && this._position_fix.x <= visible_x_max;
 		}
 
 		const visible_y_min = this._position === this.POSITION_CENTER_TOP

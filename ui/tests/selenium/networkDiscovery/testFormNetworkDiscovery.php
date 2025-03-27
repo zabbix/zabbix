@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -1756,15 +1756,16 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'discovery' => self::DELETE_RULES['action_used'],
-					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_used']).
-						' is used in "Action with discovery rule" action.'
+					'error' => 'Cannot delete discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_used']).
+							': action "Action with discovery rule" uses this discovery rule.'
 				]
 			],
 			[
 				[
 					'discovery' => self::DELETE_RULES['action_check_used'],
-					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_check_used']).
-						' is used in "Action with discovery check" action.'
+					'error' => 'Cannot delete discovery check "Telnet (15)" of discovery rule '.
+							CXPathHelper::escapeQuotes(self::DELETE_RULES['action_check_used']).
+							': action "Action with discovery check" uses this discovery check.'
 				]
 			]
 		];

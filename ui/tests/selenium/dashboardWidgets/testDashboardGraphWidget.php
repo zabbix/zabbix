@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
@@ -2470,7 +2470,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue(!$dashboard->getWidget(self::DEFAULT_WIDGET, false)->isValid());
+		$this->assertFalse($dashboard->getWidget(self::DEFAULT_WIDGET, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr(self::DEFAULT_WIDGET);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
