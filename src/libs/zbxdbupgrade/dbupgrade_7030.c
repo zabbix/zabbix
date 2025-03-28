@@ -444,9 +444,9 @@ static int	DBpatch_7030029(void)
 			dbupgrade_copy_template_host_prototypes(last_hostid, last_flags, &templateids, &db_insert);
 
 		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
 	}
 
+	zbx_db_insert_clean(&db_insert);
 	zbx_vector_uint64_destroy(&templateids);
 
 	return SUCCEED;
