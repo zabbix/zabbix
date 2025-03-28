@@ -8830,6 +8830,103 @@ class CApiInputValidatorTest extends TestCase {
 				'{#MACRO}',
 				'/1/number',
 				'Invalid parameter "/1/number": incorrect syntax near "#MACRO}".'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'',
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": cannot be empty.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				[],
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				true,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				null,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'abc',
+				'/1/selementid',
+				'abc'
+			],
+			[
+				['type' => API_SELEMENTID],
+				123,
+				'/1/selementid',
+				'123'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'123',
+				'/1/selementid',
+				'123'
+			],
+			[
+				['type' => API_SELEMENTID],
+				1.5,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'1.5',
+				'/1/selementid',
+				'1.5'
+			],
+			[
+				['type' => API_SELEMENTID],
+				005,
+				'/1/selementid',
+				'5'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'005',
+				'/1/selementid',
+				'005'
+			],
+			[
+				['type' => API_SELEMENTID],
+				-1,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'-1',
+				'/1/selementid',
+				'-1'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'{$MACRO}',
+				'/1/selementid',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'Заббикс сервер',
+				'/1/selementid',
+				'Заббикс сервер'
+			],
+			[
+				['type' => API_SELEMENTID],
+				// broken UTF-8 byte sequence
+				'Заббикс '."\xd1".'сервер',
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": invalid byte sequence in UTF-8.'
 			]
 		];
 	}

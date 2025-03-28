@@ -16,7 +16,7 @@
 
 #include "zbxjson.h"
 
-void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg)
+void zbx_preproc_stats_ext_get_data(struct zbx_json *json, const void *arg)
 {
 	ZBX_UNUSED(arg);
 
