@@ -526,7 +526,7 @@ void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src)
  * Return value: pointer to the found row or NULL if not found                *
  *                                                                            *
  ******************************************************************************/
-zbx_sync_row_t	*zbx_sync_rowset_search_by_id(zbx_sync_rowset_t *rowset, zbx_uint64_t rowid)
+const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rowset, zbx_uint64_t rowid)
 {
 	zbx_sync_row_t	row_local;
 	int		i;

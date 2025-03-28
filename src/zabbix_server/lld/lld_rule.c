@@ -348,30 +348,21 @@ void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *m
  *             items           - [IN/OUT] sorted list of items                *
  *                                                                            *
  ******************************************************************************/
-void	lld_rule_macro_paths_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items)
+void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
-		zbx_lld_item_full_t		*item = items->values[i];
-		int				index;
-		zbx_lld_item_prototype_t	item_prototype_local;
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		item_prototype_local.itemid = item->parent_itemid;
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
-		}
 
-		zbx_sync_rowset_merge(&item->macro_paths, &item_prototypes->values[index]->macro_paths);
+		zbx_sync_rowset_merge(&item->macro_paths, &item->prototype->macro_paths);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -405,6 +396,9 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 		item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
 
 		for (int j = 0; j < item->macro_paths.rows.values_num; j++)
@@ -609,42 +603,28 @@ static void	lld_rule_rollback_filter(zbx_lld_item_full_t *item)
  * Purpose: update LLD rule filter formulas by replacing prototype condition  *
  *          IDs with actual condition IDs                                     *
  *                                                                            *
- * Parameters: item_prototypes - [IN] vector of LLD item prototypes           *
- *             items           - [IN/OUT] vector of LLD items                 *
+ * Parameters: items           - [IN/OUT] vector of LLD items                 *
  *             info            - [OUT] LLD error message                      *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_update_item_formula(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, char **info)
+static void	lld_rule_update_item_formula(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
 	for (int i = 0; i < items->values_num; i++)
 	{
-		zbx_lld_item_full_t		*item = items->values[i];
-		int				j, index;
-		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
-		zbx_eval_context_t		ctx;
-		char				*error = NULL;
+		zbx_lld_item_full_t	*item = items->values[i];
+		int			j;
+		zbx_eval_context_t	ctx;
+		char			*error = NULL;
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		item_prototype_local.itemid = item->parent_itemid;
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
-				lld_item_prototype_compare_func)))
+		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != item->prototype->evaltype)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		item_prototype = item_prototypes->values[index];
-
-		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != item_prototype->evaltype)
-		{
-			if (0 != strcmp(item->formula, item_prototype->formula))
+			if (0 != strcmp(item->formula, item->prototype->formula))
 			{
 				item->formula_orig = item->formula;
-				item->formula = zbx_strdup(NULL, item_prototype->formula);
+				item->formula = zbx_strdup(NULL, item->prototype->formula);
 				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA;
 			}
 
@@ -653,7 +633,7 @@ static void	lld_rule_update_item_formula(const zbx_vector_lld_item_prototype_ptr
 
 		/* update custom LLD filter formula */
 
-		if (SUCCEED != zbx_eval_parse_expression(&ctx, item_prototype->formula,
+		if (SUCCEED != zbx_eval_parse_expression(&ctx, item->prototype->formula,
 				ZBX_EVAL_PARSE_LLD_FILTER_EXPRESSION, &error))
 		{
 			*info = zbx_strdcatf(*info, "Cannot parse LLD filter expression for item \"%s\": %s.\n",
@@ -729,39 +709,30 @@ static void	lld_rule_update_item_formula(const zbx_vector_lld_item_prototype_ptr
  * Purpose: update existing LLD rule filters and creates new ones based       *
  *          on rule prototypes.                                               *
  *                                                                            *
- * Parameters: item_prototypes - [IN]                                         *
- *             items           - [IN/OUT] sorted list of items                *
+ * Parameters: items           - [IN/OUT] sorted list of items                *
  *             info            - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_filters_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, char **info)
+void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
-		zbx_lld_item_full_t		*item = items->values[i];
-		int				index;
-		zbx_lld_item_prototype_t	item_prototype_local;
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		item_prototype_local.itemid = item->parent_itemid;
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
-		}
 
-		zbx_sync_rowset_merge(&item->filters, &item_prototypes->values[index]->filters);
+
+		zbx_sync_rowset_merge(&item->filters, &item->prototype->filters);
 	}
 
 	lld_rule_filters_set_ids(items);
-	lld_rule_update_item_formula(item_prototypes, items, info);
+	lld_rule_update_item_formula(items, info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -775,7 +746,7 @@ static void	lld_rule_filters_make(const zbx_vector_lld_item_prototype_ptr_t *ite
  *             host_locked - [IN/OUT] host record is locked                   *
  *                                                                            *
  ******************************************************************************/
-static int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked)
+int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked)
 {
 	int			ret = SUCCEED, new_num = 0, update_num = 0, delete_num = 0;
 	zbx_lld_item_full_t	*item;
@@ -793,6 +764,9 @@ static int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_p
 		item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
 
 		for (int j = 0; j < item->filters.rows.values_num; j++)
@@ -1636,7 +1610,7 @@ static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *
  *             host_locked - [IN/OUT] host record is locked                   *
  *                                                                            *
  ******************************************************************************/
-static int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked)
+int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked)
 {
 	int			ret = SUCCEED, new_num = 0, update_num = 0, delete_num = 0;
 	zbx_lld_item_full_t	*item;
@@ -1659,6 +1633,9 @@ static int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_ful
 		item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
 
 		for (int j = 0; j < item->overrides.rows.values_num; j++)
@@ -2338,44 +2315,30 @@ out:
  *                                                                            *
  * Purpose: update LLD rule override formulas and operation IDs               *
  *                                                                            *
- * Parameters: item_prototypes - [IN] vector of LLD rule prototypes           *
- *             items           - [IN/OUT] vector of LLD items to update       *
+ * Parameters: items           - [IN/OUT] vector of LLD items to update       *
  *             info            - [OUT] error message if update fails          *
  *                                                                            *
  * Comments: Replaces prototype references with actual LLD rule data in       *
  *           overrides.                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_update_overrides(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, char **info)
+static void	lld_rule_update_overrides(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
 	for (int i = 0; i < items->values_num; i++)
 	{
-		zbx_lld_item_full_t		*item = items->values[i];
-		int				index;
-		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		item_prototype_local.itemid = item->parent_itemid;
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		item_prototype = item_prototypes->values[index];
-
 		for (int j = 0; j < item->overrides.rows.values_num; j++)
 		{
-			zbx_sync_row_t	*src_row, *dst_row;
+			zbx_sync_row_t		*dst_row;
+			const zbx_sync_row_t	*src_row;
 
 			dst_row = item->overrides.rows.values[j];
 
-			if (NULL == (src_row = zbx_sync_rowset_search_by_id(&item_prototype->overrides,
+			if (NULL == (src_row = zbx_sync_rowset_search_by_id(&item->prototype->overrides,
 					dst_row->parent_rowid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -2397,43 +2360,31 @@ static void	lld_rule_update_overrides(const zbx_vector_lld_item_prototype_ptr_t 
  * Purpose: updates existing LLD rule overrides and creates new ones based    *
  *          on rule prototypes.                                               *
  *                                                                            *
- * Parameters: item_prototypes - [IN]                                         *
- *             items           - [IN/OUT] sorted list of items                *
+ * Parameters: items           - [IN/OUT] sorted list of items                *
  *             info            - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_overrides_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, char **info)
+void	lld_rule_overrides_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
-		zbx_lld_item_full_t		*item = items->values[i];
-		int				index;
-		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		item_prototype_local.itemid = item->parent_itemid;
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
-		}
 
-		item_prototype = item_prototypes->values[index];
+		zbx_sync_rowset_merge(&item->overrides, &item->prototype->overrides);
 
-		zbx_sync_rowset_merge(&item->overrides, &item_prototype->overrides);
-
-		for (int j = 0; j < item_prototype->overrides.rows.values_num; j++)
+		for (int j = 0; j < item->prototype->overrides.rows.values_num; j++)
 		{
 			zbx_sync_row_t	*dst, *src;
 
-			src = item_prototype->overrides.rows.values[j];
+			src = item->prototype->overrides.rows.values[j];
 
 			if (NULL == (dst = zbx_sync_rowset_search_by_parent(&item->overrides, src->rowid)))
 			{
@@ -2445,14 +2396,14 @@ static void	lld_rule_overrides_make(const zbx_vector_lld_item_prototype_ptr_t *i
 	}
 
 	lld_rule_overrides_set_ids(items);
-	lld_rule_update_overrides(item_prototypes, items, info);
+	lld_rule_update_overrides(items, info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: fetch LLD rule prototype macro paths from database             *
+ * Purpose: fetch LLD rule prototype macro paths from database                *
  *                                                                            *
  * Parameters: item_prototypes - [IN/OUT] vector of LLD rule prototypes       *
  *             protoids        - [IN] vector of prototype IDs to fetch        *
@@ -2850,6 +2801,9 @@ static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *ite
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
+		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+			continue;
+
 		index_local.lld_row = item->lld_row;
 		if (NULL == (index = (zbx_lld_row_itemids_t *)zbx_hashset_search(&exported, &index_local)))
 		{
@@ -2876,7 +2830,6 @@ static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *ite
  * Purpose: process nested LLD rules                                          *
  *                                                                            *
  * Parameters: hostid          - [IN] host identifier                         *
- *             item_prototypes - [IN] vector of LLD item prototypes           *
  *             items           - [IN] vector of discovered LLD items          *
  *                                                                            *
  * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
@@ -2889,22 +2842,9 @@ static void	lld_rule_process_nested_rules(zbx_uint64_t hostid,
 	for (int i = 0; i < items->values_num; i++)
 	{
 		const zbx_lld_item_full_t	*item = items->values[i];
-		zbx_lld_item_prototype_t	item_prototype_local, *item_prototype;
-		int				index;
 
-		item_prototype_local.itemid = item->parent_itemid;
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &item_prototype_local,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		item_prototype = item_prototypes->values[index];
-
-		if (ITEM_TYPE_NESTED_LLD != item_prototype->type ||
-				0 == (item_prototype->dflags & ZBX_FLAG_DISCOVERY_RULE))
+		if (ITEM_TYPE_NESTED_LLD != item->prototype->type ||
+				0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 		{
 			continue;
 		}
@@ -2931,99 +2871,49 @@ static void	lld_rule_process_nested_rules(zbx_uint64_t hostid,
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
-		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		zbx_hashset_t *rule_index)
+int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
+		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, zbx_hashset_t *items_index)
 {
-	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
-	zbx_hashset_t				items_index;
-	int					ret = SUCCEED, host_record_is_locked = 0;
-	zbx_vector_lld_item_full_ptr_t		items;
-	zbx_hashset_t				prototype_rules;
-	zbx_hashset_iter_t			iter;
+	int				ret = SUCCEED;
+	zbx_hashset_t			prototype_rules;
+	zbx_hashset_iter_t		iter;
+	zbx_vector_lld_row_ptr_t	lld_rows_copy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_lld_item_prototype_ptr_create(&item_prototypes);
-
-	lld_item_prototypes_get(lld_ruleid, &item_prototypes, ZBX_FLAG_DISCOVERY_RULE);
-
-	if (0 == item_prototypes.values_num)
-		goto out;
-
-	zbx_vector_lld_item_full_ptr_create(&items);
-	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
-			lld_item_index_compare_func);
-	zbx_hashset_create_ext(&prototype_rules, item_prototypes.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create_ext(&prototype_rules, item_prototypes->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, lld_prototype_items_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items, ZBX_FLAG_DISCOVERY_RULE);
-	zbx_db_commit();
+	/* create copy of lld_rows to leave original item_links untouched */
 
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "LLD rule prototypes:");
-
-		for (int i = 0; i < item_prototypes.values_num; i++)
-			lld_item_prototype_dump(item_prototypes.values[i]);
-	}
-
-	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
-	lld_items_preproc_make(&item_prototypes, &items);
-	lld_items_param_make(&item_prototypes, &items, error);
-	lld_rule_macro_paths_make(&item_prototypes, &items);
-	lld_rule_filters_make(&item_prototypes, &items, error);
-	lld_rule_overrides_make(&item_prototypes, &items, error);
-
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-	{
-		for (int i = 0; i < items.values_num; i++)
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "discovered item " ZBX_FS_UI64, items.values[i]->itemid);
-
-			lld_override_dump(&items.values[i]->overrides);
-		}
-	}
-
-	lld_items_validate(hostid, &items, error);
-
-	zbx_db_begin();
-
-	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
-			ZBX_FLAG_DISCOVERY_RULE, rule_index) &&
-			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_rule_macro_paths_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_rule_filters_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_items_overrides_save(hostid, &items, &host_record_is_locked))
-	{
-		if (ZBX_DB_OK != zbx_db_commit())
-		{
-			ret = FAIL;
-			goto clean;
-		}
-	}
-	else
-	{
-		zbx_db_rollback();
-		goto clean;
-	}
-
-	lld_rule_export_lld_macros(&items);
-	lld_rule_process_nested_rules(hostid, &item_prototypes, &items);
-
-	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
+	zbx_vector_lld_row_ptr_create(&lld_rows_copy);
+	zbx_vector_lld_row_ptr_reserve(&lld_rows_copy, lld_rows->values_num);
 
 	for (int i = 0; i < lld_rows->values_num; i++)
-		zbx_vector_lld_item_link_ptr_clear_ext(&lld_rows->values[i]->item_links, lld_item_link_free);
+	{
+		zbx_lld_row_t		*copy;
+		const zbx_lld_row_t	*lld_row = lld_rows->values[i];
+
+		copy = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
+		copy->data = lld_row->data;
+		zbx_vector_lld_item_link_ptr_create(&copy->item_links);
+		zbx_vector_lld_override_ptr_create(&copy->overrides);
+		zbx_vector_lld_override_ptr_append_array(&copy->overrides, lld_row->overrides.values,
+				lld_row->overrides.values_num);
+
+		zbx_vector_lld_row_ptr_append(&lld_rows_copy, copy);
+	}
+
+	lld_rule_export_lld_macros(items);
+	lld_rule_process_nested_rules(hostid, item_prototypes, items);
 
 	/* prepare remapping of prototype ids to lld rule ids for discovered item prototypes */
 
 	zbx_lld_item_index_t	*item_index;
 
-	zbx_hashset_iter_reset(&items_index, &iter);
+	zbx_hashset_iter_reset(items_index, &iter);
 	while (NULL != (item_index = (zbx_lld_item_index_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_lld_prototype_rules_t	prules_local, *prules;
@@ -3051,37 +2941,40 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	zbx_lld_lifetime_t	proto_enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
 
-	for (int i = 0; i < item_prototypes.values_num; i++)
+	for (int i = 0; i < item_prototypes->values_num; i++)
 	{
 		zbx_lld_prototype_rules_t	prules_local, *prules;
 		zbx_hashset_t			*proto_rule_index;
-		zbx_lld_item_prototype_t	*item_prototype = item_prototypes.values[i];
+		zbx_lld_item_prototype_t	*item_prototype = item_prototypes->values[i];
 
-		prules_local.itemid = item_prototypes.values[i]->itemid;
+		if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+			continue;
+
+		prules_local.itemid = item_prototype->itemid;
 		if (NULL != (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_search(&prototype_rules, &prules_local)))
 			proto_rule_index = &prules->rule_index;
 		else
 			proto_rule_index = NULL;
 
-		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  lld_rows, error, lifetime,
+		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &lld_rows_copy, error, lifetime,
 				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
-			goto clean;
+			goto out;
 		}
 
-		lld_item_links_sort(lld_rows);
+		lld_item_links_sort(&lld_rows_copy);
 
-		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, lld_rows, error, lifetime,
+		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, &lld_rows_copy, error, lifetime,
 				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 					" processing lld rule");
-			goto clean;
+			goto out;
 		}
 
-		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, lld_rows, error, lifetime,
+		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, &lld_rows_copy, error, lifetime,
 				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
@@ -3089,30 +2982,16 @@ int	lld_update_rules(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 			goto out;
 		}
 
-		lld_update_hosts(item_prototype->itemid, lld_rows, error, lifetime, &proto_enabled_lifetime,
+		lld_update_hosts(item_prototype->itemid, &lld_rows_copy, error, lifetime, &proto_enabled_lifetime,
 				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index);
-
-		if (SUCCEED != lld_update_rules(hostid, item_prototype->itemid, lld_rows, error, lifetime,
-				&proto_enabled_lifetime, lastcheck, proto_rule_index))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add lld rule because parent host was removed while"
-					" processing lld rule");
-			goto out;
-		}
 	}
 
 	ret = SUCCEED;
-clean:
-	zbx_hashset_destroy(&prototype_rules);
-
-	zbx_hashset_destroy(&items_index);
-
-	zbx_vector_lld_item_full_ptr_clear_ext(&items, lld_item_full_free);
-	zbx_vector_lld_item_full_ptr_destroy(&items);
-
-	zbx_vector_lld_item_prototype_ptr_clear_ext(&item_prototypes, lld_item_prototype_free);
 out:
-	zbx_vector_lld_item_prototype_ptr_destroy(&item_prototypes);
+	zbx_vector_lld_row_ptr_clear_ext(&lld_rows_copy, lld_row_free);
+	zbx_vector_lld_row_ptr_destroy(&lld_rows_copy);
+
+	zbx_hashset_destroy(&prototype_rules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

@@ -976,7 +976,7 @@ void	lld_item_link_free(zbx_lld_item_link_t *item_link)
 	zbx_free(item_link);
 }
 
-static void	lld_row_free(zbx_lld_row_t *lld_row)
+void	lld_row_free(zbx_lld_row_t *lld_row)
 {
 	zbx_vector_lld_item_link_ptr_clear_ext(&lld_row->item_links, lld_item_link_free);
 	zbx_vector_lld_item_link_ptr_destroy(&lld_row->item_links);
@@ -1125,14 +1125,6 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now, ZBX_FLAG_DISCOVERY_NORMAL,
 			NULL);
-
-	if (SUCCEED != lld_update_rules(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
-			NULL))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add lld rule because parent host was removed while"
-				" processing lld rule");
-		goto out;
-	}
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
