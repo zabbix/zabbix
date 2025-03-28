@@ -195,8 +195,16 @@ class CControllerGraphUpdate extends CController {
 
 		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
-		foreach ($validator->getAllErrors() as $error) {
-			error($error);
+		foreach (['yaxismin', 'yaxismax'] as $field) {
+			if ($this->hasInput($field)) {
+				$value = $this->getInput($field);
+
+				if ($value !== '' && !is_numeric($value)) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('a number is expected')));
+
+					return false;
+				}
+			}
 		}
 
 		return !$validator->isErrorFatal() && !$validator->isError();
@@ -204,15 +212,22 @@ class CControllerGraphUpdate extends CController {
 
 	private function validatePercentFields(): bool {
 		foreach (['percent_left', 'percent_right'] as $field) {
-			if ($this->hasInput($field)
-					&& !CGraphHelper::validateNumberRangeWithPrecision($this->getInput($field), 0, 100, 4)) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', $field,
-					_s('value must be between "%1$s" and "%2$s", and have no more than "%3$s" digits after the decimal point',
-						'0', '100', '4'
-					)
-				));
+			if ($this->hasInput($field)) {
+				if (!is_numeric($this->getInput($field))) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('a number is expected')));
 
-				return false;
+					return false;
+				}
+
+				if (!CGraphHelper::validateNumberRangeWithPrecision($this->getInput($field), 0, 100, 4)) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', $field,
+						_s('value must be between "%1$s" and "%2$s", and have no more than "%3$s" digits after the decimal point',
+							'0', '100', '4'
+						)
+					));
+
+					return false;
+				}
 			}
 		}
 
