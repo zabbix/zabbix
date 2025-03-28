@@ -219,7 +219,7 @@ $yaxis_min_itemid = (new CDiv(
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 $yaxis_min_item_prototpye = (new CDiv(
-	(new CButton('yaxis_main_prototype', _('Select prototype')))
+	(new CButton('yaxis_min_prototype', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->addClass('js-item-prototype-select')
 		->setAttribute('data-dstfld1', 'ymin_itemid')
