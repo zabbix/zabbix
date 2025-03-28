@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "tag_cache.h"
 #include "zbxdbwrap.h"
 
 void	zbx_db_save_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
@@ -95,7 +96,7 @@ clean:
 
 int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
 {
-	zbx_vector_uint64_t	templateids, hostids;
+	zbx_vector_uint64_t	templateids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_db_insert_t		db_insert_host_tag_cache;
@@ -105,14 +106,13 @@ int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_tem
 
 	zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid", "tag_hostid", (char *)NULL);
 
-	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&templateids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"with recursive cte as ( select h0.templateid, h0.hostid from hosts_templates h0 "
 				"union all select h1.templateid, c.hostid from cte c "
 				"join hosts_templates h1 on c.templateid=h1.hostid) "
-				"select hostid,templateid from cte where");
+				"select templateid from cte where");
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", lnk_templateids->values,
 			lnk_templateids->values_num);
@@ -123,11 +123,9 @@ int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_tem
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_uint64_t	hostid, templateid;
+		zbx_uint64_t	templateid;
 
-		ZBX_STR2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(templateid, row[1]);
-		zbx_vector_uint64_append(&hostids, hostid);
+		ZBX_STR2UINT64(templateid, row[0]);
 		zbx_vector_uint64_append(&templateids, templateid);
 	}
 
@@ -142,7 +140,6 @@ int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_tem
 	zbx_db_insert_execute(&db_insert_host_tag_cache);
 	zbx_db_insert_clean(&db_insert_host_tag_cache);
 
-	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&templateids);
 	zbx_free(sql);
 
