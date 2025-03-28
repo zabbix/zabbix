@@ -5011,6 +5011,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
+	zbx_vector_uint64_t new_httptestids;
+	zbx_vector_uint64_create(&new_httptestids);
+
 	if (0 == httptests->values_num)
 		return;
 
@@ -5233,6 +5236,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 
 		if (0 == httptest->httptestid)
 		{
+			zbx_vector_uint64_append(&new_httptestids, httptestid);
 			httptest->httptestid = httptestid++;
 
 			zbx_audit_httptest_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, httptest->httptestid,
@@ -5486,6 +5490,33 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	{
 		zbx_db_insert_execute(&db_insert_htest);
 		zbx_db_insert_clean(&db_insert_htest);
+
+		zbx_db_execute_multiple_query(
+				"insert into httptest_tag_cache  with recursive cte as ( "
+				"select i0.templateid, i0.httptestid, i0.hostid from httptest i0 "
+				"union all "
+				"select i1.templateid, c.httptestid, c.hostid from cte c "
+				"join httptest i1 on c.templateid=i1.httptestid where i1.templateid is not NULL) "
+				"select cte.httptestid,ii.hostid from cte,httptest ii where "
+				"cte.templateid= ii.httptestid and ",
+				"cte.httptestid", &new_httptestids);
+
+		zbx_db_insert_t	db_insert_httptest_tag_cache_host_itself;
+
+		zbx_db_insert_prepare(&db_insert_httptest_tag_cache_host_itself, "httptest_tag_cache",
+			"httptestid", "tag_hostid",  (char *)NULL);
+
+		for (int i = 0; i < new_httptestids.values_num; i++)
+		{
+			zbx_db_insert_add_values(&db_insert_httptest_tag_cache_host_itself, new_httptestids.values[i],
+					hostid);
+		}
+
+		zbx_db_insert_execute(&db_insert_httptest_tag_cache_host_itself);
+		zbx_db_insert_clean(&db_insert_httptest_tag_cache_host_itself);
+
+
+		zbx_vector_uint64_destroy(&new_httptestids);
 	}
 
 	if (0 != num_httpsteps)
