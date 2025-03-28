@@ -1294,30 +1294,30 @@ class testFormMapProperties extends CWebTest {
 					'urls' => [
 						[
 							'id' => 0,
-							'Name' => 'Host URL',
+							'Name' => '1 Host URL',
 							'URL' => 'http://test1-url@zabbix.com'
 						],
 						[
 							'id' => 1,
-							'Name' => 'Group URL',
+							'Name' => '2 Group URL',
 							'URL' => 'http://test2-url@zabbix.com',
 							'Element' => 'Host group'
 						],
 						[
 							'id' => 2,
-							'Name' => 'Image URL',
+							'Name' => '3 Image URL',
 							'URL' => 'http://test3-url@zabbix.com',
 							'Element' => 'Image'
 						],
 						[
 							'id' => 3,
-							'Name' => 'Map URL',
+							'Name' => '4 Map URL',
 							'URL' => 'http://test4-url@zabbix.com',
 							'Element' => 'Map'
 						],
 						[
 							'id' => 4,
-							'Name' => 'Trigger URL',
+							'Name' => '5 Trigger URL',
 							'URL' => 'http://test5-url@zabbix.com',
 							'Element' => 'Trigger'
 						]
@@ -1345,32 +1345,32 @@ class testFormMapProperties extends CWebTest {
 					],
 					'expected_urls' => [
 						[
-							'id' => 1,
-							'name' => 'Host URL',
+							'id' => 0,
+							'name' => '1 Host URL',
 							'url' => 'http://test1-url@zabbix.com',
 							'element_type' => 0
 						],
 						[
-							'id' => 0,
-							'name' => 'Group URL',
+							'id' => 1,
+							'name' => '2 Group URL',
 							'url' => 'http://test2-url@zabbix.com',
 							'element_type' => 3
 						],
 						[
 							'id' => 2,
-							'name' => 'Image URL',
+							'name' => '3 Image URL',
 							'url' => 'http://test3-url@zabbix.com',
 							'element_type' => 4
 						],
 						[
 							'id' => 3,
-							'name' => 'Map URL',
+							'name' => '4 Map URL',
 							'url' => 'http://test4-url@zabbix.com',
 							'element_type' => 1
 						],
 						[
 							'id' => 4,
-							'name' => 'Trigger URL',
+							'name' => '5 Trigger URL',
 							'url' => 'http://test5-url@zabbix.com',
 							'element_type' => 2
 						]
