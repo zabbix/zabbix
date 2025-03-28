@@ -177,7 +177,7 @@ require_once __DIR__.'/macros/testFormMacrosTemplate.php';
 
 // Maps.
 require_once __DIR__.'/maps/testFormMapConstructor.php';
-require_once __DIR__.'/maps/testFormSysmap.php';
+require_once __DIR__.'/maps/testFormMapProperties.php';
 require_once __DIR__.'/maps/testPageMaps.php';
 
 // Maintenance.
@@ -523,7 +523,7 @@ class SeleniumTests {
 
 		// Maps.
 		$suite->addTestSuite('testFormMapConstructor');
-		$suite->addTestSuite('testFormSysmap');
+		$suite->addTestSuite('testFormMapProperties');
 		$suite->addTestSuite('testPageMaps');
 
 		// Media types.
