@@ -32,7 +32,7 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_SECURITY_NONE.','.SMTP_SECURITY_STARTTLS.','.SMTP_SECURITY_SSL,
 			'smtp_verify_peer' =>		'db media_type.smtp_verify_peer|in 0,1',
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
-			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
+			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH]),
 			'exec_path' =>				'db media_type.exec_path',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
@@ -52,7 +52,13 @@ class CControllerMediatypeUpdate extends CController {
 			'description' =>			'db media_type.description',
 			'message_format' =>			'db media_type.message_format|in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_templates' =>		'array',
-			'provider' => 				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
+			'provider' => 				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders())),
+			'redirection_url' =>		'db media_type_oauth.redirection_url',
+			'client_id' => 				'db media_type_oauth.client_id',
+			'client_secret' =>			'db media_type_oauth.client_secret',
+			'authorization_url' =>		'db media_type_oauth.authorization_url',
+			'token_url' =>				'db media_type_oauth.token_url',
+			'token_status' =>			'db media_type_oauth.token_status|in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
 		];
 
 		$ret = $this->validateInput($fields);
@@ -134,6 +140,13 @@ class CControllerMediatypeUpdate extends CController {
 				}
 				elseif ($this->hasInput('smtp_username')) {
 					$mediatype['username'] = $this->getInput('smtp_username');
+				}
+
+				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+					$this->getInputs($mediatype, [
+						'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
+						'token_status'
+					]);
 				}
 				break;
 

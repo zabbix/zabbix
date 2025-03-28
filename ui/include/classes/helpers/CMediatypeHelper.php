@@ -413,10 +413,10 @@ class CMediatypeHelper {
 	 */
 	public static function getOauthDefaultsByProvider(): array {
 		$redirection_url = '';
-		$base_url = CSettingsHelper::get(CSettingsHelper::URL);
+		$base_url = rtrim(CSettingsHelper::get(CSettingsHelper::URL), '/');
 
 		if ($base_url !== '') {
-			$url = new CUrl($base_url);
+			$url = new CUrl($base_url.'/zabbix.php');
 			$url->setArgument('action', 'oauth.authorize');
 			$redirection_url = $url->getUrl();
 		}

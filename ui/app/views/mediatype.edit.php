@@ -146,33 +146,30 @@ $mediatype_form_grid = (new CFormGrid())
 	]);
 
 $oauth_status = [];
+$oauth_fields = [];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-	// TODO: exclude oauth[client_secret] from form variables!
-	$oauth_status = array_merge($oauth_status, [
-		new CVar('oauth[redirection_url]', $data['oauth']['redirection_url']),
-		new CVar('oauth[client_id]', $data['oauth']['client_id']),
-		new CVar('oauth[client_secret]', $data['oauth']['client_secret']),
-		new CVar('oauth[authorization_url]', $data['oauth']['authorization_url']),
-		new CVar('oauth[token_url]', $data['oauth']['token_url']),
-		new CVar('oauth[token_status]', $data['oauth']['token_status']),
-	]);
+	$oauth_fields = [
+		new CVar('redirection_url', $data['redirection_url']),
+		new CVar('client_id', $data['client_id']),
+		new CVar('authorization_url', $data['authorization_url']),
+		new CVar('token_url', $data['token_url']),
+		new CVar('tokens_status', $data['tokens_status'])
+	];
 
-	if ($data['oauth']['access_token_updated'] > 0) {
-		$oauth_status = array_merge($oauth_status, [
-			italic(_s('Configured %1$s ago', zbx_date2age($data['oauth']['access_token_updated']), time())),
+	if ($data['access_token_updated'] > 0) {
+		$oauth_status[] = [
+			italic(_s('Configured %1$s ago', zbx_date2age($data['access_token_updated']), time())),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-		]);
+		];
 	}
 
-	if (!($data['oauth']['token_status'] & OAUTH_REFRESH_TOKEN_VALID)) {
-		$oauth_status = array_merge($oauth_status, [
+	if (!($data['tokens_status'] & OAUTH_REFRESH_TOKEN_VALID)) {
+		$oauth_status[] = [
 			makeErrorIcon(_('Refresh token is invalid or outdated.')),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-		]);
+		];
 	}
-
-	$oauth_status = (new CSpan($oauth_status))->setId('js-oauth-status');
 }
 
 $mediatype_form_grid->addItem([
@@ -180,11 +177,12 @@ $mediatype_form_grid->addItem([
 		->setId('oauth-token-label')
 		->setAsteriskMark(),
 	(new CFormField([
-		$oauth_status,
+		$oauth_status ? (new CSpan($oauth_status))->setId('js-oauth-status') : null,
 		(new CButtonLink(_('Configure')))
 			->setId('js-oauth-configure')
 			->setEnabled(!array_key_exists('curl_error', $data)),
-		array_key_exists('curl_error', $data) ? makeErrorIcon($data['curl_error']) : null
+		array_key_exists('curl_error', $data) ? makeErrorIcon($data['curl_error']) : null,
+		(new CSpan($oauth_fields))->setId('js-oauth-fields')
 	]))->setId('oauth-token-field')
 ]);
 
@@ -520,10 +518,11 @@ $form
 	->addItem($parameters_exec_template)
 	->addItem(
 		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
-			'mediatype' => array_diff_key($data, array_flip(['oauth'])),
+			'mediatype' => $data,
 			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
 			'smtp_server_default' => $email_defaults['smtp_server'],
-			'smtp_email_default' =>  $email_defaults['smtp_email']
+			'smtp_email_default' =>  $email_defaults['smtp_email'],
+			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider()
 		]).');'))->setOnDocumentReady()
 	);
 

@@ -21,7 +21,7 @@
 
 window.mediatype_edit_popup = new class {
 
-	init({mediatype, message_templates, smtp_server_default, smtp_email_default}) {
+	init({mediatype, message_templates, smtp_server_default, smtp_email_default, oauth_defaults_by_provider}) {
 		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -32,6 +32,7 @@ window.mediatype_edit_popup = new class {
 		this.message_templates = Object.fromEntries(message_templates.map((obj, index) => [index, { ...obj }]));
 		this.smtp_server_default = smtp_server_default;
 		this.smtp_email_default = smtp_email_default;
+		this.oauth_defaults_by_provider = oauth_defaults_by_provider;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'mediatype.list');
@@ -100,28 +101,67 @@ window.mediatype_edit_popup = new class {
 		}
 
 		this.form.querySelector('#js-oauth-configure').addEventListener('click', () => {
+			const oauth_fields = ['redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
+				'tokens_status'
+			];
 			const mediatype = getFormFields(this.form);
+			const mediatype_oauth = Object.fromEntries(
+				Object.entries(mediatype).filter(([key]) => oauth_fields.includes(key))
+			);
 			let data = {
-				...mediatype.oauth,
-				update: 0,
+				update: 'tokens_status' in mediatype ? 1 : 0,
 				advanced_form: mediatype.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
 			};
 
 			if ('mediatypeid' in mediatype) {
-				data.update = 'oauth' in mediatype ? 1 : 0;
 				data.mediatypeid = mediatype.mediatypeid;
 			}
 
-			if (!data.update) {
-				data = {...data, ...this.mediatype.provider_oauth_defaults[mediatype.provider]}
+			if (!Object.keys(mediatype_oauth).length) {
+				data = {
+					...data,
+					...this.oauth_defaults_by_provider[mediatype.provider]
+				};
 			}
 
-			PopUp('oauth.edit', data, {dialogue_class: 'modal-popup-generic'});
+			const overlay = PopUp('oauth.edit', data, {dialogue_class: 'modal-popup-generic'});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				const oauth = e.detail;
+				const oauth_fields_container = this.form.querySelector('#js-oauth-fields');
+
+				oauth_fields_container.innerHTML = '';
+
+				for (const [name, value] of Object.entries(oauth)) {
+					const input = document.createElement('input');
+
+					input.name = name;
+					input.type = 'hidden';
+					input.value = value;
+
+					oauth_fields_container.append(input);
+				}
+			});
+		});
+
+		this.form.querySelector('#smtp_authentication').addEventListener('change', (e) => {
+			if (e.target.value === undefined || e.target.value == this.mediatype.smtp_authentication) {
+				return;
+			}
+
+			this.mediatype.smtp_authentication = e.target.value;
+
+			if (e.target.value == <?= SMTP_AUTHENTICATION_OAUTH ?>) {
+				this.form.querySelector('#js-oauth-status')?.remove();
+				this.form.querySelector('#js-oauth-fields').innerHTML = '';
+			}
 		});
 	}
 
 	clone({title, buttons}) {
 		this.mediatypeid = null;
+		this.form.querySelector('#js-oauth-status')?.remove();
+		this.form.querySelector('#js-oauth-fields').innerHTML = '';
 
 		this.#toggleChangePasswordButton();
 		this.overlay.setProperties({title, buttons});
@@ -580,6 +620,7 @@ window.mediatype_edit_popup = new class {
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 			).checked = true;
 			this.form.querySelector('#js-oauth-status')?.remove();
+			this.form.querySelector('#js-oauth-fields').innerHTML = '';
 		}
 
 		const authentication = this.form.querySelector('#smtp_authentication');

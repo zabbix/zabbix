@@ -54,6 +54,7 @@ window.oauth_edit_popup = new class {
 		const oauth = getFormFields(this.form);
 		const width = 500;
 		const height = 600;
+
 		this.oauth_popup = window.open(
 			this.#getOauthPopupUrl(oauth),
 			'oauthpopup',
