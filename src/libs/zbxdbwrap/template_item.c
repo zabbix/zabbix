@@ -1308,7 +1308,7 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 			"select i.itemid,r.itemid"
 			" from items i,item_discovery id,items r"
 			" where i.templateid=id.itemid"
-				" and id.lldrule_itemid=r.templateid"
+				" and id.lldruleid=r.templateid"
 				" and r.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
@@ -1333,7 +1333,7 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert, "item_discovery", "itemdiscoveryid", "itemid",
-					"lldrule_itemid", (char *)NULL);
+					"lldruleid", (char *)NULL);
 
 	for (i = 0; i < prototypes.values_num; i++)
 	{

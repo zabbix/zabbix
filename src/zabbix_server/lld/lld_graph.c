@@ -1584,7 +1584,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
 				" and i.itemid=id.itemid"
-				" and id.lldrule_itemid=" ZBX_FS_UI64,
+				" and id.lldruleid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))

@@ -2760,7 +2760,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	if (0 == item->itemid)
 	{
 		const zbx_lld_item_prototype_t	*item_prototype = item_prototypes->values[index];
-		zbx_uint64_t 			lldrule_itemid = 0, parent_itemid = item->parent_itemid;
+		zbx_uint64_t 			lldruleid = 0, parent_itemid = item->parent_itemid;
 
 		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
@@ -2788,11 +2788,11 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 			row_ruleid_local.lld_row = item->lld_row;
 			if (NULL != (row_ruleid = zbx_hashset_search(rule_index, &row_ruleid_local)))
-				lldrule_itemid = row_ruleid->ruleid;
+				lldruleid = row_ruleid->ruleid;
 		}
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
-				parent_itemid, item_prototype->key, item->lastcheck, lldrule_itemid);
+				parent_itemid, item_prototype->key, item->lastcheck, lldruleid);
 
 		if (NULL != db_insert_irtdata)
 			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
@@ -3445,7 +3445,7 @@ int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_
 				"evaltype", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
-				"parent_itemid", "key_", "lastcheck", "lldrule_itemid", (char *)NULL);
+				"parent_itemid", "key_", "lastcheck", "lldruleid", (char *)NULL);
 
 		if (NULL != pdb_insert_irtdata)
 			zbx_db_insert_prepare(pdb_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
@@ -4189,7 +4189,7 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 				"i.lifetime,i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime_type,i.evaltype"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
-				" and id.lldrule_itemid=" ZBX_FS_UI64
+				" and id.lldruleid=" ZBX_FS_UI64
 				" and i.flags&%d=%d",
 			lld_ruleid, ZBX_FLAG_DISCOVERY_RULE, dflags & ZBX_FLAG_DISCOVERY_RULE);
 

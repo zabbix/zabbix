@@ -400,7 +400,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid,
 				" where tg.triggerid=f.triggerid"
 					" and f.itemid=i.itemid"
 					" and i.itemid=id.itemid"
-					" and id.lldrule_itemid=" ZBX_FS_UI64 ")",
+					" and id.lldruleid=" ZBX_FS_UI64 ")",
 			lld_ruleid);
 
 	/* run through trigger prototypes */

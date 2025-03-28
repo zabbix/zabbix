@@ -165,8 +165,8 @@ static void	lld_fetch_exported_macros(const zbx_vector_uint64_t *ruleids, zbx_ha
 		zbx_hashset_insert(lld_rules, &rule_macros_local, sizeof(rule_macros_local));
 	}
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_macroid,itemid,name,value from lld_macro where");
-
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_macro_exportid,itemid,lld_macro,value"
+			" from lld_macro_export where");
 	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "itemid", ruleids);
 
 	while (NULL != (row = zbx_db_large_query_fetch(&query)))
