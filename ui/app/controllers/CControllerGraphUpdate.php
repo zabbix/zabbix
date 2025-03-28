@@ -195,6 +195,10 @@ class CControllerGraphUpdate extends CController {
 
 		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
+		foreach ($validator->getAllErrors() as $error) {
+			error($error);
+		}
+
 		foreach (['yaxismin', 'yaxismax'] as $field) {
 			if ($this->hasInput($field)) {
 				$value = $this->getInput($field);
