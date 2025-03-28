@@ -561,6 +561,11 @@ svg a {
   border-radius: 50%;
   background: #23d545; }
 
+.svg-pie-chart-hintbox .svg-pie-chart-hintbox-color, .map-link-hintbox-row .map-link-hintbox-row-color-box {
+  width: 10px;
+  height: 10px;
+  margin-right: 10px; }
+
 .list-table thead th .text-vertical:lang(ja), .list-table thead th .text-vertical:lang(ko), .list-table thead th .text-vertical:lang(zh) {
   transform: unset; }
 
@@ -3216,12 +3221,11 @@ output {
   align-items: center;
   white-space: pre;
   line-height: 18px; }
-  .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity .navigation-tree-node-info-problems-hint-severity-color {
-    margin-right: 10px; }
 
 .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color {
   width: 16px;
-  height: 16px; }
+  height: 16px;
+  margin-right: 10px; }
   .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color::before {
     width: 16px;
     height: 16px;
@@ -3757,10 +3761,6 @@ section {
   display: flex;
   align-items: center;
   white-space: pre; }
-  .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color {
-    width: 10px;
-    height: 10px;
-    margin-right: 10px; }
 
 .svg-honeycomb .svg-honeycomb-container {
   --color: #eeeeee;
@@ -7386,6 +7386,13 @@ svg {
     margin: 0;
     padding: 0;
     border: 0; }
+
+.map-link-hintbox-row {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+  line-height: 18px;
+  min-height: 18px; }
 
 .lld-overrides-operations-table,
 .confirmation-msg {
