@@ -21,10 +21,6 @@
 void	dbupgrade_copy_template_host_prototypes(zbx_uint64_t hostid, int flags, zbx_vector_uint64_t *templateids,
 		zbx_db_insert_t *db_insert)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "COPY: " ZBX_FS_UI64, hostid);
-	for (int i = 0; i < templateids->values_num; i++)
-		zabbix_log(LOG_LEVEL_WARNING, "  " ZBX_FS_UI64, templateids->values[i]);
-
 #if defined(ZABBIX_SERVER)
 	int	audit_context;
 

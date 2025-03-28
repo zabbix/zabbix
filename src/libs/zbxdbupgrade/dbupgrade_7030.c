@@ -393,20 +393,13 @@ static int	DBpatch_7030029(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_uint64_t		last_hostid = 0, hostid, templateid, max_hostid = 0;
+	zbx_uint64_t		last_hostid = 0, hostid, templateid;
 	zbx_vector_uint64_t	templateids;
 	zbx_db_insert_t		db_insert;
-	int			last_flags, ret;
+	int			last_flags;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
-
-	result = zbx_db_select("select max(hostid) from hosts");
-	if (NULL != (row = zbx_db_fetch(result)))
-	{
-		ZBX_DBROW2UINT64(max_hostid, row[0]);
-	}
-	zbx_db_free_result(result);
 
 	zbx_vector_uint64_create(&templateids);
 
@@ -419,8 +412,8 @@ static int	DBpatch_7030029(void)
 					" join hosts h on ht.hostid=h.hostid"
 				" where h.flags=4"
 					" and exists (select null from items i,host_discovery hd"
-						" where i.hostid=ht.templateid"
-							" and hd.parent_itemid=i.itemid)"
+							" where i.hostid=ht.templateid"
+								" and hd.parent_itemid=i.itemid)"
 				" order by hostid");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -450,17 +443,13 @@ static int	DBpatch_7030029(void)
 		if (0 != templateids.values_num)
 			dbupgrade_copy_template_host_prototypes(last_hostid, last_flags, &templateids, &db_insert);
 
-		/* 1 - ZBX_PROTOTYPE_NO_DISCOVER, 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-		ret = zbx_db_execute("update hosts set discover=1 where hostid>" ZBX_FS_UI64 " and flags&2",
-				max_hostid);
-
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
 
 	zbx_vector_uint64_destroy(&templateids);
 
-	return ZBX_DB_OK > ret ? FAIL : SUCCEED;
+	return SUCCEED;
 }
 
 #endif
