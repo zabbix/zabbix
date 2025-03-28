@@ -996,6 +996,27 @@ dependent:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	save_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
+{
+	zbx_db_insert_t	db_insert_item_tag_cache_host_itself;
+
+	zbx_db_execute_multiple_query("insert into item_tag_cache with recursive cte as "
+			"( select i0.templateid, i0.itemid, i0.hostid from items i0 "
+			"union all select i1.templateid, c.itemid, c.hostid from cte c "
+			"join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL) "
+			"select cte.itemid,ii.hostid from cte,items ii "
+			"where cte.templateid= ii.itemid and ", "cte.itemid", new_itemids);
+
+	zbx_db_insert_prepare(&db_insert_item_tag_cache_host_itself, "item_tag_cache",
+			"itemid", "tag_hostid",  (char *)NULL);
+
+	for (int i = 0; i < new_itemids->values_num; i++)
+		zbx_db_insert_add_values(&db_insert_item_tag_cache_host_itself, new_itemids->values[i], hostid);
+
+	zbx_db_insert_execute(&db_insert_item_tag_cache_host_itself);
+	zbx_db_insert_clean(&db_insert_item_tag_cache_host_itself);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: saves template items to target host in database                   *
@@ -1014,15 +1035,13 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	zbx_uint64_t		itemid = 0;
 	zbx_db_insert_t		db_insert_items, db_insert_irtdata, db_insert_irtname;
 	zbx_template_item_t	*item;
-	zbx_vector_uint64_t	itemids_value_type_diff;
+	zbx_vector_uint64_t	itemids_value_type_diff, new_itemids;
 
 	if (0 == items->values_num)
 		return;
 
-	zbx_vector_uint64_t new_itemids;
-	zbx_vector_uint64_create(&new_itemids);
-
 	zbx_vector_uint64_create(&itemids_value_type_diff);
+	zbx_vector_uint64_create(&new_itemids);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -1089,26 +1108,9 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		zbx_db_insert_clean(&db_insert_irtname);
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
+
+		save_item_tag_cache(hostid, &new_itemids);
 	}
-
-	zbx_db_execute_multiple_query("insert into item_tag_cache with recursive cte as "
-			"( select i0.templateid, i0.itemid, i0.hostid from items i0 "
-			"union all select i1.templateid, c.itemid, c.hostid from cte c "
-			"join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL) "
-			"select cte.itemid,ii.hostid from cte,items ii "
-			"where cte.templateid= ii.itemid and ", "cte.itemid", &new_itemids);
-
-	zbx_db_insert_t	db_insert_item_tag_cache_host_itself;
-	zbx_db_insert_prepare(&db_insert_item_tag_cache_host_itself, "item_tag_cache",
-			"itemid", "tag_hostid",  (char *)NULL);
-
-	for (int i = 0; i < new_itemids.values_num; i++)
-		zbx_db_insert_add_values(&db_insert_item_tag_cache_host_itself, new_itemids.values[i], hostid);
-
-	zbx_db_insert_execute(&db_insert_item_tag_cache_host_itself);
-	zbx_db_insert_clean(&db_insert_item_tag_cache_host_itself);
-
-	zbx_vector_uint64_destroy(&new_itemids);
 
 	if (0 != upd_items)
 	{
@@ -1121,6 +1123,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 	zbx_vector_uint64_destroy(&itemids_value_type_diff);
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zbx_vector_uint64_destroy(&new_itemids);
 }
 
 /******************************************************************************
