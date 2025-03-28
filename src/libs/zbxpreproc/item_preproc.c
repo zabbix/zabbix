@@ -1079,16 +1079,18 @@ out:
  *                                                                            *
  * Purpose: checks error for pattern matching regular expression              *
  *                                                                            *
- * Parameters: value  - [IN] value to process                                 *
- *             params - [IN] operation parameters                             *
- *             error  - [IN/OUT]                                              *
+ * Parameters: value            - [IN] value to process                       *
+ *             params           - [IN] operation parameters                   *
+ *             output_template  - [IN] the output string template             *
+ *             error            - [OUT] matched error using output template   *
  *                                                                            *
  * Return value: FAIL - preprocessing step error                              *
  *               SUCCEED - preprocessing step succeeded, error may contain    *
  *                         extracted error message                            *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error)
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, const char *output_template,
+		char **error)
 {
 #define ZBX_PP_MATCH_TYPE_MATCHES	0
 #define ZBX_PP_MATCH_TYPE_ANY		-1
@@ -1118,8 +1120,8 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 			goto out;
 		}
 
-		if (SUCCEED == zbx_mregexp_sub_precompiled(value->data.str, regex, *error, ZBX_MAX_RECV_DATA_SIZE,
-				&out))
+		if (SUCCEED == zbx_mregexp_sub_precompiled(value->data.str, regex, output_template,
+				ZBX_MAX_RECV_DATA_SIZE, &out))
 		{
 			if (NULL != out)
 			{

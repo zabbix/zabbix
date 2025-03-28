@@ -34,7 +34,7 @@
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
+void	zbx_stats_ext_get_data_server(struct zbx_json *json, const void *arg)
 {
 	zbx_vc_stats_t			vc_stats;
 	zbx_uint64_t			queue_size, connector_queue_size;

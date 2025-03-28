@@ -147,3 +147,33 @@ int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if item value type change would make value unusable.        *
+ *                                                                            *
+ * Return value: if it would, then return SUCCEED                             *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old)
+{
+	if (value_type_new == ITEM_VALUE_TYPE_BIN)
+		return SUCCEED;
+
+	if (value_type_new == ITEM_VALUE_TYPE_UINT64 || value_type_new == ITEM_VALUE_TYPE_FLOAT)
+	{
+		if (value_type_old == ITEM_VALUE_TYPE_UINT64 || value_type_old == ITEM_VALUE_TYPE_FLOAT)
+			return FAIL;
+
+		return SUCCEED;
+	}
+
+	if (value_type_old == ITEM_VALUE_TYPE_TEXT || value_type_old == ITEM_VALUE_TYPE_LOG ||
+			value_type_old == ITEM_VALUE_TYPE_STR)
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}

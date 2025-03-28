@@ -31,6 +31,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_context_t	ctx;
 	zbx_timespec_t		ts, history_ts;
 	zbx_pp_step_t		step;
+	char			*error = NULL;
 
 	ZBX_UNUSED(state);
 
@@ -50,7 +51,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec(&ts);
 
 	act_ret = pp_execute_step(&ctx, NULL, NULL, 0, ITEM_VALUE_TYPE_TEXT, &value, ts, &step, &history_value_in,
-			&history_value_out, &history_ts, get_zbx_config_source_ip());
+			&history_value_out, &history_ts, get_zbx_config_source_ip(), &error);
+
+	zbx_free(error);
 
 	exp_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_int_eq("return value", exp_ret, act_ret);

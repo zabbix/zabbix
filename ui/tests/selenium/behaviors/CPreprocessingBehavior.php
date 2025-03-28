@@ -130,7 +130,7 @@ class CPreprocessingBehavior extends CBehavior {
 				$add->click();
 			}
 
-			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item") and @data-step="'.$rows - 1 .'"]')
+			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
 					->waitUntilPresent()->one();
 
 			foreach ($fields as $field) {

@@ -45,6 +45,7 @@ $options = [
 	'background' => $map_data['background'],
 	'elements' => $map_data['elements'],
 	'links' => $map_data['links'],
+	'duplicated_links' => $map_data['duplicated_links'],
 	'shapes' => $map_data['shapes'],
 	'aria_label' => $map_data['aria_label'],
 	'label_location' => $map_data['label_location'],

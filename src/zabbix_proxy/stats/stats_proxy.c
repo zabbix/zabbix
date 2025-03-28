@@ -30,7 +30,7 @@
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_proxy_stats_ext_get(struct zbx_json *json, const void *arg)
+void	zbx_stats_ext_get_data_proxy(struct zbx_json *json, const void *arg)
 {
 	const zbx_config_comms_args_t	*config_comms = (const zbx_config_comms_args_t *)arg;
 	unsigned int			encryption;

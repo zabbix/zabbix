@@ -50,38 +50,7 @@ class CTriggerManager {
 
 		self::checkUsedInActions($del_triggerids);
 
-		// Remove trigger sysmap elements.
-		$selement_triggerids = [];
-		$selementids = [];
-
-		$db_selement_triggers = DBselect(
-			'SELECT st.selement_triggerid,st.selementid'.
-			' FROM sysmap_element_trigger st'.
-			' WHERE '.dbConditionInt('st.triggerid', $del_triggerids)
-		);
-
-		while ($db_selement_trigger = DBfetch($db_selement_triggers)) {
-			$selement_triggerids[] = $db_selement_trigger['selement_triggerid'];
-			$selementids[$db_selement_trigger['selementid']] = true;
-		}
-
-		if ($selement_triggerids) {
-			DB::delete('sysmap_element_trigger', ['selement_triggerid' => $selement_triggerids]);
-
-			// Remove map elements without triggers.
-			$db_selement_triggers = DBselect(
-				'SELECT DISTINCT st.selementid'.
-				' FROM sysmap_element_trigger st'.
-				' WHERE '.dbConditionInt('st.selementid', array_keys($selementids))
-			);
-			while ($db_selement_trigger = DBfetch($db_selement_triggers)) {
-				unset($selementids[$db_selement_trigger['selementid']]);
-			}
-
-			if ($selementids) {
-				DB::delete('sysmaps_elements', ['selementid' => array_keys($selementids)]);
-			}
-		}
+		API::Map()->unlinkTriggers($del_triggerids);
 
 		// Remove related events.
 		$ins_housekeeper = [];

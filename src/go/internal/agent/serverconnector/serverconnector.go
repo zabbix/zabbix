@@ -51,6 +51,7 @@ type Connector struct {
 	lastActiveCheckErrors      []error
 	lastActiveHbErrors         []error
 	firstActiveChecksRefreshed bool
+	firstActiveChecksLog       bool
 	resultCache                resultcache.ResultCache
 	taskManager                scheduler.Scheduler
 	options                    *agent.AgentOptions
@@ -146,7 +147,8 @@ func ParseServerActive() ([][]string, error) {
 	return addrs, nil
 }
 
-func (c *Connector) refreshActiveChecks() {
+//nolint:gocognit,gocyclo,cyclop,maintidx
+func (c *Connector) refreshActiveChecks() bool {
 	var err error
 
 	a := activeChecksRequest{
@@ -166,14 +168,14 @@ func (c *Connector) refreshActiveChecks() {
 		agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host interface: %s", err)
 
-		return
+		return false
 	}
 
 	if a.HostMetadata, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostMetadata",
 		c.options.HostMetadata, c.options.HostMetadataItem, agent.HostMetadataLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host metadata: %s", err)
 
-		return
+		return false
 	}
 
 	if len(c.options.ListenIP) > 0 {
@@ -191,7 +193,8 @@ func (c *Connector) refreshActiveChecks() {
 	request, err := json.Marshal(&a)
 	if err != nil {
 		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address.Get(), err)
-		return
+
+		return false
 	}
 
 	data, errs, errRead := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
@@ -213,7 +216,7 @@ func (c *Connector) refreshActiveChecks() {
 			c.lastActiveCheckErrors = errs
 		}
 
-		return
+		return false
 	}
 
 	if c.lastActiveCheckErrors != nil {
@@ -234,21 +237,32 @@ func (c *Connector) refreshActiveChecks() {
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.address.Get(), err)
-		return
+
+		return false
 	}
 
 	now := time.Now()
 
 	if response.Response != "success" {
-		if len(response.Info) != 0 {
-			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.address.Get(), response.Info)
-		} else {
-			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address.Get())
+		if !c.firstActiveChecksLog {
+			if response.Info != "" {
+				log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.address.Get(),
+					response.Info)
+			} else {
+				log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address.Get())
+			}
+
+			log.Errf("[%d] active checks on server started to fail", c.clientID)
+			c.firstActiveChecksLog = true
 		}
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
-		return
+
+		return false
+	} else if c.firstActiveChecksLog {
+		log.Errf("[%d] active checks on server are active again", c.clientID)
+		c.firstActiveChecksLog = false
 	}
 
 	if response.HistoryUpload == "disabled" {
@@ -268,46 +282,54 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			parseSuccess = true
 		}
-		return
+
+		return false
 	}
 
 	c.configRevision = response.ConfigRevision
 
 	for i := 0; i < len(response.Data); i++ {
+
 		if len(response.Data[i].Key) == 0 {
 			if response.Data[i].Itemid == 0 {
 				log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing",
 					c.clientID, c.address.Get())
-				return
+
+				return false
 			}
 
 			log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
-			return
+
+			return false
 		}
 
 		if response.Data[i].Itemid == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: itemid is missing for key '%s'",
 				c.clientID, c.address.Get(), response.Data[i].Key)
-			return
+
+			return false
 		}
 
 		if len(response.Data[i].Delay) == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: delay is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
-			return
+
+			return false
 		}
 
 		if response.Data[i].LastLogsize == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: lastlogsize is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
-			return
+
+			return false
 		}
 
 		if response.Data[i].Mtime == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
-			return
+
+			return false
 		}
 	}
 
@@ -315,37 +337,43 @@ func (c *Connector) refreshActiveChecks() {
 		if len(response.Expressions[i].Name) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "name"`,
 				c.clientID, c.address.Get())
-			return
+
+			return false
 		}
 
 		if len(response.Expressions[i].Body) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression"`,
 				c.clientID, c.address.Get())
-			return
+
+			return false
 		}
 
 		if response.Expressions[i].Type == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression_type"`,
 				c.clientID, c.address.Get())
-			return
+
+			return false
 		}
 
 		if response.Expressions[i].Delimiter == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "exp_delimiter"`,
 				c.clientID, c.address.Get())
-			return
+
+			return false
 		}
 
 		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
 				c.clientID, c.address.Get(), *response.Expressions[i].Delimiter)
-			return
+
+			return false
 		}
 
 		if response.Expressions[i].Mode == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "case_sensitive"`,
 				c.clientID, c.address.Get())
-			return
+
+			return false
 		}
 	}
 
@@ -354,6 +382,8 @@ func (c *Connector) refreshActiveChecks() {
 
 	parseSuccess = true
 	c.firstActiveChecksRefreshed = true
+
+	return true
 }
 
 func (c *Connector) sendHeartbeatMsg() {
@@ -399,7 +429,7 @@ func (c *Connector) sendHeartbeatMsg() {
 }
 
 func (c *Connector) run() {
-	var lastRefresh, lastFlush, lastHeartbeat int64
+	var nextRefresh, lastFlush, lastHeartbeat int64
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
@@ -416,9 +446,15 @@ run:
 				c.resultCache.Upload(nil)
 				lastFlush = now
 			}
-			if (now - lastRefresh) >= int64(c.options.RefreshActiveChecks) {
-				c.refreshActiveChecks()
-				lastRefresh = time.Now().Unix()
+			if now >= nextRefresh {
+				var ret = c.refreshActiveChecks()
+
+				nextRefresh = time.Now().Unix()
+				if !ret {
+					nextRefresh += 60
+				} else {
+					nextRefresh += int64(c.options.RefreshActiveChecks)
+				}
 			}
 			if c.options.HeartbeatFrequency > 0 {
 				if (now - lastHeartbeat) >= int64(c.options.HeartbeatFrequency) {

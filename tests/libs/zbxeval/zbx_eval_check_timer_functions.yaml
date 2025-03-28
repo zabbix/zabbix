@@ -1,0 +1,43 @@
+---
+test case: "expression: 'date(1w)'"
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'date(1w)'
+out:
+  return: SUCCEED
+---
+test case: "expression: 'time(1h)'"
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'time(1h)'
+out:
+  return: SUCCEED
+---
+test case: "expression: 'now()'"
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'now()'
+out:
+  return: SUCCEED
+---
+test case: "expression: 'dayofmonth(3)'"
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'dayofmonth(3)'
+out:
+  return: SUCCEED
+---
+test case: "expression: 'dayofweek(7)'"
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'dayofweek(7)'
+out:
+  return: SUCCEED
+---
+test case: "no timer functions"
+in:
+  rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: '1w + 2G + 3h + 4K + 5s '
+out:
+  return: FAIL
+...

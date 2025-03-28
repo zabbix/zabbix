@@ -87,6 +87,10 @@ ZABBIX.apps.map = (function($) {
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
 	const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
+	const DEFAULT_COLOR_PALETTE = [
+		'E65660', 'FCCB1D', '3BC97D', '2ED3B7', '19D0D7', '29C2FA', '58B0FE', '5D98FE', '859AFA', 'E580FA',
+		'F773C7', 'FC5F7E', 'FC738E', 'FF6D2E', 'F48D48', 'F89C3A', 'FBB318', 'FECF62', '87CE40', 'A3E86D'
+	];
 
 	function createMap(containerId, mapData) {
 		var CMap = function(containerId, mapData) {
@@ -108,7 +112,7 @@ ZABBIX.apps.map = (function($) {
 				shapes: {} // selected shapes
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
-			this.allLinkTriggerIds = {};
+			this.items = mapData.sysmap.items;
 			this.sysmapid = mapData.sysmap.sysmapid;
 			this.data = mapData.sysmap;
 			this.background = null;
@@ -388,6 +392,7 @@ ZABBIX.apps.map = (function($) {
 
 				this.map.update({
 					'background': this.data.backgroundid,
+					'background_scale': this.data.background_scale,
 					'elements': elements,
 					'links': links,
 					'shapes': shapes,
@@ -443,7 +448,7 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @param selementIds
 			 *
-			 * @return {Array} an array of link ids
+			 * @returns {Array} an array of link ids
 			 */
 			getLinksBySelementIds: function(selementIds) {
 				var linkIds = [],
@@ -929,14 +934,22 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				$('#formLinkApply').click(function() {
-					try {
-						var linkData = that.linkForm.getValues();
-						that.links[that.currentLinkId].update(linkData);
-						that.linkForm.updateList(that.selection.selements);
-					}
-					catch (err) {
-						alert(err);
-					}
+					const map_window = document.getElementById('map-window');
+					map_window.classList.add('is-loading', 'is-loading-fadein');
+
+					that.linkForm
+						.getValues()
+						.then(values => {
+							that.links[that.currentLinkId].update(values);
+							that.linkForm.updateList(that.selection.selements);
+						})
+						.catch(e => {
+							// Timeout for removing spinner.
+							setTimeout(() => alert(e), 50);
+						})
+						.finally(() => {
+							map_window.classList.remove('is-loading', 'is-loading-fadein');
+						});
 				});
 
 				$('#formLinkClose').click(function() {
@@ -945,7 +958,7 @@ ZABBIX.apps.map = (function($) {
 
 				this.linkForm.domNode.on('click', '.triggerRemove', function() {
 					var triggerid,
-						tid = $(this).attr('data-linktriggerid').toString();
+						tid = $(this).attr('data-index').toString();
 
 					$('#linktrigger_' + tid).remove();
 
@@ -954,6 +967,18 @@ ZABBIX.apps.map = (function($) {
 							delete that.linkForm.triggerids[triggerid];
 						}
 					}
+				});
+
+				this.linkForm.domNode.on('click', '.threshold-remove', function() {
+					const tid = $(this).attr('data-index').toString();
+
+					$('#threshold_' + tid).remove();
+				});
+
+				this.linkForm.domNode.on('click', '.highlight-remove', function() {
+					const tid = $(this).attr('data-index').toString();
+
+					$('#highlight_' + tid).remove();
 				});
 
 				$('#border_type').on('change', function() {
@@ -1589,11 +1614,17 @@ ZABBIX.apps.map = (function($) {
 			if (!linkData) {
 				linkData = {
 					label: '',
+					show_label: MAP_SHOW_LABEL_DEFAULT,
 					selementid1: null,
 					selementid2: null,
-					linktriggers: {},
 					drawtype: 0,
-					color: '00CC00'
+					color: '00CC00',
+					indicator_type: MAP_INDICATOR_TYPE_STATIC_LINK,
+					linktriggers: {},
+					itemid: null,
+					item: {},
+					thresholds: {},
+					highlights: {}
 				};
 
 				for (selementid in this.sysmap.selection.selements) {
@@ -1606,7 +1637,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// generate unique linkid
-				linkData.linkid =  getUniqueId();
+				linkData.linkid = getUniqueId();
 			}
 			else {
 				if ($.isArray(linkData.linktriggers)) {
@@ -1618,10 +1649,6 @@ ZABBIX.apps.map = (function($) {
 			this.id = this.data.linkid;
 			this.expanded = this.data.expanded;
 			delete this.data.expanded;
-
-			for (var linktrigger in this.data.linktriggers) {
-				this.sysmap.allLinkTriggerIds[linktrigger.triggerid] = true;
-			}
 
 			// assign by reference
 			this.sysmap.data.links[this.id] = this.data;
@@ -2232,6 +2259,7 @@ ZABBIX.apps.map = (function($) {
 					iconid_off: this.sysmap.defaultIconId, // first imageid
 					label: t('S_NEW_ELEMENT'),
 					label_location: -1, // set default map label location
+					show_label: MAP_SHOW_LABEL_DEFAULT,
 					x: 0,
 					y: 0,
 					urls: {},
@@ -2406,8 +2434,9 @@ ZABBIX.apps.map = (function($) {
 			update: function(data, unsetUndefined) {
 				var fieldName,
 					dataFelds = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
-						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'evaltype', 'tags'
+						'iconid_disabled', 'label', 'label_location', 'show_label', 'x', 'y', 'elementsubtype',
+						'areatype', 'width', 'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'evaltype',
+						'tags'
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
@@ -2608,8 +2637,8 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for elements.
 		 *
-		 * @param {object} formContainer jQuery object
-		 * @param {object} sysmap
+		 * @param {jQuery} formContainer jQuery object
+		 * @param {Object} sysmap
 		 */
 		function SelementForm(formContainer, sysmap) {
 			var formTplData = {
@@ -2937,7 +2966,7 @@ ZABBIX.apps.map = (function($) {
 					if (triggerids.length != 0) {
 						// get priority
 						var ajaxUrl = new Curl('jsrpc.php');
-						ajaxUrl.setArgument('type', 11);
+						ajaxUrl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
 						$.ajax({
 							url: ajaxUrl.getUrl(),
 							type: 'post',
@@ -3260,6 +3289,13 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'enable',
+						value: '#mass_show_label [name=show_label]',
+						cond: [{
+							checkbox_show_label: 'checked'
+						}]
+					},
+					{
+						action: 'enable',
 						value: '#massUseIconmap',
 						cond: [{
 							chkboxMassUseIconmap: 'checked'
@@ -3365,7 +3401,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Get values from mass update form that should be updated in all selected elements.
 			 *
-			 * @return array
+			 * @returns {Array}
 			 */
 			getValues: function() {
 				var values = $('#massForm').serializeArray(),
@@ -3509,13 +3545,14 @@ ZABBIX.apps.map = (function($) {
 				$('#border_type').change();
 
 				$('#last_shape_type').val(shape.type);
+
 				$('input[type=radio][name=type]:checked').change();
 			},
 
 			/**
 			 * Get values from shape update form that should be updated
 			 *
-			 * @return array
+			 * @returns {Array}
 			 */
 			getValues: function() {
 				var values = $('#shapeForm').serializeArray(),
@@ -3638,7 +3675,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Get values from mass update form that should be updated in all selected shapes.
 			 *
-			 * @return array
+			 * @returns {Array}
 			 */
 			getValues: function() {
 				var values = $('#massShapeForm').serializeArray(),
@@ -3659,16 +3696,135 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for editing links.
 		 *
-		 * @param {object} formContainer jQuesry object
+		 * @param {object} formContainer jQuery object
 		 * @param {object} sysmap
 		 */
 		function LinkForm(formContainer, sysmap) {
 			this.sysmap = sysmap;
-			this.formContainer = formContainer;
 			this.triggerids = {};
+			this.item_type = null;
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
 
+			document.getElementById('indicator_type').addEventListener('change', () => {
+				this.handleIndicatorTypeChange();
+			});
+
+			document.getElementById('link-thresholds-field').addEventListener('change', e => {
+				const input = e.target.closest('.js-threshold-input');
+
+				if (input !== null) {
+					input.value = input.value.trim();
+				}
+			});
+
+			const allowed_item_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR
+			];
+
+			$('#itemid')
+				.multiSelectHelper({
+					id: 'itemid',
+					object_name: 'items',
+					name: 'itemid',
+					selectedLimit: 1,
+					objectOptions: {
+						filter: {
+							value_type: allowed_item_value_types
+						},
+						real_hosts: true,
+						resolve_macros: true
+					},
+					popup: {
+						parameters: {
+							srctbl: 'items',
+							srcfld1: 'itemid',
+							dstfrm: 'linkForm',
+							dstfld1: 'itemid',
+							value_types: allowed_item_value_types,
+							real_hosts: 1,
+							resolve_macros: 1
+						}
+					}
+				})
+				.on('change', () => {
+					this.onMultiSelectChange();
+				});
+
+			document.getElementById('threshold-add').addEventListener('click', () => this.addNewThreshold());
+			document.getElementById('highlight-add').addEventListener('click', () => this.addNewHighlight());
+
 			this.domNode.find('.color-picker input').colorpicker();
+			colorPalette.setThemeColors(DEFAULT_COLOR_PALETTE);
+		}
+
+		/**
+		 * Fetch type of item by itemid.
+		 *
+		 * @param {string|null} itemid
+		 *
+		 * @returns {Promise<any>}  Resolved promise will contain item type, or null in case of error or if no item is
+		 *                         currently selected.
+		 */
+		function promiseGetItemType(itemid) {
+			if (itemid === null) {
+				return Promise.resolve(null);
+			}
+
+			const url_params = objectToSearchParams({
+				method: 'item_value_type.get',
+				type: PAGE_TYPE_TEXT_RETURN_JSON,
+				itemid
+			});
+
+			const url = new URL(`jsrpc.php?${url_params}`, location.href);
+
+			return fetch(url)
+				.then(response => response.json())
+				.then(response => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+
+					return parseInt(response.result);
+				})
+				.catch(exception => {
+					console.log('Could not get item type', exception);
+
+					return null;
+				});
+		}
+
+		/**
+		 * @param {Array} threshold_values
+		 *
+		 * @returns {Promise<any>}  Resolved promise will contain object with error or empty object if thresholds are
+		 *                          correct.
+		 */
+		function promiseValidateThresholdValues(threshold_values) {
+			const url_params = objectToSearchParams({
+				method: 'link_thresholds.validate',
+				type: PAGE_TYPE_TEXT_RETURN_JSON,
+				thresholds: threshold_values
+			});
+
+			const url = new URL(`jsrpc.php?${url_params}`, location.href);
+
+			return fetch(url)
+				.then(response => response.json())
+				.then(response => {
+					if ('result' in response) {
+						return response.result;
+					}
+
+					throw response;
+				})
+				.catch(exception => {
+					console.log('Could not validate link thresholds', exception);
+
+					return {
+						error: 'Could not validate link thresholds'
+					};
+				});
 		}
 
 		LinkForm.prototype = {
@@ -3686,58 +3842,270 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				$('#linkForm').hide();
 				$('.element-edit-control').prop('disabled', false);
+				$('#itemid').multiSelect('addData', [], false);
+			},
+
+			handleIndicatorTypeChange: function() {
+				const indicator_type = document.getElementById('indicator-type-field')
+					.querySelector('[name=indicator_type]:checked').value;
+
+				if (indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					this.onMultiSelectChange(this);
+				}
+				else {
+					this.toggleItemValueRelatedObjects();
+				}
+
+				const item_value_row = document.getElementById('item-value-field');
+				item_value_row.style.display = indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE ? '' : 'none';
+
+				for (const input of item_value_row.querySelectorAll('input')) {
+					if (indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						input.removeAttribute('disabled');
+					}
+					else {
+						input.setAttribute('disabled', 'disabled');
+					}
+				}
+
+				const link_indicators_field = document.getElementById('link-indicators-field');
+				link_indicators_field.style.display = indicator_type == MAP_INDICATOR_TYPE_TRIGGER ? '' : 'none';
+
+				for (const input of link_indicators_field.querySelectorAll('input')) {
+					if (indicator_type == MAP_INDICATOR_TYPE_TRIGGER) {
+						input.removeAttribute('disabled');
+					}
+					else {
+						input.setAttribute('disabled', 'disabled');
+					}
+				}
+			},
+
+			onMultiSelectChange: function() {
+				const ms_item_data = $('#itemid').multiSelect('getData');
+
+				this.item_type = null;
+				this.toggleItemValueRelatedObjects();
+
+				if (ms_item_data.length > 0) {
+					const map_window = document.getElementById('map-window');
+					map_window.classList.add('is-loading', 'is-loading-fadein');
+
+					promiseGetItemType(ms_item_data[0].id)
+						.then(type => {
+							this.item_type = type;
+							this.toggleItemValueRelatedObjects(this.item_type);
+						})
+						.finally(() => {
+							map_window.classList.remove('is-loading', 'is-loading-fadein');
+						});
+				}
+			},
+
+			toggleItemValueRelatedObjects: function(type = null) {
+				const is_numeric = type == ITEM_VALUE_TYPE_FLOAT || type == ITEM_VALUE_TYPE_UINT64;
+				const is_text = type == ITEM_VALUE_TYPE_STR || type == ITEM_VALUE_TYPE_LOG
+					|| type == ITEM_VALUE_TYPE_TEXT;
+				const thresholds_field = document.getElementById('link-thresholds-field');
+				const highlights_field = document.getElementById('link-highlights-field');
+
+				thresholds_field.style.display = is_numeric ? '' : 'none';
+
+				for (const input of thresholds_field.querySelectorAll('input')) {
+					if (is_numeric) {
+						input.removeAttribute('disabled');
+					}
+					else {
+						input.setAttribute('disabled', 'disabled');
+					}
+				}
+
+				highlights_field.style.display = is_text ? '' : 'none';
+
+				for (const input of highlights_field.querySelectorAll('input')) {
+					if (is_text) {
+						input.removeAttribute('disabled');
+					}
+					else {
+						input.setAttribute('disabled', 'disabled');
+					}
+				}
+			},
+
+			checkThresholds: function(link_thresholds) {
+				const threshold_values = Object.values(link_thresholds).map(link_threshold => {
+					return {
+						threshold: link_threshold.threshold
+					};
+				});
+
+				return promiseValidateThresholdValues(threshold_values);
 			},
 
 			/**
 			 * Get form values for link fields.
 			 */
 			getValues: function() {
-				var values = $('#linkForm').serializeArray(),
-					data = {
-						linktriggers: {}
-					},
-					i,
-					ln,
-					linkTriggerPattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
-					linkTrigger;
+				return new Promise((resolve, reject) => {
+					const values = $('#linkForm').serializeArray(),
+						link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|drawtype|color|desc_exp)$/,
+						link_threshold_pattern = /^threshold_(\w+)_(linkid|drawtype|color|threshold)$/,
+						link_highlights_pattern = /^highlight_(\w+)_(linkid|drawtype|color|pattern)$/;
 
-				for (i = 0, ln = values.length; i < ln; i++) {
-					linkTrigger = linkTriggerPattern.exec(values[i].name);
+					let data = {
+							indicator_type: MAP_INDICATOR_TYPE_STATIC_LINK,
+							linktriggers: {},
+							itemid: null,
+							thresholds: {},
+							highlights: {}
+						},
+						link_trigger,
+						link_threshold,
+						link_highlight;
 
-					if (linkTrigger !== null) {
-						if (linkTrigger[2] == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
-						}
+					const ms_data = $('#itemid').multiSelect('getData');
 
-						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
-							data.linktriggers[linkTrigger[1]] = {};
-						}
-
-						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
+					if (ms_data.length > 0) {
+						this.sysmap.items[ms_data[0].id] = ms_data[0];
 					}
-					else {
-						if (values[i].name == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+
+					for (let i = 0, ln = values.length; i < ln; i++) {
+						link_trigger = link_trigger_pattern.exec(values[i].name);
+						link_threshold = link_threshold_pattern.exec(values[i].name);
+						link_highlight = link_highlights_pattern.exec(values[i].name);
+
+						if (link_highlight !== null) {
+							if (data.highlights[link_highlight[1]] === undefined) {
+								data.highlights[link_highlight[1]] = {};
+							}
+
+							if (link_highlight[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/highlights/${Object.keys(data.highlights).length}/color`,
+									t('S_EXPECTING_COLOR_CODE')
+								);
+							}
+
+							if (link_highlight[2] === 'pattern' && !values[i].value) {
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/highlights/${Object.keys(data.highlights).length}/pattern`,
+									t('S_CANNOT_BE_EMPTY')
+								);
+							}
+
+							data.highlights[link_highlight[1]][link_highlight[2]] = values[i].value.toString();
+						}
+						else if (link_threshold !== null) {
+							if (data.thresholds[link_threshold[1]] === undefined) {
+								data.thresholds[link_threshold[1]] = {};
+							}
+
+							if (link_threshold[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/thresholds/${Object.keys(data.thresholds).length}/color`,
+									t('S_EXPECTING_COLOR_CODE')
+								);
+							}
+
+							if (link_threshold[2] === 'threshold') {
+								if (!values[i].value) {
+									throw sprintf(t('S_INCORRECT_VALUE'),
+										`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
+										t('S_CANNOT_BE_EMPTY')
+									);
+								}
+							}
+
+							data.thresholds[link_threshold[1]][link_threshold[2]] = values[i].value.toString();
+						}
+						else if (link_trigger !== null) {
+							if (link_trigger[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/linktriggers/${Object.keys(data.linktriggers).length}/color`,
+									t('S_EXPECTING_COLOR_CODE')
+								);
+							}
+
+							if (data.linktriggers[link_trigger[1]] === undefined) {
+								data.linktriggers[link_trigger[1]] = {};
+							}
+
+							data.linktriggers[link_trigger[1]][link_trigger[2]] = values[i].value.toString();
+						}
+						else {
+							if (values[i].name === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+								throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+							}
+
+							data[values[i].name] = values[i].value.toString();
+						}
+					}
+
+					if (data.indicator_type == MAP_INDICATOR_TYPE_TRIGGER) {
+						if (Object.keys(data.linktriggers).length === 0) {
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+								t('S_LINK_TRIGGER_IS_REQUIRED')
+							);
+						}
+					}
+					else if (data.indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						if (data.itemid == null) {
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
+								t('S_CANNOT_BE_EMPTY')
+							);
 						}
 
-						data[values[i].name] = values[i].value.toString();
-					}
-				}
+						if (this.item_type == ITEM_VALUE_TYPE_LOG || this.item_type == ITEM_VALUE_TYPE_TEXT
+								|| this.item_type == ITEM_VALUE_TYPE_STR) {
+							if (Object.keys(data.highlights).length === 0) {
+								throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+									t('S_LINK_HIGHLIGHT_IS_REQUIRED')
+								);
+							}
+						}
+						else if (this.item_type == ITEM_VALUE_TYPE_FLOAT || this.item_type == ITEM_VALUE_TYPE_UINT64) {
+							if (Object.keys(data.thresholds).length === 0) {
+								throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+									t('S_LINK_THRESHOLD_IS_REQUIRED')
+								);
+							}
 
-				return data;
+							this.checkThresholds(data.thresholds)
+								.then(response => {
+									if ('error' in response) {
+										throw response.error;
+									}
+
+									resolve(data);
+								})
+								.catch(e => {
+									reject(e);
+								});
+
+							return;
+						}
+						else {
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
+								t('S_INCORRECT_ITEM_VALUE_TYPE')
+							);
+						}
+					}
+
+					resolve(data);
+				});
 			},
 
 			/**
 			 * Update form controls with values from link.
 			 *
-			 * @param {object} link
+			 * @param {Object} link
 			 */
 			setValues: function(link) {
 				var selement1,
 					tmp,
 					selementid,
 					selement,
-					elementName,
+					element_name,
 					optgroups = {},
 					optgroupType,
 					optgroupLabel,
@@ -3821,31 +4189,93 @@ ZABBIX.apps.map = (function($) {
 				$('#selementid2').replaceWith(connect_to_select);
 
 				// set values for form elements
-				for (elementName in link) {
-					$('[name=' + elementName + ']', this.domNode).val(link[elementName]);
+				for (element_name in link) {
+					if (element_name === 'itemid') {
+						continue;
+					}
+
+					$('[name=' + element_name + ']', this.domNode).val([link[element_name]]);
 				}
 
-				// clear triggers
+				let item_data = [];
+
+				if ('itemid' in link && link.itemid !== '' && link.itemid in this.sysmap.items) {
+					item_data = [this.sysmap.items[link.itemid]];
+				}
+
+				$('#itemid').multiSelect('addData', item_data, false);
+
+				this.handleIndicatorTypeChange();
+
+				// triggers
 				this.triggerids = {};
 				$('#linkTriggerscontainer tbody tr').remove();
 				this.addLinkTriggers(link.linktriggers);
+
+				// thresholds
+				$('#link-thresholds-container tbody tr').remove();
+				this.addLinkThresholds(link.thresholds);
+
+				// highlights
+				$('#link-highlights-container tbody tr').remove();
+				this.addLinkHighlights(link.highlights);
 			},
 
 			/**
 			 * Add link triggers to link form.
 			 *
-			 * @param {object} triggers
+			 * @param {Object} triggers
 			 */
 			addLinkTriggers: function(triggers) {
-				var tpl = new Template($('#linkTriggerRow').html()),
-					linkTrigger,
+				const template = new Template($('#linkTriggerRow').html()),
 					table = $('#linkTriggerscontainer tbody');
 
-				for (linkTrigger in triggers) {
-					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
-					$(tpl.evaluate(triggers[linkTrigger])).appendTo(table);
-					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype')
-						.val(triggers[linkTrigger].drawtype);
+				for (const index in triggers) {
+					this.triggerids[triggers[index].triggerid] = index;
+					triggers[index].index = index;
+
+					$(template.evaluate(triggers[index])).appendTo(table);
+					$('#linktrigger_' + index + '_drawtype').val(triggers[index].drawtype);
+				}
+
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
+			},
+
+			/**
+			 * Add link thresholds to link form.
+			 *
+			 * @param {Object} thresholds
+			 */
+			addLinkThresholds: function(thresholds) {
+				const template = new Template($('#threshold-row').html()),
+					table = $('#link-thresholds-container tbody');
+
+				for (const index in thresholds) {
+					thresholds[index].index = index;
+
+					$(template.evaluate(thresholds[index])).appendTo(table);
+					$('#threshold_' + index + '_drawtype').val(thresholds[index].drawtype);
+				}
+
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
+			},
+
+			/**
+			 * Add link highlights to link form.
+			 *
+			 * @param {Object} highlights
+			 */
+			addLinkHighlights: function(highlights) {
+				const template = new Template($('#highlight-row').html()),
+					table = $('#link-highlights-container tbody');
+
+				for (const index in highlights) {
+					highlights[index].index = index;
+
+					$(template.evaluate(highlights[index])).appendTo(table);
+					$('#highlight_' + index + '_drawtype').val(highlights[index].drawtype);
 				}
 
 				table.find('.color-picker input').colorpicker();
@@ -3855,34 +4285,30 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Add new triggers which were selected in popup to trigger list.
 			 *
-			 * @param {object} triggers
+			 * @param {Array} triggers
 			 */
 			addNewTriggers: function(triggers) {
-				var tpl = new Template($('#linkTriggerRow').html()),
-					linkTrigger = {
-						color: 'DD0000'
-					},
-					linktriggerid,
-					i,
-					ln,
+				const template = new Template($('#linkTriggerRow').html()),
 					table = $('#linkTriggerscontainer tbody');
 
-				for (i = 0, ln = triggers.length; i < ln; i++) {
-					if (typeof this.triggerids[triggers[i].triggerid] !== 'undefined') {
+				for (const trigger of triggers) {
+					if (this.triggerids[trigger.triggerid] !== undefined) {
 						continue;
 					}
 
-					linktriggerid = getUniqueId();
-
-					// store linktriggerid to generate every time unique one
-					this.sysmap.allLinkTriggerIds[linktriggerid] = true;
+					const index = getUniqueId();
 
 					// store triggerid to forbid selecting same trigger twice
-					this.triggerids[triggers[i].triggerid] = linktriggerid;
-					linkTrigger.linktriggerid = linktriggerid;
-					linkTrigger.desc_exp = triggers[i].description;
-					linkTrigger.triggerid = triggers[i].triggerid;
-					$(tpl.evaluate(linkTrigger)).appendTo(table);
+					this.triggerids[trigger.triggerid] = index;
+
+					const link_trigger = {
+						index,
+						desc_exp: trigger.description,
+						triggerid: trigger.triggerid,
+						color: this.getNextColor()
+					};
+
+					$(template.evaluate(link_trigger)).appendTo(table);
 				}
 
 				table.find('.color-picker input').colorpicker();
@@ -3890,23 +4316,70 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Add new threshold.
+			 */
+			addNewThreshold: function() {
+				const template = new Template($('#threshold-row').html()),
+					table = $('#link-thresholds-container tbody');
+
+				$(template.evaluate({
+					index: getUniqueId(),
+					color: this.getNextColor()
+				})).appendTo(table);
+
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
+			},
+
+			/**
+			 * Add new highlight.
+			 */
+			addNewHighlight: function() {
+				const template = new Template($('#highlight-row').html()),
+					table = $('#link-highlights-container tbody');
+
+				$(template.evaluate({
+					index: getUniqueId(),
+					color: this.getNextColor(),
+				})).appendTo(table);
+
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
+			},
+
+			/**
+			 * Returns color picker next color.
+			 *
+			 * @returns {string}
+			 */
+			getNextColor() {
+				const colors = this.domNode[2].querySelectorAll('.color-picker input:not([disabled])');
+				const used_colors = [];
+
+				for (const color of colors) {
+					if (color.value !== '') {
+						used_colors.push(color.value);
+					}
+				}
+
+				return colorPalette.getNextColor(used_colors);
+			},
+
+			/**
 			 * Updates links list for element.
 			 *
-			 * @param {string} selementIds
+			 * @param {string} selementids
 			 */
-			updateList: function(selementIds) {
-				var links = this.sysmap.getLinksBySelementIds(selementIds),
-					linkTable,
-					rowTpl,
-					list,
-					i, j,
+			updateList: function(selementids) {
+				const links = this.sysmap.getLinksBySelementIds(selementids);
+				let link_table,
+					row_template,
 					selement,
 					tmp,
-					ln,
 					link,
-					linktriggers,
-					fromElementName,
-					toElementName;
+					link_indicators,
+					from_element_name,
+					to_element_name;
 
 				$('.element-links').hide();
 				$('.element-links tbody').empty();
@@ -3914,29 +4387,29 @@ ZABBIX.apps.map = (function($) {
 				if (links.length) {
 					$('#mapLinksContainer').show();
 
-					if (objectSize(selementIds) > 1) {
-						rowTpl = '#massElementLinkTableRowTpl';
-						linkTable = $('#mass-element-links');
+					if (objectSize(selementids) > 1) {
+						row_template = '#massElementLinkTableRowTpl';
+						link_table = $('#mass-element-links');
 					}
 					else {
-						rowTpl = '#elementLinkTableRowTpl';
-						linkTable = $('#element-links');
+						row_template = '#elementLinkTableRowTpl';
+						link_table = $('#element-links');
 					}
 
-					rowTpl = new Template($(rowTpl).html());
+					row_template = new Template($(row_template).html());
 
-					list = [];
-					for (i = 0, ln = links.length; i < ln; i++) {
-						link = this.sysmap.links[links[i]].data;
+					const link_list = [];
+					for (const linkid of links) {
+						link = this.sysmap.links[linkid].data;
 
 						/*
 						 * If one element selected and it's not link.selementid1, we need to swap link.selementid1
 						 * and link.selementid2 in order that sorting works correctly.
 						 */
-						if (objectSize(selementIds) == 1 && !selementIds[link.selementid1]) {
+						if (objectSize(selementids) == 1 && !selementids[link.selementid1]) {
 							// Get currently selected element.
-							for (var selementId in this.sysmap.selection.selements) {
-								selement = this.sysmap.selements[selementId];
+							for (const selementid in this.sysmap.selection.selements) {
+								selement = this.sysmap.selements[selementid];
 							}
 
 							if (selement.id !== link.selementid1) {
@@ -3946,71 +4419,78 @@ ZABBIX.apps.map = (function($) {
 							}
 						}
 
-						linktriggers = [];
+						link_indicators = [];
 
-						for (var linktrigger in link.linktriggers) {
-							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
+						if (link.indicator_type == MAP_INDICATOR_TYPE_TRIGGER) {
+							for (const key in link.linktriggers) {
+								link_indicators.push(link.linktriggers[key].desc_exp);
+							}
+						}
+						else if (link.indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE
+								&& link.itemid && link.itemid != 0) {
+							const item = this.sysmap.items[link.itemid];
+							link_indicators.push(`${item.prefix}${item.name}`);
 						}
 
-						fromElementName = this.sysmap.selements[link.selementid1].getName();
-						toElementName = this.sysmap.selements[link.selementid2].getName();
+						from_element_name = this.sysmap.selements[link.selementid1].getName();
+						to_element_name = this.sysmap.selements[link.selementid2].getName();
 
-						list.push({
-							fromElementName: fromElementName,
-							toElementName: toElementName,
+						link_list.push({
+							from_element_name,
+							to_element_name,
 							linkid: link.linkid,
-							linktriggers: linktriggers
+							link_indicators
 						});
 					}
 
 					// Sort by "from" element and then by "to" element.
-					list.sort(function(a, b) {
-						var fromElementA = a.fromElementName.toLowerCase(),
-							fromElementB = b.fromElementName.toLowerCase(),
-							toElementA = a.toElementName.toLowerCase(),
-							toElementB = b.toElementName.toLowerCase(),
-							linkIdA = a.linkid,
-							linkIdB = b.linkid;
+					link_list.sort(function(a, b) {
+						const from_element_a = a.from_element_name.toLowerCase(),
+							from_element_b = b.from_element_name.toLowerCase(),
+							to_element_a = a.to_element_name.toLowerCase(),
+							to_element_b = b.to_element_name.toLowerCase(),
+							link_id_a = a.linkid,
+							link_id_b = b.linkid;
 
-						if (fromElementA < fromElementB) {
+						if (from_element_a < from_element_b) {
 							return -1;
 						}
-						else if (fromElementA > fromElementB) {
+						else if (from_element_a > from_element_b) {
 							return 1;
 						}
 
-						if (toElementA < toElementB) {
+						if (to_element_a < to_element_b) {
 							return -1;
 						}
-						else if (toElementA > toElementB) {
+						else if (to_element_a > to_element_b) {
 							return 1;
 						}
 
-						if (linkIdA < linkIdB) {
+						if (link_id_a < link_id_b) {
 							return -1;
 						}
-						else if (linkIdA > linkIdB) {
+						else if (link_id_a > link_id_b) {
 							return 1;
 						}
 
 						return 0;
 					});
 
-					for (i = 0, ln = list.length; i < ln; i++) {
-						var row = $(rowTpl.evaluate(list[i])),
+					for (const link of link_list) {
+						const row = $(row_template.evaluate(link)),
 							row_urls = $('.element-urls', row);
 
-						for (j = 0; j < list[i].linktriggers.length; j++) {
-							if (j != 0) {
+						for (let i = 0; i < link.link_indicators.length; i++) {
+							if (i != 0) {
 								row_urls.append($('<br>'));
 							}
-							row_urls.append($('<span>').text(list[i].linktriggers[j]));
+							row_urls.append($('<span>').text(link.link_indicators[i]));
 						}
 
-						row.appendTo(linkTable.find('tbody'));
+						row.appendTo(link_table.find('tbody'));
 					}
 
-					linkTable.closest('.element-links').show();
+					link_table.closest('.element-links').show();
 				}
 				else {
 					$('#mapLinksContainer').hide();
@@ -4018,7 +4498,7 @@ ZABBIX.apps.map = (function($) {
 			}
 		};
 
-		var sysmap = new CMap(containerId, mapData);
+		const sysmap = new CMap(containerId, mapData);
 
 		Shape.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0

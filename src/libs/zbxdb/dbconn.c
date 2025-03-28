@@ -1329,7 +1329,10 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
 #define ZBX_DB_WAIT_RETRY_COUNT	6
-	int	err, retries = ZBX_DB_WAIT_RETRY_COUNT;
+	int	err;
+#if defined(HAVE_POSTGRESQL)
+	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 

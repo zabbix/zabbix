@@ -360,7 +360,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71, // Discord
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						]
@@ -425,7 +425,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'leading.trailing',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71, //Discord
 								'attribute' => 'leading.trailing'
 							]
 						]
@@ -491,7 +491,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71, // Discord
 								'attribute' => STRING_255
 							]
 						]

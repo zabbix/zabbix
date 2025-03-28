@@ -3107,6 +3107,18 @@ svg {
 	}
 }
 
+.map-link-hintbox-row {
+	display: flex;
+	align-items: center;
+	white-space: pre;
+	line-height: 18px;
+	min-height: 18px;
+
+	.map-link-hintbox-row-color-box {
+		@extend %indicator-color-box;
+	}
+}
+
 .lld-overrides-operations-table,
 .confirmation-msg {
 	white-space: normal;

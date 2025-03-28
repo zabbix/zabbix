@@ -143,12 +143,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			// Sort column contents ascending.
 			usort($values_asc, function($a, $b) {
-				return strcasecmp($a, $b);
+				return strnatcasecmp($a, $b);
 			});
 
 			// Sort column contents descending.
 			usort($values_desc, function($a, $b) {
-				return strcasecmp($b, $a);
+				return strnatcasecmp($b, $a);
 			});
 
 			// Check ascending and descending sorting in column.
@@ -176,7 +176,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'Jira '
 					],
-					'result' => ['Jira ServiceDesk']
+					'result' => ['Jira Service Management']
 				]
 			],
 			[
@@ -191,7 +191,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'a S'
 					],
-					'result' => ['Jira ServiceDesk']
+					'result' => ['Jira Service Management']
 				]
 			],
 			// Filter by status.
@@ -757,10 +757,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #1 Used in action operation directly.
 			[
 				[
-					'name' => 'Github',
+					'name' => 'GitHub',
 					'actions' => [
 						[
-							'name' => 'Github action operation',
+							'name' => 'GitHub action operation',
 							'operation' => 'operations'
 						]
 					]
@@ -809,14 +809,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #5 Used in two actions update operations directly.
 			[
 				[
-					'name' => 'OTRS',
+					'name' => 'OTRS CE',
 					'actions' => [
 						[
-							'name' => 'OTRS acton update operation 1',
+							'name' => 'OTRS CE acton update operation 1',
 							'operation' => 'update_operations'
 						],
 						[
-							'name' => 'OTRS acton update operation 2',
+							'name' => 'OTRS CE acton update operation 2',
 							'operation' => 'update_operations'
 						]
 					]

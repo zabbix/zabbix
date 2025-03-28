@@ -1,0 +1,20 @@
+---
+test case: Some ids
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
+  expression: '{3}+{100}+{200}'
+out:
+  ids:
+  - 3
+  - 100
+  - 200
+---
+test case: Some ids uint64
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
+  expression: '{9874562345678901234}+{9874562345678901235}+{9874564345678901234}'
+out:
+  ids:
+  - 9874562345678901234
+  - 9874562345678901235
+  - 9874564345678901234

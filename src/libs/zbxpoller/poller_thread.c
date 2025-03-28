@@ -751,8 +751,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
 	{
-		zbx_dc_close_user_macros(um_handle);
 		zbx_dc_close_user_macros(um_handle_secure);
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

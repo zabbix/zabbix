@@ -19,7 +19,7 @@
  */
 class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
-	static function getValidationRules() {
+	public static function getValidationRules(): array {
 		$host_inventory_fields = [];
 
 		foreach (array_column(getHostInventories(), 'db_field') as $field_name) {

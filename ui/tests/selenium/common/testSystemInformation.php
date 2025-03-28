@@ -18,7 +18,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
 
-	const FAILOVER_DELAY = 8;
+	const FAILOVER_DELAY = 20;
 
 	public static $active_lastaccess;
 	public static $update_timestamp;

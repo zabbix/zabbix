@@ -212,25 +212,44 @@ class CMapImporter extends CImporter {
 		unset($selement);
 
 		foreach ($map['links'] as &$link) {
-			if (!$link['linktriggers']) {
-				unset($link['linktriggers']);
-				continue;
+			if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+				foreach ($link['linktriggers'] as &$linktrigger) {
+					$trigger = $linktrigger['trigger'];
+					unset($linktrigger['trigger']);
+
+					$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
+						$trigger['recovery_expression'], true
+					);
+
+					if ($triggerid === null) {
+						throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
+							$trigger['description'], $map['name']));
+					}
+
+					$linktrigger['triggerid'] = $triggerid;
+				}
+				unset($linktrigger);
 			}
+			elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				$item = $link['item'];
+				unset($link['item']);
 
-			foreach ($link['linktriggers'] as &$linktrigger) {
-				$trigger = $linktrigger['trigger'];
-				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
-					$trigger['recovery_expression'], true
-				);
+				$hostid = $this->referencer->findHostidByHost($item['host']);
+				$itemid = $hostid !== null
+					? $this->referencer->findItemidByKey($hostid, $item['key'], true)
+					: null;
 
-				if ($triggerid === null) {
-					throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
-						$trigger['description'], $map['name']));
+				if ($itemid === null) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used in a link of map "%3$s".',
+						$item['key'],
+						$item['host'],
+						$map['name']
+					));
 				}
 
-				$linktrigger['triggerid'] = $triggerid;
+				$link['itemid'] = $itemid;
 			}
-			unset($linktrigger);
 		}
 		unset($link);
 
