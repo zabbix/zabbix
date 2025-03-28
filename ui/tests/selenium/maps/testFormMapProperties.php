@@ -165,12 +165,12 @@ class testFormMapProperties extends CWebTest {
 					[
 						'name' => STRING_255,
 						'url' => STRING_2048,
-						'elementtype' => 3
+						'elementtype' => 1
 					],
 					[
 						'name' => '4 Host group - xss',
 						'url' => self::XSS_EXAMPLE,
-						'elementtype' => 1
+						'elementtype' => 3
 					],
 					[
 						'name' => '3 Trigger URL',
@@ -1397,26 +1397,21 @@ class testFormMapProperties extends CWebTest {
 						],
 						[
 							'id' => 2,
-							'Name' => '📡📡📡📡📡',
-							'URL' => 'test'
-						],
-						[
-							'id' => 3,
 							'Name' => '9 sysmap',
 							'URL' => 'test'
 						],
 						[
-							'id' => 4,
+							'id' => 3,
 							'Name' => 'ĀĀāāāĒĒēēēŽŽžžŅŅķķķййЖЖ',
 							'URL' => 'test'
 						],
 						[
-							'id' => 5,
+							'id' => 4,
 							'Name' => 'Administration map',
 							'URL' => 'test'
 						],
 						[
-							'id' => 6,
+							'id' => 5,
 							'Name' => '02223',
 							'URL' => 'test'
 						]
@@ -1445,42 +1440,36 @@ class testFormMapProperties extends CWebTest {
 					'expected_urls' => [
 						[
 							'id' => 0,
-							'name' => '📡📡📡📡📡',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 1,
 							'name' => '012345',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 2,
+							'id' => 1,
 							'name' => '02223',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 3,
+							'id' => 2,
 							'name' => '9 sysmap',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 4,
+							'id' => 3,
 							'name' => 'ĀĀāāāĒĒēēēŽŽžžŅŅķķķййЖЖ',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 5,
+							'id' => 4,
 							'name' => 'Administration map',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 6,
+							'id' => 5,
 							'name' => 'Zabbix sysmap',
 							'url' => 'test',
 							'element_type' => 0
@@ -2334,7 +2323,7 @@ class testFormMapProperties extends CWebTest {
 					'id' => 4,
 					'name' => STRING_255,
 					'url' => STRING_2048,
-					'element_type' => 3
+					'element_type' => 1
 				],
 				[
 					'id' => 0,
@@ -2352,7 +2341,7 @@ class testFormMapProperties extends CWebTest {
 					'id' => 3,
 					'name' => '4 Host group - xss',
 					'url' => self::XSS_EXAMPLE,
-					'element_type' => 1
+					'element_type' => 3
 				],
 				[
 					'id' => 2,
