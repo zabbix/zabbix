@@ -16,6 +16,7 @@
 #include "zbxdbwrap.h"
 
 #include "template.h"
+#include "tag_cache.h"
 
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
@@ -996,26 +997,6 @@ dependent:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	save_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
-{
-	zbx_db_insert_t	db_insert_item_tag_cache_host_itself;
-
-	zbx_db_execute_multiple_query("insert into item_tag_cache with recursive cte as "
-			"( select i0.templateid, i0.itemid, i0.hostid from items i0 "
-			"union all select i1.templateid, c.itemid, c.hostid from cte c "
-			"join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL) "
-			"select cte.itemid,ii.hostid from cte,items ii "
-			"where cte.templateid= ii.itemid and ", "cte.itemid", new_itemids);
-
-	zbx_db_insert_prepare(&db_insert_item_tag_cache_host_itself, "item_tag_cache",
-			"itemid", "tag_hostid",  (char *)NULL);
-
-	for (int i = 0; i < new_itemids->values_num; i++)
-		zbx_db_insert_add_values(&db_insert_item_tag_cache_host_itself, new_itemids->values[i], hostid);
-
-	zbx_db_insert_execute(&db_insert_item_tag_cache_host_itself);
-	zbx_db_insert_clean(&db_insert_item_tag_cache_host_itself);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -1109,7 +1090,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 
-		save_item_tag_cache(hostid, &new_itemids);
+		zbx_db_save_item_tag_cache(hostid, &new_itemids);
 	}
 
 	if (0 != upd_items)
