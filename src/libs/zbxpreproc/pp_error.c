@@ -288,11 +288,12 @@ void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int r
  * Purpose: apply 'on fail' preprocessing error handler                       *
  *                                                                            *
  * Parameters: value - [IN/OUT]                                               *
+*              error - [IN] error that overrides error handler params         *
  *             step  - [IN] preprocessing operation that produced error       *
  *                                                                            *
  ******************************************************************************/
 int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, zbx_variant_t *value,
-		const zbx_pp_step_t *step)
+		const char *error, const zbx_pp_step_t *step)
 {
 	char	*error_handler_params;
 
@@ -306,18 +307,18 @@ int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, 
 		case ZBX_PREPROC_FAIL_SET_VALUE:
 		case ZBX_PREPROC_FAIL_SET_ERROR:
 			zbx_variant_clear(value);
-
-			error_handler_params = zbx_strdup(NULL, step->error_handler_params);
+			error_handler_params = zbx_strdup(NULL, NULL != error ? error : step->error_handler_params);
 
 			if (NULL != um_handle)
 			{
-				char	*error = NULL;
+				char	*error_resolve = NULL;
 
 				if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache,
-						&error_handler_params, &hostid, 1, ZBX_MACRO_ENV_NONSECURE, &error))
+						&error_handler_params, &hostid, 1, ZBX_MACRO_ENV_NONSECURE,
+						&error_resolve))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
-					zbx_free(error);
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error_resolve);
+					zbx_free(error_resolve);
 				}
 			}
 
