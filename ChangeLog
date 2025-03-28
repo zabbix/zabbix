@@ -1,6 +1,7 @@
 Changes for 7.4.0beta1
 
 New features:
+A.F.I..... [ZBXNEXT-8784] added the ability to show map element and link labels only on hover, scale the map background image proportionally, and set item thresholds and highlights for map links (agriscenko, dfofanovs, dgoloscapov)
 .........T [ZBXNEXT-9271] added Azure MSSQL DTU database by HTTP template (abrosimovs)
 ..F....... [ZBXNEXT-9029] added a button for copying values to clipboard in item test form (esekace)
 ...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Zabbix Agent 2 Smart plugin (lsurvilo)
@@ -11,6 +12,12 @@ New features:
 A.F.I..PS. [ZBXNEXT-7048] converted the settings table to a key-value format (askolmeisters, jfreibergs, vmaksimovs)
 
 Bug fixes:
+.......PS. [ZBX-26211] fixed crash on check for not supported value (vso)
+...G...... [ZBX-26055] fixed failing to refresh active checks when next refresh was faster than 60 seconds (sboidenko)
+...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
+.......PS. [ZBX-26042] fixed agent redirection if host encryption settings are wrong (sboidenko)
+........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when the database transaction commit fails; fixed inability to identify the interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 .......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 ..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
@@ -63,35 +70,55 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
 
+--------------------------------------------------------------------------------
+Changes for 7.2.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.5
+
+7.2.5rc2 was released as 7.2.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.2.5rc2
+
+Bug fixes:
+.......PS. [ZBX-26211] fixed a crash when checking for not supported value (vso)
+
+--------------------------------------------------------------------------------
 Changes for 7.2.5rc1
 
 New features:
 .........T [ZBXNEXT-9271] added Azure MSSQL DTU database by HTTP template (abrosimovs)
-...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Zabbix Agent 2 Smart plugin (lsurvilo)
+...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Smart Zabbix agent 2 plugin (lsurvilo)
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
-..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
+..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
 .........T [ZBX-25940] added namespace to Pod discovery rule in Kubernetes nodes by HTTP template (egordymov)
-...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
-..F....... [ZBX-25946] fixed special pattern removing from multiselect and pattern select fields (esekace)
+...G...... [ZBX-25436] updated Zabbix agent 2 server configuration description in config (esneiders)
+..F....... [ZBX-25946] fixed special pattern removal from multiselect and pattern select fields (esekace)
 .........T [ZBX-25855] fixed CPU item in Ubiquiti AirOS by SNMP template (abrosimovs)
 ..F....... [ZBX-25837] fixed global notification sound playback duration (esekace)
-..F....... [ZBX-25886] fixed wildard pattern in top items widget (talbergs)
+..F....... [ZBX-25886] fixed wildcard pattern in top items widget (talbergs)
 ........S. [ZBX-22617] enhanced Zabbix server performance by implementing parallel syncing of trends and avoiding range queries, resulting in faster shutdown times (vso)
-........S. [ZBX-25365] fixed map elements deletion during LLD and action operations processing by Zabbix server (asestakovs)
+........S. [ZBX-25365] fixed map element deletion during LLD and action operation processing via Zabbix server (asestakovs)
 ...G...... [ZBX-25798] fixed error with converting empty string to utf8 (MVekslers)
 ........S. [ZBX-25706] updated macro substitution process to re-try resolving macros in item key parameters and macro context without double-quoting if quoting was not possible (asestakovs)
-........S. [ZBX-25907] fixed auto registration with proxy group to specific proxy in same proxy group (wiper)
+........S. [ZBX-25907] fixed autoregistration with proxy group to specific proxy in same proxy group (wiper)
 .......PS. [ZBX-25860] prevented 06050165 upgrade patch from saving oversized escaped function parameters (arimdjonoks)
 ....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
-..F....... [ZBX-25678] fixed the inability to select multiple tag values in graph subfilter (esekace)
+..F....... [ZBX-25678] fixed inability to select multiple tag values in graph subfilter (esekace)
 ........S. [ZBX-25651] improved trend update performance on TimescaleDB by using upserts instead of updates (vso)
 ........S. [ZBX-25419] fixed macro expansion when simple context macro begins with substring ":regex" (mprihodko)
 ..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
-.........T [ZBX-26029] added device retrieval loop errors exceptions handling to Meraki template (abiba)
+.........T [ZBX-26029] added device retrieval loop error exception handling to Meraki template (abiba)
 ........S. [ZBX-26066] fixed autoreg_host table overflow during autoregistration (sboidenko)
 ........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
 .........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
@@ -100,12 +127,12 @@ A......... [ZBX-25670] restored audit logging of host group links to hosts (jfre
 ..F....... [ZBX-25911] fixed correlation form popup opening on event details page (rgontarski)
 .........T [ZBX-26070] fixed macro in HashiCorp Consul Cluster by HTTP template (abrosimovs)
 ....I..... [ZBX-25868] fixed missing permissions for built-in templates (asestakovs)
-..F....... [ZBX-22952] made matching of headers to be performed in case-insensitive way (agriscenko)
-..F....... [ZBX-25744] fixed column width in the Top Hosts widget's Sparkline chart when configured with a single column (isharha)
+..F....... [ZBX-22952] made header matching case-insensitive (agriscenko)
+..F....... [ZBX-25744] fixed column width in top hosts widget sparkline chart when configured with single column (isharha)
 A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
-..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
+..F....... [ZBX-25582] fixed approximation "all" for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
-.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; updated dashboard in Azure Cost Management by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.4
@@ -418,35 +445,54 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.12rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.11
+
+7.0.11rc2 was released as 7.0.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.11rc2
+
+Bug fixes:
+.......PS. [ZBX-26211] fixed a crash when checking for not supported value (vso)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.11rc1
 
 New features:
 .........T [ZBXNEXT-9271] added Azure MSSQL DTU database by HTTP template (abrosimovs)
-...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Zabbix Agent 2 Smart plugin (lsurvilo)
+...G...... [ZBXNEXT-8388] added normalized_value tag extracted from ata_smart_attributes for Smart Zabbix agent 2 plugin (lsurvilo)
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
-..F....... [ZBX-24714] fixed "Custom on fail" layout in item preprocessing form being broken in some languages (agriscenko)
+..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
 .........T [ZBX-25940] added namespace to Pod discovery rule in Kubernetes nodes by HTTP template (egordymov)
-...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
-..F....... [ZBX-25946] fixed special pattern removing from multiselect and pattern select fields (esekace)
+...G...... [ZBX-25436] updated Zabbix agent 2 server configuration description in config (esneiders)
+..F....... [ZBX-25946] fixed special pattern removal from multiselect and pattern select fields (esekace)
 .........T [ZBX-25855] fixed CPU item in Ubiquiti AirOS by SNMP template (abrosimovs)
 ..F....... [ZBX-25837] fixed global notification sound playback duration (esekace)
 ........S. [ZBX-22617] enhanced Zabbix server performance by implementing parallel syncing of trends and avoiding range queries, resulting in faster shutdown times (vso)
 ...G...... [ZBX-25798] fixed error with converting empty string to utf8 (MVekslers)
-........S. [ZBX-25365] fixed map elements deletion during LLD and action operations processing by Zabbix server (asestakovs)
+........S. [ZBX-25365] fixed map element deletion during LLD and action operation processing via Zabbix server (asestakovs)
 ........S. [ZBX-25706] updated macro substitution process to re-try resolving macros in item key parameters and macro context without double-quoting if quoting was not possible (asestakovs)
-........S. [ZBX-25907] fixed auto registration with proxy group to specific proxy in same proxy group (wiper)
+........S. [ZBX-25907] fixed autoregistration with proxy group to specific proxy in same proxy group (wiper)
 .......PS. [ZBX-25860] prevented 06050165 upgrade patch from saving oversized escaped function parameters (arimdjonoks)
-A......... [ZBX-26057] returned the presence of missing "message_format" field in the output of mediatype.get API method (wczerneha)
+A......... [ZBX-26057] returned presence of missing message_format field in output of mediatype.get API method (wczerneha)
 ....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
-..F....... [ZBX-25678] fixed the inability to select multiple tag values in graph subfilter (esekace)
+..F....... [ZBX-25678] fixed inability to select multiple tag values in graph subfilter (esekace)
 ........S. [ZBX-25651] improved trend update performance on TimescaleDB by using upserts instead of updates (vso)
 ........S. [ZBX-25419] fixed macro expansion when simple context macro begins with substring ":regex" (mprihodko)
 ..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
-.........T [ZBX-26029] added device retrieval loop errors exceptions handling to Meraki template (abiba)
+.........T [ZBX-26029] added device retrieval loop error exception handling to Meraki template (abiba)
 ........S. [ZBX-26066] fixed autoreg_host table overflow during autoregistration (sboidenko)
 ........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
 .........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
@@ -456,12 +502,12 @@ A......... [ZBX-25670] restored audit logging of host group links to hosts (jfre
 ...GI..PS. [ZBX-25140] made configure reject TLS unaware compilers (jxl)
 .........T [ZBX-26070] fixed macro in HashiCorp Consul Cluster by HTTP template (abrosimovs)
 ....I..... [ZBX-25868] fixed missing permissions for built-in templates (asestakovs)
-..F....... [ZBX-22952] made matching of headers to be performed in case-insensitive way (agriscenko)
+..F....... [ZBX-22952] made header matching case-insensitive (agriscenko)
 A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
 .......PS. [ZBX-25991] fixed invalid SQL statement during network discovery when using Oracle database (asestakovs)
-..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
+..F....... [ZBX-25582] fixed approximation "all" for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
-.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; updated dashboard in Azure Cost Management by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.10
