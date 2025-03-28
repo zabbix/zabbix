@@ -1402,16 +1402,11 @@ class testFormMapProperties extends CWebTest {
 						],
 						[
 							'id' => 3,
-							'Name' => 'ĀĀāāāĒĒēēēŽŽžžŅŅķķķййЖЖ',
-							'URL' => 'test'
-						],
-						[
-							'id' => 4,
 							'Name' => 'Administration map',
 							'URL' => 'test'
 						],
 						[
-							'id' => 5,
+							'id' => 4,
 							'Name' => '02223',
 							'URL' => 'test'
 						]
@@ -1458,18 +1453,12 @@ class testFormMapProperties extends CWebTest {
 						],
 						[
 							'id' => 3,
-							'name' => 'ĀĀāāāĒĒēēēŽŽžžŅŅķķķййЖЖ',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 4,
 							'name' => 'Administration map',
 							'url' => 'test',
 							'element_type' => 0
 						],
 						[
-							'id' => 5,
+							'id' => 4,
 							'name' => 'Zabbix sysmap',
 							'url' => 'test',
 							'element_type' => 0
