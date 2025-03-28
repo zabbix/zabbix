@@ -27,7 +27,6 @@ require_once __DIR__ . '/../../include/classes/helpers/CMediatypeHelper.php';
  */
 class testMediatype extends CAPITest {
 
-
 	public static function updateInvalidDataProvider(): array {
 		return [
 			'Email media type gmail do not support SMTP_AUTHENTICATION_NONE' =>
@@ -309,6 +308,89 @@ class testMediatype extends CAPITest {
 	 */
 	public function testCreate(array $mediatypes, $expected_error) {
 		$this->call('mediatype.create', $mediatypes, $expected_error);
+	}
+
+	public static function createAccessTokenUpdatedDataProvider(): array {
+		return [
+			'access_token set access_token_updated' =>
+			[
+				[[
+					'redirection_url' => 'http://example.com',
+					'client_id' => 'clientid',
+					'client_secret' => 'clientsecret',
+					'authorization_url' => 'http://example.com',
+					'token_url' => 'http://example.com',
+					'access_token' => 'updated',
+					'access_expires_in' => SEC_PER_HOUR
+				]],
+				true
+			],
+			'refresh_token do not set access_token_updated' =>
+			[
+				[[
+					'redirection_url' => 'http://example.com',
+					'client_id' => 'clientid',
+					'client_secret' => 'clientsecret',
+					'authorization_url' => 'http://example.com',
+					'token_url' => 'http://example.com',
+					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
+					'refresh_token' => 'refreshtoken'
+				]],
+				false
+			],
+			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_NORMAL do not set access_token_updated' =>
+			[
+				[[
+					'smtp_authentication' => SMTP_AUTHENTICATION_NONE
+				]],
+				false
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createAccessTokenUpdatedDataProvider
+	 */
+	public function testCreateAccessTokenUpdated(array $mediatypes, bool $should_change) {
+		static $i = 0;
+
+		$db_access_token_updated = [];
+		$mediatype_defaults = [
+			'name' => 'testCreateAccessTokenUpdated'.($i++),
+			'type' => MEDIA_TYPE_EMAIL,
+			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
+			'smtp_server' => 'smtp.gmail.com',
+			'smtp_helo' => 'example.com',
+			'smtp_email' => 'zabbix@example.com',
+			'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH
+		];
+
+		foreach ($mediatypes as &$mediatype) {
+			$mediatype += $mediatype_defaults;
+		}
+
+		$mediatypeids = $this->call('mediatype.create', $mediatypes)['result']['mediatypeids'];
+		// database column media_type_oauth.access_token_updated default value
+		$db_access_token_updated[] = array_fill_keys($mediatypeids, 0);
+
+		$result = $this->call('mediatype.get', [
+			'output' => ['mediatypeid', 'access_token_updated'],
+			'mediatypeids' => $mediatypeids
+		])['result'];
+		$db_access_token_updated[] = array_column($result, 'access_token_updated', 'mediatypeid');
+
+		$this->call('mediatype.delete', $mediatypeids);
+
+		if ($should_change) {
+			$this->assertNotEquals($db_access_token_updated[0], $db_access_token_updated[1],
+				'Field access_token_updated should be changed.'
+			);
+		}
+		else {
+			$this->assertEquals($db_access_token_updated[0], $db_access_token_updated[1],
+				'Field access_token_updated should contain default value.'
+			);
+		}
 	}
 
 	public function prepareTestData() {

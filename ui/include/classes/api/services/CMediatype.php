@@ -269,15 +269,14 @@ class CMediatype extends CApiService {
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 		$ins_media_type_oauth = [];
+		$oauth_fields = array_flip(self::OAUTH_OUTPUT_FIELDS) + ['mediatypeid' => ''];
 
 		foreach ($mediatypes as $index => &$mediatype) {
 			$mediatype['mediatypeid'] = $mediatypeids[$index];
 
 			if (array_key_exists('smtp_authentication', $mediatype)
 					&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-				$ins_media_type_oauth[] = array_intersect_key($mediatype,
-					array_flip(self::OAUTH_OUTPUT_FIELDS) + ['mediatypeid' => '']
-				);
+				$ins_media_type_oauth[] = array_intersect_key($mediatype, $oauth_fields);
 			}
 		}
 		unset($mediatype);
@@ -575,6 +574,9 @@ class CMediatype extends CApiService {
 		$db_defaults = DB::getDefaults('media_type') + DB::getDefaults('media_type_oauth');
 		$db_defaults['parameters'] = [];
 		$token_reset_fields = array_flip(['client_id', 'client_secret', 'token_url']);
+		$token_db_defaults =  array_intersect_key(DB::getDefaults('media_type_oauth'), array_flip([
+			'tokens_status', 'access_token', 'access_token_updated', 'access_expires_in', 'refresh_token'
+		]));
 
 		if ($method === 'update') {
 			$type_fields = [
@@ -639,12 +641,9 @@ class CMediatype extends CApiService {
 						);
 
 						if ($changed_fields) {
-							$mediatype += array_intersect_key(DB::getDefaults('media_type_oauth'), array_flip([
-								'tokens_status', 'access_token', 'access_token_updated', 'access_expires_in',
-								'refresh_token'
-							]));
+							$mediatype = array_merge($mediatype, $token_db_defaults);
 						}
-						else if (array_key_exists('access_token', $mediatype)) {
+						elseif (array_key_exists('access_token', $mediatype)) {
 							$mediatype['access_token_updated'] = time();
 						}
 						break;
@@ -666,6 +665,11 @@ class CMediatype extends CApiService {
 						$mediatype
 					);
 				}
+			}
+			elseif ($type == MEDIA_TYPE_EMAIL && array_key_exists('smtp_authentication', $mediatype)
+					&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH
+					&& array_key_exists('access_token', $mediatype)) {
+				$mediatype['access_token_updated'] = time();
 			}
 		}
 		unset($mediatype);
