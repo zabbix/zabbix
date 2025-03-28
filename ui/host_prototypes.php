@@ -79,7 +79,7 @@ if (getRequest('parent_discoveryid')) {
 		'editable' => true
 	]);
 	$discoveryRule = reset($discoveryRule);
-	if (!$discoveryRule || $discoveryRule['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!$discoveryRule) {
 		access_deny();
 	}
 
