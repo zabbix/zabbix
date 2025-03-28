@@ -238,7 +238,7 @@ window.template_edit_popup = new class {
 
 	clone() {
 		const parameters = this.#trimFields(this.form.getAllValues());
-		fields.description = getFormFields(this.form_element).description.trim();
+		parameters.description = getFormFields(this.form_element).description.trim();
 
 		parameters.clone = 1;
 		parameters.templateid = this.templateid;
