@@ -822,15 +822,6 @@ form {
 		}
 	}
 
-	.dynamic-row > td {
-		padding-top: 0;
-	}
-
-	.dynamic-row-control > td {
-		padding-top: 0;
-		padding-bottom: 0;
-	}
-
 	.btn-icon,
 	.icon {
 		&:not(:first-child) {
@@ -3101,6 +3092,18 @@ svg {
 	}
 }
 
+.map-link-hintbox-row {
+	display: flex;
+	align-items: center;
+	white-space: pre;
+	line-height: 18px;
+	min-height: 18px;
+
+	.map-link-hintbox-row-color-box {
+		@extend %indicator-color-box;
+	}
+}
+
 .lld-overrides-operations-table,
 .confirmation-msg {
 	white-space: normal;
@@ -3317,6 +3320,11 @@ svg {
 			flex: 0 0 $name-width + $drag-icon;
 			max-width: $name-width + $drag-icon;
 			padding-left: 30px;
+		}
+
+		.step-on-fail {
+			@extend %overflow-ellipsis;
+			display: inline-block;
 		}
 	}
 
@@ -3899,7 +3907,7 @@ z-select {
 }
 
 .modal-popup-preprocessing {
-	.preprocessing-list-head{
+	.preprocessing-list-head {
 		.step-name {
 			flex: 0 0 190px;
 		}
