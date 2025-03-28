@@ -3721,7 +3721,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				(char *)NULL);
 		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available",
 				(char *)NULL);
-		zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid", "tag_hostid");
+		zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid", "tag_hostid",
+				(char *)NULL);
 	}
 
 	if (0 != new_host_hgsets)
