@@ -2835,9 +2835,7 @@ static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *ite
  * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_process_nested_rules(zbx_uint64_t hostid,
-		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		const zbx_vector_lld_item_full_ptr_t *items)
+static void	lld_rule_process_nested_rules(zbx_uint64_t hostid, const zbx_vector_lld_item_full_ptr_t *items)
 {
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -2907,7 +2905,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 	}
 
 	lld_rule_export_lld_macros(items);
-	lld_rule_process_nested_rules(hostid, item_prototypes, items);
+	lld_rule_process_nested_rules(hostid, items);
 
 	/* prepare remapping of prototype ids to lld rule ids for discovered item prototypes */
 

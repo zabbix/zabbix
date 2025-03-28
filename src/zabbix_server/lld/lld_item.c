@@ -2649,16 +2649,13 @@ void	lld_items_param_make(const zbx_vector_lld_item_prototype_ptr_t *item_protot
  * Purpose: Updates existing items tags and creates new ones based on item    *
  *          prototypes.                                                       *
  *                                                                            *
- * Parameters: item_prototypes - [IN]                                         *
- *             items           - [IN/OUT] sorted list of items                *
+ * Parameters: items           - [IN/OUT] sorted list of items                *
  *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_tags_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, char **error)
+static void	lld_items_tags_make(zbx_vector_lld_item_full_ptr_t *items, char **error)
 {
-	int				index;
-	zbx_lld_item_prototype_t	*item_proto;
+	const zbx_lld_item_prototype_t	*item_proto;
 	zbx_vector_db_tag_ptr_t		new_tags;
 	zbx_db_tag_t			*db_tag;
 
@@ -2674,19 +2671,7 @@ static void	lld_items_tags_make(const zbx_vector_lld_item_prototype_ptr_t *item_
 		if (0 != (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
 
-		zbx_lld_item_prototype_t	cmp = {.itemid = item->parent_itemid};
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
-				lld_item_prototype_compare_func)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		if (0 != (item_proto->item_flags & ZBX_FLAG_DISCOVERY_RULE))
-			continue;
-
-		item_proto = item_prototypes->values[index];
+		item_proto = item->prototype;
 
 		for (int j = 0; j < item_proto->item_tags.values_num; j++)
 		{
@@ -4197,7 +4182,7 @@ void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_protot
 				"i.flags"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
-				" and id.lldrule_itemid=" ZBX_FS_UI64,
+				" and id.lldruleid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -4662,7 +4647,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	lld_items_preproc_make(&item_prototypes, &items);
 	lld_items_param_make(&item_prototypes, &items, error);
-	lld_items_tags_make(&item_prototypes, &items, error);
+	lld_items_tags_make(&items, error);
 	lld_link_dependent_items(&items, &items_index);
 
 	lld_rule_macro_paths_make(&items);
@@ -4699,7 +4684,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	for (int i = 0; i < lld_rows->values_num; i++)
 		zbx_vector_lld_item_link_ptr_clear_ext(&lld_rows->values[i]->item_links, lld_item_link_free);
 
-	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lifetime, lastcheck, &items_index);
+	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lifetime, lastcheck,
+			&items_index);
 
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 clean:
