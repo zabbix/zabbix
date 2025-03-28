@@ -355,6 +355,7 @@ class testFormGraphs extends CWebTest {
 
 	public function getCommonGraphData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -372,6 +373,7 @@ class testFormGraphs extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -388,6 +390,7 @@ class testFormGraphs extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -406,34 +409,24 @@ class testFormGraphs extends CWebTest {
 					],
 					'error' => 'Cannot add graph',
 					'details' => [
-						'Incorrect value "-100" for "Width" field: must be between 20 and 65535.',
-						'Incorrect value "-1" for "Height" field: must be between 20 and 65535.',
-						'Field "yaxismin" is mandatory.',
-						'Field "yaxismax" is mandatory.',
-						'Incorrect value "-2" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
-						'Incorrect value "-200" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
+						'Incorrect value for field "width": value must be no less than "20".',
+						'Incorrect value for field "height": value must be no less than "20".',
+						'Field "items" is mandatory.'
 					]
 				]
 			],
+			// #3.
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Commas in inputs'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => '20,5',
-						'Height' => '50,9',
-						'id:visible_percent_left' => true,
-						'id:visible_percent_right' => true,
-						'id:percent_left' => '1,3',
-						'id:percent_right' => '5,6',
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => '88,9',
-						'id:yaxismax' => '0,1'
+						'Name' => 'Too large width and height'.($this->prototype ? ' {#KEY}' : NULL),
+						'Width' => 65536,
+						'Height' => 65536
 					],
 					'items' => [
 						[
-							'item' => 'graph_trap_float',
+							'item' => 'testFormItem',
 							'color'=> 'BBDEFB',
 							'functions' => [
 								'calc_fnc' => 'min',
@@ -441,130 +434,391 @@ class testFormGraphs extends CWebTest {
 								'yaxisside' => 'Right'
 							]
 						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Too large inputs'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => 65536,
-						'Height' => 65536,
-						'id:visible_percent_left' => true,
-						'id:visible_percent_right' => true,
-						'id:percent_left' => 101,
-						'id:percent_right' => 101,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => 12345678999999998,
-						'id:yaxismax' => 12345678999999998
 					],
 					'error' => 'Cannot add graph',
 					'details' => [
-						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
-						'Incorrect value "65536" for "Height" field: must be between 20 and 65535.',
-						'Incorrect value "101" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
-						'Incorrect value "101" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
+						'Incorrect value for field "width": value must be no greater than "65535".',
+						'Incorrect value for field "height": value must be no greater than "65535".'
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Text in inputs'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => 'test',
-						'Height' => 'value',
+						'Name' => 'Too low width and height'.($this->prototype ? ' {#KEY}' : NULL),
+						'Width' => -65536,
+						'Height' => -65536
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "width": value must be no less than "20".',
+						'Incorrect value for field "height": value must be no less than "20".'
+					]
+				]
+			],
+			// #5.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Too large value for percent_left field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:visible_percent_left' => true,
+						'id:percent_left' => 101
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "percent_left": value must be between "0" and "100", '.
+						'and have no more than "4" digits after the decimal point.',
+					]
+				]
+			],
+			// #6.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Negative value for percent_left field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:visible_percent_left' => true,
+						'id:percent_left' => -101
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "percent_left": value must be between "0" and "100", '.
+						'and have no more than "4" digits after the decimal point.',
+					]
+				]
+			],
+			// #7.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float value in percent_left field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:visible_percent_left' => true,
+						'id:percent_left' => '1,3'
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "percent_left": a number is expected.',
+					]
+				]
+			],
+			// #8.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Too large value for percent_right field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:visible_percent_right' => true,
-						'id:percent_left' => 'letters',
-						'id:percent_right' => 'symbols',
+						'id:percent_right' => 101
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "percent_right": value must be between "0" and "100", '.
+						'and have no more than "4" digits after the decimal point.',
+					]
+				]
+			],
+			// #9.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Too large value for percent_right field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:visible_percent_right' => true,
+						'id:percent_right' => -101
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "percent_right": value must be between "0" and "100", '.
+						'and have no more than "4" digits after the decimal point.',
+					]
+				]
+			],
+			// #10.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float value in percent_right field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:visible_percent_right' => true,
+						'id:percent_right' => '5,9'
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "percent_right": a number is expected.',
+					]
+				]
+			],
+			// #11.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Comma in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => '88,9',
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "yaxismin": a number is expected.',
+					]
+				]
+			],
+			// #12.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'String in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
 						'id:yaxismin' => 'text',
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "yaxismin": a number is expected.',
+					]
+				]
+			],
+			// #13.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Comma in "Y axis MAX value" field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismax' => '88,9'
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
+					'details' => [
+						'Incorrect value for field "yaxismax": a number is expected.',
+					]
+				]
+			],
+			// #14.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'String in "Y axis MAX value" field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
 						'id:yaxismax' => 'value'
 					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
 					'error' => 'Cannot add graph',
 					'details' => [
-						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
-						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not correct: a number is expected',
-						'Field "yaxismax" is not correct: a number is expected',
-						'Field "Percentile line (left)" is not correct: a number is expected',
-						'Field "Percentile line (right)" is not correct: a number is expected'
+						'Incorrect value for field "yaxismax": a number is expected.',
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Low width and height and too many fractional digits in percentile and axis'.
-								($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => 1,
-						'Height' => 19,
-						'id:visible_percent_left' => true,
-						'id:visible_percent_right' => true,
-						'id:percent_left' => 1.99999,
-						'id:percent_right' => 2.12345,
+						'Name' => 'Y_min is greater than Y_max'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => 1.12345,
-						'id:yaxismax' => 1.999999999
+						'id:yaxismin' => 10,
+						'id:yaxismax' => 9
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
 					],
 					'error' => 'Cannot add graph',
 					'details' => [
-						'Incorrect value "1" for "Width" field: must be between 20 and 65535.',
-						'Incorrect value "19" for "Height" field: must be between 20 and 65535.',
-						'Incorrect value "1.99999" for "Percentile line (left)" field: must be between 0 and 100, and '.
-								'have no more than 4 digits after the decimal point.',
-						'Incorrect value "2.12345" for "Percentile line (right)" field: must be between 0 and 100, and '.
-								'have no more than 4 digits after the decimal point.'
+						'Y axis MAX value must be greater than Y axis MIN value.',
 					]
 				]
 			],
+			// #16
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Too large negative numbers'.($this->prototype ? ' {#KEY}' : NULL),
+						'Name' => 'Text in "Percentile line (left)" field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:visible_percent_left' => true,
-						'id:visible_percent_right' => true,
-						'id:percent_left' => -900000,
-						'id:percent_right' => -900000,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => -90000000000000000,
-						'id:yaxismax' => -90000000000000000
+						'id:percent_left' => 'letters',
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
 					],
 					'error' => 'Cannot add graph',
 					'details' => [
-						'Incorrect value "-900000" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
-						'Incorrect value "-900000" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
+						'Incorrect value for field "percent_left": a number is expected.'
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty item'.($this->prototype ? ' {#KEY}' : NULL)
+						'Name' => 'Text in "Percentile line (right)" field'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:visible_percent_right' => true,
+						'id:percent_right' => 'letters',
 					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Cannot add graph',
 					'details' => [
-						'Missing items for graph'.$this->getGraphSuffix().' "Empty item'.
-								($this->prototype ? ' {#KEY}' : NULL).'".'
+						'Incorrect value for field "percent_right": a number is expected.'
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty Y MIN and MAX items',
-						'Width' => 200,
-						'Height' => 400,
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
@@ -603,7 +857,9 @@ class testFormGraphs extends CWebTest {
 			$this->query('button', 'Create graph'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
 		}
 
-		$form = $this->query('id:graph-form')->waitUntilVisible()->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one();
+		$form = $dialog->query('id:'.($this->prototype ? 'graph-prototype-form' : 'graph-form'))
+				->waitUntilVisible()->asForm()->one();
 
 		// Clear all items from graph to change them to new ones from data provider.
 		if ($update) {
@@ -647,7 +903,6 @@ class testFormGraphs extends CWebTest {
 						->waitUntilClickable()->one()->click();
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$dialog->query('link:'.$item['item'])->waitUntilClickable()->one()->click();
-				$dialog->ensureNotPresent();
 
 				// Check that added item link appeared.
 				$item_row = $items_container->query('xpath:.//tr[@id="items_'.$i.'"]')->one()->waitUntilPresent();
@@ -705,7 +960,7 @@ class testFormGraphs extends CWebTest {
 			);
 
 			// Open just created graph and check that all fields present correctly in form.
-			$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilPresent()
+			$this->query('xpath://form[@name="graph_form"]/table')->asTable()->one()->waitUntilPresent()
 					->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
@@ -825,11 +1080,11 @@ class testFormGraphs extends CWebTest {
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 
-//		if (CTestArrayHelper::get($data, 'check_buttons')) {
-//			foreach (['Update', 'Clone', 'Delete'] as $button) {
-//				$this->assertFalse($footer->query('button:'.$button)->exists());
-//			}
-//		}
+		if (CTestArrayHelper::get($data, 'check_buttons')) {
+			foreach (['Update', 'Clone', 'Delete'] as $button) {
+				$this->assertFalse($footer->query('button:'.$button)->exists());
+			}
+		}
 
 		$form->fill($data['fields']);
 

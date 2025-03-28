@@ -713,7 +713,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				$filter->getField($group_field)->clear();
 			}
 			else {
-				$filter->getField('Hosts')->fill($data['group']);
+				$filter->getField($group_field)->select($data['group']);
 			}
 		}
 
@@ -724,7 +724,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				$filter->getField($field_label)->clear();
 			}
 			else {
-				$filter->getField('Hosts')->fill($data['host']);
+				$filter->getField($field_label)->fill($data['host']);
 			}
 			if (array_key_exists('change_group', $data)) {
 				$filter->getField($group_field)->clear();
@@ -742,8 +742,8 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		if (array_key_exists('graph', $data)) {
 			foreach ($data['graph'] as $graph) {
-				$this->assertTrue($this->query('xpath://a[contains(@href,"zabbix.php?action=popup&popup=graph.edit")]'.
-						'[text()="'.$graph.'"]')->one()->isVisible()
+				$this->assertTrue($this->query('xpath://a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]')
+						->one()->isVisible()
 				);
 			}
 		}
