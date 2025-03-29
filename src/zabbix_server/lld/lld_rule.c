@@ -2727,7 +2727,7 @@ zbx_hash_t	lld_row_index_hash(const void *v)
 {
 	const zbx_lld_row_ruleid_t	*index = (const zbx_lld_row_ruleid_t *)v;
 
-	return ZBX_DEFAULT_STRING_HASH_ALGO(&index->lld_row, sizeof(index->lld_row), 0);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(&index->data, sizeof(index->data), 0);
 }
 
 int	lld_row_index_compare(const void *v1, const void *v2)
@@ -2735,7 +2735,7 @@ int	lld_row_index_compare(const void *v1, const void *v2)
 	const zbx_lld_row_ruleid_t        *index1 = (const zbx_lld_row_ruleid_t *)v1;
 	const zbx_lld_row_ruleid_t        *index2 = (const zbx_lld_row_ruleid_t *)v2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(index1->lld_row, index2->lld_row);
+	ZBX_RETURN_IF_NOT_EQUAL(index1->data, index2->data);
 
 	return 0;
 }
@@ -2920,6 +2920,9 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		if (0 == (item_index->item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
+		if (0 == (item_index->item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+			continue;
+
 		prules_local.itemid = item_index->parent_itemid;
 		if (NULL == (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_search(&prototype_rules, &prules_local)))
 		{
@@ -2930,7 +2933,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		}
 
 		row_ruleid_local.ruleid = item_index->item->itemid;
-		row_ruleid_local.lld_row = item_index->lld_row;
+		row_ruleid_local.data = item_index->lld_row->data;
 
 		zbx_hashset_insert(&prules->rule_index, &row_ruleid_local, sizeof(row_ruleid_local));
 	}

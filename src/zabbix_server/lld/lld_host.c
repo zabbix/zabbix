@@ -3859,7 +3859,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			{
 				zbx_lld_row_ruleid_t    row_ruleid_local, *row_ruleid;
 
-				row_ruleid_local.lld_row = host->lld_row;
+				row_ruleid_local.data = host->lld_row->data;
 				if (NULL != (row_ruleid = zbx_hashset_search(rule_index, &row_ruleid_local)))
 					lldruleid = row_ruleid->ruleid;
 			}
