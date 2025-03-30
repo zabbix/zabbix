@@ -1584,11 +1584,13 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 
 		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		/* recursively delete discovered items/lld rules */
-		db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
-		zbx_db_delete_items(&itemids_linked, audit_context_mode);
 	}
+
+	/* recursively delete discovered items/lld rules */
+	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
+	if (0 != itemids_linked.values_num)
+		zbx_db_delete_items(&itemids_linked, audit_context_mode);
+
 	zbx_vector_uint64_destroy(&itemids_linked);
 
 	zbx_db_update_item_map_links(itemids);
