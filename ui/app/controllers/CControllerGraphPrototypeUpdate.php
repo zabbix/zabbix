@@ -129,7 +129,7 @@ class CControllerGraphPrototypeUpdate extends CController {
 				'ymin_type' => $this->getInput('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED),
 				'ymax_type' => $this->getInput('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED),
 				'yaxismin' => $this->getInput('yaxismin', 0),
-				'yaxismax' => $this->getInput('yaxismax', 0),
+				'yaxismax' => $this->getInput('yaxismax', 100),
 				'show_work_period' => $this->getInput('show_work_period', 0),
 				'show_triggers' => $this->getInput('show_triggers', 0),
 				'graphtype' => $this->getInput('graphtype'),
