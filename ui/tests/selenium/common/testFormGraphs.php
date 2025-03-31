@@ -103,10 +103,6 @@ class testFormGraphs extends CWebTest {
 						'id:show_legend' =>  ['value' => true],
 						'id:show_work_period' =>  ['value' => true],
 						'id:show_triggers' =>  ['value' => true],
-						'id:visible_percent_left' =>  ['value' => false], // Percentile line (left) checkbox.
-						'id:visible_percent_right' =>  ['value' => false], // Percentile line (right) checkbox.
-						'id:percent_left' =>  ['visible' => false], // Percentile line (left) input.
-						'id:percent_right' =>  ['visible' => false], // Percentile line (right) input.
 						'id:ymin_type' =>  ['value' => 'Calculated'], // Y axis MIN value dropdown.
 						'id:ymax_type' =>  ['value' => 'Calculated'], // Y axis MAX value dropdown.
 						'id:yaxismin' =>  ['visible' => false], // Y axis MIN fixed value input.
@@ -116,7 +112,7 @@ class testFormGraphs extends CWebTest {
 						'id:items-table' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Draw style', 'Y axis side', 'Colour', ''],
+						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', ''],
 						'dropdowns' => [
 							'calc_fnc' => ['all', 'min', 'avg', 'max'],
 							'drawtype' => ['Line', 'Filled region', 'Bold line', 'Dot', 'Dashed line', 'Gradient line'],
@@ -138,10 +134,10 @@ class testFormGraphs extends CWebTest {
 						'id:show_legend' =>  ['value' => true],
 						'id:show_work_period' =>  ['value' => true],
 						'id:show_triggers' =>  ['value' => true],
-						'id:visible_percent_left' =>  ['exists' => false], // Percentile line (left) checkbox.
-						'id:visible_percent_right' =>  ['exists' => false], // Percentile line (right) checkbox.
-						'id:percent_left' =>  ['exists' => false], // Percentile line (left) input.
-						'id:percent_right' =>  ['exists' => false], // Percentile line (right) input.
+						'id:visible_percent_left' =>  ['exists' => true], // Percentile line (left) checkbox.
+						'id:visible_percent_right' =>  ['exists' => true], // Percentile line (right) checkbox.
+						'id:percent_left' =>  ['exists' => true], // Percentile line (left) input.
+						'id:percent_right' =>  ['exists' => true], // Percentile line (right) input.
 						'id:ymin_type' =>  ['value' => 'Calculated'], // Y axis MIN value dropdown.
 						'id:ymax_type' =>  ['value' => 'Calculated'], // Y axis MAX value dropdown.
 						'id:yaxismin' =>  ['visible' => false], // Y axis MIN fixed value input.
@@ -170,18 +166,6 @@ class testFormGraphs extends CWebTest {
 						'id:height' =>  ['value' => '200'],
 						'id:graphtype' =>  ['value' => 'Pie'],
 						'id:show_legend' =>  ['value' => true],
-						'id:show_work_period' =>  ['exists' => false],
-						'id:show_triggers' =>  ['exists' => false],
-						'id:visible_percent_left' =>  ['exists' => false], // Percentile line (left) checkbox.
-						'id:visible_percent_right' =>  ['exists' => false], // Percentile line (right) checkbox.
-						'id:percent_left' =>  ['exists' => false], // Percentile line (left) input.
-						'id:percent_right' =>  ['exists' => false], // Percentile line (right) input.
-						'id:ymin_type' =>  ['exists' => false], // Y axis MIN value dropdown.
-						'id:ymax_type' =>  ['exists' => false], // Y axis MAX value dropdown.
-						'id:yaxismin' =>  ['exists' => false], // Y axis MIN fixed value input.
-						'id:yaxismax' =>  ['exists' => false], // Y axis MAX fixed value input.
-						'id:ymin_name' =>  ['exists' => false], // Y axis MIN item input.
-						'id:ymax_name' =>  ['exists' => false], // Y axis MAX item input.
 						'id:show_3d' =>  ['value' => false],
 						'id:items-table' =>  ['visible' => true]
 					],
@@ -205,18 +189,6 @@ class testFormGraphs extends CWebTest {
 						'id:height' =>  ['value' => '200'],
 						'id:graphtype' =>  ['value' => 'Exploded'],
 						'id:show_legend' =>  ['value' => true],
-						'id:show_work_period' =>  ['exists' => false],
-						'id:show_triggers' =>  ['exists' => false],
-						'id:visible_percent_left' =>  ['exists' => false], // Percentile line (left) checkbox.
-						'id:visible_percent_right' =>  ['exists' => false], // Percentile line (right) checkbox.
-						'id:percent_left' =>  ['exists' => false], // Percentile line (left) input.
-						'id:percent_right' =>  ['exists' => false], // Percentile line (right) input.
-						'id:ymin_type' =>  ['exists' => false], // Y axis MIN value dropdown.
-						'id:ymax_type' =>  ['exists' => false], // Y axis MAX value dropdown.
-						'id:yaxismin' =>  ['exists' => false], // Y axis MIN fixed value input.
-						'id:yaxismax' =>  ['exists' => false], // Y axis MAX fixed value input.
-						'id:ymin_name' =>  ['exists' => false], // Y axis MIN item input.
-						'id:ymax_name' =>  ['exists' => false], // Y axis MAX item input.
 						'id:show_3d' =>  ['value' => false],
 						'id:items-table' =>  ['visible' => true]
 					],
@@ -340,7 +312,9 @@ class testFormGraphs extends CWebTest {
 			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link', $item['name'])
 					->waitUntilClickable()->one()->click();
 
-			$this->assertEquals($data['items']['item_columns'], $form->query('id:items-table')->asTable()->one()->getHeadersText());
+			$visibleHeaders = $form->query('id:items-table')->asTable()->one()
+					->query('xpath:.//th[not(contains(@style, "display: none"))]')->all()->asText();
+			$this->assertEquals($data['items']['item_columns'], $visibleHeaders);
 
 			// Check items functions dropdown options depending on graph type.
 			foreach ($data['items']['dropdowns'] as $function => $options) {

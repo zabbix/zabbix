@@ -60,14 +60,13 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Graphs');
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->checkValue(['Hosts' => $host_name]);
+		$this->assertEquals($host_name, $filter->getField('Hosts')->query('class:subfilter-enabled')->one()->getText());
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
-		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
 		$this->page->waitUntilReady();
 		$breadcrumbs = [
@@ -75,7 +74,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			'zabbix.php?action=popup&popup=host.edit&hostid='.$hostid => $host_name,
 			'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
 			'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
-			'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D='.$hostid.'&context=host' => 'Graphs',
+			'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Graphs',
 			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
 			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Web scenarios'
 		];
@@ -93,7 +92,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		// Check table headers on page.
-		$xpath = '//form[@name="graphForm"]//thead/tr/th[not(@class)]';
+		$xpath = '//form[@name="graph_form"]//thead/tr/th[not(@class)]';
 		$get_headers = $this->query('xpath', $xpath)->all();
 		foreach ($get_headers as $row) {
 			$table_headers[] = $row->getText();
@@ -110,9 +109,10 @@ class testPageHostGraph extends CLegacyWebTest {
 
 			// Check name value.
 			$this->assertEquals($graph['name'],
-					$element->query('xpath:./td/a[@href="zabbix.php?action=popup&popup=graph.edit&graphid='.
+					$element->query('xpath:.//a[@href="zabbix.php?action=popup&popup=graph.edit&graphid='.
 							$graph['graphid'].'&context=host"]')->one()->getText()
 			);
+
 
 			// Check width value.
 			$this->assertEquals($graph['width'], $element->query('xpath:./td[3]')->one()->getText());

@@ -65,9 +65,10 @@ class testInheritanceGraph extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.edit&graphid='.$data['graphid'].'&context=host');
 		$this->zbxTestCheckTitle('Graph edit');
-		COverlayDialogElement::find()->one()->waitUntilReady()->query('class:overlay-dialogue-footer')->one()
+		$this->query('class:overlay-dialogue-footer')->one()
 				->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
+
 		$this->assertEquals($oldHashGraphs, CDBHelper::getHash($sqlGraphs));
 	}
 

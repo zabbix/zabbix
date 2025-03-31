@@ -25,7 +25,7 @@ class testPageGraphPrototypesTemplate extends testPagePrototypes {
 
 	public $source = 'graph';
 
-	protected $link = 'zabbix.php?action=graph.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid=';
+	protected $link = 'zabbix.php?action=graph.prototype.list&context=template&parent_discoveryid=';
 	protected static $prototype_graphids;
 	protected static $host_druleids;
 
