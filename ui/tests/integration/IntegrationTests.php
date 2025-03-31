@@ -54,6 +54,8 @@ require_once dirname(__FILE__).'/testFunctionChangeCount.php';
 require_once dirname(__FILE__).'/testProxyHa.php';
 require_once dirname(__FILE__).'/testBrowserMonitoring.php';
 require_once dirname(__FILE__).'/testHostConnMacroValidation.php';
+require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
+require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -103,6 +105,8 @@ class IntegrationTests {
 		$suite->addTestSuite('testProxyHa');
 		$suite->addTestSuite('testBrowserMonitoring');
 		$suite->addTestSuite('testHostConnMacroValidation');
+		$suite->addTestSuite('testUserMacrosWithContext');
+		$suite->addTestSuite('testUserMacrosWithContextRegex');
 
 		return $suite;
 	}
