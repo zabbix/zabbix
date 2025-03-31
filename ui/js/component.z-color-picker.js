@@ -550,16 +550,18 @@ class ZColorPicker extends HTMLElement {
 		const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
 		const box_rect = this.#box.getBoundingClientRect();
 		const dialog_rect = this.#dialog.getBoundingClientRect();
+		const dialog_max_width = 402;
+		const dialog_max_height = 344;
 
 		const space_right = wrapper_rect.width + wrapper_rect.left - box_rect.left - box_rect.width;
 		const space_left = box_rect.left - wrapper_rect.left;
 		const space_below = wrapper_rect.height - box_rect.top - box_rect.width;
 		const space_above = box_rect.top;
 
-		const fits_right = dialog_rect.width <= space_right;
-		const fits_left = dialog_rect.width <= space_left;
-		const fits_below = dialog_rect.height <= space_below;
-		const fits_above = dialog_rect.height <= space_above;
+		const fits_right = dialog_max_width <= space_right;
+		const fits_left = dialog_max_width <= space_left;
+		const fits_below = dialog_max_height <= space_below;
+		const fits_above = dialog_max_height <= space_above;
 
 		const pos = {
 			left: fits_right || !fits_right && !fits_left
