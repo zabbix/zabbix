@@ -1625,6 +1625,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_db_execute_multiple_query("update items set master_itemid=null where master_itemid is not null and",
 			"itemid", itemids);
 	zbx_db_execute_multiple_query("delete from items where", "itemid", itemids);
+	zbx_db_execute_multiple_query("delete from item_tag_cache where", "itemid", itemids);
 
 	zbx_vector_uint64_destroy(&profileids);
 out:
