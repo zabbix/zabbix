@@ -498,8 +498,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid",
 						"tag_hostid", (char *)NULL);
 				zbx_db_insert_add_values(&db_insert_host_tag_cache, hostid, hostid);
-				zbx_db_insert_execute(&db_insert);
-				zbx_db_insert_clean(&db_insert);
+
+				zbx_db_insert_execute(&db_insert_host_tag_cache);
+				zbx_db_insert_clean(&db_insert_host_tag_cache);
 
 				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 						ZBX_AUDIT_ACTION_ADD, hostid, hostname);
@@ -676,8 +677,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid",
 						"tag_hostid", (char *)NULL);
 				zbx_db_insert_add_values(&db_insert_host_tag_cache, hostid, hostid);
-				zbx_db_insert_execute(&db_insert);
-				zbx_db_insert_clean(&db_insert);
+				zbx_db_insert_execute(&db_insert_host_tag_cache);
+				zbx_db_insert_clean(&db_insert_host_tag_cache);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 				{
