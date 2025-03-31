@@ -1461,6 +1461,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
+
+		__zbx_update_env(zbx_time());
 	}
 out:
 	if (SUCCEED == ZBX_EXIT_STATUS())
