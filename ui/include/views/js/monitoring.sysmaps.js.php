@@ -425,7 +425,7 @@ function createFontSelect(string $name): CSelect {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CTextBox('border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+							(new CNumericBox('border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Color'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
