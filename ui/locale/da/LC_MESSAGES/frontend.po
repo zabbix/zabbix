@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-16 12:16+0000\n"
+"PO-Revision-Date: 2025-03-21 19:20+0000\n"
 "Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -2717,7 +2717,7 @@ msgstr "Kan ikke slette standard bruger-bibliotek."
 #: include/classes/api/services/CDRule.php:772
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "Kan ikke slette opdagelseskontrol \"%1$s\" for opdagelsesreglen \"%2$s\": %3$s."
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2729,7 +2729,7 @@ msgstr[1] "Kan ikke slette opdagelsesregler"
 #: include/classes/api/services/CDRule.php:979
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke slette opdagelsesreglen \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2758,7 +2758,7 @@ msgstr[1] "Kan ikke slette vært"
 #: include/classes/api/services/CHost.php:1631
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke slette værten \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2776,7 +2776,7 @@ msgstr[1] "Kan ikke slette værts-grupper"
 #: include/classes/api/services/CHostGroup.php:767
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke slette værtsgruppen \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2923,7 +2923,7 @@ msgstr[1] "Kan ikke slette skabelon"
 #: include/classes/api/services/CTemplate.php:805
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke slette skabelonen \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2963,7 +2963,7 @@ msgstr[1] "Kan ikke slette udløsere"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke slette udøseren \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -2991,12 +2991,12 @@ msgstr[1] "Kan ikke slette bruger grupper"
 #: include/classes/api/services/CUserGroup.php:1330
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "Kan ikke slette brugergruppen \"%1$s\", fordi den bruges af LDAP-brugerkataloget \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1325
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "Kan ikke slette brugergruppen \"%1$s\", fordi den bruges af SAML-brugermappe."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3309,7 +3309,7 @@ msgstr "Kan ikke finde datapunktet \"%1$s\" på \"%2$s\" brugt som Y-aksens MIN-
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
-msgstr ""
+msgstr "Kan ikke finde elementet \"%1$s\" på \"%2$s\" brugt i et link til kortet \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -3993,7 +3993,7 @@ msgstr "Kan ikke opdatere \"%1$s\" for skabelonudløserprototypen \"%2$s\"."
 #: include/classes/api/helpers/CApiSettingsHelper.php:94
 #, c-format
 msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
-msgstr ""
+msgstr "Parameteren \"%1$s\" kan ikke opdateres, fordi den i øjeblikket er skrivebeskyttet. Overvej at opgradere Zabbix for at fjerne denne begrænsning."
 
 #: include/classes/api/services/CHost.php:2344
 #, c-format
@@ -4494,7 +4494,7 @@ msgstr "Tjek om filen findes. Returnerer 0 - ikke fundet; 1 - fil af den angivne
 
 #: include/classes/data/CItemData.php:1115
 msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Kontrollerer, om værten er tilgængelig via ICMP-ping med genforsøg. 0 - ICMP-ping mislykkes. 1 - ICMP-ping lykkedes."
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -5997,7 +5997,7 @@ msgstr "Database TLS nøglefil"
 #: include/classes/api/clients/CLocalApiClient.php:124
 #: include/classes/api/clients/CLocalApiClient.php:138
 msgid "Database error occurred."
-msgstr ""
+msgstr "Der opstod en databasefejl."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6697,19 +6697,19 @@ msgstr "Slettet"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "Slettet vært"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "Slettet værtsgruppe"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "Slettede værtsgruppe(r)"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "Slettet udløser"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -7344,7 +7344,7 @@ msgstr "Vis lokal tid"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Vis logtid"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9516,7 +9516,7 @@ msgstr "Historie funktioner"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Historik, trends og komprimering af revisionslog"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -11254,7 +11254,7 @@ msgstr "Uendelig"
 
 #: include/views/js/monitoring.sysmaps.js.php:841
 msgid "Indicator type"
-msgstr ""
+msgstr "Indikator type"
 
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
@@ -13616,7 +13616,7 @@ msgstr "Menusti"
 
 #: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
-msgstr ""
+msgstr "Flet sektorer mindre end"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -17823,7 +17823,7 @@ msgstr "Resultatet er SAND"
 #: app/controllers/CControllerPopupItemTestSend.php:456
 #, c-format
 msgid "Result is truncated due to its size (%1$s)."
-msgstr ""
+msgstr "Resultatet er afkortet på grund af dets størrelse (%1$s)."
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17903,7 +17903,7 @@ msgstr "Returnerer antallet af UDP-sockets, der matcher parametre. Returnerer he
 
 #: include/classes/data/CItemData.php:2862
 msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
-msgstr ""
+msgstr "Returnerer antallet af tilstandsændringer fra disk/hukommelsestilstand siden start. Hyppige tilstandsændringer indikerer, at enten hukommelsesbufferstørrelse eller alder skal øges."
 
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
@@ -17986,7 +17986,7 @@ msgstr "Kør scriptet \"%1$s\" på nuværende vært"
 #: include/actions.inc.php:601
 #, c-format
 msgid "Run script \"%1$s\" on deleted object(s)"
-msgstr ""
+msgstr "Kør scriptet \"%1$s\" på slettede objekt(er)"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -18828,7 +18828,7 @@ msgstr "Tjeneste"
 #: include/classes/api/services/CService.php:1549
 #, c-format
 msgid "Service \"%1$s\" cannot have problem tags and children at the same time."
-msgstr ""
+msgstr "Tjenesten \"%1$s\" kan ikke have problem-tags og under-tags på samme tid."
 
 #: app/views/action.list.php:36 include/classes/helpers/CMenuHelper.php:240
 #: include/classes/helpers/CRoleHelper.php:471
@@ -19300,7 +19300,7 @@ msgstr "Sidebar kontrol"
 
 #: app/views/administration.authentication.edit.php:356
 msgid "Sign"
-msgstr ""
+msgstr "Tegn"
 
 #: include/views/general.login.php:64 include/views/general.login.php:79
 msgid "Sign in"
@@ -20676,11 +20676,11 @@ msgstr "Disse parametre sendes til scriptet som kommandolinjeargumenter i den an
 
 #: app/views/action.list.php:163
 msgid "This action has conditions or operations referencing deleted object(s)."
-msgstr ""
+msgstr "Denne handling har betingelser eller operationer, der refererer til slettede objekt(er)."
 
 #: app/views/action.list.php:158
 msgid "This action has missing conditions or operations due to previously deleted object(s)."
-msgstr ""
+msgstr "Denne handling mangler betingelser eller handlinger på grund af tidligere slettede objekt(er)."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20734,7 +20734,7 @@ msgstr "Denne indstilling viser lokal tid i stedet for tidsstemplet. \"Vis tidss
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Denne indstilling viser logtid i stedet for datapunktets tidsstempel. \"Vis tidsstempel\" skal også være afkrydset i den avancerede konfiguration."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -20978,7 +20978,7 @@ msgstr "I dag indtil videre"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Token redigering"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21011,7 +21011,7 @@ msgstr "Top værter"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "Top datapunkter"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21381,8 +21381,8 @@ msgstr "Udløser prototype tilføjet"
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
-msgstr[0] ""
-msgstr[1] "Udløserprototype slettet"
+msgstr[0] "Udløserprototype slettet"
+msgstr[1] "Udløserprototyper slettet"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
@@ -22941,83 +22941,83 @@ msgstr "VMware virtuel maskine navn, \"url\" - VMware service URL, \"uuid\" - VM
 
 #: include/classes/data/CItemData.php:2415
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware virtuel maskine netværksgrænseflade inputstatistik, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator, \"instans\" - netværks interface instans, \"mode\" - bps/pps - bytes/pakker pr. sekund"
 
 #: include/classes/data/CItemData.php:2422
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware virtuel maskine netværk interface output statistik, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator, \"instans\" - netværk interface instans, \"mode\" - bps/pps - bytes/pakker pr. sekund"
 
 #: include/classes/data/CItemData.php:2436
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unik identifikator, \"path\" - performance counter path, \"instance\" - performance counter instans"
 
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine strømtilstand, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2498
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine privat hukommelsesstørrelse, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
-msgstr ""
+msgstr "VMware virtuel maskine privat hukommelsesstørrelse, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2275
 msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine processor klar tid ms, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2296
 msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Brug af VMware virtuel maskine processor i Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2450
 msgid "VMware virtual machine property, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"prop\" - property path"
-msgstr ""
+msgstr "VMware virtuel maskine egenskab, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator, \"prop\" - egenskabssti"
 
 #: include/classes/data/CItemData.php:2366
 msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine delt hukommelsesstørrelse, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2457
 msgid "VMware virtual machine snapshot state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware virtuel maskine snapshot tilstand, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator. Returnerer JSON"
 
 #: include/classes/data/CItemData.php:2464
 msgid "VMware virtual machine state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine tilstand, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2373
 msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine byttet hukommelsesstørrelse, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2520
 msgid "VMware virtual machine tags array, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware virtuel maskine tags array, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator. Returnerer JSON"
 
 #: include/classes/data/CItemData.php:2527
 msgid "VMware virtual machine tools state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"mode\"- version or status"
-msgstr ""
+msgstr "VMware virtuelle maskinværktøjstilstand, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator, \"mode\" - version eller status"
 
 #: include/classes/data/CItemData.php:2394
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine samlet hukommelsesstørrelse, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2499
 msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine uforpligtet lagerplads, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2506
 msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine udelt lagerplads, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2534
 msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware virtuel maskine oppetid, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine global unik identifikator"
 
 #: include/classes/data/CItemData.php:2086
 msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "VVMware hypervisor vedligeholdelsesstatus, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unik identifikator. Returnerer 0 - ikke i vedligeholdelse; 1 - i vedligeholdelse"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Valid URI schemes"
@@ -23182,7 +23182,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1225
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Værdien af enhver Windows-ydelsestæller. Returnerer heltal, float, streng eller tekst (afhængigt af anmodningen)"
 
 #: app/views/js/correlation.edit.js.php:268
 #: include/classes/helpers/CCorrelationHelper.php:153
@@ -23236,7 +23236,7 @@ msgstr "Forskellige oplysninger om specifikke processer. Returnere decimaltal"
 #: include/classes/setup/CSetupWizard.php:791
 #: include/classes/setup/CSetupWizard.php:807
 msgid "Vault API endpoint"
-msgstr ""
+msgstr "Vault API-slutpunkt"
 
 #: include/classes/setup/CSetupWizard.php:598
 #: include/classes/setup/CSetupWizard.php:799
@@ -24023,11 +24023,11 @@ msgstr "Zabbix-server (proxy)"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
-msgstr ""
+msgstr "Zabbix server og proxy"
 
 #: app/views/administration.miscconfig.edit.php:107
 msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
-msgstr ""
+msgstr "Zabbix-server og proxy: hemmeligheder hentes fra Vault af både Zabbix-server og proxyer, hvilket giver dem mulighed for at løse makroer uafhængigt."
 
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
@@ -24048,7 +24048,7 @@ msgstr "Zabbix server version"
 
 #: app/views/administration.miscconfig.edit.php:105
 msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
-msgstr ""
+msgstr "Zabbix-server: hemmeligheder hentes fra Vault af Zabbix-serveren og videresendes til proxyer, når det er nødvendigt."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24221,37 +24221,37 @@ msgstr "acos() - Arccosinus for en værdi som en vinkel, udtrykt i radianer"
 #: include/classes/api/services/CDRule.php:773
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne opdagelseskontrol"
 
 #: include/classes/api/services/CDRule.php:980
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne opdagelsesregel"
 
 #: include/classes/api/services/CHost.php:1632
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne vært"
 
 #: include/classes/api/services/CHostGroup.php:768
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne værtsgruppe"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne tjeneste"
 
 #: include/classes/api/services/CTemplate.php:806
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne skabelon"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "handling \"%1$s\" bruger denne udløser"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -24421,15 +24421,15 @@ msgstr "asin() - Bøjningen af en værdi som en vinkel, udtrykt i radianer"
 
 #: jsLoader.php:300
 msgid "at least 1 link highlight is required"
-msgstr ""
+msgstr "mindst 1 linkfremhævning er påkrævet"
 
 #: jsLoader.php:301
 msgid "at least 1 link threshold is required"
-msgstr ""
+msgstr "mindst 1 linktærskel er påkrævet"
 
 #: jsLoader.php:299
 msgid "at least 1 link trigger is required"
-msgstr ""
+msgstr "der kræves mindst 1 linkudløser"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -24489,7 +24489,7 @@ msgstr "between() - Kontrollerer, om en værdi hører til det givne område (1 -
 
 #: include/classes/api/services/CMap.php:1973
 msgid "binary item is not supported"
-msgstr ""
+msgstr "binært element er ikke understøttet"
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -25046,7 +25046,7 @@ msgstr "first() - Den ældste værdi i det angivne tidsinterval"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:626
 msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
-msgstr ""
+msgstr "firstclock() - Tidsstempel for den ældste værdi i det angivne tidsinterval"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -25225,7 +25225,7 @@ msgstr "forkert udtryk startende fra \"%1$s\""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
-msgstr ""
+msgstr "forkert datapunktværditype"
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25499,7 +25499,7 @@ msgstr "logsource() - Logkilde for den sidste logindgang, der matcher parameter 
 
 #: app/controllers/CControllerPopupTriggerExpr.php:795
 msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
-msgstr ""
+msgstr "logtimestamp() - Tidsstempel for den sidste (seneste) T-logmeddelelse"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
@@ -25930,7 +25930,7 @@ msgstr "eller"
 
 #: include/views/configuration.httpconf.edit.php:99
 msgid "other"
-msgstr ""
+msgstr "andre"
 
 #: include/forms.inc.php:1337 include/views/js/item.preprocessing.js.php:323
 msgid "output"
@@ -26107,7 +26107,7 @@ msgstr "søgestreng"
 #: include/classes/helpers/CMaintenanceHelper.php:45
 msgctxt "adjective"
 msgid "second"
-msgstr ""
+msgstr "sekund"
 
 #: include/forms.inc.php:1355 include/views/js/item.preprocessing.js.php:343
 msgid "seconds"
