@@ -1,0 +1,858 @@
+/*
+** Copyright (C) 2001-2025 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+class ZColorPicker extends HTMLElement {
+
+	static ZBX_STYLE_CLASS =				'color-picker';
+	static ZBX_STYLE_BOX =					'color-picker-box';
+	static ZBX_STYLE_DIALOG =				'color-picker-dialog';
+	static ZBX_STYLE_TABS =					'color-picker-tabs';
+	static ZBX_STYLE_TAB =					'color-picker-tab';
+	static ZBX_STYLE_TAB_SELECTED =			'color-picker-tab-selected';
+	static ZBX_STYLE_TAB_SOLID =			'color-picker-tab-solid';
+	static ZBX_STYLE_TAB_PALETTE =			'color-picker-tab-palette';
+	static ZBX_STYLE_CONTENTS =				'color-picker-contents';
+	static ZBX_STYLE_CONTENT =				'color-picker-content';
+	static ZBX_STYLE_CONTENT_SELECTED =		'color-picker-content-selected';
+	static ZBX_STYLE_CONTENT_SOLID =		'color-picker-content-solid';
+	static ZBX_STYLE_CONTENT_PALETTE =		'color-picker-content-palette';
+	static ZBX_STYLE_COLORS =				'color-picker-colors';
+	static ZBX_STYLE_COLOR =				'color-picker-color';
+	static ZBX_STYLE_COLOR_SELECTED =		'color-picker-color-selected';
+	static ZBX_STYLE_CONTROLS =				'color-picker-controls';
+	static ZBX_STYLE_INPUT_WRAP =			'color-picker-input-wrap';
+	static ZBX_STYLE_INPUT =				'color-picker-input';
+	static ZBX_STYLE_PREVIEW =				'color-picker-preview';
+	static ZBX_STYLE_BUTTON =				'color-picker-button';
+	static ZBX_STYLE_BUTTON_APPLY =			'color-picker-button-apply';
+	static ZBX_STYLE_BUTTON_DEFAULT =		'color-picker-button-default';
+	static ZBX_STYLE_BUTTON_CLEAR =			'color-picker-button-clear';
+	static ZBX_STYLE_DEFAULT_COLOR =		'color-picker-default-color';
+	static ZBX_STYLE_NO_COLOR =				'color-picker-no-color';
+	static ZBX_STYLE_IS_PALETTE =			'color-picker-is-palette';
+	static ZBX_STYLE_PALETTE_ICON =			'color-picker-palette-icon';
+	static ZBX_STYLE_PALETTE_ICON_PART =	'color-picker-palette-icon-part';
+	static ZBX_STYLE_PALETTE_ROW =			'color-picker-palette-row';
+
+	static PALETTE_PREFIX = 'palette_';
+
+	static SOLID_COLORS = [
+		['FF0000', 'FF0080', 'BF00FF', '4000FF', '0040FF', '0080FF', '00BFFF', '00FFFF', '00FFBF', '00FF00', '80FF00', 'BFFF00', 'FFFF00', 'FFBF00', 'FF8000', 'FF4000', 'CC6600', '666699'],
+		['FFCDD2', 'F8BBD0', 'E1BEE7', 'D1C4E9', 'C5CAE9', 'BBDEFB', 'B3E5FC', 'B2EBF2', 'B2DFDB', 'C8E6C9', 'DCEDC8', 'F0F4C3', 'FFF9C4', 'FFECB3', 'FFE0B2', 'FFCCBC', 'D7CCC8', 'CFD8DC'],
+		['EF9A9A', 'F48FB1', 'CE93D8', 'B39DDB', '9FA8DA', '90CAF9', '81D4FA', '80DEEA', '80CBC4', 'A5D6A7', 'C5E1A5', 'E6EE9C', 'FFF59D', 'FFE082', 'FFCC80', 'FFAB91', 'BCAAA4', 'B0BEC5'],
+		['E57373', 'F06292', 'BA68C8', '9575CD', '7986CB', '64B5F6', '4FC3F7', '4DD0E1', '4DB6AC', '81C784', 'AED581', 'DCE775', 'FFF176', 'FFD54F', 'FFB74D', 'FF8A65', 'A1887F', '90A4AE'],
+		['EF5350', 'EC407A', 'AB47BC', '7E57C2', '5C6BC0', '42A5F5', '29B6F6', '26C6DA', '26A69A', '66BB6A', '9CCC65', 'D4E157', 'FFEE58', 'FFCA28', 'FFA726', 'FF7043', '8D6E63', '78909C'],
+		['F44336', 'E91E63', '9C27B0', '673AB7', '3F51B5', '2196F3', '03A9F4', '00BCD4', '009688', '4CAF50', '8BC34A', 'CDDC39', 'FFEB3B', 'FFC107', 'FF9800', 'FF5722', '795548', '607D8B'],
+		['E53935', 'D81B60', '8E24AA', '5E35B1', '3949AB', '1E88E5', '039BE5', '00ACC1', '00897B', '43A047', '7CB342', 'C0CA33', 'FDD835', 'FFB300', 'FB8C00', 'F4511E', '6D4C41', '546E7A'],
+		['D32F2F', 'C2185B', '7B1FA2', '512DA8', '303F9F', '1976D2', '0288D1', '0097A7', '00796B', '388E3C', '689F38', 'AFB42B', 'FBC02D', 'FFA000', 'F57C00', 'E64A19', '5D4037', '455A64'],
+		['C62828', 'AD1457', '6A1B9A', '4527A0', '283593', '1565C0', '0277BD', '00838F', '00695C', '2E7D32', '558B2F', '9E9D24', 'F9A825', 'FF8F00', 'EF6C00', 'D84315', '4E342E', '37474F'],
+		['B71C1C', '880E4F', '4A148C', '311B92', '1A237E', '0D47A1', '01579B', '006064', '004D40', '1B5E20', '33691E', '827717', 'F57F17', 'FF6F00', 'E65100', 'BF360C', '3E2723', '263238'],
+		['891515', '660A3B', '370F69', '24146D', '131A5E', '093578', '044174', '00484B', '003930', '144618', '264E16', '615911', 'B75F11', 'BF5300', 'AC3C00', '8F2809', '2E1D1A', '1C252A'],
+		['5B0E0E', '440727', '250A46', '180D49', '0D113F', '062350', '002B4D', '003032', '002620', '0D2F10', '19340F', '413B0B', '7A3F0B', '7F3700', '732800', '5F1B06', '1F1311', '13191C']
+	];
+
+	static PALETTE_COLORS = [
+		['F48485', 'CA767B', 'FF78D9', 'CA76BE', '8867B9', '3B97FF', '4876B1', '6DBCCD', '7AD9CC', '619F3A', '92E79A', 'BBBC39', 'FCC95A', 'F69F89', 'E37E23', '7E574D', 'B89B93', '7E7E7E'],
+		['C75566', 'BF7FCB', 'B34FB7', '91497D', '7F3FA1', '8775BB', '646AD0', '68AFE4', '5188B9', '598530', '486C4E', '75CAC8', '67B08A', 'BCC239', 'A1A441', 'F0B338', 'EB9A39', 'DB6D47'],
+		['DD530E', 'F64C68', 'ED5AAD', 'DB4FEE', '9E7DF7', '6A45FC', '6A71F6', '3370FF', '3290FB', '0AABF0', '05ACD1', '66A22A', '62C51B', '15BC9E', '14B86B', 'EDB007', 'F16E22', 'A19AA2'],
+		['EFECFE', 'E6E1FE', 'D9D2FE', 'CFC3FE', 'C7B9FE', 'AF97FC', '9F83FB', '946CF9', '895DF8', '8247F0', '7534EF', '6D2CDD', '6724DB', '5320AC', '471B93', '411985', '2C115A', '220D45'],
+		['3975EC', '4173ED', '4571ED', '4A70EE', '4E6FEE', '546DEF', '596BEF', '5D6AEF', '6268EF', '6767F0', '6C66F1', '7064F1', '7563F1', '7A62F2', '7F60F2', '845FF3', '895EF3', '8C5CF3'],
+		['B8DFFF', '8ACAFF', '58B0FE', '4198FB', '3290FB', '2778F1', '196FF0', '1D64E7', '175BD9', '1A4DBC', '1848AF', '1C4797', '19418A', '19428F', '163A7E', '153675', '102A5B', '0C2045'],
+		['CCE7F0', 'A9D6E5', '89C2D9', '61A5C2', '59A1BF', '468FAF', '4489A7', '2C7DA0', '2A7798', '2A6F97', '266488', '014F86', '014B7F', '01497C', '01416F', '013A63', '012A4A', '00060A'],
+		['3D77EA', '557FD6', '6E88C1', '8992AB', 'A59C94', 'C5A77A', 'D1AC6F', 'E7B45D', 'FCBC4C', 'FCB54A', 'FCAA47', 'FC9F43', 'FC923F', 'FC893C', 'FD7C39', 'FC7436', 'FC6C33', 'FC6030'],
+		['FEF3CD', 'FEE38F', 'FFCB52', 'FEB939', 'FEB225', 'F99B1F', 'F9920B', 'F77402', 'E36B02', 'D95408', 'BB4907', 'AF410E', '97380C', '8F350F', '81300E', '6E280C', '531E09', '451908'],
+		['FFE8D1', 'FFD8B3', 'FE9F6C', 'FE7F4D', 'FE6D34', 'FE541A', 'FE480B', 'F22F03', 'E22C03', 'CC1C05', 'B81A05', 'A1180C', '93160B', '811B0E', '73180C', '65160B', '5C140A', '531209'],
+		['24C56B', '45C55D', '6BC64C', '83C53E', '9BC42F', 'B4C222', 'C7BE1E', 'DDBA19', 'EAB317', 'F4A917', 'FA9D14', 'F8930D', 'F48302', 'F17501', 'EE6601', 'EC5A01', 'E84A01', 'E43403'],
+		['D7F9E2', 'ACF1C7', '77E4A8', '75DBA7', '40CE85', '17C571', '15B769', '0A9F59', '099554', '09814C', '087847', '0A7044', '09623B', '095837', '084F31', '074B2F', '053320', '031C11']
+	];
+
+	static #hidden_input_template = `
+		<input type="hidden">
+	`;
+
+	static #box_template = `
+		<button type="button" class="${ZColorPicker.ZBX_STYLE_BOX} ${ZColorPicker.ZBX_STYLE_PREVIEW}" data-default-symbol="${t('D')}">
+			<div class="${ZColorPicker.ZBX_STYLE_PALETTE_ICON}">
+				<div class="${ZColorPicker.ZBX_STYLE_PALETTE_ICON_PART}"></div>
+				<div class="${ZColorPicker.ZBX_STYLE_PALETTE_ICON_PART}"></div>
+				<div class="${ZColorPicker.ZBX_STYLE_PALETTE_ICON_PART}"></div>
+			</div>
+		</button>
+	`;
+
+	static #dialog_template = `
+		<div class="${ZColorPicker.ZBX_STYLE_DIALOG} ${ZBX_STYLE_OVERLAY_DIALOGUE}">
+			<ul class="${ZColorPicker.ZBX_STYLE_TABS}">
+				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_SOLID}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_SOLID}" tabindex="0">
+					<span>${t('Solid color')}</span>
+				</li>
+				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_PALETTE}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE}" tabindex="0">
+					<span>${t('Palette')}</span>
+				</li>
+			</ul>
+			<div class="${ZColorPicker.ZBX_STYLE_CONTENTS}">
+				<div class="${ZColorPicker.ZBX_STYLE_CONTENT} ${ZColorPicker.ZBX_STYLE_CONTENT_SOLID}">
+					<div class="${ZColorPicker.ZBX_STYLE_COLORS}"></div>
+					<div class="${ZColorPicker.ZBX_STYLE_CONTROLS}">
+						<div class="${ZColorPicker.ZBX_STYLE_INPUT_WRAP}">
+							<input type="text" class="${ZColorPicker.ZBX_STYLE_INPUT}" maxlength="6"/>
+							<div class="${ZColorPicker.ZBX_STYLE_PREVIEW}" data-default-symbol="${t('D')}"></div>
+						</div>
+						<button type="button" class="${ZColorPicker.ZBX_STYLE_BUTTON} ${ZColorPicker.ZBX_STYLE_BUTTON_APPLY} ${ZBX_STYLE_BTN}" title="${t('Apply')}" aria-label="${t('Apply')}">${t('Apply')}</button>
+						<button type="button" class="${ZColorPicker.ZBX_STYLE_BUTTON} ${ZColorPicker.ZBX_STYLE_BUTTON_DEFAULT} ${ZBX_STYLE_BTN_ALT}" title="${t('Use default')}" aria-label="${t('Use default')}">${t('Use default')}</button>
+						<button type="button" class="${ZColorPicker.ZBX_STYLE_BUTTON} ${ZColorPicker.ZBX_STYLE_BUTTON_CLEAR} ${ZBX_STYLE_BTN_ALT}" title="${t('Clear')}" aria-label="${t('Clear')}">${t('Clear')}</button>
+					</div>
+				</div>
+				<div class="${ZColorPicker.ZBX_STYLE_CONTENT} ${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE}">
+					<ul class="${ZColorPicker.ZBX_STYLE_COLORS}"></ul>
+				</div>
+			</div>
+		</div>
+	`;
+
+	static #solid_row_template = `
+		<div></div>
+	`;
+
+	static #solid_column_template = `
+		<button type="button" class="${ZColorPicker.ZBX_STYLE_COLOR}" title="##{color}" data-color="#{color}" style="background: ##{color}"></button>
+	`;
+
+	static #palette_row_template = `
+		<li class="${ZColorPicker.ZBX_STYLE_PALETTE_ROW}">
+			<input type="radio" class="${ZBX_STYLE_CHECKBOX_RADIO}" id="${ZColorPicker.PALETTE_PREFIX}#{value}" name="${ZColorPicker.PALETTE_PREFIX}" value="${ZColorPicker.PALETTE_PREFIX}#{value}"/>
+			<label for="${ZColorPicker.PALETTE_PREFIX}#{value}">
+				<span></span>
+				<div></div>
+			</label>
+		</li>
+	`;
+
+	static #palette_column_template = `
+		<div style="background: ##{color}"></div>
+	`;
+
+	/**
+	 * Elements of color picker.
+	 */
+	#box;
+	#hidden_input;
+	#dialog;
+	#input;
+	#preview;
+
+	/**
+	 * Attributes of color picker.
+	 */
+	#name;
+	#value;
+	#input_id;
+	#has_default;
+	#has_palette;
+	#disabled;
+
+	#events;
+
+	#is_connected = false;
+	#is_dialog_open = false;
+	#is_dialog_hovered = false;
+
+	constructor() {
+		super();
+	}
+
+	connectedCallback() {
+		if (!this.#is_connected) {
+			this.#is_connected = true;
+
+			this.classList.add(ZColorPicker.ZBX_STYLE_CLASS);
+
+			this.#name = this.getAttribute('name');
+			this.#value = this.getAttribute('value')?.toUpperCase();
+			this.#input_id = this.getAttribute('input-id');
+			this.#has_default = this.hasAttribute('has-default');
+			this.#has_palette = this.hasAttribute('has-palette');
+			this.#disabled = this.hasAttribute('disabled');
+
+			this.#hidden_input = new Template(ZColorPicker.#hidden_input_template).evaluateToElement();
+			this.#box = new Template(ZColorPicker.#box_template).evaluateToElement();
+
+			this.appendChild(this.#hidden_input);
+			this.appendChild(this.#box);
+
+			this.#dialog = this.#createDialog();
+			this.#input = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_INPUT}`);
+			this.#preview = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_PREVIEW}`);
+		}
+
+		this.#refresh();
+		this.#registerEvents();
+	}
+
+	disconnectedCallback() {
+		this.#unregisterEvents();
+	}
+
+	static get observedAttributes() {
+		return ['name', 'value', 'input-id', 'has-default', 'has-palette', 'disabled'];
+	}
+
+	attributeChangedCallback(name, old_value, new_value) {
+		if (!this.#is_connected || old_value === new_value) {
+			return;
+		}
+
+		if (this.#is_dialog_open) {
+			this.#closeDialog();
+		}
+
+		switch (name) {
+			case 'name':
+				this.#name = new_value;
+				break;
+
+			case 'value':
+				this.#value = new_value?.toUpperCase();
+				break;
+
+			case 'input-id':
+				this.#input_id = new_value;
+				break;
+
+			case 'has-default':
+				this.#has_default = new_value !== null;
+				break;
+
+			case 'has-palette':
+				this.#has_palette = new_value !== null;
+				break;
+
+			case 'disabled':
+				this.#disabled = new_value !== null;
+				break;
+
+			default:
+				return;
+		}
+
+		this.#refresh();
+	}
+
+	#refresh() {
+		this.#hidden_input.name = this.#name;
+		this.#hidden_input.value = this.#value;
+
+		if (this.#input_id === null) {
+			this.#hidden_input.id = zbx_formatDomId(this.#name);
+		}
+		else {
+			this.#hidden_input.id = this.#input_id;
+		}
+
+		this.#box.id = `lbl_${zbx_formatDomId(this.#name)}`;
+		this.#box.title = this.#getTitle(this.#value);
+		this.#box.classList.toggle(ZColorPicker.ZBX_STYLE_IS_PALETTE, this.#isValidPalette(this.#value));
+
+		if (isColorHex(`#${this.#value}`)) {
+			this.#box.style.background = `#${this.#value}`;
+		}
+		else if (this.#value === '') {
+			this.#box.style.background = '';
+		}
+
+		if (this.#isValidPalette(this.#value)) {
+			const icon_parts = this.#box.querySelectorAll(`.${ZColorPicker.ZBX_STYLE_PALETTE_ICON_PART}`);
+
+			const number = ZColorPicker.#getPaletteRowNumber(this.#value);
+
+			icon_parts[0].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][0]}`);
+			icon_parts[1].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][8]}`);
+			icon_parts[2].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][17]}`);
+		}
+
+		this.#updateEmptyState(this.#box, this.#value);
+
+		if (this.#disabled) {
+			this.#hidden_input.setAttribute('disabled', '');
+			this.#box.setAttribute('disabled', '');
+		}
+		else {
+			this.#hidden_input.removeAttribute('disabled');
+			this.#box.removeAttribute('disabled');
+		}
+	}
+
+	#registerEvents() {
+		this.#events = {
+			dialogMouseenter: () => {
+				this.#is_dialog_hovered = true;
+			},
+
+			dialogMouseleave: () => {
+				this.#is_dialog_hovered = false;
+			},
+
+			dialogClick: e => {
+				const tab = e.target.closest(`.${ZColorPicker.ZBX_STYLE_TAB}`);
+
+				if (tab !== null) {
+					this.#selectTab(tab);
+
+					return;
+				}
+
+				const selected_tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SELECTED}`);
+
+				if (selected_tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_SOLID)) {
+					const color = e.target.closest(`.${ZColorPicker.ZBX_STYLE_COLOR}`);
+					const button = e.target.closest(`.${ZColorPicker.ZBX_STYLE_BUTTON}`);
+
+					if (color !== null) {
+						this.#selectColor(color.dataset.color);
+					}
+					else if (button !== null) {
+						this.#selectButton(button);
+					}
+				}
+				else if (selected_tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_PALETTE)) {
+					const palette = e.target.closest(`.${ZColorPicker.ZBX_STYLE_PALETTE_ROW}`);
+
+					if (palette !== null && e.detail !== 0) {
+						this.#selectPalette(palette);
+					}
+				}
+			},
+
+			dialogKeydown: e => {
+				switch (e.which) {
+					case KEY_ENTER:
+						const tab = e.target.closest(`.${ZColorPicker.ZBX_STYLE_TAB}`);
+
+						if (tab !== null) {
+							this.#selectTab(tab);
+
+							return;
+						}
+
+						const selected_tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SELECTED}`);
+
+						if (selected_tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_SOLID)) {
+							const color = e.target.closest(`.${ZColorPicker.ZBX_STYLE_COLOR}`);
+
+							if (color !== null) {
+								this.#selectColor(color.dataset.color);
+							}
+							else if (e.target.closest(`.${ZColorPicker.ZBX_STYLE_INPUT}`) === this.#input) {
+								this.#selectColor(this.#input.value);
+							}
+						}
+						else if (selected_tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_PALETTE)) {
+							const palette = e.target.closest(`.${ZColorPicker.ZBX_STYLE_PALETTE_ROW}`);
+
+							if (palette !== null) {
+								this.#selectPalette(palette);
+							}
+						}
+
+						break;
+				}
+			},
+
+			inputChange: e => {
+				const value = e.target.value;
+
+				this.#updatePreview(value);
+				this.#updateHighlight(value);
+				this.#updateApplyButton(value);
+			},
+
+			documentClick: e => {
+				const box = e.target.closest(`.${ZColorPicker.ZBX_STYLE_BOX}`);
+
+				if (box !== null) {
+					if (box === this.#box) {
+						if (this.#is_dialog_open) {
+							this.#closeDialog();
+						}
+						else {
+							this.#openDialog();
+						}
+					}
+					else {
+						if (this.#is_dialog_open) {
+							this.#closeDialog();
+						}
+					}
+				}
+				else if (e.target.closest(`.${ZColorPicker.ZBX_STYLE_DIALOG}`) === null) {
+					if (this.#is_dialog_open) {
+						this.#closeDialog();
+					}
+				}
+			},
+
+			documentKeydown: e => {
+				if (e.which === KEY_ESCAPE) {
+					this.#closeDialog();
+				}
+			},
+
+			documentResize: () => {
+				this.#closeDialog();
+			},
+
+			documentWheel: () => {
+				if (!this.#is_dialog_hovered) {
+					this.#closeDialog();
+				}
+			}
+		};
+
+		document.addEventListener('click', this.#events.documentClick);
+		document.addEventListener('resize', this.#events.documentResize);
+	}
+
+	#unregisterEvents() {
+		document.removeEventListener('click', this.#events.documentClick);
+		document.removeEventListener('resize', this.#events.documentResize);
+	}
+
+	#createDialog() {
+		const dialog = new Template(ZColorPicker.#dialog_template).evaluateToElement();
+
+		const solid_row_template = new Template(ZColorPicker.#solid_row_template);
+		const solid_column_template = new Template(ZColorPicker.#solid_column_template);
+
+		for (const row of ZColorPicker.SOLID_COLORS) {
+			let columns_html = '';
+
+			for (const color of row) {
+				columns_html += solid_column_template.evaluate({color});
+			}
+
+			const row_element = solid_row_template.evaluateToElement();
+
+			row_element.innerHTML = columns_html;
+
+			dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_SOLID} .${ZColorPicker.ZBX_STYLE_COLORS}`).appendChild(row_element);
+		}
+
+		const palette_row_template = new Template(ZColorPicker.#palette_row_template);
+		const palette_column_template = new Template(ZColorPicker.#palette_column_template);
+
+		for (let i = 0; i < ZColorPicker.PALETTE_COLORS.length; i++) {
+			let columns_html = '';
+
+			for (const color of ZColorPicker.PALETTE_COLORS[i]) {
+				columns_html += palette_column_template.evaluate({color});
+			}
+
+			const row_element = palette_row_template.evaluateToElement({value: i});
+
+			row_element.querySelector('div').innerHTML = columns_html;
+
+			dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE} .${ZColorPicker.ZBX_STYLE_COLORS}`).appendChild(row_element);
+		}
+
+		return dialog;
+	}
+
+	#openDialog() {
+		document.body.appendChild(this.#dialog);
+
+		this.#is_dialog_open = true;
+
+		this.#updatePreview(this.#value);
+		this.#updateHighlight(this.#value);
+		this.#updateApplyButton(this.#value);
+
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TABS}`)
+			.style.display = this.#has_palette ? '' : 'none';
+
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_DEFAULT}`)
+			.style.display = this.#has_default ? '' : 'none';
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_CLEAR}`)
+			.style.display = this.#has_default ? 'none' : '';
+
+		this.#dialog.querySelectorAll(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)
+			.forEach(input => input.checked = false);
+
+		if (ZColorPicker.#isValidSolid(this.#value)) {
+			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
+
+			if (tab !== null) {
+				this.#selectTab(tab);
+			}
+
+			this.#input.value = this.#value;
+
+			this.#input.focus();
+		}
+		else if (this.#isValidPalette(this.#value)) {
+			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_PALETTE}`);
+
+			if (tab !== null) {
+				this.#selectTab(tab);
+			}
+
+			this.#input.value = '';
+
+			const row_number = ZColorPicker.#getPaletteRowNumber(this.#value);
+			const input = this.#dialog.querySelector(`input[value="${ZColorPicker.PALETTE_PREFIX}${row_number}"]`);
+
+			if (input !== null) {
+				input.checked = true;
+			}
+		}
+
+		this.#positionDialog();
+
+		this.#dialog.addEventListener('mouseenter', this.#events.dialogMouseenter);
+		this.#dialog.addEventListener('mouseleave', this.#events.dialogMouseleave);
+		this.#dialog.addEventListener('keydown', this.#events.dialogKeydown);
+		this.#dialog.addEventListener('click', this.#events.dialogClick);
+
+		this.#input.addEventListener('input', this.#events.inputChange);
+
+		document.addEventListener('keydown', this.#events.documentKeydown);
+		document.addEventListener('wheel', this.#events.documentWheel);
+	}
+
+	#closeDialog() {
+		this.#dialog.removeEventListener('mouseenter', this.#events.dialogMouseenter);
+		this.#dialog.removeEventListener('mouseleave', this.#events.dialogMouseleave);
+		this.#dialog.removeEventListener('keydown', this.#events.dialogKeydown);
+		this.#dialog.removeEventListener('click', this.#events.dialogClick);
+
+		this.#input.removeEventListener('input', this.#events.inputChange);
+
+		document.removeEventListener('keydown', this.#events.documentKeydown);
+		document.removeEventListener('wheel', this.#events.documentWheel);
+
+		this.#dialog.remove();
+
+		this.#is_dialog_open = false;
+	}
+
+	#positionDialog() {
+		const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
+		const box_rect = this.#box.getBoundingClientRect();
+		const dialog_rect = this.#dialog.getBoundingClientRect();
+
+		const space_right = wrapper_rect.width + wrapper_rect.left - box_rect.left - box_rect.width;
+		const space_left = box_rect.left - wrapper_rect.left;
+		const space_below = wrapper_rect.height - box_rect.top - box_rect.width;
+		const space_above = box_rect.top;
+
+		const fits_right = dialog_rect.width <= space_right;
+		const fits_left = dialog_rect.width <= space_left;
+		const fits_below = dialog_rect.height <= space_below;
+		const fits_above = dialog_rect.height <= space_above;
+
+		const pos = {
+			left: fits_right || !fits_right && !fits_left
+				? box_rect.left + box_rect.width
+				: box_rect.left - dialog_rect.width,
+			top: fits_below || !fits_below && !fits_above
+				? box_rect.top
+				: box_rect.top + box_rect.height - dialog_rect.height
+		};
+
+		this.#dialog.style.left = `${pos.left}px`;
+		this.#dialog.style.top = `${pos.top}px`;
+	}
+
+	/**
+	 * Update element (box or preview) emptiness states.
+	 *
+	 * @param {Element} element
+	 * @param {string} value
+	 */
+	#updateEmptyState(element, value) {
+		element.classList.remove(ZColorPicker.ZBX_STYLE_DEFAULT_COLOR, ZColorPicker.ZBX_STYLE_NO_COLOR);
+
+		if (value === '') {
+			element.classList.add(this.#has_default
+				? ZColorPicker.ZBX_STYLE_DEFAULT_COLOR
+				: ZColorPicker.ZBX_STYLE_NO_COLOR
+			);
+		}
+	}
+
+	/**
+	 * Update color preview inside dialog.
+	 *
+	 * @param {string} value
+	 */
+	#updatePreview(value) {
+		value = value.toUpperCase();
+
+		if (isColorHex(`#${value}`)) {
+			this.#preview.style.background = `#${value}`;
+		}
+		else if (value === '') {
+			this.#preview.style.background = '';
+		}
+		else if (this.#isValidPalette(value)) {
+			this.#preview.style.background = '';
+		}
+
+		this.#preview.title = this.#getTitle(value, false);
+
+		this.#updateEmptyState(this.#preview, value);
+	}
+
+	/**
+	 * Update color highlighting - mark selected color if it matches one of given colors.
+	 *
+	 * @param {string} value
+	 */
+	#updateHighlight(value) {
+		value = value.toUpperCase();
+
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR_SELECTED}`)
+			?.classList.remove(ZColorPicker.ZBX_STYLE_COLOR_SELECTED);
+
+		const color = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR}[data-color="${value}"]`);
+
+		if (color !== null) {
+			color.classList.add(ZColorPicker.ZBX_STYLE_COLOR_SELECTED);
+		}
+	}
+
+	/**
+	 * Update "Apply" button - enable or disable it based on value.
+	 *
+	 * @param {string} value
+	 */
+	#updateApplyButton(value) {
+		value = value.toUpperCase();
+
+		const button = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`);
+		const color = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR}[data-color="${value}"]`);
+
+		button.disabled = color !== null || !ZColorPicker.#isValidSolid(value);
+	}
+
+	/**
+	 * Select tab.
+	 *
+	 * @param {Element} tab
+	 */
+	#selectTab(tab) {
+		if (tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_SELECTED)) {
+			return;
+		}
+
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SELECTED}`)
+			?.classList.remove(ZColorPicker.ZBX_STYLE_TAB_SELECTED);
+
+		tab.classList.add(ZColorPicker.ZBX_STYLE_TAB_SELECTED);
+
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_SELECTED}`)
+			?.classList.remove(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
+
+		this.#dialog.querySelector(`.${tab.dataset.content}`)
+			.classList.add(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
+	}
+
+	/**
+	 * Select solid color.
+	 *
+	 * @param {string} color
+	 */
+	#selectColor(color) {
+		if (!ZColorPicker.#isValidSolid(color)) {
+			return;
+		}
+
+		this.value = color;
+
+		this.#closeDialog();
+
+		this.dispatchEvent(new Event('change', {bubbles: true}));
+	}
+
+	/**
+	 * Select one of given buttons.
+	 *
+	 * @param {Element} button
+	 */
+	#selectButton(button) {
+		let color = '';
+
+		if (button.classList.contains(ZColorPicker.ZBX_STYLE_BUTTON_APPLY)) {
+			color = this.#input.value;
+		}
+
+		this.#selectColor(color);
+
+		this.#closeDialog();
+	}
+
+	/**
+	 * Select chosen palette.
+	 *
+	 * @param {Element} palette
+	 */
+	#selectPalette(palette) {
+		const value = palette.querySelector('input')?.value;
+
+		if (!this.#isValidPalette(value)) {
+			return;
+		}
+
+		this.value = value;
+
+		this.#closeDialog();
+	}
+
+	/**
+	 * Determine displayable title of box and preview.
+	 *
+	 * @param {string} value
+	 * @param {boolean} is_palette_allowed
+	 *
+	 * @returns {string}
+	 */
+	#getTitle(value, is_palette_allowed = true) {
+		value = value.toUpperCase();
+
+		if (isColorHex(`#${value}`)) {
+			return `#${value}`;
+		}
+		else if (value === '') {
+			return this.#has_default ? t('Use default') : t('No color');
+		}
+		else if (is_palette_allowed && this.#isValidPalette(value)) {
+			const number = ZColorPicker.#getPaletteRowNumber(value);
+
+			return `${t('Palette')} ${number + 1}`;
+		}
+		else {
+			return '';
+		}
+	}
+
+	/**
+	 * Check if provided value is valid solid color.
+	 *
+	 * @param {string} value
+	 *
+	 * @returns {boolean}
+	 */
+	static #isValidSolid(value) {
+		return isColorHex(`#${value}`) || value === '';
+	}
+
+	/**
+	 * Check if provided value is valid palette code.
+	 *
+	 * @param {string} value
+	 *
+	 * @returns {boolean}
+	 */
+	#isValidPalette(value) {
+		if (!this.#has_palette) {
+			return false;
+		}
+
+		const number = ZColorPicker.#getPaletteRowNumber(value);
+
+		return number >= 0 && number < ZColorPicker.PALETTE_COLORS.length;
+	}
+
+	/**
+	 * Get row number of selected palette.
+	 *
+	 * @param {string} value
+	 *
+	 * @returns {number}
+	 */
+	static #getPaletteRowNumber(value) {
+		const regex = new RegExp(`^${ZColorPicker.PALETTE_PREFIX}(\\d+)$`, 'i');
+
+		if (value.match(regex) === null) {
+			return -1;
+		}
+
+		return Number(value.match(regex)[1]);
+	}
+
+	get name() {
+		return this.getAttribute('name');
+	}
+
+	set name(name) {
+		this.setAttribute('name', name);
+	}
+
+	get value() {
+		return this.getAttribute('value');
+	}
+
+	set value(value) {
+		this.setAttribute('value', value);
+	}
+
+	get inputId() {
+		return this.getAttribute('input-id');
+	}
+
+	set inputId(input_id) {
+		this.setAttribute('input-id', input_id);
+	}
+
+	get hasDefault() {
+		return this.hasAttribute('has-default');
+	}
+
+	set hasDefault(has_default) {
+		if (has_default) {
+			this.setAttribute('has-default', '');
+		}
+		else {
+			this.removeAttribute('has-default');
+		}
+	}
+
+	get hasPalette() {
+		return this.hasAttribute('has-palette');
+	}
+
+	set hasPalette(has_palette) {
+		if (has_palette) {
+			this.setAttribute('has-palette', '');
+		}
+		else {
+			this.removeAttribute('has-palette');
+		}
+	}
+
+	get disabled() {
+		return this.hasAttribute('disabled');
+	}
+
+	set disabled(disabled) {
+		if (disabled) {
+			this.setAttribute('disabled', '');
+		}
+		else {
+			this.removeAttribute('disabled');
+		}
+	}
+}
+
+customElements.define('z-color-picker', ZColorPicker);

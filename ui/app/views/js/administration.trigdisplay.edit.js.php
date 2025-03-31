@@ -32,9 +32,7 @@
 		$("input[name=custom_color]").on('change', function() {
 			var checked = $(this).is(':checked');
 			$(".js-event-color-picker").each(function() {
-				var $field = $(this);
-				$field.toggleClass('<?= ZBX_STYLE_DISABLED ?>', !checked);
-				$("input, input+button", $field).prop('disabled', !checked);
+				this.disabled = !checked;
 			});
 		});
 

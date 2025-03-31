@@ -977,3 +977,10 @@ function convertHSLToRGB(h, s, l) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
+
+/**
+ * Must be synced with zbx_formatDomId in func.inc.php.
+ */
+function zbx_formatDomId(value) {
+	return value.replaceAll('[', '_').replaceAll(']', '');
+}
