@@ -29,7 +29,7 @@ Plugins.Smart.Path=/usr/sbin/smartctl
 ```
 - **Example for Windows:**
 ```
-Plugins.Smart.Path="C:\Program Files\smartctl\smartctl.exe"
+Plugins.Smart.Path=C:\Program Files\smartctl\smartctl.exe
 ```
 - **Usage:** Use this parameter to specify the location of the `smartctl` binary.
 - **Note:**  
