@@ -219,11 +219,15 @@ int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, z
 	int	ret;
 	va_list	args;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s", __func__, *data);
+
 	va_start(args, cb);
 
 	ret = substitute_item_key_params_args(data, error, maxerrlen, cb, args);
 
 	va_end(args);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
