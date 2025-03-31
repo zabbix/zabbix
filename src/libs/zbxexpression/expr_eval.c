@@ -2094,12 +2094,9 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const z
  ******************************************************************************/
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
 {
-	int			i;
-	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-	um_handle = zbx_dc_open_user_macros();
-
-	for (i = 0; i < eval->queries.values_num; i++)
+	for (int i = 0; i < eval->queries.values_num; i++)
 	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
