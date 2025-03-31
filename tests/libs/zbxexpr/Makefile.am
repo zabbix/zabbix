@@ -30,7 +30,9 @@ BINARIES_tests = \
 	zbx_get_agent_item_nextcheck \
 	zbx_url_encode_decode \
 	zbx_custom_interval_is_scheduling \
-	zbx_user_macro_quote_context_dyn
+	zbx_user_macro_quote_context_dyn \
+	zbx_substitute_item_key_params \
+	zbx_substitute_snmp_oid_params
 
 if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
@@ -38,8 +40,7 @@ endif
 
 if SERVER
 BINARIES_tests += \
-	zbx_substitute_macros_um \
-	zbx_substitute_item_key_params
+	zbx_substitute_macros_um
 
 CONFIGCACHE_WRAP_FUNCS = \
 	-Wl,--wrap=__zbx_shmem_malloc \
@@ -597,3 +598,17 @@ zbx_substitute_item_key_params_LDADD += @SERVER_LIBS@
 zbx_substitute_item_key_params_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_substitute_item_key_params_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+zbx_substitute_snmp_oid_params_SOURCES = \
+	zbx_substitute_snmp_oid_params.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_snmp_oid_params_LDADD = \
+	$(EXPR_LIBS) \
+	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a
+
+zbx_substitute_snmp_oid_params_LDADD += @SERVER_LIBS@
+
+zbx_substitute_snmp_oid_params_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_substitute_snmp_oid_params_CFLAGS = $(EXPR_COMPILER_FLAGS)

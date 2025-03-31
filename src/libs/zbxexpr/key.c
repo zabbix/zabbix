@@ -203,9 +203,15 @@ clean:
  *                                                                            *
  * Purpose: safely substitutes macros in parameters of an item key            *
  *                                                                            *
- * Example:  key                     | macro  | result            | return    *
- *          -------------------------+--------+-------------------+---------  *
- *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
+ * Parameters:                                                                *
+ *      data      - [IN/OUT] item key                                         *
+ *      error     - [OUT] error buffer (can be NULL)                          *
+ *      maxerrlen - [IN] size of error buffer                                 *
+ *      cb        - [IN] callback function                                    *
+ *      ...       - [IN/OUT] variadic arguments passed to callback function   *
+ *                                                                            *
+ * Return value: SUCCEED - function executed successfully                     *
+ *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...)
