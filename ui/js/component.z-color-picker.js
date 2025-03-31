@@ -668,6 +668,8 @@ class ZColorPicker extends HTMLElement {
 
 		this.#dialog.querySelector(`.${tab.dataset.content}`)
 			.classList.add(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
+
+		this.#positionDialog();
 	}
 
 	/**
