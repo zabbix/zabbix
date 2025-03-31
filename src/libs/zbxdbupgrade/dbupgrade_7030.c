@@ -14,13 +14,13 @@
 
 #include "dbupgrade.h"
 
-#include "dbupgrade_component.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "dbupgrade_common.h"
+#include "zbxtasks.h"
 
 /*
  * 7.4 development database patches
@@ -391,65 +391,20 @@ static int	DBpatch_7030028(void)
 
 static int	DBpatch_7030029(void)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_uint64_t		last_hostid = 0, hostid, templateid;
-	zbx_vector_uint64_t	templateids;
-	zbx_db_insert_t		db_insert;
-	int			last_flags;
+	zbx_db_insert_t	db_insert;
+	int		ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_vector_uint64_create(&templateids);
-
-	zbx_db_insert_prepare(&db_insert, "hosts_templates",  "hosttemplateid", "hostid", "templateid",
-			"link_type", (char *)NULL);
-
-	/* 4 - ZBX_FLAG_DISCOVERY_CREATED */
-	result = zbx_db_select("select h.hostid,h.flags,ht.templateid"
-				" from hosts_templates ht"
-					" join hosts h on ht.hostid=h.hostid"
-				" where h.flags=4"
-					" and exists (select null from items i,host_discovery hd"
-							" where i.hostid=ht.templateid"
-								" and hd.parent_itemid=i.itemid)"
-				" order by hostid");
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(hostid, row[0]);
-
-		if (hostid != last_hostid)
-		{
-			if (0 != last_hostid)
-			{
-				dbupgrade_copy_template_host_prototypes(last_hostid, last_flags, &templateids,
-						&db_insert);
-			}
-
-			last_hostid = hostid;
-			last_flags = atoi(row[1]);
-			zbx_vector_uint64_clear(&templateids);
-		}
-
-		ZBX_STR2UINT64(templateid, row[2]);
-		zbx_vector_uint64_append(&templateids, templateid);
-	}
-	zbx_db_free_result(result);
-
-	if (0 != last_hostid)
-	{
-		if (0 != templateids.values_num)
-			dbupgrade_copy_template_host_prototypes(last_hostid, last_flags, &templateids, &db_insert);
-
-		zbx_db_insert_execute(&db_insert);
-	}
-
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", (char *)NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
-	zbx_vector_uint64_destroy(&templateids);
 
-	return SUCCEED;
+	return ret;
 }
 
 #endif

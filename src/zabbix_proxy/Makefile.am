@@ -91,7 +91,6 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
-	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade_proxy.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	autoreg/libzbxautoreg_proxy.a \
