@@ -69,11 +69,9 @@ class C72ImportConverter extends CConverter {
 	}
 
 	private static function convertMapElements(array $selements): array {
-		$default_zindex = DB::getDefault('sysmaps_elements', 'zindex');
-		$increment = 0;
-
+		$i = 0;
 		foreach ($selements as &$selement) {
-			$selement['zindex'] = (string) ($default_zindex + $increment++);
+			$selement['zindex'] = (string) $i++;
 		}
 		unset($selement);
 
