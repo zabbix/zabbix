@@ -97,7 +97,10 @@
 
 		setSubfilter(tag, value) {
 			if (value !== null) {
-				this._filter_tags.set(tag, value);
+				const tag_values = this._filter_tags.has(tag) ? this._filter_tags.get(tag) : [];
+
+				tag_values.push(value);
+				this._filter_tags.set(tag, tag_values);
 			}
 			else {
 				this._filter_tagnames.add(tag);
@@ -106,7 +109,9 @@
 
 		unsetSubfilter(tag, value) {
 			if (value !== null) {
-				this._filter_tags.delete(tag);
+				const values = this._filter_tags.get(tag);
+
+				this._filter_tags.set(tag, values.filter((tag_value) => value !== tag_value));
 			}
 			else {
 				this._filter_tagnames.delete(tag);
@@ -130,8 +135,10 @@
 				element.remove();
 			}
 
-			this._filter_tags.forEach((value, tag) => {
-				this.filterAddVar(`subfilter_tags[${encodeURIComponent(tag)}][]`, value);
+			this._filter_tags.forEach((values, tag) => {
+				for (let value of values) {
+					this.filterAddVar(`subfilter_tags[${encodeURIComponent(tag)}][]`, value);
+				}
 			});
 			this._filter_tagnames.forEach(tag => {
 				this.filterAddVar(`subfilter_tagnames[]`, tag);

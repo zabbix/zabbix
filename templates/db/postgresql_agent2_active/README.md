@@ -42,7 +42,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 4. Set the connection string for the PostgreSQL instance in the `{$PG.CONNSTRING.AGENT2}` macro as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
 
-**Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, cerfiticate/key filepaths if needed etc.).
+**Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, certificate/key filepaths if needed etc.).
 
 You can check the [`PostgreSQL plugin documentation`](https://git.zabbix.com/projects/AP/repos/postgresql/browse?at=refs%2Fheads%2Frelease%2F7.4) for details about agent plugin parameters and named sessions.
 

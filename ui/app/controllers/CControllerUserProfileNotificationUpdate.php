@@ -58,10 +58,11 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 	}
 
 	protected function doAction(): void {
-		$user = [];
-		$user['userid'] = CWebUser::$data['userid'];
+		$user = [
+			'userid' => CWebUser::$data['userid']
+		];
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+		if ($this->checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)) {
 			$user['medias'] = $this->getInputUserMedia();
 		}
 
@@ -71,7 +72,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
+			$response = new CControllerResponseRedirect(new CUrl(CMenuHelper::getFirstUrl()));
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {

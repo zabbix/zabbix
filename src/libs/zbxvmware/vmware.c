@@ -3189,7 +3189,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 		zbx_vmware_service_remove(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d job_type:%X revision:%d", __func__, jobs_num,
-			job_type, revision);
+		(unsigned int)job_type, revision);
 
 	return 0 == jobs_num ? 1 : 0;
 }

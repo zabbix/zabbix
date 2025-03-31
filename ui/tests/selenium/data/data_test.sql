@@ -778,14 +778,14 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (130, 'Selenium user group');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (140, 'Selenium user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (150, 'Selenium user group in configuration');
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (5, 0, 'Selenium script','test',2,140,NULL,'selenium script description', 1);
-UPDATE config SET alert_usrgrpid = 150 WHERE configid = 1;
+UPDATE settings SET value_usrgrpid = 150 WHERE name='alert_usrgrpid';
 
 -- Disable warning if Zabbix server is down
-UPDATE config SET server_check_interval = 0 WHERE configid = 1;
+UPDATE settings SET value_int= 0 WHERE name='server_check_interval';
 -- Super admin rows per page
 UPDATE users SET rows_per_page = 100 WHERE userid = 1;
 -- Set default language to EN_gb to display the date/time in the 24-hour format
-UPDATE config SET default_lang='en_GB' WHERE configid=1;
+UPDATE settings SET value_str='en_GB' WHERE name='default_lang';
 
 -- test data for testPageAdministrationGeneralIconMapping and testFormAdministrationGeneralIconMapping
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (100, 'Icon mapping one', 10);
@@ -1294,8 +1294,8 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 100068);
 
 -- testFormAdministrationMediaTypes
-INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value, sortorder) VALUES (1012, 100, '', '{ALERT.SUBJECT}', 0);
+INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (110, 1, 'Test script', 'Selenium test script', 1, '', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value, sortorder) VALUES (1312, 110, '', '{ALERT.SUBJECT}', 0);
 
 -- testFormUser
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
@@ -1417,21 +1417,21 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, f
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99349, 0, 99137, 'Test discovery rule', '', 'test', NULL, 1,'', '', '', '');
 
 -- testFormAdministrationMediaTypeWebhook
-INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (101, 4, 'Reference webhook', 0, 'return 0;', 'Reference webhook media type');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1000, 101, 'URL', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1001, 101, 'To', '{ALERT.SENDTO}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1002, 101, 'Subject', '{ALERT.SUBJECT}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1003, 101, 'Message', '{ALERT.MESSAGE}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1004, 101, 'HTTPProxy', '');
+INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (111, 4, 'Reference webhook', 0, 'return 0;', 'Reference webhook media type');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1300, 111, 'URL', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1301, 111, 'To', '{ALERT.SENDTO}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1302, 111, 'Subject', '{ALERT.SUBJECT}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1303, 111, 'Message', '{ALERT.MESSAGE}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1304, 111, 'HTTPProxy', '');
 INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (102, 4, 'Validation webhook', 0, 'return 0;', 'Reference webhook media type for validation tests');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1005, 102, 'URL', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1006, 102, 'To', '{ALERT.SENDTO}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1007, 102, 'Subject', '{ALERT.SUBJECT}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1008, 102, 'Message', '{ALERT.MESSAGE}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1009, 102, 'HTTPProxy', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1305, 102, 'URL', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1306, 102, 'To', '{ALERT.SENDTO}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1307, 102, 'Subject', '{ALERT.SUBJECT}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1308, 102, 'Message', '{ALERT.MESSAGE}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1309, 102, 'HTTPProxy', '');
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (103, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1011, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1310, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1311, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
 -- testPageProblems_ProblemLinks
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (104, 4, 'URL test webhook', 0, 'return 0;', 1, 'Webhook url for all', 'zabbix.php?action=mediatype.edit&mediatypeid=101', 'Webhook media type for URL test');
@@ -1487,7 +1487,7 @@ INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_ope
 
 INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (40000, 0);
 
-UPDATE config SET session_key='caf1c06dcf802728c4cfc24d645e1e73' WHERE configid = 1;
+UPDATE settings SET value_str='caf1c06dcf802728c4cfc24d645e1e73' WHERE name='session_key';
 
 -- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');
