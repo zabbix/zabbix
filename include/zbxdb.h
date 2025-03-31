@@ -26,6 +26,7 @@
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
+#define ZBX_DB_RONLY	-3
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -101,6 +102,7 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+void	zbx_db_clear_last_errcode(void);
 char	*zbx_tsdb_get_license(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 int	zbx_tsdb_table_has_compressed_chunks(const char *table_names);
