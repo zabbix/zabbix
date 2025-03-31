@@ -435,13 +435,15 @@ out:
  * Purpose: copy nested host prototypes from templates to discovered hosts    *
  *                                                                            *
  ******************************************************************************/
-static int	copy_nested_host_prototypes(void)
+static void	copy_nested_host_prototypes(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_uint64_t		last_hostid = 0, hostid, templateid;
 	zbx_vector_uint64_t	templateids;
 	zbx_db_insert_t		db_insert;
+
+	zabbix_log(LOG_LEVEL_WARNING, "starting nested host prototype update forced by database upgrade");
 
 	zbx_vector_uint64_create(&templateids);
 
@@ -493,7 +495,7 @@ static int	copy_nested_host_prototypes(void)
 	zbx_db_insert_clean(&db_insert);
 	zbx_vector_uint64_destroy(&templateids);
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_WARNING, "nested host prototype update completed");
 }
 
 /******************************************************************************
@@ -530,8 +532,7 @@ int	zbx_check_postinit_tasks(char **error)
 					*error = zbx_strdup(*error, "cannot update event names");
 				break;
 			case ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES:
-				if (FAIL == (ret = copy_nested_host_prototypes()))
-					*error = zbx_strdup(*error, "cannot copy nested host prototypes");
+				copy_nested_host_prototypes();
 				break;
 		}
 
