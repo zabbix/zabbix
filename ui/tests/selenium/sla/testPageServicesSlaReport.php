@@ -46,6 +46,10 @@ class testPageServicesSlaReport extends testSlaReport {
 		foreach ([false, true] as $status) {
 			$filter->expand($status);
 			$this->assertTrue($filter->isExpanded($status));
+
+			// Refresh the page to make sure the filter state is still saved.
+			$this->page->refresh()->waitUntilReady();
+			$this->assertTrue($filter->isExpanded($status));
 		}
 
 		// Check the list of available SLAs (disabled SLAs should not be present).
