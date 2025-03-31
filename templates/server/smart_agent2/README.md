@@ -23,16 +23,29 @@ This template has been tested on:
 
 ## Setup
 
-Install the Zabbix agent 2 and Smartmontools 7.1.
-Grant Zabbix agent 2 super/admin user privileges for smartctl utility.
+1. Install Zabbix agent 2 and Smartmontools 7.1 or newer.
 
-### Linux example:
+2. Ensure the path to the `smartctl` executable is correctly specified. You can either provide the full path to the executable (e.g., `/usr/sbin/smartctl` on Linux or `C:\Program Files\smartctl\smartctl.exe` on Windows) in the configuration file or ensure that the folder containing the `smartctl` executable is added to the system's environment variables (`PATH`). This applies to both Linux and Windows systems.
 
-> sudo dnf install smartmontools
-> sudo visudo
->> zabbix ALL=(ALL) NOPASSWD:/usr/sbin/smartctl
+Example for Linux:
 
-Plugin [parameters list](https://www.zabbix.com/documentation/7.0/manual/appendix/config/zabbix_agent2_plugins/smart_plugin)
+`Plugins.Smart.Path=/usr/sbin/smartctl`
+
+Example for Windows:
+
+`Plugins.Smart.Path="C:\Program Files\smartctl\smartctl.exe"`
+
+3. Grant Zabbix agent 2 super/admin user privileges for the `smartctl` utility (not required for Windows). Example for Linux (add the line that grants execution of the `smartctl` utility without the password):
+
+- Run the `visudo` command to edit the `sudoers` file:
+
+`sudo visudo`
+
+- Add the permission line and save the changes:
+
+`zabbix ALL=(ALL) NOPASSWD:/usr/sbin/smartctl`
+
+Plugin [parameters list](https://www.zabbix.com/documentation/7.0/manual/appendix/config/zabbix_agent2_plugins/smart_plugin).
 
 ### Macros used
 
