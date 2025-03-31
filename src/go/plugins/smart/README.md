@@ -72,7 +72,7 @@ The plugin provides specific items for monitoring disk health.
   - `{#THRESH}`: Threshold value for the attribute, representing the critical limit.
 
 ### `smart.disk.get`
-- **Description:** Retrieves detailed SMART attributes for a specified disk or all disks if no parameters are provided.
+- **Description:** Retrieves detailed SMART attributes, including both raw and normalized values, for a specified disk or all disks if no parameters are provided.
 - **Key:** `smart.disk.get["<device_path>","<raid_type>"]`
   - `<device_path>`: Path to the disk device (e.g., `/dev/sda`).
   - `<raid_type>`: RAID type, if applicable (e.g., `megaraid,0`); use an empty string if not applicable.
