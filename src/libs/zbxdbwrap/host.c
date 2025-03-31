@@ -5906,7 +5906,7 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *hostgroupi
  *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
+static void	db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode)
 {
 	int			i;
@@ -6064,7 +6064,7 @@ out:
  *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
+void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode)
 {
 	zbx_vector_uint64_t	host_prototype_ids;
@@ -6089,7 +6089,7 @@ void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, con
 
 	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
 
-	zbx_db_delete_hosts(hostids, hostnames, audit_context_mode);
+	db_delete_hosts(hostids, hostnames, audit_context_mode);
 clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);

@@ -4852,7 +4852,7 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 
 		zbx_db_begin();
 
-		zbx_db_delete_hosts_with_prototypes(&del_hostids, &del_hosts, ZBX_AUDIT_LLD_CONTEXT);
+		zbx_db_delete_hosts(&del_hostids, &del_hosts, ZBX_AUDIT_LLD_CONTEXT);
 
 		zbx_db_commit();
 	}
