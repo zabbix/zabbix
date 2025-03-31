@@ -15,6 +15,6 @@
 #include "zbxalgo.h"
 
 int	zbx_db_delete_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
-int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
+int	zbx_db_copy_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
 void	zbx_db_save_httptest_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_httptestids);
 void	zbx_db_save_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids);

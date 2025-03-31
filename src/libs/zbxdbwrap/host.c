@@ -5708,13 +5708,14 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		hosttemplateid++;
 	}
 
-	DBcopy_template_items(hostid, lnk_templateids, audit_context_mode);
-
-	if (FAIL == (res = zbx_db_copy_item_tag_cache(hostid, lnk_templateids)))
+	if (FAIL == (res = zbx_db_copy_host_tag_cache(hostid, lnk_templateids)))
 	{
-		*error = zbx_strdup(NULL, "failed to copy item tag cache");
+		*error = zbx_strdup(NULL, "failed to copy host tag cache");
 		goto clean;
 	}
+
+	DBcopy_template_items(hostid, lnk_templateids, audit_context_mode);
+
 
 	DBcopy_template_host_prototypes(hostid, lnk_templateids, audit_context_mode, db_insert_htemplates);
 

@@ -13,7 +13,10 @@
 **/
 
 #include "tag_cache.h"
-#include "zbxdbwrap.h"
+
+#include "zbxdb.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 void	zbx_db_save_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
 {
@@ -94,7 +97,7 @@ clean:
 	return res;
 }
 
-int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
+int	zbx_db_copy_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_vector_uint64_t	templateids;
 	zbx_db_result_t		result;
@@ -145,6 +148,7 @@ int	zbx_db_copy_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_tem
 
 	return SUCCEED;
 }
+
 
 void	zbx_db_save_httptest_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_httptestids)
 {
