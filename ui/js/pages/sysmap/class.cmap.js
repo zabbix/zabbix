@@ -836,7 +836,8 @@ class CMap {
 		// Apply link changes via link form.
 		document.getElementById('formLinkApply').addEventListener('click', () => {
 			const map_window = document.getElementById('map-window');
-				map_window.classList.add('is-loading', 'is-loading-fadein');
+
+			map_window.classList.add('is-loading', 'is-loading-fadein');
 
 			this.linkForm
 				.getValues()
@@ -916,7 +917,7 @@ class CMap {
 		document.querySelectorAll('#shapeForm input[type=radio][name=type]').forEach((radio) => {
 			radio.addEventListener('change', (e) => {
 				const value = parseInt(e.target.value, 10),
-					last_shape_type = document.querySelector('#shapeForm #last_shape_type'),
+					last_shape_type = document.getElementById('last_shape_type'),
 					last_value = parseInt(last_shape_type.value, 10);
 
 				document.querySelectorAll('#shape-text-row, #shape-background-row').forEach((element) => {
@@ -931,7 +932,7 @@ class CMap {
 						: element.dataset.value;
 					});
 
-					if ((last_value == SVGMapShape.TYPE_LINE) != (value == SVGMapShape.TYPE_LINE)) {
+					if ((last_value == SVGMapShape.TYPE_LINE) !== (value == SVGMapShape.TYPE_LINE)) {
 						const shape_x = document.getElementById('shapeX'),
 							shape_y = document.getElementById('shapeY'),
 							shape_area_size_width = document.getElementById('shapeAreaSizeWidth'),
