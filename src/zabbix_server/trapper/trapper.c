@@ -1387,6 +1387,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED);
 		zbx_update_env(zbx_time());
 
+		if (TIMEOUT_ERROR == ret)
+			continue;
+
 		if (SUCCEED == ret)
 		{
 			zbx_timespec_t	ts;

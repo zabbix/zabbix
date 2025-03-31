@@ -130,6 +130,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		ret = zbx_tcp_accept(&s, configured_tls_accept_modes);
 		zbx_update_env(zbx_time());
 
+		if (TIMEOUT_ERROR == ret)
+			continue;
+
 		if (SUCCEED == ret)
 		{
 			zbx_setproctitle("listener #%d [processing request]", process_num);
