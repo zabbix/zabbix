@@ -21,7 +21,7 @@ use CButton,
 	CButtonLink,
 	CCheckBox,
 	CCol,
-	CColor,
+	CColorPicker,
 	CDiv,
 	CFormField,
 	CFormGrid,
@@ -219,8 +219,10 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				]))->addClass('js-items-multiselect');
 			}
 
-			$dataset_head[] = (new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-				->appendColorPickerJs(false);
+			$dataset_head[] = (new CColorPicker())
+				->setName($field_name.'['.$row_num.'][color]')
+				->setValue($value['color'])
+				->setHasPalette();
 
 			if ($host_pattern_field !== null) {
 				$dataset_head[] = $host_pattern_field;
@@ -516,9 +518,10 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(
-				(new CColor($this->field->getName().'['.$ds_num.'][color][]', $color,
-					'items_'.$ds_num.'_'.$row_num.'_color'
-				))->appendColorPickerJs(false)
+				(new CColorPicker())
+					->setName($this->field->getName().'['.$ds_num.'][color][]')
+					->setValue($color)
+					->setInputId('items_'.$ds_num.'_'.$row_num.'_color')
 			))->addClass('table-col-color'),
 			(new CCol(new CSpan($row_num.':')))->addClass('table-col-no'),
 			(new CCol([

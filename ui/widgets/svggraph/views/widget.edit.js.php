@@ -63,8 +63,7 @@ window.widget_svggraph_form = new class {
 		});
 
 		jQuery(`#${form_tabs_id}`)
-			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', () => this.onGraphConfigChange());
+			.on('change', 'input, z-color-picker, z-select, .multiselect', () => this.onGraphConfigChange());
 
 		this._datasetTabInit();
 		this._problemsTabInit();
@@ -128,10 +127,6 @@ window.widget_svggraph_form = new class {
 				);
 			})
 			.on('click', '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', function(e) {
-				if (!e.target.classList.contains('color-picker-preview')) {
-					jQuery.colorpicker('hide');
-				}
-
 				const list_item = e.target.closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
 
 				if (list_item.classList.contains('<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')) {
@@ -176,17 +171,6 @@ window.widget_svggraph_form = new class {
 
 		// Initialize rangeControl UI elements.
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this._dataset_wrapper)).rangeControl();
-
-		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			jQuery(colorpicker).colorpicker({
-				onUpdate: function(color) {
-					jQuery('.<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>',
-						jQuery(this).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')
-					).css('background-color', `#${color}`);
-				},
-				appendTo: '.overlay-dialogue-body'
-			});
-		}
 
 		this._dataset_wrapper.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add-item')) {
@@ -324,7 +308,7 @@ window.widget_svggraph_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
 			if (color.value !== '') {
 				used_colors.push(color.value);
 			}
@@ -343,10 +327,6 @@ window.widget_svggraph_form = new class {
 		this._updateDatasetsLabel();
 
 		const dataset = this._getOpenedDataset();
-
-		for (const colorpicker of dataset.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
-		}
 
 		for (const range_control of dataset.querySelectorAll('.<?= CRangeControl::ZBX_STYLE_CLASS ?>')) {
 			jQuery(range_control).rangeControl();
@@ -641,15 +621,13 @@ window.widget_svggraph_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
 			if (color.value !== '') {
 				used_colors.push(color.value);
 			}
 		}
 
-		jQuery(`#items_${dataset_index}_${items_new_index}_color`)
-			.val(colorPalette.getNextColor(used_colors))
-			.colorpicker();
+		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').value = colorPalette.getNextColor(used_colors);
 	}
 
 	_removeSingleItem(element) {
@@ -722,22 +700,16 @@ window.widget_svggraph_form = new class {
 	}
 
 	_updateSingleItemsOrder(dataset) {
-		jQuery.colorpicker('destroy', jQuery('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input', dataset));
-
 		const dataset_index = dataset.getAttribute('data-set');
 
 		for (const row of dataset.querySelectorAll('.single-item-table-row')) {
 			const prefix = `items_${dataset_index}_${row.rowIndex}`;
 
+			row.querySelector('.table-col-color .<?= ZBX_STYLE_COLOR_PICKER ?>').inputId = `${prefix}_color`;
 			row.querySelector('.table-col-no span').textContent = `${row.rowIndex}:`;
 			row.querySelector('.table-col-name a').id = `${prefix}_name`;
 			row.querySelector('.table-col-action input[name$="[itemids][]"]').id = `${prefix}_itemid`;
 			row.querySelector('.table-col-action input[name$="[references][]"]').id = `${prefix}_reference`;
-
-			const colorpicker = row.querySelector('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input');
-
-			colorpicker.id = `${prefix}_color`;
-			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
 		}
 	}
 
