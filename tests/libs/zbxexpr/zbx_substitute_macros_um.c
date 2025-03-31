@@ -148,18 +148,18 @@ void	zbx_mock_test_entry(void **state)
 
 	switch (um)
 	{
-	case 0:
-		um_handle = zbx_dc_open_user_macros();
-		break;
-	case 1:
-		um_handle = zbx_dc_open_user_macros_secure();
-		break;
-	case 2:
-		um_handle = zbx_dc_open_user_macros_masked();
-		break;
-	default:
-		exit(1);
-		break;
+		case 0:
+			um_handle = zbx_dc_open_user_macros();
+			break;
+		case 1:
+			um_handle = zbx_dc_open_user_macros_secure();
+			break;
+		case 2:
+			um_handle = zbx_dc_open_user_macros_masked();
+			break;
+		default:
+			exit(1);
+			break;
 	}
 
 	/* we should also check when user caches overlap */

@@ -205,30 +205,6 @@ clean:
  *                                                                            *
  * Example:  key                     | macro  | result            | return    *
  *          -------------------------+--------+-------------------+---------  *
- *           echo.sh[{$MACRO}]       | a      | echo.sh[a]        | SUCCEED   *
- *           echo.sh[{$MACRO}]       | a\     | echo.sh[a\]       | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a      | echo.sh["a"]      | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a\     | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       |  a     | echo.sh[" a"]     | SUCCEED   *
- *           echo.sh[{$MACRO}]       |  a\    | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     |  a     | echo.sh[" a"]     | SUCCEED   *
- *           echo.sh["{$MACRO}"]     |  a\    | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | "a"    | echo.sh["\"a\""]  | SUCCEED   *
- *           echo.sh[{$MACRO}]       | "a"\   | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | "a"    | echo.sh["\"a\""]  | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | "a"\   | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | a,b    | echo.sh["a,b"]    | SUCCEED   *
- *           echo.sh[{$MACRO}]       | a,b\   | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | a,b    | echo.sh["a,b"]    | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a,b\   | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | a]     | echo.sh["a]"]     | SUCCEED   *
- *           echo.sh[{$MACRO}]       | a]\    | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | a]     | echo.sh["a]"]     | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a]\    | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | [a     | echo.sh["a]"]     | SUCCEED   *
- *           echo.sh[{$MACRO}]       | [a\    | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | [a     | echo.sh["[a"]     | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | [a\    | undefined         | FAIL      *
  *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
