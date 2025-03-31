@@ -119,7 +119,7 @@ class Link {
 		delete this.sysmap.links[this.id];
 
 		if (this.sysmap.form.active) {
-			this.sysmap.linkForm.updateList(sysmap.selection.selements);
+			this.sysmap.linkForm.updateList(this.sysmap.selection.selements);
 		}
 
 		this.sysmap.linkForm.hide();
