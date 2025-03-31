@@ -108,7 +108,6 @@ static int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
-static int			ZBX_PG_READ_ONLY_RECOVERABLE;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
@@ -387,11 +386,8 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == ZBX_PG_READ_ONLY_RECOVERABLE &&
-			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
-	{
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
-	}
 
 	return FAIL;
 }
@@ -839,6 +835,27 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	if (NULL != (row = zbx_db_fetch_basic(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+
+	zbx_db_free_result(result);
+
+	result = zbx_db_select_basic("show default_transaction_read_only");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch_basic(result)))
+	{
+		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
 	zbx_db_free_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
@@ -848,7 +865,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 			ret = ZBX_DB_OK;
 	}
 
-	ZBX_PG_READ_ONLY_RECOVERABLE = cfg->read_only_recoverable;
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
@@ -1904,8 +1920,15 @@ error:
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
+		zbx_err_codes_t	errcode;
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result->pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
+		else
+			errcode = ERR_Z3005;
+
 		zbx_postgresql_error(&error, result->pg_result);
-		zbx_db_errlog(ERR_Z3005, 0, error, sql);
+		zbx_db_errlog(errcode, 0, error, sql);
 		zbx_free(error);
 
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
@@ -3063,6 +3086,16 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 int	zbx_tsdb_get_compression_availability(void)
 {
 	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear last error code                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_clear_last_errcode(void)
+{
+	last_db_errcode = 0;
 }
 
 #endif

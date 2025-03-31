@@ -251,22 +251,47 @@ void	zbx_db_init_autoincrement_options(void)
  ******************************************************************************/
 int	zbx_db_connect(int flag)
 {
+#define ZBX_DB_WAIT_RETRY_COUNT	6
 	int	err;
-
+#if defined(HAVE_POSTGRESQL)
+	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __func__, flag);
 
 	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == flag)
+		{
+#if defined(HAVE_POSTGRESQL)
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
+#endif
 			break;
+		}
 
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == flag)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
 			exit(EXIT_FAILURE);
 		}
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == zbx_cfg_dbhigh->read_only_recoverable && 0 >= retries--)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
 
-		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
+
 		connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
@@ -275,11 +300,15 @@ int	zbx_db_connect(int flag)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		zbx_db_clear_last_errcode();
+#endif
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
+#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error)
