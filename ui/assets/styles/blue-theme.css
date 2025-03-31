@@ -6116,9 +6116,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .qr-code {
   height: 190px;
   width: 190px;
-  margin: 20px auto;
-  color: #1f2c33;
-  background-color: #ffffff; }
+  margin: 20px auto; }
 
 .qr-code img {
   image-rendering: pixelated; }
