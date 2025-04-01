@@ -1093,7 +1093,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 
-		zbx_db_save_item_tag_cache(hostid, &new_itemids);
+		zbx_db_save_item_template_cache(hostid, &new_itemids);
 	}
 
 	if (0 != upd_items)

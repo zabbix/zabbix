@@ -1712,7 +1712,7 @@ FIELD		|automatic	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|hostid
 CHANGELOG	|2
 
-TABLE|host_tag_cache|hostid,tag_hostid|ZBX_TEMPLATE
+TABLE|host_template_cache|hostid,tag_hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts	|		|
 FIELD		|tag_hostid	|t_id		|	|NOT NULL	|0			|2|hosts	|hostid		|
 INDEX		|1		|tag_hostid
@@ -1863,7 +1863,7 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid
 CHANGELOG	|4
 
-TABLE|item_tag_cache|itemid,tag_hostid|ZBX_TEMPLATE
+TABLE|item_template_cache|itemid,tag_hostid|ZBX_TEMPLATE
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items	|		|
 FIELD		|tag_hostid	|t_id		|	|NOT NULL	|0			|2|hosts	|hostid		|
 INDEX		|1		|tag_hostid
@@ -1875,7 +1875,7 @@ FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|httptestid
 
-TABLE|httptest_tag_cache|httptestid,tag_hostid|ZBX_TEMPLATE
+TABLE|httptest_template_cache|httptestid,tag_hostid|ZBX_TEMPLATE
 FIELD		|httptestid	|t_id		|	|NOT NULL	|0			|1|httptest	|		|
 FIELD		|tag_hostid	|t_id		|	|NOT NULL	|0			|2|hosts	|hostid		|
 INDEX		|1		|tag_hostid

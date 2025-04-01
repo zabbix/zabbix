@@ -18,28 +18,28 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 
-void	zbx_db_save_item_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
+void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
 {
-	zbx_db_insert_t	db_insert_item_tag_cache_host_itself;
+	zbx_db_insert_t	db_insert_item_template_cache_host_itself;
 
-	zbx_db_execute_multiple_query("insert into item_tag_cache with recursive cte as "
+	zbx_db_execute_multiple_query("insert into item_template_cache with recursive cte as "
 			"( select i0.templateid, i0.itemid, i0.hostid from items i0 "
 			"union all select i1.templateid, c.itemid, c.hostid from cte c "
 			"join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL) "
 			"select cte.itemid,ii.hostid from cte,items ii "
 			"where cte.templateid= ii.itemid and ", "cte.itemid", new_itemids);
 
-	zbx_db_insert_prepare(&db_insert_item_tag_cache_host_itself, "item_tag_cache",
-			"itemid", "tag_hostid",  (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_item_template_cache_host_itself, "item_template_cache",
+			"itemid", "link_hostid",  (char *)NULL);
 
 	for (int i = 0; i < new_itemids->values_num; i++)
-		zbx_db_insert_add_values(&db_insert_item_tag_cache_host_itself, new_itemids->values[i], hostid);
+		zbx_db_insert_add_values(&db_insert_item_template_cache_host_itself, new_itemids->values[i], hostid);
 
-	zbx_db_insert_execute(&db_insert_item_tag_cache_host_itself);
-	zbx_db_insert_clean(&db_insert_item_tag_cache_host_itself);
+	zbx_db_insert_execute(&db_insert_item_template_cache_host_itself);
+	zbx_db_insert_clean(&db_insert_item_template_cache_host_itself);
 }
 
-int	zbx_db_delete_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
+int	zbx_db_delete_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
 {
 	zbx_vector_uint64_t	t_templateids;
 	zbx_db_result_t		t_result;
@@ -83,12 +83,12 @@ int	zbx_db_delete_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_t
 	t_sql = (char *)zbx_malloc(NULL, t_sql_alloc);
 
 	zbx_snprintf_alloc(&t_sql, &t_sql_alloc, &t_sql_offset,
-			"delete from host_tag_cache"
+			"delete from host_template_cache"
 				" where hostid=" ZBX_FS_UI64
 				" and",
 				hostid);
 
-	zbx_db_add_condition_alloc(&t_sql, &t_sql_alloc, &t_sql_offset, "tag_hostid",
+	zbx_db_add_condition_alloc(&t_sql, &t_sql_alloc, &t_sql_offset, "link_hostid",
 			t_templateids.values, t_templateids.values_num);
 	zbx_db_execute("%s", t_sql);
 clean:
@@ -97,17 +97,18 @@ clean:
 	return res;
 }
 
-int	zbx_db_copy_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
+int	zbx_db_copy_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_vector_uint64_t	templateids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_db_insert_t		db_insert_host_tag_cache;
+	zbx_db_insert_t		db_insert_host_template_cache;
 
 	size_t			sql_alloc = 256, sql_offset = 0;
 	char			*sql = (char *)zbx_malloc(NULL, sql_alloc);
 
-	zbx_db_insert_prepare(&db_insert_host_tag_cache, "host_tag_cache", "hostid", "tag_hostid", (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_host_template_cache, "host_template_cache", "hostid", "link_hostid",
+			(char *)NULL);
 
 	zbx_vector_uint64_create(&templateids);
 
@@ -135,13 +136,13 @@ int	zbx_db_copy_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_tem
 	zbx_db_free_result(result);
 
 	for (int i = 0; i < templateids.values_num; i++)
-		zbx_db_insert_add_values(&db_insert_host_tag_cache, hostid, templateids.values[i]);
+		zbx_db_insert_add_values(&db_insert_host_template_cache, hostid, templateids.values[i]);
 
 	for (int i = 0; i < lnk_templateids->values_num; i++)
-		zbx_db_insert_add_values(&db_insert_host_tag_cache, hostid,  lnk_templateids->values[i]);
+		zbx_db_insert_add_values(&db_insert_host_template_cache, hostid,  lnk_templateids->values[i]);
 
-	zbx_db_insert_execute(&db_insert_host_tag_cache);
-	zbx_db_insert_clean(&db_insert_host_tag_cache);
+	zbx_db_insert_execute(&db_insert_host_template_cache);
+	zbx_db_insert_clean(&db_insert_host_template_cache);
 
 	zbx_vector_uint64_destroy(&templateids);
 	zbx_free(sql);
@@ -150,12 +151,12 @@ int	zbx_db_copy_host_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_tem
 }
 
 
-void	zbx_db_save_httptest_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_httptestids)
+void	zbx_db_save_httptest_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_httptestids)
 {
-	zbx_db_insert_t	db_insert_httptest_tag_cache_host_itself;
+	zbx_db_insert_t	db_insert_httptest_template_cache_host_itself;
 
 	zbx_db_execute_multiple_query(
-			"insert into httptest_tag_cache  with recursive cte as ( "
+			"insert into httptest_template_cache  with recursive cte as ( "
 			"select i0.templateid, i0.httptestid, i0.hostid from httptest i0 "
 			"union all "
 			"select i1.templateid, c.httptestid, c.hostid from cte c "
@@ -165,12 +166,15 @@ void	zbx_db_save_httptest_tag_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *ne
 			"cte.httptestid", new_httptestids);
 
 
-	zbx_db_insert_prepare(&db_insert_httptest_tag_cache_host_itself, "httptest_tag_cache",
-			"httptestid", "tag_hostid",  (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_httptest_template_cache_host_itself, "httptest_template_cache",
+			"httptestid", "link_hostid",  (char *)NULL);
 
 	for (int i = 0; i < new_httptestids->values_num; i++)
-		zbx_db_insert_add_values(&db_insert_httptest_tag_cache_host_itself, new_httptestids->values[i], hostid);
+	{
+		zbx_db_insert_add_values(&db_insert_httptest_template_cache_host_itself, new_httptestids->values[i],
+				hostid);
+	}
 
-	zbx_db_insert_execute(&db_insert_httptest_tag_cache_host_itself);
-	zbx_db_insert_clean(&db_insert_httptest_tag_cache_host_itself);
+	zbx_db_insert_execute(&db_insert_httptest_template_cache_host_itself);
+	zbx_db_insert_clean(&db_insert_httptest_template_cache_host_itself);
 }

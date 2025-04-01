@@ -4222,8 +4222,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	}
 
 	zbx_db_execute_multiple_query(
-			"insert into item_tag_cache select id.itemid,tag_hostid "
-				"from item_tag_cache itc "
+			"insert into item_template_cache select id.itemid,link_hostid "
+				"from item_template_cache itc "
 				"join item_discovery id on "
 				"itc.itemid=id.parent_itemid "
 				"where ", "id.itemid", &new_itemids);

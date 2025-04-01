@@ -7645,7 +7645,7 @@ return [
 			]
 		]
 	],
-	'host_tag_cache' => [
+	'host_template_cache' => [
 		'key' => 'hostid,tag_hostid',
 		'fields' => [
 			'hostid' => [
@@ -8305,7 +8305,7 @@ return [
 			]
 		]
 	],
-	'item_tag_cache' => [
+	'item_template_cache' => [
 		'key' => 'itemid,tag_hostid',
 		'fields' => [
 			'itemid' => [
@@ -8353,7 +8353,7 @@ return [
 			]
 		]
 	],
-	'httptest_tag_cache' => [
+	'httptest_template_cache' => [
 		'key' => 'httptestid,tag_hostid',
 		'fields' => [
 			'httptestid' => [

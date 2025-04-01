@@ -1625,7 +1625,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_db_execute_multiple_query("update items set master_itemid=null where master_itemid is not null and",
 			"itemid", itemids);
 	zbx_db_execute_multiple_query("delete from items where", "itemid", itemids);
-	zbx_db_execute_multiple_query("delete from item_tag_cache where", "itemid", itemids);
+	zbx_db_execute_multiple_query("delete from item_template_cache where", "itemid", itemids);
 
 	zbx_vector_uint64_destroy(&profileids);
 out:
@@ -1720,7 +1720,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 			httptestids->values, httptestids->values_num);
 	zbx_db_execute("%s", sql);
 
-	zbx_db_execute_multiple_query("delete from httptest_tag_cache where", "itemid", httptestids);
+	zbx_db_execute_multiple_query("delete from httptest_template_cache where", "itemid", httptestids);
 
 	zbx_vector_uint64_destroy(&httpstepids);
 	zbx_vector_uint64_destroy(&itemids);
@@ -2232,7 +2232,7 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 
 	zbx_free(sql);
 
-	if (SUCCEED != (res = zbx_db_delete_host_tag_cache(hostid, del_templateids)))
+	if (SUCCEED != (res = zbx_db_delete_host_template_cache(hostid, del_templateids)))
 		*error = zbx_strdup(NULL, "failed to delete host tag cache");
 clean:
 	zbx_vector_uint64_destroy(&templateids);
@@ -5444,7 +5444,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	{
 		zbx_db_insert_execute(&db_insert_htest);
 		zbx_db_insert_clean(&db_insert_htest);
-		zbx_db_save_httptest_tag_cache(hostid, &new_httptestids);
+		zbx_db_save_httptest_template_cache(hostid, &new_httptestids);
 	}
 
 	if (0 != num_httpsteps)
@@ -5708,7 +5708,7 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		hosttemplateid++;
 	}
 
-	if (FAIL == (res = zbx_db_copy_host_tag_cache(hostid, lnk_templateids)))
+	if (FAIL == (res = zbx_db_copy_host_template_cache(hostid, lnk_templateids)))
 	{
 		*error = zbx_strdup(NULL, "failed to copy host tag cache");
 		goto clean;
