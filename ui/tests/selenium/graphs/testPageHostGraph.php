@@ -713,7 +713,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				$filter->getField($group_field)->clear();
 			}
 			else {
-				$filter->getField($group_field)->fill($data['group']);
+				$filter->getField($group_field)->select($data['group']);
 			}
 		}
 
@@ -742,8 +742,8 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		if (array_key_exists('graph', $data)) {
 			foreach ($data['graph'] as $graph) {
-				$this->assertTrue($this->query('xpath://a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]')
-						->one()->isVisible()
+				$this->assertTrue($this->query('xpath://a[contains(@href,"zabbix.php?action=popup&popup=graph.edit")]'.
+						'[text()="'.$graph.'"]')->one()->isVisible()
 				);
 			}
 		}
