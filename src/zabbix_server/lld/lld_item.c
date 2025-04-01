@@ -693,6 +693,9 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 	if (0 == items->values_num)
 		goto out;
 
+	zbx_vector_uint64_sort(&tag_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&lldruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 
 	for (int i = items->values_num - 1; i >= 0; i--)
@@ -4170,13 +4173,15 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 	zbx_item_param_t		*item_param;
 	zbx_uint64_t			itemid;
 	int				index;
-	zbx_vector_uint64_t		protoids;
+	zbx_vector_uint64_t		protoids, tag_protoids, lldrule_protoids;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&protoids);
+	zbx_vector_uint64_create(&tag_protoids);
+	zbx_vector_uint64_create(&lldrule_protoids);
 
 	result = zbx_db_select(
 			"select i.itemid,i.name,i.key_,i.type,i.value_type,i.delay,"
@@ -4269,6 +4274,11 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);
 
 		zbx_vector_uint64_append(&protoids, item_prototype->itemid);
+
+		if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+			zbx_vector_uint64_append(&tag_protoids, item_prototype->itemid);
+		else
+			zbx_vector_uint64_append(&lldrule_protoids, item_prototype->itemid);
 	}
 	zbx_db_free_result(result);
 
@@ -4340,39 +4350,51 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 
 	/* get item prototype tags */
 
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", protoids.values,
-			protoids.values_num);
-	result = zbx_db_select("%s", sql);
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (0 != tag_protoids.values_num)
 	{
-		zbx_db_tag_t	*db_tag;
+		zbx_vector_uint64_sort(&tag_protoids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		ZBX_STR2UINT64(itemid, row[0]);
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", tag_protoids.values,
+				tag_protoids.values_num);
+		result = zbx_db_select("%s", sql);
 
-		zbx_lld_item_prototype_t	cmp = {.itemid = itemid};
-
-		if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
-				lld_item_prototype_compare_func)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+			zbx_db_tag_t	*db_tag;
+
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			zbx_lld_item_prototype_t	cmp = {.itemid = itemid};
+
+			if (FAIL == (index = zbx_vector_lld_item_prototype_ptr_bsearch(item_prototypes, &cmp,
+					lld_item_prototype_compare_func)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item_prototype = item_prototypes->values[index];
+
+			db_tag = zbx_db_tag_create(row[1], row[2]);
+			zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
 		}
-
-		item_prototype = item_prototypes->values[index];
-
-		db_tag = zbx_db_tag_create(row[1], row[2]);
-		zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
+		zbx_db_free_result(result);
 	}
-	zbx_db_free_result(result);
 
-	lld_rule_get_prototype_macro_paths(item_prototypes, &protoids);
-	lld_rule_get_prototype_filters(item_prototypes, &protoids);
-	lld_rule_get_prototype_overrides(item_prototypes, &protoids);
+	if (0 != lldrule_protoids.values_num)
+	{
+		zbx_vector_uint64_sort(&lldrule_protoids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		lld_rule_get_prototype_macro_paths(item_prototypes, &protoids);
+		lld_rule_get_prototype_filters(item_prototypes, &protoids);
+		lld_rule_get_prototype_overrides(item_prototypes, &protoids);
+	}
 out:
 	zbx_free(sql);
+	zbx_vector_uint64_destroy(&lldrule_protoids);
+	zbx_vector_uint64_destroy(&tag_protoids);
 	zbx_vector_uint64_destroy(&protoids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, item_prototypes->values_num);
