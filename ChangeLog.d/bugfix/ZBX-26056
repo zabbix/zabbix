@@ -1,1 +1,1 @@
-........S. [ZBX-26056] fixed null error message in server log (rtrizna)
+........S. [ZBX-26056] fixed undefined behavior while linking template with LLD macro (rtrizna)
