@@ -861,21 +861,21 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
 
-	zbx_db_free_result(result);
+	DBfree_result(result);
 
-	result = zbx_db_select_basic("show default_transaction_read_only");
+	result = zbx_db_select("show default_transaction_read_only");
 
-	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
 	{
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
 	}
 
-	if (NULL != (row = zbx_db_fetch_basic(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(row[0], "on"))
 		{
-			zbx_db_free_result(result);
+			DBfree_result(result);
 			ret = ZBX_DB_RONLY;
 			goto out;
 		}
