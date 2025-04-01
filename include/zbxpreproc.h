@@ -35,7 +35,7 @@ typedef struct
 {
 	zbx_variant_t	value;
 	zbx_variant_t	value_raw;
-	int		action;
+	unsigned char	action;
 }
 zbx_pp_result_t;
 
