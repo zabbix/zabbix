@@ -113,7 +113,6 @@ int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
-static int			ZBX_PG_READ_ONLY_RECOVERABLE = 0;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
@@ -392,11 +391,8 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == ZBX_PG_READ_ONLY_RECOVERABLE &&
-			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
-	{
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
-	}
 
 	return FAIL;
 }
@@ -422,8 +418,7 @@ void	zbx_db_init_autoincrement_options(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13,
-			int read_only_recoverable)
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -461,7 +456,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 #if defined(HAVE_MYSQL)
 	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(read_only_recoverable);
 
 	if (NULL == (conn = mysql_init(NULL)))
 	{
@@ -645,7 +639,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
-	ZBX_UNUSED(read_only_recoverable);
 
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -864,6 +857,27 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+
+	DBfree_result(result);
+
+	result = zbx_db_select("show default_transaction_read_only");
+
+	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "on"))
+		{
+			DBfree_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
 	DBfree_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
@@ -873,7 +887,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			ret = ZBX_DB_OK;
 	}
 
-	ZBX_PG_READ_ONLY_RECOVERABLE = read_only_recoverable;
 out:
 #elif defined(HAVE_SQLITE3)
 	ZBX_UNUSED(host);
@@ -887,7 +900,7 @@ out:
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
-	ZBX_UNUSED(read_only_recoverable);
+
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE |
 		SQLITE_OPEN_CREATE, NULL))
@@ -1882,8 +1895,15 @@ error:
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
+		zbx_err_codes_t	errcode;
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result->pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
+		else
+			errcode = ERR_Z3005;
+
 		zbx_postgresql_error(&error, result->pg_result);
-		zbx_db_errlog(ERR_Z3005, 0, error, sql);
+		zbx_db_errlog(errcode, 0, error, sql);
 		zbx_free(error);
 
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
@@ -3032,5 +3052,15 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 int	zbx_tsdb_get_compression_availability(void)
 {
 	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear last error code                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_clear_last_errcode(void)
+{
+	last_db_errcode = 0;
 }
 #endif
