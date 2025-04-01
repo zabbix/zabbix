@@ -311,7 +311,7 @@ static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sq
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, int item_flags)
+		zbx_vector_lld_item_full_ptr_t *items)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -324,7 +324,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_item_discovery_ptr_t	item_discoveries;
-	zbx_vector_uint64_t		itemids;
+	zbx_vector_uint64_t		itemids, lldruleids, tag_itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -332,6 +332,8 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 	zbx_vector_uint64_reserve(&parent_itemids, item_prototypes->values_num);
 	zbx_vector_item_discovery_ptr_create(&item_discoveries);
 	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&lldruleids);
+	zbx_vector_uint64_create(&tag_itemids);
 
 	for (int i = 0; i < item_prototypes->values_num; i++)
 	{
@@ -404,7 +406,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					"post_type,http_proxy,headers,retrieve_mode,request_method,output_format,"
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
 					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
-					"enabled_lifetime_type,evaltype"
+					"enabled_lifetime_type,evaltype,flags"
 				" from items"
 				" where");
 
@@ -665,6 +667,11 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 				item->evaltype_orig = atoi(row[48]);
 			}
 
+			if (0 != (atoi(row[49]) & ZBX_FLAG_DISCOVERY_RULE))
+				zbx_vector_uint64_append(&lldruleids, item->itemid);
+			else
+				zbx_vector_uint64_append(&tag_itemids, item->itemid);
+
 			item->lld_row = NULL;
 
 			zbx_vector_lld_item_preproc_ptr_create(&item->preproc_ops);
@@ -798,11 +805,11 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 		zbx_db_free_result(result);
 	}
 
-	if (ZBX_FLAG_DISCOVERY_NORMAL == item_flags)
+	if (0 != tag_itemids.values_num)
 	{
 		batch_index = 0;
 
-		while (batch_index < itemids.values_num)
+		while (batch_index < tag_itemids.values_num)
 		{
 			sql_offset = 0;
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -810,7 +817,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					" from item_tag"
 					" where");
 
-			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &tag_itemids, &batch_index);
 
 			result = zbx_db_select("%s", sql);
 
@@ -839,10 +846,11 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 			zbx_db_free_result(result);
 		}
 	}
-	else
+
+	if (0 != lldruleids.values_num)
 	{
 		batch_index = 0;
-		while (batch_index < itemids.values_num)
+		while (batch_index < lldruleids.values_num)
 		{
 			sql_offset = 0;
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -850,7 +858,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					" from lld_macro_path"
 					" where");
 
-			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &lldruleids, &batch_index);
 
 			result = zbx_db_select("%s", sql);
 
@@ -875,7 +883,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 		}
 
 		batch_index = 0;
-		while (batch_index < itemids.values_num)
+		while (batch_index < lldruleids.values_num)
 		{
 			sql_offset = 0;
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -883,7 +891,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					" from item_condition"
 					" where");
 
-			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &lldruleids, &batch_index);
 
 			result = zbx_db_select("%s", sql);
 
@@ -914,14 +922,14 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 		zbx_vector_lld_override_data_ptr_create(&overrides);
 
 		batch_index = 0;
-		while (batch_index < itemids.values_num)
+		while (batch_index < lldruleids.values_num)
 		{
 			sql_offset = 0;
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					"select lld_overrideid,itemid,name,step,stop,evaltype,formula"
 					" from lld_override where");
-			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &lldruleids, &batch_index);
 
 			result = zbx_db_select("%s", sql);
 
@@ -963,6 +971,8 @@ out:
 	zbx_vector_uint64_destroy(&parent_itemids);
 	zbx_vector_item_discovery_ptr_clear_ext(&item_discoveries, zbx_item_discovery_free);
 	zbx_vector_item_discovery_ptr_destroy(&item_discoveries);
+	zbx_vector_uint64_destroy(&tag_itemids);
+	zbx_vector_uint64_destroy(&lldruleids);
 	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -4642,7 +4652,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
 	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items, dflags);
+	lld_items_get(&item_prototypes, &items);
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
