@@ -63,7 +63,7 @@ class CMediatypeHelper {
 				'smtp_email' => 'zabbix@example.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_SECURITY_STARTTLS,
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
@@ -85,7 +85,7 @@ class CMediatypeHelper {
 				'smtp_email' => 'zabbix@example.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_SECURITY_STARTTLS,
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML

@@ -82,12 +82,12 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_NORMAL' =>
+			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' =>
 			[
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
-					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 					'redirection_url' => 'http://example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
@@ -96,7 +96,7 @@ class testMediatype extends CAPITest {
 			[
 				[[
 					'mediatypeid' => ':media_type:Script media type',
-					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL
+					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be 0.'
 			]
@@ -110,7 +110,7 @@ class testMediatype extends CAPITest {
 				[[
 					'mediatypeid' => ':media_type:Email media type SMTP',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_GMAIL,
-					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 					'passwd' => 'passwordpassword'
 				]],
 				null
@@ -286,16 +286,16 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_NORMAL' =>
+			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' =>
 			[
 				[[
-					'name' => 'OAuth not supported for SMTP_AUTHENTICATION_NORMAL',
+					'name' => 'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD',
 					'type' => MEDIA_TYPE_EMAIL,
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 					'smtp_server' => 'smtp.gmail.com',
 					'smtp_helo' => 'example.com',
 					'smtp_email' => 'zabbix@example.com',
-					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 					'redirection_url' => 'http://example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
@@ -338,7 +338,7 @@ class testMediatype extends CAPITest {
 				]],
 				false
 			],
-			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_NORMAL do not set access_token_updated' =>
+			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_PASSWORD do not set access_token_updated' =>
 			[
 				[[
 					'smtp_authentication' => SMTP_AUTHENTICATION_NONE
@@ -407,7 +407,7 @@ class testMediatype extends CAPITest {
 				'smtp_server' => 'smtp.gmail.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 				'passwd' => 'passwordpassword'
 			],
 			[

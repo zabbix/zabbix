@@ -129,7 +129,7 @@ class CControllerMediatypeEdit extends CController {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];
 					$data['display_password_input'] =
-						$this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_NORMAL;
+						$this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_PASSWORD;
 					break;
 
 				case MEDIA_TYPE_EXEC:

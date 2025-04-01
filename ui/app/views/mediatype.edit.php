@@ -123,7 +123,7 @@ $mediatype_form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
 				->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
-				->addValue(_('Username and password'), SMTP_AUTHENTICATION_NORMAL)
+				->addValue(_('Username and password'), SMTP_AUTHENTICATION_PASSWORD)
 				->addValue(_('OAuth'), SMTP_AUTHENTICATION_OAUTH)
 				->setModern()
 		))->setId('smtp-authentication-field')

@@ -734,7 +734,7 @@ window.mediatype_edit_popup = new class {
 							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 							break;
 
-						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
 							const show_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
 								'#passwd_field'
 							];
@@ -763,7 +763,7 @@ window.mediatype_edit_popup = new class {
 					smtp_none.setAttribute('disabled', 'disabled');
 
 					switch (parseInt(authentication)) {
-						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
 							const show_fields = ['#passwd_label', '#passwd_field'];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
@@ -807,7 +807,7 @@ window.mediatype_edit_popup = new class {
 							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 							break;
 
-						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
 							const show_fields = ['#passwd_label', '#passwd_field'];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');

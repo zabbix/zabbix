@@ -314,7 +314,7 @@ class CMediatype extends CApiService {
 			'smtp_security' =>			['type' => API_INT32],
 			'smtp_verify_peer' =>		['type' => API_INT32],
 			'smtp_verify_host' =>		['type' => API_INT32],
-			'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH])],
+			'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH])],
 			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
 			'redirection_url' =>		['type' => API_URL],
 			'client_id' =>				['type' => API_STRING_UTF8],
@@ -449,7 +449,7 @@ class CMediatype extends CApiService {
 			'smtp_security' =>			['type' => API_INT32],
 			'smtp_verify_peer' =>		['type' => API_INT32],
 			'smtp_verify_host' =>		['type' => API_INT32],
-			'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH])],
+			'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH])],
 			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
 			'redirection_url' =>		['type' => API_URL],
 			'client_id' =>				['type' => API_STRING_UTF8],
@@ -694,11 +694,11 @@ class CMediatype extends CApiService {
 					'smtp_security', 'smtp_authentication', 'provider', 'tokens_status'
 				]));
 				$provider_smtp_authentication = [
-					CMediatypeHelper::EMAIL_PROVIDER_SMTP => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_GMAIL => [SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL]
+					CMediatypeHelper::EMAIL_PROVIDER_SMTP => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_GMAIL => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD]
 				][$mediatype['provider']];
 				$api_input_rules['fields'] = [
 					'smtp_server' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_server')],
@@ -760,7 +760,7 @@ class CMediatype extends CApiService {
 						$api_input_rules['fields']['refresh_token']['flags'] |= API_REQUIRED;
 					}
 				}
-				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
 					if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 						$api_input_rules['fields'] += [
 							'username' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'username')],

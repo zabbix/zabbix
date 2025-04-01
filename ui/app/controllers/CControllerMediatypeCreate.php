@@ -31,7 +31,7 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_SECURITY_NONE.','.SMTP_SECURITY_STARTTLS.','.SMTP_SECURITY_SSL,
 			'smtp_verify_peer' =>		'db media_type.smtp_verify_peer|in 0,1',
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
-			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL, SMTP_AUTHENTICATION_OAUTH]),
+			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH]),
 			'exec_path' =>				'db media_type.exec_path',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
@@ -127,7 +127,7 @@ class CControllerMediatypeCreate extends CController {
 
 					$mediatype['smtp_helo'] = $domain;
 
-					if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+					if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
 						$mediatype['username'] = $clean_email;
 					}
 
