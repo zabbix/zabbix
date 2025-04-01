@@ -1,6 +1,7 @@
 Changes for 7.4.0beta1
 
 New features:
+A.F....... [ZBXNEXT-2122] added new user role actions to control access to create and edit own and other user media (agriscenko)
 A.F.I..... [ZBXNEXT-8784] added the ability to show map element and link labels only on hover, scale the map background image proportionally, and set item thresholds and highlights for map links (agriscenko, dfofanovs, dgoloscapov)
 .........T [ZBXNEXT-9271] added Azure MSSQL DTU database by HTTP template (abrosimovs)
 ..F....... [ZBXNEXT-9029] added a button for copying values to clipboard in item test form (esekace)
@@ -69,6 +70,13 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.6rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 7.2.5
@@ -436,6 +444,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.12rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 7.0.11
@@ -3871,6 +3886,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean and Japanese languages (dfofanovs)
 .......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
 ...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
