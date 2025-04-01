@@ -14,24 +14,11 @@
 **/
 
 
-/**
- * @var CView $this
- */
-?>
+class CVertical extends CTag {
 
-<script>
-	const view = {
+	public function __construct($item = null) {
+		parent::__construct('z-vertical', true);
 
-		init({qr_code_url}) {
-			const qr_code_div = document.querySelector('.qr-code');
-			const size = qr_code_div.clientWidth;
-
-			new QRCode(qr_code_div, {
-				text: qr_code_url,
-				width: size,
-				height: size,
-				correctLevel : QRCode.CorrectLevel.L
-			});
-		}
+		$this->addItem($item);
 	}
-</script>
+}

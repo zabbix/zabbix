@@ -568,9 +568,6 @@ svg a {
   height: 10px;
   margin-right: 10px; }
 
-.list-table thead th .text-vertical:lang(ja), .list-table thead th .text-vertical:lang(ko), .list-table thead th .text-vertical:lang(zh) {
-  transform: unset; }
-
 .ui-resizable-border-n {
   border-top: 1px solid #768d99;
   height: 5px;
@@ -2282,14 +2279,14 @@ button {
     color: #737373;
     white-space: nowrap;
     vertical-align: bottom; }
-    .list-table thead th .text-vertical {
+    .list-table thead th z-vertical {
+      display: inline-block;
+      position: relative;
       max-height: 150px;
       min-width: 22px;
       overflow: hidden;
       text-overflow: ellipsis;
-      writing-mode: vertical-lr;
-      line-height: 22px;
-      transform: rotate(180deg); }
+      line-height: 22px; }
     .list-table thead th .arrow-up {
       margin-left: 3px;
       border-bottom-color: #737373; }
@@ -6427,9 +6424,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .qr-code {
   height: 190px;
   width: 190px;
-  margin: 20px auto;
-  color: #f2f2f2;
-  background-color: #2b2b2b; }
+  margin: 20px auto; }
 
 .qr-code img {
   image-rendering: pixelated; }
