@@ -56,8 +56,8 @@ int	zbx_db_delete_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *
 			"with recursive cte as ("
 				" select h0.templateid, h0.hostid from hosts_templates h0"
 					" union all"
-				" select h1.templateid, c.hostid from cte"
-				" join hosts_templates h1 on c.templateid=h1.hostid)"
+				" select h1.templateid, c.hostid from cte c"
+					" join hosts_templates h1 on c.templateid=h1.hostid)"
 			" select templateid from cte where ");
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", del_templateids->values,
