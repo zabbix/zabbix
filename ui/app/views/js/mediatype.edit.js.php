@@ -105,10 +105,11 @@ window.mediatype_edit_popup = new class {
 				'tokens_status'
 			];
 			const mediatype = getFormFields(this.form);
-			const mediatype_oauth = Object.fromEntries(
+			let mediatype_oauth = Object.fromEntries(
 				Object.entries(mediatype).filter(([key]) => oauth_fields.includes(key))
 			);
 			let data = {
+				...mediatype_oauth,
 				update: 'tokens_status' in mediatype ? 1 : 0,
 				advanced_form: mediatype.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
 			};
@@ -118,30 +119,12 @@ window.mediatype_edit_popup = new class {
 			}
 
 			if (!Object.keys(mediatype_oauth).length) {
-				data = {
-					...data,
-					...this.oauth_defaults_by_provider[mediatype.provider]
-				};
+				mediatype_oauth = {...this.oauth_defaults_by_provider[mediatype.provider], client_secret: ''};
 			}
 
-			const overlay = PopUp('oauth.edit', data, {dialogue_class: 'modal-popup-generic'});
+			const overlay = PopUp('oauth.edit', {...data, ...mediatype_oauth}, {dialogue_class: 'modal-popup-generic'});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const oauth = e.detail;
-				const oauth_fields_container = this.form.querySelector('#js-oauth-fields');
-
-				oauth_fields_container.innerHTML = '';
-
-				for (const [name, value] of Object.entries(oauth)) {
-					const input = document.createElement('input');
-
-					input.name = name;
-					input.type = 'hidden';
-					input.value = value;
-
-					oauth_fields_container.append(input);
-				}
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#setOAuth(e.detail));
 		});
 
 		this.form.querySelector('#smtp_authentication').addEventListener('change', (e) => {
@@ -152,16 +135,14 @@ window.mediatype_edit_popup = new class {
 			this.mediatype.smtp_authentication = e.target.value;
 
 			if (e.target.value == <?= SMTP_AUTHENTICATION_OAUTH ?>) {
-				this.form.querySelector('#js-oauth-status')?.remove();
-				this.form.querySelector('#js-oauth-fields').innerHTML = '';
+				this.#setOAuth({});
 			}
 		});
 	}
 
 	clone({title, buttons}) {
 		this.mediatypeid = null;
-		this.form.querySelector('#js-oauth-status')?.remove();
-		this.form.querySelector('#js-oauth-fields').innerHTML = '';
+		this.#setOAuth({});
 
 		this.#toggleChangePasswordButton();
 		this.overlay.setProperties({title, buttons});
@@ -235,6 +216,28 @@ window.mediatype_edit_popup = new class {
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
+	}
+
+	/**
+	 * Set form OAuth input fields, remove UI updated status.
+	 *
+	 * @param {object} oauth  Key value pair of OAuth fields.
+	 */
+	#setOAuth(oauth) {
+		const oauth_fields_container = this.form.querySelector('#js-oauth-fields');
+
+		this.form.querySelector('#js-oauth-status')?.remove();
+		oauth_fields_container.innerHTML = '';
+
+		for (const [name, value] of Object.entries(oauth)) {
+			const input = document.createElement('input');
+
+			input.name = name;
+			input.type = 'hidden';
+			input.value = value;
+
+			oauth_fields_container.append(input);
+		}
 	}
 
 	/**
@@ -619,8 +622,7 @@ window.mediatype_edit_popup = new class {
 			this.form.querySelector(
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 			).checked = true;
-			this.form.querySelector('#js-oauth-status')?.remove();
-			this.form.querySelector('#js-oauth-fields').innerHTML = '';
+			this.#setOAuth({});
 		}
 
 		const authentication = this.form.querySelector('#smtp_authentication');

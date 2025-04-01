@@ -61,17 +61,8 @@ class CControllerOauthAuthorize extends CController {
 		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url']);
 		$result = !array_diff_key($mandatory_all, $state);
 
-		$mandatory_one = array_flip(['mediaid', 'client_secret']);
+		$mandatory_one = array_flip(['mediatypeid', 'client_secret']);
 		$result = $result && array_intersect_key($mandatory_one, $state);
-
-		if ($result && array_key_exists('token_url_parameters', $state)) {
-			$mandatory_all = array_flip(['name', 'value']);
-			$invalid_entries = array_filter(
-				$state['token_url_parameters'],
-				fn ($parameter) => (bool) array_diff_key($mandatory_all, $parameter)
-			);
-			$result = !$invalid_entries;
-		}
 
 		if (!$result) {
 			error(_('Invalid request.'));
@@ -98,12 +89,6 @@ class CControllerOauthAuthorize extends CController {
 				'mediatypeids' => [$state['mediatypeid']]
 			]);
 			$oauth['client_secret'] = $mediatype ? $mediatype[0]['client_secret'] : '';
-		}
-
-		if (array_key_exists('token_url_parameters', $state)) {
-			foreach ($state['token_url_parameters'] as $parameter) {
-				$oauth += [$parameter['name'] => $parameter['value']];
-			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -162,6 +147,7 @@ class CControllerOauthAuthorize extends CController {
 		}
 
 		return [
+			'tokens_status' => OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID,
 			'access_token' => $response['access_token'],
 			'access_expires_in' => $response['expires_in'],
 			'refresh_token' => $response['refresh_token']

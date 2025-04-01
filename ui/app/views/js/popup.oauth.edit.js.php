@@ -51,50 +51,23 @@ window.oauth_edit_popup = new class {
 	}
 
 	submit() {
-		const oauth = getFormFields(this.form);
-		const width = 500;
-		const height = 600;
+		const data = getFormFields(this.form);
 
-		this.oauth_popup = window.open(
-			this.#getOauthPopupUrl(oauth),
-			'oauthpopup',
-			`width=${width},height=${height},left=${(screen.width - width)/2},top=${(screen.height - height)/2}`
-		);
+		this.validateFields(data)
+			.then(response => this.#popupAuthenticate(response.oauth_popup_url, response.oauth)
+				.then(response => this.#submitDataToOpener(response), (reject) => {
+					if (this.advanced_form) {
+						this.form.querySelector('[name="authorization_mode"][value="manual"]').click();
+						this.form.querySelector('[name="code"]').focus();
 
-		this.#getTokensFromOauthService(this.oauth_popup)
-			.then((tokens) => this.#addTokenFormFields(tokens), (reject) => {
-				if (this.advanced_form) {
-					this.form.querySelector('[name="authorization_mode"][value="manual"]').click();
-					this.form.querySelector('[name="code"]').focus();
+						return Promise.reject({title: null, messages: [this.messages.authorization_error]});
+					}
 
-					throw new Error(this.messages.authorization_error);
-				}
-
-				if (reject.error) {
-					throw new Error(reject.error);
-				}
-			})
-			.then(() => {
-				const values = getFormFields(this.form);
-				const detail = {
-					access_expires_in: values.access_expires_in,
-					access_token: values.access_token,
-					authorization_url: this.#getUrl(values.authorization_url, Object.values(values.authorization_url_parameters||{})),
-					client_id: values.client_id,
-					redirection_url: values.redirection_url,
-					refresh_token: values.refresh_token,
-					token_url: this.#getUrl(values.token_url, Object.values(values.token_url_parameters||{}))
-				};
-
-				if ('client_secret' in values) {
-					detail.client_secret = values.client_secret;
-				}
-
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail}));
-			})
-			.catch(error => this.#addErrorMessage(error.message))
+					if (reject.error) {
+						return Promise.reject({title: null, messages: [reject.error]});
+					}
+				}))
+			.catch(error => this.#addErrorMessage(error))
 			.finally(() => this.overlay.unsetLoading());
 	}
 
@@ -127,6 +100,15 @@ window.oauth_edit_popup = new class {
 			writeTextClipboard(input.value);
 			e.target.focus();
 		});
+
+		this.form.querySelector('button[name="client_secret_button"]')?.addEventListener('click', e => {
+			const input = this.form.querySelector('[name="client_secret"]');
+
+			e.target.remove();
+			input.style.display = '';
+			input.removeAttribute('disabled');
+			input.focus();
+		});
 	}
 
 	#initParameters(url_selector, parameters_selector, options) {
@@ -145,18 +127,6 @@ window.oauth_edit_popup = new class {
 		);
 	}
 
-	#addTokenFormFields(fields) {
-		for (const [name, value] of Object.entries(fields)) {
-			const input = document.createElement('input');
-
-			input.type = 'hidden';
-			input.name = name;
-			input.value = value;
-
-			this.form.appendChild(input);
-		}
-	}
-
 	#formChangeEvent(event) {
 		const target = event.target;
 
@@ -165,40 +135,60 @@ window.oauth_edit_popup = new class {
 		}
 	}
 
-	#getOauthPopupUrl(oauth) {
-		if (oauth.authorization_mode === 'manual') {
-			return this.#getUrl(window.location, [
-				{name: 'action', value: 'oauth.authorize'},
-				{name: 'code', value: oauth.code},
-				{name: 'state', value: this.#getUrlStateParameter(oauth)}
-			]);
-		}
-
-		return this.#getUrl(
-			oauth.authorization_url,
-			Object.values(oauth.authorization_url_parameters||{}).concat([
-				{name: 'redirect_uri', value: oauth.redirection_url},
-				{name: 'client_id', value: oauth.client_id},
-				{name: 'state', value: this.#getUrlStateParameter(oauth)}
-		]));
+	#submitDataToOpener(detail) {
+		overlayDialogueDestroy(this.overlay.dialogueid);
+		this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail}));
 	}
 
-	#getTokensFromOauthService(popup) {
+	validateFields(data) {
+		return new Promise((resolve, reject) => {
+			const action_url = new URL('zabbix.php', location.href);
+
+			action_url.searchParams.set('action', 'oauth.check');
+
+			fetch(action_url.href, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(data)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						reject(response.error);
+					}
+					else {
+						resolve(response);
+					}
+				});
+		});
+	}
+
+	#popupAuthenticate(oauth_popup_url, server_data) {
+		const width = 500;
+		const height = 600;
+		const popup = window.open(
+			oauth_popup_url,
+			'oauthpopup',
+			`width=${width},height=${height},left=${(screen.width - width)/2},top=${(screen.height - height)/2}`
+		);
+
+		this.oauth_popup = popup;
+
 		return new Promise((resolve, reject) => {
 			if (popup === null) {
-				reject({error: this.messages.popup_blocked_error});
+				reject({title: null, messages: [this.messages.popup_blocked_error]});
 
 				return;
 			}
 
 			window.addEventListener('message', function (e) {
 				if (e.source !== popup) {
-					reject({error: 'Wrong message source'});
+					reject({title: null, messages: ['Wrong OAuth message source.']});
 				}
 				else {
 					clearInterval(oauth_popup_guard);
 					popup.close();
-					resolve(e.data);
+					resolve({...server_data, ...e.data});
 				}
 
 				window.removeEventListener('message', this);
@@ -210,26 +200,19 @@ window.oauth_edit_popup = new class {
 				}
 
 				clearInterval(oauth_popup_guard);
-				reject({error: this.messages.popup_closed});
+				reject({title: null, messages: [this.messages.popup_closed]});
 			}, 500);
 		});
 	}
 
-	#getUrl(url_base, params) {
-		const url = new URL(url_base);
+	#addErrorMessage(error) {
+		if ('message' in error) {
+			// Handle javascript exceptions.
+			error = {title: null, messages: [error.message]};
+		}
 
-		params.map(({name, value}) => url.searchParams.set(name, value));
-
-		return url.toString();
-	}
-
-	#getUrlStateParameter(data) {
-		return btoa(JSON.stringify(data));
-	}
-
-	#addErrorMessage(message) {
 		[...this.form.parentNode.querySelectorAll('.msg-good,.msg-bad,.msg-warning')].map(el => el.remove());
 
-		this.form.parentNode.insertBefore(makeMessageBox('bad', [message])[0], this.form);
+		this.form.parentNode.insertBefore(makeMessageBox('bad', error.messages, error.title)[0], this.form);
 	}
 }();

@@ -57,7 +57,10 @@ class CControllerMediatypeCreate extends CController {
 			'client_secret' =>			'db media_type_oauth.client_secret',
 			'authorization_url' =>		'db media_type_oauth.authorization_url',
 			'token_url' =>				'db media_type_oauth.token_url',
-			'token_status' =>			'db media_type_oauth.token_status|in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
+			'tokens_status' =>			'int32|in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
+			'access_token' =>			'db media_type_oauth.access_token',
+			'access_expires_in' =>		'int32',
+			'refresh_token' =>			'db media_type_oauth.refresh_token'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -142,7 +145,7 @@ class CControllerMediatypeCreate extends CController {
 				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$this->getInputs($mediatype, [
 						'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
-						'token_status'
+						'tokens_status', 'access_token', 'access_expires_in', 'refresh_token'
 					]);
 				}
 				break;

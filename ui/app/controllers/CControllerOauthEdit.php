@@ -65,12 +65,13 @@ class CControllerOauthEdit extends CController {
 			'mediatypeid' => null,
 			'redirection_url' => '',
 			'client_id' => '',
-			'client_secret' => '',
 			'authorization_url' => '',
 			'token_url' => '',
 			'token_status' => 0
 		];
-		$this->getInputs($data, array_keys($data));
+		$this->getInputs($data, ['update', 'advanced_form', 'mediatypeid', 'redirection_url', 'client_id',
+			'client_secret', 'authorization_url', 'token_url', 'token_status'
+		]);
 
 		$data['user'] = [
 			'debug_mode' => $this->getDebugMode()

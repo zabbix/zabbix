@@ -22,6 +22,7 @@
 
 $form = (new CForm('post'))
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('oauth'))
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -75,21 +76,37 @@ $form_grid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('oauth-clientid-field')
-	])
-	->addItem([
-		(new CLabel([
-			_('Client secret'),
-			makeHelpIcon(_('The client secret registered within the authorization server.'))
-		]))
-			->setAsteriskMark()
-			->setId('oauth-client-secret-label'),
-		(new CFormField(
-			(new CTextBox('client_secret', $data['client_secret']))
-				->disableAutocomplete()
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-		))->setId('oauth-client-secret-field')
 	]);
+
+if (array_key_exists('client_secret', $data)) {
+	$client_secrect = [
+		(new CTextBox('client_secret', $data['client_secret']))
+			->disableAutocomplete()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	];
+}
+else {
+	$client_secrect = [
+		(new CButton('client_secret_button', _('Change client secret'))),
+		(new CTextBox('client_secret', $data['client_secret']))
+			->disableAutocomplete()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->addStyle('display: none;')
+			->setEnabled(false)
+	];
+}
+
+$form_grid->addItem([
+	(new CLabel([
+		_('Client secret'),
+		makeHelpIcon(_('The client secret registered within the authorization server.'))
+	]))
+		->setAsteriskMark()
+		->setId('oauth-client-secret-label'),
+	(new CFormField($client_secrect))->setId('oauth-client-secret-field')
+]);
 
 if ($data['advanced_form']) {
 	$form->addItem(
@@ -201,7 +218,7 @@ $form_grid->addItem(
 			'messages' => [
 				'popup_closed' => _('Please complete authentication to get tokens'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),
-				'authorization_error' => _('Authorization code is empty or incorrect.')
+				'authorization_error' => _('Cannot get authorization code.')
 			]
 		], JSON_FORCE_OBJECT) .');
 	'))->setOnDocumentReady()
