@@ -1826,7 +1826,7 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 		goto clean;
 
 	if (0 != hostids.values_num)
-		zbx_db_delete_hosts(&hostids, &hostnames, audit_context_mode);
+		zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, audit_context_mode);
 
 	/* delete group prototypes */
 
@@ -6099,17 +6099,33 @@ void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, con
 	zbx_vector_uint64_create(&host_prototype_ids);
 	zbx_vector_str_create(&host_prototype_names);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hd.hostid,h.name"
-			" from items i,host_discovery hd, hosts h"
-			" where hd.hostid=h.hostid and i.itemid=hd.lldruleid"
-				" and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hostid,name from hosts"
+			" where flags&%d<>0"
+				" and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
+	if (FAIL != DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names) &&
+			0 != host_prototype_ids.values_num)
+	{
+		DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
 		goto clean;
+	}
 
-	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+		"select hd.hostid,h.name"
+		" from items i,host_discovery hd, hosts h"
+		" where hd.hostid=h.hostid and i.itemid=hd.lldruleid"
+			" and");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values,
+			hostids->values_num);
+
+	if (FAIL != DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names) &&
+			0 != host_prototype_ids.values_num)
+	{
+		DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+	}
 
 	zbx_db_delete_hosts(hostids, hostnames, audit_context_mode);
 clean:

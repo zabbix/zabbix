@@ -406,9 +406,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
 					"enabled_lifetime_type,evaltype"
 				" from items"
-				" where"
-					" flags&%d=%d and",
-					ZBX_FLAG_DISCOVERY_PROTOTYPE, item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE);
+				" where");
 
 		add_batch_select_condition(&sql, &sql_alloc, &sql_offset, "itemid", &itemids, &batch_index);
 
@@ -4265,6 +4263,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 	zbx_db_free_result(result);
 
 	zbx_vector_lld_item_prototype_ptr_sort(item_prototypes, lld_item_prototype_compare_func);
+	zbx_vector_uint64_sort(&protoids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 == item_prototypes->values_num)
 		goto out;
