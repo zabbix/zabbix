@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-17 21:23+0000\n"
+"PO-Revision-Date: 2025-03-20 20:32+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1382,7 +1382,7 @@ msgstr "Alternativement, vous pouvez l'installer manuellement :"
 #: include/views/monitoring.sysmap.edit.php:269
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Always"
-msgstr ""
+msgstr "Toujours"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1843,7 +1843,7 @@ msgstr "Auto"
 #: include/views/monitoring.sysmap.edit.php:270
 #: include/views/monitoring.sysmap.edit.php:277
 msgid "Auto hide"
-msgstr ""
+msgstr "Masquer automatiquement"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1969,7 +1969,7 @@ msgstr "Image de fond"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background scale"
-msgstr ""
+msgstr "Échelle de fond"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -3311,7 +3311,7 @@ msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé comme v
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément « %1$s » sur « %2$s » utilisé dans un lien de la carte « %3$s »."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -5999,7 +5999,7 @@ msgstr "Fichier de clé TLS de la base de données"
 #: include/classes/api/clients/CLocalApiClient.php:124
 #: include/classes/api/clients/CLocalApiClient.php:138
 msgid "Database error occurred."
-msgstr ""
+msgstr "Une erreur de base de données s'est produite."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -11256,7 +11256,7 @@ msgstr "Indéfiniment"
 
 #: include/views/js/monitoring.sysmaps.js.php:841
 msgid "Indicator type"
-msgstr ""
+msgstr "Type d'indicateur"
 
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
@@ -16799,7 +16799,7 @@ msgstr "Propriétés"
 
 #: include/views/monitoring.sysmap.edit.php:126
 msgid "Proportionally"
-msgstr ""
+msgstr "Proportionnellement"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
@@ -19148,7 +19148,7 @@ msgstr "Afficher les hôtes en maintenance"
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
 msgid "Show label"
-msgstr ""
+msgstr "Afficher l'étiquette"
 
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
@@ -19170,11 +19170,11 @@ msgstr "Afficher les lignes"
 
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
-msgstr ""
+msgstr "Afficher les étiquettes des liens"
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
-msgstr ""
+msgstr "Afficher les étiquettes des éléments de la carte"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19634,7 +19634,7 @@ msgstr "Statique"
 
 #: include/views/js/monitoring.sysmaps.js.php:843
 msgid "Static link"
-msgstr ""
+msgstr "Lien statique"
 
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
@@ -24423,15 +24423,15 @@ msgstr "asin() - L'arcsinus d'une valeur sous forme d'angle, exprimé en radians
 
 #: jsLoader.php:300
 msgid "at least 1 link highlight is required"
-msgstr ""
+msgstr "au moins 1 lien en surbrillance est requis"
 
 #: jsLoader.php:301
 msgid "at least 1 link threshold is required"
-msgstr ""
+msgstr "au moins 1 seuil de lien est requis"
 
 #: jsLoader.php:299
 msgid "at least 1 link trigger is required"
-msgstr ""
+msgstr "au moins 1 déclencheur de lien est requis"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -24491,7 +24491,7 @@ msgstr "between() - Vérifie si une valeur appartient à la plage donnée (1 - d
 
 #: include/classes/api/services/CMap.php:1973
 msgid "binary item is not supported"
-msgstr ""
+msgstr "l'élément binaire n'est pas pris en charge"
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -25013,7 +25013,7 @@ msgstr "exp() - Nombre d'Euler à la puissance d'une valeur"
 
 #: jsLoader.php:294
 msgid "expecting hexadecimal color code (6 symbols)"
-msgstr ""
+msgstr "en attente d'un code couleur hexadécimal (6 symboles)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
@@ -25141,7 +25141,7 @@ msgstr "un groupe d'hôte avec le même UUID existe déjà"
 
 #: include/classes/api/services/CMap.php:1967
 msgid "host item ID is expected"
-msgstr ""
+msgstr "l'ID de l'élément hôte est attendu"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
@@ -25163,7 +25163,7 @@ msgstr "un prototype d'hôte avec le même UUID existe déjà"
 
 #: include/classes/api/services/CMap.php:2198
 msgid "host trigger ID is expected"
-msgstr ""
+msgstr "l'ID de déclencheur d'hôte est attendu"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25227,7 +25227,7 @@ msgstr "expression incorrecte à partir de \"%1$s\""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
-msgstr ""
+msgstr "type de valeur d'élément incorrect"
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725

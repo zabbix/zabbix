@@ -56,10 +56,11 @@ $form = (new CForm())
 	->addVar('userid', $data['userid']);
 
 // Media tab.
-if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-	$media = new CPartial('user.edit.media.tab', ['form' => $form] + $data);
-	$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
-}
+$media = new CPartial('user.edit.media.tab', [
+	'form' => $form,
+	'can_edit_media' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
+] + $data);
+$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
 // Frontend notifications tab.
 $messaging_form_list = (new CFormList())
