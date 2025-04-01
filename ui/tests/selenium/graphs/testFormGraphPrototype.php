@@ -717,7 +717,7 @@ class testFormGraphPrototype extends testFormGraphs {
 			'fields' => [
 				'Name' => 'Graph prototype of text items',
 				'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-				'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'),
+				'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 			],
 			'yaxis_items' => [
 				'min' => 'graph_prototype_trap_text',

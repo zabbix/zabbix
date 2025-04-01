@@ -466,7 +466,7 @@ class testFormGraphs extends CWebTest {
 					'error' => 'Cannot add graph',
 					'details' => [
 						'Incorrect value for field "percent_left": value must be between "0" and "100", '.
-						'and have no more than "4" digits after the decimal point.',
+						'and have no more than "4" digits after the decimal point.'
 					]
 				]
 			],
@@ -493,7 +493,7 @@ class testFormGraphs extends CWebTest {
 					'error' => 'Cannot add graph',
 					'details' => [
 						'Incorrect value for field "percent_left": value must be between "0" and "100", '.
-						'and have no more than "4" digits after the decimal point.',
+						'and have no more than "4" digits after the decimal point.'
 					]
 				]
 			],
@@ -546,7 +546,7 @@ class testFormGraphs extends CWebTest {
 					'error' => 'Cannot add graph',
 					'details' => [
 						'Incorrect value for field "percent_right": value must be between "0" and "100", '.
-						'and have no more than "4" digits after the decimal point.',
+						'and have no more than "4" digits after the decimal point.'
 					]
 				]
 			],
@@ -573,7 +573,7 @@ class testFormGraphs extends CWebTest {
 					'error' => 'Cannot add graph',
 					'details' => [
 						'Incorrect value for field "percent_right": value must be between "0" and "100", '.
-						'and have no more than "4" digits after the decimal point.',
+						'and have no more than "4" digits after the decimal point.'
 					]
 				]
 			],
@@ -598,9 +598,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "percent_right": a number is expected.',
-					]
+					'details' => ['Incorrect value for field "percent_right": a number is expected.']
 				]
 			],
 			// #11.
@@ -610,7 +608,7 @@ class testFormGraphs extends CWebTest {
 					'fields' => [
 						'Name' => 'Comma in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => '88,9',
+						'id:yaxismin' => '88,9'
 					],
 					'items' => [
 						[
@@ -624,9 +622,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "yaxismin": a number is expected.',
-					]
+					'details' => ['Incorrect value for field "yaxismin": a number is expected.']
 				]
 			],
 			// #12.
@@ -636,7 +632,7 @@ class testFormGraphs extends CWebTest {
 					'fields' => [
 						'Name' => 'String in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => 'text',
+						'id:yaxismin' => 'text'
 					],
 					'items' => [
 						[
@@ -650,9 +646,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "yaxismin": a number is expected.',
-					]
+					'details' => ['Incorrect value for field "yaxismin": a number is expected.']
 				]
 			],
 			// #13.
@@ -676,9 +670,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "yaxismax": a number is expected.',
-					]
+					'details' => ['Incorrect value for field "yaxismax": a number is expected.']
 				]
 			],
 			// #14.
@@ -702,9 +694,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "yaxismax": a number is expected.',
-					]
+					'details' => ['Incorrect value for field "yaxismax": a number is expected.']
 				]
 			],
 			// #15.
@@ -730,9 +720,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Y axis MAX value must be greater than Y axis MIN value.',
-					]
+					'details' => ['Y axis MAX value must be greater than Y axis MIN value.']
 				]
 			],
 			// #16
@@ -742,7 +730,7 @@ class testFormGraphs extends CWebTest {
 					'fields' => [
 						'Name' => 'Text in "Percentile line (left)" field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:visible_percent_left' => true,
-						'id:percent_left' => 'letters',
+						'id:percent_left' => 'letters'
 					],
 					'items' => [
 						[
@@ -756,9 +744,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "percent_left": a number is expected.'
-					]
+					'details' => ['Incorrect value for field "percent_left": a number is expected.']
 				]
 			],
 			// #17.
@@ -768,7 +754,7 @@ class testFormGraphs extends CWebTest {
 					'fields' => [
 						'Name' => 'Text in "Percentile line (right)" field'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:visible_percent_right' => true,
-						'id:percent_right' => 'letters',
+						'id:percent_right' => 'letters'
 					],
 					'items' => [
 						[
@@ -782,9 +768,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "percent_right": a number is expected.'
-					]
+					'details' => ['Incorrect value for field "percent_right": a number is expected.']
 				]
 			],
 			// #18.
