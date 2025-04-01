@@ -822,15 +822,6 @@ form {
 		}
 	}
 
-	.dynamic-row > td {
-		padding-top: 0;
-	}
-
-	.dynamic-row-control > td {
-		padding-top: 0;
-		padding-bottom: 0;
-	}
-
 	.btn-icon,
 	.icon {
 		&:not(:first-child) {
@@ -1675,8 +1666,6 @@ div {
 	height: 190px;
 	width: 190px;
 	margin: 20px auto;
-	color: #{$font-color};
-	background-color: #{$ui-bg-color};
 }
 
 .qr-code img {
