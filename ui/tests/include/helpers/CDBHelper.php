@@ -553,7 +553,7 @@ class CDBHelper {
 
 				$trigger_tags = DB::select('trigger_tag', [
 					'output' => ['tag', 'value'],
-					'filter' => ['triggerid' => $trigger['triggerid']],
+					'filter' => ['triggerid' => $trigger['triggerid']]
 				]);
 				$item_tags = CDBHelper::getAll(
 					'SELECT tag, value FROM item_tag WHERE itemid IN'.
