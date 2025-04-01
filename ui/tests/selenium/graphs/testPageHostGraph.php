@@ -60,13 +60,14 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Graphs');
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals($host_name, $filter->getField('Hosts')->query('class:subfilter-enabled')->one()->getText());
+		$filter->checkValue(['Hosts' => $host_name]);
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
+		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
 		$this->page->waitUntilReady();
 		$breadcrumbs = [

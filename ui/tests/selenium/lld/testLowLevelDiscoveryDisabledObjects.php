@@ -363,7 +363,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			[
 				[
 					'object' => 'graph',
-					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D=99012'
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D='
 				]
 			]
 		];
