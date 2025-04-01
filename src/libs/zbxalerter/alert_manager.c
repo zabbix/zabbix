@@ -1935,6 +1935,7 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 		am_alert_free(alert);
 	}
 
+	zbx_free(name);
 	zbx_free(params);
 	zbx_free(smtp_server);
 	zbx_free(smtp_helo);
