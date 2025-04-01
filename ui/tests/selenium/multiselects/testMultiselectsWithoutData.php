@@ -632,7 +632,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				[
 					'object' => 'graph',
 					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B0%5D=',
-					'form' => 'id:graph-form'
+					'form' => 'id:graph-form',
+					'overlay_form' => true
 				]
 			],
 			// #4.
@@ -661,7 +662,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				[
 					'object' => 'graph prototype',
 					'url' => 'zabbix.php?action=graph.prototype.list&context=host&parent_discoveryid=',
-					'form' => 'id:graph-prototype-form'
+					'form' => 'id:graph-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// #7.
@@ -741,7 +743,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				[
 					'object' => 'graph prototype',
 					'url' => 'zabbix.php?action=graph.prototype.list&context=template&parent_discoveryid=',
-					'form' => 'id:graph-prototype-form'
+					'form' => 'id:graph-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// #15.

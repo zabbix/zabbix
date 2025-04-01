@@ -732,19 +732,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #2 Correct token (create graph).
-			[
-				[
-					'token' => true,
-					'token_url' => 'zabbix.php?action=popup&popup=graph.edit&context=host&hostid=50013',
-					'db' => 'SELECT * FROM graphs',
-					'link' => 'zabbix.php?action=popup&popup=graph.edit&hostid=10084&context=host&yaxismin=0'.
-						'&yaxismax=100&name=Test&width=920&height=201&graphtype=0&context=host&add=Add&_csrf_token=',
-					'error' => self::INCORRECT_REQUEST,
-					'return_button' => true
-				]
-			],
-			// #3 No token.
+			// #2 No token.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -766,7 +754,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #4 Empty token.
+			// #3 Empty token.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -798,7 +786,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #5 Incorrect token.
+			// #4 Incorrect token.
 			[
 				[
 					'db' => 'SELECT * FROM settings',

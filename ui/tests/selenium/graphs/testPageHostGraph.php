@@ -713,7 +713,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				$filter->getField($group_field)->clear();
 			}
 			else {
-				$filter->getField($group_field)->select($data['group']);
+				$filter->getField($group_field)->fill($data['group']);
 			}
 		}
 

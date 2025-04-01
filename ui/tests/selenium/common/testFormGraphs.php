@@ -720,7 +720,7 @@ class testFormGraphs extends CWebTest {
 					],
 					'items' => [
 						[
-							'item' => 'testFormItem',
+							'item' => 'testFormItem'.($this->prototype ? 'Prototype1' : ''),
 							'color'=> 'BBDEFB',
 							'functions' => [
 								'calc_fnc' => 'min',
@@ -860,7 +860,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 				if ($this->prototype) {
 					$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
-					$dialog = COverlayDialogElement::find()->one();
+					$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
 				}
 				else {
@@ -873,8 +873,13 @@ class testFormGraphs extends CWebTest {
 		// Add items or item prototypes to graph.
 		if (array_key_exists('items', $data)) {
 			foreach ($data['items'] as $i => $item) {
-				$items_container->query('button', CTestArrayHelper::get($item, 'prototype', false) ? 'Add prototype' : 'Add')
+				if ($item['item'] === 'testFormItemPrototype1') {
+					$items_container->query('button', 'Add prototype')->waitUntilClickable()->one()->click();
+				}
+				else {
+					$items_container->query('button', CTestArrayHelper::get($item, 'prototype', false) ? 'Add prototype' : 'Add')
 						->waitUntilClickable()->one()->click();
+				}
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$dialog->query('link:'.$item['item'])->waitUntilClickable()->one()->click();
 
@@ -907,7 +912,15 @@ class testFormGraphs extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'error')) {
-				$error = $data['error'];
+				if ($update) {
+					$error = 'Cannot update graph'.$this->getGraphSuffix();
+				}
+				else if (!$update){
+					$error = 'Cannot add graph'.$this->getGraphSuffix();
+				}
+				else {
+					$error = $data['error'];
+				}
 			}
 			else {
 				$error = $update
@@ -1050,13 +1063,12 @@ class testFormGraphs extends CWebTest {
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:'.($this->prototype ? 'graph-prototype-form' : 'graph-form'))->waitUntilVisible()->asForm()->one();
-		$footer = $dialog->query('class:overlay-dialogue-footer')->one();
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 
 		if (CTestArrayHelper::get($data, 'check_buttons')) {
 			foreach (['Update', 'Clone', 'Delete'] as $button) {
-				$this->assertFalse($footer->query('button:'.$button)->exists());
+				$this->assertTrue($dialog->query('button:'.$button)->one(false)->isVisible(false));
 			}
 		}
 
@@ -1171,10 +1183,9 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$footer = $dialog->query('class:overlay-dialogue-footer')->one();
 
 		if ($data['case'] === 'Clone' || $data['case'] === 'Delete') {
-			$footer->query('button', $data['case'])->waitUntilClickable()->one()->click();
+			$dialog->getFooter()->query('button', $data['case'])->waitUntilClickable()->one()->click();
 		}
 
 		if ($data['case'] === 'Delete') {
@@ -1186,7 +1197,7 @@ class testFormGraphs extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		}
 		else {
-			$footer->query('button:Cancel')->waitUntilClickable()->one()->click();
+			$dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 
 		$this->assertTrue($this->query('button', 'Create graph'.$this->getGraphSuffix())->exists());
@@ -1267,10 +1278,10 @@ class testFormGraphs extends CWebTest {
 		// Assert that text items are not suggested in multiselect.
 		foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 			if ($this->prototype) {
-				$form->query('xpath:.//button[@id="y'.$y.'_itemid"]')->waitUntilClickable()->one()->click();
-				$dialog = COverlayDialogElement::find()->one();
+				$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
+				$item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$this->assertFalse($dialog->query('link', $yaxis_item)->exists());
-				$dialog->close();
+				$item_dialog->close();
 			}
 			else {
 				$form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')->asMultiselect()->one()->query('tag:input')
@@ -1282,12 +1293,14 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$items_container->query('button', 'Add'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
+		$item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		// Assert that text items are not present in dialog.
 		foreach ($data['items'] as  $item) {
-			$this->assertFalse($dialog->query('link', $item)->exists());
+			$this->assertFalse($item_dialog->query('link', $item)->exists());
 		}
 
+		$item_dialog->close();
 		$dialog->close();
 	}
 

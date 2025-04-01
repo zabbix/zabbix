@@ -129,16 +129,16 @@ class testInheritanceGraph extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
 				$this->zbxTestTextNotPresent('Cannot add graph');
-				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Templates' => $this->template]);
-				$this->query('button:Apply')->one()->click();
+				$filter = $this->query('name:zbx_filter')->asForm()->one();
+				$filter->getField('Templates')->clear()->fill($this->template);
+				$filter->submit();
 				$this->page->waitUntilReady();
 				$this->query('link', $data['name'])->one()->waitUntilVisible();
 				break;
 
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, $data['error_msg']);
-				$this->zbxTestCheckTitle('Configuration of graphs');
-				$this->zbxTestCheckHeader('Graphs');
+				$this->zbxTestCheckTitle('Graph edit');
 				$this->zbxTestTextNotPresent('Graph added');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
