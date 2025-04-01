@@ -13,7 +13,7 @@
 **/
 
 
-class CWidgetPastePlaceholder extends CWidget {
+class CWidgetCreatePlaceholder extends CWidget {
 
 	onStart() {
 		for (const button of this._header.querySelectorAll('button')) {

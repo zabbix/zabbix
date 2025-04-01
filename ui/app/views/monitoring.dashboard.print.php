@@ -35,7 +35,7 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
-$this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget.create-placeholder.js');
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);

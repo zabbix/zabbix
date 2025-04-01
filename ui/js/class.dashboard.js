@@ -473,8 +473,8 @@ class CDashboard {
 		return this._data;
 	}
 
-	addPastePlaceholderWidget(dashboard_page, {type, name, view_mode, pos}) {
-		const widget = new CWidgetPastePlaceholder({
+	addCreatePlaceholderWidget(dashboard_page, {type, name, view_mode, pos}) {
+		const widget = new CWidgetCreatePlaceholder({
 			type: 'paste-placeholder',
 			name,
 			view_mode,
@@ -887,7 +887,7 @@ class CDashboard {
 			}
 		}
 
-		const paste_placeholder_widget = this.addPastePlaceholderWidget(dashboard_page, {
+		const create_placeholder_widget = this.addCreatePlaceholderWidget(dashboard_page, {
 			type: new_widget_data.type,
 			name: new_widget_data.name,
 			view_mode: new_widget_data.view_mode,
@@ -907,10 +907,10 @@ class CDashboard {
 
 				if (response.widgets[0] === null) {
 					if (widget !== null) {
-						dashboard_page.replaceWidget(paste_placeholder_widget, widget);
+						dashboard_page.replaceWidget(create_placeholder_widget, widget);
 					}
 					else {
-						dashboard_page.deleteWidget(paste_placeholder_widget);
+						dashboard_page.deleteWidget(create_placeholder_widget);
 					}
 
 					this._warn(t('Cannot paste inaccessible widget.'));
@@ -918,7 +918,7 @@ class CDashboard {
 					return;
 				}
 
-				const widget_replace = this.replaceWidgetFromData(dashboard_page, paste_placeholder_widget, {
+				const widget_replace = this.replaceWidgetFromData(dashboard_page, create_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
 					widgetid: null,
@@ -932,7 +932,7 @@ class CDashboard {
 				}
 			})
 			.catch(exception => {
-				dashboard_page.deleteWidget(paste_placeholder_widget);
+				dashboard_page.deleteWidget(create_placeholder_widget);
 
 				clearMessages();
 
