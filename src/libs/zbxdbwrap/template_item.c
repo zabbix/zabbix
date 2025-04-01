@@ -803,7 +803,8 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
  ******************************************************************************/
 static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_template_item_t *item,
 		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata,
-		zbx_db_insert_t *db_insert_irtname, int audit_context_mode, char **sql, size_t *sql_alloc,
+		zbx_db_insert_t *db_insert_irtname, int audit_context_mode,
+		zbx_vector_uint64_t *new_itemids, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
 	int			i;
@@ -957,6 +958,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	}
 	else
 	{
+		zbx_vector_uint64_append(new_itemids, *itemid);
+
 		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid, (int)item->type,
 				(int)item->value_type, item->delay, item->history, item->trends,
 				(int)item->status, item->trapper_hosts, item->units, item->formula, item->logtimefmt,
@@ -991,7 +994,7 @@ dependent:
 
 		dependent->master_itemid = item->itemid;
 		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, db_insert_irtname,
-				audit_context_mode, sql, sql_alloc, sql_offset);
+				audit_context_mode, new_itemids, sql, sql_alloc, sql_offset);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1074,9 +1077,9 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		/* dependent items are saved within recursive save_template_item calls while saving master */
 		if (0 == item->master_itemid)
 		{
-			zbx_vector_uint64_append(&new_itemids, itemid);
 			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
-					&db_insert_irtname, audit_context_mode, &sql, &sql_alloc, &sql_offset);
+					&db_insert_irtname, audit_context_mode, &new_itemids, &sql, &sql_alloc,
+					&sql_offset);
 		}
 	}
 
