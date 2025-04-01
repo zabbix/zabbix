@@ -214,20 +214,17 @@ class testLldLinking extends CIntegrationTest {
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
 	public function testLinkingLLD_conflict() {
-/*
-		$this->killComponent(self::COMPONENT_SERVER);
+
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_SAME_LLD);
-
 		$this->metaDataItemUpdate();
-		$this->startComponent(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
-		sleep(1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": conflicting item key "lld" found', true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
-		$this->metaDataItemUpdate();
-		$this->fullClear();*/
+		$this->fullClear();
 
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
