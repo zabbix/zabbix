@@ -213,7 +213,7 @@ class testLldLinking extends CIntegrationTest {
 	 * @required-components server, agent
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
-	public function testLinkingLinking_conflict() {
+	public function testLinkingLLD_conflict() {
 /*
 		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
@@ -229,13 +229,12 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->fullClear();*/
 
-		$this->killComponent(self::COMPONENT_SERVER);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->metaDataItemUpdate();
-		$this->startComponent(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
-		sleep(1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
