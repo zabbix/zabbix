@@ -282,7 +282,19 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM correlation',
 					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation event correlation',
+						'id:operation_0_type' => true
+					],
+					'dialog_actions' => [
+						[
+							'click' => 'class:js-condition-add',
+							'fill' => [
+								'id:tag' => 'event_tag'
+							]
+						]
+					]
 				]
 			],
 			// #25 Event correlation update.
@@ -690,6 +702,20 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		if (array_key_exists('fields', $data)) {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
+			}
+		}
+
+		// Fill mandatory fields that should be filled via additional dialogs.
+		if (array_key_exists('dialog_actions', $data)) {
+			foreach ($data['dialog_actions'] as $action) {
+				$this->query($action['click'])->waitUntilClickable()->one()->click();
+				$form = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+
+				foreach ($action['fill'] as $dialog_field => $value) {
+					$form->getField($dialog_field)->fill($value);
+				}
+
+				$form->submit();
 			}
 		}
 
