@@ -17,7 +17,8 @@
 /**
  * @var CView $this
  */
-?>//<script>
+
+?>
 window.oauth_edit_popup = new class {
 
 	constructor() {
@@ -53,7 +54,7 @@ window.oauth_edit_popup = new class {
 	submit() {
 		const data = getFormFields(this.form);
 
-		this.validateFields(data)
+		this.#validateFields(data)
 			.then(response => this.#popupAuthenticate(response.oauth_popup_url, response.oauth)
 				.then(response => this.#submitDataToOpener(response), (reject) => {
 					if (this.advanced_form) {
@@ -84,8 +85,8 @@ window.oauth_edit_popup = new class {
 				}
 			}
 
-			this.#initParameters('[name="authorization_url"]', '#oauth-auth-parameters-table', options);
-			this.#initParameters('[name="token_url"]', '#oauth-token-parameters-table', options);
+			this.#initDynamicRows('[name="authorization_url"]', '#oauth-auth-parameters-table', options);
+			this.#initDynamicRows('[name="token_url"]', '#oauth-token-parameters-table', options);
 		}
 	}
 
@@ -111,7 +112,7 @@ window.oauth_edit_popup = new class {
 		});
 	}
 
-	#initParameters(url_selector, parameters_selector, options) {
+	#initDynamicRows(url_selector, parameters_selector, options) {
 		const url_element = this.form.querySelector(url_selector);
 		const url = parseUrlString(url_element.value);
 		const input_name = url_element.getAttribute('name');
@@ -140,7 +141,7 @@ window.oauth_edit_popup = new class {
 		this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail}));
 	}
 
-	validateFields(data) {
+	#validateFields(data) {
 		return new Promise((resolve, reject) => {
 			const action_url = new URL('zabbix.php', location.href);
 
@@ -166,9 +167,7 @@ window.oauth_edit_popup = new class {
 	#popupAuthenticate(oauth_popup_url, server_data) {
 		const width = 500;
 		const height = 600;
-		const popup = window.open(
-			oauth_popup_url,
-			'oauthpopup',
+		const popup = window.open(oauth_popup_url, 'oauthpopup',
 			`width=${width},height=${height},left=${(screen.width - width)/2},top=${(screen.height - height)/2}`
 		);
 
@@ -182,10 +181,7 @@ window.oauth_edit_popup = new class {
 			}
 
 			window.addEventListener('message', function (e) {
-				if (e.source !== popup) {
-					reject({title: null, messages: ['Wrong OAuth message source.']});
-				}
-				else {
+				if (e.source === popup) {
 					clearInterval(oauth_popup_guard);
 					popup.close();
 					resolve({...server_data, ...e.data});

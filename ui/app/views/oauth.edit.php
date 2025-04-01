@@ -228,7 +228,7 @@ $output = [
 	'header' => _('OAuth'),
 	'body' => $form->addItem($form_grid)->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('popup.oauth.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('oauth.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

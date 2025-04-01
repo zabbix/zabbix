@@ -374,8 +374,10 @@ class CMediatype extends CApiService {
 		self::validateUpdate($mediatypes, $db_mediatypes);
 
 		$upd_mediatypes = [];
+		$ins_media_type_oauth = [];
 		$upd_media_type_oauth = [];
 		$del_media_type_oauth = [];
+		$oauth_fields = array_flip(self::OAUTH_OUTPUT_FIELDS) + ['mediatypeid' => ''];
 
 		foreach ($mediatypes as $mediatype) {
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
@@ -388,11 +390,15 @@ class CMediatype extends CApiService {
 				];
 			}
 
-			if (array_key_exists('smtp_authentication', $upd_mediatype)
-					&& $db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-				$del_media_type_oauth[] = $mediatype['mediatypeid'];
+			if (array_key_exists('smtp_authentication', $upd_mediatype)) {
+				if ($db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+					$del_media_type_oauth[] = $mediatype['mediatypeid'];
+				}
+				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+					$ins_media_type_oauth[] = array_intersect_key($mediatype, $oauth_fields);
+				}
 			}
-			else {
+			elseif ($db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 				$oauth_fields = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 				if ($oauth_fields) {
@@ -406,6 +412,10 @@ class CMediatype extends CApiService {
 
 		if ($upd_mediatypes) {
 			DB::update('media_type', $upd_mediatypes);
+		}
+
+		if ($ins_media_type_oauth) {
+			DB::insert('media_type_oauth', $ins_media_type_oauth, false);
 		}
 
 		if ($upd_media_type_oauth) {
@@ -666,9 +676,7 @@ class CMediatype extends CApiService {
 					);
 				}
 			}
-			elseif ($type == MEDIA_TYPE_EMAIL && array_key_exists('smtp_authentication', $mediatype)
-					&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH
-					&& array_key_exists('access_token', $mediatype)) {
+			elseif ($type == MEDIA_TYPE_EMAIL && array_key_exists('access_token', $mediatype)) {
 				$mediatype['access_token_updated'] = time();
 			}
 		}
@@ -693,20 +701,13 @@ class CMediatype extends CApiService {
 				$mediatype += array_intersect_key($db_mediatype, array_flip([
 					'smtp_security', 'smtp_authentication', 'provider', 'tokens_status'
 				]));
-				$provider_smtp_authentication = [
-					CMediatypeHelper::EMAIL_PROVIDER_SMTP => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_GMAIL => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-					CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD]
-				][$mediatype['provider']];
 				$api_input_rules['fields'] = [
 					'smtp_server' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_server')],
 					'smtp_helo' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
 					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
 					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_SECURITY_NONE, SMTP_SECURITY_STARTTLS, SMTP_SECURITY_SSL])],
-					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', $provider_smtp_authentication)],
+					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', CMediatypeHelper::EMAIL_PROVIDER_AUTHENTICATIONS[$mediatype['provider']])],
 					'message_format' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_MESSAGE_FORMAT_TEXT, ZBX_MEDIA_MESSAGE_FORMAT_HTML])],
 					'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))]
 				];
@@ -717,10 +718,6 @@ class CMediatype extends CApiService {
 						'smtp_verify_peer' =>	['type' => API_INT32, 'in' => '0,1'],
 						'smtp_verify_host' =>	['type' => API_INT32, 'in' => '0,1']
 					];
-				}
-
-				if (!in_array($mediatype['smtp_authentication'], $provider_smtp_authentication)) {
-					$api_input_rules['fields']['smtp_authentication']['flags'] = API_REQUIRED;
 				}
 
 				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH

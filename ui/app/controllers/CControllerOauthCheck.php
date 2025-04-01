@@ -23,9 +23,9 @@ class CControllerOauthCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>					'id',
-			'redirection_url' =>				'string|required',
-			'client_id' => 						'string|required',
-			'client_secret' =>					'string',
+			'redirection_url' =>				'db media_type_oauth.redirection_url|required',
+			'client_id' => 						'db media_type_oauth.client_id|required',
+			'client_secret' =>					'db media_type_oauth.client_secret',
 			'authorization_url' =>				'string',
 			'authorization_url_parameters' =>	'array',
 			'token_url' =>						'string',
@@ -126,7 +126,6 @@ class CControllerOauthCheck extends CController {
 		}
 		else {
 			$url = new CUrl();
-
 			$url->setArgument('action', 'oauth.authorize');
 			$url->setArgument('code', $this->getInput('code'));
 		}

@@ -23,11 +23,11 @@ class CControllerOauthEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>		'id',
-			'redirection_url' =>	'string',
-			'client_id' => 			'string',
-			'client_secret' =>		'string',
-			'authorization_url' =>	'string',
-			'token_url' =>			'string',
+			'redirection_url' =>	'db media_type_oauth.redirection_url',
+			'client_id' => 			'db media_type_oauth.client_id',
+			'client_secret' =>		'db media_type_oauth.client_secret',
+			'authorization_url' =>	'db media_type_oauth.authorization_url',
+			'token_url' =>			'db media_type_oauth.token_url',
 			'token_status' =>		'in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
 			'update' =>				'in 0,1',
 			'advanced_form' =>		'in 0,1'

@@ -345,7 +345,10 @@ class CAudit {
 				]
 			],
 			[
-				'paths' => ['mediatype.client_secret', 'mediatype.access_token', 'mediatype.refresh_token']
+				'paths' => ['mediatype.client_secret', 'mediatype.access_token', 'mediatype.refresh_token'],
+				'conditions' => [
+					['smtp_authentication' => SMTP_AUTHENTICATION_OAUTH]
+				]
 			]
 		],
 		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],

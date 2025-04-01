@@ -19,7 +19,7 @@ require_once __DIR__ . '/../include/helpers/CTestDataHelper.php';
 require_once __DIR__ . '/../../include/classes/helpers/CMediatypeHelper.php';
 
 /**
- *
+ * @backup media_type
  *
  * @onBefore prepareTestData
  *
@@ -88,7 +88,7 @@ class testMediatype extends CAPITest {
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
-					'redirection_url' => 'http://example.com'
+					'redirection_url' => 'http://updated.example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
@@ -128,7 +128,7 @@ class testMediatype extends CAPITest {
 			'Enable access token' =>
 			[
 				[[
-					'mediatypeid' => ':media_type:OAuth with tokens invalid',
+					'mediatypeid' => ':media_type:OAuth with tokens and tokens_status 0',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID
 				]],
 				null
@@ -145,7 +145,7 @@ class testMediatype extends CAPITest {
 			'Enable refresh token' =>
 			[
 				[[
-					'mediatypeid' => ':media_type:OAuth with tokens invalid',
+					'mediatypeid' => ':media_type:OAuth with tokens and tokens_status 0',
 					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID
 				]],
 				null
@@ -456,7 +456,7 @@ class testMediatype extends CAPITest {
 				'refresh_token' => 'refreshtoken'
 			],
 			[
-				'name' => 'OAuth with tokens invalid',
+				'name' => 'OAuth with tokens and tokens_status 0',
 				'type' => MEDIA_TYPE_EMAIL,
 				'provider' => CMediatypeHelper::EMAIL_PROVIDER_GMAIL,
 				'smtp_server' => 'smtp.gmail.com',

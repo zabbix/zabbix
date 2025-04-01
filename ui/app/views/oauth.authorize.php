@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 
