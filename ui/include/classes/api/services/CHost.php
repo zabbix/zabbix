@@ -1880,7 +1880,7 @@ class CHost extends CHostGeneral {
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			// discovered items
 			$discoveryRules = DBFetchArray(DBselect(
-				'SELECT hd.hostid,hd2.parent_itemid'.
+				'SELECT hd.hostid,hd2.lldruleid'.
 					' FROM host_discovery hd,host_discovery hd2'.
 					' WHERE '.dbConditionInt('hd.hostid', $hostids).
 					' AND hd.parent_hostid=hd2.hostid'

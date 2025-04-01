@@ -53,12 +53,6 @@ ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
 int	lld_item_link_compare_func(const void *d1, const void *d2);
 void	lld_item_link_free(zbx_lld_item_link_t *item_link);
 
-typedef struct
-{
-	zbx_uint64_t	id;
-	char		*name;
-}
-zbx_id_name_pair_t;
 
 #define ZBX_LLD_DISCOVERY_STATUS_NORMAL		0
 #define ZBX_LLD_DISCOVERY_STATUS_LOST		1

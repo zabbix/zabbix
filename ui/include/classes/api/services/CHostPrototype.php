@@ -151,7 +151,7 @@ class CHostPrototype extends CHostBase {
 		$sqlParts['from'][] = 'items i';
 		$sqlParts['from'][] = 'hosts ph';
 		$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
-		$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
+		$sqlParts['where'][] = 'hd.lldruleid=i.itemid';
 		$sqlParts['where'][] = 'i.hostid=ph.hostid';
 		$sqlParts['where'][] = 'ph.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 
@@ -174,10 +174,10 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['where'][] = dbConditionInt('hd.parent_itemid', (array) $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionInt('hd.lldruleid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['hd'] = 'hd.parent_itemid';
+				$sqlParts['group']['hd'] = 'hd.lldruleid';
 			}
 		}
 
@@ -245,7 +245,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hd.hostid,i.hostid AS parent_hostid'.
 					' FROM host_discovery hd,items i'.
 					' WHERE '.dbConditionId('hd.hostid', $hostids).
-					' AND hd.parent_itemid=i.itemid'
+					' AND hd.lldruleid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
 				$relationMap->addRelation($relation['hostid'], $relation['parent_hostid']);
@@ -646,10 +646,10 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function addInternalFields(array &$db_hosts): void {
 		$result = DBselect(
-			'SELECT h.hostid,h.templateid,hd.parent_itemid AS ruleid,hh.status AS host_status'.
+			'SELECT h.hostid,h.templateid,hd.lldruleid AS ruleid,hh.status AS host_status'.
 			' FROM hosts h,host_discovery hd,items i,hosts hh'.
 			' WHERE h.hostid=hd.hostid'.
-				' AND hd.parent_itemid=i.itemid'.
+				' AND hd.lldruleid=i.itemid'.
 				' AND i.hostid=hh.hostid'.
 				' AND '.dbConditionId('h.hostid', array_keys($db_hosts))
 		);
@@ -1098,7 +1098,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.host'.
 					' FROM items i,host_discovery hd,hosts h'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND ('.implode(' OR ', $where).')',
 					1
@@ -1115,7 +1115,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.host,hh.host AS parent_host,hh.status'.
 					' FROM items i,host_discovery hd,hosts h,hosts hh'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND i.hostid=hh.hostid'.
 						' AND ('.implode(' OR ', $where).')',
@@ -1147,7 +1147,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.name'.
 					' FROM items i,host_discovery hd,hosts h'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND ('.implode(' OR ', $where).')',
 					1
@@ -1164,7 +1164,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.name,hh.host AS parent_host,hh.status'.
 					' FROM items i,host_discovery hd,hosts h,hosts hh'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND i.hostid=hh.hostid'.
 						' AND ('.implode(' OR ', $where).')',
@@ -1871,12 +1871,12 @@ class CHostPrototype extends CHostBase {
 	 */
 	public function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT hd.hostid,h.host,h.uuid,h.templateid,hd.parent_itemid AS ruleid,hh.status AS host_status'.
+			'SELECT hd.hostid,h.host,h.uuid,h.templateid,hd.lldruleid AS ruleid,hh.status AS host_status'.
 			' FROM host_discovery hd,hosts h,items i,hosts hh'.
 			' WHERE hd.hostid=h.hostid'.
-				' AND hd.parent_itemid=i.itemid'.
+				' AND hd.lldruleid=i.itemid'.
 				' AND i.hostid=hh.hostid'.
-				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
+				' AND '.dbConditionId('hd.lldruleid', $ruleids)
 		);
 
 		$hosts = [];
@@ -2128,7 +2128,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT h.hostid,h.host,h.templateid,i.itemid AS ruleid,i.templateid AS parent_ruleid,'.
 				'hh.status AS host_status'.
 			' FROM items i,host_discovery hd,hosts h,hosts hh'.
-			' WHERE i.itemid=hd.parent_itemid'.
+			' WHERE i.itemid=hd.lldruleid'.
 				' AND hd.hostid=h.hostid'.
 				' AND i.hostid=hh.hostid'.
 				' AND '.dbConditionId('i.itemid', $ruleids).

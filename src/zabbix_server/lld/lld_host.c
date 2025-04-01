@@ -4673,7 +4673,7 @@ static int	lld_host_delete_validate(zbx_uint64_t hostid)
  *                                                                             *
  *******************************************************************************/
 static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_lld_lifetime_t *lifetime,
-		const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
+		const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck, int dflags)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -4885,7 +4885,11 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 
 		zbx_db_begin();
 
-		zbx_db_delete_hosts_with_prototypes(&del_hostids, &del_hosts, ZBX_AUDIT_LLD_CONTEXT);
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			zbx_db_delete_hosts_with_prototypes(&del_hostids, &del_hosts, ZBX_AUDIT_LLD_CONTEXT);
+		else
+			zbx_db_delete_host_prototypes(&del_hostids, &del_hosts, ZBX_AUDIT_LLD_CONTEXT);
+
 
 		zbx_db_commit();
 	}
@@ -6462,7 +6466,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		lld_host_export_lld_macros(&hosts);
 		lld_host_process_nested_lld_rules(&hosts);
 
-		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck);
+		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck, dflags);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);
 
 		zbx_vector_db_tag_ptr_clear_ext(&tags, zbx_db_tag_free);

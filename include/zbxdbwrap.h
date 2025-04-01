@@ -92,6 +92,8 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 		int audit_context_mode);
 void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode);
+void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids,
+		const zbx_vector_str_t *host_prototype_names, int audit_context_mode);
 
 void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
@@ -190,5 +192,14 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 
 int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old);
 void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids);
+
+typedef struct
+{
+	zbx_uint64_t	id;
+	char		*name;
+}
+zbx_id_name_pair_t;
+
+ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
 
 #endif /* ZABBIX_DBWRAP_H */
