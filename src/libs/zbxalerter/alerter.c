@@ -169,7 +169,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
 	int		maxattempts, object, source, ret;
 
-	zbx_mailauth_t	mailauth = {0};
+	zbx_media_auth_t	mailauth = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

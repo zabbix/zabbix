@@ -708,7 +708,7 @@ out:
 static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
-		smtp_verify_peer, unsigned char smtp_verify_host, const zbx_mailauth_t *auth,
+		smtp_verify_peer, unsigned char smtp_verify_host, const zbx_media_auth_t *auth,
 		unsigned char message_format, int timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error)
 {
@@ -944,7 +944,7 @@ static void	zbx_mailaddr_free(zbx_mailaddr_t *mailaddr)
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		const zbx_mailauth_t *auth, unsigned char message_format, int timeout, const char *config_source_ip,
+		const zbx_media_auth_t *auth, unsigned char message_format, int timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error)
 {
 	int			ret = FAIL;
