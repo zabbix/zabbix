@@ -494,7 +494,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
-				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 1");
 				zbx_db_insert_prepare(&db_insert_host_template_cache, "host_template_cache", "hostid",
 						"link_hostid", (char *)NULL);
 				zbx_db_insert_add_values(&db_insert_host_template_cache, hostid, hostid);
@@ -644,7 +643,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							hostname, hostname, tls_accepted, tls_accepted, psk_identity,
 							psk, new_monitored_by);
 
-
 					zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(
@@ -673,7 +671,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
-				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 2");
 				zbx_db_insert_prepare(&db_insert_host_template_cache, "host_template_cache", "hostid",
 						"link_hostid", (char *)NULL);
 				zbx_db_insert_add_values(&db_insert_host_template_cache, hostid, hostid);

@@ -2551,6 +2551,7 @@ static void	lld_items_tags_make(const zbx_vector_lld_item_prototype_ptr_t *item_
  *             db_insert_irtdata    - [IN] prepared item real-time data bulk  *
  *                                         insert                             *
  *             db_insert_irtname    - [IN]                                    *
+ *             new_itemids          - [OUT]                                   *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
@@ -2613,8 +2614,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 		dependent->master_itemid = item->itemid;
 		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert_items,
-				db_insert_idiscovery, db_insert_irtdata, db_insert_irtname,
-				new_itemids);
+				db_insert_idiscovery, db_insert_irtdata, db_insert_irtname, new_itemids);
 	}
 }
 
@@ -3080,6 +3080,7 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *             items           - [IN/OUT] items to save                       *
  *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
+ *             new_itemids     - [OUT]                                        *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully saved or saving was not *
  *                         necessary                                          *
@@ -3192,8 +3193,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
-					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname,
-					new_itemids);
+					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname, new_itemids);
 		}
 		else
 		{
@@ -3208,9 +3208,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 						&db_insert_irtname, new_itemids);
 			}
 		}
-
 	}
-
 
 	if (0 != new_items)
 	{
@@ -4172,6 +4170,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_t				items_index;
 	int					ret = SUCCEED, host_record_is_locked = 0;
 	zbx_vector_lld_item_full_ptr_t		items;
+	zbx_vector_uint64_t			new_itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4181,6 +4180,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	if (0 == item_prototypes.values_num)
 		goto out;
+
+	zbx_vector_uint64_create(&new_itemids);
 
 	zbx_vector_lld_item_full_ptr_create(&items);
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
@@ -4199,9 +4200,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	lld_items_validate(hostid, &items, error);
 
 	zbx_db_begin();
-
-	zbx_vector_uint64_t new_itemids;
-	zbx_vector_uint64_create(&new_itemids);
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
 			&new_itemids) &&
@@ -4222,11 +4220,11 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	}
 
 	zbx_db_execute_multiple_query(
-			"insert into item_template_cache select id.itemid,link_hostid "
-				"from item_template_cache itc "
-				"join item_discovery id on "
-				"itc.itemid=id.parent_itemid "
-				"where ", "id.itemid", &new_itemids);
+			"insert into item_template_cache"
+				" select id.itemid,link_hostid from item_template_cache itc"
+					" join item_discovery id on"
+					" itc.itemid=id.parent_itemid"
+					" where ", "id.itemid", &new_itemids);
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);

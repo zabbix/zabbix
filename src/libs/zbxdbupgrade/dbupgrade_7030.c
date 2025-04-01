@@ -432,10 +432,10 @@ static int	DBpatch_7030033(void)
 					" ("
 					" select h0.templateid, h0.hostid from hosts_templates h0"
 						" union all"
-					" select h1.templateid, c.hostid from cte c join hosts_templates h1 on"
-						" c.templateid=h1.hostid"
+					" select h1.templateid, c.hostid from cte c"
+						" join hosts_templates h1 on c.templateid=h1.hostid"
 					" )"
-			" select hostid,templateid from cte)"))
+				" select hostid,templateid from cte)"))
 	{
 		return FAIL;
 	}

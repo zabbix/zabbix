@@ -793,6 +793,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
  *             db_insert_items    - [IN] prepared item bulk insert            *
  *             db_insert_irtdata  - [IN] prepared item discovery bulk insert  *
  *             audit_context_mode - [IN]                                      *
+ *             new_itemids        - [OUT]                                     *
  *             sql                - [IN/OUT] sql buffer pointer used for      *
  *                                           update operations                *
  *             sql_alloc          - [IN/OUT] sql buffer already allocated     *
@@ -999,7 +1000,6 @@ dependent:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 /******************************************************************************
  *                                                                            *

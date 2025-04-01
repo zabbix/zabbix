@@ -2233,7 +2233,7 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 	zbx_free(sql);
 
 	if (SUCCEED != (res = zbx_db_delete_host_template_cache(hostid, del_templateids)))
-		*error = zbx_strdup(NULL, "failed to delete host tag cache");
+		*error = zbx_dsprintf(NULL, "failed to delete host tag cache for hostid: " ZBX_FS_UI64, hostid);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -4964,7 +4964,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				new_httptestids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-
 
 	if (0 == httptests->values_num)
 		return;
