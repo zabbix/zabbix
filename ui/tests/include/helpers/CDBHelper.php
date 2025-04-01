@@ -551,11 +551,15 @@ class CDBHelper {
 			if ($trigger) {
 				$trigger = $trigger[0];
 
-				$tags = DB::select('trigger_tag', [
+				$trigger_tags = DB::select('trigger_tag', [
 					'output' => ['tag', 'value'],
 					'filter' => ['triggerid' => $trigger['triggerid']],
-					'preservekeys' => true
 				]);
+				$item_tags = CDBHelper::getAll(
+					'SELECT tag, value FROM item_tag WHERE itemid IN'.
+						' (SELECT DISTINCT itemid FROM functions WHERE triggerid='.zbx_dbstr($trigger['triggerid']).')'
+				);
+				$tags = array_merge($trigger_tags, $item_tags);
 
 				$time = time();
 
