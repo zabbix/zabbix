@@ -7646,7 +7646,7 @@ return [
 		]
 	],
 	'host_template_cache' => [
-		'key' => 'hostid,tag_hostid',
+		'key' => 'hostid,link_hostid',
 		'fields' => [
 			'hostid' => [
 				'null' => false,
@@ -7655,7 +7655,7 @@ return [
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
 			],
-			'tag_hostid' => [
+			'link_hostid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -8306,7 +8306,7 @@ return [
 		]
 	],
 	'item_template_cache' => [
-		'key' => 'itemid,tag_hostid',
+		'key' => 'itemid,link_hostid',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -8315,7 +8315,7 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid'
 			],
-			'tag_hostid' => [
+			'link_hostid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -8354,7 +8354,7 @@ return [
 		]
 	],
 	'httptest_template_cache' => [
-		'key' => 'httptestid,tag_hostid',
+		'key' => 'httptestid,link_hostid',
 		'fields' => [
 			'httptestid' => [
 				'null' => false,
@@ -8363,7 +8363,7 @@ return [
 				'ref_table' => 'httptest',
 				'ref_field' => 'httptestid'
 			],
-			'tag_hostid' => [
+			'link_hostid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
