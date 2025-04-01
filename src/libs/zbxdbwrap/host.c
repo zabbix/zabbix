@@ -4947,7 +4947,6 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httptests, int audit_context_mode)
 {
 	char			*sql;
@@ -4961,12 +4960,11 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				num_httptestfields = 0, num_httpstepfields = 0, num_httptesttags = 0, num_httptests = 0;
 	zbx_db_insert_t		db_insert_htest, db_insert_hstep, db_insert_htitem, db_insert_hsitem, db_insert_tfield,
 				db_insert_sfield, db_insert_httag;
-	zbx_vector_uint64_t	httpupdtestids, httpupdstepids, deletefieldsids, deletestepfieldsids, deletetagids;
+	zbx_vector_uint64_t	httpupdtestids, httpupdstepids, deletefieldsids, deletestepfieldsids, deletetagids,
+				new_httptestids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
-	zbx_vector_uint64_t new_httptestids;
-	zbx_vector_uint64_create(&new_httptestids);
 
 	if (0 == httptests->values_num)
 		return;
@@ -4978,6 +4976,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	zbx_vector_uint64_create(&deletefieldsids);
 	zbx_vector_uint64_create(&deletestepfieldsids);
 	zbx_vector_uint64_create(&deletetagids);
+	zbx_vector_uint64_create(&new_httptestids);
 
 	for (i = 0; i < httptests->values_num; i++)
 	{
@@ -5710,13 +5709,11 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 
 	if (FAIL == (res = zbx_db_copy_host_template_cache(hostid, lnk_templateids)))
 	{
-		*error = zbx_strdup(NULL, "failed to copy host tag cache");
+		*error = zbx_dsprintf(NULL, "failed to copy host tag cache for hostid: " ZBX_FS_UI64, hostid);
 		goto clean;
 	}
 
 	DBcopy_template_items(hostid, lnk_templateids, audit_context_mode);
-
-
 	DBcopy_template_host_prototypes(hostid, lnk_templateids, audit_context_mode, db_insert_htemplates);
 
 	zbx_db_insert_execute(db_insert_htemplates);
