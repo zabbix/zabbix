@@ -45,15 +45,15 @@ typedef struct
 
 	int	old_access_expires_in;
 	int	access_expires_in;
-} zbx_oauth2_data_t;
+} zbx_oauth_data_t;
 
-void	zbx_oauth2_clean(zbx_oauth2_data_t *data);
+void	zbx_oauth_clean(zbx_oauth_data_t *data);
 
-int	zbx_oauth2_fetch(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, char **error);
-int	zbx_oauth2_access_refresh(zbx_oauth2_data_t *data, long timeout, const char *config_source_ip,
+int	zbx_oauth_fetch(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **error);
+int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *config_source_ip,
 	const char *config_ssl_ca_location, char **error);
-void	zbx_oauth2_update(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, int fetch_result);
-void	zbx_oauth2_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
-		const zbx_oauth2_data_t *data, int fetch_result);
+void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result);
+void	zbx_oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
+		const zbx_oauth_data_t *data, int fetch_result);
 
 #endif

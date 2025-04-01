@@ -204,9 +204,9 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		}
 		case SMTP_AUTHENTICATION_OAUTH:
 		{
-			zbx_oauth2_data_t	data = {0};
+			zbx_oauth_data_t	data = {0};
 
-			if (SUCCEED != (ret = zbx_oauth2_fetch(mediatypeid, &data, &error)))
+			if (SUCCEED != (ret = zbx_oauth_fetch(mediatypeid, &data, &error)))
 				goto out;
 
 			if (data.access_token_updated + data.access_expires_in < time(NULL))
@@ -217,13 +217,13 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 				{
 					zbx_free(suberror);	/* clear last error */
 
-					ret = zbx_oauth2_access_refresh(&data, ALARM_ACTION_TIMEOUT, config_source_ip,
+					ret = zbx_oauth_access_refresh(&data, ALARM_ACTION_TIMEOUT, config_source_ip,
 							config_ssl_ca_location, &suberror);
 				}
 				while (0 < maxattempts-- && NETWORK_ERROR == ret);
 
-				zbx_oauth2_update(mediatypeid, &data, ret);
-				zbx_oauth2_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
+				zbx_oauth_update(mediatypeid, &data, ret);
+				zbx_oauth_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
 
 				if (SUCCEED != ret)
 				{
@@ -235,7 +235,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 			mailauth.oauthbearer = zbx_strdup(NULL, data.access_token);
 			mailauth.username = zbx_strdup(mailauth.username, smtp_email);
 
-			zbx_oauth2_clean(&data);
+			zbx_oauth_clean(&data);
 			ZBX_FALLTHROUGH;
 		}
 		default:

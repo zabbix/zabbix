@@ -21,7 +21,7 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
-int	zbx_oauth2_fetch(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, char **error)
+int	zbx_oauth_fetch(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **error)
 {
 #define CHECK_FOR_NULL(index, message)								\
 	do {											\
@@ -73,7 +73,7 @@ out:
 #undef CHECK_FOR_NULL
 }
 
-int	zbx_oauth2_access_refresh(zbx_oauth2_data_t *data, long timeout, const char *config_source_ip,
+int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error)
 {
 #ifndef HAVE_LIBCURL
@@ -190,7 +190,7 @@ out:
 #endif
 }
 
-void	zbx_oauth2_update(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, int fetch_result)
+void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result)
 {
 	data->old_tokens_status = data->tokens_status;
 
@@ -217,8 +217,8 @@ void	zbx_oauth2_update(zbx_uint64_t mediatypeid, zbx_oauth2_data_t *data, int fe
 	}
 }
 
-void	zbx_oauth2_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
-		const zbx_oauth2_data_t *data, int fetch_result)
+void	zbx_oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
+		const zbx_oauth_data_t *data, int fetch_result)
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
@@ -246,7 +246,7 @@ void	zbx_oauth2_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const ch
 	zbx_hashset_insert(zbx_get_audit_hashset(), &entry, sizeof(entry));
 }
 
-void	zbx_oauth2_clean(zbx_oauth2_data_t *data)
+void	zbx_oauth_clean(zbx_oauth_data_t *data)
 {
 	zbx_free(data->token_url);
 	zbx_free(data->client_id);
