@@ -506,7 +506,7 @@ func ValidateOptions(options *AgentOptions) error {
 	_, err = zbxnet.GetAllowedPeers(options.Server)
 
 	if err != nil {
-		return fmt.Errorf("%w", err)
+		return errs.Wrap(err, `failed to validate "ServerActive" configuration parameter`)
 	}
 
 	_, err = ParseServerActive(options.ServerActive)

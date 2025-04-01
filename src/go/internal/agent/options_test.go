@@ -519,8 +519,8 @@ func Test_removeSystem(t *testing.T) {
 func Test_ValidateOptions(t *testing.T) {
 	t.Parallel()
 
-	invalidServerConfigurationError := "invalid \"Server\" " +
-		"configuration: incorrect address parameter: "
+	invalidServerConfigurationError := `Failed to validate "ServerActive" configuration parameter: invalid "Server" ` +
+		`configuration: incorrect address parameter: `
 
 	type args struct {
 		options *AgentOptions
@@ -579,7 +579,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: "\n",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"\n\""),
+			errors.New(invalidServerConfigurationError + "\"\n\"."),
 			true,
 		},
 		{
@@ -589,7 +589,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: ",",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"\""),
+			errors.New(invalidServerConfigurationError + "\"\"."),
 			true,
 		},
 		{
@@ -599,7 +599,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: "localhost,",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"\""),
+			errors.New(invalidServerConfigurationError + "\"\"."),
 			true,
 		},
 		{
@@ -609,7 +609,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: ";",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\";\""),
+			errors.New(invalidServerConfigurationError + "\";\"."),
 			true,
 		},
 		{
@@ -619,7 +619,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: "127.0.0.1;localhost",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"127.0.0.1;localhost\""),
+			errors.New(invalidServerConfigurationError + "\"127.0.0.1;localhost\"."),
 			true,
 		},
 	}
