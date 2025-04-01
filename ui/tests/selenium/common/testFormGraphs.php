@@ -518,9 +518,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'error' => 'Cannot add graph',
-					'details' => [
-						'Incorrect value for field "percent_left": a number is expected.',
-					]
+					'details' => ['Incorrect value for field "percent_left": a number is expected.']
 				]
 			],
 			// #8.
