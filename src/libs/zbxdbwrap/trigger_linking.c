@@ -1599,7 +1599,7 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 			&templates_triggers_descriptions, &temp_templates_triggerids);
 
 	if (FAIL == res && 0 == templates_triggers_descriptions.values_num)
-		*error = zbx_strdup(NULL, "cannot link triggers");
+		*error = zbx_strdup(NULL, "unknown error while linking triggers");
 
 	if (0 == templates_triggers_descriptions.values_num)
 		goto end;
