@@ -418,8 +418,7 @@ void	zbx_db_init_autoincrement_options(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13,
-			int read_only_recoverable)
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -457,7 +456,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 #if defined(HAVE_MYSQL)
 	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(read_only_recoverable);
 
 	if (NULL == (conn = mysql_init(NULL)))
 	{
@@ -641,7 +639,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
-	ZBX_UNUSED(read_only_recoverable);
 
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -903,7 +900,7 @@ out:
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
-	ZBX_UNUSED(read_only_recoverable);
+
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE |
 		SQLITE_OPEN_CREATE, NULL))
