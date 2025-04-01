@@ -46,7 +46,8 @@ class testLldLinking extends CIntegrationTest {
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051)
+				'ListenPort' => self::getConfigurationValue(self::COMPONENT_SERVER,
+					'ListenPort', 10051)
 			]
 		];
 	}
@@ -220,8 +221,11 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():FAIL', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": conflicting item key "lld" found', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():FAIL', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": conflicting item key "lld" found',
+			true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->fullClear();
@@ -230,11 +234,13 @@ class testLldLinking extends CIntegrationTest {
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 	}
 }

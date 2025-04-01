@@ -59,7 +59,6 @@ require_once dirname(__FILE__).'/testLldLinking.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 
-
 use PHPUnit\Framework\TestSuite;
 
 class IntegrationTests {
