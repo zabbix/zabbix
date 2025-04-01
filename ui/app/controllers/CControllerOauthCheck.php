@@ -102,7 +102,7 @@ class CControllerOauthCheck extends CController {
 		]);
 
 		$authorization_url = new CUrl($oauth['authorization_url']);
-		foreach ($this->getInput('authorization_url_parameters') as $parameter) {
+		foreach ($this->getInput('authorization_url_parameters', []) as $parameter) {
 			if (array_key_exists('name', $parameter) && array_key_exists('value', $parameter)) {
 				$authorization_url->setArgument($parameter['name'], $parameter['value']);
 			}
@@ -111,7 +111,7 @@ class CControllerOauthCheck extends CController {
 		$oauth['authorization_url'] = $authorization_url->getUrl();
 
 		$token_url = new CUrl($oauth['token_url']);
-		foreach ($this->getInput('token_url_parameters') as $parameter) {
+		foreach ($this->getInput('token_url_parameters', []) as $parameter) {
 			if (array_key_exists('name', $parameter) && array_key_exists('value', $parameter)) {
 				$token_url->setArgument($parameter['name'], $parameter['value']);
 			}

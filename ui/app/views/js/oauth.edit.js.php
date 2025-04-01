@@ -56,7 +56,7 @@ window.oauth_edit_popup = new class {
 
 		this.#validateFields(data)
 			.then(response => this.#popupAuthenticate(response.oauth_popup_url, response.oauth)
-				.then(response => this.#submitDataToOpener(response), (reject) => {
+				.then(response => this.#submitDataToOpener(response), (error) => {
 					if (this.advanced_form) {
 						this.form.querySelector('[name="authorization_mode"][value="manual"]').click();
 						this.form.querySelector('[name="code"]').focus();
@@ -64,9 +64,7 @@ window.oauth_edit_popup = new class {
 						return Promise.reject({title: null, messages: [this.messages.authorization_error]});
 					}
 
-					if (reject.error) {
-						return Promise.reject({title: null, messages: [reject.error]});
-					}
+					return Promise.reject(error);
 				}))
 			.catch(error => this.#addErrorMessage(error))
 			.finally(() => this.overlay.unsetLoading());
