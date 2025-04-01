@@ -71,42 +71,46 @@ $html_page->addItem(
 						$data['context'] === 'host' ? _('Host groups') : _('Template groups'),
 						'filter_groupids__ms'
 					),
-					(new CMultiSelect([
-						'name' => 'filter_groupids[]',
-						'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
-						'data' => $data['filter']['groups'],
-						'popup' => [
-							'parameters' => [
-									'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
-									'srcfld1' => 'groupid',
-									'dstfrm' => 'zbx_filter',
-									'dstfld1' => 'filter_groupids_',
-									'editable' => true,
-									'enrich_parent_groups' => true
-								] + $hostgroup_ms_params
-						]
-					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					new CFormField(
+						(new CMultiSelect([
+							'name' => 'filter_groupids[]',
+							'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
+							'data' => $data['filter']['groups'],
+							'popup' => [
+								'parameters' => [
+										'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
+										'srcfld1' => 'groupid',
+										'dstfrm' => 'zbx_filter',
+										'dstfld1' => 'filter_groupids_',
+										'editable' => true,
+										'enrich_parent_groups' => true
+									] + $hostgroup_ms_params
+							]
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
 				])
 				->addItem([
 					new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms'),
-					(new CMultiSelect([
-						'name' => 'filter_hostids[]',
-						'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
-						'data' => $data['filter']['hosts'],
-						'popup' => [
-							'filter_preselect' => [
-								'id' => 'filter_groupids_',
-								'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
-							],
-							'parameters' => [
-								'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
-								'srcfld1' => 'hostid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_hostids_',
-								'editable' => 1
+					new CFormField(
+						(new CMultiSelect([
+							'name' => 'filter_hostids[]',
+							'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
+							'data' => $data['filter']['hosts'],
+							'popup' => [
+								'filter_preselect' => [
+									'id' => 'filter_groupids_',
+									'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
+								],
+								'parameters' => [
+									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
+									'srcfld1' => 'hostid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_hostids_',
+									'editable' => 1
+								]
 							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
 				])
 		])
 );
