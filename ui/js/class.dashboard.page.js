@@ -379,6 +379,104 @@ class CDashboardPage {
 
 	// Dashboard page view methods.
 
+	findFreePosAll() {
+		const occupied = [];
+
+		for (let y = 0; y < this._max_rows; y++) {
+			occupied[y] = new Array(this._max_columns);
+			occupied[y].fill(false);
+		}
+
+		for (const widget of this._widgets.keys()) {
+			const pos = widget.getPos();
+
+			for (let y = pos.y; y < pos.y + pos.height; y++) {
+				occupied[y].fill(true, pos.x, pos.x + pos.width);
+			}
+		}
+
+		const x_free = [];
+
+		for (let y = 0; y < this._max_rows; y++) {
+			x_free[y] = new Array(this._max_columns);
+
+			for (let acc = 0, x = this._max_columns - 1; x >= 0; x--) {
+				if (occupied[y][x]) {
+					acc = 0;
+				}
+				else {
+					acc++;
+				}
+
+				x_free[y][x] = acc;
+			}
+		}
+
+		const found_areas = new Map();
+
+		for (let y = 0; y < this._max_rows; y++) {
+			for (let x = 0; x < this._max_columns; x++) {
+				if (x !== 0 && x_free[y][x - 1] !== 0 || x_free[y][x] === 0) {
+					continue;
+				}
+
+				let y1 = y;
+				let y1_width = x_free[y][x];
+				let y2 = y;
+				let y2_width = x_free[y][x];
+
+				do {
+					if (y1_width > 0 && y1_width >= y2_width) {
+						while (y1 >= 0 && x_free[y1][x] >= y1_width) {
+							y1--;
+						}
+					}
+
+					if (y2_width > 0 && y2_width >= y1_width) {
+						while (y2 < this._max_rows && x_free[y2][x] >= y2_width) {
+							y2++;
+						}
+					}
+
+					const pos = {
+						x: x,
+						y: y1 + 1,
+						width: Math.max(y1_width, y2_width),
+						height: y2 - y1 - 1
+					};
+
+					const pos_key = `${pos.x}:${pos.y}`;
+					const size_key = `${pos.width}:${pos.height}`;
+
+					if (!found_areas.has(pos_key)) {
+						found_areas.set(pos_key, {
+							x: pos.x,
+							y: pos.y,
+							sizes: new Map()
+						});
+					}
+
+					found_areas.get(pos_key).sizes.set(size_key, {
+						width: pos.width,
+						height: pos.height
+					});
+
+					y1_width = y1 >= 0 ? x_free[y1][x] : 0;
+					y2_width = y2 < this._max_rows ? x_free[y2][x] : 0;
+				}
+				while (y1_width > 0 || y2_width > 0);
+			}
+		}
+
+		const result = [];
+
+		for (const {x, y, sizes} of found_areas.values()) {
+			result.push({x, y, sizes: [...sizes.values()]});
+		}
+
+		return result;
+	}
+
 	findFreePos({width, height}) {
 		const pos = {x: 0, y: 0, width, height};
 

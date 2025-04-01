@@ -1452,6 +1452,40 @@ class CDashboard {
 			});
 	}
 
+	findPosForNewWidget({dashboard_page}) {
+		let pos_best = null;
+		let pos_best_value = null;
+
+		for (const pos of dashboard_page.findFreePosAll()) {
+			let pos_value = 0;
+
+			for (const widget_defaults of Object.values(this._widget_defaults)) {
+				let best_intersection = 0;
+
+				for (const pos_size of pos.sizes) {
+					best_intersection = Math.max(best_intersection,
+						Math.min(pos_size.width, widget_defaults.size.width) / widget_defaults.size.width
+						* Math.min(pos_size.height, widget_defaults.size.height) / widget_defaults.size.height
+					);
+				}
+
+				pos_value += best_intersection;
+			}
+
+			if (pos_best === null || pos_value > pos_best_value
+					|| (pos_value === pos_best_value && pos.y < pos_best.y)
+					|| (pos_value === pos_best_value && pos.y === pos_best.y && pos.x < pos_best.x)) {
+				pos_best = {
+					x: pos.x,
+					y: pos.y
+				};
+				pos_best_value = pos_value;
+			}
+		}
+
+		return pos_best;
+	}
+
 	editWidget(properties = {}, {new_widget_pos = null} = {}) {
 		this._clearWarnings();
 
