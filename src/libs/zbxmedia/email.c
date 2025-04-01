@@ -823,7 +823,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		/*   - versions 7.31.0 to 7.33.0 support login options in CURLOPT_USERPWD                           */
 		/*   - versions 7.34.0 and above support explicit CURLOPT_LOGIN_OPTIONS                             */
 	}
-	else if (SMTP_AUTHENTICATION_OAUTH2 == auth->type)
+	else if (SMTP_AUTHENTICATION_OAUTH == auth->type)
 	{
 		/* OAuth 2.0 Bearer added in curl 7.33.0 */
 		if (SUCCEED != zbx_curl_has_bearer(error))

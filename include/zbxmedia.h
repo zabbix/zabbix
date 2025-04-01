@@ -24,7 +24,7 @@
 /* SMTP authentication options */
 #define SMTP_AUTHENTICATION_NONE	0
 #define SMTP_AUTHENTICATION_PASSWORD	1
-#define SMTP_AUTHENTICATION_OAUTH2	2
+#define SMTP_AUTHENTICATION_OAUTH	2
 
 typedef struct
 {

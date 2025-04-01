@@ -202,7 +202,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 			zbx_db_trigger_clean(&event.trigger);
 			break;
 		}
-		case SMTP_AUTHENTICATION_OAUTH2:
+		case SMTP_AUTHENTICATION_OAUTH:
 		{
 			zbx_oauth2_data_t	data = {0};
 
