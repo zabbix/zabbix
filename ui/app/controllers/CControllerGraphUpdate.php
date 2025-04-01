@@ -123,7 +123,7 @@ class CControllerGraphUpdate extends CController {
 				'show_work_period' => $this->getInput('show_work_period', 0),
 				'show_triggers' => $this->getInput('show_triggers', 0),
 				'graphtype' => $this->getInput('graphtype'),
-				'show_legend' => $this->getInput('show_legend', 1),
+				'show_legend' => $this->getInput('show_legend', 0),
 				'show_3d' => $this->getInput('show_3d', 0),
 				'percent_left' => $this->getInput('percent_left', 0),
 				'percent_right' => $this->getInput('percent_right', 0),
