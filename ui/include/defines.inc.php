@@ -129,12 +129,6 @@ define('TOTP_SECRET_CONFIRMED', 1);
 define('OAUTH_ACCESS_TOKEN_VALID',	1);
 define('OAUTH_REFRESH_TOKEN_VALID',	2);
 
-/**
- * Set to true to enable Online Certificate Status Protocol stapling verification when making connection to
- * OAuth token provider service during access and refresh token retrieval.
- */
-define('OAUTH_VERIFY_OCSP', false);
-
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);

@@ -111,7 +111,7 @@ class CControllerOauthAuthorize extends CController {
 	 *
 	 * @param array $oauth  OAuth data to be sent.
 	 *
-	 * @return array of 'access_token', 'access_expires_in' and 'refresh_token'.
+	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token'.
 	 */
 	protected function exchangeCodeToTokens(string $token_url, array $data): array {
 		$result = [];
@@ -124,8 +124,7 @@ class CControllerOauthAuthorize extends CController {
 			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_SSL_VERIFYPEER => true,
-			CURLOPT_SSL_VERIFYHOST => 2,
-			CURLOPT_SSL_VERIFYSTATUS => OAUTH_VERIFY_OCSP
+			CURLOPT_SSL_VERIFYHOST => 2
 		];
 
 		curl_setopt_array($handle, $curl_options);
