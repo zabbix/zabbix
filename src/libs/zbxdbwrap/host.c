@@ -1871,7 +1871,7 @@ void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids
 	}
 
 	/* delete discovered hosts */
-	if (0 == hosts.values_num)
+	if (0 != hosts.values_num)
 	{
 		id_name_pair_vector_split(&hosts, &hostids, &hostnames);
 		zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, audit_context_mode);
@@ -1909,6 +1909,10 @@ void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids
 				host_prototype_names->values[i]);
 	}
 
+	zbx_vector_uint64_destroy(&group_prototype_ids);
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_str_destroy(&hostnames);
+
 	for (int i = 0; i < hosts.values_num; i++)
 		zbx_free(hosts.values[i].name);
 	zbx_vector_id_name_pair_destroy(&hosts);
@@ -1917,10 +1921,6 @@ void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids
 		zbx_free(protos.values[i].name);
 	zbx_vector_id_name_pair_destroy(&protos);
 
-	zbx_vector_uint64_destroy(&group_prototype_ids);
-	zbx_vector_uint64_destroy(&hostids);
-	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
-	zbx_vector_str_destroy(&hostnames);
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
