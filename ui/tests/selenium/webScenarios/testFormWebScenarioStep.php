@@ -888,6 +888,7 @@ class testFormWebScenarioStep extends CWebTest {
 				$dialog->close();
 			}
 			else {
+				$dialog->ensureNotPresent();
 				$scenario_form->submit();
 				$this->assertMessage(TEST_BAD, 'Cannot update web scenario', $data['scenario_error']);
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));

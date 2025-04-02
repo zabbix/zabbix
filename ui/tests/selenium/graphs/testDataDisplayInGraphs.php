@@ -2200,7 +2200,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
-				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+				$this->query('xpath://button[@title="Kiosk mode"]')->one()->hoverMouse()->click();
 				$charts_table->waitUntilReloaded();
 				$this->page->waitUntilReady();
 			}
