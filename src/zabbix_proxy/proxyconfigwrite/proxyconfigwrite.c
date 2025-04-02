@@ -1632,11 +1632,11 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
  * Purpose: sync templates by creating empty templates when necessary to link *
  *          to other templates                                                *
  *                                                                            *
- * Parameters: hosts_templates - [IN] the hosts_temlates data                 *
- *             hostmacro       - [IN] the hostmacro data                      *
- *             error           - [OUT] the error message                      *
+ * Parameters: hosts_templates - [IN]                                         *
+ *             hostmacro       - [IN]                                         *
+ *             error           - [OUT]                                        *
  *                                                                            *
- * Return value: SUCCEED - the templates were synced successfully             *
+ * Return value: SUCCEED - templates were synced successfully                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/

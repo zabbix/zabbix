@@ -142,7 +142,7 @@ int	zbx_db_copy_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *ln
 		zbx_db_insert_add_values(&db_insert_host_template_cache, hostid, templateids.values[i]);
 
 	for (int i = 0; i < lnk_templateids->values_num; i++)
-		zbx_db_insert_add_values(&db_insert_host_template_cache, hostid,  lnk_templateids->values[i]);
+		zbx_db_insert_add_values(&db_insert_host_template_cache, hostid, lnk_templateids->values[i]);
 
 	zbx_db_insert_execute(&db_insert_host_template_cache);
 	zbx_db_insert_clean(&db_insert_host_template_cache);
@@ -169,7 +169,6 @@ void	zbx_db_save_httptest_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_
 				" select cte.httptestid,ii.hostid from cte,httptest ii where"
 					" cte.templateid= ii.httptestid and ",
 					" cte.httptestid", new_httptestids);
-
 
 	zbx_db_insert_prepare(&db_insert_httptest_template_cache_host_itself, "httptest_template_cache",
 			"httptestid", "link_hostid",  (char *)NULL);
