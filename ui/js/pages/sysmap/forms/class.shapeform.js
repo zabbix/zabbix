@@ -69,9 +69,7 @@ class ShapeForm {
 
 		document.getElementById('border_type').dispatchEvent(new Event('change'));
 		document.getElementById('last_shape_type').value = shape.type;
-
-		document.querySelectorAll('input[type=radio][name=type]:checked')
-			.forEach((input) => input.dispatchEvent(new Event('change')));
+		document.querySelector('input[type=radio][name=type]:checked').dispatchEvent(new Event('change'));
 	}
 
 	/**

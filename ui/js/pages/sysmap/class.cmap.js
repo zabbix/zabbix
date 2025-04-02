@@ -619,14 +619,12 @@ class CMap {
 					disabled: !can_remove,
 					action: () => {
 						if (this.selection.count.selements || this.selection.count.shapes) {
-							Object.keys(this.selection.selements).forEach(selementid => {
+							Object.keys(this.selection.selements).forEach((selementid) => {
 								this.selements[selementid].remove();
 								this.#removeLinksBySelementId(selementid);
 							});
 
-							Object.keys(this.selection.shapes).forEach(shapeid => {
-								this.shapes[shapeid].remove();
-							});
+							Object.keys(this.selection.shapes).forEach((shapeid) => this.shapes[shapeid].remove());
 						}
 
 						this.#toggleForm();
@@ -1494,7 +1492,7 @@ class CMap {
 		if (element instanceof Shape) {
 			if (this.selection.count.shapes == 1 && this.selection.count.selements == 0
 					&& this.selection.shapes[element.id] !== undefined) {
-				this.shapeForm.setValues({x, y, width, height});
+				this.shapeForm.setValues({x, y, width, height, type: element.data.type});
 			}
 
 			this.updateImage();
