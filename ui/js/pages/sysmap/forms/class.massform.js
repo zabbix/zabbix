@@ -22,7 +22,7 @@
 class MassForm {
 	constructor(form_container, sysmap) {
 		const tpl = new Template(document.getElementById('mapMassFormTpl').innerHTML),
-			formActions = [
+			form_actions = [
 				{
 					action: 'enable',
 					value: '#massLabel',
@@ -115,7 +115,7 @@ class MassForm {
 		select_icon_maintenance.selectedIndex = 0;
 		select_icon_disabled.selectedIndex = 0;
 
-		this.actionProcessor = new ActionProcessor(formActions);
+		this.actionProcessor = new ActionProcessor(form_actions);
 		this.actionProcessor.process();
 	}
 

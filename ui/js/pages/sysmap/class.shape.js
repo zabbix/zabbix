@@ -35,7 +35,7 @@ class Shape {
 			height: 50,
 			border_color: '000000',
 			background_color: '',
-			border_width: 2,
+			border_width: SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT,
 			// Helvetica
 			font: 9,
 			font_size: 11,

@@ -85,7 +85,14 @@ class MassShapeForm {
 		this.domNode.toggle(false);
 		this.active = false;
 		$(':checkbox', this.domNode).prop('checked', false).prop('disabled', false);
-		$('textarea, input[type=text]', this.domNode).val('');
+		$('textarea, input[type=text]', this.domNode).each(function() {
+			if ($(this).hasClass('js-numericbox')) {
+				$(this).val(SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT);
+			}
+			else {
+				$(this).val('');
+			}
+		});
 		$('.color-picker input', this.domNode).change();
 		this.actionProcessor.process();
 

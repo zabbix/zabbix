@@ -1491,7 +1491,7 @@ class CMap {
 	afterMove(element) {
 		const {x, y, width, height} = element.data;
 
-		if (element.data.sysmap_shapeid !== undefined) {
+		if (element instanceof Shape) {
 			if (this.selection.count.shapes == 1 && this.selection.count.selements == 0
 					&& this.selection.shapes[element.id] !== undefined) {
 				this.shapeForm.setValues({x, y, width, height});
@@ -1500,7 +1500,7 @@ class CMap {
 			this.updateImage();
 		}
 
-		if (element.data.selementid !== undefined) {
+		if (element instanceof Selement) {
 			if (this.selection.count.selements == 1 && this.selection.count.shapes == 0
 					&& this.selection.selements[element.id] !== undefined) {
 				this.form.setValues({x, y, width, height});

@@ -23,7 +23,7 @@ class SelementForm {
 	constructor(form_container, sysmap) {
 		const formTplData = {sysmapid: sysmap.sysmapid},
 			tpl = new Template(document.getElementById('mapElementFormTpl').innerHTML),
-			formActions = [
+			form_actions = [
 				{
 					action: 'show',
 					value: '#subtypeRow, #hostGroupSelectRow',
@@ -211,7 +211,7 @@ class SelementForm {
 			}
 		});
 
-		this.actionProcessor = new ActionProcessor(formActions);
+		this.actionProcessor = new ActionProcessor(form_actions);
 		this.actionProcessor.process();
 	}
 

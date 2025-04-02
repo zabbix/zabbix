@@ -425,7 +425,8 @@ function createFontSelect(string $name): CSelect {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CNumericBox('border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+							(new CNumericBox('border_width', SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT, 2, false, false, false))
+								->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Color'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -604,7 +605,10 @@ function createFontSelect(string $name): CSelect {
 								->setAttribute('data-value', _('Border width'))
 								->setAttribute('data-value-2', _('Line width'))
 							),
-						(new CTextBox('mass_border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						(new CNumericBox('mass_border_width', SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT, 2, false, false,
+								false))
+							->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+							->addClass('js-numericbox')
 					)
 					->addRow((new CCheckBox('chkbox_border_color'))
 							->setId('chkboxBorderColor')
