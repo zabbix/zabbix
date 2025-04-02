@@ -713,7 +713,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				[
 					'object' => 'graph',
 					'url' => 'zabbix.php?action=graph.list&context=template&filter_set=1&filter_hostids%5B%5D=',
-					'form' => 'id:graph-form'
+					'form' => 'id:graph-form',
+					'overlay_form' => true
 				]
 			],
 			// #12.
