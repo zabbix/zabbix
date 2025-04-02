@@ -24,7 +24,6 @@
 
 #define ZBX_OAUTH_TOKEN_VALID		(ZBX_OAUTH_TOKEN_ACCESS_VALID | ZBX_OAUTH_TOKEN_REFRESH_VALID)
 
-
 typedef struct
 {
 	char	*token_url;
