@@ -132,7 +132,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 
 		*error = zbx_dsprintf(NULL, "Access token retrieval failed: %s", tmp);
 
-		data->tokens_status = (data->tokens_status & ~ZBX_OAUTH2_TOKEN_ACCESS_VALID) & ZBX_OAUTH2_TOKEN_VALID;
+		data->tokens_status = (data->tokens_status & ~ZBX_OAUTH_TOKEN_ACCESS_VALID) & ZBX_OAUTH_TOKEN_VALID;
 	}
 	else
 	{
@@ -196,16 +196,16 @@ void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetc
 
 	if (SUCCEED != fetch_result)
 	{
-		data->tokens_status &= ZBX_OAUTH2_TOKEN_REFRESH_VALID;
+		data->tokens_status &= ZBX_OAUTH_TOKEN_REFRESH_VALID;
 
 		zbx_db_execute("update media_type_oauth set tokens_status=%d"
 				" where mediatypeid="ZBX_FS_UI64, data->tokens_status, mediatypeid);
 	}
 	else
 	{
-		data->tokens_status |= ZBX_OAUTH2_TOKEN_ACCESS_VALID;
+		data->tokens_status |= ZBX_OAUTH_TOKEN_ACCESS_VALID;
 		if (NULL != data->old_refresh_token)
-			data->tokens_status |= ZBX_OAUTH2_TOKEN_REFRESH_VALID;
+			data->tokens_status |= ZBX_OAUTH_TOKEN_REFRESH_VALID;
 
 		zbx_db_execute("update media_type_oauth"
 				" set access_token='%s',access_token_updated=%d,access_expires_in=%d,"
