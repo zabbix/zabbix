@@ -47,7 +47,7 @@ class Selement {
 				evaltype: TAG_EVAL_TYPE_AND_OR,
 				tags: [],
 				inherited_label: null,
-				zindex: Object.keys(sysmap.selements).length
+				zindex: Object.values(sysmap.selements).reduce((max, el) => Math.max(max, el.data.zindex), -1) + 1
 			};
 		}
 		else {

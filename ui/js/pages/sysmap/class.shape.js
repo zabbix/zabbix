@@ -53,7 +53,7 @@ class Shape {
 
 			// Generate unique sysmap_shapeid.
 			data.sysmap_shapeid = getUniqueId();
-			data.zindex = Object.keys(sysmap.shapes).length;
+			data.zindex = Object.values(sysmap.shapes).reduce((max, el) => Math.max(max, el.data.zindex), -1) + 1;
 		}
 		else {
 			Object.keys(default_data).forEach((field) => {
