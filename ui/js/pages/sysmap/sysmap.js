@@ -15,53 +15,9 @@
 
 ZABBIX.namespace('apps.map');
 
-ZABBIX.apps.map = (function($) {
-	const Observer = ZABBIX.classes.Observer;
-
+ZABBIX.apps.map = (function() {
 	function createMap(containerid, data) {
-		Observer.makeObserver(Link.prototype);
-		Observer.makeObserver(Shape.prototype);
-		Observer.makeObserver(Selement.prototype);
-
-		const sysmap = new CMap(containerid, data);
-
-		Shape.prototype.bind('afterMove', function(e, element) {
-			if (sysmap.selection.count.shapes == 1 && sysmap.selection.count.selements == 0
-					&& sysmap.selection.shapes[element.id] !== undefined) {
-				document.getElementById('shapeX').value = element.data.x;
-				document.getElementById('shapeY').value = element.data.y;
-
-				if (element.data.width !== undefined) {
-					document.querySelector('#shapeForm input[name=width]').value = element.data.width;
-				}
-				if (element.data.height !== undefined) {
-					document.querySelector('#shapeForm input[name=height]').value = element.data.height;
-				}
-			}
-
-			sysmap.updateImage();
-		});
-
-		Selement.prototype.bind('afterMove', function(e, element) {
-			if (sysmap.selection.count.selements == 1 && sysmap.selection.count.shapes == 0
-					&& sysmap.selection.selements[element.id] !== undefined) {
-				document.getElementById('x').value = element.data.x;
-				document.getElementById('y').value = element.data.y;
-
-				if (element.data.width !== undefined) {
-					document.getElementById('areaSizeWidth').value = element.data.width;
-				}
-				if (element.data.height !== undefined) {
-					document.getElementById('areaSizeHeight').value = element.data.height;
-				}
-			}
-
-			if (sysmap.buffered_expand === false) {
-				sysmap.updateImage();
-			}
-		});
-
-		return sysmap;
+		return new CMap(containerid, data);
 	}
 
 	return {

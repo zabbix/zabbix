@@ -122,7 +122,6 @@ $available_js = [
 	'class.tab-indicators.js' => '',
 	'class.popup-manager.js' => '',
 	'class.popup-manager.event.js' => '',
-	'observer.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts

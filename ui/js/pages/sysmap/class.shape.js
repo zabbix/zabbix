@@ -123,7 +123,7 @@ class Shape {
 		this.makeResizable(this.data.type != SVGMapShape.TYPE_LINE);
 
 		this.align(false);
-		this.trigger('afterMove', this);
+		this.sysmap.afterMove(this);
 
 		Object.assign(this.data, data);
 
@@ -213,7 +213,7 @@ class Shape {
 							height: `${dimensions.height}px`
 						});
 
-						this.trigger('afterMove', this);
+						this.sysmap.afterMove(this);
 					}
 				});
 			}
@@ -471,7 +471,7 @@ class Shape {
 
 		if (invalidate !== false) {
 			this.align();
-			this.trigger('afterMove', this);
+			this.sysmap.afterMove(this);
 		}
 		else {
 			const dimensions = this.getDimensions();

@@ -397,8 +397,8 @@ class SelementForm {
 	 */
 	setValues(selement) {
 		// jQuery left here for convenience purposes.
-		for (const name in selement) {
-			$(`[name=${name}]`, this.domNode).val([selement[name]]);
+		for (const field in selement) {
+			$(`[name=${field}]`, this.domNode).val([selement[field]]);
 		}
 
 		['iconid_on', 'iconid_disabled', 'iconid_maintenance'].forEach((name) => {

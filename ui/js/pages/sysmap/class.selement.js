@@ -287,7 +287,7 @@ class Selement {
 		this.updateLabel();
 		this.#updateIcon();
 		this.align(false);
-		this.trigger('afterMove', this);
+		this.sysmap.afterMove(this);
 
 		if (invalidate) {
 			this.sysmap.expandMacros(this);

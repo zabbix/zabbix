@@ -1482,4 +1482,33 @@ class CMap {
 			}
 		}
 	}
+
+	/**
+	 * Performs selement or shape form field updates after element has been moved.
+	 *
+	 * @param {object} element
+	 */
+	afterMove(element) {
+		const {x, y, width, height} = element.data;
+
+		if (element.data.sysmap_shapeid !== undefined) {
+			if (this.selection.count.shapes == 1 && this.selection.count.selements == 0
+					&& this.selection.shapes[element.id] !== undefined) {
+				this.shapeForm.setValues({x, y, width, height});
+			}
+
+			this.updateImage();
+		}
+
+		if (element.data.selementid !== undefined) {
+			if (this.selection.count.selements == 1 && this.selection.count.shapes == 0
+					&& this.selection.selements[element.id] !== undefined) {
+				this.form.setValues({x, y, width, height});
+			}
+
+			if (this.buffered_expand === false) {
+				this.updateImage();
+			}
+		}
+	}
 }
