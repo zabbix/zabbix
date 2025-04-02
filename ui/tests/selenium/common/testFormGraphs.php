@@ -1046,6 +1046,7 @@ class testFormGraphs extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:'.($this->prototype ? 'graph-prototype-form' : 'graph-form'))->waitUntilVisible()->asForm()->one();
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$dialog->waitUntilReady();
 		$form->invalidate();
 
 		if (CTestArrayHelper::get($data, 'check_buttons')) {
