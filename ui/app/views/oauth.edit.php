@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-
 $form = (new CForm('post'))
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('oauth'))
