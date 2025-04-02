@@ -4500,9 +4500,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$this->query('button:Apply')->one()->click();
 		CDashboardElement::find()->one()->waitUntilReady();
 
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',)->one()]
+		);
+
 		$skip_selectors = [
 			'class:clock',
-			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
 			'xpath://footer',
 			// Cover Geomap widget, because it's screenshots are not stable.

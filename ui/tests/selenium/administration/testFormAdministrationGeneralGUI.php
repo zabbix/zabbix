@@ -991,7 +991,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$form->fill($data['field']);
 		$form->submit();
 		// Check saved settings.
-		$this->page->open($data['link']);
+		$this->page->open($data['link'])->waitUntilReady();
 
 		switch ((array_keys($data['field']))[0]) {
 			case 'Default theme':
