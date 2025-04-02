@@ -384,6 +384,7 @@ static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
 static char	*config_sms_devices			= NULL;
+static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -757,6 +758,14 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (NULL != config_frontend_allowed_ip && FAIL == zbx_validate_peer_list(config_frontend_allowed_ip, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"FrontendAllowedIP\" configuration parameter: %s",
+			ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
+
 	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s",
@@ -1069,6 +1078,14 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendCertIssuer",	&(zbx_config_tls->frontend_cert_issuer),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendCertSubject",	&(zbx_config_tls->frontend_cert_subject),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendAccept",		&(zbx_config_tls->frontend_accept),	ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSListen",			&zbx_config_tls->tls_listen,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"StartAlerters",		&config_forks[ZBX_PROCESS_TYPE_ALERTER],
@@ -1147,6 +1164,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			1},
+		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1585,7 +1604,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
-			.autoreg_update_host_cb = zbx_autoreg_update_host_server
+			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
+			.config_tls = zbx_config_tls,
+			.config_frontend_allowed_ip = config_frontend_allowed_ip
 		};
 
 	zbx_thread_escalator_args	escalator_args =

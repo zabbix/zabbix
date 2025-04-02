@@ -34,6 +34,7 @@ typedef int	(*zbx_trapper_process_request_func_t)(const char *request, zbx_socke
 typedef struct
 {
 	zbx_config_comms_args_t			*config_comms;
+	zbx_config_tls_t			*config_tls;
 	zbx_config_vault_t			*config_vault;
 	zbx_get_program_type_f			zbx_get_program_type_cb_arg;
 	const char				*progname;
@@ -43,6 +44,7 @@ typedef struct
 	int					proxydata_frequency;
 	zbx_get_config_forks_f			get_process_forks_cb_arg;
 	const char				*config_stats_allowed_ip;
+	const char				*config_frontend_allowed_ip;
 	const char				*config_java_gateway;
 	int					config_java_gateway_port;
 	const char				*config_externalscripts;

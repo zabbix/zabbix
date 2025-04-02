@@ -44,6 +44,12 @@ static const char	*zbx_tls_parameter_name(int type, char * const *param, const z
 	if (&(config_tls->accept) == param)
 		return "TLSAccept";
 
+	if (&(config_tls->tls_listen) == param)
+		return "TLSListen";
+
+	if (&(config_tls->frontend_accept) == param)
+		return "TLSFrontendAccept";
+
 	if (&(config_tls->ca_file) == param)
 		return ZBX_TLS_PARAMETER_CONFIG_FILE == type ? "TLSCAFile" : "--tls-ca-file";
 
@@ -408,6 +414,51 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	zbx_tls_parameter_not_empty(&(config_tls->cipher_all), config_tls);
 	zbx_tls_parameter_not_empty(&(config_tls->cipher_cmd), config_tls);
 
+	if (NULL != config_tls->tls_listen && 0 != strcmp(config_tls->tls_listen, "required"))
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->tls_listen), NULL,
+				config_tls);
+	}
+
+	/* parse and validate 'TLSFrontendAccept' parameter (in zabbix_server.conf ) */
+	if (NULL != config_tls->frontend_accept)
+	{
+		char		*s, *p, *delim;
+
+		config_tls->frontend_accept_modes = 0;
+		p = s = zbx_strdup(NULL, config_tls->frontend_accept);
+
+		while (1)
+		{
+			delim = strchr(p, ',');
+
+			if (NULL != delim)
+				*delim = '\0';
+
+			if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
+			{
+				config_tls->frontend_accept_modes |= ZBX_TCP_SEC_UNENCRYPTED;
+			}
+			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
+			{
+				config_tls->frontend_accept_modes |= ZBX_TCP_SEC_TLS_CERT;
+			}
+			else
+			{
+				zbx_free(s);
+				zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept),
+						NULL, config_tls);
+			}
+
+			if (NULL == delim)
+				break;
+
+			p = delim + 1;
+		}
+
+		zbx_free(s);
+	}
+
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
 	/* parameter (in zabbix_get and zabbix_sender) */
 
@@ -697,6 +748,44 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY, &(config_tls->cipher_cmd),
 					&(config_tls->cert_file), &(config_tls->psk_identity), config_tls);
 		}
+	}
+
+	/* Frontend certificate issuer is optional but must be defined only together with a certificate */
+	if (NULL == config_tls->cert_file && NULL != config_tls->frontend_cert_issuer)
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(config_tls->frontend_cert_issuer),
+				&(config_tls->cert_file), config_tls);
+	}
+
+	/* Frontend certificate subject is optional but must be defined only together with a certificate */
+	if (NULL == config_tls->cert_file && NULL != config_tls->frontend_cert_subject)
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(config_tls->frontend_cert_subject),
+				&(config_tls->cert_file), config_tls);
+	}
+
+	if (0 != (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL == config_tls->cert_file)
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(config_tls->accept),
+				&(config_tls->cert_file), config_tls);
+	}
+
+	if (config_tls->tls_listen != NULL && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY) &&
+		0 == (config_tls->connect_mode & (ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_TLS_CERT)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
+			" connection but it conflicts with unencrypted config of parameter \"TLSAccept\"");
+		zbx_tls_free();
+		exit(EXIT_FAILURE);
+	}
+
+	if (config_tls->tls_listen != NULL && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) &&
+		0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
+			" connection but it conflicts with unencrypted config of parameter \"TLSFrontendAccept\"");
+		zbx_tls_free();
+		exit(EXIT_FAILURE);
 	}
 }
 #endif
