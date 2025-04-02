@@ -89,7 +89,7 @@ if (array_key_exists('client_secret', $data)) {
 else {
 	$client_secrect = [
 		(new CButton('client_secret_button', _('Change client secret'))),
-		(new CTextBox('client_secret', $data['client_secret']))
+		(new CTextBox('client_secret', ''))
 			->disableAutocomplete()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -216,7 +216,7 @@ $form_grid->addItem(
 			'update' => $data['update'] == 0,
 			'advanced_form' => $data['advanced_form'] == 1,
 			'messages' => [
-				'popup_closed' => _('Please complete authentication to get tokens'),
+				'popup_closed' => _('Complete authentication to get tokens.'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),
 				'authorization_error' => _('Cannot get authorization code.')
 			]

@@ -77,22 +77,32 @@ class CControllerOauthAuthorize extends CController {
 
 	public function doAction() {
 		$state = json_decode(base64_decode($this->getInput('state')), true);
-		$oauth = [
+		$data = [
 			'code' => $this->getInput('code'),
 			'redirect_uri' => $state['redirection_url']
 		];
-		$oauth += array_intersect_key($state, array_flip(['client_id', 'client_secret']));
+		$data += array_intersect_key($state, array_flip(['client_id', 'client_secret']));
 
-		if (!array_key_exists('client_secret', $oauth)) {
+		if (!array_key_exists('client_secret', $data)) {
 			$mediatype = API::MediaType()->get([
 				'output' => ['client_secret'],
 				'mediatypeids' => [$state['mediatypeid']]
 			]);
-			$oauth['client_secret'] = $mediatype ? $mediatype[0]['client_secret'] : '';
+			$data['client_secret'] = $mediatype ? $mediatype[0]['client_secret'] : '';
+		}
+
+		$token_url = $state['token_url'];
+		$i = strpos($token_url, '?');
+
+		if ($i !== false) {
+			$url_arguments = [];
+			parse_str(substr($token_url, $i + 1), $url_arguments);
+			$data += $url_arguments;
+			$token_url = substr($token_url, 0, $i);
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'tokens' => $this->exchangeCodeToTokens($state['token_url'], $oauth)
+			'tokens' => $this->exchangeCodeToTokens($token_url, $data)
 		]));
 	}
 
@@ -106,7 +116,7 @@ class CControllerOauthAuthorize extends CController {
 	protected function exchangeCodeToTokens(string $token_url, array $data): array {
 		$result = [];
 		$handle = curl_init();
-		curl_setopt_array($handle, [
+		$curl_options = [
 			CURLOPT_URL => $token_url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
@@ -115,8 +125,10 @@ class CControllerOauthAuthorize extends CController {
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2,
-			// CURLOPT_SSL_VERIFYSTATUS => true // this option is very tricky to setup apache2 and php correctly
-		]);
+			CURLOPT_SSL_VERIFYSTATUS => OAUTH_VERIFY_OCSP
+		];
+
+		curl_setopt_array($handle, $curl_options);
 
 		$raw_response = curl_exec($handle);
 
