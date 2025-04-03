@@ -214,6 +214,10 @@ window.item_edit_form = new class {
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
+			if (target.readOnly) {
+				return;
+			}
+
 			switch (target.getAttribute('name')) {
 				case 'custom_timeout':
 				case 'history_mode':
@@ -221,6 +225,7 @@ window.item_edit_form = new class {
 					this.updateFieldsVisibility();
 
 					break;
+
 				case 'parseurl':
 					const url = parseUrlString(this.field.url.value);
 
@@ -699,23 +704,21 @@ window.item_edit_form = new class {
 	}
 
 	#updateHistoryModeVisibility() {
-		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
+		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.field.history_mode.forEach((e) => e.disabled = e.readOnly);
 	}
 
 	#updateTrendsModeVisibility() {
-		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
+		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.field.trends_mode.forEach((e) => e.disabled = e.readOnly);
 	}
 
 	#updateValueTypeOptionVisibility() {
