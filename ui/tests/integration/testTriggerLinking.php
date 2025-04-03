@@ -105,7 +105,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'operationtype' => 2
+					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
 		]);
@@ -127,7 +127,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'operationtype' => 6,
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' =>
 					$templateids_for_api_call
 				]
@@ -166,7 +166,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'operationtype' => 6,
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' =>
 					$templateids_for_api_call_collision_description
 				]

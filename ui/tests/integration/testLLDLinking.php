@@ -90,7 +90,7 @@ class testLldLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'operationtype' => 2
+					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
 		]);
@@ -206,13 +206,13 @@ class testLldLinking extends CIntegrationTest {
 
 	/*
 	Test ensures that the Zabbix auto-registration process correctly handles template with LLD rule linking
-	conflicts and re-registration behavior under different conditions.
+	conflicts and re-registration behavior.
 
 	In the first scenario, two templates are linked to a host via auto-registration. Both templates contain the same
 	LLD rule with identical keys. The templates should not be linked due to the conflict in LLD rule keys.
 
-	In the second scenario, a template is linked to a host through auto-registration, then unlinked. The host is
-	restarted with different metadata. The host should be registered again without conflicts.
+	In the second scenario, a single template is linked to a host through auto-registration, then unlinked. The host is
+	restarted with different metadata. The template gets linked this time with conflicts resolved.
 	*/
 
 	/**
