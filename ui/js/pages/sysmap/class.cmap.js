@@ -1492,7 +1492,10 @@ class CMap {
 		if (element instanceof Shape) {
 			if (this.selection.count.shapes == 1 && this.selection.count.selements == 0
 					&& this.selection.shapes[element.id] !== undefined) {
-				this.shapeForm.setValues({x, y, width, height, type: element.data.type});
+				document.getElementById('shapeX').value = x;
+				document.getElementById('shapeY').value = y;
+				document.querySelector('#shapeForm input[name=width]').value = width;
+				document.querySelector('#shapeForm input[name=height]').value = height;
 			}
 
 			this.updateImage();
@@ -1501,7 +1504,16 @@ class CMap {
 		if (element instanceof Selement) {
 			if (this.selection.count.selements == 1 && this.selection.count.shapes == 0
 					&& this.selection.selements[element.id] !== undefined) {
-				this.form.setValues({x, y, width, height});
+				document.getElementById('x').value = x;
+				document.getElementById('y').value = y;
+
+				if (width !== undefined) {
+					document.getElementById('areaSizeWidth').value = width;
+				}
+
+				if (height !== undefined) {
+					document.getElementById('areaSizeHeight').value = height;
+				}
 			}
 
 			if (this.buffered_expand === false) {
