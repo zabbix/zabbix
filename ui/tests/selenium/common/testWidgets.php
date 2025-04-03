@@ -123,16 +123,12 @@ class testWidgets extends CWebTest {
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
+		$items_dialog->query('button:Select')->waitUntilClickable();
 		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
 		// Close all dialogs.
-		$dialogs = COverlayDialogElement::find()->all();
-
-		$dialog_count = $dialogs->count();
-		for ($i = $dialog_count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
-		}
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
