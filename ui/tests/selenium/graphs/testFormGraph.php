@@ -29,6 +29,8 @@ class testFormGraph extends testFormGraphs {
 
 	protected $url = 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
 
+	protected $formid = 'graph-form';
+
 	public function prepareGraphsData() {
 		self::$update_graph = 'Graph for update';
 

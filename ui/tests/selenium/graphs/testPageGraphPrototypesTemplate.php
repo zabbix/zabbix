@@ -134,8 +134,8 @@ class testPageGraphPrototypesTemplate extends testPagePrototypes {
 	 */
 	public function testPageGraphPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=graph.prototype.list&context=template&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'].'&sort='.$data['sort'].
-				'&sortorder=ASC')->waitUntilReady();
+				self::$host_druleids['Template for prototype check:drule'].'&sort='.$data['sort'].'&sortorder=ASC'
+		)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 

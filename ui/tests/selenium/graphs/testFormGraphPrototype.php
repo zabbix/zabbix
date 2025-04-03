@@ -29,6 +29,7 @@ class testFormGraphPrototype extends testFormGraphs {
 
 	protected $prototype = true;
 	protected $url = 'zabbix.php?action=graph.prototype.list&parent_discoveryid='.self::LLDID.'&context=host';
+	protected $formid = 'graph-prototype-form';
 
 	public function prepareGraphPrototypesData() {
 		self::$update_graph = 'Graph for update';

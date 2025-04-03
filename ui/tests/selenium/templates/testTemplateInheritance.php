@@ -267,8 +267,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 
-		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
-		$form->submit();
+		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
 
 		$this->assertMessage(TEST_GOOD,'Graph added');
 
@@ -507,8 +506,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
-		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
-		$form->submit();
+		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
 
 		$this->assertMessage(TEST_GOOD,'Graph prototype added');
 		$this->zbxTestTextPresent('Test LLD graph');

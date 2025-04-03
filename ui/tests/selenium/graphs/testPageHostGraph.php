@@ -111,9 +111,8 @@ class testPageHostGraph extends CLegacyWebTest {
 			// Check name value.
 			$this->assertEquals($graph['name'],
 					$element->query('xpath:.//a[@href="zabbix.php?action=popup&popup=graph.edit&graphid='.
-							$graph['graphid'].'&context=host"]')->one()->getText()
+					$graph['graphid'].'&context=host"]')->one()->getText()
 			);
-
 
 			// Check width value.
 			$this->assertEquals($graph['width'], $element->query('xpath:./td[3]')->one()->getText());
