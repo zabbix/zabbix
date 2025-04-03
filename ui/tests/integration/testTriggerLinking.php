@@ -102,7 +102,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_HOST_ADD
@@ -124,7 +124,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
@@ -163,7 +163,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,

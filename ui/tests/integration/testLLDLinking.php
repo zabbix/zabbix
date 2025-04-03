@@ -87,7 +87,7 @@ class testLldLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_HOST_ADD
