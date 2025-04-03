@@ -162,6 +162,8 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip, const char *config_ssl_ca_location)
 {
+#define EXPIRE_OFFSET	SEC_PER_MIN	/* offset before we will renew access token for OAuth2 */
+
 	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *inreplyto = NULL,
 			*expression, *recovery_expression, *mediatype_name, *error = NULL;
@@ -209,7 +211,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 			if (SUCCEED != (ret = zbx_oauth_fetch(mediatypeid, &data, &error)))
 				goto out;
 
-			if (data.access_token_updated + data.access_expires_in < time(NULL))
+			if (data.access_token_updated + data.access_expires_in + EXPIRE_OFFSET < time(NULL))
 			{
 				char	*suberror = NULL;
 
@@ -267,6 +269,7 @@ out:
 	zbx_free(mailauth.oauthbearer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+#undef EXPIRE_OFFSET
 }
 
 /******************************************************************************
