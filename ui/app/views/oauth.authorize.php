@@ -32,7 +32,7 @@ if ($errors || array_key_exists('raw_response', $data['tokens'])) {
 	$show_details = true;
 
 	if ($data && array_key_exists('raw_response', $data['tokens'])) {
-		$errors[] = ['message' => [_('Response body'), new CPre($data['tokens']['raw_response'])]];
+		$errors[] = ['message' => [_('Response'), new CPre($data['tokens']['raw_response'])]];
 		$show_details = false;
 	}
 
