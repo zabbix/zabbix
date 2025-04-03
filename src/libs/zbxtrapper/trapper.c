@@ -1209,8 +1209,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip)
 {
 	int	ret = SUCCEED;
 
@@ -1274,7 +1273,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				ret = recv_getqueue(sock, &jp, config_comms->config_timeout, config_tls,
+				ret = recv_getqueue(sock, &jp, config_comms->config_timeout, config_comms->config_tls,
 					config_frontend_allowed_ip);
 			}
 		}
@@ -1282,7 +1281,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				ret = recv_getstatus(sock, &jp, config_comms->config_timeout, config_tls,
+				ret = recv_getstatus(sock, &jp, config_comms->config_timeout, config_comms->config_tls,
 					config_frontend_allowed_ip);
 			}
 		}
@@ -1402,8 +1401,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1413,7 +1411,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
 			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb,
-			config_tls, config_frontend_allowed_ip);
+			config_frontend_allowed_ip);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1475,7 +1473,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED,
-				POLL_TIMEOUT, trapper_args_in->config_tls->tls_listen,
+				POLL_TIMEOUT, trapper_args_in->config_comms->config_tls->tls_listen,
 				trapper_args_in->config_stats_allowed_ip);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
@@ -1525,7 +1523,6 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
 					trapper_args_in->autoreg_update_host_cb,
-					trapper_args_in->config_tls,
 					trapper_args_in->config_frontend_allowed_ip);
 			sec = zbx_time() - sec;
 

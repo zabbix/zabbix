@@ -1605,7 +1605,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
-			.config_tls = zbx_config_tls,
 			.config_frontend_allowed_ip = config_frontend_allowed_ip
 		};
 

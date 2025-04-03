@@ -34,7 +34,6 @@ typedef int	(*zbx_trapper_process_request_func_t)(const char *request, zbx_socke
 typedef struct
 {
 	zbx_config_comms_args_t			*config_comms;
-	zbx_config_tls_t			*config_tls;
 	zbx_config_vault_t			*config_vault;
 	zbx_get_program_type_f			zbx_get_program_type_cb_arg;
 	const char				*progname;
