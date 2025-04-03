@@ -264,9 +264,9 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 			continue
 		}
 
-		query := &cpuUtilQuery{procQuery: *q, cmdlinePattern: stats.cmdlinePattern}
+		query := cpuUtilQuery{procQuery: q, cmdlinePattern: stats.cmdlinePattern}
 
-		queries = append(queries, query)
+		queries = append(queries, &query)
 		stats.scanid = p.scanid
 		if q.name != "" {
 			flags |= procInfoName | procInfoCmdline
@@ -495,7 +495,7 @@ func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags in
 		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
 	}
 
-	query := &cpuUtilQuery{procQuery: *q, cmdlinePattern: regxp}
+	query = &cpuUtilQuery{procQuery: *q, cmdlinePattern: regxp}
 
 	if q.name != "" {
 		flags |= procInfoName | procInfoCmdline
