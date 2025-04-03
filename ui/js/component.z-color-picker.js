@@ -46,7 +46,7 @@ class ZColorPicker extends HTMLElement {
 	static ZBX_STYLE_PALETTE_ICON_PART =	'color-picker-palette-icon-part';
 	static ZBX_STYLE_PALETTE_ROW =			'color-picker-palette-row';
 
-	static PALETTE_PREFIX = 'palette_';
+	static PALETTE_PREFIX = 'PALETTE_';
 
 	static SOLID_COLORS = [
 		['FF0000', 'FF0080', 'BF00FF', '4000FF', '0040FF', '0080FF', '00BFFF', '00FFFF', '00FFBF', '00FF00', '80FF00', 'BFFF00', 'FFFF00', 'FFBF00', 'FF8000', 'FF4000', 'CC6600', '666699'],
