@@ -764,9 +764,9 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 				&(config_tls->cert_file), config_tls);
 	}
 
-	if (0 != (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL == config_tls->cert_file)
+	if (0 != (config_tls->frontend_accept_modes == ZBX_TCP_SEC_TLS_CERT) && NULL == config_tls->cert_file)
 	{
-		zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(config_tls->accept),
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(config_tls->frontend_accept),
 				&(config_tls->cert_file), config_tls);
 	}
 
