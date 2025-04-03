@@ -1584,7 +1584,7 @@ static void	db_get_item_prototypes(const zbx_vector_uint64_t *itemids, zbx_vecto
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UCHAR(flags, row[1]);
 
-		if (NULL == (flags & ZBX_FLAG_DISCOVERY_RULE))
+		if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE))
 			zbx_vector_uint64_append(proto_itemids, itemid);
 		else
 			zbx_vector_uint64_append(proto_lldruleids, itemid);
@@ -1612,7 +1612,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
 	zbx_vector_uint64_t	itemids_linked, linked_llruleids;
-	char			*sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 

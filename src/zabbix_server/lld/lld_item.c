@@ -2798,10 +2798,10 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
 				parent_itemid, item_prototype->key, item->lastcheck, lldruleid);
 
-		if (NULL != db_insert_irtdata)
+		if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
-		if (NULL != db_insert_irtname)
+		if (0 == (item_prototype->item_flags & (ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_RULE)))
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
 		zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, *itemid, item->name,
@@ -3273,7 +3273,8 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 
 	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME) &&
+			0 == (item_prototype->item_flags & (ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_RULE)))
 	{
 		value_esc = zbx_db_dyn_escape_string(item->name);
 
@@ -3326,7 +3327,6 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *             items           - [IN/OUT] items to save                       *
  *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
- *             item_flags      - [IN] item flags                              *
  *             rule_index      - [IN] mapping of LLD rows to discovered LLD   *
  *                                    rules                                   *
  *                                                                            *
@@ -3336,14 +3336,13 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *                                                                            *
  ******************************************************************************/
 static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked, int item_flags,
+		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked,
 		zbx_hashset_t *rule_index)
 {
 	int				ret = SUCCEED, new_items = 0, upd_items = 0;
 	zbx_lld_item_full_t		*item;
 	zbx_uint64_t			itemid, itemdiscoveryid;
-	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname,
-					*pdb_insert_irtname = NULL, *pdb_insert_irtdata = NULL;
+	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname;
 	zbx_lld_item_index_t		item_index_local;
 	zbx_vector_uint64_t		item_protoids;
 	char				*sql = NULL;
@@ -3421,13 +3420,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		goto out;
 	}
 
-	if (0 == (item_flags & (ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_RULE)))
-		pdb_insert_irtname = &db_insert_irtname;
-
-	if (0 == (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-		pdb_insert_irtdata = &db_insert_irtdata;
-
-
 	if (0 != upd_items)
 		sql = (char*)zbx_malloc(NULL, sql_alloc);
 
@@ -3451,14 +3443,9 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", "lastcheck", "lldruleid", (char *)NULL);
 
-		if (NULL != pdb_insert_irtdata)
-			zbx_db_insert_prepare(pdb_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
-
-		if (NULL != pdb_insert_irtname)
-		{
-			zbx_db_insert_prepare(pdb_insert_irtname, "item_rtname", "itemid", "name_resolved",
-					"name_resolved_upper", (char *)NULL);
-		}
+		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
+				"name_resolved_upper", (char *)NULL);
 	}
 
 	for (int i = 0; i < items->values_num; i++)
@@ -3470,7 +3457,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
-					&db_insert_idiscovery, pdb_insert_irtdata, pdb_insert_irtname, rule_index);
+					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname, rule_index);
 		}
 		else
 		{
@@ -3481,8 +3468,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
-						&db_insert_items, &db_insert_idiscovery, pdb_insert_irtdata,
-						pdb_insert_irtname, rule_index);
+						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata,
+						&db_insert_irtname, rule_index);
 			}
 		}
 
@@ -3496,17 +3483,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		zbx_db_insert_execute(&db_insert_idiscovery);
 		zbx_db_insert_clean(&db_insert_idiscovery);
 
-		if (NULL != pdb_insert_irtname)
-		{
-			zbx_db_insert_execute(pdb_insert_irtname);
-			zbx_db_insert_clean(pdb_insert_irtname);
-		}
+		zbx_db_insert_execute(&db_insert_irtname);
+		zbx_db_insert_clean(&db_insert_irtname);
 
-		if (NULL != pdb_insert_irtdata)
-		{
-			zbx_db_insert_execute(pdb_insert_irtdata);
-			zbx_db_insert_clean(pdb_insert_irtdata);
-		}
+		zbx_db_insert_execute(&db_insert_irtdata);
+		zbx_db_insert_clean(&db_insert_irtdata);
 
 		zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 	}
@@ -4693,7 +4674,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_begin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
-			dflags, rule_index) &&
+			rule_index) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked) &&
