@@ -88,7 +88,9 @@ if (array_key_exists('client_secret', $data)) {
 }
 else {
 	$client_secrect = [
-		(new CButton('client_secret_button', _('Change client secret'))),
+		(new CSimpleButton(_('Change client secret')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setName('client_secret_button'),
 		(new CTextBox('client_secret', ''))
 			->disableAutocomplete()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
