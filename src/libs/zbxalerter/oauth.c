@@ -28,8 +28,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 	do {												\
 		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))			\
 		{											\
-			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s " message,	\
-					mediatype_name);						\
+			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype \"%s\": "	\
+					message, mediatype_name);					\
 			goto out; 									\
 		}											\
 	} while(0)
@@ -47,8 +47,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s requires"
-				" frontend authorization for OAuth2", mediatype_name);
+		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype \"%s\" requires"
+				" OAuth2 to be configured in frontend", mediatype_name);
 		goto out;
 	}
 
@@ -90,14 +90,12 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 	return FAIL;
 #else
 	int			ret = FAIL;
-	const char		*header;
 	char			*out = NULL, *posts = NULL, *tmp = NULL;
 	size_t			tmp_alloc = 0;
 	long			response_code;
 	struct zbx_json_parse	jp;
 	time_t			sec = time(NULL);
-
-	header = "Content-Type: application/x-www-form-urlencoded";
+	const char		*header = "Content-Type: application/x-www-form-urlencoded";
 
 	posts = zbx_strdcatf(posts, "grant_type=refresh_token");
 	posts = zbx_strdcatf(posts, "&client_id=%s", data->client_id);
