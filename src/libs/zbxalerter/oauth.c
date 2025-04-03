@@ -90,7 +90,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 	size_t			tmp_alloc = 0;
 	long			response_code;
 	struct zbx_json_parse	jp;
-	time_t			sec;
+	time_t			sec = time(NULL);
 
 	header = "Content-Type: application/x-www-form-urlencoded";
 
@@ -104,8 +104,6 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 	{
 		goto out;
 	}
-
-	sec = time(NULL);
 
 	if (SUCCEED != zbx_json_open(out, &jp))
 	{
