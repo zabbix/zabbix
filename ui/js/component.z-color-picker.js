@@ -721,6 +721,8 @@ class ZColorPicker extends HTMLElement {
 		this.value = value;
 
 		this.#closeDialog();
+
+		this.dispatchEvent(new Event('change', {bubbles: true}));
 	}
 
 	/**

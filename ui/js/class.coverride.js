@@ -32,12 +32,15 @@ jQuery(function ($) {
 			field_name = opt.makeName(option, opt.getId($override));
 
 		if (option === 'color') {
-			const id = field_name.replace(/\]/g, '_').replace(/\[/g, '_');
-			const input = $('<input>', {'name': field_name, 'type': 'hidden', 'id': id}).val(value);
+			const color_picker = new ZColorPicker();
+
+			color_picker.name = field_name;
+			color_picker.value = value;
+			color_picker.inputId = zbx_formatDomId(field_name);
+			color_picker.hasPalette = true;
 
 			return $('<div>')
-				.addClass('color-picker')
-				.append(input)
+				.append(color_picker)
 				.append(close);
 		}
 		else if (option === 'timeshift') {
@@ -217,10 +220,6 @@ jQuery(function ($) {
 
 					$(elmnt).insertBefore($(this));
 					$(this).remove();
-
-					if (opt === 'color') {
-						$(elmnt).find('input').colorpicker();
-					}
 				});
 
 				$override.on('click', '[data-option]', function(e) {
@@ -266,10 +265,6 @@ jQuery(function ($) {
 				$('<li>')
 					.append(elmnt)
 					.insertBefore($('li:last', $override));
-
-				if (option === 'color') {
-					$(elmnt).find('input').colorpicker();
-				}
 			}
 
 			// Call on-select callback.

@@ -3929,7 +3929,9 @@ z-color-picker {
     height: 24px;
     padding: 0;
     color: #000000;
-    border: 1px solid #888888; }
+    background: #ffffff;
+    border: 1px solid #888888;
+    justify-items: center; }
     z-color-picker .color-picker-box:disabled {
       background: #9f9f9f !important;
       border-color: #9f9f9f;
@@ -4025,25 +4027,19 @@ z-color-picker {
     line-height: 18px;
     text-align: center; }
 
-.color-picker-no-color {
-  background: transparent !important; }
-  .color-picker-no-color::after {
-    content: "";
-    font-size: 20px;
-    color: #d40000; }
+.color-picker-no-color::after {
+  content: "";
+  font-size: 20px;
+  color: #d40000;
+  justify-content: center; }
 
 .color-picker-is-palette {
   background: transparent !important; }
   .color-picker-is-palette .color-picker-palette-icon {
-    position: absolute;
-    top: 1px;
-    right: 1px;
-    bottom: 1px;
-    left: 1px;
     display: flex !important;
     gap: 1px;
-    width: 20px;
-    height: 20px; }
+    width: calc(100% - 2px);
+    height: calc(100% - 2px); }
     .color-picker-is-palette .color-picker-palette-icon .color-picker-palette-icon-part {
       flex-grow: 1;
       height: 100%;
@@ -5461,6 +5457,8 @@ form.dashboard-widget-svggraph {
           width: 85px;
           min-height: 22px;
           border-style: none; }
+      form.dashboard-widget-svggraph .overrides-options-list li .color-picker {
+        line-height: 22px; }
       form.dashboard-widget-svggraph .overrides-options-list li:not(:last-child) {
         margin-right: 5px; }
     form.dashboard-widget-svggraph .overrides-options-list .btn-icon {
