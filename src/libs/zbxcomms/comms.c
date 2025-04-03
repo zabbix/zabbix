@@ -1741,7 +1741,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, c
 		}
 		else
 		{
-			s->stats_request_allowed = ZBX_STAT_REQUEST_ALLOWED;
+			/* stats request allowed exception when unencrypted connection not allowed */
+			s->max_len_limit = ZBX_MAX_RECV_2KB_DATA_SIZE;
 		}
 	}
 
@@ -2026,9 +2027,9 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 #if defined(_WINDOWS)
 	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
 #else
-	if (ZBX_STAT_REQUEST_ALLOWED == s->stats_request_allowed)
+	if (0 != s->max_len_limit)
 	{
-		tcp_recv_context->max_len = ZBX_MAX_RECV_2KB_DATA_SIZE;
+		tcp_recv_context->max_len = s->max_len_limit;
 	}
 	else if (0 != (flags & ZBX_TCP_LARGE))
 	{

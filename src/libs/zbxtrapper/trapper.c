@@ -120,6 +120,58 @@ zbx_status_section_t;
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Check frontend connection allowed according to configuration      *
+ *          TLSFrontendAccept, FrontendAllowedIP, TLSFrontendCertIssuer and   *
+ *          TLSFrontendCertSubject                                            *
+ *                                                                            *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              config_tls     - [IN]                                         *
+ *              config_frontend_allowed_ip - [IN]                             *
+ *                                                                            *
+ * Return value:  SUCCEED - connection allowed                                *
+ *                FAIL - not allowed                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
+	const char *config_frontend_allowed_ip)
+{
+if (NULL != config_frontend_allowed_ip &&
+SUCCEED != zbx_tcp_check_allowed_peers_info(&sock->peer_info, config_frontend_allowed_ip))
+{
+zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed by FrontendAllowedIP",
+	sock->peer);
+
+return FAIL;
+}
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+char	*msg = NULL;
+
+if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock,
+	config_tls->frontend_cert_issuer,
+	config_tls->frontend_cert_subject,
+	&msg))
+{
+zabbix_log(LOG_LEVEL_DEBUG, "connection from server \"%s\" is not allowed: %s", sock->peer, msg);
+zbx_free(msg);
+
+return FAIL;
+}
+#endif
+
+if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
+{
+zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
+		zbx_tcp_connection_type_name(sock->connection_type));
+
+return FAIL;
+}
+
+return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: processes received values from active agents                      *
  *                                                                            *
  ******************************************************************************/
@@ -822,58 +874,6 @@ static void	status_stats_export(struct zbx_json *json)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check frontend connection allowed according to configuration      *
- *          TLSFrontendAccept, FrontendAllowedIP, TLSFrontendCertIssuer and   *
- *          TLSFrontendCertSubject                                            *
- *                                                                            *
- * Parameters:  sock           - [IN] request socket                          *
- *              config_tls     - [IN]                                         *
- *              config_frontend_allowed_ip - [IN]                             *
- *                                                                            *
- * Return value:  SUCCEED - connection allowed                                *
- *                FAIL - not allowed                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
-			const char *config_frontend_allowed_ip)
-{
-	if (NULL != config_frontend_allowed_ip &&
-		SUCCEED != zbx_tcp_check_allowed_peers_info(&sock->peer_info, config_frontend_allowed_ip))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed by FrontendAllowedIP",
-			sock->peer);
-
-		return FAIL;
-	}
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char	*msg = NULL;
-
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock,
-			config_tls->frontend_cert_issuer,
-			config_tls->frontend_cert_subject,
-			&msg))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "connection from server \"%s\" is not allowed: %s", sock->peer, msg);
-		zbx_free(msg);
-
-		return FAIL;
-	}
-#endif
-
-	if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
-				zbx_tcp_connection_type_name(sock->connection_type));
-
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: processes status request                                          *
  *                                                                            *
  * Parameters:  sock           - [IN] request socket                          *
@@ -1234,7 +1234,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
 
-		if (ZBX_STAT_REQUEST_ALLOWED == sock->stats_request_allowed &&
+		if (ZBX_MAX_RECV_2KB_DATA_SIZE == sock->max_len_limit &&
 			0 != strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 		{
 			zabbix_log(LOG_LEVEL_WARNING,

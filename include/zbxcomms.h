@@ -182,13 +182,6 @@ typedef struct
 } zbx_tls_context_t;
 #endif
 
-typedef enum
-{
-	ZBX_STAT_REQUEST_DENIED = 0,
-	ZBX_STAT_REQUEST_ALLOWED = 1
-}
-zbx_stat_request_allowed_t;
-
 typedef struct
 {
 	ZBX_SOCKET			socket;
@@ -214,10 +207,9 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
-	/* stats request allowed exception in case if unencrypted connection not allowed */
-	/* but peer is allowed in StatsAllowedIP */
-	/* limit tcp received packet size to 2 Kb if allowed */
-	zbx_stat_request_allowed_t	stats_request_allowed;
+
+	/* limits tcp received packet size, overrides flags limits */
+	zbx_uint64_t			max_len_limit;
 }
 zbx_socket_t;
 
