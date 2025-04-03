@@ -53,7 +53,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'items'					=> ['type' => API_STRINGS_UTF8],
 				'itemids'				=> ['type' => API_IDS],
 				'references'			=> ['type' => API_STRINGS_UTF8],
-				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_PALETTE],
 				'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 				'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
 				'width'					=> ['type' => API_INT32, 'in' => '0:10'],

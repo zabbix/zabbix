@@ -9,7 +9,9 @@ z-color-picker {
 		height: 24px;
 		padding: 0;
 		color: $font-color;
+		background: #ffffff;
 		border: 1px solid $form-border-color;
+		justify-items: center;
 
 		&:disabled {
 			background: $form-disabled-font-color !important;
@@ -183,14 +185,13 @@ z-color-picker {
 }
 
 .color-picker-no-color {
-	background: transparent !important;
-
 	&::after {
 		@extend %icon-position;
 		@extend %icons-font;
 		content: $zi-slash;
 		font-size: 20px;
 		color: $colorpicker-empty-color;
+		justify-content: center;
 	}
 }
 
@@ -198,15 +199,10 @@ z-color-picker {
 	background: transparent !important;
 
 	.color-picker-palette-icon {
-		position: absolute;
-		top: 1px;
-		right: 1px;
-		bottom: 1px;
-		left: 1px;
 		display: flex !important;
 		gap: 1px;
-		width: 20px;
-		height: 20px;
+		width: calc(100% - 2px);
+		height: calc(100% - 2px);
 
 		.color-picker-palette-icon-part {
 			flex-grow: 1;
