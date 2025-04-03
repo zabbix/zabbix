@@ -1,0 +1,1 @@
+...G...... [ZBX-25526] made Zabbix agent 2 proc.num item behave consistently with Zabbix agent when non-existing user is specified (arimdjonoks)
