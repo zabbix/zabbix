@@ -21,6 +21,7 @@
 
 $form = (new CForm('post'))
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addVar('advanced_form', $data['advanced_form'])
 	->addVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('oauth'))
 	->addItem(getMessages());
 
@@ -169,6 +170,7 @@ if ($data['advanced_form']) {
 				->setModern(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('code', ''))
+				->disableAutocomplete()
 				->setAttribute('placeholder', _('Authorization code'))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		]))->setId('oauth-authorization-code-field')

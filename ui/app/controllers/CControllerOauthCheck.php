@@ -23,25 +23,20 @@ class CControllerOauthCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>					'id',
-			'redirection_url' =>				'db media_type_oauth.redirection_url|required',
-			'client_id' => 						'db media_type_oauth.client_id|required',
-			'client_secret' =>					'db media_type_oauth.client_secret',
-			'authorization_url' =>				'string',
+			'redirection_url' =>				'db media_type_oauth.redirection_url|required|not_empty',
+			'client_id' => 						'db media_type_oauth.client_id|required|not_empty',
+			'client_secret' =>					'db media_type_oauth.client_secret|not_empty',
+			'authorization_url' =>				'string|not_empty',
 			'authorization_url_parameters' =>	'array',
-			'token_url' =>						'string',
+			'token_url' =>						'string|not_empty',
 			'token_url_parameters' =>			'array',
 			'authorization_mode' =>				'string|in auto,manual',
-			'code' =>							'string',
+			'code' =>							'string|not_empty',
 			'update' =>							'in 0,1',
 			'advanced_form' =>					'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->hasInput('client_secret') && $this->getInput('client_secret') === '') {
-			$ret = false;
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')));
-		}
 
 		if ($ret && $this->getInput('advanced_form', 0)) {
 			$ret = $this->validateAdvancedForm();
@@ -66,21 +61,16 @@ class CControllerOauthCheck extends CController {
 	protected function validateAdvancedForm(): bool {
 		$ret = true;
 
-		if (trim($this->getInput('authorization_url', '')) === ''
-				|| parse_url($this->getInput('authorization_url'), PHP_URL_SCHEME) === null) {
+		if (parse_url($this->getInput('authorization_url', ''), PHP_URL_SCHEME) === null
+				|| strval(parse_url($this->getInput('authorization_url', ''), PHP_URL_HOST)) === '') {
 			$ret = false;
 			error(_s('Incorrect value for field "%1$s": %2$s.', 'authorization_url', _('unacceptable URL')));
 		}
 
-		if (trim($this->getInput('token_url', '')) === ''
-				|| parse_url($this->getInput('token_url'), PHP_URL_SCHEME) === null) {
+		if (parse_url($this->getInput('token_url', ''), PHP_URL_SCHEME) === null
+				|| strval(parse_url($this->getInput('token_url', ''), PHP_URL_HOST)) === '') {
 			$ret = false;
 			error(_s('Incorrect value for field "%1$s": %2$s.', 'token_url', _('unacceptable URL')));
-		}
-
-		if ($this->getInput('authorization_mode', 'auto') === 'manual' && trim($this->getInput('code', '')) === '') {
-			$ret = false;
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'code', _('cannot be empty')));
 		}
 
 		return $ret;
