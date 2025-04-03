@@ -21,15 +21,17 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
-int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **error)
+int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatye_name, zbx_oauth_data_t *data,
+		char **error)
 {
-#define CHECK_FOR_NULL(index, message)								\
-	do {											\
-		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))		\
-		{										\
-			*error = zbx_dsprintf(NULL, "Access token fetch failed: " message);	\
-			goto out; 								\
-		}										\
+#define CHECK_FOR_NULL(index, message)									\
+	do {												\
+		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))			\
+		{											\
+			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s ("		\
+					ZBX_FS_UI64 ") " message, mediatye_name, mediatypeid);		\
+			goto out; 									\
+		}											\
 	} while(0)
 
 	int		ret = FAIL;
@@ -45,7 +47,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, ch
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype requires authorization for OAuth2");
+		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s (" ZBX_FS_UI64 ") requires"
+				" frontend authorization for OAuth2", mediatye_name, mediatypeid);
 		goto out;
 	}
 

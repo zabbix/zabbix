@@ -48,7 +48,8 @@ typedef struct
 
 void	zbx_oauth_clean(zbx_oauth_data_t *data);
 
-int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **error);
+int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatye_name, zbx_oauth_data_t *data,
+		char **error);
 int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *config_source_ip,
 	const char *config_ssl_ca_location, char **error);
 void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result);
