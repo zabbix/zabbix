@@ -24,7 +24,10 @@ class CControllerTemplateCreate extends CController {
 	public static function getValidationRules(): array {
 		$api_uniq = [
 			['template.get', ['host' => '{template_name}']],
-			['template.get', ['name' => '{visiblename}']]
+			['template.get', ['name' => '{visiblename}']],
+			['template.get', ['name' => '{template_name}']],
+			['host.get', ['host' => '{template_name}']],
+			['host.get', ['name' => '{visiblename}']]
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
