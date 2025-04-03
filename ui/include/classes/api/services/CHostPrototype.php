@@ -1258,7 +1258,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$result = DBselect(
-			'SELECT i.itemid,i.hostid,h.status,h.flags'.
+			'SELECT i.itemid,h.status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
 				' AND '.dbConditionId('i.itemid', $ruleids)
