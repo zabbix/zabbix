@@ -27,6 +27,7 @@
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
 #include "zbxbincommon.h"
+#include "zbxtime.h"
 
 static char	*config_pid_file = NULL;
 
