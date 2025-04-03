@@ -512,6 +512,7 @@ class CConfigurationExportBuilder {
 					$result[$i] += [
 						'redirection_url' => $media_type['redirection_url'],
 						'client_id' => $media_type['client_id'],
+						'client_secret' => $media_type['client_secret'],
 						'authorization_url' => $media_type['authorization_url'],
 						'token_url' => $media_type['token_url']
 					];

@@ -3239,6 +3239,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
 					'redirection_url' =>		['type' => XML_STRING],
 					'client_id' =>				['type' => XML_STRING],
+					'client_secret' =>			['type' => XML_STRING],
 					'authorization_url' =>		['type' => XML_STRING],
 					'token_url' =>				['type' => XML_STRING],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
