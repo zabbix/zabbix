@@ -31,7 +31,7 @@ class CMapHelper {
 			'output' => ['sysmapid', 'name', 'width', 'height', 'backgroundid', 'background_scale', 'label_type',
 				'label_location', 'show_element_label', 'show_link_label', 'highlight', 'expandproblem', 'markelements',
 				'show_unack', 'label_format', 'label_type_host', 'label_type_hostgroup', 'label_type_trigger',
-				'label_type_map', 'label_type_image', 'label_string_host',  'label_string_hostgroup',
+				'label_type_map', 'label_type_image', 'label_string_host', 'label_string_hostgroup',
 				'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid', 'severity_min',
 				'show_suppressed'
 			],
