@@ -28,8 +28,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 	do {												\
 		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))			\
 		{											\
-			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s ("		\
-					ZBX_FS_UI64 ") " message, mediatype_name, mediatypeid);		\
+			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s " message,	\
+					mediatype_name);						\
 			goto out; 									\
 		}											\
 	} while(0)
@@ -47,8 +47,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s (" ZBX_FS_UI64 ") requires"
-				" frontend authorization for OAuth2", mediatype_name, mediatypeid);
+		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype %s requires"
+				" frontend authorization for OAuth2", mediatype_name);
 		goto out;
 	}
 
