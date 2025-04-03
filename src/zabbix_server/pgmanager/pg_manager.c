@@ -27,6 +27,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize proxy group manager                                    *
@@ -545,6 +546,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		{
 			pgm_update(&cache);
 			time_update = time_now;
+			zbx_handle_log();
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
