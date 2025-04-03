@@ -341,25 +341,25 @@ class testTriggerLinking extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname'		=>  self::HOST_NAME,
+				'Hostname'	=>	self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
-				'HostMetadata' => 'first_XSTRATA'
+				'DebugLevel'	=>	4,
+				'LogFileSize'	=>	0,
+				'LogFile'	=>	self::getLogPath(self::COMPONENT_AGENT),
+				'PidFile'	=>	 PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'HostMetadata'	=>	'first_XSTRATA'
 			],
 
 			self::COMPONENT_AGENT2 => [
-				'Hostname'		=>  self::HOST_NAME,
+				'Hostname'	=>	self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_AGENT2),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
-				'HostMetadata' => 'second_XSTRATA'
+				'DebugLevel'	=>	4,
+				'LogFileSize'	=>	0,
+				'LogFile'	=>	self::getLogPath(self::COMPONENT_AGENT2),
+				'PidFile'	=>	PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
+				'HostMetadata'	=>	'second_XSTRATA'
 			]
 		];
 	}

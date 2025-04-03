@@ -20,7 +20,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @hosts test_trigger_linking
  * @backup history, autoreg_host
  */
 class testLldLinking extends CIntegrationTest {
@@ -29,7 +28,7 @@ class testLldLinking extends CIntegrationTest {
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
-	private static $hostCreateId;
+	private static $actionId;
 	private static $actionLinkTemplateId;
 	private static $templateids = array();
 
@@ -60,14 +59,14 @@ class testLldLinking extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname'		=> self::HOST_NAME,
+				'Hostname'	=>	self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
-				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
+				'DebugLevel'	=>	4,
+				'LogFileSize'	=>	0,
+				'LogFile'	=>	self::getLogPath(self::COMPONENT_AGENT),
+				'PidFile'	=>	PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'HostMetadataItem'	=>	'vfs.file.contents['.self::METADATA_FILE.']'
 			]
 		];
 	}
@@ -83,7 +82,7 @@ class testLldLinking extends CIntegrationTest {
 		}
 	}
 
-	private function hostCreateAutoRegAndLink($templateNumber) {
+	private function setupAutoregToLinkTemplates($templateNumber) {
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -96,7 +95,7 @@ class testLldLinking extends CIntegrationTest {
 			]
 		]);
 
-		self::$hostCreateId = $response['result']['actionids'][0];
+		self::$actionId = $response['result']['actionids'][0];
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
 		$this->assertArrayHasKey('actionids', $response['result'], $ep);
@@ -123,7 +122,7 @@ class testLldLinking extends CIntegrationTest {
 				'name' => 'LLD rule with LLD macro paths',
 				'key_' => 'lld',
 				'hostid' => self::$templateids[$i],
-				'type' => 0,
+				'type' => ITEM_TYPE_ZABBIX,
 				'delay' => '30s',
 				'lld_macro_paths' => [
 					[
@@ -151,13 +150,12 @@ class testLldLinking extends CIntegrationTest {
 
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
-			'eventsource' => 2,
-			'status' => 0,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
-					'operationtype' => 6,
-					'optemplate' =>
-					$templateids_for_api_call
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
+					'optemplate' => $templateids_for_api_call
 				]
 			]
 		]);
@@ -173,7 +171,7 @@ class testLldLinking extends CIntegrationTest {
 			'filter' => [
 				'host' => self::HOST_NAME
 			]
-			]);
+		]);
 
 		$this->assertArrayHasKey('result', $response, json_encode($response));
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
@@ -182,16 +180,15 @@ class testLldLinking extends CIntegrationTest {
 		$response = $this->call('host.update', [
 			'hostid' => $hostid,
 			'templates' => []
-			]);
+		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertEquals(1, count($response['result']['hostids']));
-		sleep(1);
 	}
 
-	private function fullClear() {
+	private function deleteActionsAndTemplates () {
 
-		$response = $this->call('action.delete',[self::$hostCreateId]);
+		$response = $this->call('action.delete',[self::$actionId]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
 
@@ -217,7 +214,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_SAME_LLD);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_SAME_LLD);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -228,9 +225,9 @@ class testLldLinking extends CIntegrationTest {
 			true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
-		$this->fullClear();
+		$this->deleteActionsAndTemplates();
 
-		$this->hostCreateAutoRegAndLink(self::NUMBER_OF_TEMPLATES_ONE);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_ONE);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
