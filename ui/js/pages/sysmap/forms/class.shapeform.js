@@ -73,7 +73,7 @@ class ShapeForm {
 	}
 
 	/**
-	 * Get values from shape update form that should be updated
+	 * Get values from shape update form that should be updated.
 	 *
 	 * @return {object}
 	 */
