@@ -70,6 +70,7 @@ class CMapHelper {
 				'show_link_label' => MAP_SHOW_LABEL_ALWAYS,
 				'selements' => [],
 				'links' => [],
+				'duplicated_links' => [],
 				'shapes' => [[
 					'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 					'x' => 0,
