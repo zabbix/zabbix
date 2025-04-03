@@ -388,6 +388,40 @@ static int	DBpatch_7030028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030029(void)
+{
+	const zbx_db_field_t	field = {"wizard_ready", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_7030030(void)
+{
+	const zbx_db_field_t	field = {"readme", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_table_t	table =
+			{"hostmacro_config", "hostmacroid", 0,
+				{
+					{"hostmacroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"label", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"required", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"regex", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"options", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -423,5 +457,8 @@ DBPATCH_ADD(7030025, 0, 1)
 DBPATCH_ADD(7030026, 0, 1)
 DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
+DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
 
 DBPATCH_END()
