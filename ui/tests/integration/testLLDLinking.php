@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup history, autoreg_host
  */
 class testLldLinking extends CIntegrationTest {
-	const NUMBER_OF_TEMPLATES_SAME_LLD = 2;
-	const NUMBER_OF_TEMPLATES_ONE = 1;
+	const NUMBER_OF_TEMPLATES_TEST_1 = 2;
+	const NUMBER_OF_TEMPLATES_TEST_2 = 1;
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
 	const HOST_NAME = 'test_lld_linking';
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
@@ -204,6 +204,17 @@ class testLldLinking extends CIntegrationTest {
 		self::$templateids = [];
 	}
 
+	/*
+	Test ensures that the Zabbix auto-registration process correctly handles template with LLD rule linking
+	conflicts and re-registration behavior under different conditions.
+
+	In the first scenario, two templates are linked to a host via auto-registration. Both templates contain the same
+	LLD rule with identical keys. The templates should not be linked due to the conflict in LLD rule keys.
+
+	In the second scenario, a template is linked to a host through auto-registration, then unlinked. The host is
+	restarted with different metadata. The host should be registered again without conflicts.
+	*/
+
 	/**
 	 * Test LLD linking cases.
 	 *
@@ -214,7 +225,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_SAME_LLD);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -227,7 +238,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->deleteActionsAndTemplates();
 
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_ONE);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
