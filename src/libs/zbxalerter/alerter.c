@@ -208,7 +208,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		{
 			zbx_oauth_data_t	data = {0};
 
-			if (SUCCEED != (ret = zbx_oauth_fetch(mediatypeid, &data, &error)))
+			if (SUCCEED != (ret = zbx_oauth_fetch_from_db(mediatypeid, &data, &error)))
 				goto out;
 
 			if (data.access_token_updated + data.access_expires_in + EXPIRE_OFFSET < time(NULL))

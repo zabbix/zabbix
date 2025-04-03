@@ -21,11 +21,12 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
-int	zbx_oauth_fetch(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **error)
+int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **error)
 {
 #define CHECK_FOR_NULL(index, message)								\
 	do {											\
-		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index])) {		\
+		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))		\
+		{										\
 			*error = zbx_dsprintf(NULL, "Access token fetch failed: " message);	\
 			goto out; 								\
 		}										\
@@ -61,7 +62,7 @@ int	zbx_oauth_fetch(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, char **err
 	data->access_token = zbx_strdup(NULL, row[4]);
 	data->access_token_updated = (time_t)atoi(row[5]);
 	data->access_expires_in = (time_t)atoi(row[6]);
-	data->tokens_status = atoi(row[7]);
+	data->tokens_status = (unsigned char)atoi(row[7]);
 
 	ret = SUCCEED;
 out:
@@ -81,7 +82,8 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(config_ssl_ca_location);
-	*error = zbx_dsprintf(*error, "missing cURL library");
+	*error = zbx_dsprintf(*error, "OAuth requires curl library. This Zabbix server binary was compiled without curl"
+		" library support.");
 	return FAIL;
 #else
 	int			ret = FAIL;
