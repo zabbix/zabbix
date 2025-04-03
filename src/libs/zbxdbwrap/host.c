@@ -1556,6 +1556,47 @@ static void	db_get_linked_items(const zbx_vector_uint64_t *itemids, const char *
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets linked (discovered, dependent, etc) items                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_item_prototypes(const zbx_vector_uint64_t *itemids, zbx_vector_uint64_t *proto_itemids,
+		zbx_vector_uint64_t *proto_lldruleids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_db_large_query_t	query;
+	zbx_db_row_t		row;
+	zbx_uint64_t		itemid;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select id.itemid,i.flags"
+			" from items i,item_discovery id"
+			" where id.itemid=i.itemid"
+				" and");
+
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "id.lldruleid", itemids);
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		unsigned char	flags;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(flags, row[1]);
+
+		if (NULL == (flags & ZBX_FLAG_DISCOVERY_RULE))
+			zbx_vector_uint64_append(proto_itemids, itemid);
+		else
+			zbx_vector_uint64_append(proto_lldruleids, itemid);
+
+	}
+	zbx_db_large_query_clear(&query);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: deletes items from database                                       *
  *                                                                            *
  * Parameters:                                                                *
@@ -1570,7 +1611,8 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	const char		*profile_idx = "web.favorite.graphids";
 	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
-	zbx_vector_uint64_t	itemids_linked;
+	zbx_vector_uint64_t	itemids_linked, linked_llruleids;
+	char			*sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
@@ -1578,8 +1620,9 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 		goto out;
 
 	zbx_vector_uint64_create(&itemids_linked);
+	zbx_vector_uint64_create(&linked_llruleids);
 
-	db_get_linked_items(itemids, "item_discovery i where", "i.lldruleid", &itemids_linked);
+	db_get_item_prototypes(itemids, &itemids_linked, &linked_llruleids);
 	db_get_linked_items(itemids, "items i where", "i.master_itemid", &itemids_linked);
 
 	if (0 != itemids_linked.values_num)
@@ -1591,11 +1634,13 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
-	/* recursively delete discovered items/lld rules */
+	/* recursively delete lld rule prototypes and discovered items/lld rules */
+	zbx_vector_uint64_append_array(&itemids_linked, linked_llruleids.values, linked_llruleids.values_num);
 	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
 	if (0 != itemids_linked.values_num)
 		zbx_db_delete_items(&itemids_linked, audit_context_mode);
 
+	zbx_vector_uint64_destroy(&linked_llruleids);
 	zbx_vector_uint64_destroy(&itemids_linked);
 
 	zbx_db_update_item_map_links(itemids);
