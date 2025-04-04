@@ -27,7 +27,9 @@ require_once __DIR__.'/../common/testFormGraphs.php';
  */
 class testFormGraph extends testFormGraphs {
 
-	protected $url = 'graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
+	protected $url = 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
+
+	protected $formid = 'graph-form';
 
 	public function prepareGraphsData() {
 		self::$update_graph = 'Graph for update';
@@ -551,7 +553,7 @@ class testFormGraph extends testFormGraphs {
 	 */
 	public function testFormGraph_CheckAvailableItems() {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::HOST_WITH_ITEMS));
-		$url = 'graphs.php?hostid='.$hostid.'&form=create&context=host';
+		$url = 'zabbix.php?action=popup&popup=graph.edit&context=host&hostid='.$hostid;
 
 		$this->checkAvailableItems($url);
 	}
