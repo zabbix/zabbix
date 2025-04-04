@@ -129,7 +129,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("error field not found");
+			SET_ERROR("error field not found in OAuth server response");
 			goto out;
 		}
 
@@ -138,7 +138,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error_description", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("error_description field not found");
+			SET_ERROR("error_description field not found in OAuth server response");
 			goto out;
 		}
 
@@ -150,19 +150,19 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "token_type", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("token_type field not found");
+			SET_ERROR("token_type field not found in OAuth server response");
 			goto out;
 		}
 
 		if (0 != strcmp(tmp, "Bearer"))
 		{
-			SET_ERROR("token_type is not \"Bearer\"");
+			SET_ERROR("token_type is not \"Bearer\" in OAuth server response");
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "access_token", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("access_token field not found");
+			SET_ERROR("access_token field not found in OAuth server response");
 			goto out;
 		}
 
@@ -171,7 +171,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "expires_in", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("expires_in field not found");
+			SET_ERROR("expires_in field not found in OAuth server response");
 			goto out;
 		}
 
