@@ -1052,8 +1052,6 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form = $dialog->asForm();
