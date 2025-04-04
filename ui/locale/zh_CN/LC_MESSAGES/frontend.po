@@ -5282,6 +5282,14 @@ msgstr "创建并编辑维护期"
 msgid "Create and edit maps"
 msgstr "创建并编辑拓扑图"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "创建背景"
@@ -14240,6 +14248,10 @@ msgstr "新监控项原型"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "创建维修时段"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -25603,6 +25615,14 @@ msgstr "没有将故障现象问题转换为起因问题的权限"
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
 msgstr "没有创建和编辑拓扑图权限"
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"

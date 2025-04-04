@@ -23,8 +23,7 @@ $page['file'] = 'sysmap.php';
 $page['scripts'] = ['class.linkform.js', 'class.massshapeform.js', 'class.shapeform.js',
 	'class.massform.js', 'class.selementform.js', 'class.selement.js', 'class.shape.js', 'class.link.js',
 	'class.imagecache.js', 'class.svgcanvas.js', 'class.svgtextarea.js', 'class.svgelement.js', 'class.svgmap.js',
-	'class.svgmapelement.js', 'class.svgmaplink.js', 'class.svgmapshape.js', 'colorpicker.js', 'class.cmap.js',
-	'sysmap.js'
+	'class.svgmapelement.js', 'class.svgmaplink.js', 'class.svgmapshape.js', 'class.cmap.js', 'sysmap.js'
 ];
 $page['type'] = detect_page_type();
 

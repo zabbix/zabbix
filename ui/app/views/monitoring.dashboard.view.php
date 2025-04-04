@@ -53,7 +53,6 @@ $this->addJsFile('class.svgmap.js');
 $this->addJsFile('class.svgmapelement.js');
 $this->addJsFile('class.svgmaplink.js');
 $this->addJsFile('class.svgmapshape.js');
-$this->addJsFile('colorpicker.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('layout.mode.js');

@@ -45,7 +45,6 @@ $this->addJsFile('class.widget-field.checkbox-list.js');
 $this->addJsFile('class.widget-field.multiselect.js');
 $this->addJsFile('class.widget-field.time-period.js');
 $this->addJsFile('class.widget-select.popup.js');
-$this->addJsFile('colorpicker.js');
 $this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');

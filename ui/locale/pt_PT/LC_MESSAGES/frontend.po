@@ -5392,6 +5392,14 @@ msgstr "Criar e editar manutenção"
 msgid "Create and edit maps"
 msgstr "Criar e editar mapas"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Criar plano de fundo"
@@ -14406,6 +14414,10 @@ msgstr ""
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Novo período de manutenção"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -25805,6 +25817,14 @@ msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
 msgstr ""
 
 #: include/classes/api/services/CEvent.php:1566
