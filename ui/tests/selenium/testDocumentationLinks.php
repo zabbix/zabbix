@@ -846,7 +846,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=22947',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=22947&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -854,7 +854,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger => AIX: FS [{#FSNAME}]: Space is low.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=22947&triggerid=17114',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=22947&triggerid=17114&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -1064,7 +1064,7 @@ class testDocumentationLinks extends CWebTest {
 			// #105 Host trigger update form.
 			[
 				[
-					'url' => 'zabbix.php?action=popup&popup=trigger.edit&triggerid=99251', // Test trigger with tag.
+					'url' => 'zabbix.php?action=popup&popup=trigger.edit&triggerid=99251&context=host&hostid=10084', // Test trigger with tag.
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
@@ -1191,7 +1191,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => testFormDiscoveryRule.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -1199,7 +1199,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger name => testFormTriggerPrototype1.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800&triggerid=99518',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800&triggerid=99518&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
