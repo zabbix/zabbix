@@ -110,6 +110,8 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	time_t			sec = time(NULL);
 	const char		*header = "Content-Type: application/x-www-form-urlencoded";
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	char	*posts = zbx_strdcatf(NULL, "grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s",
 			data->client_id, data->client_secret, data->refresh_token);
 
@@ -189,7 +191,6 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 		data->access_token_updated = sec;
 		ret = SUCCEED;
 	}
-
 out:
 	zbx_free(posts);
 	zbx_free(tmp);
@@ -197,6 +198,8 @@ out:
 
 	if (NULL != *error)
 		zabbix_log(LOG_LEVEL_ERR, "%s", *error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 #undef SET_ERROR
