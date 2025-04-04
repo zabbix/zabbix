@@ -91,6 +91,9 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 		" library support.");
 	return FAIL;
 #else
+
+#define ZBX_HTTP_STATUS_CODE_OK  200
+
 #define SET_ERROR(message, ...)											\
 	do													\
 	{													\
@@ -122,7 +125,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 		goto out;
 	}
 
-	if (200 != response_code)
+	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error", &tmp, &tmp_alloc, NULL))
 		{
