@@ -25,14 +25,16 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 		char **error)
 {
 #define CHECK_FOR_NULL(index, message)									\
-	do {												\
+	do												\
+	{												\
 		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))			\
 		{											\
 			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype \"%s\": "	\
 					message, mediatype_name);					\
 			goto out; 									\
 		}											\
-	} while(0)
+	}												\
+	while(0)
 
 	int		ret = FAIL;
 	zbx_db_result_t	result;
@@ -77,8 +79,8 @@ out:
 #undef CHECK_FOR_NULL
 }
 
-int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *config_source_ip,
-		const char *config_ssl_ca_location, char **error)
+int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name, long timeout,
+		const char *config_source_ip, const char *config_ssl_ca_location, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(data);
@@ -89,18 +91,24 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 		" library support.");
 	return FAIL;
 #else
+#define SET_ERROR(message, ...)											\
+	do													\
+	{													\
+		*error = zbx_dsprintf(NULL, "Access token retrieval failed: mediatype \"%s\": " message,	\
+				mediatype_name, ##__VA_ARGS__);							\
+	}													\
+	while (0)
+
 	int			ret = FAIL;
-	char			*out = NULL, *posts = NULL, *tmp = NULL;
+	char			*out = NULL, *tmp = NULL;
 	size_t			tmp_alloc = 0;
 	long			response_code;
 	struct zbx_json_parse	jp;
 	time_t			sec = time(NULL);
 	const char		*header = "Content-Type: application/x-www-form-urlencoded";
 
-	posts = zbx_strdcatf(posts, "grant_type=refresh_token");
-	posts = zbx_strdcatf(posts, "&client_id=%s", data->client_id);
-	posts = zbx_strdcatf(posts, "&client_secret=%s", data->client_secret);
-	posts = zbx_strdcatf(posts, "&refresh_token=%s", data->refresh_token);
+	char	*posts = zbx_strdcatf(NULL, "grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s",
+			data->client_id, data->client_secret, data->refresh_token);
 
 	if (SUCCEED != zbx_http_req(data->token_url, header, timeout, NULL, NULL, config_source_ip,
 			config_ssl_ca_location, NULL, NULL, &out, posts, &response_code, error))
@@ -110,7 +118,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 
 	if (SUCCEED != zbx_json_open(out, &jp))
 	{
-		*error = zbx_dsprintf(NULL, "Access token retrieval failed: %s", zbx_json_strerror());
+		SET_ERROR("%s", zbx_json_strerror());
 		goto out;
 	}
 
@@ -118,7 +126,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error", &tmp, &tmp_alloc, NULL))
 		{
-			*error = zbx_dsprintf(NULL, "Access token retrieval failed: error field not found");
+			SET_ERROR("error field not found");
 			goto out;
 		}
 
@@ -127,11 +135,11 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error_description", &tmp, &tmp_alloc, NULL))
 		{
-			*error = zbx_dsprintf(NULL, "Access token retrieval failed: error_description field not found");
+			SET_ERROR("error_description field not found");
 			goto out;
 		}
 
-		*error = zbx_dsprintf(NULL, "Access token retrieval failed: %s", tmp);
+		SET_ERROR("%s", tmp);
 
 		data->tokens_status = (data->tokens_status & ~ZBX_OAUTH_TOKEN_ACCESS_VALID) & ZBX_OAUTH_TOKEN_VALID;
 	}
@@ -139,19 +147,19 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "token_type", &tmp, &tmp_alloc, NULL))
 		{
-			*error = zbx_dsprintf(NULL, "Access token retrieval failed: token_type field not found");
+			SET_ERROR("token_type field not found");
 			goto out;
 		}
 
 		if (0 != strcmp(tmp, "Bearer"))
 		{
-			*error = zbx_dsprintf(NULL, "Access token retrieval failed: token_type is not \"Bearer\"");
+			SET_ERROR("token_type is not \"Bearer\"");
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "access_token", &tmp, &tmp_alloc, NULL))
 		{
-			*error = zbx_dsprintf(NULL, "Access token retrieval failed: access_token field not found");
+			SET_ERROR("access_token field not found");
 			goto out;
 		}
 
@@ -160,7 +168,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, long timeout, const char *c
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "expires_in", &tmp, &tmp_alloc, NULL))
 		{
-			*error = zbx_dsprintf(NULL, "Access token retrieval failed: expires_in field not found");
+			SET_ERROR("expires_in field not found");
 			goto out;
 		}
 
@@ -188,6 +196,7 @@ out:
 		zabbix_log(LOG_LEVEL_ERR, "%s", *error);
 
 	return ret;
+#undef SET_ERROR
 #endif
 }
 

@@ -219,8 +219,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 				{
 					zbx_free(suberror);	/* clear last error */
 
-					ret = zbx_oauth_access_refresh(&data, ALARM_ACTION_TIMEOUT, config_source_ip,
-							config_ssl_ca_location, &suberror);
+					ret = zbx_oauth_access_refresh(&data, mediatype_name, ALARM_ACTION_TIMEOUT,
+							config_source_ip, config_ssl_ca_location, &suberror);
 				}
 				while (0 < maxattempts-- && NETWORK_ERROR == ret);
 
