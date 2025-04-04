@@ -134,7 +134,7 @@ window.widget_svggraph_form = new class {
 				}
 
 				if (e.target.classList.contains('js-click-expand')
-						|| e.target.classList.contains('color-picker-preview')) {
+						|| e.target.closest('.<?= ZBX_STYLE_COLOR_PICKER ?>') !== null) {
 					$data_sets.zbx_vertical_accordion('expandNth',
 						[...list_item.parentElement.children].indexOf(list_item)
 					);
