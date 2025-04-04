@@ -1,6 +1,7 @@
 Changes for 7.4.0beta1
 
 New features:
+........S. [ZBXNEXT-9718] added additional log message to assist in finding which item causes exhaustion of value cache (dgoloscapov)
 ..F....... [ZBXNEXT-9850] moved graphs and graph prototypes to MVC model and refactored edit forms to modal windows (esekace)
 .........T [ZBXNEXT-9782] added Pure Storage FlashArray by HTTP templates for REST API v1 and v2 (aiantsen)
 A.F....... [ZBXNEXT-2122] added new user role actions to control access to create and edit own and other user media (agriscenko)
@@ -15,6 +16,7 @@ A.F.I..... [ZBXNEXT-8784] added ability to show map element and link labels only
 A.F.I..PS. [ZBXNEXT-7048] converted settings table to key-value format (askolmeisters, jfreibergs, vmaksimovs)
 
 Bug fixes:
+.......PS. [ZBX-26197] fixed max repetition count not being inherited by host created by LLD (dgoloscapov)
 .........T [ZBX-26074] fixed authentication settings in README.md (egordymov)
 ..F....... [ZBX-25603] fixed "Tag for matching" field visibility when "OK event generation" is set to "None" in trigger and trigger prototype configuration forms (esekace)
 ..F....... [ZBX-25928] fixed error handling for invalid parameters in item and trigger popup URLs (esekace)
@@ -97,9 +99,11 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.6rc1
 
 New features:
+........S. [ZBXNEXT-9718] added additional log message to assist in finding which item causes exhaustion of value cache (dgoloscapov)
 .........T [ZBXNEXT-9782] added Pure Storage FlashArray by HTTP templates for the REST API v1 and v2 (aiantsen)
 
 Bug fixes:
+.......PS. [ZBX-26197] fixed max repetition count not being inherited by host created by LLD (dgoloscapov)
 .........T [ZBX-26074] fixed authentication settings in README.md (egordymov)
 ..F....... [ZBX-25603] fixed "Tag for matching" field visibility when "OK event generation" is set to "None" in trigger and trigger prototype configuration forms (esekace)
 ..F....... [ZBX-25928] fixed error handling for invalid parameters in item and trigger popup URLs (esekace)
@@ -496,9 +500,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.12rc1
 
 New features:
+........S. [ZBXNEXT-9718] added additional log message to assist in finding which item causes exhaustion of value cache (dgoloscapov)
 .........T [ZBXNEXT-9782] added Pure Storage FlashArray by HTTP templates for the REST API v1 and v2 (aiantsen)
 
 Bug fixes:
+.......PS. [ZBX-26197] fixed max repetition count not being inherited by host created by LLD (dgoloscapov)
 .........T [ZBX-26074] fixed authentication settings in README.md (egordymov)
 ..F....... [ZBX-25603] fixed "Tag for matching" field visibility when "OK event generation" is set to "None" in trigger and trigger prototype configuration forms (esekace)
 ..F....... [ZBX-25683] fixed Ctrl+Arrow shortcuts does not work in preprocessing form (isharha)
