@@ -274,7 +274,6 @@ class ZColorPicker extends HTMLElement {
 
 		if (this.#isValidPalette(this.#value)) {
 			const icon_parts = this.#box.querySelectorAll(`.${ZColorPicker.ZBX_STYLE_PALETTE_ICON_PART}`);
-
 			const number = ZColorPicker.#getPaletteRowNumber(this.#value);
 
 			icon_parts[0].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][0]}`);
@@ -446,7 +445,8 @@ class ZColorPicker extends HTMLElement {
 
 			row_element.innerHTML = columns_html;
 
-			dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_SOLID} .${ZColorPicker.ZBX_STYLE_COLORS}`).appendChild(row_element);
+			dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_SOLID} .${ZColorPicker.ZBX_STYLE_COLORS}`)
+				.appendChild(row_element);
 		}
 
 		const palette_row_template = new Template(ZColorPicker.#palette_row_template);
@@ -463,7 +463,8 @@ class ZColorPicker extends HTMLElement {
 
 			row_element.querySelector('div').innerHTML = columns_html;
 
-			dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE} .${ZColorPicker.ZBX_STYLE_COLORS}`).appendChild(row_element);
+			dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE} .${ZColorPicker.ZBX_STYLE_COLORS}`)
+				.appendChild(row_element);
 		}
 
 		return dialog;
