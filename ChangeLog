@@ -1,8 +1,33 @@
 Changes for 7.0.12rc1
 
 New features:
+.........T [ZBXNEXT-9782] added Pure Storage FlashArray by HTTP templates for the REST API v1 and v2 (aiantsen)
 
 Bug fixes:
+.........T [ZBX-26074] fixed authentication settings in README.md (egordymov)
+..F....... [ZBX-25603] fixed "Tag for matching" field visibility when "OK event generation" is set to "None" in trigger and trigger prototype configuration forms (esekace)
+..F....... [ZBX-25683] fixed Ctrl+Arrow shortcuts does not work in preprocessing form (isharha)
+...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
+...G...... [ZBX-26121] added default flags to net.dns.get arguments when none are specified (arimdjonoks)
+..F....... [ZBX-22654] fixed item units not resolving when value mapping is applied (isharha)
+........S. [ZBX-25552] replaced Resource name Discovery rule to LLD rule (rtrizna)
+.........T [ZBX-25975] optimized temperature sensors discovery in MikroTik templates (drasikhov)
+.........T [ZBX-26026] updated get last backup query in MSSQL by ODBC template (akotsegubov)
+.........T [ZBX-26208] fixed buffer pool efficiency formula for family of MySQL templates (akotsegubov)
+..F....... [ZBX-26093] fixed Geomap widget host popup displaced (isharha)
+..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean and Japanese languages (dfofanovs)
+........S. [ZBX-25306] updated Zabbix web service chromdp and cdproto dependency (esneiders)
+........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
+...G...... [ZBX-26055] fixed failing to refresh active checks when next refresh was faster than 60 seconds (sboidenko)
+.......PS. [ZBX-26042] fixed agent redirection if host encryption settings are wrong (sboidenko)
+.......PS. [ZBX-25146] removed concurrency when using net-snmp library for network discovery (MVekslers)
+..F....... [ZBX-25749] removed theming from QR code (talbergs)
+.........T [ZBX-23750] updated documentation for SMART by Zabbix agent 2 templates (drasikhov)
+.D........ [ZBX-25612] updated documentation for both Oracle DB templates and Oracle DB Zabbix agent 2 plugin (knaglis)
+.........T [ZBX-25439] added note about replication privilege requirements for MariaDB in MySQL templates (drasikhov)
+...G...... [ZBX-21876] corrected getPluginCapacity to avoid false warnings when default capacity exceeds maximum capacity (sjurgensons)
+...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
+.......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.11
@@ -3438,6 +3463,8 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
+...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
 ..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean and Japanese languages (dfofanovs)
 .......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
@@ -6869,6 +6896,7 @@ Changes for 5.0.47rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
 
 --------------------------------------------------------------------------------
