@@ -119,7 +119,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		$this->query('id:add-item')->waitUntilClickable()->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
