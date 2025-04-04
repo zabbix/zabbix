@@ -214,18 +214,19 @@ void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetc
 	{
 		data->tokens_status &= ZBX_OAUTH_TOKEN_REFRESH_VALID;
 
-		zbx_db_execute("update media_type_oauth set tokens_status=%d"
+		zbx_db_execute("update media_type_oauth set tokens_status=%hhu"
 				" where mediatypeid="ZBX_FS_UI64, data->tokens_status, mediatypeid);
 	}
 	else
 	{
 		data->tokens_status |= ZBX_OAUTH_TOKEN_ACCESS_VALID;
+
 		if (NULL != data->old_refresh_token)
 			data->tokens_status |= ZBX_OAUTH_TOKEN_REFRESH_VALID;
 
 		zbx_db_execute("update media_type_oauth"
-				" set access_token='%s',access_token_updated=%d,access_expires_in=%d,"
-				"refresh_token='%s',tokens_status=%d"
+				" set access_token='%s',access_token_updated=" ZBX_FS_TIME_T ",access_expires_in=%d,"
+				"refresh_token='%s',tokens_status=%hhu"
 				" where mediatypeid="ZBX_FS_UI64,
 				data->access_token, data->access_token_updated, data->access_expires_in,
 				data->refresh_token, data->tokens_status,
