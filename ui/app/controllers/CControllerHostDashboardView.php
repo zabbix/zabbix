@@ -75,7 +75,7 @@ class CControllerHostDashboardView extends CController {
 			}
 
 			$db_dashboards = API::HostDashboard()->get([
-				'output' => ['dashboardid', 'name', 'display_period', 'auto_start'],
+				'output' => ['dashboardid', 'name', 'display_period', 'auto_start', 'templateid'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'hostids' => $this->getInput('hostid'),
 				'dashboardids' => $dashboardid
@@ -83,11 +83,6 @@ class CControllerHostDashboardView extends CController {
 
 			if ($db_dashboards) {
 				$dashboard = $db_dashboards[0];
-
-				$dashboard['templateid'] = API::TemplateDashboard()->get([
-					'output' => ['templateid'],
-					'dashboardids' => $dashboardid
-				])[0]['templateid'];
 
 				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
 					$this->getInput('hostid')

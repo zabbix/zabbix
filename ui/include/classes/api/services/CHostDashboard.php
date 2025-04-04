@@ -23,7 +23,7 @@ class CHostDashboard extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	public const OUTPUT_FIELDS = ['hostid', 'dashboardid', 'name', 'display_period', 'auto_start'];
+	public const OUTPUT_FIELDS = ['hostid', 'dashboardid', 'name', 'display_period', 'auto_start', 'templateid'];
 
 	private const SORT_COLUMNS = ['hostid', 'dashboardid', 'name'];
 
@@ -46,7 +46,7 @@ class CHostDashboard extends CApiService {
 			// Filters.
 			'hostids' =>				['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			'dashboardids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['dashboardid', 'name', 'display_period', 'auto_start']],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['dashboardid', 'name', 'display_period', 'auto_start', 'templateid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -118,7 +118,7 @@ class CHostDashboard extends CApiService {
 		$templateids = $templates;
 		$template_parents = [];
 
-		do {
+		while ($templateids) {
 			$options = [
 				'output' => ['templateid', 'hostid'],
 				'filter' => ['hostid' => array_keys($templateids)]
@@ -134,11 +134,11 @@ class CHostDashboard extends CApiService {
 
 				$template_parents[$row['hostid']][] = $row['templateid'];
 			}
-		} while ($templateids);
+		}
 
-		$templateids = $templates;
+		$_templateids = $templates;
 
-		do {
+		while ($templateids = $_templateids) {
 			$_templateids = [];
 
 			foreach ($templateids as $templateid => $foo) {
@@ -167,7 +167,7 @@ class CHostDashboard extends CApiService {
 					$_templateids[$parent_templateid] = true;
 				}
 			}
-		} while ($templateids = $_templateids);
+		}
 
 		return $templates;
 	}
@@ -242,22 +242,16 @@ class CHostDashboard extends CApiService {
 
 			if (array_key_exists('hostids', $templates[$row['templateid']])) {
 				foreach ($templates[$row['templateid']]['hostids'] as $hostid => $foo) {
-					$host_dashboards[] = [
-						'hostid' => (string) $hostid,
-						'dashboardid' => $row['dashboardid'],
-						'name' => $row['name']
-					];
+					$host_dashboards[] =
+						array_combine(self::SORT_COLUMNS, [(string) $hostid, $row['dashboardid'], $row['name']]);
 				}
 			}
 
 			if (array_key_exists('templateids', $templates[$row['templateid']])) {
 				foreach ($templates[$row['templateid']]['templateids'] as $_hostids) {
 					foreach ($_hostids as $hostid => $foo) {
-						$host_dashboards[] = [
-							'hostid' => (string) $hostid,
-							'dashboardid' => $row['dashboardid'],
-							'name' => $row['name']
-						];
+						$host_dashboards[] =
+							array_combine(self::SORT_COLUMNS, [(string) $hostid, $row['dashboardid'], $row['name']]);
 					}
 				}
 			}
@@ -281,7 +275,7 @@ class CHostDashboard extends CApiService {
 			$_host_dashboard = [];
 
 			foreach ($output as $field_name) {
-				$_host_dashboard[$field_name] = in_array($field_name, ['hostid', 'dashboardid', 'name'])
+				$_host_dashboard[$field_name] = in_array($field_name, self::SORT_COLUMNS)
 					? $host_dashboard[$field_name]
 					: $template_dashboards[$host_dashboard['dashboardid']][$field_name];
 			}
@@ -322,7 +316,7 @@ class CHostDashboard extends CApiService {
 			$sql_parts['group']['templateid'] = 'd.templateid';
 		}
 		else {
-			$common_fields = array_flip(['dashboardid', 'name', 'display_period', 'auto_start']);
+			$common_fields = array_flip(['dashboardid', 'name', 'display_period', 'auto_start', 'templateid']);
 
 			$td_output = $options['output'] === API_OUTPUT_EXTEND
 				? $common_fields
