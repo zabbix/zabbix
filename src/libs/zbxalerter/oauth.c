@@ -252,7 +252,8 @@ void	zbx_oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const cha
 		zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_expires_in",
 				data->old_access_expires_in, data->access_expires_in);
 		zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_token_updated",
-				data->old_access_token_updated, data->access_token_updated);
+				(int)data->old_access_token_updated, (int)data->access_token_updated);
+
 		if (NULL != data->old_refresh_token)
 		{
 			zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.refresh_token",
