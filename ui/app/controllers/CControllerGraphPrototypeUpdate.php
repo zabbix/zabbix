@@ -202,7 +202,7 @@ class CControllerGraphPrototypeUpdate extends CController {
 			$fields['yaxismax'] = 'required|string|not_empty';
 		}
 		elseif ($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$fields['ymax_itemid'] = 'required|not_empty|db graphs.ymax_itemid';
+			$fields['ymax_itemid'] = 'required|db graphs.ymax_itemid|not_empty';
 		}
 
 		$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
