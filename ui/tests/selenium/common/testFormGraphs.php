@@ -182,7 +182,7 @@ class testFormGraphs extends CWebTest {
 						'id:yaxismin' => ['exists' => true, 'visible' => false], // Y axis MIN fixed value input.
 						'id:yaxismax' => ['exists' => true, 'visible' => false], // Y axis MAX fixed value input.
 						'id:ymin_itemid' => ['visible' => false], // Y axis MIN item input.
-						'id:ymax_itemid' => ['visible' => false], // Y axis MAX item input.
+						'id:ymax_itemid' => ['visible' => false] // Y axis MAX item input.
 					],
 					'items' => [
 						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', ''],
