@@ -4,6 +4,8 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
+...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
 ..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean and Japanese languages (dfofanovs)
 .......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
@@ -3435,6 +3437,7 @@ Changes for 5.0.47rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
 
 --------------------------------------------------------------------------------
