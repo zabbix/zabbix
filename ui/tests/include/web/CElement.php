@@ -26,6 +26,7 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverKeys;
 use Facebook\WebDriver\Interactions\WebDriverActions;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 /**
  * Generic web page element.
