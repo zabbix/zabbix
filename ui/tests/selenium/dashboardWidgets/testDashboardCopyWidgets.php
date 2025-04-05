@@ -210,11 +210,26 @@ class testDashboardCopyWidgets extends CWebTest {
 			$dashboard->pasteWidget();
 		}
 
-		// Wait until widget is pasted and loading spinner disappeared.
+		/* On the dashboard the widget has a unique name, except when copied/pasted within the same dashboard.
+		 * $new_dashboard contains widget with name 'Test copy Map navigation tree' so name index should be 2 for this case.
+		 */
+		if ($new_page || $new_dashboard) {
+			$name_index = $new_dashboard && ($widget_name === 'Test copy Map navigation tree') ? '[2]' : '';
+		}
+		else {
+			$name_index = '[2]';
+		}
+
+		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
+		 * since the widget header and the conent block without the loading appear first,
+		 * and only after that the loading appears.
+		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
+		 */
+		$copied_widget = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
+				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')->waitUntilPresent()->asWidget()->one();
 		sleep(1);
-		$dashboard->waitUntilReady();
-		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
+		$copied_widget->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
