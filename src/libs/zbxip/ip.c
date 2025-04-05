@@ -17,6 +17,8 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 
+#include <limits.h>
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if string is IPv4 address                                  *
@@ -38,6 +40,10 @@ int	zbx_is_ip4(const char *ip)
 	{
 		if (0 != isdigit(*p))
 		{
+			if ((INT_MAX - (*p - '0')) / 10 < octet) {
+				res = FAIL;
+				break;
+			}
 			octet = octet * 10 + (*p - '0');
 			digits++;
 		}
