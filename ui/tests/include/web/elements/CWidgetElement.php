@@ -85,6 +85,12 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
+		$button = $this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one();
+
+		if ($button->isVisible(false)) {
+			$button->hoverMouse();
+		}
+
 		// Edit can sometimes fail so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
 			$this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one()->click(true);
@@ -109,5 +115,12 @@ class CWidgetElement extends CElement {
 		return function () use ($target) {
 			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function isReady() {
+		return call_user_func([$this, 'getReadyCondition']);
 	}
 }
