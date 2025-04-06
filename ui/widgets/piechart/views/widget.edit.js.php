@@ -73,7 +73,7 @@ window.widget_form = new class extends CWidgetForm {
 			.on('change', 'input, z-select, .multiselect', () => {
 				this.#updateForm();
 
-				this.registerUpdateEvent({immediate: true});
+				this.registerUpdateEvent();
 			});
 
 		this.#dataset_wrapper.addEventListener('input', e => {
@@ -305,7 +305,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#initDataSetSortable();
 		this.#updateForm();
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	#cloneDataset() {
@@ -383,7 +383,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.updateSingleItemsReferences();
 		this.#updateForm();
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	#getOpenedDataset() {
@@ -416,7 +416,7 @@ window.widget_form = new class extends CWidgetForm {
 				this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this.#updateDatasetsLabel();
 
-				this.registerUpdateEvent({immediate: true});
+				this.registerUpdateEvent();
 			});
 		}
 	}
@@ -617,7 +617,7 @@ window.widget_form = new class extends CWidgetForm {
 			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	#removeSingleItem(element) {
@@ -628,7 +628,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#updateSingleItemsOrder(dataset);
 		this.#initSingleItemSortable(dataset);
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	#initSingleItemSortable(dataset) {
@@ -649,7 +649,7 @@ window.widget_form = new class extends CWidgetForm {
 		sortable.on(CSortable.EVENT_SORT, () => {
 			this.#updateSingleItemsOrder(dataset);
 
-			this.registerUpdateEvent({immediate: true});
+			this.registerUpdateEvent();
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);

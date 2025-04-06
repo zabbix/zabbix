@@ -27,8 +27,6 @@ class CWidgetForm {
 	static EVENT_RELOAD_REQUEST = 'dialogue.reload-request';
 	static EVENT_SUBMIT_REQUEST = 'dialogue.submit-request';
 
-	static UPDATE_THROTTLE_TIMEOUT_MS = 1000;
-
 	/**
 	 * Add widget form field to the respective widget form.
 	 *
@@ -48,11 +46,6 @@ class CWidgetForm {
 	 * @type {Overlay}
 	 */
 	overlay;
-
-	/**
-	 * @type {number|null}
-	 */
-	#fields_update_throttle_timeout = null;
 
 	/**
 	 * @type {AbortController}
@@ -82,7 +75,7 @@ class CWidgetForm {
 				event: CWidgetFieldEvent.EVENT_UPDATE,
 				form_name
 			},
-			callback: ({data}) => this.registerUpdateEvent({immediate: data.immediate}),
+			callback: () => this.registerUpdateEvent(),
 			signal
 		});
 
@@ -152,27 +145,15 @@ class CWidgetForm {
 	 * Inform the framework about the update event on the form level.
 	 *
 	 * The framework will validate the configuration and update the widget on the fly.
-	 *
-	 * @param {boolean} immediate  Whether the update event is final (will cause immediate update) or throttled.
 	 */
-	registerUpdateEvent({immediate = false} = {}) {
-		if (this.#fields_update_throttle_timeout !== null) {
-			clearTimeout(this.#fields_update_throttle_timeout);
-		}
-
-		this.#fields_update_throttle_timeout = setTimeout(() => {
-			this.#fields_update_throttle_timeout = null;
-
-			ZABBIX.EventHub.publish(new CWidgetFormEvent({
-				descriptor: {
-					context: CWidgetForm.EVENT_CONTEXT,
-					event: CWidgetFormEvent.EVENT_UPDATE,
-					form_name: this.getForm().getAttribute('name')
-				}
-			}));
-
-			// Zero time-out is by design for grouping multiple events within the same micro-task.
-		}, immediate ? 0 : CWidgetForm.UPDATE_THROTTLE_TIMEOUT_MS);
+	registerUpdateEvent() {
+		ZABBIX.EventHub.publish(new CWidgetFormEvent({
+			descriptor: {
+				context: CWidgetForm.EVENT_CONTEXT,
+				event: CWidgetFormEvent.EVENT_UPDATE,
+				form_name: this.getForm().getAttribute('name')
+			}
+		}));
 	}
 
 	#initialize({tab_indicators_tabs_id}) {
@@ -211,10 +192,11 @@ class CWidgetForm {
 	}
 
 	#endScripting() {
-		if (this.#fields_update_throttle_timeout !== null) {
-			clearTimeout(this.#fields_update_throttle_timeout);
-		}
-
 		this.#events_abort_controller.abort();
+
+		ZABBIX.EventHub.invalidateData({
+			context: CWidgetForm.EVENT_CONTEXT,
+			form_name: this.getForm().getAttribute('name')
+		});
 	}
 }

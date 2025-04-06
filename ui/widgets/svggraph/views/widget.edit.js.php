@@ -80,7 +80,7 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	onGraphConfigChange() {
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 
 		this._updateForm();
 		this._updatePreview();
@@ -368,7 +368,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._initDataSetSortable();
 		this._updateForm();
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	_cloneDataset() {
@@ -466,7 +466,7 @@ window.widget_form = new class extends CWidgetForm {
 				this._updateDatasetsLabel();
 				this._updatePreview();
 
-				this.registerUpdateEvent({immediate: true});
+				this.registerUpdateEvent();
 			});
 		}
 	}
@@ -664,7 +664,7 @@ window.widget_form = new class extends CWidgetForm {
 			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	_removeSingleItem(element) {
@@ -676,7 +676,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._initSingleItemSortable(dataset);
 		this._updatePreview();
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	_initSingleItemSortable(dataset) {
@@ -698,7 +698,7 @@ window.widget_form = new class extends CWidgetForm {
 			this._updateSingleItemsOrder(dataset);
 			this._updatePreview();
 
-			this.registerUpdateEvent({immediate: true});
+			this.registerUpdateEvent();
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);

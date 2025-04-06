@@ -41,7 +41,7 @@ class CWidgetFieldCheckboxList extends CWidgetField {
 		for (const checkbox of this.#checkboxes) {
 			checkbox.addEventListener('change', () => {
 				this.#update();
-				this.dispatchUpdateEvent({immediate: true});
+				this.dispatchUpdateEvent();
 			});
 			observer.observe(checkbox, {attributeFilter: ['disabled']});
 		}

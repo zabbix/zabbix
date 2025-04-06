@@ -37,13 +37,12 @@ class CWidgetFieldTags extends CWidgetField {
 				new CTagFilterItem(rows[rows.length - 1]);
 			})
 			.on('afterremove.dynamicRows', () => {
-				this.dispatchUpdateEvent({immediate: true});
+				this.dispatchUpdateEvent();
 			});
 
 		// Init existing fields once loaded.
 		this.#tags_table.querySelectorAll('.form_row').forEach(row => new CTagFilterItem(row));
 
 		this.#tags_table.addEventListener('input', () => this.dispatchUpdateEvent());
-		this.#tags_table.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }

@@ -30,7 +30,7 @@ class CWidgetFieldSeverities extends CWidgetField {
 
 	#initField() {
 		for (const checkbox of this.#checkboxes) {
-			checkbox.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
+			checkbox.addEventListener('change', () => this.dispatchUpdateEvent());
 		}
 	}
 }
