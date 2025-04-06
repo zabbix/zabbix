@@ -30,6 +30,5 @@ class CWidgetFieldTextBox extends CWidgetField {
 
 	#initField() {
 		this.#input.addEventListener('input', () => this.dispatchUpdateEvent());
-		this.#input.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
 	}
 }

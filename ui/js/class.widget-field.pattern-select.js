@@ -26,6 +26,6 @@ class CWidgetFieldPatternSelect extends CWidgetField {
 	}
 
 	#initField() {
-		this.#pattern_select.on('change', () => this.dispatchUpdateEvent({immediate: true}));
+		this.#pattern_select.on('change', () => this.dispatchUpdateEvent());
 	}
 }

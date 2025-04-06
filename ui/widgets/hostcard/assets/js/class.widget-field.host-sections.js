@@ -50,13 +50,13 @@ class HostCard_CWidgetFieldHostSections extends CWidgetField {
 			})
 			.on('tableupdate.dynamicRows', () => {
 				this.#update();
-				this.dispatchUpdateEvent({immediate: true});
+				this.dispatchUpdateEvent();
 			})
 			.on('afteradd.dynamicRows', () => this.#selectNextSection());
 
 		jQuery(this.#table).on('change', () => {
 			this.#toggleSelectedSections();
-			this.dispatchUpdateEvent({immediate: true});
+			this.dispatchUpdateEvent();
 		});
 
 		this.#toggleSelectedSections();

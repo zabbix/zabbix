@@ -35,6 +35,6 @@ class CWidgetFieldRangeControl extends CWidgetField {
 
 		const range_control = this.#input.closest('div.range-control');
 
-		range_control.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
+		range_control.addEventListener('change', () => this.dispatchUpdateEvent());
 	}
 }

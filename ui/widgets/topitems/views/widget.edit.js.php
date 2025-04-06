@@ -136,7 +136,7 @@ window.widget_form = new class extends CWidgetForm {
 	#triggerUpdate() {
 		this.#form.dispatchEvent(new CustomEvent('form_fields.changed', {detail: {}}));
 
-		this.registerUpdateEvent({immediate: true});
+		this.registerUpdateEvent();
 	}
 
 	#processColumnsAction(e) {

@@ -29,6 +29,6 @@ class CWidgetFieldCheckbox extends CWidgetField {
 	}
 
 	#initField() {
-		this.#checkbox.addEventListener('change', () => this.dispatchUpdateEvent({immediate: true}));
+		this.#checkbox.addEventListener('change', () => this.dispatchUpdateEvent());
 	}
 }

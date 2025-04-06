@@ -66,14 +66,11 @@ class CWidgetField {
 	 * Inform the framework about the update event on the field level.
 	 *
 	 * The framework will validate the configuration and update the widget on the fly.
-	 *
-	 * @param {boolean} immediate  Whether the update event is final (will cause immediate update) or throttled.
 	 */
-	dispatchUpdateEvent({immediate = false} = {}) {
+	dispatchUpdateEvent() {
 		ZABBIX.EventHub.publish(new CWidgetFieldEvent({
 			data: {
 				name: this.getName(),
-				immediate
 			},
 			descriptor: {
 				context: CWidgetField.EVENT_CONTEXT,

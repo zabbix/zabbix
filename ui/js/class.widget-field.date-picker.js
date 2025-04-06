@@ -32,6 +32,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		this.#input.addEventListener('input', () => this.dispatchUpdateEvent());
 
 		// jQuery events can only be caught by jQuery.
-		jQuery(this.#input).on('change', () => this.dispatchUpdateEvent({immediate: true}));
+		jQuery(this.#input).on('change', () => this.dispatchUpdateEvent());
 	}
 }
