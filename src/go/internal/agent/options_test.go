@@ -513,13 +513,10 @@ func Test_removeSystem(t *testing.T) {
 	}
 }
 
-/*
-* Only for the 'Server' parameter (for now).
- */
 func Test_ValidateOptions(t *testing.T) {
 	t.Parallel()
 
-	invalidServerConfigurationError := `Failed to validate "ServerActive" configuration parameter: invalid "Server" ` +
+	invalidServerConfigurationError := `Failed to validate "Server" configuration parameter: invalid "Server" ` +
 		`configuration: incorrect address parameter: `
 
 	type args struct {
@@ -975,7 +972,7 @@ func TestParseServerActive(t *testing.T) {
 		},
 		{
 			"-IPv6WithEmptySpaceInside",
-			" fe80::72d5:8d8b: b2ca:206  ",
+			" fe80::72d5:8d8b: b2ca:206 ",
 			fmt.Errorf("%w %s", errServerActive,
 				`address "fe80::72d5:8d8b: b2ca:206": address fe80::72d5:8d8b: b2ca:206: too many colons in address.`),
 			true,
@@ -1000,8 +997,7 @@ func TestParseServerActive(t *testing.T) {
 
 			diff := cmp.Diff(al, tt.result)
 			if diff != "" {
-				t.Errorf("ParseServerActive failed for ServerActive input: %s, received value: %s "+
-					"does not match expected value: %s\n", tt.serverActive, al, tt.result)
+				t.Errorf("ParseServerActive failed for ServerActive input: %s\n %s\n", tt.serverActive, diff)
 			}
 		})
 	}

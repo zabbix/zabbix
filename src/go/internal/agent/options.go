@@ -373,9 +373,7 @@ func isValidHostname(hostname string) bool {
 func validateHost(host string) error {
 	host = strings.TrimSpace(host)
 
-	if net.ParseIP(host) != nil {
-		return nil
-	} else if isValidHostname(host) {
+	if net.ParseIP(host) != nil || isValidHostname(host) {
 		return nil
 	}
 
@@ -504,13 +502,11 @@ func ValidateOptions(options *AgentOptions) error {
 	}
 
 	_, err = zbxnet.GetAllowedPeers(options.Server)
-
 	if err != nil {
-		return errs.Wrap(err, `failed to validate "ServerActive" configuration parameter`)
+		return errs.Wrap(err, `failed to validate "Server" configuration parameter`)
 	}
 
 	_, err = ParseServerActive(options.ServerActive)
-
 	if err != nil {
 		return errs.Wrap(err, `failed to validate "ServerActive" configuration parameter`)
 	}
