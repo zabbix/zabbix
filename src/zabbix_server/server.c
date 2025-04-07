@@ -1437,7 +1437,7 @@ static int	zbx_check_db(void)
 
 	int k = 0x7fffffff;
 	k += 9;
-	zabbix_log(LOG_LEVEL_INFORMATINON, "BADER: %d", k);
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	ret = zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type);
