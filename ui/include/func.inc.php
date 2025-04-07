@@ -305,12 +305,24 @@ function hex2rgb($color) {
 	return [hexdec($r), hexdec($g), hexdec($b)];
 }
 
-function getColorVariations($color, $variations_requested = 1) {
+/**
+ * Get array of color variations.
+ *
+ * @param string $color  Color hex code or color palette code.
+ * @param int    $count  How many variations are requested.
+ *
+ * @return array  Color hex codes in format ['#FF0000', '#FF7F7F'].
+ */
+function getColorVariations(string $color, int $count = 1): array {
 	if ($color === '') {
 		return [];
 	}
 
-	if ($variations_requested <= 1) {
+	if (isValidPalette($color)) {
+		return getPaletteColors($color, $count);
+	}
+
+	if ($count <= 1) {
 		return ['#'.$color];
 	}
 
@@ -320,10 +332,10 @@ function getColorVariations($color, $variations_requested = 1) {
 	$color = hex2rgb('#'.$color);
 	$variations = [];
 
-	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
+	$range = range(-1 * $max, $max, $max * 2 / $count);
 
 	// Remove redundant values.
-	while (count($range) > $variations_requested) {
+	while (count($range) > $count) {
 		(count($range) % 2) ? array_shift($range) : array_pop($range);
 	}
 
@@ -361,14 +373,14 @@ const PALETTE_COLORS = [
 const PALETTE_PREFIX = 'PALETTE_';
 
 /**
- * Get array of palette color hex codes.
+ * Get array of palette colors.
  *
- * @param string $palette_code
- * @param int    $item_count
+ * @param string $palette_code  Valid palette code.
+ * @param int    $count         How many colors from palette are requested.
  *
- * @return array
+ * @return array  Color hex codes in format ['#FF0000', '#FF7F7F'].
  */
-function getPaletteColors($palette_code, $item_count) {
+function getPaletteColors(string $palette_code, int $count): array {
 	$row_number = getPaletteRowNumber($palette_code);
 
 	$result = [];
@@ -381,7 +393,7 @@ function getPaletteColors($palette_code, $item_count) {
 
 	$total_elements = $row_count * $col_count;
 
-	while (count($result) < $item_count) {
+	while (count($result) < $count) {
 		// If color is not used, take it.
 		if (!$used[$row][$col]) {
 			$result[] = '#'.PALETTE_COLORS[$row][$col];
@@ -389,7 +401,7 @@ function getPaletteColors($palette_code, $item_count) {
 		}
 
 		// If all colors gathered, stop.
-		if (count($result) === $item_count) {
+		if (count($result) === $count) {
 			break;
 		}
 
