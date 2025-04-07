@@ -428,14 +428,10 @@ class ZColorPicker extends HTMLElement {
 		};
 
 		document.addEventListener('click', this.#events.documentClick);
-
-		addEventListener('resize', this.#events.windowResize);
 	}
 
 	#unregisterEvents() {
 		document.removeEventListener('click', this.#events.documentClick);
-
-		removeEventListener('resize', this.#events.windowResize);
 	}
 
 	#createDialog() {
@@ -540,6 +536,8 @@ class ZColorPicker extends HTMLElement {
 		document.addEventListener('keydown', this.#events.documentKeydown);
 		document.addEventListener('wheel', this.#events.documentWheel);
 
+		addEventListener('resize', this.#events.windowResize);
+
 		this.#mutation_observer.observe(document.body, {
 			attributes: true,
 			attributeFilter: ['style', 'class'],
@@ -558,6 +556,8 @@ class ZColorPicker extends HTMLElement {
 
 		document.removeEventListener('keydown', this.#events.documentKeydown);
 		document.removeEventListener('wheel', this.#events.documentWheel);
+
+		removeEventListener('resize', this.#events.windowResize);
 
 		this.#dialog.remove();
 
