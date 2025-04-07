@@ -416,24 +416,26 @@ class ZColorPicker extends HTMLElement {
 				}
 			},
 
-			documentResize: () => {
-				this.#closeDialog();
-			},
-
 			documentWheel: () => {
 				if (!this.#is_dialog_hovered) {
 					this.#closeDialog();
 				}
+			},
+
+			windowResize: () => {
+				this.#closeDialog();
 			}
 		};
 
 		document.addEventListener('click', this.#events.documentClick);
-		document.addEventListener('resize', this.#events.documentResize);
+
+		addEventListener('resize', this.#events.windowResize);
 	}
 
 	#unregisterEvents() {
 		document.removeEventListener('click', this.#events.documentClick);
-		document.removeEventListener('resize', this.#events.documentResize);
+
+		removeEventListener('resize', this.#events.windowResize);
 	}
 
 	#createDialog() {
