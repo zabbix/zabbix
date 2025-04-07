@@ -921,7 +921,8 @@ out:
 	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(config_ssl_ca_location);
 
-	*error = zbx_strdup(*error, "Zabbix server was compiled without cURL library required for SMTP authentication");
+	*error = zbx_strdup(*error, "Zabbix server was compiled without cURL library required for OAuth, SMTP"
+			" authentication");
 
 	return FAIL;
 #endif
