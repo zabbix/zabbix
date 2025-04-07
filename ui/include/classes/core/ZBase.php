@@ -474,10 +474,8 @@ class ZBase {
 		$session = new CEncryptedCookieSession();
 		$sessionid = $session->extractSessionId();
 
-		if ($sessionid === null) {
-			CWebUser::setDefault();
-		}
-		elseif (!CWebUser::checkAuthentication($sessionid)) {
+		if ($sessionid === null || !CWebUser::checkAuthentication($sessionid)) {
+			// Clean all session data when session id is invalid or session itself is outdated.
 			$session->destroy($sessionid);
 			CWebUser::setDefault();
 		}
