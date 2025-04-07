@@ -323,13 +323,13 @@ int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error)
 
 int	zbx_curl_has_bearer(char **error)
 {
-	/* added in 7.61.0 (0x073d00) */
-	if (libcurl_version_num() < 0x073d00)
+	/* added in 7.33.0 (0x072100) */
+	if (libcurl_version_num() < 0x072100)
 	{
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "cURL library version %s does not support HTTP Bearer token"
-					" authentication, 7.61.0 or newer is required", libcurl_version_str());
+					" authentication, 7.33.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
