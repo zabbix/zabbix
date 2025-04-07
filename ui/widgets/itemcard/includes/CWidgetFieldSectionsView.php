@@ -1,0 +1,95 @@
+<?php declare(strict_types = 0);
+/*
+** Copyright (C) 2001-2025 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+namespace Widgets\ItemCard\Includes;
+
+use CButton,
+	CButtonLink,
+	CCol,
+	CDiv,
+	CRow,
+	CSelect,
+	CSpan,
+	CTable,
+	CTemplateTag,
+	CWidgetFieldView;
+
+class CWidgetFieldSectionsView extends CWidgetFieldView {
+
+	public function __construct(CWidgetFieldSections $field) {
+		$this->field = $field;
+	}
+
+	public function getView(): CDiv {
+		return (new CDiv(
+			(new CTable())
+				->setId($this->field->getName().'-table')
+				->setHeader(['', '', (new CCol(_('Name')))->addStyle('width: 100%;'), ''])
+				->addClass(ZBX_STYLE_LIST_NUMBERED)
+				->setFooter(new CRow(
+					(new CCol(
+						(new CButtonLink(_('Add')))
+							->setId('add-row')
+							->addClass('element-table-add')
+					))->setColSpan(4)
+				))
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+	}
+
+	public function getJavaScript(): string {
+		return '
+			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
+				new CWidgetFieldSections('.json_encode([
+					'field_name' => $this->field->getName(),
+					'field_value' => $this->field->getValue()
+				]).');
+		';
+	}
+
+	public function getTemplates(): array {
+		return [
+			new CTemplateTag($this->field->getName().'-row-tmpl',
+				(new CRow([
+					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
+					(new CSelect($this->field->getName().'[#{rowNum}]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							CWidgetFieldSections::SECTION_DESCRIPTION => _('Description'),
+							CWidgetFieldSections::SECTION_ERROR_TEXT => _('Error text'),
+							CWidgetFieldSections::SECTION_METRICS => _('Metrics'),
+							CWidgetFieldSections::SECTION_LATEST_DATA => _('Latest data'),
+							CWidgetFieldSections::SECTION_TYPE_OF_INFORMATION => _('Type of information'),
+							CWidgetFieldSections::SECTION_TRIGGERS => _('Triggers'),
+							CWidgetFieldSections::SECTION_HOST_INTERFACE => _('Host interface'),
+							CWidgetFieldSections::SECTION_TYPE => _('Type'),
+							CWidgetFieldSections::SECTION_HOST_INVENTORY => _('Host inventory'),
+							CWidgetFieldSections::SECTION_TAGS => _('Tags')
+						]))
+						->setValue('#{section}')
+						->setId($this->field->getName().'_#{rowNum}')
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+					(new CDiv(
+						(new CButton($this->field->getName().'[#{rowNum}][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+					))
+				]))->addClass('form_row')
+			)
+		];
+	}
+}
