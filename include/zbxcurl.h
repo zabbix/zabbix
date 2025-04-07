@@ -71,7 +71,8 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error);
 int	zbx_curl_has_ssl(char **error);
-int	zbx_curl_has_bearer(char **error);
+int	zbx_curl_has_http_bearer(char **error);
+int	zbx_curl_has_oauth2_bearer(char **error);
 int	zbx_curl_has_smtp_auth(char **error);
 int	zbx_curl_good_for_elasticsearch(char **error);
 

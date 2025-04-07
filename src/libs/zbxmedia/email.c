@@ -826,7 +826,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	else if (SMTP_AUTHENTICATION_OAUTH == auth->type)
 	{
 		/* OAuth 2.0 Bearer added in curl 7.33.0 */
-		if (SUCCEED != zbx_curl_has_bearer(error))
+		if (SUCCEED != zbx_curl_has_oauth2_bearer(error))
 			goto clean;
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_XOAUTH2_BEARER, auth->oauthbearer)))
