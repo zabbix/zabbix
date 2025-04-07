@@ -472,8 +472,13 @@ class ZBase {
 	 */
 	protected function authenticateUser(): void {
 		$session = new CEncryptedCookieSession();
+		$sessionid = $session->extractSessionId();
 
-		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
+		if ($sessionid === null) {
+			CWebUser::setDefault();
+		}
+		elseif (!CWebUser::checkAuthentication($sessionid)) {
+			$session->destroy($sessionid);
 			CWebUser::setDefault();
 		}
 
