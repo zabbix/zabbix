@@ -34,7 +34,7 @@ abstract class CDashboardGeneral extends CApiService {
 		ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => 'value_mediatypeid'
 	];
 
-	protected const WIDGET_FIELD_TYPE_COLUMNS = [
+	public const WIDGET_FIELD_TYPE_COLUMNS = [
 		ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
 		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str'
 	] + self::WIDGET_FIELD_TYPE_COLUMNS_FK;
