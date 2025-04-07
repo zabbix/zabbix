@@ -31,7 +31,22 @@ class testLldLinking extends CIntegrationTest {
 	private static $actionId;
 	private static $actionLinkTemplateId;
 	private static $templateids = array();
-
+	const DISCOVERY_RULE_TEMPLATE = [
+		'name' => 'LLD rule with LLD macro paths',
+		'key_' => 'lld',
+		'type' => ITEM_TYPE_ZABBIX,
+		'delay' => '30s',
+		'lld_macro_paths' => [
+			[
+				'lld_macro' => '{#FSNAME}',
+				'path' => '$.fsname'
+			],
+			[
+				'lld_macro' => '{#FSTYPE}',
+				'path' => '$.fstype'
+			]
+		]
+	];
 	/**
 	* Component configuration provider for server related tests.
 	*
@@ -82,7 +97,7 @@ class testLldLinking extends CIntegrationTest {
 		}
 	}
 
-	private function setupAutoregToLinkTemplates($templateNumber) {
+	private function setupAutoregToLinkTemplates($templateNumber, $LLDParametrs) {
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -118,23 +133,11 @@ class testLldLinking extends CIntegrationTest {
 		}
 
 		for ($i = 0; $i < $templateNumber; $i++) {
-			$response = $this->call('discoveryrule.create', [
-				'name' => 'LLD rule with LLD macro paths',
-				'key_' => 'lld',
-				'hostid' => self::$templateids[$i],
-				'type' => ITEM_TYPE_ZABBIX,
-				'delay' => '30s',
-				'lld_macro_paths' => [
-					[
-						'lld_macro' => '{#FSNAME}',
-						'path' => '$.fsname'
-					],
-					[
-						'lld_macro' => '{#FSTYPE}',
-						'path' => '$.fstype'
-					]
-				]
-			]);
+			$params = array_merge(
+				$LLDParametrs,
+				['hostid' => self::$templateids[$i]]
+			);
+			$response = $this->call('discoveryrule.create', $params);
 
 			$ep = json_encode($response, JSON_PRETTY_PRINT);
 
@@ -204,6 +207,27 @@ class testLldLinking extends CIntegrationTest {
 		self::$templateids = [];
 	}
 
+	private function linkLLD (){
+
+		$response = $this->call('discoveryrule.create', [
+			'name' => 'LLD rule with LLD macro paths',
+			'key_' => 'lld',
+			'hostid' => self::$templateids[0],
+			'type' => ITEM_TYPE_ZABBIX,
+			'delay' => '30s',
+			'lld_macro_paths' => [
+				[
+					'lld_macro' => '{#FSNAME}',
+					'path' => '$.fsname'
+				],
+				[
+					'lld_macro' => '{#FSTYPE}',
+					'path' => '$.fstype'
+				]
+			]
+		]);
+	}
+
 	/*
 	Test ensures that the Zabbix auto-registration process correctly handles template with LLD rule linking
 	conflicts and re-registration behavior.
@@ -216,7 +240,7 @@ class testLldLinking extends CIntegrationTest {
 	*/
 
 	/**
-	 * Test LLD linking cases.
+	 * Test LLD linking cases with conflicts.
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent
@@ -225,7 +249,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::DISCOVERY_RULE_TEMPLATE);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -238,7 +262,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->deleteActionsAndTemplates();
 
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::DISCOVERY_RULE_TEMPLATE);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -251,4 +275,12 @@ class testLldLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 	}
+
+/*
+	public function testLinkingLLD_manyItems() {
+
+		$this->killComponent(self::COMPONENT_AGENT);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2);
+	}
+*/
 }
