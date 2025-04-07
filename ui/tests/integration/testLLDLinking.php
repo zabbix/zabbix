@@ -31,7 +31,7 @@ class testLldLinking extends CIntegrationTest {
 	private static $actionId;
 	private static $actionLinkTemplateId;
 	private static $templateids = array();
-	const DISCOVERY_RULE_TEMPLATE = [
+	const DISCOVERY_RULE_MACRO_PATH = [
 		'name' => 'LLD rule with LLD macro paths',
 		'key_' => 'lld',
 		'type' => ITEM_TYPE_ZABBIX,
@@ -44,6 +44,37 @@ class testLldLinking extends CIntegrationTest {
 			[
 				'lld_macro' => '{#FSTYPE}',
 				'path' => '$.fstype'
+			]
+		]
+	];
+
+	const DISCOVERY_RULE_FILTER = [
+		'name' => 'LLD rule with filter',
+		'key_' => 'lld',
+		'type' => ITEM_TYPE_ZABBIX,
+		'delay' => '30s',
+		'filter' => [
+			'evaltype' => 1,
+			'conditions' => [
+				[
+					'macro' => '{#MACRO}',
+					'value' => '@regex1'
+				],
+				[
+					'lld_macro' => '{#MACRO2}',
+					'value' => '@regex2',
+					'operator' => 9
+				],
+				[
+					'macro' => '{#MACRO3}',
+					'value'=> '',
+					'operator' => 12
+				],
+				[
+					'macro' => '{#MACRO4}',
+					'value' => '',
+					'operator' => 13
+				]
 			]
 		]
 	];
@@ -207,26 +238,6 @@ class testLldLinking extends CIntegrationTest {
 		self::$templateids = [];
 	}
 
-	private function linkLLD (){
-
-		$response = $this->call('discoveryrule.create', [
-			'name' => 'LLD rule with LLD macro paths',
-			'key_' => 'lld',
-			'hostid' => self::$templateids[0],
-			'type' => ITEM_TYPE_ZABBIX,
-			'delay' => '30s',
-			'lld_macro_paths' => [
-				[
-					'lld_macro' => '{#FSNAME}',
-					'path' => '$.fsname'
-				],
-				[
-					'lld_macro' => '{#FSTYPE}',
-					'path' => '$.fstype'
-				]
-			]
-		]);
-	}
 
 	/*
 	Test ensures that the Zabbix auto-registration process correctly handles template with LLD rule linking
@@ -249,7 +260,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::DISCOVERY_RULE_TEMPLATE);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::DISCOVERY_RULE_MACRO_PATH);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -262,7 +273,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->deleteActionsAndTemplates();
 
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::DISCOVERY_RULE_TEMPLATE);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::DISCOVERY_RULE_MACRO_PATH);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -276,11 +287,15 @@ class testLldLinking extends CIntegrationTest {
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 	}
 
-/*
+
 	public function testLinkingLLD_manyItems() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: DISCOVERY_RULE_FILTER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->metaDataItemUpdate();
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 	}
-*/
 }
