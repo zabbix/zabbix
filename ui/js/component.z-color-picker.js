@@ -169,6 +169,8 @@ class ZColorPicker extends HTMLElement {
 	#is_dialog_open = false;
 	#is_dialog_hovered = false;
 
+	#mutation_observer;
+
 	constructor() {
 		super();
 	}
@@ -195,6 +197,12 @@ class ZColorPicker extends HTMLElement {
 			this.#dialog = this.#createDialog();
 			this.#input = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_INPUT}`);
 			this.#preview = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_PREVIEW}`);
+
+			this.#mutation_observer = new MutationObserver(() => {
+				if (!isVisible(this.#box)) {
+					this.#closeDialog();
+				}
+			});
 		}
 
 		this.#refresh();
@@ -529,6 +537,13 @@ class ZColorPicker extends HTMLElement {
 
 		document.addEventListener('keydown', this.#events.documentKeydown);
 		document.addEventListener('wheel', this.#events.documentWheel);
+
+		this.#mutation_observer.observe(document.body, {
+			attributes: true,
+			attributeFilter: ['style', 'class'],
+			subtree: true,
+			childList: true
+		});
 	}
 
 	#closeDialog() {
@@ -545,6 +560,8 @@ class ZColorPicker extends HTMLElement {
 		this.#dialog.remove();
 
 		this.#is_dialog_open = false;
+
+		this.#mutation_observer.disconnect();
 	}
 
 	#positionDialog() {
