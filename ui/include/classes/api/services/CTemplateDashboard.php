@@ -169,7 +169,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 		}
 
 		// Template IDs for super admins or if editable template dashboards is requested.
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || $options['editable']) {
+		if ($options['templateids'] !== null
+				&& (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || $options['editable'])) {
 			$sql_parts['where']['templateids'] = dbConditionId('d.templateid', $options['templateids']);
 		}
 
