@@ -105,7 +105,7 @@ class CCookieSession implements SessionHandlerInterface {
 	public function read($id) {
 		$session_data = json_decode($this->parseData(), true);
 
-		if (!is_array($session_data)) {
+		if (!is_array($session_data) || $this->extractSessionId() !== $id) {
 			return '';
 		}
 
