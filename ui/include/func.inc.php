@@ -306,14 +306,18 @@ function hex2rgb($color) {
 }
 
 function getColorVariations($color, $variations_requested = 1) {
+	if ($color === '') {
+		return [];
+	}
+
 	if ($variations_requested <= 1) {
-		return [$color];
+		return ['#'.$color];
 	}
 
 	$change = hex2rgb('#ffffff'); // Color which is increased/decreased in variations.
 	$max = 50;
 
-	$color = hex2rgb($color);
+	$color = hex2rgb('#'.$color);
 	$variations = [];
 
 	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
@@ -329,7 +333,7 @@ function getColorVariations($color, $variations_requested = 1) {
 		$g = $color[1] + ($change[1] / 100 * $var);
 		$b = $color[2] + ($change[2] / 100 * $var);
 
-		$variations[] = '#' . rgb2hex([
+		$variations[] = '#'.rgb2hex([
 			$r < 0 ? 0 : ($r > 255 ? 255 : (int) $r),
 			$g < 0 ? 0 : ($g > 255 ? 255 : (int) $g),
 			$b < 0 ? 0 : ($b > 255 ? 255 : (int) $b)

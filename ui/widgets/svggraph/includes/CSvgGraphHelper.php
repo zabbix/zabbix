@@ -227,7 +227,7 @@ class CSvgGraphHelper {
 
 			$colors = isValidPalette($data_set['color'])
 				? getPaletteColors($data_set['color'], count($items))
-				: getColorVariations('#'.$data_set['color'], count($items));
+				: getColorVariations($data_set['color'], count($items));
 
 			foreach ($items as $item) {
 				$data_set['color'] = array_shift($colors);
@@ -446,7 +446,7 @@ class CSvgGraphHelper {
 				$colors = (array_key_exists('color', $override) && $override['color'] !== '')
 					? (isValidPalette($override['color'])
 						? getPaletteColors($override['color'], count($metrics_matched))
-						: getColorVariations('#'.$override['color'], count($metrics_matched)))
+						: getColorVariations($override['color'], count($metrics_matched)))
 					: null;
 
 				if (array_key_exists('transparency', $override)) {
