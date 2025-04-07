@@ -167,7 +167,6 @@ class ZColorPicker extends HTMLElement {
 
 	#is_connected = false;
 	#is_dialog_open = false;
-	#is_dialog_hovered = false;
 
 	#mutation_observer;
 
@@ -303,14 +302,6 @@ class ZColorPicker extends HTMLElement {
 
 	#registerEvents() {
 		this.#events = {
-			dialogMouseenter: () => {
-				this.#is_dialog_hovered = true;
-			},
-
-			dialogMouseleave: () => {
-				this.#is_dialog_hovered = false;
-			},
-
 			dialogClick: e => {
 				const tab = e.target.closest(`.${ZColorPicker.ZBX_STYLE_TAB}`);
 
@@ -416,13 +407,11 @@ class ZColorPicker extends HTMLElement {
 				}
 			},
 
-			documentWheel: () => {
-				if (!this.#is_dialog_hovered) {
-					this.#closeDialog();
-				}
+			windowResize: () => {
+				this.#closeDialog();
 			},
 
-			windowResize: () => {
+			windowScroll: () => {
 				this.#closeDialog();
 			}
 		};
@@ -526,17 +515,15 @@ class ZColorPicker extends HTMLElement {
 
 		this.#positionDialog();
 
-		this.#dialog.addEventListener('mouseenter', this.#events.dialogMouseenter);
-		this.#dialog.addEventListener('mouseleave', this.#events.dialogMouseleave);
 		this.#dialog.addEventListener('keydown', this.#events.dialogKeydown);
 		this.#dialog.addEventListener('click', this.#events.dialogClick);
 
 		this.#input.addEventListener('input', this.#events.inputChange);
 
 		document.addEventListener('keydown', this.#events.documentKeydown);
-		document.addEventListener('wheel', this.#events.documentWheel);
 
 		addEventListener('resize', this.#events.windowResize);
+		addEventListener('scroll', this.#events.windowScroll, {capture: true});
 
 		this.#mutation_observer.observe(document.body, {
 			attributes: true,
@@ -547,17 +534,15 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	#closeDialog() {
-		this.#dialog.removeEventListener('mouseenter', this.#events.dialogMouseenter);
-		this.#dialog.removeEventListener('mouseleave', this.#events.dialogMouseleave);
 		this.#dialog.removeEventListener('keydown', this.#events.dialogKeydown);
 		this.#dialog.removeEventListener('click', this.#events.dialogClick);
 
 		this.#input.removeEventListener('input', this.#events.inputChange);
 
 		document.removeEventListener('keydown', this.#events.documentKeydown);
-		document.removeEventListener('wheel', this.#events.documentWheel);
 
 		removeEventListener('resize', this.#events.windowResize);
+		removeEventListener('scroll', this.#events.windowScroll, {capture: true});
 
 		this.#dialog.remove();
 
