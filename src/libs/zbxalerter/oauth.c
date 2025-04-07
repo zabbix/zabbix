@@ -24,14 +24,20 @@
 int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name, zbx_oauth_data_t *data,
 		char **error)
 {
+#define SET_ERROR(message) 										\
+	do 												\
+	{												\
+		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype \"%s\": "		\
+			message, mediatype_name);							\
+	}												\
+	while(0)
 #define CHECK_FOR_NULL(index, message)									\
 	do												\
 	{												\
 		if (SUCCEED == zbx_db_is_null(row[index]) || 0 == strlen(row[index]))			\
 		{											\
-			*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype \"%s\": "	\
-					message, mediatype_name);					\
-			goto out; 									\
+			SET_ERROR(message);								\
+			goto out;									\
 		}											\
 	}												\
 	while(0)
@@ -60,6 +66,18 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 	CHECK_FOR_NULL(3, "refresh token is missing");
 	CHECK_FOR_NULL(4, "access token is missing");
 
+	if (0 == atoi(row[5]))
+	{
+		SET_ERROR("access token update time is zero");
+		goto out;
+	}
+
+	if (0 == atoi(row[6]))
+	{
+		SET_ERROR("access token expire time is zero");
+		goto out;
+	}
+
 	data->token_url = zbx_strdup(NULL, row[0]);
 	data->client_id = zbx_strdup(NULL, row[1]);
 	data->client_secret = zbx_strdup(NULL, row[2]);
@@ -77,6 +95,7 @@ out:
 
 	return ret;
 #undef CHECK_FOR_NULL
+#undef SET_ERROR
 }
 
 int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name, long timeout,
