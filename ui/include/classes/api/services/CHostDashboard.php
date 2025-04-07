@@ -27,20 +27,6 @@ class CHostDashboard extends CApiService {
 
 	private const SORT_COLUMNS = ['hostid', 'dashboardid', 'name'];
 
-	private const WIDGET_FIELD_TYPE_COLUMNS = [
-		ZBX_WIDGET_FIELD_TYPE_GROUP => 'value_groupid',
-		ZBX_WIDGET_FIELD_TYPE_HOST => 'value_hostid',
-		ZBX_WIDGET_FIELD_TYPE_ITEM => 'value_itemid',
-		ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
-		ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
-		ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
-		ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid',
-		ZBX_WIDGET_FIELD_TYPE_SERVICE => 'value_serviceid',
-		ZBX_WIDGET_FIELD_TYPE_SLA => 'value_slaid',
-		ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
-		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str'
-	];
-
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// Filters.
@@ -506,7 +492,7 @@ class CHostDashboard extends CApiService {
 		$value_graphids = [];
 
 		while ($widget_field = DBfetch($result)) {
-			$value_field_name = self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']];
+			$value_field_name = CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']];
 
 			$value = [
 				'type' => $widget_field['type'],
