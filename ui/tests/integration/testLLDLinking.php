@@ -296,6 +296,7 @@ class testLldLinking extends CIntegrationTest {
 	}
 
 	private function linkingTestLogic($LLDRuleType){
+
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, $LLDRuleType);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -311,7 +312,6 @@ class testLldLinking extends CIntegrationTest {
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 		$this->deleteActionsAndTemplates();
 	}
-
 
 	/*
 	Test ensures that the Zabbix auto-registration process correctly handles template with LLD rule linking
@@ -334,7 +334,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::LLD_RULE_FILTER);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::LLD_RULE_MACRO_PATH);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -347,23 +347,11 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->deleteActionsAndTemplates();
 
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::LLD_RULE_MACRO_PATH);
-		$this->metaDataItemUpdate();
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
-		$this->stopComponent(self::COMPONENT_AGENT);
-		$this->unlinkTemplates();
-		$this->metaDataItemUpdate();
-		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
-		$this->deleteActionsAndTemplates();
+		$this->linkingTestLogic(self::LLD_RULE_MACRO_PATH);
 	}
 
 	/**
-	 * Test LLD linking cases.
+	 * Test LLD linking cases with different parameters.
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @required-components server, agent
@@ -372,5 +360,8 @@ class testLldLinking extends CIntegrationTest {
 
 	public function testLinkingLLD_manyItems() {
 		$this->linkingTestLogic(self::LLD_RULE_FILTER);
+		$this->linkingTestLogic(self::LLD_RULE_CUSTOM_QUERY_FIELDS);
+		$this->linkingTestLogic(self::LLD_RULE_PREPROCESSING);
+		$this->linkingTestLogic(self::LLD_RULE_SCRIPT);
 	}
 }
