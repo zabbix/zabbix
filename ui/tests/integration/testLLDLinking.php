@@ -92,7 +92,7 @@ class testLldLinking extends CIntegrationTest {
 			],
 			[
 				'name' => 'elements',
-				'value' => 2
+				'value' => '2'
 			]
 		],
 		'headers' => [
