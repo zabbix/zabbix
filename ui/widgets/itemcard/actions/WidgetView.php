@@ -59,7 +59,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			'trigger_parent_templates' => $trigger_parent_templates,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
+			]
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
@@ -107,7 +107,7 @@ class WidgetView extends CControllerDashboardWidgetView
 
 		if (in_array(CWidgetFieldSections::SECTION_HOST_INTERFACE, $this->fields_values['sections'])) {
 			$options += [
-				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip'],
+				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip']
 			];
 		}
 

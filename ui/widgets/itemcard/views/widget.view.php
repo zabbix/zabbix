@@ -278,12 +278,12 @@ function makeSectionsHeader(array $item, string $context, array $item_parent_tem
 					])),
 				$error_text,
 				$item_discovery,
-				$item_status,
+				$item_status
 			]))->addClass('item-name'),
 			$problems_indicator
 		]))->addClass('section-item'),
 		(new CDiv($path))
-			->addClass('section-path'),
+			->addClass('section-path')
 	]))->addClass('sections-header');
 }
 
@@ -428,7 +428,7 @@ function makeSectionMetrics(string $interval, string $history, string $trends, a
 			(new CSpan($trends))
 				->setTitle($trends)
 				->addClass('column-value')
-		]))->addClass('right-column'),
+		]))->addClass('right-column')
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-metrics');
