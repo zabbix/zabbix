@@ -115,9 +115,9 @@ class testLldLinking extends CIntegrationTest {
 		'type' => ITEM_TYPE_ZABBIX,
 		'delay' => '60s',
 		'preprocessing' => [
-			'type' => 20,
+			'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
 			'params' => '20',
-			'error_handler' => 0,
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		]
 	];
@@ -295,6 +295,23 @@ class testLldLinking extends CIntegrationTest {
 		self::$templateids = [];
 	}
 
+	private function linkingTestLogic($LLDRuleType){
+		$this->killComponent(self::COMPONENT_AGENT);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, $LLDRuleType);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->metaDataItemUpdate();
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->unlinkTemplates();
+		$this->metaDataItemUpdate();
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->deleteActionsAndTemplates();
+	}
+
 
 	/*
 	Test ensures that the Zabbix auto-registration process correctly handles template with LLD rule linking
@@ -317,7 +334,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::LLD_RULE_MACRO_PATH);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::LLD_RULE_FILTER);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -345,7 +362,6 @@ class testLldLinking extends CIntegrationTest {
 		$this->deleteActionsAndTemplates();
 	}
 
-
 	/**
 	 * Test LLD linking cases.
 	 *
@@ -353,17 +369,8 @@ class testLldLinking extends CIntegrationTest {
 	 * @required-components server, agent
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 */
-	public function testLinkingLLD_manyItems() {
 
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: LLD_RULE_SCRIPT);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->metaDataItemUpdate();
-		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
-		$this->stopComponent(self::COMPONENT_AGENT);
-		$this->unlinkTemplates();
-		$this->deleteActionsAndTemplates();
+	public function testLinkingLLD_manyItems() {
+		$this->linkingTestLogic(self::LLD_RULE_FILTER);
 	}
 }
