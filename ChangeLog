@@ -29,7 +29,7 @@ Bug fixes:
 .........T [ZBX-25439] added note about replication privilege requirements for MariaDB in MySQL templates (drasikhov)
 ...G...... [ZBX-21876] corrected getPluginCapacity to avoid false warnings when default capacity exceeds maximum capacity (sjurgensons)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
-.......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
+.......PS. [ZBX-26006] made PSK comparison case-insensitive during autoregistration (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.11
@@ -3468,7 +3468,7 @@ Bug fixes:
 ........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
 ...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
 ..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean and Japanese languages (dfofanovs)
-.......PS. [ZBX-26006] made PSK comparison case-sensitive during autoregistration (arimdjonoks)
+.......PS. [ZBX-26006] made PSK comparison case-insensitive during autoregistration (arimdjonoks)
 ...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing a runaway regular expression (mprihodko)
 ...G...... [ZBX-25436] updated Zabbix agent 2 Server configuration description in config (esneiders)
 .......PS. [ZBX-26109] fixed crash on HTTP checks with empty data (sboidenko)
