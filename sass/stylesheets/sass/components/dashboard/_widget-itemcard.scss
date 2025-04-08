@@ -179,9 +179,9 @@ div.dashboard-widget-itemcard {
 
 				&.section-single-parameter {
 
-					 &.section-body {
-						 @extend %overflow-ellipsis;
-					 }
+					&.section-body {
+						@extend %overflow-ellipsis;
+					}
 				}
 
 				&.section-tags {
