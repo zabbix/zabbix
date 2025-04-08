@@ -172,7 +172,7 @@ class CControllerGraphList extends CController {
 			'preservekeys' => true
 		];
 
-		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['status', 'ts_delete']]);
+		$data['graphs'] = API::Graph()->get($options + ['selectDiscoveryData' => ['status', 'ts_delete']]);
 
 		foreach ($data['graphs'] as &$graph) {
 			$graph['graphtype'] = graphType($graph['graphtype']);

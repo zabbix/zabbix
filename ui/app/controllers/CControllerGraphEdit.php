@@ -107,7 +107,7 @@ class CControllerGraphEdit extends CController {
 				'graphids' => $data['graphid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
-				'selectGraphDiscovery' 	=> ['parent_graphid']
+				'selectDiscoveryData' => ['parent_graphid']
 			];
 
 			$graph = API::Graph()->get($options);

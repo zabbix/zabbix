@@ -83,7 +83,8 @@ class CGraph extends CGraphGeneral {
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
-			'selectGraphDiscovery'		=> null,
+			'selectGraphDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
+			'selectDiscoveryData'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -360,15 +361,15 @@ class CGraph extends CGraphGeneral {
 
 		// adding Items
 		if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
+			$relation_map = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
 			$items = API::Item()->get([
 				'output' => $options['selectItems'],
-				'itemids' => $relationMap->getRelatedIds(),
+				'itemids' => $relation_map->getRelatedIds(),
 				'webitems' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
 			]);
-			$result = $relationMap->mapMany($result, $items, 'items');
+			$result = $relation_map->mapMany($result, $items, 'items');
 		}
 
 		if ($options['selectDiscoveryRule'] !== null) {
@@ -398,17 +399,31 @@ class CGraph extends CGraphGeneral {
 
 		// adding graph discovery
 		if ($options['selectGraphDiscovery'] !== null) {
-			$graphDiscoveries = API::getApiService()->select('graph_discovery', [
+			$graph_discoveries = API::getApiService()->select('graph_discovery', [
 				'output' => $this->outputExtend($options['selectGraphDiscovery'], ['graphid']),
 				'filter' => ['graphid' => array_keys($result)],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($graphDiscoveries, 'graphid', 'graphid');
+			$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
 
-			$graphDiscoveries = $this->unsetExtraFields($graphDiscoveries, ['graphid'],
+			$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid'],
 				$options['selectGraphDiscovery']
 			);
-			$result = $relationMap->mapOne($result, $graphDiscoveries, 'graphDiscovery');
+
+			$result = $relation_map->mapOne($result, $graph_discoveries, 'graphDiscovery');
+		}
+
+		if ($options['selectDiscoveryData'] !== null) {
+			$graph_discoveries = API::getApiService()->select('graph_discovery', [
+				'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
+				'filter' => ['graphid' => array_keys($result)],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
+
+			$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid']);
+
+			$result = $relation_map->mapOne($result, $graph_discoveries, 'discoveryData');
 		}
 
 		return $result;

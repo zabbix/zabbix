@@ -107,7 +107,7 @@ class WidgetView extends CControllerWidgetIterator {
 			$graphs_created_all = API::Graph()->get([
 				'output' => ['graphid', 'name'],
 				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
-				'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
+				'selectDiscoveryData' => ['graphid', 'parent_graphid'],
 				'selectHosts' => ['name'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
 				'expandName' => true
