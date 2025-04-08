@@ -39,7 +39,8 @@ class testFormWebScenarioStep extends CWebTest {
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
 	const UPDATE_SCENARIO = 'Scenario for Clone';
 	const CREATE_SCENARIO = 'Scenario for Update';
-	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid ORDER BY hsf.name';
+	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid'.
+			' ORDER BY hsf.httpstepid, hsf.name';
 	const MAPPING = [
 		null,
 		'Name' => ['selector' => 'xpath:.//input[@data-type="name"]'],
