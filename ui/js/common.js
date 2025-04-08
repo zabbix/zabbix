@@ -509,6 +509,11 @@ function closeDialogHandler(event) {
 					});
 					break;
 
+				// Close overlay color picker.
+				case 'color_picker':
+					jQuery.colorpicker('hide');
+					break;
+
 				// Close map/shape overlay.
 				case 'map-window':
 					jQuery('#map-window .btn-overlay-close').trigger('click');
