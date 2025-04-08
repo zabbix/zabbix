@@ -308,7 +308,7 @@ function hex2rgb($color) {
 /**
  * Get array of color variations.
  *
- * @param string $color  Color hex code or color palette code.
+ * @param string $color  Color hex code.
  * @param int    $count  How many variations are requested.
  *
  * @return array  Color hex codes in format ['#FF0000', '#FF7F7F'].
@@ -316,10 +316,6 @@ function hex2rgb($color) {
 function getColorVariations(string $color, int $count = 1): array {
 	if ($color === '') {
 		return [];
-	}
-
-	if (isValidPalette($color)) {
-		return getPaletteColors($color, $count);
 	}
 
 	if ($count <= 1) {
