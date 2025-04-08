@@ -3540,8 +3540,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			item->poller_type = ZBX_NO_POLLER;
 		}
 
-		if (ITEM_TYPE_NESTED_LLD == item->type && (0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
-				|| 0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)))
+		if (ITEM_TYPE_NESTED_LLD == item->type && 0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
+				&& 0 == (item->flags & ZBX_FLAG_DISCOVERY_CREATED))
 		{
 			zbx_timespec_t	ts = {now, 0};
 
