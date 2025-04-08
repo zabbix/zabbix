@@ -288,6 +288,13 @@ class testLldLinking extends CIntegrationTest {
 	}
 
 
+	/**
+	 * Test LLD linking cases.
+	 *
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @required-components server, agent
+	 * @backup actions,hosts,host_tag,autoreg_host
+	 */
 	public function testLinkingLLD_manyItems() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
