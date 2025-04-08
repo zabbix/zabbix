@@ -26,7 +26,13 @@ class CWidgetFieldColorView extends CWidgetFieldView {
 		return 'lbl_'.$this->field->getName();
 	}
 
-	public function getView(): CColorPicker {
+	public function getView(): CColor {
+		return (new CColor($this->field->getName(), $this->field->getValue()))
+			->appendColorPickerJs(false)
+			->enableUseDefault(!$this->field->hasAllowInherited());
+	}
+
+	public function getViewNew(): CColorPicker {
 		return (new CColorPicker())
 			->setName($this->field->getName())
 			->setValue($this->field->getValue())
