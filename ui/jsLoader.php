@@ -54,6 +54,7 @@ $available_js = [
 	'flickerfreescreen.js' => '',
 	'multilineinput.js' => '',
 	'multiselect.js' => '',
+	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
@@ -441,6 +442,11 @@ $translate_strings = [
 			_('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
+	],
+	'colorpicker.js' => [
+		'D' => _x('D', 'Default color option'),
+		'S_CLOSE' => _('Close'),
+		'Use default' => _('Use default')
 	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
