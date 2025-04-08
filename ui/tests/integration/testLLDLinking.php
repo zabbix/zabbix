@@ -61,7 +61,7 @@ class testLldLinking extends CIntegrationTest {
 					'value' => '@regex1'
 				],
 				[
-					'lld_macro' => '{#MACRO2}',
+					'macro' => '{#MACRO2}',
 					'value' => '@regex2',
 					'operator' => 9
 				],
