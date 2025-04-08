@@ -31,7 +31,7 @@ class testLldLinking extends CIntegrationTest {
 	private static $actionId;
 	private static $actionLinkTemplateId;
 	private static $templateids = array();
-	const DISCOVERY_RULE_MACRO_PATH = [
+	const LLD_RULE_MACRO_PATH = [
 		'name' => 'LLD rule with LLD macro paths',
 		'key_' => 'lld',
 		'type' => ITEM_TYPE_ZABBIX,
@@ -48,7 +48,7 @@ class testLldLinking extends CIntegrationTest {
 		]
 	];
 
-	const DISCOVERY_RULE_FILTER = [
+	const LLD_RULE_FILTER = [
 		'name' => 'LLD rule with filter',
 		'key_' => 'lld',
 		'type' => ITEM_TYPE_ZABBIX,
@@ -78,6 +78,38 @@ class testLldLinking extends CIntegrationTest {
 			]
 		]
 	];
+
+	const LLD_RULE_CUSTOM_QUERY_FIELDS = [
+		'name' => 'API HTTP agent',
+		'key_' => 'api_discovery_rule',
+		'type' => 19,
+		'delay' => '30s',
+		'url' => 'http://127.0.0.1?discoverer.php',
+		'query_fields' => [
+			[
+				'name' => 'mode',
+				'value' => 'json'
+			],
+			[
+				'name' => 'elements',
+				'value' => 2
+			]
+		],
+		'headers' => [
+			[
+				'name' => 'X-Type',
+				'value' => 'api'
+			],
+			[
+				'name'=> 'Authorization',
+				'value'=> 'Bearer mF_A.B5f-2.1JcM',
+			]
+		],
+		'allow_traps' => 1,
+		'trapper_host'=> '127.0.0.1'
+
+	];
+
 	/**
 	* Component configuration provider for server related tests.
 	*
@@ -260,7 +292,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_conflict() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::DISCOVERY_RULE_MACRO_PATH);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_1,self::LLD_RULE_MACRO_PATH);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -273,7 +305,7 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->deleteActionsAndTemplates();
 
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::DISCOVERY_RULE_MACRO_PATH);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::LLD_RULE_MACRO_PATH);
 		$this->metaDataItemUpdate();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
@@ -299,11 +331,14 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_manyItems() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: DISCOVERY_RULE_FILTER);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: LLD_RULE_CUSTOM_QUERY_FIELDS);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->unlinkTemplates();
+		$this->deleteActionsAndTemplates();
 	}
 }
