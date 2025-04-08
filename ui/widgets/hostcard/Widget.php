@@ -18,7 +18,7 @@ namespace Widgets\HostCard;
 
 use Zabbix\Core\CWidget;
 
-use Widgets\HostCard\Includes\CWidgetFieldHostSections;
+use Widgets\HostCard\Includes\CWidgetFieldSections;
 
 class Widget extends CWidget {
 
@@ -35,9 +35,9 @@ class Widget extends CWidget {
 	public function getInitialFieldsValues(): array {
 		return [
 			'sections' => [
-				CWidgetFieldHostSections::SECTION_MONITORING,
-				CWidgetFieldHostSections::SECTION_AVAILABILITY,
-				CWidgetFieldHostSections::SECTION_MONITORED_BY
+				CWidgetFieldSections::SECTION_MONITORING,
+				CWidgetFieldSections::SECTION_AVAILABILITY,
+				CWidgetFieldSections::SECTION_MONITORED_BY
 			]
 		];
 	}

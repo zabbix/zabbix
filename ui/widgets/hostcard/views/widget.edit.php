@@ -21,7 +21,7 @@
  * @var array $data
  */
 
-use Widgets\HostCard\Includes\CWidgetFieldHostSectionsView;
+use Widgets\HostCard\Includes\CWidgetFieldSectionsView;
 
 (new CWidgetFormView($data))
 	->addField(array_key_exists('hostid', $data['fields'])
@@ -32,7 +32,7 @@ use Widgets\HostCard\Includes\CWidgetFieldHostSectionsView;
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
 	->addField(
-		new CWidgetFieldHostSectionsView($data['fields']['sections'])
+		new CWidgetFieldSectionsView($data['fields']['sections'])
 	)
 	->addField(
 		(new CWidgetFieldMultiSelectHostInventoryView($data['fields']['inventory']))

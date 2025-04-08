@@ -27,9 +27,9 @@ use CButton,
 	CTemplateTag,
 	CWidgetFieldView;
 
-class CWidgetFieldHostSectionsView extends CWidgetFieldView {
+class CWidgetFieldSectionsView extends CWidgetFieldView {
 
-	public function __construct(CWidgetFieldHostSections $field) {
+	public function __construct(CWidgetFieldSections $field) {
 		$this->field = $field;
 	}
 
@@ -54,7 +54,7 @@ class CWidgetFieldHostSectionsView extends CWidgetFieldView {
 	public function getJavaScript(): string {
 		return '
 			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
-				new CWidgetFieldHostSections('.json_encode([
+				new CWidgetFieldSections('.json_encode([
 					'field_name' => $this->field->getName(),
 					'field_value' => $this->field->getValue()
 				]).');
@@ -69,14 +69,14 @@ class CWidgetFieldHostSectionsView extends CWidgetFieldView {
 					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 					(new CSelect($this->field->getName().'[#{rowNum}]'))
 						->addOptions(CSelect::createOptionsFromArray([
-							CWidgetFieldHostSections::SECTION_HOST_GROUPS => _('Host groups'),
-							CWidgetFieldHostSections::SECTION_DESCRIPTION => _('Description'),
-							CWidgetFieldHostSections::SECTION_MONITORING => _('Monitoring'),
-							CWidgetFieldHostSections::SECTION_AVAILABILITY => _('Availability'),
-							CWidgetFieldHostSections::SECTION_MONITORED_BY => _('Monitored by'),
-							CWidgetFieldHostSections::SECTION_TEMPLATES => _('Templates'),
-							CWidgetFieldHostSections::SECTION_INVENTORY => _('Inventory'),
-							CWidgetFieldHostSections::SECTION_TAGS => _('Tags')
+							CWidgetFieldSections::SECTION_HOST_GROUPS => _('Host groups'),
+							CWidgetFieldSections::SECTION_DESCRIPTION => _('Description'),
+							CWidgetFieldSections::SECTION_MONITORING => _('Monitoring'),
+							CWidgetFieldSections::SECTION_AVAILABILITY => _('Availability'),
+							CWidgetFieldSections::SECTION_MONITORED_BY => _('Monitored by'),
+							CWidgetFieldSections::SECTION_TEMPLATES => _('Templates'),
+							CWidgetFieldSections::SECTION_INVENTORY => _('Inventory'),
+							CWidgetFieldSections::SECTION_TAGS => _('Tags')
 						]))
 						->setValue('#{section}')
 						->setId($this->field->getName().'_#{rowNum}')

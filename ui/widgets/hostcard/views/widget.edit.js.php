@@ -14,7 +14,7 @@
 **/
 
 
-use Widgets\HostCard\Includes\CWidgetFieldHostSections;
+use Widgets\HostCard\Includes\CWidgetFieldSections;
 
 ?>
 
@@ -50,7 +50,7 @@ window.widget_hostcard_form = new class {
 		let show_inventory_field = false;
 
 		for (const element of sections) {
-			if (element.value == <?= CWidgetFieldHostSections::SECTION_INVENTORY ?>) {
+			if (element.value == <?= CWidgetFieldSections::SECTION_INVENTORY ?>) {
 
 				show_inventory_field = true;
 				break;
