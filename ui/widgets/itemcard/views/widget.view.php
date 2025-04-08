@@ -394,7 +394,9 @@ function makeSectionMetrics(string $interval, string $history, string $trends, a
 		$table = (new CTableInfo())->setHeader([_('Type'), _('Interval'), _('Period')]);
 
 		foreach ($custom_intervals as $custom_interval) {
-			$table->addRow([$custom_interval['type'], $custom_interval['update_interval'],
+			$table->addRow([
+				$custom_interval['type'] == ITEM_DELAY_FLEXIBLE ? _('Flexible') : _('Scheduling'),
+				$custom_interval['update_interval'],
 				$custom_interval['time_period']]
 			);
 		}
