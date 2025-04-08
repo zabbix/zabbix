@@ -4368,9 +4368,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 	{
 		zbx_vector_uint64_sort(&lldrule_protoids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		lld_rule_get_prototype_macro_paths(item_prototypes, &protoids);
-		lld_rule_get_prototype_filters(item_prototypes, &protoids);
-		lld_rule_get_prototype_overrides(item_prototypes, &protoids);
+		lld_rule_get_prototype_macro_paths(item_prototypes, &lldrule_protoids);
+		lld_rule_get_prototype_filters(item_prototypes, &lldrule_protoids);
+		lld_rule_get_prototype_overrides(item_prototypes, &lldrule_protoids);
 	}
 out:
 	zbx_free(sql);
