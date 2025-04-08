@@ -106,7 +106,7 @@ class testLldLinking extends CIntegrationTest {
 			]
 		],
 		'allow_traps' => 1,
-		'trapper_host'=> '127.0.0.1'
+		'trapper_hosts'=> '127.0.0.1'
 
 	];
 
