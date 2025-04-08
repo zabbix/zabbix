@@ -347,7 +347,19 @@ class testLldLinking extends CIntegrationTest {
 		$this->unlinkTemplates();
 		$this->deleteActionsAndTemplates();
 
-		$this->linkingTestLogic(self::LLD_RULE_MACRO_PATH);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2,self::LLD_RULE_MACRO_PATH);
+		$this->metaDataItemUpdate();
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->unlinkTemplates();
+		$this->metaDataItemUpdate();
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
+		$this->deleteActionsAndTemplates();
 	}
 
 	/**
