@@ -86,8 +86,8 @@ class CColor extends CDiv {
 	 */
 	protected function getInitJavascript(): string {
 		return 'jQuery("#'.$this->name.'").colorpicker('.json_encode([
-				'use_default' => $this->use_default
-			]).');';
+			'use_default' => $this->use_default
+		]).');';
 	}
 
 	/**
