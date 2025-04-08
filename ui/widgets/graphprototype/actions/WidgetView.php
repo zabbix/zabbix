@@ -238,7 +238,7 @@ class WidgetView extends CControllerWidgetIterator {
 			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name_resolved'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
-				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
+				'selectDiscoveryData' => ['itemid', 'parent_itemid'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 			]);
 

@@ -132,7 +132,8 @@ class CItem extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectDiscoveryRule'		=> null,
-			'selectItemDiscovery'		=> null,
+			'selectItemDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
+			'selectDiscoveryData'		=> null,
 			'selectPreprocessing'		=> null,
 			'selectValueMap'			=> null,
 			'countOutput'				=> false,
@@ -145,6 +146,8 @@ class CItem extends CItemGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 		$this->validateGet($options);
+
+		$this->checkDeprecatedParam($options, 'selectItemDiscovery');
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1747,17 +1750,31 @@ class CItem extends CItemGeneral {
 
 		// adding item discovery
 		if ($options['selectItemDiscovery'] !== null) {
-			$itemDiscoveries = API::getApiService()->select('item_discovery', [
+			$item_discoveries = API::getApiService()->select('item_discovery', [
 				'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemdiscoveryid', 'itemid']),
 				'filter' => ['itemid' => array_keys($result)],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($itemDiscoveries, 'itemid', 'itemdiscoveryid');
+			$relation_map = $this->createRelationMap($item_discoveries, 'itemid', 'itemdiscoveryid');
 
-			$itemDiscoveries = $this->unsetExtraFields($itemDiscoveries, ['itemid', 'itemdiscoveryid'],
+			$item_discoveries = $this->unsetExtraFields($item_discoveries, ['itemid', 'itemdiscoveryid'],
 				$options['selectItemDiscovery']
 			);
-			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
+
+			$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
+		}
+
+		if ($options['selectDiscoveryData'] !== null) {
+			$discovery_data = API::getApiService()->select('item_discovery', [
+				'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemdiscoveryid', 'itemid']),
+				'filter' => ['itemid' => array_keys($result)],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
+
+			$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid']);
+
+			$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 		}
 
 		$requested_output = array_filter([
