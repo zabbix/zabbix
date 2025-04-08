@@ -20,33 +20,18 @@ class CColorPicker extends CTag {
 		parent::__construct('z-color-picker', true);
 	}
 
-	/**
-	 * @param string $value
-	 *
-	 * @return self
-	 */
 	public function setValue(string $value): self {
 		$this->setAttribute('value', $value);
 
 		return $this;
 	}
 
-	/**
-	 * @param string $input_id
-	 *
-	 * @return self
-	 */
 	public function setInputId(string $input_id): self {
 		$this->setAttribute('input-id', $input_id);
 
 		return $this;
 	}
 
-	/**
-	 * @param bool $has_default
-	 *
-	 * @return self
-	 */
 	public function setHasDefault(bool $has_default = true): self {
 		if ($has_default) {
 			$this->setAttribute('has-default', '');
@@ -58,11 +43,6 @@ class CColorPicker extends CTag {
 		return $this;
 	}
 
-	/**
-	 * @param bool $has_palette
-	 *
-	 * @return self
-	 */
 	public function setHasPalette(bool $has_palette = true): self {
 		if ($has_palette) {
 			$this->setAttribute('has-palette', '');
@@ -74,11 +54,6 @@ class CColorPicker extends CTag {
 		return $this;
 	}
 
-	/**
-	 * @param bool $disabled
-	 *
-	 * @return self
-	 */
 	public function setDisabled(bool $disabled = true): self {
 		if ($disabled) {
 			$this->setAttribute('disabled', '');
