@@ -54,7 +54,6 @@ $available_js = [
 	'flickerfreescreen.js' => '',
 	'multilineinput.js' => '',
 	'multiselect.js' => '',
-	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
@@ -69,9 +68,10 @@ $available_js = [
 	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
-	'component.z-vertical.js' => '',
+	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
 	'class.base-component.js' => '',
@@ -442,11 +442,6 @@ $translate_strings = [
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
-	'colorpicker.js' => [
-		'D' => _x('D', 'Default color option'),
-		'S_CLOSE' => _('Close'),
-		'Use default' => _('Use default')
-	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
@@ -480,6 +475,15 @@ $translate_strings = [
 	'class.navigationtree.js' => [
 		'Maintenance with data collection' => _('Maintenance with data collection'),
 		'Maintenance without data collection' => _('Maintenance without data collection')
+	],
+	'component.z-color-picker.js' => [
+		'Apply' => _('Apply'),
+		'Clear' => _('Clear'),
+		'D' => _x('D', 'Default color option'),
+		'No color' => _('No color'),
+		'Palette' => _('Palette'),
+		'Solid color' => _('Solid color'),
+		'Use default' => _('Use default')
 	]
 ];
 
@@ -493,9 +497,10 @@ if (empty($_GET['files'])) {
 		'colorpicker.js',
 		'common.js',
 		'component.z-bar-gauge.js',
-		'component.z-vertical.js',
+		'component.z-color-picker.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
+		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
 		'class.base-component.js',
