@@ -214,7 +214,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'active_available'
 		],
-		'selectHostDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
+		'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 		'selectDiscoveryRule' => ['lifetime_type', 'enabled_lifetime_type'],
 		'selectInterfaces' => ['interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available',
 			'error'

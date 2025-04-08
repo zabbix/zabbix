@@ -249,7 +249,7 @@ class CControllerHostList extends CController {
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
-			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
+			'selectDiscoveryData' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true

@@ -75,7 +75,8 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
 	 * @param string|array  $options['selectDiscoveryRule']                Return a "discoveryRule" property with the low-level discovery rule that created the host.
-	 * @param string|array  $options['selectHostDiscovery']                Return a "hostDiscovery" property with host discovery object data.
+	 * @param string|array  $options['selectHostDiscovery']                Return a "hostDiscovery" property with host discovery object data. - DEPRECATED.
+	 * @param string|array  $options['selectDiscoveryData']                Return a "hostDiscovery" property with host discovery object data.
 	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
 	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
 	 * @param bool          $options['countOutput']                        Return host count as output.
@@ -155,7 +156,8 @@ class CHost extends CHostGeneral {
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
 			'selectDiscoveryRule'				=> null,
-			'selectHostDiscovery'				=> null,
+			'selectHostDiscovery'				=> null, // Deprecated, use selectDiscoveryData instead.
+			'selectDiscoveryData'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
 			'selectValueMaps'					=> null,
@@ -170,6 +172,8 @@ class CHost extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
+
+		$this->checkDeprecatedParam($options, 'selectHostDiscovery');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1808,12 +1812,12 @@ class CHost extends CHostGeneral {
 				// we need to order interfaces for proper linkage and viewing
 				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
-				$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+				$relation_map = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
 				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'],
 					$options['selectInterfaces']
 				);
-				$result = $relationMap->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
+				$result = $relation_map->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
 			}
 			else {
 				$interfaces = API::HostInterface()->get([
@@ -1896,17 +1900,31 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($options['selectHostDiscovery'] !== null) {
-			$hostDiscoveries = API::getApiService()->select('host_discovery', [
+			$host_discoveries = API::getApiService()->select('host_discovery', [
 				'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
 				'filter' => ['hostid' => $hostids],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
+			$relation_map = $this->createRelationMap($host_discoveries, 'hostid', 'hostid');
 
-			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, ['hostid'],
+			$host_discoveries = $this->unsetExtraFields($host_discoveries, ['hostid'],
 				$options['selectHostDiscovery']
 			);
-			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');
+
+			$result = $relation_map->mapOne($result, $host_discoveries, 'hostDiscovery');
+		}
+
+		if ($options['selectDiscoveryData'] !== null) {
+			$discovery_data = API::getApiService()->select('host_discovery', [
+				'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
+				'filter' => ['hostid' => $hostids],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
+
+			$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid']);
+
+			$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 		}
 
 		if ($options['selectTags'] !== null) {
