@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-21 19:20+0000\n"
+"PO-Revision-Date: 2025-03-31 09:20+0000\n"
 "Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -1380,7 +1380,7 @@ msgstr "Alternativt kan du installere det manuelt:"
 #: include/views/monitoring.sysmap.edit.php:269
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Always"
-msgstr ""
+msgstr "Altid"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1841,7 +1841,7 @@ msgstr "Auto"
 #: include/views/monitoring.sysmap.edit.php:270
 #: include/views/monitoring.sysmap.edit.php:277
 msgid "Auto hide"
-msgstr ""
+msgstr "Skjul automatisk"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1967,7 +1967,7 @@ msgstr "Baggrundsbillede"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background scale"
-msgstr ""
+msgstr "Baggrunds skala"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -5385,6 +5385,14 @@ msgstr "Opret og rediger vedligeholdelse"
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
 msgstr "Opret og rediger kort"
+
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -9080,6 +9088,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Grafen er slettet"
 msgstr[1] "Graferne er slettet"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9126,6 +9138,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Grafprototype slettet"
 msgstr[1] "Grafprototyper slettet"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14368,6 +14384,14 @@ msgstr "Ny begivenheds tag værdi"
 msgid "New excluded downtime"
 msgstr "Ny udelukket nedetid"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Ny vært"
@@ -14389,6 +14413,10 @@ msgstr "Ny datapunkt prototype"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Ny vedligeholdelsesperiode"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -25787,6 +25815,14 @@ msgstr "ingen tilladelser til at konvertere symptomproblemer til at forårsage p
 msgid "no permissions to create and edit maps"
 msgstr "ingen tilladelser til at oprette og redigere kort"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "ingen tilladelser til at undertrykke problemer"
@@ -26647,6 +26683,14 @@ msgstr[1] "værdien skal være en af ​​%1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "værdien skal være mellem \"%1$s\" og \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

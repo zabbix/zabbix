@@ -5497,6 +5497,14 @@ msgstr "Tworzenie i edycja wsparcia"
 msgid "Create and edit maps"
 msgstr "Tworzenie i edycja map"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Utwórz tło"
@@ -9201,6 +9209,10 @@ msgstr[0] "Usunięto wykres"
 msgstr[1] "Usunięto wykresy"
 msgstr[2] "Usunięto wykresy"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9248,6 +9260,10 @@ msgid_plural "Graph prototypes deleted"
 msgstr[0] "Usunięto prototyp wykresu"
 msgstr[1] "Usunięto prototypy wykresów"
 msgstr[2] "Usunięto prototypy wykresów"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14524,6 +14540,14 @@ msgstr "Nowa wartość znacznika zdarzenia"
 msgid "New excluded downtime"
 msgstr "Nowy wyłączony czas przestoju"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nowy host"
@@ -14545,6 +14569,10 @@ msgstr "Nowy prototyp pozycji"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Nowy okres utrzymania"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -25977,6 +26005,14 @@ msgstr "brak uprawnień by skonwertować problem objawu na problemu przyczyny"
 msgid "no permissions to create and edit maps"
 msgstr "brak uprawnień do tworzenia i edycji map"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "brak uprawnień do stłumienia problemów"
@@ -26838,6 +26874,14 @@ msgstr[2] "wartość musi być jedną z %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "wartość musi być między \"%1$s\" a \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
