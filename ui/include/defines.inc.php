@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.4.0beta1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7030031);
+define('ZABBIX_DB_VERSION',		7030032);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -424,6 +424,16 @@ define('MAINTENANCE_STATUS_EXPIRED',	2);
 
 define('HOST_GROUP_TYPE_HOST_GROUP', 		0);
 define('HOST_GROUP_TYPE_TEMPLATE_GROUP', 	1);
+
+// Host Wizard (used for templates).
+define('ZBX_WIZARD_NOT_READY', 0);
+define('ZBX_WIZARD_READY', 1);
+define('ZBX_WIZARD_FIELD_NOCONF', 0);
+define('ZBX_WIZARD_FIELD_TEXT', 1);
+define('ZBX_WIZARD_FIELD_LIST', 2);
+define('ZBX_WIZARD_FIELD_CHECKBOX', 3);
+define('ZBX_WIZARD_FIELD_NOT_REQUIRED', 0);
+define('ZBX_WIZARD_FIELD_REQUIRED', 1);
 
 // Modules.
 define('MODULE_STATUS_DISABLED', 0);

@@ -422,6 +422,14 @@ static int	DBpatch_7030031(void)
 	return DBcreate_table(&table);
 }
 
+static int	DBpatch_7030032(void)
+{
+	const zbx_db_field_t	field = {"hostmacroid", NULL, "hostmacro", "hostmacroid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hostmacro_config", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -460,5 +468,6 @@ DBPATCH_ADD(7030028, 0, 1)
 DBPATCH_ADD(7030029, 0, 1)
 DBPATCH_ADD(7030030, 0, 1)
 DBPATCH_ADD(7030031, 0, 1)
+DBPATCH_ADD(7030032, 0, 1)
 
 DBPATCH_END()
