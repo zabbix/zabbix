@@ -441,7 +441,7 @@ function getPaletteColors(string $palette_code, int $count): array {
  *
  * @return bool
  */
-function isValidPalette($value) {
+function isValidPalette(string $value): bool {
 	$number = getPaletteRowNumber($value);
 
 	return $number >= 0 && $number < count(PALETTE_COLORS);
@@ -454,7 +454,7 @@ function isValidPalette($value) {
  *
  * @return int
  */
-function getPaletteRowNumber($value) {
+function getPaletteRowNumber(string $value): int {
 	if (preg_match('/^'.PALETTE_PREFIX.'(\\d+)$/i', $value, $matches)) {
 		return (int) $matches[1];
 	}
