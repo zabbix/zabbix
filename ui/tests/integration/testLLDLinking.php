@@ -54,7 +54,7 @@ class testLldLinking extends CIntegrationTest {
 		'type' => ITEM_TYPE_ZABBIX,
 		'delay' => '30s',
 		'filter' => [
-			'evaltype' => 1,
+			'evaltype' => CONDITION_EVAL_TYPE_AND,
 			'conditions' => [
 				[
 					'macro' => '{#MACRO}',
@@ -63,17 +63,17 @@ class testLldLinking extends CIntegrationTest {
 				[
 					'macro' => '{#MACRO2}',
 					'value' => '@regex2',
-					'operator' => 9
+					'operator' => CONDITION_OPERATOR_NOT_REGEXP
 				],
 				[
 					'macro' => '{#MACRO3}',
 					'value'=> '',
-					'operator' => 12
+					'operator' => CONDITION_OPERATOR_EXISTS
 				],
 				[
 					'macro' => '{#MACRO4}',
 					'value' => '',
-					'operator' => 13
+					'operator' => CONDITION_OPERATOR_NOT_EXISTS
 				]
 			]
 		]
@@ -82,7 +82,7 @@ class testLldLinking extends CIntegrationTest {
 	const LLD_RULE_CUSTOM_QUERY_FIELDS = [
 		'name' => 'API HTTP agent',
 		'key_' => 'api_discovery_rule',
-		'type' => 19,
+		'type' => ITEM_TYPE_HTTPAGENT,
 		'delay' => '30s',
 		'url' => 'http://127.0.0.1?discoverer.php',
 		'query_fields' => [
@@ -105,7 +105,7 @@ class testLldLinking extends CIntegrationTest {
 				'value'=> 'Bearer mF_A.B5f-2.1JcM',
 			]
 		],
-		'allow_traps' => 1,
+		'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
 		'trapper_hosts'=> '127.0.0.1'
 
 	];
