@@ -102,6 +102,7 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 	if c.compress {
 		z := zlib.NewWriter(&buf)
 		if _, err = z.Write(data); err != nil {
+			z.Close()
 			return
 		}
 		z.Close()
