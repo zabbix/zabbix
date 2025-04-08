@@ -125,6 +125,8 @@ static void	*ALIGN8(void *ptr)
 	return (void *)((uintptr_t)((char *)ptr + 7) & (uintptr_t)~7);
 }
 
+#define TIMEKEEPER_ALIGN8(x) (((x) + 7) & (~7u))
+
 static void	*ALIGNPTR(void *ptr)
 {
 	if (4 == ZBX_PTR_SIZE)
@@ -638,19 +640,19 @@ out:
 int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
-	void	*base = NULL;
+	zbx_uint64_t	base = 0;
 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	base = (void *)((zbx_shmem_info_t *)(base) + 1);
-	base = ALIGNPTR(base);
-	base = (void *)((void **)base + ZBX_SHMEM_BUCKET_COUNT);
-	base = (void *)((char *)base + strlen(descr) + 1);
-	base = (void *)((char *)base + strlen(param) + 1);
-	base = ALIGN8(base);
+	base = base + 1;
+	base = TIMEKEEPER_ALIGN8(base);
+	base = base + ZBX_SHMEM_BUCKET_COUNT * 8;
+	base = (base + strlen(descr) + 1);
+	base = (base + strlen(param) + 1);
+	base = TIMEKEEPER_ALIGN8(base);
 
-	size += (size_t )base;
+	size += base;
 
 	size += 8;
 	size += 2 * SHMEM_SIZE_FIELD;

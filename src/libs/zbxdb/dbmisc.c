@@ -60,7 +60,7 @@ zbx_db_idcache_t;
 
 /* nextid cache for tables updated only by server/proxy */
 static zbx_mutex_t	idcache_mutex = ZBX_MUTEX_NULL;
-static zbx_shmem_info_t	*idcache_mem = NULL;
+zbx_shmem_info_t	*idcache_mem;
 static zbx_db_idcache_t	*idcache = NULL;
 
 int	zbx_db_init(char **error)
