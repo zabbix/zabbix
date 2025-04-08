@@ -101,8 +101,8 @@ class testLldLinking extends CIntegrationTest {
 				'value' => 'api'
 			],
 			[
-				'name'=> 'Authorization',
-				'value'=> 'Bearer mF_A.B5f-2.1JcM',
+				'name' => 'Authorization',
+				'value' => 'Bearer mF_A.B5f-2.1JcM',
 			]
 		],
 		'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
@@ -117,9 +117,22 @@ class testLldLinking extends CIntegrationTest {
 		'preprocessing' => [
 			'type' => 20,
 			'params' => '20',
-			'error_handler'=> 0,
-			'error_handler_params'=> ''
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		]
+	];
+
+	const LLD_RULE_SCRIPT = [
+		'name' => 'Script example',
+		'key_' => 'custom.script.lldrule',
+		'type' => ITEM_TYPE_SCRIPT,
+		'params' => 'var request = new HttpRequest();\nreturn request.post(\"https://postman-echo.com/post\", JSON.parse(value));',
+		'parameters' => [
+			'name' => 'host',
+			'value'=> '{HOST.CONN}'
+		],
+		'timeout' => '6s',
+		'delay' => '30s'
 	];
 
 	/**
@@ -343,7 +356,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_manyItems() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: LLD_RULE_PREPROCESSING);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: LLD_RULE_SCRIPT);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
