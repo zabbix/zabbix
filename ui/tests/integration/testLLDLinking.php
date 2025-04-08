@@ -107,7 +107,19 @@ class testLldLinking extends CIntegrationTest {
 		],
 		'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
 		'trapper_hosts'=> '127.0.0.1'
+	];
 
+	const LLD_RULE_PREPROCESSING = [
+		'name' => 'Discovery rule with preprocessing',
+		'key_' => 'lld.with.preprocessing',
+		'type' => ITEM_TYPE_ZABBIX,
+		'delay' => '60s',
+		'preprocessing' => [
+			'type' => 20,
+			'params' => '20',
+			'error_handler'=> 0,
+			'error_handler_params'=> ''
+		]
 	];
 
 	/**
@@ -331,7 +343,7 @@ class testLldLinking extends CIntegrationTest {
 	public function testLinkingLLD_manyItems() {
 
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: LLD_RULE_CUSTOM_QUERY_FIELDS);
+		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, self:: LLD_RULE_PREPROCESSING);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->metaDataItemUpdate();
 		$this->startComponent(self::COMPONENT_AGENT);
