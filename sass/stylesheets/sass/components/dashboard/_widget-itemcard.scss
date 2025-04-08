@@ -5,10 +5,11 @@ div.dashboard-widget-itemcard {
 		min-width: 300px;
 
 		.sections-header {
-			grid-auto-rows: minmax(54px, auto);
+			display: flex;
+			flex-direction: column;
+			justify-content: space-evenly;
 			height: 53px;
 			padding: 0 10px;
-			align-items: center;
 			border-bottom: 1px solid $table-border-color;
 
 			.section-item {
@@ -44,7 +45,6 @@ div.dashboard-widget-itemcard {
 
 				display: flex;
 				gap: 5px;
-				margin-top: 5px;
 
 				.path-element {
 					@extend %overflow-ellipsis;
@@ -98,6 +98,7 @@ div.dashboard-widget-itemcard {
 
 				&.section-metrics, &.section-latest-data {
 					grid-template-columns: repeat(3, 1fr);
+					column-gap: 10px;
 
 					.center-column {
 						display: flex;
@@ -107,18 +108,27 @@ div.dashboard-widget-itemcard {
 					.column, .right-column {
 						@extend %overflow-ellipsis;
 
+						display: flex;
+						flex-direction: column;
+						gap: 5px;
+
 						.column-header {
 							color: $font-alt-color;
 						}
 
 						.column-header, .column-value {
 							@extend %overflow-ellipsis;
+
 							display: block;
 							position: relative;
-							height: 18px;
+							height: 16px;
+							line-height: 16px;
+						}
 
+						.column-value {
 							.btn-icon {
-								height: 18px;
+								height: 14px;
+								margin-top: 2px;
 							}
 
 							z-sparkline {
@@ -132,8 +142,13 @@ div.dashboard-widget-itemcard {
 						}
 					}
 
-					.right-column {;
+					.right-column {
+						align-items: flex-end;
 						text-align: right;
+
+						.column-value {
+							width: 100%;
+						}
 					}
 				}
 
