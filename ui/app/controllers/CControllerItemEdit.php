@@ -18,6 +18,16 @@ require 'include/forms.inc.php';
 
 class CControllerItemEdit extends CControllerItem {
 
+	/**
+	 * @var array
+	 */
+	private $host;
+
+	/**
+	 * @var array
+	 */
+	private $template;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -56,6 +66,34 @@ class CControllerItemEdit extends CControllerItem {
 	protected function checkPermissions(): bool {
 		if (!CWebUser::isLoggedIn() || !$this->validateReferredObjects()) {
 			return false;
+		}
+
+		if ($this->getInput('context') === 'host') {
+			$host = API::Host()->get([
+				'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
+				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
+				'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+			]);
+
+			if (!$host) {
+				return false;
+			}
+
+			$this->host = reset($host);
+		}
+		else {
+			$template = API::Template()->get([
+				'output' => ['templateid', 'name', 'flags'],
+				'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+			]);
+
+			if (!$template) {
+				return false;
+			}
+
+			$this->template = reset($template);
 		}
 
 		return parent::checkPermissions();
@@ -137,12 +175,7 @@ class CControllerItemEdit extends CControllerItem {
 	 * @return array
 	 */
 	protected function getHost(): array {
-		[$host] = API::Host()->get([
-			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
-			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
-		]);
+		$host = $this->host;
 
 		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 			$host['proxyid'] = $host['assigned_proxyid'];
@@ -165,11 +198,7 @@ class CControllerItemEdit extends CControllerItem {
 	 * @return array
 	 */
 	protected function getTemplate(): array {
-		[$template] = API::Template()->get([
-			'output' => ['templateid', 'name', 'flags'],
-			'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
-		]);
+		$template = $this->template;
 		$template += [
 			'hostid' => $template['templateid'],
 			'proxyid' => 0,

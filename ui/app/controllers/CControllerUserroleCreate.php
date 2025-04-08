@@ -85,6 +85,8 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'actions_manage_sla' => 						'in 0,1',
 			'actions_invoke_execute_now' =>					'in 0,1',
 			'actions_change_problem_ranking' =>				'in 0,1',
+			'actions_edit_own_media' =>						'in 0,1',
+			'actions_edit_user_media' =>					'in 0,1',
 			'modules' => 									'array',
 			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 								'array',
