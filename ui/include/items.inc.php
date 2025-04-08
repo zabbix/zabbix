@@ -532,6 +532,7 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ * @param bool   $set_title         Adds a title attribute to the created element.
  *
  * @return array|null
  */
