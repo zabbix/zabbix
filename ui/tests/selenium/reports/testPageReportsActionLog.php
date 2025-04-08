@@ -162,7 +162,7 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Media types' => ['Github']
+						'Media types' => ['GitHub']
 					],
 					'result' => []
 				]

@@ -117,7 +117,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @param string $graph_item['hostname']       Item host name.
 	 * @param string $graph_item['color']          Item presentation color.
 	 * @param int    $graph_item['drawtype']       Item presentation draw type, could be one of
-	 *                                             GRAPH_ITEM_DRAWTYPE_* constants.
+	 *                                             DRAWTYPE_* constants.
 	 * @param int    $graph_item['yaxisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
 	 * @param int    $graph_item['calc_fnc']       Item calculation function, could be one of CALC_FNC_* constants.
 	 * @param int    $graph_item['calc_type']      Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
@@ -125,7 +125,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
-			$graph_item['drawtype'] = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
+			$graph_item['drawtype'] = DRAWTYPE_FILLED_REGION;
 		}
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
@@ -137,7 +137,7 @@ class CLineGraphDraw extends CGraphDraw {
 		// Set graph item safe default values.
 		$graph_item += [
 			'color' => 'Dark Green',
-			'drawtype' => GRAPH_ITEM_DRAWTYPE_LINE,
+			'drawtype' => DRAWTYPE_LINE,
 			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
 			'calc_fnc' => CALC_FNC_AVG,
 			'calc_type' => GRAPH_ITEM_SIMPLE
@@ -1626,7 +1626,7 @@ class CLineGraphDraw extends CGraphDraw {
 	protected function limitToBounds(&$value1, &$value2, $min, $max, $drawtype) {
 		// fixes graph out of bounds problem
 		if ((($value1 > ($max + $min)) && ($value2 > ($max + $min))) || ($value1 < $min && $value2 < $min)) {
-			if (!in_array($drawtype, [GRAPH_ITEM_DRAWTYPE_FILLED_REGION, GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE])) {
+			if (!in_array($drawtype, [DRAWTYPE_FILLED_REGION, DRAWTYPE_GRADIENT_LINE])) {
 				return false;
 			}
 		}
@@ -1773,9 +1773,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// draw main line
 		switch ($drawtype) {
-			case GRAPH_ITEM_DRAWTYPE_LINE:
-			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
-				$style = $drawtype == GRAPH_ITEM_DRAWTYPE_BOLD_LINE ? LINE_TYPE_BOLD : LINE_TYPE_NORMAL;
+			case DRAWTYPE_LINE:
+			case DRAWTYPE_BOLD_LINE:
+				$style = $drawtype == DRAWTYPE_BOLD_LINE ? LINE_TYPE_BOLD : LINE_TYPE_NORMAL;
 
 				if ($calc_fnc == CALC_FNC_ALL) {
 					if (PHP_VERSION_ID >= 80100) {
@@ -1796,28 +1796,28 @@ class CLineGraphDraw extends CGraphDraw {
 				zbx_imagealine($this->im, $x1, $y1, $x2, $y2, $avg_color, $style);
 				break;
 
-			case GRAPH_ITEM_DRAWTYPE_DOT:
+			case DRAWTYPE_DOT:
 				imagefilledrectangle($this->im, $x1 - 1, $y1 - 1, $x1, $y1, $avg_color);
 				break;
 
-			case GRAPH_ITEM_DRAWTYPE_BOLD_DOT:
+			case DRAWTYPE_BOLD_DOT:
 				imagefilledrectangle($this->im, $x2 - 1, $y2 - 1, $x2 + 1, $y2 + 1, $avg_color);
 				break;
 
-			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
+			case DRAWTYPE_DASHED_LINE:
 				imagesetstyle($this->im, [$avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT]);
 				zbx_imageline($this->im, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 				break;
 
-			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
-			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+			case DRAWTYPE_GRADIENT_LINE:
+			case DRAWTYPE_FILLED_REGION:
 				/*
 				 * Graphs should be at least 50px in height in order to visually see the gradient. Though 51px would not
 				 * make any difference either. If graph height is too small to see gradient, use standard solid color
 				 * filling function instead.
 				 */
-				if ($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION
-						|| ($drawtype == GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE && $this->sizeY <= 50)) {
+				if ($drawtype == DRAWTYPE_FILLED_REGION
+						|| ($drawtype == DRAWTYPE_GRADIENT_LINE && $this->sizeY <= 50)) {
 					$a[0] = $x1;
 					$a[1] = $y1;
 					$a[2] = $x1;
@@ -2186,7 +2186,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				if (!$draw && !$prevDraw) {
 					$draw = true;
-					$valueDrawType = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
+					$valueDrawType = DRAWTYPE_BOLD_DOT;
 				}
 				else {
 					$valueDrawType = $drawtype;

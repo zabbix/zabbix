@@ -73,7 +73,7 @@ class testFormUserMedia extends CWebTest {
 						'period' => '1-7,00:00-24:00'
 					],
 					[
-						'mediatypeid' => 10, // Discord.
+						'mediatypeid' => 71, // Discord.
 						'sendto' => 'user@test.domain1.com',
 						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 16,
@@ -441,7 +441,7 @@ class testFormUserMedia extends CWebTest {
 		// Check that disabled media types are shown in red color in media configuration form.
 		$discord_row->query('button:Edit')->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals('focusable red', $dialog->asForm()->getField('Type')->query('button:Discord')->one()->getAttribute('class'));
+		$this->assertEquals('focusable color-negative', $dialog->asForm()->getField('Type')->query('button:Discord')->one()->getAttribute('class'));
 		$dialog->close();
 
 		// Check that there is no icon and no hintbox for disabled user media that belong to enabled media type.
@@ -595,7 +595,7 @@ class testFormUserMedia extends CWebTest {
 		if ($data['action'] !== 'delete') {
 			$user_form->selectTab('Media');
 			$user_form->query('button:Add')->one()->click();
-			$media_form = $this->query('id:media_form')->asForm()->waitUntilVisible()->one();
+			$media_form = $this->query('id:media-form')->asForm()->waitUntilVisible()->one();
 			$media_form->fill($data['media_fields']);
 			$media_form->submit();
 			$this->page->waitUntilReady();
@@ -683,13 +683,13 @@ class testFormUserMedia extends CWebTest {
 	 * @param array	$data	data provider
 	 */
 	private function setMediaValues($data) {
-		$media_form = $this->query('id:media_form')->waitUntilVisible()->asForm()->one();
+		$media_form = $this->query('id:media-form')->waitUntilVisible()->asForm()->one();
 		$media_form->fill($data['fields']);
 
 		// Check that there is possibility to add only multiple emails to media.
 		$clickable = ($data['fields']['Type'] === 'Email');
 
-		foreach (['id:email_send_to_add', 'button:Remove'] as $selector) {
+		foreach (['button:Add', 'button:Remove'] as $selector) {
 			$this->assertEquals($clickable, $media_form->query($selector)->one()->isClickable());
 		}
 

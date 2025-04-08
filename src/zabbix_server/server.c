@@ -2526,12 +2526,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
-	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_get_worker_info);
+	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
+	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);
 	zbx_diag_init(diag_add_section_info_server);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
@@ -2690,6 +2690,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location);
+
+		__zbx_update_env(zbx_time());
 	}
 
 	zbx_log_exit_signal();

@@ -489,7 +489,7 @@ void	zbx_mock_extract_yaml_values_str(const char *path, zbx_vector_str_t *values
  *             values - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_mock_extract_yaml_values_ptr (zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
+void	zbx_mock_extract_yaml_values_ptr(zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
 {
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	hvalue;
@@ -502,5 +502,27 @@ void	zbx_mock_extract_yaml_values_ptr (zbx_mock_handle_t hdata, zbx_vector_ptr_t
 			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
 
 		zbx_vector_ptr_append(values, (void *)value);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: path   - [IN]  YAML path                                       *
+ *             values - [OUT]                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uint64_t *values)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	hvalue;
+
+	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hdata, &hvalue))
+	{
+		zbx_uint64_t	value;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(hvalue, &value)))
+			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
+
+		zbx_vector_uint64_append(values, value);
 	}
 }
