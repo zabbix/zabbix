@@ -116,7 +116,8 @@ class CTrigger extends CTriggerGeneral {
 			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
-			'selectTriggerDiscovery'		=> null,
+			'selectTriggerDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
+			'selectDiscoveryData'			=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -889,6 +890,33 @@ class CTrigger extends CTriggerGeneral {
 				unset($trigger_discovery['triggerid']);
 
 				$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
+			}
+		}
+
+		if ($options['selectDiscoveryData'] !== null && $options['selectDiscoveryData'] !== API_OUTPUT_COUNT) {
+			foreach ($result as &$trigger) {
+				$trigger['discoveryData'] = [];
+			}
+			unset($trigger);
+
+			$sql_select = ['triggerid'];
+			foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
+				if ($this->outputIsRequested($field, $options['selectDiscoveryData'])) {
+					$sql_select[] = $field;
+				}
+			}
+
+			$trigger_discoveries = DBselect(
+				'SELECT '.implode(',', $sql_select).
+				' FROM trigger_discovery'.
+				' WHERE '.dbConditionInt('triggerid', $triggerids)
+			);
+
+			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
+				$triggerid = $trigger_discovery['triggerid'];
+				unset($trigger_discovery['triggerid']);
+
+				$result[$triggerid]['discoveryData'] = $trigger_discovery;
 			}
 		}
 
