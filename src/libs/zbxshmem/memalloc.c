@@ -645,13 +645,12 @@ int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	base = base + 8;
+	base = base + sizeof(zbx_shmem_info_t);
 	base = TIMEKEEPER_ALIGN8(base);
 	base = base + ZBX_SHMEM_BUCKET_COUNT * 8;
 	base = (base + strlen(descr) + 1);
 	base = (base + strlen(param) + 1);
 	base = TIMEKEEPER_ALIGN8(base);
-zabbix_log(LOG_LEVEL_INFORMATION, "XXX: %d", base);
 	size += base;
 
 	size += 8;
