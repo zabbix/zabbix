@@ -103,11 +103,11 @@ class CFormValidator {
 			this.#use_checks = use_checks;
 
 			try {
-				this.#validate(values_to_validate, validation_rules);
-				await this.#validateDelayed();
-				await this.#validateApiUniqueness();
-				this.#validateDistinctness(values, validation_rules);
-				resolve_whole();
+				const r1 = this.#validate(values_to_validate, validation_rules);
+				const r2 = await this.#validateDelayed();
+				const r3 = await this.#validateApiUniqueness();
+				const r4 = this.#validateDistinctness(values, validation_rules);
+				resolve_whole(r1 && r2 && r3 && r4);
 			}
 			catch (error) {
 				if (error.cause !== 'RulesError' && error.type !== 'abort') {
