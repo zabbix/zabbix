@@ -57,12 +57,12 @@ window.widget_itemcard_form = new class {
 			}
 		}
 
-		for (const element of this.#form.querySelectorAll('.js-sparkline-field')) {
+		for (const element of this.#form.querySelectorAll('.js-sparkline-row')) {
 			element.style.display = has_latest_data_section ? '' : 'none';
-		}
 
-		for (const input of this.#form.querySelectorAll('.js-sparkline-field input')) {
-			input.disabled = !has_latest_data_section;
+			for (const input of element.querySelectorAll('.input')) {
+				input.disabled = !has_latest_data_section;
+			}
 		}
 
 		this.#form.fields['sparkline[time_period]'].disabled = !has_latest_data_section;

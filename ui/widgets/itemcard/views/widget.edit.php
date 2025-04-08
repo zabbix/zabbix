@@ -31,7 +31,7 @@ use Widgets\ItemCard\Includes\CWidgetFieldSectionsView;
 		new CWidgetFieldSectionsView($data['fields']['sections'])
 	)
 	->addField(
-		(new CWidgetFieldSparklineView($data['fields']['sparkline']))->addRowClass('js-sparkline-field')
+		(new CWidgetFieldSparklineView($data['fields']['sparkline']))->addRowClass('js-sparkline-row')
 	)
 	->addField($data['templateid'] === null
 		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])

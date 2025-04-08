@@ -18,6 +18,9 @@
 			"itemid": {
 				"type": "_itemid",
 				"required": true
+			},
+			"sparkline": {
+				"type": "_timeperiod"
 			}
 		}
 	},

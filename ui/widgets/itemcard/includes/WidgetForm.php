@@ -45,6 +45,23 @@ class WidgetForm extends CWidgetForm {
 		'history'	=> CWidgetFieldSparkline::DATA_SOURCE_AUTO
 	];
 
+	public function validate(bool $strict = false): array {
+		$sections = $this->getFieldValue('sections');
+		$sparkline_enabled = in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $sections);
+		$errors = [];
+
+		foreach ($this->fields as $name => $field) {
+			if (!$sparkline_enabled && $name === 'sparkline') {
+				$field->setValue(CWidgetFieldSparkline::DEFAULT_VALUE);
+			}
+			else {
+				$errors = array_merge($errors, $field->validate($strict));
+			}
+		}
+
+		return $errors;
+	}
+
 	protected function normalizeValues(array $values): array {
 		$values = parent::normalizeValues($values);
 
