@@ -9096,6 +9096,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gráfico eliminado"
 msgstr[1] "Gráfico eliminado"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9143,6 +9147,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Protótipo de gráfico eliminado"
 msgstr[1] "Protótipo de gráfico eliminado"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14392,6 +14400,14 @@ msgstr "Novo valor para a etiqueta de eventos"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
 msgstr "Novo tempo de inatividade excluído"
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -26686,6 +26702,14 @@ msgstr[1] ""
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
+msgstr ""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
