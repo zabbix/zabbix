@@ -132,8 +132,8 @@ zbx_status_section_t;
  *                FAIL - not allowed                                          *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
-	const char *config_frontend_allowed_ip)
+int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip)
 {
 if (NULL != config_frontend_allowed_ip &&
 SUCCEED != zbx_tcp_check_allowed_peers_info(&sock->peer_info, config_frontend_allowed_ip))
@@ -1293,7 +1293,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = zbx_trapper_expressions_evaluate(sock, &jp, config_comms->config_timeout);
+				ret = zbx_trapper_expressions_evaluate(sock, &jp, config_comms->config_timeout,
+					config_comms->config_tls, config_frontend_allowed_ip);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 		{
@@ -1303,7 +1304,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 						zbx_get_program_type_cb(), progname, get_config_forks,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
 						zbx_get_value_internal_ext_cb, config_ssh_key_location,
-						config_webdriver_url);
+						config_webdriver_url, config_comms->config_tls,
+						config_frontend_allowed_ip);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1311,7 +1313,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			ret = process_active_check_heartbeat(sock, &jp, config_comms->config_timeout);
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
-				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks))
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks,
+				config_comms->config_tls, config_frontend_allowed_ip))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
