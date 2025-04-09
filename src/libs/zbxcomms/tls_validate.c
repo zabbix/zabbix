@@ -770,8 +770,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 				&(config_tls->cert_file), config_tls);
 	}
 
-	if (config_tls->tls_listen != NULL && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY) &&
-		0 == (config_tls->connect_mode & (ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_TLS_CERT)))
+	if (NULL != config_tls->tls_listen && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) &&
+		0 == (config_tls->accept_modes & (ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_TLS_CERT)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
 			" connection but it conflicts with unencrypted config of parameter \"TLSAccept\"");
@@ -779,7 +779,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 		exit(EXIT_FAILURE);
 	}
 
-	if (config_tls->tls_listen != NULL && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) &&
+	if (NULL != config_tls->tls_listen && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) &&
 		0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
