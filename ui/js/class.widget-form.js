@@ -82,7 +82,11 @@ class CWidgetForm {
 		const dialogue = this.overlay.$dialogue[0];
 
 		dialogue.addEventListener('dialogue.reload', () => this.#endScripting(), {signal});
-		dialogue.addEventListener('dialogue.close', () => this.#endScripting(), {signal});
+		dialogue.addEventListener('dialogue.close', e => {
+			if (!e.defaultPrevented) {
+				this.#endScripting();
+			}
+		}, {signal});
 
 		this.fire(CWidgetForm.EVENT_READY);
 	}
@@ -113,8 +117,6 @@ class CWidgetForm {
 	 * This method is meant for widget type switching, and it shall not be used by widgets.
 	 */
 	reload() {
-		this.#endScripting();
-
 		this.fire(CWidgetForm.EVENT_RELOAD_REQUEST);
 	}
 
@@ -124,8 +126,6 @@ class CWidgetForm {
 	 * The caller must implement respective event listener.
 	 */
 	submit() {
-		this.#endScripting();
-
 		this.fire(CWidgetForm.EVENT_SUBMIT_REQUEST);
 	}
 

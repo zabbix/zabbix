@@ -440,6 +440,8 @@ function overlayPreloaderDestroy(id) {
 /**
  * Close and destroy overlay dialogue and move focus to IU element that was clicked to open it.
  *
+ * Closing action by user (not script) can be prevented by preventing default action of the "dialog.close" event.
+ *
  * @param {string} dialogueid
  * @param {string} close_by    Indicates the initiator of closing action.
  */
@@ -447,6 +449,22 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 	const overlay = overlays_stack.getById(dialogueid);
 
 	if (overlay === undefined) {
+		return;
+	}
+
+	const is_default_prevented = !overlay.$dialogue[0].dispatchEvent(
+		new CustomEvent('dialogue.close', {
+			detail: {
+				dialogueid,
+				position: overlay.getPosition(),
+				position_fix: overlay.getPositionFix(),
+				close_by
+			},
+			cancelable: true
+		})
+	);
+
+	if (close_by === Overlay.prototype.CLOSE_BY_USER && is_default_prevented) {
 		return;
 	}
 
@@ -463,17 +481,6 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 	jQuery(`[data-dialogueid="${dialogueid}"]`).remove();
 
 	removeFromOverlaysStack(dialogueid);
-
-	overlay.$dialogue[0].dispatchEvent(
-		new CustomEvent('dialogue.close', {
-			detail: {
-				dialogueid,
-				position: overlay.getPosition(),
-				position_fix: overlay.getPositionFix(),
-				close_by
-			}
-		})
-	);
 }
 
 /**

@@ -44,5 +44,6 @@ class CWidgetFieldTags extends CWidgetField {
 		this.#tags_table.querySelectorAll('.form_row').forEach(row => new CTagFilterItem(row));
 
 		this.#tags_table.addEventListener('input', () => this.dispatchUpdateEvent());
+		this.#tags_table.addEventListener('change', () => this.dispatchUpdateEvent());
 	}
 }
