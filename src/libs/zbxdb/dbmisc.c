@@ -820,7 +820,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	}
 
 #ifdef HAVE_MYSQL
-	if ((NULL != config->dbsocket) && (0 != config->dbport))
+	if (NULL != config->dbsocket && 0 != config->dbport)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "both parameters \"DBPort\" and \"DBSocket\" are defined");
 		exit(EXIT_FAILURE);
