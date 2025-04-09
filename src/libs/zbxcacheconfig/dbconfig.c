@@ -16118,7 +16118,7 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 						ZBX_TOKEN_SEARCH_BASIC))
 				{
 					(void)zbx_calculate_macro_function(*text + token.loc.l,
-							&inner_token.data.func_macro, &out));
+							&inner_token.data.func_macro, &out);
 					value = out;
 				}
 
