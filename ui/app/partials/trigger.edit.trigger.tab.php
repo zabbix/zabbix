@@ -137,10 +137,7 @@ $expression_row[] = [
 		->setId('expression-constructor-buttons')
 		->addClass(ZBX_STYLE_FORM_SUBFIELD)
 		->addStyle('display: none'),
-	new CDiv($input_method_toggle),
-	(new CDiv())
-		->setId('expression-error-container')
-		->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	new CDiv($input_method_toggle)
 ];
 
 $trigger_form_grid
@@ -156,10 +153,18 @@ $trigger_form_grid
 $input_method_toggle = new CDiv(
 	(new CButtonLink(_('Close expression constructor')))->setId('close-expression-constructor')
 );
-$trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
-	->addStyle('display: none')
-	->setId('close-expression-constructor-field')
-);
+$trigger_form_grid
+	->addItem((new CFormField([null, $input_method_toggle]))
+		->addStyle('display: none')
+		->setId('close-expression-constructor-field')
+	)
+	->addItem(
+		(new CFormField(
+			(new CDiv())
+				->setId('expression-error-container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+		))
+	);
 
 $trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode'),
 	new CFormField((new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
@@ -218,10 +223,7 @@ $recovery_expression_row[] = [
 		->setId('recovery-constructor-buttons')
 		->addClass(ZBX_STYLE_FORM_SUBFIELD)
 		->addStyle('display: none'),
-	new CDiv($input_method_toggle),
-	(new CDiv())
-		->setId('recovery-expression-error-container')
-		->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	new CDiv($input_method_toggle)
 ];
 
 $trigger_form_grid
@@ -242,6 +244,13 @@ $trigger_form_grid
 	->addItem((new CFormField([null, $input_method_toggle]))
 		->addStyle('display: none')
 		->setId('close-recovery-expression-constructor-field')
+	)
+	->addItem(
+		(new CFormField(
+			(new CDiv())
+				->setId('recovery-expression-error-container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+		))
 	)
 	->addItem([new CLabel(_('PROBLEM event generation mode'), 'type'),
 		new CFormField((new CRadioButtonList('type', (int) $data['type']))
