@@ -1658,7 +1658,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		}
 		// if the user is not logged in - offer to login
 		else {
-			CSessionHelper::unset(['saml_data']);
 			$data = [
 				'header' => _('You are not logged in'),
 				'messages' => [

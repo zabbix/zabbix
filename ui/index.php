@@ -47,7 +47,6 @@ if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	}
 
 	CWebUser::logout();
-	CSessionHelper::unset(['saml_data']);
 	redirect('index.php');
 }
 
