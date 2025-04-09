@@ -105,6 +105,8 @@ void	zbx_config_tls_free(zbx_config_tls_t *config_tls)
 	zbx_free(config_tls->cipher_cmd);
 	zbx_free(config_tls->frontend_accept);
 	zbx_free(config_tls->tls_listen);
+	zbx_free(config_tls->frontend_cert_issuer);
+	zbx_free(config_tls->frontend_cert_subject);
 
 	zbx_free(config_tls);
 }
