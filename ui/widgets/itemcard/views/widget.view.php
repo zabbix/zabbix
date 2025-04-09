@@ -203,8 +203,8 @@ function makeSectionsHeader(array $item, string $context, array $item_parent_tem
 	if ($context === 'host') {
 		$host_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'popup')
-			->setArgument('popup', $context)
-			->setArgument('hostid', $item['hosts'][0]['hostid'])
+			->setArgument('popup', 'host.edit')
+			->setArgument('hostid', $item['hostid'])
 			->getUrl();
 
 		$path[] = (new CLink($item['hosts'][0]['name'], $host_url))
