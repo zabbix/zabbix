@@ -5279,6 +5279,14 @@ msgstr "유지 관리 생성 및 편집"
 msgid "Create and edit maps"
 msgstr "맵 생성 및 수정"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "배경 생성"
@@ -8964,6 +8972,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "그래프를 삭제하였습니다"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9009,6 +9021,10 @@ msgstr "그래프 프로토타입을 추가하였습니다"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "그래프 프로토타입을 삭제하였습니다"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14217,6 +14233,14 @@ msgstr "새로운 이벤트 태그의 값"
 msgid "New excluded downtime"
 msgstr "새로 제외된 가동 중지 시간"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "새 호스트"
@@ -14238,6 +14262,10 @@ msgstr "새 항목 프로토타입"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "신규 메인터넌스 기간"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -25603,6 +25631,14 @@ msgstr "증상 장애를 원인 장애로 변환할 권한이 없음"
 msgid "no permissions to create and edit maps"
 msgstr "지도를 만들고 편집할 수 있는 권한이 없음"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "장애를 억제할 수 있는 권한이 없음"
@@ -26462,6 +26498,14 @@ msgstr[0] ""
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "값은 \"%1$s\"에서 \"%2$s\" 사이여야 함"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

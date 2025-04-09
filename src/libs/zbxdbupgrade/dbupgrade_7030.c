@@ -390,6 +390,31 @@ static int	DBpatch_7030028(void)
 
 static int	DBpatch_7030029(void)
 {
+	int		i;
+	const char	*values[] = {
+			"web.hosts.graphs.php.sort", "web.hosts.graph.list.sort",
+			"web.hosts.graphs.php.sortorder", "web.hosts.graph.list.sortorder",
+			"web.hosts.graphs.filter_hostids", "web.hosts.graph.list.filter_hostids",
+			"web.hosts.graphs.filter_groupids", "web.hosts.graph.list.filter_groupids",
+			"web.hosts.graphs.filter.active", "web.hosts.graph.list.filter.active",
+			"web.templates.graphs.php.sort", "web.templates.graph.list.sort",
+			"web.templates.graphs.php.sortorder", "web.templates.graph.list.sortorder",
+			"web.templates.graphs.filter_hostids", "web.templates.graph.list.filter_hostids",
+			"web.templates.graphs.filter_groupids", "web.templates.graph.list.filter_groupids",
+			"web.templates.graphs.filter.active", "web.templates.graph.list.filter.active",
+		};
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030030(void)
+{
 	const zbx_db_table_t	table =
 			{"host_template_cache", "hostid,link_hostid", 0,
 				{
@@ -403,7 +428,7 @@ static int	DBpatch_7030029(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030030(void)
+static int	DBpatch_7030031(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -411,7 +436,7 @@ static int	DBpatch_7030030(void)
 	return DBadd_foreign_key("host_template_cache", 1, &field);
 }
 
-static int	DBpatch_7030031(void)
+static int	DBpatch_7030032(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -419,12 +444,12 @@ static int	DBpatch_7030031(void)
 	return DBadd_foreign_key("host_template_cache", 2, &field);
 }
 
-static int	DBpatch_7030032(void)
+static int	DBpatch_7030033(void)
 {
 	return DBcreate_index("host_template_cache", "host_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7030033(void)
+static int	DBpatch_7030034(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			" insert into host_template_cache"
@@ -446,7 +471,7 @@ static int	DBpatch_7030033(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030034(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_table_t	table =
 			{"item_template_cache", "itemid,link_hostid", 0,
@@ -461,7 +486,7 @@ static int	DBpatch_7030034(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030035(void)
+static int	DBpatch_7030036(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -469,7 +494,7 @@ static int	DBpatch_7030035(void)
 	return DBadd_foreign_key("item_template_cache", 1, &field);
 }
 
-static int	DBpatch_7030036(void)
+static int	DBpatch_7030037(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -477,12 +502,12 @@ static int	DBpatch_7030036(void)
 	return DBadd_foreign_key("item_template_cache", 2, &field);
 }
 
-static int	DBpatch_7030037(void)
+static int	DBpatch_7030038(void)
 {
 	return DBcreate_index("item_template_cache", "item_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7030038(void)
+static int	DBpatch_7030039(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			" insert into item_template_cache"
@@ -511,7 +536,7 @@ static int	DBpatch_7030038(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030039(void)
+static int	DBpatch_7030040(void)
 {
 	const zbx_db_table_t	table =
 			{"httptest_template_cache", "httptestid,link_hostid", 0,
@@ -526,7 +551,7 @@ static int	DBpatch_7030039(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030040(void)
+static int	DBpatch_7030041(void)
 {
 	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -534,7 +559,7 @@ static int	DBpatch_7030040(void)
 	return DBadd_foreign_key("httptest_template_cache", 1, &field);
 }
 
-static int	DBpatch_7030041(void)
+static int	DBpatch_7030042(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -542,12 +567,12 @@ static int	DBpatch_7030041(void)
 	return DBadd_foreign_key("httptest_template_cache", 2, &field);
 }
 
-static int  DBpatch_7030042(void)
+static int  DBpatch_7030043(void)
 {
 	return DBcreate_index("httptest_template_cache", "httptest_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7030043(void)
+static int	DBpatch_7030044(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			" insert into httptest_template_cache"
@@ -575,6 +600,7 @@ static int	DBpatch_7030043(void)
 
 	return SUCCEED;
 }
+
 #endif
 
 DBPATCH_START(7030)
@@ -625,5 +651,6 @@ DBPATCH_ADD(7030040, 0, 1)
 DBPATCH_ADD(7030041, 0, 1)
 DBPATCH_ADD(7030042, 0, 1)
 DBPATCH_ADD(7030043, 0, 1)
+DBPATCH_ADD(7030044, 0, 1)
 
 DBPATCH_END()
