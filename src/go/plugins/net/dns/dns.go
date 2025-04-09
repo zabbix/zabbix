@@ -37,7 +37,7 @@ const (
 	inAddrSuffix   = ".in-addr.arpa"
 	inAddrV6Suffix = ".ip6.arpa"
 
-	defaultCount = 2
+	defaultCount      = 2
 	defaultRecordType = dns.TypeSOA
 )
 
