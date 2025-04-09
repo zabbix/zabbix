@@ -2594,10 +2594,10 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
 				item_prototype->allow_traps);
 
-				zbx_vector_uint64_append(new_itemids, *itemid);
+		zbx_vector_uint64_append(new_itemids, *itemid);
 
-				zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
-						item->parent_itemid, item_prototype->key, item->lastcheck);
+		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
+				item->parent_itemid, item_prototype->key, item->lastcheck);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 		zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
@@ -3080,7 +3080,6 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *             items           - [IN/OUT] items to save                       *
  *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
- *             new_itemids     - [OUT]                                        *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully saved or saving was not *
  *                         necessary                                          *
