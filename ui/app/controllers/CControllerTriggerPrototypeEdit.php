@@ -102,26 +102,27 @@ class CControllerTriggerPrototypeEdit extends CController {
 			}
 
 			$this->trigger_prototype = reset($trigger_prototypes);
+			$ids = array_column($this->trigger_prototype['hosts'], 'hostid');
 
 			if ($this->getInput('context') === 'host') {
-				$host = API::Host()->get([
+				$exists = (bool) API::Host()->get([
 					'output' => [],
-					'triggerids' => $trigger_id ? [$trigger_id] : null
+					'hostids' => $ids,
+					'triggerids' => $trigger_id,
+					'limit' => 1
 				]);
-
-				if (!$host) {
-					return false;
-				}
 			}
 			else {
-				$template = API::Template()->get([
-					'output' => ['templateid'],
-					'triggerids' => $trigger_id ? [$trigger_id] : null
+				$exists = (bool) API::Template()->get([
+					'output' => [],
+					'templateids' => $ids,
+					'triggerids' => $trigger_id,
+					'limit' => 1
 				]);
+			}
 
-				if (!$template) {
-					return false;
-				}
+			if (!$exists) {
+				return false;
 			}
 		}
 		else {
