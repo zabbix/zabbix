@@ -1845,6 +1845,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
+					'wizard_ready' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'readme' =>					['type' => XML_STRING, 'default' => ''],
 					'vendor' =>					['type' => XML_ARRAY, 'rules' => [
 						'name' =>					['type' => XML_STRING | XML_REQUIRED],
 						'version' =>				['type' => XML_STRING | XML_REQUIRED]
@@ -2958,7 +2960,30 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
-							'description' =>			['type' => XML_STRING, 'default' => '']
+							'description' =>			['type' => XML_STRING, 'default' => ''],
+							'config' =>					['type' => XML_ARRAY, 'rules' => [
+								'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_NOCONF => CXmlConstantName::MACRO_CONFIG_TYPE_NOCONF, CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]],
+								'label' =>					['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING | XML_REQUIRED],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'description' =>			['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'required' =>				['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'regex' =>					['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'options' =>				['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING | XML_REQUIRED],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]]
+							]]
 						]]
 					]],
 					'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [

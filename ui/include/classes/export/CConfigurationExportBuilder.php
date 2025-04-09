@@ -339,7 +339,7 @@ class CConfigurationExportBuilder {
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
-				'macros' => $this->formatMacros($template['macros']),
+				'macros' => $this->formatTemplateMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
@@ -382,7 +382,7 @@ class CConfigurationExportBuilder {
 				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
-				'macros' => $this->formatMacros($host['macros']),
+				'macros' => $this->formatHostMacros($host['macros']),
 				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
 				'tags' => $this->formatTags($host['tags']),
@@ -969,7 +969,7 @@ class CConfigurationExportBuilder {
 				'discover' => $hostPrototype['discover'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'macros' => $this->formatMacros($hostPrototype['macros']),
+				'macros' => $this->formatHostMacros($hostPrototype['macros']),
 				'tags' => $this->formatTags($hostPrototype['tags']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
 				'inventory_mode' => $hostPrototype['inventory_mode'],
@@ -1279,13 +1279,38 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format macros.
+	 * Format template macros.
 	 *
 	 * @param array $macros
 	 *
 	 * @return array
 	 */
-	protected function formatMacros(array $macros) {
+	protected function formatTemplateMacros(array $macros) {
+		$result = [];
+
+		$macros = order_macros($macros, 'macro');
+
+		foreach ($macros as $macro) {
+			$result[] = [
+				'macro' => $macro['macro'],
+				'type' => $macro['type'],
+				'value' => array_key_exists('value', $macro) ? $macro['value'] : '',
+				'description' => $macro['description'],
+				'config' => $macro['config']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format host and host prototype macros.
+	 *
+	 * @param array $macros
+	 *
+	 * @return array
+	 */
+	protected function formatHostMacros(array $macros) {
 		$result = [];
 
 		$macros = order_macros($macros, 'macro');

@@ -294,7 +294,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			],
 			[
 				'uuid' => '00fda66f07e4479498058bf352711a06',
@@ -308,13 +310,19 @@ class CImportDataAdapterTest extends TestCase {
 						'macro' => '{$MACRO}',
 						'value' => '2',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
 						'value' => '1',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					]
 				],
 				'templates' => [
@@ -331,7 +339,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 	}
@@ -1544,13 +1554,19 @@ class CImportDataAdapterTest extends TestCase {
 						'value' => '21',
 						'macro' => '{$PORT.FTP}',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					],
 					[
 						'value' => '22',
 						'macro' => '{$PORT.SSH}',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					]
 				],
 				'host' => 'Template_Linux',
@@ -1565,7 +1581,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			],
 			[
 				'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
@@ -1582,7 +1600,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 
@@ -1929,7 +1949,10 @@ class CImportDataAdapterTest extends TestCase {
 						'value' => '23',
 						'macro' => '{#VALUE}',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					]
 				],
 				'templates' => [
@@ -1944,7 +1967,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 
@@ -2220,7 +2245,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 
@@ -2977,7 +3004,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => 'Zabbix',
 				'vendor_version' => '6.4-0',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 	}

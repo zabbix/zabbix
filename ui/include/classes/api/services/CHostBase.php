@@ -1531,6 +1531,12 @@ abstract class CHostBase extends CApiService {
 		$upd_hostmacros = [];
 		$del_hostmacroids = [];
 
+		if ($this instanceof CTemplate) {
+			$ins_hostmacro_configs = [];
+			$upd_hostmacro_configs = [];
+			$del_hostmacro_configs = [];
+		}
+
 		foreach ($hosts as $i => &$host) {
 			if (!array_key_exists('macros', $host)) {
 				continue;
@@ -1549,6 +1555,46 @@ abstract class CHostBase extends CApiService {
 							'where' => ['hostmacroid' => $macro['hostmacroid']]
 						];
 						$changed = true;
+					}
+
+					if ($this instanceof CTemplate && array_key_exists('config', $macro)) {
+						if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+							$del_hostmacro_configs[] = $macro['hostmacroid'];
+						}
+						else {
+							$upd_hostmacro_config = DB::getUpdatedValues('hostmacro_config', $macro['config'],
+								$db_macros[$macro['hostmacroid']]['config']
+							);
+
+							if ($upd_hostmacro_config) {
+								if ($db_macros[$macro['hostmacroid']]['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+									$ins_hostmacro_configs[] = $upd_hostmacro_config
+										+ ['hostmacroid' => $macro['hostmacroid']];
+								}
+								else {
+									if ($macro['config']['type'] != ZBX_WIZARD_FIELD_LIST
+											&& $macro['config']['type'] != ZBX_WIZARD_FIELD_CHECKBOX) {
+										$upd_hostmacro_config['options'] =
+											DB::getDefault('hostmacro_config', 'options');
+									}
+
+									if ($macro['config']['type'] != ZBX_WIZARD_FIELD_LIST
+											&& $macro['config']['type'] != ZBX_WIZARD_FIELD_TEXT) {
+										$upd_hostmacro_config['required'] =
+											DB::getDefault('hostmacro_config', 'required');
+									}
+
+									if ($macro['config']['type'] != ZBX_WIZARD_FIELD_TEXT) {
+										$upd_hostmacro_config['regex'] = DB::getDefault('hostmacro_config', 'regex');
+									}
+
+									$upd_hostmacro_configs[] = [
+										'values' => $upd_hostmacro_config,
+										'where' => ['hostmacroid' => $macro['hostmacroid']]
+									];
+								}
+							}
+						}
 					}
 
 					unset($db_macros[$macro['hostmacroid']]);
@@ -1578,10 +1624,22 @@ abstract class CHostBase extends CApiService {
 
 		if ($del_hostmacroids) {
 			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
+
+			if ($this instanceof CTemplate) {
+				DB::delete('hostmacro_config', ['hostmacroid' => $del_hostmacroids]);
+			}
+		}
+
+		if ($this instanceof CTemplate && $del_hostmacro_configs) {
+			DB::delete('hostmacro_config', ['hostmacroid' => $del_hostmacro_configs]);
 		}
 
 		if ($upd_hostmacros) {
 			DB::update('hostmacro', $upd_hostmacros);
+		}
+
+		if ($this instanceof CTemplate && $upd_hostmacro_configs) {
+			DB::update('hostmacro_config', $upd_hostmacro_configs);
 		}
 
 		if ($ins_hostmacros) {
@@ -1597,10 +1655,23 @@ abstract class CHostBase extends CApiService {
 				if (!array_key_exists('hostmacroid', $macro)) {
 					$macro['hostmacroid'] = array_shift($hostmacroids);
 				}
+
+				if ($this instanceof CTemplate) {
+					foreach ($ins_hostmacros as $_macro) {
+						if (array_key_exists('config', $_macro)
+								&& $_macro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+							$ins_hostmacro_configs[] = $_macro['config'] + ['hostmacroid' => $macro['hostmacroid']];
+						}
+					}
+				}
 			}
 			unset($macro);
 		}
 		unset($host);
+
+		if ($this instanceof CTemplate && $ins_hostmacro_configs) {
+			DB::insert('hostmacro_config', $ins_hostmacro_configs, false);
+		}
 	}
 
 	/**
@@ -1840,9 +1911,40 @@ abstract class CHostBase extends CApiService {
 		];
 		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
 
+		if ($this instanceof CTemplate) {
+			$hostmacroids = [];
+		}
+
 		while ($db_macro = DBfetch($db_macros)) {
+			if ($this instanceof CTemplate) {
+				$hostmacroids[] = $db_macro['hostmacroid'];
+			}
+
 			$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
 				array_diff_key($db_macro, array_flip(['hostid']));
+		}
+
+		if ($this instanceof CTemplate) {
+			$options = [
+				'output' => ['hostmacroid', 'type', 'label', 'description', 'required', 'regex', 'options'],
+				'filter' => ['hostmacroid' => $hostmacroids]
+			];
+			$db_macro_configs = DBfetchArray(DBselect(DB::makeSql('hostmacro_config', $options)));
+
+			foreach ($db_hosts as &$db_host) {
+				foreach ($db_host['macros'] as &$db_macro) {
+					$db_macro['config'] = DB::getDefaults('hostmacro_config');
+
+					foreach ($db_macro_configs as $db_macro_config) {
+						if (bccomp($db_macro['hostmacroid'], $db_macro_config['hostmacroid']) == 0) {
+							unset($db_macro_config['hostmacroid']);
+							$db_macro['config'] = $db_macro_config;
+						}
+					}
+				}
+				unset($db_macro);
+			}
+			unset($db_host);
 		}
 	}
 
@@ -1868,9 +1970,27 @@ abstract class CHostBase extends CApiService {
 				'nopermissions' => true
 			]);
 
-			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
+			if ($this instanceof CTemplate && $this->outputIsRequested('config', $options['selectMacros'])) {
+				$hostmacro_config = API::getApiService()->select('hostmacro_config', [
+					'output' => ['type', 'label', 'description', 'required', 'regex', 'options'],
+					'filter' => ['hostmacroid' => array_keys($macros)],
+					'preservekeys' => true
+				]);
+				$hostmacro_config = $this->unsetExtraFields($hostmacro_config, ['hostmacroid'], []);
+				$relation_map = $this->createRelationMap($macros, 'hostmacroid', 'hostmacroid');
+				$macros = $relation_map->mapOne($macros, $hostmacro_config, 'config');
+
+				foreach ($macros as &$macro) {
+					if (!$macro['config']) {
+						$macro['config'] = DB::getDefaults('hostmacro_config');
+					}
+				}
+				unset($macro);
+			}
+
+			$relation_map = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
 			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
-			$result = $relationMap->mapMany($result, $macros, 'macros',
+			$result = $relation_map->mapMany($result, $macros, 'macros',
 				array_key_exists('limitSelects', $options) ? $options['limitSelects'] : null
 			);
 		}

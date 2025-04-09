@@ -84,7 +84,7 @@ class CImportDataAdapter {
 
 				$templates[] = CArrayHelper::getByKeys($template, [
 					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
-					'valuemaps', 'vendor_name', 'vendor_version'
+					'valuemaps', 'vendor_name', 'vendor_version', 'wizard_ready', 'readme'
 				]);
 			}
 		}

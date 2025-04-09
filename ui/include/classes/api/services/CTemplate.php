@@ -301,7 +301,8 @@ class CTemplate extends CHostGeneral {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])]
+			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])],
+			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'hostid', 'macro', 'value', 'type', 'description', 'automatic', 'config'])]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -377,8 +378,33 @@ class CTemplate extends CHostGeneral {
 										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
-				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]]
+				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
+				'config' => 			['type' => API_OBJECT, 'fields' => [
+					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+					'label' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'description' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'required' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'regex' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'options' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]]
+			]],
+			'wizard_ready' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_NOT_READY, ZBX_WIZARD_READY])],
+			'readme' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'readme')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
@@ -495,10 +521,35 @@ class CTemplate extends CHostGeneral {
 			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
 				'hostmacroid' =>		['type' => API_ID],
 				'macro' =>				['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]]
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
+				'config' => 			['type' => API_OBJECT, 'fields' => [
+					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+					'label' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'description' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'required' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'regex' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'options' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_JSON, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]]
+			]],
+			'wizard_ready' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_NOT_READY, ZBX_WIZARD_READY])],
+			'readme' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'readme')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
@@ -506,7 +557,9 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['uuid', 'templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
+			'output' => ['uuid', 'templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version',
+				'wizard_ready', 'readme'
+			],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -517,6 +570,68 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$this->addAffectedObjects($templates, $db_templates);
+
+		$api_input_macro_config_rules = [
+			'config' => 			['type' => API_OBJECT, 'fields' => [
+				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+				'label' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'options' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]]
+			]]
+		];
+
+		foreach ($templates as $t => $template) {
+			if (array_key_exists('macros', $template) && $template['macros']) {
+				$m = 0;
+				foreach ($template['macros'] as $macro) {
+					if (!array_key_exists('hostmacroid', $macro)) {
+						$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
+							API_REQUIRED;
+						$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
+							API_REQUIRED;
+
+						$macro['config'] = array_intersect_key($macro['config'],
+							$api_input_macro_config_rules['config']['fields']
+						);
+						if (!CApiInputValidator::validate($api_input_macro_config_rules['config'], $macro['config'],
+								'/'.($t + 1).'/macros/'.($m + 1), $error)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+						}
+					}
+					else {
+						$db_type =
+							$db_templates[$template['templateid']]['macros'][$macro['hostmacroid']]['config']['type'];
+
+						if ($db_type != $macro['config']['type']) {
+							if ($db_type == ZBX_WIZARD_FIELD_NOCONF) {
+								$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
+									API_REQUIRED;
+							}
+
+							if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
+									|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+								$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
+									API_REQUIRED;
+							}
+
+							$macro['config'] = array_intersect_key($macro['config'],
+								$api_input_macro_config_rules['config']['fields']
+							);
+							if (!CApiInputValidator::validate($api_input_macro_config_rules['config'], $macro['config'],
+									'/'.($t + 1).'/macros/'.($m + 1), $error)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+							}
+						}
+					}
+					$m++;
+				}
+			}
+		}
 
 		self::checkVendorFields($templates, $db_templates);
 		self::checkUuidDuplicates($templates, $db_templates);
