@@ -3088,15 +3088,14 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
  *                                                                            *
  ******************************************************************************/
 static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked,
-		zbx_vector_uint64_t *new_itemids)
+		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int *host_locked)
 {
 	int				ret = SUCCEED, new_items = 0, upd_items = 0;
 	zbx_lld_item_full_t		*item;
 	zbx_uint64_t			itemid, itemdiscoveryid;
 	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname;
 	zbx_lld_item_index_t		item_index_local;
-	zbx_vector_uint64_t		item_protoids;
+	zbx_vector_uint64_t		item_protoids, new_itemids;
 	char				*sql = NULL;
 	size_t				sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_lld_item_prototype_t	*item_prototype;
@@ -3104,6 +3103,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&item_protoids);
+	zbx_vector_uint64_create(&new_itemids);
 
 	if (0 == items->values_num)
 		goto out;
@@ -3193,7 +3193,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
-					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname, new_itemids);
+					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname, &new_itemids);
 		}
 		else
 		{
@@ -3205,7 +3205,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
 						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata,
-						&db_insert_irtname, new_itemids);
+						&db_insert_irtname, &new_itemids);
 			}
 		}
 	}
@@ -3222,6 +3222,13 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		zbx_db_insert_clean(&db_insert_irtname);
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
+
+		zbx_db_execute_multiple_query(
+				"insert into item_template_cache"
+					" select id.itemid,link_hostid from item_template_cache itc"
+						" join item_discovery id on"
+						" itc.itemid=id.parent_itemid"
+						" where ", "id.itemid", &new_itemids);
 
 		zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 	}
@@ -3270,6 +3277,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&item_protoids);
+	zbx_vector_uint64_destroy(&new_itemids);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
@@ -4170,7 +4178,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_t				items_index;
 	int					ret = SUCCEED, host_record_is_locked = 0;
 	zbx_vector_lld_item_full_ptr_t		items;
-	zbx_vector_uint64_t			new_itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4180,8 +4187,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	if (0 == item_prototypes.values_num)
 		goto out;
-
-	zbx_vector_uint64_create(&new_itemids);
 
 	zbx_vector_lld_item_full_ptr_create(&items);
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
@@ -4201,8 +4206,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	zbx_db_begin();
 
-	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
-			&new_itemids) &&
+	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked))
@@ -4219,13 +4223,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		goto clean;
 	}
 
-	zbx_db_execute_multiple_query(
-			"insert into item_template_cache"
-				" select id.itemid,link_hostid from item_template_cache itc"
-					" join item_discovery id on"
-					" itc.itemid=id.parent_itemid"
-					" where ", "id.itemid", &new_itemids);
-
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 clean:
@@ -4235,8 +4232,6 @@ clean:
 	zbx_vector_lld_item_full_ptr_destroy(&items);
 
 	zbx_vector_lld_item_prototype_ptr_clear_ext(&item_prototypes, lld_item_prototype_free);
-
-	zbx_vector_uint64_destroy(&new_itemids);
 out:
 	zbx_vector_lld_item_prototype_ptr_destroy(&item_prototypes);
 
