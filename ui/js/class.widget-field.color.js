@@ -29,6 +29,7 @@ class CWidgetFieldColor extends CWidgetField {
 	}
 
 	#initField() {
-		this.#input.addEventListener('change', () => this.dispatchUpdateEvent());
+		// jQuery events can only be caught by jQuery.
+		jQuery(this.#input).on('change', () => this.dispatchUpdateEvent());
 	}
 }
