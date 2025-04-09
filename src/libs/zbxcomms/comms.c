@@ -1733,6 +1733,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, c
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 
+	s->max_len_limit = 0;
+
 	if (s->connection_type == ZBX_TCP_SEC_UNENCRYPTED && tls_listen != NULL)
 	{
 		if (NULL == unencrypted_allowed_ip || SUCCEED != zbx_tcp_check_allowed_peers(s, unencrypted_allowed_ip))
