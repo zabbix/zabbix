@@ -331,6 +331,17 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 		return errs.Wrap(err, "cannot initialize logger")
 	}
 
+	if logType == log.File {
+		go func() {
+			t := time.NewTicker(15 * time.Second)
+			defer t.Stop()
+
+			for range t.C {
+				log.RefreshLogFile()
+			}
+		}()
+	}
+
 	zbxlib.SetLogLevel(agent.Options.DebugLevel)
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())

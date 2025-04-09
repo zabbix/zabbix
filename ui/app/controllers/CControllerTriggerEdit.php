@@ -34,6 +34,7 @@ class CControllerTriggerEdit extends CController {
 		}
 
 		$ret = $this->validateInput(['object', 'fields' => [
+			'context' => ['string', 'required', 'in' => ['host', 'template']],
 			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
 			'form_refresh' => ['integer', 'in' => [0, 1]]
 		] + $allow_any]);
@@ -47,12 +48,14 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkPermissions(): bool {
 		if ($this->hasInput('triggerid')) {
+			$trigger_id = $this->getInput('triggerid');
+
 			$parameters = [
 				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 					'templateid', 'type', 'state', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode',
 					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name'
 				],
-				'triggerids' => $this->getInput('triggerid'),
+				'triggerids' => $trigger_id,
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 				'selectTriggerDiscovery' => ['parent_triggerid', 'disable_source'],
@@ -72,6 +75,29 @@ class CControllerTriggerEdit extends CController {
 			}
 
 			$this->trigger = reset($triggers);
+
+			if ($this->getInput('context') === 'host') {
+				$host = API::Host()->get([
+					'output' => [],
+					'hostids' => [$this->getInput('hostid')],
+					'triggerids' => $trigger_id
+				]);
+
+				if (!$host) {
+					return false;
+				}
+			}
+			else {
+				$template = API::Template()->get([
+					'output' => [],
+					'templateids' => [$this->getInput('hostid')],
+					'triggerids' => $trigger_id
+				]);
+
+				if (!$template) {
+					return false;
+				}
+			}
 		}
 		else {
 			$this->trigger = null;

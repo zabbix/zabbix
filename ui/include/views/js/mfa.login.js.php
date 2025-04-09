@@ -24,15 +24,12 @@
 
 		init({qr_code_url}) {
 			const qr_code_div = document.querySelector('.qr-code');
-			const styles = getComputedStyle(qr_code_div);
 			const size = qr_code_div.clientWidth;
 
 			new QRCode(qr_code_div, {
 				text: qr_code_url,
 				width: size,
 				height: size,
-				colorDark : styles.color,
-				colorLight : styles.backgroundColor,
 				correctLevel : QRCode.CorrectLevel.L
 			});
 		}

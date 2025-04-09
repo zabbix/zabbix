@@ -35,6 +35,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 		}
 
 		$ret = $this->validateInput(['object', 'fields' => [
+			'context' => ['string', 'required', 'in' => ['host', 'template']],
 			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
 			'form_refresh' => ['integer', 'in' => [0, 1]]
 		] + $allow_any]);
@@ -57,6 +58,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			return false;
 		}
 
+		$trigger_id = $this->hasInput('triggerid') ? $this->getInput('triggerid') : null;
+
 		if ($this->hasInput('triggerid')) {
 			$trigger_prototypes = API::TriggerPrototype()->get([
 				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
@@ -76,6 +79,27 @@ class CControllerTriggerPrototypeEdit extends CController {
 			}
 
 			$this->trigger_prototype = reset($trigger_prototypes);
+
+			if ($this->getInput('context') === 'host') {
+				$host = API::Host()->get([
+					'output' => [],
+					'triggerids' => $trigger_id ? [$trigger_id] : null
+				]);
+
+				if (!$host) {
+					return false;
+				}
+			}
+			else {
+				$template = API::Template()->get([
+					'output' => ['templateid'],
+					'triggerids' => $trigger_id ? [$trigger_id] : null
+				]);
+
+				if (!$template) {
+					return false;
+				}
+			}
 		}
 		else {
 			$this->trigger_prototype = null;
