@@ -97,25 +97,23 @@ class CControllerTriggerEdit extends CController {
 
 			$this->trigger = reset($triggers);
 
-			if ($this->getInput('context') === 'host') {
-				$host = API::Host()->get([
-					'output' => [],
-					'hostids' => [$this->getInput('hostid')],
-					'triggerids' => $trigger_id
-				]);
-
-				if (!$host) {
-					return false;
+			if ($this->hasInput('hostid')) {
+				if ($this->getInput('context') === 'host') {
+					$exists = (bool) API::Host()->get([
+						'output' => [],
+						'hostids' => [$this->getInput('hostid')],
+						'triggerids' => $trigger_id
+					]);
 				}
-			}
-			else {
-				$template = API::Template()->get([
-					'output' => [],
-					'templateids' => [$this->getInput('hostid')],
-					'triggerids' => $trigger_id
-				]);
+				else {
+					$exists = (bool) API::Template()->get([
+						'output' => [],
+						'templateids' => [$this->getInput('hostid')],
+						'triggerids' => $trigger_id
+					]);
+				}
 
-				if (!$template) {
+				if (!$exists) {
 					return false;
 				}
 			}
