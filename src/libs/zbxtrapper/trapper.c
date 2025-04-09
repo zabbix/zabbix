@@ -135,39 +135,39 @@ zbx_status_section_t;
 int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
 		const char *config_frontend_allowed_ip)
 {
-if (NULL != config_frontend_allowed_ip &&
-SUCCEED != zbx_tcp_check_allowed_peers_info(&sock->peer_info, config_frontend_allowed_ip))
-{
-zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed by FrontendAllowedIP",
-	sock->peer);
+	if (NULL != config_frontend_allowed_ip &&
+		SUCCEED != zbx_tcp_check_allowed_peers_info(&sock->peer_info, config_frontend_allowed_ip))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed by FrontendAllowedIP",
+			sock->peer);
 
-return FAIL;
-}
+		return FAIL;
+	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-char	*msg = NULL;
+	char	*msg = NULL;
 
-if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock,
-	config_tls->frontend_cert_issuer,
-	config_tls->frontend_cert_subject,
-	&msg))
-{
-zabbix_log(LOG_LEVEL_DEBUG, "connection from server \"%s\" is not allowed: %s", sock->peer, msg);
-zbx_free(msg);
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock,
+		config_tls->frontend_cert_issuer,
+		config_tls->frontend_cert_subject,
+		&msg))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "connection from server \"%s\" is not allowed: %s", sock->peer, msg);
+		zbx_free(msg);
 
-return FAIL;
-}
+		return FAIL;
+	}
 #endif
 
-if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
-{
-zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
-		zbx_tcp_connection_type_name(sock->connection_type));
+	if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
+				zbx_tcp_connection_type_name(sock->connection_type));
 
-return FAIL;
-}
+		return FAIL;
+	}
 
-return SUCCEED;
+	return SUCCEED;
 }
 
 /******************************************************************************
