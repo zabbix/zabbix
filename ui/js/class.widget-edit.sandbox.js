@@ -139,15 +139,20 @@ class CWidgetEditSandbox {
 		else if (this.#widget_original !== this.#widget) {
 			const widget = this.#widget;
 
-			this.#widget_original.setPos(widget.getPos());
+			this.update({
+				type: this.#widget_original.getType(),
+				name: this.#widget_original.getName(),
+				view_mode: this.#widget_original.getViewMode(),
+				fields: this.#widget_original.getFields(),
+				is_configured: !(this.#widget_original instanceof CWidgetMisconfigured)
+					|| this.#widget_original.getMessageType() !== CWidgetMisconfigured.MESSAGE_TYPE_NOT_CONFIGURED
+			});
 
-			this.#dashboard_page.replaceWidget(widget, this.#widget_original);
-
-			this.#widget = this.#widget_original;
-
-			if (widget.getType() !== this.#widget_original.getType()) {
+			if (this.#widget_original.getType() !== widget.getType()) {
 				this.#correctListeners();
 			}
+
+			this.#widget_original.destroy();
 		}
 
 		this.#deactivate();
