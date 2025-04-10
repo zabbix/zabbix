@@ -39,7 +39,7 @@ class CDashboard {
 
 	static EVENT_FEEDBACK = 'dashboard-feedback';
 
-	static WIDGET_EDIT_INPUT_THROTTLE_MS = 1000;
+	static WIDGET_EDIT_INPUT_THROTTLE_MS = 500;
 
 	#broadcast_options;
 
