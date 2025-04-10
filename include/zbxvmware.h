@@ -179,6 +179,7 @@ typedef struct
 {
 	char				*name;
 	char				*uuid;
+	char				*id;
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
@@ -293,6 +294,7 @@ typedef struct
 	unsigned int				snapshot_count;
 	zbx_vector_vmware_custom_attr_ptr_t	custom_attrs;
 	zbx_vector_str_t			alarm_ids;
+	zbx_vector_str_t			ds_ids;
 }
 zbx_vmware_vm_t;
 
