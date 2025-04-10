@@ -978,6 +978,13 @@ class CFormValidator {
 			};
 		}
 
+		if (('not_empty' in rules) && value === '') {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
+			};
+		}
+
 		value = parseInt(value);
 
 		if (!this.#checkNumericIn(rules, value)) {
@@ -1064,6 +1071,22 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'type', t('This value is not a valid floating-point value.'))
+			};
+		}
+
+		if (('not_empty' in rules) && value === '') {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
+			};
+		}
+
+		if (value && value.split('.')[1] && value.split('.')[1].length > rules['decimal_limit']) {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'decimal_limit',
+					sprintf(t('This value cannot have more than %1$s decimal places.'),  rules['decimal_limit'])
+				)
 			};
 		}
 

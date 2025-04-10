@@ -28,7 +28,7 @@ class CControllerSlaCreate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db sla.name', 'required', 'not_empty'],
-			'slo' => ['float', 'required', 'min' => 0, 'max' => 100],
+			'slo' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4],
 			'period' => ['db sla.period', 'required', 'in' => [
 				ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY
 			]],
