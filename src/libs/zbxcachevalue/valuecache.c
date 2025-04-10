@@ -202,7 +202,7 @@ typedef struct
 	int		last_warning_time;
 
 	/* timestamp of the last warning message when item couldn't be allocated due to insufficient space */
-	int		last_alloc_warning_time;
+	time_t		last_alloc_warning_time;
 
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
@@ -749,9 +749,9 @@ static void	vc_dump_items_statistics(void)
  ******************************************************************************/
 static void	vc_warn_alloc(const zbx_vc_item_t *item, size_t requested_bytes)
 {
-	int	now;
+	time_t	now;
 
-	now = (int)time(NULL);
+	now = time(NULL);
 
 	if (now - vc_cache->last_alloc_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{

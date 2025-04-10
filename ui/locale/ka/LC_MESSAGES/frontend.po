@@ -8959,6 +8959,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "გრაფიკი წაიშალა"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9004,6 +9008,10 @@ msgstr "გრაფიკის პროტოტიპი დაემატ�
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "გრაფიკის პროტოტიპი წაიშალა"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14210,6 +14218,14 @@ msgstr "ახალი მოვლენის ჭდის მნიშვნ
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
+msgstr ""
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
 msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
@@ -26465,6 +26481,14 @@ msgstr[0] "მნიშვნელობა %1$s უნდა იყოს"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "მნიშვნელობა \"%1$s\"-სა და \"%2$s\"-ს შორის უნდა იყოს"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
