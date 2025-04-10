@@ -42,7 +42,7 @@ class CWidgetEditSandbox {
 		this.#max_rows = dashboard.getMaxRows();
 	}
 
-	promiseInit({dashboard_page, widget = null, type = null, unique_id = null, pos = null}) {
+	promiseInit({dashboard_page, widget = null, type = null, pos = null}) {
 		return new Promise(resolve => {
 			this.#dashboard_page = dashboard_page;
 
