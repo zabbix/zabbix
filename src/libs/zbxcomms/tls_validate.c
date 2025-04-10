@@ -365,6 +365,66 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
 #undef ZBX_TLS_PARAMETER_CONFIG_FILE
 #undef ZBX_TLS_PARAMETER_COMMAND_LINE
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Helper function: parse and check TLSFrontendAccept and TLSAccept       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     config_tls - [IN]                                                      *
+ *     accept     - [IN] pointer to the config file string                    *
+ *                                                                            *
+ * Return value: parsed flags                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned int tls_config_parse_accept(zbx_config_tls_t *config_tls, char **accept)
+{
+	unsigned int ret = 0;
+
+	char		*s, *p, *delim;
+
+	p = s = zbx_strdup(NULL, *accept);
+
+	while (1)
+	{
+		delim = strchr(p, ',');
+
+		if (NULL != delim)
+			*delim = '\0';
+
+		if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
+		{
+			ret |= ZBX_TCP_SEC_UNENCRYPTED;
+		}
+		else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
+		{
+			ret |= ZBX_TCP_SEC_TLS_CERT;
+		}
+		else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_PSK_TXT))
+		{
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+			ret |= ZBX_TCP_SEC_TLS_PSK;
+#else
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK, accept, NULL, config_tls);
+#endif
+		}
+		else
+		{
+			zbx_free(s);
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, accept, NULL, config_tls);
+		}
+
+		if (NULL == delim)
+			break;
+
+		p = delim + 1;
+	}
+
+	zbx_free(s);
+
+	return ret;
+}
+
 /**********************************************************************************************
  *                                                                                            *
  * Purpose: check for allowed combinations of TLS configuration parameters                    *
@@ -422,41 +482,11 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 
 	/* parse and validate 'TLSFrontendAccept' parameter (in zabbix_server.conf ) */
 	if (NULL != config_tls->frontend_accept)
+		config_tls->frontend_accept_modes = tls_config_parse_accept(config_tls, &(config_tls->frontend_accept));
+
+	if (0 != (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_PSK))
 	{
-		char		*s, *p, *delim;
-
-		config_tls->frontend_accept_modes = 0;
-		p = s = zbx_strdup(NULL, config_tls->frontend_accept);
-
-		while (1)
-		{
-			delim = strchr(p, ',');
-
-			if (NULL != delim)
-				*delim = '\0';
-
-			if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
-			{
-				config_tls->frontend_accept_modes |= ZBX_TCP_SEC_UNENCRYPTED;
-			}
-			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
-			{
-				config_tls->frontend_accept_modes |= ZBX_TCP_SEC_TLS_CERT;
-			}
-			else
-			{
-				zbx_free(s);
-				zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept),
-						NULL, config_tls);
-			}
-
-			if (NULL == delim)
-				break;
-
-			p = delim + 1;
-		}
-
-		zbx_free(s);
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept), NULL, config_tls);
 	}
 
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
@@ -489,58 +519,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	}
 
 	/* parse and validate 'TLSAccept' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
-
 	if (NULL != config_tls->accept)
-	{
-		char		*s, *p, *delim;
-		unsigned int	accept_modes_tmp = 0;	/* 'accept_modes' is shared between threads on */
-							/* MS Windows. To avoid races make a local temporary */
-							/* variable, modify it and write into */
-							/* 'accept_modes' when done. */
-
-		p = s = zbx_strdup(NULL, config_tls->accept);
-
-		while (1)
-		{
-			delim = strchr(p, ',');
-
-			if (NULL != delim)
-				*delim = '\0';
-
-			if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
-			{
-				accept_modes_tmp |= ZBX_TCP_SEC_UNENCRYPTED;
-			}
-			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
-			{
-				accept_modes_tmp |= ZBX_TCP_SEC_TLS_CERT;
-			}
-			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_PSK_TXT))
-			{
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-				accept_modes_tmp |= ZBX_TCP_SEC_TLS_PSK;
-#else
-				zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK, &(config_tls->accept), NULL,
-						config_tls);
-#endif
-			}
-			else
-			{
-				zbx_free(s);
-				zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->accept), NULL,
-						config_tls);
-			}
-
-			if (NULL == delim)
-				break;
-
-			p = delim + 1;
-		}
-
-		config_tls->accept_modes = accept_modes_tmp;
-
-		zbx_free(s);
-	}
+		config_tls->accept_modes = tls_config_parse_accept(config_tls, &(config_tls->accept));
 
 	/* either both a certificate and a private key must be defined or none of them */
 
