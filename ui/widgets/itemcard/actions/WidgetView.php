@@ -30,7 +30,7 @@ use API,
 	CWebUser,
 	Manager;
 
-use Widgets\ItemCard\Includes\CWidgetFieldSections;
+use Widgets\ItemCard\Includes\CWidgetFieldItemSections;
 use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
 
 class WidgetView extends CControllerDashboardWidgetView
@@ -79,51 +79,51 @@ class WidgetView extends CControllerDashboardWidgetView
 			'webitems' => true
 		];
 
-		if (in_array(CWidgetFieldSections::SECTION_DESCRIPTION, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_DESCRIPTION, $this->fields_values['sections'])) {
 			$options['output'][] = 'description';
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_METRICS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
 			$options['output'] = array_merge($options['output'], ['delay', 'key_']);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_METRICS, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
+				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$options['output'] = array_merge($options['output'], ['history', 'trends']);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$options['output'][] = 'units';
 			$options += [
 				'selectValueMap' => ['mappings']
 			];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TYPE_OF_INFORMATION, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldSections::SECTION_METRICS, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION, $this->fields_values['sections'])
+				|| in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
+				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$options['output'][] = 'value_type';
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_HOST_INTERFACE, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_HOST_INTERFACE, $this->fields_values['sections'])) {
 			$options += [
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip']
 			];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
 			$options += [
 				'selectTriggers' => ['triggerid']
 			];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TAGS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
 			$options += [
 				'selectTags' => ['tag', 'value']
 			];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_HOST_INVENTORY, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_HOST_INVENTORY, $this->fields_values['sections'])) {
 			$options['output'][] = 'inventory_link';
 		}
 
@@ -209,7 +209,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			}
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
 			$item['triggers'] = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
 					'priority', 'status', 'state', 'error', 'templateid', 'flags'
@@ -220,7 +220,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			]);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->getItemValue($item);
 		}
 

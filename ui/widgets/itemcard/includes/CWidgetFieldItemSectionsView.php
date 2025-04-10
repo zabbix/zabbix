@@ -27,9 +27,9 @@ use CButton,
 	CTemplateTag,
 	CWidgetFieldView;
 
-class CWidgetFieldSectionsView extends CWidgetFieldView {
+class CWidgetFieldItemSectionsView extends CWidgetFieldView {
 
-	public function __construct(CWidgetFieldSections $field) {
+	public function __construct(CWidgetFieldItemSections $field) {
 		$this->field = $field;
 	}
 
@@ -54,7 +54,7 @@ class CWidgetFieldSectionsView extends CWidgetFieldView {
 	public function getJavaScript(): string {
 		return '
 			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
-				new CWidgetFieldSections('.json_encode([
+				new CWidgetFieldItemSections('.json_encode([
 					'field_name' => $this->field->getName(),
 					'field_value' => $this->field->getValue()
 				]).');
@@ -69,16 +69,16 @@ class CWidgetFieldSectionsView extends CWidgetFieldView {
 					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 					(new CSelect($this->field->getName().'[#{rowNum}]'))
 						->addOptions(CSelect::createOptionsFromArray([
-							CWidgetFieldSections::SECTION_DESCRIPTION => _('Description'),
-							CWidgetFieldSections::SECTION_ERROR_TEXT => _('Error text'),
-							CWidgetFieldSections::SECTION_METRICS => _('Metrics'),
-							CWidgetFieldSections::SECTION_LATEST_DATA => _('Latest data'),
-							CWidgetFieldSections::SECTION_TYPE_OF_INFORMATION => _('Type of information'),
-							CWidgetFieldSections::SECTION_TRIGGERS => _('Triggers'),
-							CWidgetFieldSections::SECTION_HOST_INTERFACE => _('Host interface'),
-							CWidgetFieldSections::SECTION_TYPE => _('Type'),
-							CWidgetFieldSections::SECTION_HOST_INVENTORY => _('Host inventory'),
-							CWidgetFieldSections::SECTION_TAGS => _('Tags')
+							CWidgetFieldItemSections::SECTION_DESCRIPTION => _('Description'),
+							CWidgetFieldItemSections::SECTION_ERROR_TEXT => _('Error text'),
+							CWidgetFieldItemSections::SECTION_METRICS => _('Metrics'),
+							CWidgetFieldItemSections::SECTION_LATEST_DATA => _('Latest data'),
+							CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION => _('Type of information'),
+							CWidgetFieldItemSections::SECTION_TRIGGERS => _('Triggers'),
+							CWidgetFieldItemSections::SECTION_HOST_INTERFACE => _('Host interface'),
+							CWidgetFieldItemSections::SECTION_TYPE => _('Type'),
+							CWidgetFieldItemSections::SECTION_HOST_INVENTORY => _('Host inventory'),
+							CWidgetFieldItemSections::SECTION_TAGS => _('Tags')
 						]))
 						->setValue('#{section}')
 						->setId($this->field->getName().'_#{rowNum}')

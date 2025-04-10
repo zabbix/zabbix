@@ -21,14 +21,14 @@
  * @var array $data
  */
 
-use Widgets\ItemCard\Includes\CWidgetFieldSectionsView;
+use Widgets\ItemCard\Includes\CWidgetFieldItemSectionsView;
 
 (new CWidgetFormView($data))
 	->addField(
 		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'])
 	)
 	->addField(
-		new CWidgetFieldSectionsView($data['fields']['sections'])
+		new CWidgetFieldItemSectionsView($data['fields']['sections'])
 	)
 	->addField(
 		(new CWidgetFieldSparklineView($data['fields']['sparkline']))->addRowClass('js-sparkline-row')

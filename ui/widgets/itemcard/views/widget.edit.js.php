@@ -14,7 +14,7 @@
 **/
 
 
-use Widgets\ItemCard\Includes\CWidgetFieldSections;
+use Widgets\ItemCard\Includes\CWidgetFieldItemSections;
 
 ?>
 
@@ -50,7 +50,7 @@ window.widget_itemcard_form = new class {
 		let has_latest_data_section = false;
 
 		for (const element of sections) {
-			if (element.value == <?= CWidgetFieldSections::SECTION_LATEST_DATA ?>) {
+			if (element.value == <?= CWidgetFieldItemSections::SECTION_LATEST_DATA ?>) {
 				has_latest_data_section = true;
 
 				break;

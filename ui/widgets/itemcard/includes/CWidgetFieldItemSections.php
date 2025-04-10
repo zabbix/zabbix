@@ -18,9 +18,9 @@ namespace Widgets\ItemCard\Includes;
 
 use Zabbix\Widgets\CWidgetField;
 
-class CWidgetFieldSections extends CWidgetField {
+class CWidgetFieldItemSections extends CWidgetField {
 
-	public const DEFAULT_VIEW = CWidgetFieldSectionsView::class;
+	public const DEFAULT_VIEW = CWidgetFieldItemSectionsView::class;
 	public const DEFAULT_VALUE = [];
 
 	public const SECTION_DESCRIPTION = 0;

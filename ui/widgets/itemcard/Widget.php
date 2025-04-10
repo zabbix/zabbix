@@ -18,7 +18,7 @@ namespace Widgets\ItemCard;
 
 use Zabbix\Core\CWidget;
 
-use Widgets\ItemCard\Includes\CWidgetFieldSections;
+use Widgets\ItemCard\Includes\CWidgetFieldItemSections;
 
 class Widget extends CWidget {
 
@@ -35,10 +35,10 @@ class Widget extends CWidget {
 	public function getInitialFieldsValues(): array {
 		return [
 			'sections' => [
-				CWidgetFieldSections::SECTION_METRICS,
-				CWidgetFieldSections::SECTION_TYPE_OF_INFORMATION,
-				CWidgetFieldSections::SECTION_HOST_INTERFACE,
-				CWidgetFieldSections::SECTION_TYPE
+				CWidgetFieldItemSections::SECTION_METRICS,
+				CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION,
+				CWidgetFieldItemSections::SECTION_HOST_INTERFACE,
+				CWidgetFieldItemSections::SECTION_TYPE
 			]
 		];
 	}

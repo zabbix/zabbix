@@ -47,7 +47,7 @@ class WidgetForm extends CWidgetForm {
 
 	public function validate(bool $strict = false): array {
 		$sections = $this->getFieldValue('sections');
-		$sparkline_enabled = in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $sections);
+		$sparkline_enabled = in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $sections);
 		$errors = [];
 
 		foreach ($this->fields as $name => $field) {
@@ -66,7 +66,7 @@ class WidgetForm extends CWidgetForm {
 		$values = parent::normalizeValues($values);
 
 		if (array_key_exists('sections', $values) && is_array($values['sections'])
-				&& in_array(CWidgetFieldSections::SECTION_LATEST_DATA, $values['sections'])) {
+				&& in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $values['sections'])) {
 			$values['sparkline'] = array_key_exists('sparkline', $values)
 				? array_replace(self::SPARKLINE_DEFAULT, $values['sparkline'])
 				: self::SPARKLINE_DEFAULT;
@@ -83,7 +83,7 @@ class WidgetForm extends CWidgetForm {
 					->setMultiple(false)
 			)
 			->addField(
-				new CWidgetFieldSections('sections', _('Show'))
+				new CWidgetFieldItemSections('sections', _('Show'))
 			)
 			->addField(
 				(new CWidgetFieldSparkline('sparkline', _('Sparkline')))->setDefault(self::SPARKLINE_DEFAULT)

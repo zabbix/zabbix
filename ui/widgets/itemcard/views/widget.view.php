@@ -14,7 +14,7 @@
 **/
 
 
-use Widgets\ItemCard\Includes\CWidgetFieldSections;
+use Widgets\ItemCard\Includes\CWidgetFieldItemSections;
 use Widgets\ItemCard\Widget;
 
 /**
@@ -33,15 +33,15 @@ elseif ($data['item']) {
 
 	foreach ($data['sections'] as $section) {
 		switch ($section) {
-			case CWidgetFieldSections::SECTION_DESCRIPTION:
+			case CWidgetFieldItemSections::SECTION_DESCRIPTION:
 				$sections[] = makeSectionDescription($item['description']);
 				break;
 
-			case CWidgetFieldSections::SECTION_ERROR_TEXT:
+			case CWidgetFieldItemSections::SECTION_ERROR_TEXT:
 				$sections[] = makeSectionError($item['error']);
 				break;
 
-			case CWidgetFieldSections::SECTION_METRICS:
+			case CWidgetFieldItemSections::SECTION_METRICS:
 				$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 				$custom_intervals = [];
@@ -66,7 +66,7 @@ elseif ($data['item']) {
 				$sections[] = makeSectionMetrics($item['delay'], $item['history'], $item['trends'], $custom_intervals);
 				break;
 
-			case CWidgetFieldSections::SECTION_TYPE_OF_INFORMATION:
+			case CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION:
 				$value_types = [
 					ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 					ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
@@ -81,7 +81,7 @@ elseif ($data['item']) {
 				$sections[] = makeSectionSingleParameter(_('Type of information'), $information_type);
 				break;
 
-			case CWidgetFieldSections::SECTION_HOST_INTERFACE:
+			case CWidgetFieldItemSections::SECTION_HOST_INTERFACE:
 				$interface_data = _('No data');
 
 				if ($item['interfaces']) {
@@ -100,28 +100,28 @@ elseif ($data['item']) {
 				$sections[] = makeSectionSingleParameter(_('Host interface'), $interface_data);
 				break;
 
-			case CWidgetFieldSections::SECTION_TYPE:
+			case CWidgetFieldItemSections::SECTION_TYPE:
 				$sections[] = makeSectionSingleParameter(_('Type'), item_type2str($item['type']));
 				break;
 
-			case CWidgetFieldSections::SECTION_TRIGGERS:
+			case CWidgetFieldItemSections::SECTION_TRIGGERS:
 				$sections[] = makeSectionTriggers($item['triggers'], $item['hostid'], $data['trigger_parent_templates'],
 					$data['allowed_ui_conf_templates'], $data['context']
 				);
 				break;
 
-			case CWidgetFieldSections::SECTION_HOST_INVENTORY:
+			case CWidgetFieldItemSections::SECTION_HOST_INVENTORY:
 				$sections[] = makeSectionSingleParameter(_('Host inventory'), $item['inventory_link'] != 0
 					? getHostInventories()[$item['inventory_link']]['title']
 					: ''
 				);
 				break;
 
-			case CWidgetFieldSections::SECTION_TAGS:
+			case CWidgetFieldItemSections::SECTION_TAGS:
 				$sections[] = makeSectionTags($item['tags']);
 				break;
 
-			case CWidgetFieldSections::SECTION_LATEST_DATA:
+			case CWidgetFieldItemSections::SECTION_LATEST_DATA:
 				$sections[] = makeSectionLatestData($item);
 				break;
 		}
