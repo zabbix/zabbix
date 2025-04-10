@@ -204,7 +204,7 @@ class CWidgetEditDialogue {
 
 	#onClose(e) {
 		if (e.detail.close_by === Overlay.prototype.CLOSE_BY_USER) {
-			if (this.#is_unsaved && !confirm(t('Widget configuration will be reverted.'))) {
+			if (!this.#is_new && this.#is_unsaved && !confirm(t('Widget configuration will be reverted.'))) {
 				e.preventDefault();
 
 				return;
