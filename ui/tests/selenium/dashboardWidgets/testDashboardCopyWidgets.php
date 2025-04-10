@@ -221,7 +221,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
-		 * since the widget header and the conent block without the loading appear first,
+		 * since the widget header and the content block without the loading appear first,
 		 * and only after that the loading appears.
 		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
 		 */
