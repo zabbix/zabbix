@@ -15,7 +15,7 @@
 
 
 /**
- * A parser for absolute time in "YYYY[-MM[-DD]][ hh[:mm[:ss]]]" format.
+ * A parser for absolute time in "YYYY[-MM[-DD]]" format.
  */
 class CSlaSchedulePeriodParser extends CParser {
 
@@ -26,9 +26,13 @@ class CSlaSchedulePeriodParser extends CParser {
 	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
+		$this->match = '';
+		$this->length = 0;
+		$this->error = _('time period format is expected');
+
 		$source = trim($source);
 
-		foreach (explode(',', $source) as $schedule_period) {
+		foreach (explode(',', $source) as $index => $schedule_period) {
 			if (!preg_match('/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/',
 					$schedule_period, $matches)) {
 				return self::PARSE_FAIL;
@@ -42,11 +46,34 @@ class CSlaSchedulePeriodParser extends CParser {
 			$day_period_from = SEC_PER_HOUR * $from_h + SEC_PER_MIN * $from_m;
 			$day_period_to = SEC_PER_HOUR * $to_h + SEC_PER_MIN * $to_m;
 
-			if ($from_m > 59 || $to_m > 59 || $day_period_from >= $day_period_to || $day_period_to > SEC_PER_DAY) {
+			if ($from_m > 59 || $to_m > 59 || $day_period_to > SEC_PER_DAY) {
+				return self::PARSE_FAIL;
+			}
+
+			if ($day_period_from >= $day_period_to) {
+				$this->error = _('start time must be less than end time');
+				return self::PARSE_FAIL;
+			}
+
+			// Validate period uniqueness.
+			$result[] = [
+				'period_from' => SEC_PER_DAY + $day_period_from,
+				'period_to' => SEC_PER_DAY + $day_period_to
+			];
+
+			if (count($result) !== count(array_unique(array_map('json_encode', $result)))) {
+				$this->error = _('periods must be unique');
 				return self::PARSE_FAIL;
 			}
 		}
 
-		return  self::PARSE_SUCCESS;
+		$this->match = substr($source, $pos, strlen($source));
+		$this->length = strlen($source) - $pos;
+
+		return self::PARSE_SUCCESS;
+	}
+
+	public function getError(): string {
+		return $this->error;
 	}
 }

@@ -32,7 +32,12 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 			],
 			'duration_days' => ['integer', 'required', 'min' => 0],
 			'duration_hours' => ['integer', 'required', 'min' => 0, 'max' => 23],
-			'duration_minutes' => ['integer', 'required', 'min' => 0, 'max' => 59]
+			'duration_minutes' => [
+				['integer', 'required', 'min' => 0, 'max' => 59],
+				['integer', 'required', 'min' => 1, 'max' => 59, 'when' => [
+					['duration_days', 'in 0'], ['duration_hours', 'in 0']
+				], 'messages' => ['min' => _('Duration must be no less than a minute.')]]
+			]
 		]];
 	}
 

@@ -29,7 +29,7 @@ class CControllerSlaUpdate extends CController {
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'slaid' => ['db sla.slaid', 'required'],
 			'name' => ['db sla.name', 'required', 'not_empty'],
-			'slo' => ['integer', 'required'],
+			'slo' => ['float', 'required', 'min' => 0, 'max' => 100],
 			'period' => ['db sla.period', 'required', 'in' => [
 				ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY
 			]],
@@ -40,49 +40,41 @@ class CControllerSlaUpdate extends CController {
 					'schedule_enabled_0' => ['integer', 'in 1'],
 					'schedule_period_0' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_0', 'in 1']
 					],
 					'schedule_enabled_1' => ['integer', 'in 1'],
 					'schedule_period_1' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_1', 'in 1']
 					],
 					'schedule_enabled_2' => ['integer', 'in 1'],
 					'schedule_period_2' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_2', 'in 1']
 					],
 					'schedule_enabled_3' => ['integer', 'in 1'],
 					'schedule_period_3' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_3', 'in 1']
 					],
 					'schedule_enabled_4' => ['integer', 'in 1'],
 					'schedule_period_4' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_4', 'in 1']
 					],
 					'schedule_enabled_5' => ['integer', 'in 1'],
 					'schedule_period_5' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_5', 'in 1']
 					],
 					'schedule_enabled_6' => ['integer', 'in 1'],
 					'schedule_period_6' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_6', 'in 1']
 					],
 					'schedule_enabled_7' => ['integer', 'in 1'],
 					'schedule_period_7' => ['string', 'not_empty',
 						'use' => [CSlaSchedulePeriodParser::class, []],
-						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_7', 'in 1']
 					]
 				],
@@ -111,7 +103,8 @@ class CControllerSlaUpdate extends CController {
 					'period_from' => ['string'],
 					'period_to' => ['string']
 				]
-			]
+			],
+			'status' => ['db sla.status', 'in' => [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED]]
 		]];
 	}
 
