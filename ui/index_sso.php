@@ -53,15 +53,79 @@ if (!is_array($SSO)) {
 }
 
 $SSO += ['SETTINGS' => []];
-$certs = [
-	'SP_KEY'	=> 'conf/certs/sp.key',
-	'SP_CERT'	=> 'conf/certs/sp.crt',
-	'IDP_CERT'	=> 'conf/certs/idp.crt'
-];
-$certs = array_merge($certs, array_intersect_key($SSO, $certs));
-$certs = array_filter($certs, 'is_readable');
-$certs = array_map('file_get_contents', $certs);
+
+if ($SSO['CERT_STORAGE'] != 'database') {
+	$certs = [
+		'SP_KEY' => 'conf/certs/sp.key',
+		'SP_CERT' => 'conf/certs/sp.crt',
+		'IDP_CERT' => 'conf/certs/idp.crt'
+	];
+	$certs = array_merge($certs, array_intersect_key($SSO, $certs));
+	$certs = array_filter($certs, 'is_readable');
+	$certs = array_map('file_get_contents', $certs);
+}
+else {
+	/*$db_saml = API::UserDirectory()->get([
+		'output' => ['userdirectoryid'],
+		'filter' => ['idp_type' => IDP_TYPE_SAML]
+	]);*/
+
+	$certs = [
+		'SP_KEY' => '-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDUA7IlahD831KQ
+4667ATiOdV9WnVv2naQwLKYZyN9qiT749AjIjmhT0ovcRgIBGThJNOwuZkAyFEUv
+2rrOI3B8W9WL5zaJfpNjdirNlgiCWMepVdQ9KWg33DQwisv57y9iERpaY4lSD4jW
+DNxeEtJWWyTmuE1J/ALlPcWvPrdrfgdPENUooaItCvI5fvYu6DY1DiYCzDjNVhAI
+5OI0AxYggq2mcQelGqk7nwQu+ZHhrZNRD/6ZzdpvfeSZtF3v/Y1nHaXupKoxmKjd
+gDFEavo7O02AobueoofV3Tq2UZBQ0m9jvWBaZ17zPHPVxWXwJONPhLXP4FCnI0X5
+7iBW0XVNAgMBAAECggEASDFp++t+FV1GFCgzW2IzC+9To365zeQoAG9zr9wCl5hc
+ZRFT3FcBl2leTodYL1+TFvp6YeJXgbX9SSpF6eOPbgknUhhNLcx4C6o1MQQhqaDp
+e/PJ7XmoDz1gWBcrFdQoYlBIlPbHz7WSdrCyaSYnkVg/3IBtcP/rTHwYUHAerO8C
+jJApNsHSmWaSRfnbikGYYQWfilYGDZzdFbi6qwn7rhNPoAjLyE2Rx5T1twJUyQoW
+QDjVhyZwVu0kikq1zywWpWEi6/1W0+Edd9Hgy8iDcO8QArd+J49y1Y2wVRksqN9C
+zF01igWZdzPIHJc3ueiO8rC9cJA4YV44pr9Ki0ze0QKBgQDqDggFibrniF37Yhcr
+udg1wRlJW2zQsajYi+ba4tI8mBDvJVQ9LUF3IPnTw9ao2OjBrdWaLM216/oK7OwD
+SJlZR5PJGxCQkZGFW9c6jG79H1N2clreODiSbiZLCWRTsrUmix3LlNkZcqGgFZxH
+zkH+j0LlClSwSi5Y1dtoxjhQfwKBgQDn5KJTjnBrIZCcNaeONQm7InB5LDIcxFJI
+8PjihNn0prHrb0IBv6Ui/ogJUtypHyyfOlel0GQLB/jSHDQMWaNeRqLeAbD551YA
+fAYDo7vBtygGNN95DrTo0h566JuJ9WQjCkW2vIapBUs44UCbnl9rWCT/VNRYcOMw
+52l5LPCUMwKBgHV7lYsyFx8g1AvasMbCAkT5KDgqK/SVOKt5jedQ8zZ3HgjsM9yB
+WtrxMnWZV6ZpOmv9VbqNwrQOPvQ8+DqttkuaIhRQAYCPkPvfnalF1HA5ySsrO3FP
+xxW5NH91t2ZLzaILMml9zXt4jqhMMKXaYkXkoy9UgC39DkaJEhkFZj8BAoGAdoKV
+JuizsTx9ICgXkoiuiXGnU3Xvwl3ew6JLP9CvZuXOJck9TZF4vrKgKUuss83XyyRQ
+6M/gYPbZBeAeBXXGFQc6cwUgQgclH6hClpeV/AEztkBNORv3/shrhVrdKps7auD0
+Edi1ZSnscIxFrYI5t61bcxYSU4SVx0ds0t3RsZsCgYEA0V/JhHXI7zIHYtvSYvwo
+nKPvDvgUKvVPyHNrJ3twXQkGaJiZP4ucGpTv2bvRshNn+gH+4BUwmS0/3wHsW9tq
+UJOHZ6A00ygkaA0dSunf3ANVBKzP9QZ+qsUWYS2zLRgnHstljME5LDetuL3ZeHFf
+bPPo2Fr7tmfozo4P38xcC4s=
+-----END PRIVATE KEY-----',
+		'SP_CERT' => '-----BEGIN CERTIFICATE-----
+MIIDDTCCAfWgAwIBAgIUfMgP5ME0CJ0+JdSyj7F8v5FFXPowDQYJKoZIhvcNAQEL
+BQAwFjEUMBIGA1UEAwwLbXlhcHAubG9jYWwwHhcNMjUwNDA5MTg0NzMzWhcNMjYw
+NDA5MTg0NzMzWjAWMRQwEgYDVQQDDAtteWFwcC5sb2NhbDCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBANQDsiVqEPzfUpDjrrsBOI51X1adW/adpDAsphnI
+32qJPvj0CMiOaFPSi9xGAgEZOEk07C5mQDIURS/aus4jcHxb1YvnNol+k2N2Ks2W
+CIJYx6lV1D0paDfcNDCKy/nvL2IRGlpjiVIPiNYM3F4S0lZbJOa4TUn8AuU9xa8+
+t2t+B08Q1Sihoi0K8jl+9i7oNjUOJgLMOM1WEAjk4jQDFiCCraZxB6UaqTufBC75
+keGtk1EP/pnN2m995Jm0Xe/9jWcdpe6kqjGYqN2AMURq+js7TYChu56ih9XdOrZR
+kFDSb2O9YFpnXvM8c9XFZfAk40+Etc/gUKcjRfnuIFbRdU0CAwEAAaNTMFEwHQYD
+VR0OBBYEFAaaB5rk8s8zDPvQr7GfXIPLrVYXMB8GA1UdIwQYMBaAFAaaB5rk8s8z
+DPvQr7GfXIPLrVYXMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
+AG5F6b/YZgjGYiSNpQb4szT+gzpTcgXDCpulSqO+wyqSQvVYj6Gmxp85qknjojy5
+GffBoFba7FF3bM5asOnhXrWGhfevLxbKF6jpaLFbs34bLLf+8V5avWEMI66dExot
+x/qjGK48exQI+70a617LztgaWLxe1elowILNc3dsuqlzSQ21qHrIftnILPFixY3t
+FVfr5ng7Lg5T0gkpmmeiGnoLm8en/LsZvoC7w/iJUHq2KkpdvjG0zolBOo5wC6Em
+8CUkpPAUHNdX1ziGhxtClk4cSiYrum3+vQ4ETng/xL/FtEzdOXdbWC7+pjXG4dAL
+czPgUvP97K7WyLs/pfyTsKY=
+-----END CERTIFICATE-----',
+		'IDP_CERT' => '-----BEGIN CERTIFICATE-----
+MIIDXTCCAkWgAwIBAgIJALmVVuDWu4NYMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwHhcNMTYxMjMxMTQzNDQ3WhcNNDgwNjI1MTQzNDQ3WjBFMQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzUCFozgNb1h1M0jzNRSCjhOBnR+uVbVpaWfXYIR+AhWDdEe5ryY+CgavOg8bfLybyzFdehlYdDRgkedEB/GjG8aJw06l0qF4jDOAw0kEygWCu2mcH7XOxRt+YAH3TVHa/Hu1W3WjzkobqqqLQ8gkKWWM27fOgAZ6GieaJBN6VBSMMcPey3HWLBmc+TYJmv1dbaO2jHhKh8pfKw0W12VM8P1PIO8gv4Phu/uuJYieBWKixBEyy0lHjyixYFCR12xdh4CA47q958ZRGnnDUGFVE1QhgRacJCOZ9bd5t9mr8KLaVBYTCJo5ERE8jymab5dPqe5qKfJsCZiqWglbjUo9twIDAQABo1AwTjAdBgNVHQ4EFgQUxpuwcs/CYQOyui+r1G+3KxBNhxkwHwYDVR0jBBgwFoAUxpuwcs/CYQOyui+r1G+3KxBNhxkwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAAiWUKs/2x/viNCKi3Y6blEuCtAGhzOOZ9EjrvJ8+COH3Rag3tVBWrcBZ3/uhhPq5gy9lqw4OkvEws99/5jFsX1FJ6MKBgqfuy7yh5s1YfM0ANHYczMmYpZeAcQf2CGAaVfwTTfSlzNLsF2lW/ly7yapFzlYSJLGoVE+OHEu8g5SlNACUEfkXw+5Eghh+KzlIN7R6Q7r2ixWNFBC/jWf7NKUfJyX8qIG5md1YUeT6GBW9Bm2/1/RiO24JTaYlfLdKK9TYb8sG5B+OLab2DImG99CJ25RkAcSobWNF5zD0O6lgOo3cEdB/ksCq3hmtlC/DlLZ/D8CJ+7VuZnS1rR2naQ==
+-----END CERTIFICATE-----'
+	];
+}
+
 $certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
+
 /** @var CUser $service */
 $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
@@ -92,8 +156,14 @@ $settings = [
 			'url' => $baseurl.'?sls'
 		],
 		'NameIDFormat' => $saml_settings['nameid_format'],
-		'x509cert' => $certs['SP_CERT'],
-		'privateKey' => $certs['SP_KEY']
+		'x509cert' => Utils::getStringBetween(
+			$certs['SP_CERT'],
+			'-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----'
+		),
+		'privateKey' => Utils::getStringBetween(
+			$certs['SP_KEY'],
+			'-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----'
+		)
 	],
 	'idp' => [
 		'entityId' => $saml_settings['idp_entityid'],
@@ -103,7 +173,10 @@ $settings = [
 		'singleLogoutService' => [
 			'url' => $saml_settings['slo_url']
 		],
-		'x509cert' => $certs['IDP_CERT']
+		'x509cert' => Utils::getStringBetween(
+			$certs['IDP_CERT'],
+			'-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----'
+		)
 	],
 	'security' => [
 		'nameIdEncrypted' => (bool) $saml_settings['encrypt_nameid'],

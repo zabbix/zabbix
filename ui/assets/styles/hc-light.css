@@ -8414,3 +8414,13 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container .tabfilter-item-label.focused {
   box-shadow: 0 0 0 2px #111111; }
+
+.file-upload-wrapper .file-input-hidden {
+  display: none; }
+  .file-upload-wrapper .file-upload-btn {
+    margin-left: .3em; }
+  .file-upload-wrapper .file-name {
+    margin-top: 5px;
+    display: none; }
+  .file-upload-wrapper .file-name:not([style="display: none;"]) {
+    display: block; }

@@ -299,11 +299,16 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$HISTORY[\'types\'] = [\'uint\', \'text\'];
 
 // Used for SAML authentication.
-// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
-//$SSO[\'SP_KEY\']			= \'conf/certs/sp.key\';
-//$SSO[\'SP_CERT\']			= \'conf/certs/sp.crt\';
-//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
-//$SSO[\'SETTINGS\']		= [];
+// Turn on upload possibility for SP private key, SP and IdP X.509 certificates by setting CERT_STORAGE to \'database\'.
+// Possible values: \'file\' or \'database\'.
+$SSO[\'CERT_STORAGE\']     = \'database\';
+//Uncomment to set extra settings for SP private key, SP and IdP X.509 certificates.
+//$SSO[\'SETTINGS\']       = [];
+// SP_KEY, SP_CERT and IDP_CERT paths will be ignored if CERT_STORAGE is set to \'database\'.
+// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates.
+//$SSO[\'SP_KEY\']        = \'conf/certs/sp.key\';
+//$SSO[\'SP_CERT\']       = \'conf/certs/sp.crt\';
+//$SSO[\'IDP_CERT\']       = \'conf/certs/idp.crt\'
 
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
