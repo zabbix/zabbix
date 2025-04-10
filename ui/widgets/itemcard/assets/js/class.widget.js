@@ -17,7 +17,7 @@ class CWidgetItemCard extends CWidget {
 
 	#abort_controller = null;
 	#binary_button = null;
-	#binary_data_cache = undefined;
+	#binary_data_cache = new Map();
 	#thumbnail_loader = null;
 
 	setContents(response) {
@@ -48,7 +48,7 @@ class CWidgetItemCard extends CWidget {
 				alt: cell.dataset.alt
 			};
 
-			this.#loadButton(url);
+			this.#loadThumbnail(url);
 		}
 
 		this.#adjustSections();
@@ -134,15 +134,18 @@ class CWidgetItemCard extends CWidget {
 		}
 	}
 
-	#loadButton(url) {
+	#loadThumbnail(url) {
 		const fetchValue = url => {
-			const button = this.#binary_button.button;
+			const binary_data = this.#binary_data_cache.get(url);
+			const button = url === this.#binary_button.url ? this.#binary_button.button : null;
 			return new Promise((resolve, reject) => {
-				if (this.#binary_data_cache !== undefined) {
-					resolve(this.#binary_data_cache);
+				if (binary_data !== undefined) {
+					resolve(binary_data);
 				}
 				else {
-					button.classList.add('is-loading', 'is-loading-fadein');
+					if (button !== null) {
+						button.classList.add('is-loading', 'is-loading-fadein');
+					}
 
 					fetch(url, {signal: this.#abort_controller.signal})
 						.then(response => response.json())
@@ -159,35 +162,44 @@ class CWidgetItemCard extends CWidget {
 				}
 			})
 				.then(binary_data => {
-					this.#binary_data_cache = binary_data;
+					this.#binary_data_cache.set(url, binary_data);
 
-					switch (binary_data.type) {
-						case CWidgetItemHistory.VALUE_TYPE_IMAGE:
-							if ('thumbnail' in binary_data) {
-								this.#makeThumbnailButton(button, binary_data);
-							}
-							else {
+					if (button !== null) {
+						switch (binary_data.type) {
+							case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+								if ('thumbnail' in binary_data) {
+									this.#makeThumbnailButton(button, binary_data);
+								} else {
+									this.#makeBinaryButton(button, binary_data);
+								}
+								break;
+
+							case CWidgetItemHistory.VALUE_TYPE_RAW:
 								this.#makeBinaryButton(button, binary_data);
-							}
-							break;
+								break;
 
-						case CWidgetItemHistory.VALUE_TYPE_RAW:
-							this.#makeBinaryButton(button, binary_data);
-							break;
-
-						default:
-							button.disabled = true
+							default:
+								button.disabled = true
+						}
 					}
 				})
 				.catch(exception => {
 					console.log('Could not load thumbnail', exception);
 				})
 				.finally(() => {
-					button.classList.remove('is-loading', 'is-loading-fadein');
+					if (button !== null) {
+						button.classList.remove('is-loading', 'is-loading-fadein');
+					}
 				});
 		}
 
 		this.#abort_controller = new AbortController();
+
+		for (const cached_url of this.#binary_data_cache.keys()) {
+			if (cached_url !== url) {
+				this.#binary_data_cache.delete(cached_url);
+			}
+		}
 
 		this.#thumbnail_loader = fetchValue(url);
 	}
@@ -211,7 +223,7 @@ class CWidgetItemCard extends CWidget {
 				break;
 
 			default:
-				binary_data.button.disabled = true;
+				button.disabled = true;
 		}
 	}
 
