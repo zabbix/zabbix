@@ -44,7 +44,7 @@ class CWidgetMisconfigured extends CWidget {
 				return {
 					message: t('Widget is not fully configured'),
 					description: t('Please update configuration'),
-					icon: ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE
+					icon: ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE
 				};
 
 			case CWidgetMisconfigured.MESSAGE_TYPE_EMPTY_REFERENCES:
