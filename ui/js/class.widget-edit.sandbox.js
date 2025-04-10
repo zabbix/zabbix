@@ -111,7 +111,7 @@ class CWidgetEditSandbox {
 		const widget = this.#widget;
 
 		if (widget === this.#widget_original) {
-			this.#dashboard_page.deleteWidget(widget, {do_destroy: false, is_batch_mode: true});
+			this.#dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 
 			this.#widget = this.#dashboard.addWidgetFromData(this.#dashboard_page, widget_data);
 		}
@@ -125,10 +125,6 @@ class CWidgetEditSandbox {
 	}
 
 	apply() {
-		if (this.#widget_original !== null && this.#widget_original !== this.#widget) {
-			this.#widget_original.destroy();
-		}
-
 		this.#deactivate();
 	}
 
@@ -151,8 +147,6 @@ class CWidgetEditSandbox {
 			if (this.#widget_original.getType() !== widget.getType()) {
 				this.#correctListeners();
 			}
-
-			this.#widget_original.destroy();
 		}
 
 		this.#deactivate();
