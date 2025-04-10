@@ -80,6 +80,12 @@ class ValueCheck extends CController {
 
 				if ($image) {
 					$result['type'] = self::VALUE_TYPE_IMAGE;
+
+					ob_start();
+
+					imagepng(imageThumb($image, 0, 112));
+
+					$result['thumbnail'] = base64_encode(ob_get_clean());
 				}
 				else {
 					$result['type'] = self::VALUE_TYPE_RAW;

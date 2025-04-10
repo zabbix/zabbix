@@ -4739,6 +4739,18 @@ div.dashboard-widget-itemcard .item-card {
           text-align: right; }
           div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
             width: 100%; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
+            overflow: hidden; }
+            div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link) {
+              width: 100px;
+              height: 54px;
+              background: transparent var(--thumbnail) no-repeat center;
+              background-size: cover;
+              border-color: transparent;
+              text-indent: -9999px; }
+              div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link):not(.is-loading), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link):not(.is-loading) {
+                border: 1px solid #9f9f9f;
+                border-radius: 3px; }
       div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers {
         max-height: 36px;
         overflow: hidden; }

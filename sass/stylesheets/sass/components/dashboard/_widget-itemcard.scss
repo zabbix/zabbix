@@ -151,6 +151,24 @@ div.dashboard-widget-itemcard {
 						.column-value {
 							width: 100%;
 						}
+
+						.btn-thumbnail {
+							overflow: hidden;
+
+							&:not(.btn-link) {
+								width: 100px;
+								height: 54px;
+								background: transparent var(--thumbnail) no-repeat center;
+								background-size: cover;
+								border-color: transparent;
+								text-indent: -9999px;
+
+								&:not(.is-loading) {
+									border: 1px solid $ui-border-color;
+									border-radius: 3px;
+								}
+							}
+						}
 					}
 				}
 

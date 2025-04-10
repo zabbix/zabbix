@@ -490,7 +490,7 @@ function makeSectionLatestData(array $item): CDiv {
 	if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 		if ($value !== null) {
 			$column_value = (new CButton(null, _('Show')))
-				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('btn-thumbnail')
 				->addClass('js-show-binary');
 
 			$action_column

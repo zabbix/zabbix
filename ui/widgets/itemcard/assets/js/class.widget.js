@@ -34,7 +34,7 @@ class CWidgetItemCard extends CWidget {
 			const cell = button.closest('div');
 			const curl = new Curl('zabbix.php');
 
-			curl.setArgument('action', 'widget.itemhistory.value.check');
+			curl.setArgument('action', 'widget.itemcard.value.check');
 			curl.setArgument('itemid', cell.dataset.itemid);
 
 			const [clock, ns] = cell.dataset.clock.split('.');
@@ -61,7 +61,7 @@ class CWidgetItemCard extends CWidget {
 	}
 
 	promiseReady() {
-		return Promise.all([super.promiseReady(), this.#thumbnail_loader]);
+		return Promise.all([super.promiseReady(), this.#thumbnail_loader].filter(promise => promise));
 	}
 
 	#adjustSections() {
@@ -163,6 +163,14 @@ class CWidgetItemCard extends CWidget {
 
 					switch (binary_data.type) {
 						case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+							if ('thumbnail' in binary_data) {
+								this.#makeThumbnailButton(button, binary_data);
+							}
+							else {
+								this.#makeBinaryButton(button, binary_data);
+							}
+							break;
+
 						case CWidgetItemHistory.VALUE_TYPE_RAW:
 							this.#makeBinaryButton(button, binary_data);
 							break;
@@ -205,6 +213,16 @@ class CWidgetItemCard extends CWidget {
 			default:
 				binary_data.button.disabled = true;
 		}
+	}
+
+	#makeThumbnailButton(button, binary_data) {
+		button.style.setProperty('--thumbnail', `url(data:image/png;base64,${binary_data.thumbnail})`);
+
+		const img = document.createElement('img');
+		img.alt = button.dataset.alt;
+		img.src = '#';
+
+		this.#addHintbox(button, img);
 	}
 
 	#getHintboxContentCUrl() {
