@@ -54,7 +54,7 @@ if (!is_array($SSO)) {
 
 $SSO += ['SETTINGS' => []];
 
-if ($SSO['CERT_STORAGE'] != 'database') {
+if (!array_key_exists('CERT_STORAGE', $SSO) || ($SSO['CERT_STORAGE'] != 'database')) {
 	$certs = [
 		'SP_KEY' => 'conf/certs/sp.key',
 		'SP_CERT' => 'conf/certs/sp.crt',
@@ -70,6 +70,7 @@ else {
 		'filter' => ['idp_type' => IDP_TYPE_SAML]
 	]);*/
 
+	//get fields from database
 	$certs = [
 		'SP_KEY' => '-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDUA7IlahD831KQ

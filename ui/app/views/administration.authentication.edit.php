@@ -12,8 +12,6 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-global $SSO;
-
 
 /**
  * @var CView $this
@@ -33,6 +31,8 @@ $form = (new CForm())
 	->disablePasswordAutofill();
 
 // Authentication general fields.
+
+$r = $SSO;
 $auth_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Default authentication')),
@@ -304,7 +304,7 @@ $saml_tab->addItem([
 	]);
 
 // SSO certificates upload
-if (isset($SSO['CERT_STORAGE']) && $SSO['CERT_STORAGE'] == 'database') {
+if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database') {
 	/*->addItem([
 		(new CLabel(_('IdP certificate'), 'idp_certificate_label'))->setAsteriskMark(),
 		(new CFormField(
