@@ -163,19 +163,7 @@ class CWidgetEditDialogue {
 	}
 
 	#onSubmitRequest() {
-		const {type, name, view_mode, fields} = this.#getProperties();
-
-		if (type !== this.#type || name !== this.#name || view_mode !== this.#view_mode
-				|| JSON.stringify(fields) !== JSON.stringify(this.#fields)) {
-			this.#type = type;
-			this.#name = name;
-			this.#view_mode = view_mode;
-			this.#fields = fields;
-
-			this.#validator.check({type, name, fields});
-
-			this.#is_unsaved = true;
-		}
+		this.#update();
 
 		const on_result = () => {
 			if (this.#messages.length > 0) {
@@ -224,18 +212,7 @@ class CWidgetEditDialogue {
 			clearTimeout(this.#input_throttle_timeout);
 		}
 
-		this.#input_throttle_timeout = setTimeout(() => {
-			const {type, name, view_mode, fields} = this.#getProperties();
-
-			this.#type = type;
-			this.#name = name;
-			this.#view_mode = view_mode;
-			this.#fields = fields;
-
-			this.#validator.check({type, name, fields});
-		}, CDashboard.WIDGET_EDIT_INPUT_THROTTLE_MS);
-
-		this.#is_unsaved = true;
+		this.#input_throttle_timeout = setTimeout(() => this.#update(), CDashboard.WIDGET_EDIT_INPUT_THROTTLE_MS);
 	}
 
 	#onValidatorResult(result) {
@@ -270,6 +247,22 @@ class CWidgetEditDialogue {
 					is_configured: this.#messages.length === 0
 				});
 			}
+		}
+	}
+
+	#update() {
+		const {type, name, view_mode, fields} = this.#getProperties();
+
+		if (type !== this.#type || name !== this.#name || view_mode !== this.#view_mode
+				|| JSON.stringify(fields) !== JSON.stringify(this.#fields)) {
+			this.#type = type;
+			this.#name = name;
+			this.#view_mode = view_mode;
+			this.#fields = fields;
+
+			this.#validator.check({type, name, fields});
+
+			this.#is_unsaved = true;
 		}
 	}
 
