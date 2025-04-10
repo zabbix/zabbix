@@ -1233,8 +1233,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
 
-		if (ZBX_MAX_RECV_2KB_DATA_SIZE == sock->max_len_limit &&
-			0 != strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+		{
+			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
+					config_stats_allowed_ip);
+		}
+
+		if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type &&
+			NULL != config_comms->config_tls->tls_listen)
 		{
 			zabbix_log(LOG_LEVEL_WARNING,
 				"from %s: unencrypted connection not allowed for non-stat requests", sock->peer);
@@ -1284,11 +1290,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 				ret = recv_getstatus(sock, &jp, config_comms->config_timeout, config_comms->config_tls,
 					config_frontend_allowed_ip);
 			}
-		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
-		{
-			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
-					config_stats_allowed_ip);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 		{
