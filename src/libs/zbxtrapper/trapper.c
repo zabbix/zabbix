@@ -144,6 +144,14 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
 		return FAIL;
 	}
 
+	if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
+				zbx_tcp_connection_type_name(sock->connection_type));
+
+		return FAIL;
+	}
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char	*msg = NULL;
 
@@ -152,20 +160,12 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
 		config_tls->frontend_cert_subject,
 		&msg))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "connection from server \"%s\" is not allowed: %s", sock->peer, msg);
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed: %s", sock->peer, msg);
 		zbx_free(msg);
 
 		return FAIL;
 	}
 #endif
-
-	if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
-				zbx_tcp_connection_type_name(sock->connection_type));
-
-		return FAIL;
-	}
 
 	return SUCCEED;
 }
