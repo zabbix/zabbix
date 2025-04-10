@@ -454,7 +454,7 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           value_type: FLOAT
-          units: s
+          units: uptime
           params: 'SELECT date_part(''epoch'', now() - pg_postmaster_start_time())'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'

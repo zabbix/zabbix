@@ -925,7 +925,7 @@ zabbix_export:
           name: Uptime
           key: 'pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           value_type: FLOAT
-          units: s
+          units: uptime
           description: 'Time since the server started.'
           tags:
             - tag: component

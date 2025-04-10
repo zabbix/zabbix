@@ -12,7 +12,7 @@ Zabbix version: 7.4 and higher.
 ## Tested versions
 
 This template has been tested on:
-- PostgreSQL 10-15
+- PostgreSQL 10-17
 
 ## Configuration
 
