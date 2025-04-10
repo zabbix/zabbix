@@ -190,7 +190,7 @@ class CControllerTriggerEdit extends CController {
 					'flags' => $trigger['flags'],
 					'templates' => $trigger['templates'],
 					'discoveryRule' => $trigger['discoveryRule'],
-					'triggerDiscovery' => $trigger['triggerDiscovery']
+					'discoveryData' => $trigger['discoveryData']
 				]);
 			}
 			else {

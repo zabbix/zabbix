@@ -418,7 +418,7 @@ class CTriggerGeneralHelper {
 		];
 
 		unset($trigger['comments'], $trigger['hosts'], $trigger['discoveryRule'], $trigger['flags'], $trigger['state'],
-			$trigger['templateid'], $trigger['triggerDiscovery'], $trigger['dependencies'], $trigger['correlation_tag'],
+			$trigger['templateid'], $trigger['discoveryData'], $trigger['dependencies'], $trigger['correlation_tag'],
 			$trigger['items']
 		);
 

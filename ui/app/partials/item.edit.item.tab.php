@@ -28,7 +28,7 @@ if ($item['discovered']) {
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'item.prototype.edit')
 		->setArgument('context', $item['context'])
-		->setArgument('itemid', $item['itemDiscovery']['parent_itemid'])
+		->setArgument('itemid', $item['discoveryData']['parent_itemid'])
 		->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 		->getUrl();
 }
@@ -868,8 +868,8 @@ $formgrid
 	]);
 
 
-$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('itemDiscovery', $item)
-		&& $item['itemDiscovery'] && $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('discoveryData', $item)
+		&& $item['discoveryData'] && $item['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
 	: null;
 

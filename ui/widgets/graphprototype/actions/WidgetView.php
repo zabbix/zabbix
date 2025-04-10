@@ -115,7 +115,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 			// Collect graphs based on the graph prototype.
 			foreach ($graphs_created_all as $graph) {
-				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
+				if ($graph['discoveryData']['parent_graphid'] === $graph_prototype['graphid']) {
 					$prepend_host_name = $this->isTemplateDashboard()
 						? false
 						: count($graph['hosts']) == 1 || $this->fields_values['override_hostid'];
@@ -245,7 +245,7 @@ class WidgetView extends CControllerWidgetIterator {
 			// Collect items based on the item prototype.
 			$items_created = [];
 			foreach ($items_created_all as $item) {
-				if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
+				if ($item['discoveryData']['parent_itemid'] === $item_prototype['itemid']) {
 					$items_created[] = $item;
 				}
 			}

@@ -33,7 +33,7 @@ if ($discovered_trigger) {
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')
 		->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-		->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
+		->setArgument('triggerid', $data['discoveryData']['parent_triggerid'])
 		->setArgument('context', $data['context'])
 		->setArgument('prototype', '1')
 		->getUrl();
@@ -41,7 +41,7 @@ if ($discovered_trigger) {
 	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
 		(new CLink($data['discoveryRule']['name'], $discovered_trigger_url))
 			->setAttribute('data-parent_discoveryid', $data['discoveryRule']['itemid'])
-			->setAttribute('data-triggerid', $data['triggerDiscovery']['parent_triggerid'])
+			->setAttribute('data-triggerid', $data['discoveryData']['parent_triggerid'])
 			->setAttribute('data-context', $data['context'])
 			->setAttribute('data-prototype', '1')
 			->addClass('js-related-trigger-edit')
@@ -292,8 +292,8 @@ $trigger_form_grid
 		)
 	]);
 
-$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('triggerDiscovery', $data)
-		&& $data['triggerDiscovery'] && $data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('discoveryData', $data)
+		&& $data['discoveryData'] && $data['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
 	: null;
 

@@ -408,14 +408,14 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
-		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED && $db_host['hostDiscovery']
-			? $db_host['hostDiscovery']['disable_source']
+		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED && $db_host['discoveryData']
+			? $db_host['discoveryData']['disable_source']
 			: '';
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_icons = [getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
-				$db_host['hostDiscovery']['ts_disable'], $disable_source,
+				&& $db_host['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons = [getLldLostEntityIndicator(time(), $db_host['discoveryData']['ts_delete'],
+				$db_host['discoveryData']['ts_disable'], $disable_source,
 				$db_host['status'] == HOST_STATUS_NOT_MONITORED, _('host')
 			)];
 

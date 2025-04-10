@@ -117,7 +117,7 @@ class CControllerGraphEdit extends CController {
 
 			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
 				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'templateid', 'flags', 'discoveryRule', 'discoveryRulePrototype', 'graphDiscovery'
+				'percent_right', 'templateid', 'flags', 'discoveryRule', 'discoveryRulePrototype', 'discoveryData'
 			];
 
 			foreach ($fields as $field) {
