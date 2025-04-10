@@ -232,12 +232,7 @@ class CWidgetEditSandbox {
 	}
 
 	#correctListeners() {
-		const broadcaster_fields = this.#widget.getFields();
-
-		if (!('reference' in broadcaster_fields)) {
-			return;
-		}
-
+		const broadcaster_reference = this.#widget.getFields().reference;
 		const broadcast_types = this.#widget.getBroadcastTypes();
 
 		for (const listener of this.#listeners) {
@@ -245,7 +240,7 @@ class CWidgetEditSandbox {
 				accessor.setTypedReference(
 					CWidgetBase.createTypedReference(
 						broadcast_types.includes(type)
-							? {reference: broadcaster_fields.reference, type}
+							? {reference: broadcaster_reference, type}
 							: {reference: ''}
 					)
 				);
