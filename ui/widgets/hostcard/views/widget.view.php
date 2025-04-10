@@ -21,7 +21,7 @@
  * @var array $data
  */
 
-use Widgets\HostCard\Includes\CWidgetFieldSections;
+use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 use Widgets\HostCard\Widget;
 
 if ($data['error'] !== null) {
@@ -33,37 +33,37 @@ elseif ($data['host']) {
 
 	foreach ($data['sections'] as $section) {
 		switch ($section) {
-			case CWidgetFieldSections::SECTION_HOST_GROUPS:
+			case CWidgetFieldHostSections::SECTION_HOST_GROUPS:
 				$sections[] = makeSectionHostGroups($host['hostgroups']);
 				break;
 
-			case CWidgetFieldSections::SECTION_DESCRIPTION:
+			case CWidgetFieldHostSections::SECTION_DESCRIPTION:
 				$sections[] = makeSectionDescription($host['description']);
 				break;
 
-			case CWidgetFieldSections::SECTION_MONITORING:
+			case CWidgetFieldHostSections::SECTION_MONITORING:
 				$sections[] = makeSectionMonitoring($host['hostid'], $host['dashboard_count'], $host['item_count'],
 					$host['graph_count'], $host['web_scenario_count']
 				);
 				break;
 
-			case CWidgetFieldSections::SECTION_AVAILABILITY:
+			case CWidgetFieldHostSections::SECTION_AVAILABILITY:
 				$sections[] = makeSectionAvailability($host['interfaces']);
 				break;
 
-			case CWidgetFieldSections::SECTION_MONITORED_BY:
+			case CWidgetFieldHostSections::SECTION_MONITORED_BY:
 				$sections[] = makeSectionMonitoredBy($host);
 				break;
 
-			case CWidgetFieldSections::SECTION_TEMPLATES:
+			case CWidgetFieldHostSections::SECTION_TEMPLATES:
 				$sections[] = makeSectionTemplates($host['templates']);
 				break;
 
-			case CWidgetFieldSections::SECTION_INVENTORY:
+			case CWidgetFieldHostSections::SECTION_INVENTORY:
 				$sections[] = makeSectionInventory($host['hostid'], $host['inventory'], $data['inventory']);
 				break;
 
-			case CWidgetFieldSections::SECTION_TAGS:
+			case CWidgetFieldHostSections::SECTION_TAGS:
 				$sections[] = makeSectionTags($data['host']['tags']);
 				break;
 		}

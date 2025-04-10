@@ -21,7 +21,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData;
 
-use Widgets\HostCard\Includes\CWidgetFieldSections;
+use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -73,26 +73,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids
 		];
 
-		if (in_array(CWidgetFieldSections::SECTION_HOST_GROUPS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_HOST_GROUPS, $this->fields_values['sections'])) {
 			$options['selectHostGroups'] = ['name'];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_MONITORING, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_MONITORING, $this->fields_values['sections'])) {
 			$options['selectGraphs'] = API_OUTPUT_COUNT;
 			$options['selectHttpTests'] = API_OUTPUT_COUNT;
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
 			$options['selectInterfaces'] = ['interfaceid', 'ip', 'dns', 'port', 'main', 'type', 'useip', 'available',
 				'error', 'details'
 			];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TEMPLATES, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_TEMPLATES, $this->fields_values['sections'])) {
 			$options['selectParentTemplates'] = ['templateid'];
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_INVENTORY, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_INVENTORY, $this->fields_values['sections'])) {
 			$output = [];
 			$inventory_fields = getHostInventories();
 
@@ -103,7 +103,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$options['selectInventory'] = $output ?: array_column($inventory_fields, 'db_field');
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TAGS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_TAGS, $this->fields_values['sections'])) {
 			$options['selectTags'] = ['tag', 'value'];
 			$options['selectInheritedTags'] = ['tag', 'value'];
 		}
@@ -161,11 +161,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_HOST_GROUPS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_HOST_GROUPS, $this->fields_values['sections'])) {
 			CArrayHelper::sort($host['hostgroups'], ['name']);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_MONITORING, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_MONITORING, $this->fields_values['sections'])) {
 			$db_items_count = API::Item()->get([
 				'countOutput' => true,
 				'hostids' => [$host['hostid']],
@@ -181,7 +181,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($host['graphs'], $host['httpTests']);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_AVAILABILITY, $this->fields_values['sections'])) {
 			$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds(
 				array_column($host['interfaces'], 'interfaceid')
 			);
@@ -207,7 +207,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($host['active_available']);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_MONITORED_BY, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_MONITORED_BY, $this->fields_values['sections'])) {
 			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				$db_proxies = API::Proxy()->get([
 					'output' => ['name'],
@@ -224,7 +224,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TEMPLATES, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_TEMPLATES, $this->fields_values['sections'])) {
 			if ($host['parentTemplates']) {
 				$db_templates = API::Template()->get([
 					'output' => ['templateid', 'name'],
@@ -249,7 +249,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($host['parentTemplates']);
 		}
 
-		if (in_array(CWidgetFieldSections::SECTION_TAGS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldHostSections::SECTION_TAGS, $this->fields_values['sections'])) {
 			// Merge host tags with template tags, and skip duplicate tags and values.
 			if (!$host['inheritedTags']) {
 				$tags = $host['tags'];

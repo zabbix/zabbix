@@ -18,9 +18,9 @@ namespace Widgets\HostCard\Includes;
 
 use Zabbix\Widgets\CWidgetField;
 
-class CWidgetFieldSections extends CWidgetField {
+class CWidgetFieldHostSections extends CWidgetField {
 
-	public const DEFAULT_VIEW = CWidgetFieldSectionsView::class;
+	public const DEFAULT_VIEW = CWidgetFieldHostSectionsView::class;
 	public const DEFAULT_VALUE = [];
 
 	public const SECTION_HOST_GROUPS = 0;

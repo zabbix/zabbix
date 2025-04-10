@@ -44,7 +44,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(
-				new CWidgetFieldSections('sections', _('Show'))
+				new CWidgetFieldHostSections('sections', _('Show'))
 			)
 			->addField(
 				new CWidgetFieldMultiSelectHostInventory('inventory', _('Inventory fields'))

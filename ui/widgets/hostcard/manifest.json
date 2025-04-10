@@ -27,6 +27,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js", "class.widget-field.sections.js"]
+		"js": ["class.widget.js", "class.widget-field.host-sections.js"]
 	}
 }
