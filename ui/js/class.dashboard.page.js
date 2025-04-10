@@ -22,7 +22,8 @@ const DASHBOARD_PAGE_EVENT_EDIT = 'dashboard-page-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'dashboard-page-widget-add';
 const DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW = 'dashboard-page-widget-add-new';
 const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'dashboard-page-widget-delete';
-const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'dashboard-page-widget-position';
+const DASHBOARD_PAGE_EVENT_WIDGET_RESIZE = 'dashboard-page-widget-resize';
+const DASHBOARD_PAGE_EVENT_WIDGET_DRAG = 'dashboard-page-widget-drag';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'dashboard-page-widget-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS = 'dashboard-page-widget-actions';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'dashboard-page-widget-copy';
@@ -338,7 +339,7 @@ class CDashboardPage {
 	replaceWidget(old_widget, new_widget) {
 		this.deleteWidget(old_widget, {is_batch_mode: true});
 
-		return this.addWidget(new_widget);
+		this.addWidget(new_widget);
 	}
 
 	getDataCopy() {
@@ -1288,7 +1289,7 @@ class CDashboardPage {
 
 				this._is_unsaved = true;
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG, {widget: drag_widget});
 			},
 
 			mouseUp: () => {
@@ -1828,7 +1829,7 @@ class CDashboardPage {
 
 				this._is_unsaved = true;
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_RESIZE, {widget: resize_widget});
 			},
 
 			mouseUp: () => {

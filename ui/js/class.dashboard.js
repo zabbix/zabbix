@@ -39,17 +39,15 @@ class CDashboard {
 
 	static EVENT_FEEDBACK = 'dashboard-feedback';
 
+	static WIDGET_EDIT_INPUT_THROTTLE_MS = 1000;
+
 	#broadcast_options;
 
 	#broadcast_cache = new Map();
 
-	#edit_widget_cache = null;
+	#editing_widget_context = null;
 
 	#widget_form_position_fix = null;
-
-	#widget_form_abort_controller = null;
-
-	#widget_form_input_subscription = null;
 
 	constructor(target, {
 		containers,
@@ -473,16 +471,33 @@ class CDashboard {
 		return this._data;
 	}
 
-	addCreatePlaceholderWidget(dashboard_page, {type, name, view_mode, pos}) {
+	getMaxColumns() {
+		return this._max_columns;
+	}
+
+	getMaxRows() {
+		return this._max_rows;
+	}
+
+	getWidgetDefaults() {
+		return this._widget_defaults;
+	}
+
+	addCreatePlaceholderWidget(dashboard_page, {
+		type,
+		name = '',
+		view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL,
+		pos
+	}) {
 		const widget = new CWidgetCreatePlaceholder({
-			type: 'paste-placeholder',
+			type: 'create-placeholder',
 			name,
 			view_mode,
 			fields: {},
 			defaults: this._widget_defaults[type],
 			widgetid: null,
 			pos,
-			is_new: false,
+			is_new: true,
 			rf_rate: 0,
 			dashboard: {
 				templateid: this._data.templateid,
@@ -504,7 +519,10 @@ class CDashboard {
 		return widget;
 	}
 
-	addWidgetFromData(dashboard_page, {type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, messages}) {
+	addWidgetFromData(
+		dashboard_page,
+		{type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id = null, is_configured}
+	) {
 		const widget_data = {
 			type,
 			name,
@@ -527,15 +545,15 @@ class CDashboard {
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			csrf_token: this._csrf_token,
-			unique_id: this._createUniqueId()
+			unique_id: unique_id ?? this._createUniqueId()
 		};
 
 		let widget;
 
 		if (type in this._widget_defaults) {
-			if (messages.length > 0) {
+			if (!is_configured) {
 				widget = new CWidgetMisconfigured(widget_data);
-				widget.setMessages(messages);
+				widget.setMessageType(CWidgetMisconfigured.MESSAGE_TYPE_NOT_CONFIGURED);
 			}
 			else {
 				let has_empty_references = false;
@@ -739,7 +757,7 @@ class CDashboard {
 		for (const widget of widgets) {
 			if ('reference' in widget.fields) {
 				const old_reference = widget.fields.reference;
-				const new_reference = this._createReference({references});
+				const new_reference = this.createReference({references});
 
 				widget.fields.reference = new_reference;
 
@@ -792,7 +810,7 @@ class CDashboard {
 						sane_widgets.push({
 							...widgets[i],
 							fields: response.widgets[i].fields,
-							messages: response.widgets[i].messages
+							is_configured: response.widgets[i].is_configured
 						});
 					}
 				}
@@ -866,7 +884,7 @@ class CDashboard {
 		}
 
 		if ('reference' in new_widget_data.fields) {
-			new_widget_data.fields.reference = this._createReference();
+			new_widget_data.fields.reference = this.createReference();
 		}
 
 		const references = this._getReferences({dashboard_page});
@@ -924,7 +942,7 @@ class CDashboard {
 					widgetid: null,
 					pos: new_widget_pos,
 					is_new: true,
-					messages: response.widgets[0].messages
+					is_configured: response.widgets[0].is_configured
 				});
 
 				if (widget !== null) {
@@ -1140,7 +1158,8 @@ class CDashboard {
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW, this._events.dashboardPageWidgetAddNew)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
-			.on(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_RESIZE, this._events.dashboardPageWidgetResize)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_DRAG, this._events.dashboardPageWidgetDrag)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
@@ -1158,7 +1177,8 @@ class CDashboard {
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW, this._events.dashboardPageWidgetAddNew)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
-			.off(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_RESIZE, this._events.dashboardPageWidgetResize)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_DRAG, this._events.dashboardPageWidgetDrag)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
@@ -1452,370 +1472,74 @@ class CDashboard {
 			});
 	}
 
-	findPosForNewWidget({dashboard_page}) {
-		let pos_best = null;
-		let pos_best_value = null;
+	editWidget({dashboard_page = null, widget = null, new_widget_pos = null} = {}) {
+		const sandbox = new CWidgetEditSandbox({dashboard: this});
+		const validator = new CWidgetEditValidator({dashboard: this});
+		const dialogue = new CWidgetEditDialogue({dashboard: this});
 
-		for (const pos of dashboard_page.findFreePosAll()) {
-			let pos_value = 0;
+		const sandbox_params = {};
 
-			for (const widget_defaults of Object.values(this._widget_defaults)) {
-				let best_intersection = 0;
+		const dialogue_params = {
+			sandbox,
+			validator,
+			position_fix: this.#widget_form_position_fix
+		};
 
-				for (const pos_size of pos.sizes) {
-					best_intersection = Math.max(best_intersection,
-						Math.min(pos_size.width, widget_defaults.size.width) / widget_defaults.size.width
-						* Math.min(pos_size.height, widget_defaults.size.height) / widget_defaults.size.height
-					);
-				}
+		if (dashboard_page !== null && widget !== null) {
+			sandbox_params.dashboard_page = dashboard_page;
+			sandbox_params.widget = widget;
 
-				pos_value += best_intersection;
-			}
+			dialogue_params.type = widget.getType();
+			dialogue_params.name = widget.getName();
+			dialogue_params.view_mode = widget.getViewMode();
+			dialogue_params.fields = widget.getFields();
+			dialogue_params.is_new = false;
 
-			if (pos_best === null || pos_value > pos_best_value
-					|| (pos_value === pos_best_value && pos.y < pos_best.y)
-					|| (pos_value === pos_best_value && pos.y === pos_best.y && pos.x < pos_best.x)) {
-				pos_best = {
-					x: pos.x,
-					y: pos.y
-				};
-				pos_best_value = pos_value;
+			this.#editing_widget_context = {
+				unique_id: widget.getUniqueId(),
+				dashboard_page_unique_id: dashboard_page.getUniqueId()
 			}
 		}
-
-		return pos_best;
-	}
-
-	editWidget(properties = {}, {new_widget_pos = null} = {}) {
-		this._clearWarnings();
-
-		if (!('type' in properties)) {
-			properties.type = this._widget_last_type;
-
-			if (properties.type === null) {
+		else {
+			if (this._widget_last_type === null) {
 				this._warn(t('Cannot add widget: no widgets available.'));
 
 				return;
 			}
-		}
 
-		this.#edit_widget_cache = {
-			type: properties.type
-		};
+			sandbox_params.dashboard_page = this._selected_dashboard_page;
+			sandbox_params.type = this._widget_last_type;
+			sandbox_params.pos = new_widget_pos;
 
-		if ('unique_id' in properties && 'dashboard_page_unique_id' in properties) {
-			this.#edit_widget_cache.unique_id = properties.unique_id;
-			this.#edit_widget_cache.dashboard_page_unique_id = properties.dashboard_page_unique_id;
-		}
-		else {
-			this.#edit_widget_cache.new_widget_dashboard_page = this._selected_dashboard_page;
-		}
+			dialogue_params.type = this._widget_last_type;
+			dialogue_params.is_new = true;
 
-		const overlay = PopUp(`widget.${properties.type}.edit`, {
-			templateid: this._data.templateid ?? undefined,
-			...properties
-		}, {
-			// Form name is used as dialogue ID.
-			dialogueid: CWidgetForm.FORM_NAME_PRIMARY,
-			dialogue_class: 'modal-widget-configuration',
-			is_modal: true,
-			is_draggable: true,
-			position_fix: this.#widget_form_position_fix,
-			prevent_navigation: true
-		});
-
-		if (this.#widget_form_abort_controller !== null) {
-			this.#widget_form_abort_controller.abort();
-		}
-
-		this.#widget_form_abort_controller = new AbortController();
-
-		const signal = this.#widget_form_abort_controller.signal;
-
-		const dialogue = overlay.$dialogue[0];
-
-		dialogue.addEventListener(CWidgetForm.EVENT_READY,
-			() => this.#onWidgetFormReady({overlay, properties, new_widget_pos}),
-			{signal}
-		);
-
-		dialogue.addEventListener(CWidgetForm.EVENT_CLOSE,
-			e => this.#onWidgetFormClose({position_fix: e.detail.position_fix}),
-			{signal}
-		);
-
-		dialogue.addEventListener(CWidgetForm.EVENT_RELOAD_REQUEST,
-			() => this.#onWidgetFormReloadRequest({overlay}),
-			{signal}
-		);
-
-		dialogue.addEventListener(CWidgetForm.EVENT_SUBMIT_REQUEST,
-			() => this.#onWidgetFormSubmitRequest({overlay}),
-			{signal}
-		);
-
-		this.#widget_form_input_subscription = ZABBIX.EventHub.subscribe({
-			require: {
-				context: CWidgetForm.EVENT_CONTEXT,
-				event: CWidgetFormEvent.EVENT_UPDATE,
-				form_name: CWidgetForm.FORM_NAME_PRIMARY
-			},
-			callback: () => console.log('WIDGET UPDATE REQUEST'),
-			signal
-		});
-	}
-
-	#onWidgetFormReady({overlay, properties, new_widget_pos}) {
-		if ('unique_id' in properties && 'dashboard_page_unique_id' in properties) {
-			return;
-		}
-
-		this.#edit_widget_cache.new_widget_pos = new_widget_pos;
-
-		const default_widget_size = this._widget_defaults[properties.type].size;
-
-		if (new_widget_pos === null) {
-			this.#edit_widget_cache.new_widget_pos_reserved =
-				this.#edit_widget_cache.new_widget_dashboard_page.findFreePos(default_widget_size);
-		}
-		else {
-			this.#edit_widget_cache.new_widget_pos_reserved = {
-				...default_widget_size,
-				...new_widget_pos
-			};
-
-			this.#edit_widget_cache.new_widget_pos_reserved.width = Math.min(
-				this.#edit_widget_cache.new_widget_pos_reserved.width,
-				this._max_columns - this.#edit_widget_cache.new_widget_pos_reserved.x
-			);
-
-			this.#edit_widget_cache.new_widget_pos_reserved.height = Math.min(
-				this.#edit_widget_cache.new_widget_pos_reserved.height,
-				this._max_rows - this.#edit_widget_cache.new_widget_pos_reserved.y
-			);
-
-			this.#edit_widget_cache.new_widget_pos_reserved =
-				this.#edit_widget_cache.new_widget_dashboard_page.accommodatePos(
-					this.#edit_widget_cache.new_widget_pos_reserved
-				);
-		}
-
-		if (this.#edit_widget_cache.new_widget_pos_reserved === null) {
-			const form = overlay.$dialogue.$body[0].querySelector('form');
-
-			for (const element of form.parentNode.children) {
-				if (element.matches('.msg-warning')) {
-					element.parentNode.removeChild(element);
-				}
+			this.#editing_widget_context = {
+				unique_id: null,
+				dashboard_page_unique_id: this._selected_dashboard_page.getUniqueId()
 			}
-
-			const message_box = makeMessageBox('warning', [],
-				t('Cannot add widget: not enough free space on the dashboard.')
-			)[0];
-
-			form.parentNode.insertBefore(message_box, form);
-
-			overlay.$btn_submit[0].disabled = true;
-		}
-	}
-
-	#onWidgetFormClose({position_fix}) {
-		this.#widget_form_position_fix = position_fix;
-
-		if (this.#widget_form_abort_controller !== null) {
-			this.#widget_form_abort_controller.abort();
 		}
 
-		this._selected_dashboard_page.resetWidgetPlaceholder();
-	}
-
-	#onWidgetFormReloadRequest({overlay}) {
-		console.log('FORM RELOAD REQUEST, shall update widget as well');
-
-		const form = overlay.$dialogue.$body[0].querySelector('form');
-		const fields = getFormFields(form);
-
-		const properties = {
-			type: fields.type
-		};
-
-		if (properties.type === this.#edit_widget_cache.type) {
-			properties.name = fields.name;
-			properties.view_mode = fields.show_header === '1'
-				? ZBX_WIDGET_VIEW_MODE_NORMAL
-				: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
-
-			delete fields.type;
-			delete fields.name;
-			delete fields.show_header;
-
-			properties.fields = fields;
-		}
-
-		let new_widget_pos = null;
-
-		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
-			properties.unique_id = this.#edit_widget_cache.unique_id;
-			properties.dashboard_page_unique_id = this.#edit_widget_cache.dashboard_page_unique_id;
-		}
-		else {
-			new_widget_pos = this.#edit_widget_cache.new_widget_pos;
-		}
-
-		this.editWidget(properties, {new_widget_pos});
-	}
-
-	#onWidgetFormSubmitRequest({overlay}) {
-		const form = overlay.$dialogue.$body[0].querySelector('form');
-		const fields = getFormFields(form);
-
-		const templateid = this._data.templateid ?? undefined;
-		const type = fields.type;
-		const name = fields.name;
-		const view_mode = fields.show_header === '1'
-			? ZBX_WIDGET_VIEW_MODE_NORMAL
-			: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
-
-		delete fields.type;
-		delete fields.name;
-		delete fields.show_header;
-
-		let dashboard_page = null;
-		let widget = null;
-
-		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
-			dashboard_page = this.getDashboardPage(this.#edit_widget_cache.dashboard_page_unique_id);
-			widget = dashboard_page.getWidget(this.#edit_widget_cache.unique_id);
-		}
-
-		const busy_condition = this._createBusyCondition();
-
-		Promise.resolve()
-			.then(() => this.#promiseCheckWidget({templateid, type, name, view_mode, fields}))
-			.then(({fields}) => {
-				this._is_unsaved = true;
-
-				overlayDialogueDestroy(overlay.dialogueid);
-
-				if (type !== this._widget_last_type && widget?.getType() !== type) {
-					this._widget_last_type = type;
-					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
-				}
-
-				if ('reference' in fields && fields.reference === '') {
-					fields.reference = this._createReference();
-				}
-
-				const widget_data = {
-					type,
-					name,
-					view_mode,
-					fields,
-					widgetid: widget === null || widget.getType() !== type ? null : widget.getWidgetId(),
-					pos: widget === null ? this.#edit_widget_cache.new_widget_pos_reserved : widget.getPos(),
-					is_new: widget === null,
-					rf_rate: 0,
-					messages: []
-				};
-
-				if (widget === null) {
-					if (this.#edit_widget_cache.new_widget_dashboard_page.getState()
-							=== DASHBOARD_PAGE_STATE_DESTROYED) {
-						return;
-					}
-
-					this.#edit_widget_cache.new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
-						.then(() => {
-							this.addWidgetFromData(this.#edit_widget_cache.new_widget_dashboard_page, widget_data);
-							this.#edit_widget_cache.new_widget_dashboard_page.resetWidgetPlaceholder();
-						});
-				}
-				else {
-					if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
-						return;
-					}
-
-					dashboard_page.promiseScrollIntoView(widget_data.pos)
-						.then(() => {
-							const widget_replace = this.replaceWidgetFromData(dashboard_page, widget, widget_data);
-
-							dashboard_page.resetWidgetPlaceholder();
-
-							this.#validateFieldsReferences({dashboard_page, widget_delete: widget, widget_replace});
-						});
-				}
-			})
+		sandbox.promiseInit(sandbox_params)
+			.then(() => dialogue.run(dialogue_params))
 			.catch(exception => {
-				let title;
-				let messages = [];
+				if (typeof exception === 'string') {
+					this._warn(exception);
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					title = t('Failed to update widget properties.');
+					return;
 				}
 
-				const message_box = makeMessageBox('bad', messages, title);
-
-				if (form.isConnected) {
-					for (const element of form.parentNode.children) {
-						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-							element.parentNode.removeChild(element);
-						}
-					}
-
-					form.parentNode.insertBefore(message_box[0], form);
-				}
-				else {
-					clearMessages();
-					addMessage(message_box);
-				}
-			})
-			.finally(() => {
-				overlay.unsetLoading();
-				this._deleteBusyCondition(busy_condition);
+				throw exception;
 			});
 	}
 
 	getEditingWidgetContext() {
-		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
-			return {
-				unique_id: this.#edit_widget_cache.unique_id,
-				dashboard_page_unique_id: this.#edit_widget_cache.dashboard_page_unique_id
-			};
-		}
-
-		return {
-			unique_id: null,
-			dashboard_page_unique_id: this.#edit_widget_cache.new_widget_dashboard_page.getUniqueId()
-		};
+		return this.#editing_widget_context;
 	}
 
 	_isEditingWidget() {
 		// Form name is used as dialogue ID.
 		return overlays_stack.getById(CWidgetForm.FORM_NAME_PRIMARY) !== undefined;
-	}
-
-	#promiseCheckWidget({templateid, type, name, view_mode, fields}) {
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'dashboard.widget.check');
-
-		return fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({templateid, type, name, view_mode, fields})
-		})
-			.then(response => response.json())
-			.then(response => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				return response;
-			});
 	}
 
 	_getDashboardPageActionsContextMenu(dashboard_page) {
@@ -2115,7 +1839,7 @@ class CDashboard {
 	 *
 	 * @returns {string}
 	 */
-	_createReference({references = null} = {}) {
+	createReference({references = null} = {}) {
 		if (references === null) {
 			references = this._getReferences();
 		}
@@ -2202,7 +1926,7 @@ class CDashboard {
 					fields,
 					widgetid: widget.getWidgetId(),
 					is_new: false,
-					messages: []
+					is_configured: true
 				});
 			}
 		}
@@ -2311,7 +2035,7 @@ class CDashboard {
 							items: [
 								{
 									label: t('Add widget'),
-									clickCallback: () => this.editWidget({}, {new_widget_pos})
+									clickCallback: () => this.editWidget({new_widget_pos})
 								},
 								{
 									label: t('Paste widget'),
@@ -2335,7 +2059,7 @@ class CDashboard {
 					});
 				}
 				else {
-					this.editWidget({}, {new_widget_pos});
+					this.editWidget({new_widget_pos});
 
 					if (!this._isEditingWidget()) {
 						dashboard_page.resetWidgetPlaceholder();
@@ -2353,7 +2077,11 @@ class CDashboard {
 				this.#validateFieldsReferences({dashboard_page: this._selected_dashboard_page});
 			},
 
-			dashboardPageWidgetPosition: () => {
+			dashboardPageWidgetResize: () => {
+				this._clearWarnings();
+			},
+
+			dashboardPageWidgetDrag: () => {
 				this._clearWarnings();
 			},
 
@@ -2374,14 +2102,7 @@ class CDashboard {
 				const dashboard_page = e.detail.target;
 				const widget = e.detail.widget;
 
-				this.editWidget({
-					type: widget.getType(),
-					name: widget.getName(),
-					view_mode: widget.getViewMode(),
-					fields: widget.getFields(),
-					unique_id: widget.getUniqueId(),
-					dashboard_page_unique_id: dashboard_page.getUniqueId()
-				});
+				this.editWidget({dashboard_page, widget});
 			},
 
 			dashboardPageWidgetCopy: e => {

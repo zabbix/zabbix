@@ -40,6 +40,9 @@ $available_js = [
 	'class.widget.misconfigured.js' => '',
 	'class.widget.create-placeholder.js' => '',
 	'class.widget-field.js' => '',
+	'class.widget-edit.dialogue.js' => '',
+	'class.widget-edit.sandbox.js' => '',
+	'class.widget-edit.validator.js' => '',
 	'class.widget-field.checkbox.js' => '',
 	'class.widget-field.checkbox-list.js' => '',
 	'class.widget-field.color.js' => '',
@@ -222,6 +225,15 @@ $translate_strings = [
 		'Name' => _('Name'),
 		'No compatible widgets.' => _('No compatible widgets.'),
 		'Widget' => _('Widget')
+	],
+	'class.widget-edit.dialogue.js' => [
+		'Widget configuration will be reverted.' => _('Widget configuration will be reverted.')
+	],
+	'class.widget-edit.sandbox.js' => [
+		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.')
+	],
+	'class.widget-edit.validator.js' => [
+		'Failed to update widget properties.' => _('Failed to update widget properties.')
 	],
 	'class.widget-field.multiselect.js' => [
 		'Dashboard' => _('Dashboard'),

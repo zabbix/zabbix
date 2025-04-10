@@ -83,7 +83,7 @@ class CControllerDashboardWidgetCheck extends CController {
 				error($error);
 			}
 
-			$output['error']['messages'] = array_column(get_and_clear_messages(), 'message');
+			$output['messages'] = array_column(get_and_clear_messages(), 'message');
 		}
 		else {
 			$output['fields'] = $form->getFieldsValues();

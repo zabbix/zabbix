@@ -220,7 +220,7 @@ class CWidgetFormView {
 		$message_box = $messages ? makeMessageBox(ZBX_STYLE_MSG_BAD, $messages) : '';
 
 		$output = [
-			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
+			'header' => $this->data['is_new'] ? _('Add widget') : _('Edit widget'),
 			'body' => implode('', [
 				$message_box,
 				(new CForm())
@@ -236,7 +236,7 @@ class CWidgetFormView {
 			]),
 			'buttons' => [
 				[
-					'title' => $this->data['unique_id'] !== null ? _('Apply') : _('Add'),
+					'title' => $this->data['is_new'] ? _('Add') : _('Apply'),
 					'class' => 'js-button-submit',
 					'keepOpen' => true,
 					'isSubmit' => true
