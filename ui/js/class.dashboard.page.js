@@ -501,25 +501,25 @@ class CDashboardPage {
 		return pos;
 	}
 
-	accommodatePos(pos, {reverse_x = false, reverse_y = false} = {}) {
+	accommodatePos(pos, {reverse_x = false, reverse_y = false, except_widgets = null} = {}) {
 		let pos_variants = [];
 
 		let pos_x = this._accommodatePosX({
 			...pos,
 			y: reverse_y ? pos.y + pos.height - 1 : pos.y,
 			height: 1
-		}, {reverse: reverse_x});
+		}, {reverse: reverse_x, except_widgets});
 
 		pos_x = {...pos_x, y: pos.y, height: pos.height};
 
 		if (reverse_x) {
 			for (let x = pos_x.x, width = pos_x.width; width >= 1; x++, width--) {
-				pos_variants.push(this._accommodatePosY({...pos_x, x, width}, {reverse: reverse_y}));
+				pos_variants.push(this._accommodatePosY({...pos_x, x, width}, {reverse: reverse_y, except_widgets}));
 			}
 		}
 		else {
 			for (let width = pos_x.width; width >= 1; width--) {
-				pos_variants.push(this._accommodatePosY({...pos_x, width}, {reverse: reverse_y}));
+				pos_variants.push(this._accommodatePosY({...pos_x, width}, {reverse: reverse_y, except_widgets}));
 			}
 		}
 
@@ -542,12 +542,12 @@ class CDashboardPage {
 		return pos_best;
 	}
 
-	_accommodatePosX(pos, {reverse = false} = {}) {
+	_accommodatePosX(pos, {reverse = false, except_widgets = null} = {}) {
 		const max_pos = {...pos};
 
 		if (reverse) {
 			for (let x = pos.x + pos.width - 1, width = 1; x >= pos.x; x--, width++) {
-				if (!this._isPosFree({...max_pos, x, width})) {
+				if (!this._isPosFree({...max_pos, x, width}, {except_widgets})) {
 					break;
 				}
 
@@ -557,7 +557,7 @@ class CDashboardPage {
 		}
 		else {
 			for (let width = 1; width <= pos.width; width++) {
-				if (!this._isPosFree({...max_pos, width})) {
+				if (!this._isPosFree({...max_pos, width}, {except_widgets})) {
 					break;
 				}
 
@@ -568,12 +568,12 @@ class CDashboardPage {
 		return max_pos;
 	}
 
-	_accommodatePosY(pos, {reverse = false} = {}) {
+	_accommodatePosY(pos, {reverse = false, except_widgets = null} = {}) {
 		const max_pos = {...pos};
 
 		if (reverse) {
 			for (let y = pos.y + pos.height - 1, height = 1; y >= pos.y; y--, height++) {
-				if (!this._isPosFree({...max_pos, y, height})) {
+				if (!this._isPosFree({...max_pos, y, height}, {except_widgets})) {
 					break;
 				}
 
@@ -583,7 +583,7 @@ class CDashboardPage {
 		}
 		else {
 			for (let height = 1; height <= pos.height; height++) {
-				if (!this._isPosFree({...max_pos, height})) {
+				if (!this._isPosFree({...max_pos, height}, {except_widgets})) {
 					break;
 				}
 
@@ -657,8 +657,12 @@ class CDashboardPage {
 			&& pos_1.y < pos_2.y + pos_2.height && pos_1.y + pos_1.height > pos_2.y;
 	}
 
-	_isPosFree(pos) {
+	_isPosFree(pos, {except_widgets = null} = {}) {
 		for (const widget of this._widgets.keys()) {
+			if (except_widgets !== null && except_widgets.has(widget)) {
+				continue;
+			}
+
 			if (this._isPosOverlapping(pos, widget.getPos())) {
 				return false;
 			}

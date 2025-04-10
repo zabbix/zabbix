@@ -25,7 +25,7 @@ class CWidgetEditSandbox {
 	#max_rows;
 
 	#dashboard_page;
-	#widget;
+	#widget = null;
 	#widget_original = null;
 	#unique_id = null;
 	#keep_size;
@@ -162,7 +162,9 @@ class CWidgetEditSandbox {
 		result_pos.width = Math.min(result_pos.width, this.#max_columns - result_pos.x);
 		result_pos.height = Math.min(result_pos.height, this.#max_rows - result_pos.y);
 
-		return this.#dashboard_page.accommodatePos(result_pos);
+		return this.#dashboard_page.accommodatePos(result_pos, {
+			except_widgets: this.#widget !== null ? new Set([this.#widget]) : null
+		});
 	}
 
 	#findPosForNewWidget() {
