@@ -3769,19 +3769,23 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_vector_str_create(&ids);
 
-	if (NULL == (hv = hv_get(&service->data->hvs, filter_uuid)))
+	if (NULL != filter_uuid && '\0' != *filter_uuid)
 	{
-		for (i=0; i < hv->dsnames.values_num; i++)
-			zbx_vector_str_append(&ids, hv->dsnames.values[i]->id);
-	}
-	else if (NULL == (vm = service_vm_get(service, filter_uuid)))
-	{
-		zbx_vector_str_append_array(&ids, vm->ds_ids.values, vm->ds_ids.values_num);
-	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() there are no vm or hv for uuid:%s", __func__, filter_uuid);
+		if (NULL != (hv = hv_get(&service->data->hvs, filter_uuid)))
+		{
+			for (i = 0; i < hv->dsnames.values_num; i++)
+				zbx_vector_str_append(&ids, hv->dsnames.values[i]->id);
+		}
+		else if (NULL != (vm = service_vm_get(service, filter_uuid)))
+		{
+			zbx_vector_str_append_array(&ids, vm->ds_ids.values, vm->ds_ids.values_num);
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() there are no vm or hv with uuid:%s", __func__, filter_uuid);
 
-	zbx_vector_str_sort(&ids, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_str_sort(&ids, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	}
+
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < service->data->datastores.values_num; i++)
