@@ -21,6 +21,13 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	protected $xmlWriter;
 
+	/**
+	 * @var array
+	 */
+	protected $ambiguous_nodes = [
+		'options' => 'option'
+	];
+
 	public function __construct() {
 		$this->xmlWriter = new XMLWriter();
 	}
@@ -53,7 +60,8 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	protected function fromArray(array $array, $parentName = null) {
 		foreach ($array as $name => $value) {
-			if ($newName = $this->mapName($parentName)) {
+			if ($newName = $this->mapName($parentName,
+					in_array($parentName, array_keys($this->ambiguous_nodes)) && !is_numeric($name) ? true : false)) {
 				$this->xmlWriter->startElement($newName);
 			}
 			else {
@@ -81,10 +89,11 @@ class CXmlExportWriter extends CExportWriter {
 	 * Returns sub node name based on parent node name.
 	 *
 	 * @param string $name
+	 * @param bool   $skip
 	 *
 	 * @return bool
 	 */
-	private function mapName($name) {
+	private function mapName($name, $skip = false) {
 		$map = [
 			'conditions' => 'condition',
 			'dashboards' => 'dashboard',
@@ -139,6 +148,10 @@ class CXmlExportWriter extends CExportWriter {
 			'variables' => 'variable',
 			'widgets' => 'widget'
 		];
+
+		if (!$skip && array_key_exists($name, $this->ambiguous_nodes)) {
+			$map[$name] = $this->ambiguous_nodes[$name];
+		}
 
 		return isset($map[$name]) ? $map[$name] : false;
 	}

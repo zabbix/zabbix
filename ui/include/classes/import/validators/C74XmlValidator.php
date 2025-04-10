@@ -2980,7 +2980,16 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 																['else' => true, 'type' => XML_IGNORE_TAG]
 								]],
 								'options' =>				['type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING | XML_REQUIRED],
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'option', 'rules' => [
+																	'option' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																		'value' => ['type' => XML_STRING | XML_REQUIRED],
+																		'text' => ['type' => XML_STRING | XML_REQUIRED]
+																	]]
+																]],
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																	'checked' => ['type' => XML_STRING | XML_REQUIRED],
+																	'unchecked' => ['type' => XML_STRING | XML_REQUIRED]
+																]],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 								]]
 							]]

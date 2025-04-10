@@ -604,27 +604,29 @@ class CTemplate extends CHostGeneral {
 						}
 					}
 					else {
-						$db_type =
-							$db_templates[$template['templateid']]['macros'][$macro['hostmacroid']]['config']['type'];
+						if (array_key_exists('config', $macro)) {
+							$hostmacroid = $macro['hostmacroid'];
+							$db_type = $db_templates[$template['templateid']]['macros'][$hostmacroid]['config']['type'];
 
-						if ($db_type != $macro['config']['type']) {
-							if ($db_type == ZBX_WIZARD_FIELD_NOCONF) {
-								$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
-									API_REQUIRED;
-							}
+							if ($db_type != $macro['config']['type']) {
+								if ($db_type == ZBX_WIZARD_FIELD_NOCONF) {
+									$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
+										API_REQUIRED;
+								}
 
-							if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-									|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-								$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
-									API_REQUIRED;
-							}
+								if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
+										|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+									$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
+										API_REQUIRED;
+								}
 
-							$macro['config'] = array_intersect_key($macro['config'],
-								$api_input_macro_config_rules['config']['fields']
-							);
-							if (!CApiInputValidator::validate($api_input_macro_config_rules['config'], $macro['config'],
-									'/'.($t + 1).'/macros/'.($m + 1), $error)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+								$macro['config'] = array_intersect_key($macro['config'],
+									$api_input_macro_config_rules['config']['fields']
+								);
+								if (!CApiInputValidator::validate($api_input_macro_config_rules['config'],
+										$macro['config'], '/'.($t + 1).'/macros/'.($m + 1), $error)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+								}
 							}
 						}
 					}
