@@ -59,8 +59,6 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
 			ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
 			vmware_service_get_vm_snapshot, 0},
-	{"datastore", ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
-			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
 	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 	ZBX_VMPROPMAP("resourcePool"),				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
 	ZBX_VMPROPMAP("guest.toolsVersion"),			/* ZBX_VMWARE_VMPROP_TOOLS_VERSION */
@@ -632,6 +630,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>availableField</ns0:pathSet>"	\
 					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"\
 					"<ns0:pathSet>guest.net</ns0:pathSet>"		\
+					"<ns0:pathSet>datastore</ns0:pathSet>"		\
 					"%s"						\
 					"%s"						\
 				"</ns0:propSet>"					\
