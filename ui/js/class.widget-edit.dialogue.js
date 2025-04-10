@@ -245,8 +245,6 @@ class CWidgetEditDialogue {
 			this.#setError(result.error);
 		}
 		else {
-			let sandbox_fields = {};
-
 			if ('messages' in result) {
 				this.#messages = result.messages;
 
@@ -254,14 +252,13 @@ class CWidgetEditDialogue {
 					this.#setError({messages: this.#messages});
 				}
 			}
-			else if ('fields' in result) {
-				sandbox_fields = result.fields;
 
-				if ('reference' in sandbox_fields) {
-					sandbox_fields.reference = !this.#is_new && this.#type === this.#type_original
-						? this.#fields_original.reference
-						: this.#dashboard.createReference();
-				}
+			const fields = result.fields;
+
+			if ('reference' in fields) {
+				fields.reference = !this.#is_new && this.#type === this.#type_original
+					? this.#fields_original.reference
+					: this.#dashboard.createReference();
 			}
 
 			if (this.#is_new || this.#is_unsaved) {
@@ -269,7 +266,7 @@ class CWidgetEditDialogue {
 					type: this.#type,
 					name: this.#name,
 					view_mode: this.#view_mode,
-					fields: sandbox_fields,
+					fields,
 					is_configured: this.#messages.length === 0
 				});
 			}
