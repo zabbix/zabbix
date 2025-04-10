@@ -83,7 +83,7 @@ class ValueCheck extends CController {
 
 					ob_start();
 
-					imagepng(imageThumb($image, 0, 112));
+					imagepng(imageThumb($image, 0, 106));
 
 					$result['thumbnail'] = base64_encode(ob_get_clean());
 				}
