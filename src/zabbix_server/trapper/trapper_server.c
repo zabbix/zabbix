@@ -39,7 +39,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 	struct zbx_json		j;
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
-		goto out;
+		return;
 
 	if (0 == get_config_forks(ZBX_PROCESS_TYPE_REPORTMANAGER))
 	{
