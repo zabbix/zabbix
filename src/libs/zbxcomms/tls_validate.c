@@ -377,10 +377,9 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
  * Return value: parsed flags                                                 *
  *                                                                            *
  ******************************************************************************/
-static unsigned int tls_config_parse_accept(zbx_config_tls_t *config_tls, char **accept)
+static unsigned int	tls_config_parse_accept(zbx_config_tls_t *config_tls, char **accept)
 {
-	unsigned int ret = 0;
-
+	unsigned int	ret = 0;
 	char		*s, *p, *delim;
 
 	p = s = zbx_strdup(NULL, *accept);
@@ -405,6 +404,7 @@ static unsigned int tls_config_parse_accept(zbx_config_tls_t *config_tls, char *
 #if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 			ret |= ZBX_TCP_SEC_TLS_PSK;
 #else
+			zbx_free(s);
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK, accept, NULL, config_tls);
 #endif
 		}
@@ -482,11 +482,14 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 
 	/* parse and validate 'TLSFrontendAccept' parameter (in zabbix_server.conf ) */
 	if (NULL != config_tls->frontend_accept)
+	{
 		config_tls->frontend_accept_modes = tls_config_parse_accept(config_tls, &(config_tls->frontend_accept));
 
-	if (0 != (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_PSK))
-	{
-		zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept), NULL, config_tls);
+		if (0 != (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_PSK))
+		{
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept), NULL,
+					config_tls);
+		}
 	}
 
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
