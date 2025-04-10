@@ -102,7 +102,7 @@ class testLldLinking extends CIntegrationTest {
 			],
 			[
 				'name' => 'Authorization',
-				'value' => 'Bearer mF_A.B5f-2.1JcM',
+				'value' => 'Bearer mF_A.B5f-2.1JcM'
 			]
 		],
 		'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
@@ -341,7 +341,8 @@ class testLldLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():FAIL', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": conflicting item key "lld" found',
+			'cannot link template(s) "TEMPLATE_NAME_0", "TEMPLATE_NAME_1" to host "test_lld_linking": ' .
+			'conflicting item key "lld" found',
 			true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
