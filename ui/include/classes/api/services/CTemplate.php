@@ -411,10 +411,9 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkMacroConfigOptions($templates);
 		self::checkVendorFields($templates);
-
 		self::addUuid($templates);
-
 		self::checkUuidDuplicates($templates);
 		$this->checkDuplicates($templates);
 		$this->checkGroups($templates);
@@ -476,6 +475,52 @@ class CTemplate extends CHostGeneral {
 				)
 			);
 		}
+	}
+
+	private static function checkMacroConfigOptions(array &$templates): void {
+		$api_input_list_rules = [
+			'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['value', 'text']], 'fields' => [
+				'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'text' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			]
+		];
+
+		$api_input_checkbox_rules = [
+			'type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			]
+		];
+
+		foreach ($templates as $t => &$template) {
+			if (array_key_exists('macros', $template) && $template['macros']) {
+				$m = 0;
+				foreach ($template['macros'] as &$macro) {
+					if (array_key_exists('config', $macro) && ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
+							|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX)) {
+						$options = json_decode($macro['config']['options'], true);
+
+						if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
+							if (!CApiInputValidator::validate($api_input_list_rules, $options,
+									'/'.($t + 1).'/macros/'.($m + 1).'/config/options', $error)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+							}
+						}
+						else {
+							if (!CApiInputValidator::validate($api_input_checkbox_rules, $options,
+									'/'.($t + 1).'/macros/'.($m + 1).'/config/options', $error)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+							}
+						}
+
+						$macro['config']['options'] = json_encode($options);
+					}
+					$m++;
+				}
+				unset($macro);
+			}
+		}
+		unset($template);
 	}
 
 	/**
@@ -589,22 +634,8 @@ class CTemplate extends CHostGeneral {
 			if (array_key_exists('macros', $template) && $template['macros']) {
 				$m = 0;
 				foreach ($template['macros'] as $macro) {
-					if (!array_key_exists('hostmacroid', $macro)) {
-						$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
-							API_REQUIRED;
-						$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
-							API_REQUIRED;
-
-						$macro['config'] = array_intersect_key($macro['config'],
-							$api_input_macro_config_rules['config']['fields']
-						);
-						if (!CApiInputValidator::validate($api_input_macro_config_rules['config'], $macro['config'],
-								'/'.($t + 1).'/macros/'.($m + 1), $error)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-						}
-					}
-					else {
-						if (array_key_exists('config', $macro)) {
+					if (array_key_exists('config', $macro)) {
+						if (array_key_exists('hostmacroid', $macro)) {
 							$hostmacroid = $macro['hostmacroid'];
 							$db_type = $db_templates[$template['templateid']]['macros'][$hostmacroid]['config']['type'];
 
@@ -629,12 +660,27 @@ class CTemplate extends CHostGeneral {
 								}
 							}
 						}
+						else {
+							$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
+								API_REQUIRED;
+							$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
+								API_REQUIRED;
+
+							$macro['config'] = array_intersect_key($macro['config'],
+								$api_input_macro_config_rules['config']['fields']
+							);
+							if (!CApiInputValidator::validate($api_input_macro_config_rules['config'], $macro['config'],
+									'/'.($t + 1).'/macros/'.($m + 1), $error)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+							}
+						}
 					}
 					$m++;
 				}
 			}
 		}
 
+		self::checkMacroConfigOptions($templates);
 		self::checkVendorFields($templates, $db_templates);
 		self::checkUuidDuplicates($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
