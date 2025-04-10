@@ -65,7 +65,7 @@ class CProvisioning {
 				'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages', 'sign_assertions',
 				'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
 				'encrypt_assertions', 'search_filter', 'group_basedn', 'group_name', 'group_member', 'user_ref_attr',
-				'group_filter', 'group_membership'
+				'group_filter', 'group_membership', 'idp_certificate', 'sp_certificate', 'sp_private_key'
 			],
 			'userdirectoryids' => [$userdirectoryid],
 			'selectProvisionMedia' => ['userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active',
@@ -113,7 +113,7 @@ class CProvisioning {
 			IDP_TYPE_SAML	=> ['idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid',
 				'nameid_format', 'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
 				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions', 'group_name', 'user_username',
-				'user_lastname', 'scim_status'
+				'user_lastname', 'scim_status', 'idp_certificate', 'sp_certificate', 'sp_private_key'
 			]
 		];
 

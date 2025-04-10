@@ -37,7 +37,8 @@ class CUserDirectory extends CApiService {
 	public const SAML_OUTPUT_FIELDS = [
 		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
 		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status'
+		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status', 'idp_certificate',
+		'sp_certificate', 'sp_private_key'
 	];
 
 	public const OUTPUT_FIELDS = [
@@ -54,7 +55,7 @@ class CUserDirectory extends CApiService {
 		// SAML output fields.
 		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
 		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-		'encrypt_assertions', 'scim_status'
+		'encrypt_assertions', 'scim_status', 'idp_certificate', 'sp_certificate', 'sp_private_key'
 	];
 
 	public const MEDIA_OUTPUT_FIELDS = [
@@ -1548,6 +1549,18 @@ class CUserDirectory extends CApiService {
 			'idp_entityid' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
 										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'idp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sso_url' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sso_url')],
