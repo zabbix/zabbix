@@ -105,7 +105,7 @@ elseif ($data['item']) {
 				break;
 
 			case CWidgetFieldItemSections::SECTION_TRIGGERS:
-				$sections[] = makeSectionTriggers($item['triggers'], $item['hostid'], $data['trigger_parent_templates'],
+				$sections[] = makeSectionTriggers($item, $data['trigger_parent_templates'],
 					$data['allowed_ui_conf_templates'], $data['context']
 				);
 				break;
@@ -319,17 +319,17 @@ function makeSectionSingleParameter(string $section_name, string $section_body):
 		->addClass('section-single-parameter');
 }
 
-function makeSectionTriggers(array $item_triggers, string $hostid, array $trigger_parent_templates,
-		bool $allowed_ui_conf_templates, string $context): CDiv {
+function makeSectionTriggers(array $item, array $trigger_parent_templates, bool $allowed_ui_conf_templates,
+		string $context): CDiv {
 	$triggers = [];
 
 	$i = 0;
-	$template_count = count($item_triggers);
+	$template_count = count($item['triggers']);
 	$hint_trigger = [];
 
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
-	foreach ($item_triggers as $trigger) {
+	foreach ($item['triggers'] as $trigger) {
 		$triggers[] = (new CSpan([
 			(new CSpan($trigger['description']))
 				->addClass('trigger-name')
@@ -343,7 +343,7 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 			->setArgument('action', 'popup')
 			->setArgument('popup', 'trigger.edit')
 			->setArgument('triggerid', $trigger['triggerid'])
-			->setArgument('itemid', $hostid)
+			->setArgument('hostid', $item['hostid'])
 			->setArgument('context', $context)
 			->getUrl();
 
