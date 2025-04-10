@@ -35,6 +35,7 @@
 #include "zbxhash.h"
 #include "zbxstr.h"
 #include "zbxinterface.h"
+#include "zbxdbschema.h"
 
 typedef enum
 {
@@ -265,6 +266,154 @@ static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *seleme
 	zbx_db_large_query_t	query;
 
 	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "elementid", elementids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	elementid;
+
+		ZBX_STR2UINT64(elementid, row[0]);
+		zbx_vector_uint64_append(selementids, elementid);
+	}
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void	DBget_trigger_map_links(const zbx_vector_uint64_t *triggerids, zbx_vector_uint64_t *linkids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_db_row_t		row;
+	zbx_db_large_query_t	query;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct linkid from sysmaps_link_triggers where");
+
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "triggerid", triggerids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	linkid;
+
+		ZBX_STR2UINT64(linkid, row[0]);
+		zbx_vector_uint64_append(linkids, linkid);
+	}
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void	DBupdate_trigger_map_links(const zbx_vector_uint64_t *linkids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 256, sql_offset = 0;
+
+	if (0 == linkids->values_num)
+		return;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links sl set indicator_type=0 where "
+			"not exists ("
+			" select null from sysmaps_link_triggers slt where slt.linkid=sl.linkid"
+			") and");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.linkid",
+			linkids->values, linkids->values_num);
+
+	zbx_db_execute("%s", sql);
+	zbx_free(sql);
+}
+
+void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	linkids;
+	zbx_db_row_t		row;
+	zbx_db_large_query_t	query;
+
+	if (0 == itemids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&linkids);
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct linkid"
+			" from sysmaps_links"
+			" where");
+
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "itemid", itemids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	linkid;
+
+		ZBX_STR2UINT64(linkid, row[0]);
+		zbx_vector_uint64_append(&linkids, linkid);
+	}
+	zbx_db_large_query_clear(&query);
+
+	if (0 == linkids.values_num)
+		goto clean;
+
+	zbx_vector_uint64_sort(&linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links "
+				"set itemid=null,indicator_type=0 where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "linkid",
+			linkids.values, linkids.values_num);
+
+	zbx_db_execute("%s", sql);
+
+	sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmap_link_threshold where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "linkid",
+			linkids.values, linkids.values_num);
+
+	zbx_db_execute("%s", sql);
+clean:
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&linkids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Description: gets a vector of sysmap element identifiers used with the     *
+ *              trigger identifiers                                           *
+ *                                                                            *
+ * Parameters: selementids - [OUT] sysmap element identifiers                 *
+ *             triggerids  - [IN]                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_sysmapelements_triggers_by_ids(zbx_vector_uint64_t *selementids,
+		const zbx_vector_uint64_t *triggerids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_db_row_t	row;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct selementid"
+			" from sysmap_element_trigger"
+			" where");
+
+	zbx_db_large_query_t	query;
+
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "triggerid", triggerids);
 
 	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
@@ -1031,17 +1180,17 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 {
 	zbx_vector_uint64_t	selementids;
 	const char		*event_tables[] = {"events"};
-
-	ZBX_UNUSED(audit_context_mode);
+	zbx_vector_uint64_t	linkids;
 
 	if (0 == triggerids->values_num)
 		return;
 
-	zbx_vector_uint64_create(&selementids);
+	zbx_vector_uint64_create(&linkids);
 
-	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
-	if (0 != selementids.values_num)
-		zbx_db_execute_multiple_query("delete from sysmaps_elements where", "selementid", &selementids);
+	DBget_trigger_map_links(triggerids, &linkids);
+
+	zbx_vector_uint64_create(&selementids);
+	DBget_sysmapelements_triggers_by_ids(&selementids, triggerids);
 
 	zbx_audit_trigger_delete(audit_context_mode, triggerids);
 
@@ -1051,10 +1200,25 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
 
+	if (0 != selementids.values_num)
+	{
+		/* this query to delete map trigger elements must be executed after the query to delete trigger */
+		zbx_db_execute_multiple_query(
+				"delete from sysmaps_elements"
+				" where selementid not in ("
+					"select selementid from sysmap_element_trigger"
+				")"
+					" and",
+				"selementid", &selementids);
+	}
+
 	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
 
+	DBupdate_trigger_map_links(&linkids);
+
 	zbx_vector_uint64_destroy(&selementids);
+	zbx_vector_uint64_destroy(&linkids);
 }
 
 /******************************************************************************
@@ -1401,7 +1565,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_vector_uint64_t	profileids;
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
-	unsigned char		history_mode, trends_mode;
+	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
@@ -1411,6 +1575,8 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 
 	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid");
 	db_get_linked_items(itemids, "items i where", "i.master_itemid");
+
+	zbx_db_update_item_map_links(itemids);
 
 	zbx_audit_item_delete(audit_context_mode, itemids);
 
@@ -2130,6 +2296,7 @@ typedef struct
 	unsigned char	privprotocol;
 	unsigned char	version;
 	unsigned char	bulk;
+	int		max_repetitions;
 }
 zbx_interface_prototype_snmp_t;
 
@@ -3205,7 +3372,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hi.hostid,hi.main,hi.type,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,s.community,"
 				"s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,s.authprotocol,"
-				"s.privprotocol,s.contextname"
+				"s.privprotocol,s.contextname,s.max_repetitions"
 			" from interface hi"
 				" left join interface_snmp s"
 					" on hi.interfaceid=s.interfaceid"
@@ -3257,6 +3424,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
+			snmp->max_repetitions = atoi(row[17]);
 			interface->data.snmp = snmp;
 		}
 		else
@@ -3294,7 +3462,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.interfaceid,hi.hostid,hi.main,hi.type,hi.useip,hi.ip,hi.dns,hi.port,"
 					"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,"
-					"s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname"
+					"s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname,s.max_repetitions"
 				" from interface hi"
 					" left join interface_snmp s"
 						" on hi.interfaceid=s.interfaceid"
@@ -3342,6 +3510,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 				ZBX_STR2UCHAR(snmp->authprotocol, row[15]);
 				ZBX_STR2UCHAR(snmp->privprotocol, row[16]);
 				snmp->contextname = zbx_strdup(NULL, row[17]);
+				snmp->max_repetitions = atoi(row[18]);
 				interface->data.snmp = snmp;
 			}
 			else
@@ -3618,7 +3787,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	{
 		zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
 				"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
-				"privprotocol", "contextname", (char *)NULL);
+				"privprotocol", "contextname", "max_repetitions", (char *)NULL);
 	}
 
 	if (0 != new_inventory_modes)
@@ -3905,7 +4074,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							interface->data.snmp->privpassphrase,
 							(int)interface->data.snmp->authprotocol,
 							(int)interface->data.snmp->privprotocol,
-							interface->data.snmp->contextname);
+							interface->data.snmp->contextname,
+							interface->data.snmp->max_repetitions);
 
 					zbx_audit_host_prototype_update_json_add_snmp_interface(audit_context_mode,
 							host_prototype->hostid, interface->data.snmp->version,
@@ -3917,6 +4087,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							interface->data.snmp->authprotocol,
 							interface->data.snmp->privprotocol,
 							interface->data.snmp->contextname,
+							interface->data.snmp->max_repetitions,
 							interface->interfaceid);
 				}
 			}
@@ -6140,17 +6311,19 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		const unsigned char authprotocol, const unsigned char privprotocol, const char *contextname,
 		const zbx_uint64_t hostid, int audit_context_mode)
 {
-	char		*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
-	unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		break_loop = 0;
+	char			*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc,
+				*contextname_esc;
+	unsigned char		db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	static int		max_repetitions = 0;
+	int			break_loop = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __func__, interfaceid);
 
 	result = zbx_db_select(
 			"select version,bulk,community,securityname,securitylevel,authpassphrase,privpassphrase,"
-			"authprotocol,privprotocol,contextname"
+			"authprotocol,privprotocol,contextname,max_repetitions"
 			" from interface_snmp"
 			" where interfaceid=" ZBX_FS_UI64,
 			interfaceid);
@@ -6209,6 +6382,18 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	privpassphrase_esc = zbx_db_dyn_escape_field("interface_snmp", "privpassphrase", privpassphrase);
 	contextname_esc = zbx_db_dyn_escape_field("interface_snmp", "contextname", contextname);
 
+	if (0 == max_repetitions)
+	{
+		const zbx_db_table_t	*tbl;
+
+		if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		max_repetitions = atoi(zbx_db_get_field(tbl, "max_repetitions")->default_value);
+	}
+
 	if (NULL == row)
 	{
 		zbx_db_execute("insert into interface_snmp"
@@ -6221,7 +6406,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 
 		zbx_audit_host_update_json_add_snmp_interface(audit_context_mode, hostid, version, bulk, community_esc,
 				securityname_esc, securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol,
-				privprotocol, contextname_esc, interfaceid);
+				privprotocol, contextname_esc, max_repetitions, interfaceid);
 	}
 	else
 	{
@@ -6245,7 +6430,8 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		zbx_audit_host_update_json_update_snmp_interface(audit_context_mode, hostid, db_version, version,
 				db_bulk, bulk, row[2], community_esc, row[3], securityname_esc, db_securitylevel,
 				securitylevel, row[5], authpassphrase_esc, row[6], privpassphrase_esc, db_authprotocol,
-				authprotocol, db_privprotocol, privprotocol, row[9], contextname_esc, interfaceid);
+				authprotocol, db_privprotocol, privprotocol, row[9], contextname_esc,
+				max_repetitions, max_repetitions, interfaceid);
 	}
 
 	zbx_free(community_esc);
@@ -6274,9 +6460,26 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		groupid;
 	int			index;
+	uint64_t		discovery_groupid;
 
 	if (0 == groupids->values_num)
 		return;
+
+	if (NULL == (result = zbx_db_select("select value_hostgroupid from settings where name='discovery_groupid'")))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_db_free_result(result);
+		return;
+	}
+
+	ZBX_STR2UINT64(discovery_groupid, row[0]);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -6303,25 +6506,25 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select g.groupid,g.name,c.discovery_groupid"
-			" from hstgrp g,config c"
+			"select g.groupid,g.name"
+			" from hstgrp g"
 			" where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids->values, groupids->values_num);
 	if (0 < hostids.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				" and (g.groupid=c.discovery_groupid"
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and (g.groupid=" ZBX_FS_UI64
 					" or exists ("
 						"select null"
 						" from hosts_groups hg"
 						" where g.groupid=hg.groupid"
-							" and");
+							" and", discovery_groupid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values,
 				hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "))");
 	}
 	else
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=c.discovery_groupid");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=" ZBX_FS_UI64, discovery_groupid);
 
 	result = zbx_db_select("%s", sql);
 
@@ -6332,7 +6535,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 		if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(groupids, index);
 
-		if (0 == hostids.values_num || 0 == strcmp(row[0], row[2]))
+		if (0 == hostids.values_num || groupid == discovery_groupid)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" is used for network discovery"
 					" and cannot be deleted", row[1]);

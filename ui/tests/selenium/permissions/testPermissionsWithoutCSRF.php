@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup token, connector
@@ -147,7 +147,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=host.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:host' => 'CSRF validation host create',
+						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
+					]
 				]
 			],
 			// #9 Host update.
@@ -156,7 +160,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062',
 					'fields' => [
-						'id:host' => 'CSRF validation host',
+						'id:host' => 'CSRF validation host update',
 						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
 					]
 				]
@@ -197,16 +201,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?form=update&graphid=700008&filter_hostids%5B0%5D=50001&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D=700008&context=host',
+					'overlay' => 'update'
 				]
 			],
 			// #15 Graph create.
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?hostid=50011&form=create&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D=50011&context=host',
+					'overlay' => 'create'
 				]
 			],
 			// #16 Discovery rule update.
@@ -308,7 +312,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #28 GUI update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=gui.edit',
 					'return_button' => true
 				]
@@ -388,7 +392,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #38 Trigger displaying options update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=trigdisplay.edit',
 					'return_button' => true
 				]
@@ -412,7 +416,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #41 Other parameters update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=miscconfig.edit',
 					'return_button' => true
 				]
@@ -436,7 +440,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #44 Authentication update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=authentication.edit',
 					'return_button' => true
 				]
@@ -620,7 +624,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #67 Geomap update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=geomaps.edit',
 					'return_button' => true
 				]
@@ -644,7 +648,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #70 Timeout options update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=timeouts.edit',
 					'return_button' => true
 				]
@@ -656,6 +660,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	 * Test function for checking the "POST" form, but with the deleted CSRF token element.
 	 *
 	 * @dataProvider getElementRemoveData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);
@@ -740,18 +747,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #2 Correct token (create graph).
-			[
-				[
-					'token' => true,
-					'token_url' => 'graphs.php?hostid=50013&form=create&context=host',
-					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?&form_refresh=1&form=create&hostid=99015&yaxismin=0&yaxismax=100'
-						.'&name=Test&width=900&height=200&graphtype=0&context=host&add=Add&_csrf_token=',
-					'error' => self::INCORRECT_REQUEST
-				]
-			],
-			// #3 No token.
+			// #2 No token.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -773,7 +769,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #4 Empty token.
+			// #3 Empty token.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -805,10 +801,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #5 Incorrect token.
+			// #4 Incorrect token.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?_csrf_token=12345abcd&tls_accept=1&tls_in_none=1&tls_psk_identity=&tls_psk='.
 							'&action=autoreg.update',
 					'error' => self::ACCESS_DENIED,

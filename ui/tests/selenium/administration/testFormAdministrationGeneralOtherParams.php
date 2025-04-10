@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralOtherParams extends testFormAdministrationGeneral {
 
@@ -35,6 +35,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Login blocking interval' => '30s',
 		// Storage of secrets
 		'Vault provider' => 'HashiCorp Vault',
+		'Resolve secret vault macros by' => 'Zabbix server',
 		// Security.
 		'id:validate_uri_schemes' => true,
 		'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
@@ -55,6 +56,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'login_block' => '30s',
 		// Storage of secrets
 		'vault_provider' => 0,
+		'proxy_secrets_provider' => 0,
 		// Security.
 		'validate_uri_schemes' => 1,
 		'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
@@ -74,6 +76,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Login blocking interval' => '52s',
 		// Storage of secrets
 		'Vault provider' => 'CyberArk Vault',
+		'Resolve secret vault macros by' => 'Zabbix server and proxy',
 		// Security.
 		'id:validate_uri_schemes' => true,
 		'id:uri_valid_schemes' => 'custom_scheme',
@@ -92,8 +95,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		$this->page->assertHeader('Other configuration parameters');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
-		foreach (['Authorization', 'Security'] as $header) {
-			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
+		foreach (['Authorization', 'Storage of secrets', 'Security'] as $header) {
+			$this->assertTrue($this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes($header).']')->one()->isVisible());
 		}
 
 		$limits = [
@@ -119,24 +122,34 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
 
-			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
+			foreach (['uri_valid_schemes', 'iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
 		}
 
 		// Check X-Frame-Options hintbox.
-		$form->getLabel('Use X-Frame-Options HTTP header')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+		$hints = [
+			'Resolve secret vault macros by' => 'Zabbix server: secrets are retrieved from Vault by '.
+					'Zabbix server and forwarded to proxies when needed.'."\n".
+					'Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server '.
+					'and proxies, allowing them to resolve macros independently.',
+			'Use X-Frame-Options HTTP header' => 'X-Frame-Options HTTP header supported values:'."\n".
+					'SAMEORIGIN or \'self\' - allows the page to be displayed only in a frame on the '.
+					'same origin as the page itself'."\n".
+					'DENY or \'none\' - prevents the page from being displayed in a frame, regardless of '.
+					'the site attempting to do so'."\n".'a string of space-separated hostnames; adding '.
+					'\'self\' to the list allows the page to '.
+					'be displayed in a frame on the same origin as the page itself'."\n".
+					"\n".
+					'Note that \'self\' or \'none\' will be regarded as hostnames if used without single quotes.'
+		];
 
-		$hint_text = "X-Frame-Options HTTP header supported values:\n".
-				"SAMEORIGIN or 'self' - allows the page to be displayed only in a frame on the same origin as the page itself\n".
-				"DENY or 'none' - prevents the page from being displayed in a frame, regardless of the site attempting to do so\n".
-				"a string of space-separated hostnames; adding 'self' to the list allows the page to be displayed in a frame on the same origin as the page itself\n".
-				"\n".
-				"Note that 'self' or 'none' will be regarded as hostnames if used without single quotes.";
-
-		$this->assertEquals($hint_text, $hint->getText());
-		$hint->close();
+		foreach ($hints as $label => $hint_text) {
+			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$this->assertEquals($hint_text, $hint->getText());
+			$hint->close();
+		}
 
 		foreach (['Update', 'Reset defaults'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
@@ -174,6 +187,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login attempts' => 1,
 						'Login blocking interval' => '30s',
+						// Storage of secrets.
+						'Vault provider' => 'CyberArk Vault',
+						'Resolve secret vault macros by' => 'Zabbix server and proxy',
 						// Security.
 						'id:validate_uri_schemes' => false,
 						'id:x_frame_header_enabled' => true,
@@ -189,6 +205,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'login_attempts' => 1,
 						'login_block' => '30s',
+						// Storage of secrets.
+						'vault_provider' => 1,
+						'proxy_secrets_provider' => 1,
 						// Security.
 						'validate_uri_schemes' => 0,
 						'x_frame_options' => 'X',
@@ -233,7 +252,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '1m'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '1m'
 					]
 				]
@@ -246,7 +264,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '1h'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '1h'
 					]
 				]
@@ -260,17 +277,17 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '3600s',
 						// Security.
 						'id:validate_uri_schemes' => true,
-						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
-								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,'.
-								'tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
+						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,'.
+								'ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
+								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,'.
+								'file,mailto,tel,ssh,http,https',
 						'id:x_frame_header_enabled' => true,
-						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
+						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'id:iframe_sandboxing_enabled' => true,
-						'id:iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
+						'id:iframe_sandboxing_exceptions' => STRING_255
 					],
 					'db' => [
 						// Authorization.
@@ -278,16 +295,16 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'login_block' => '3600s',
 						// Security.
 						'validate_uri_schemes' => 1,
-						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
-								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,'.
-						'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
+						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,'.
+								'ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
+								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,'.
+								'mailto,tel,ssh,http,https',
+						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'iframe_sandboxing_enabled' => 1,
-						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
-								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
-								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
+						'iframe_sandboxing_exceptions' => STRING_255
 					]
 				]
 			],
@@ -299,7 +316,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '3600'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '3600'
 					]
 				]
@@ -312,7 +328,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '60m'
 					],
 					'db' => [
-						// Authorization.
 						'login_block' => '60m'
 					]
 				]
@@ -337,9 +352,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'User group for database down message' => '',
 						// Authorization.
 						'Login attempts' => '',
-						'Login blocking interval' => '',
-						// Security.
-						'id:x_frame_options' => ''
+						'Login blocking interval' => ''
 					],
 					'details' => [
 						'Field "discovery_groupid" is mandatory.',
@@ -355,7 +368,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					'fields' => [
 						// Authorization.
 						'Login attempts' => 'text',
-						'Login blocking interval' => 'text'
+						'Login blocking interval' => 'text',
+						// Storage of secrets.
+						'Vault provider' => 'CyberArk Vault',
+						'Resolve secret vault macros by' => 'Zabbix server and proxy'
 					],
 					'details' => [
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
@@ -554,7 +570,20 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// #24 Trimming spaces.
+			// #24 Empty X-Frame field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						// Security.
+						'id:x_frame_options' => ''
+					],
+					'details' => [
+						'Incorrect value for field "x_frame_options": cannot be empty.'
+					]
+				]
+			],
+			// #25 Trimming spaces.
 			[
 				[
 					'trim' => true,

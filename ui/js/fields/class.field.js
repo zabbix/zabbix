@@ -103,7 +103,7 @@ class CField {
 	}
 
 	getPath() {
-		return '/' + this.getName().replace('[', '/').replace(']', '');
+		return '/' + this.getName().replaceAll('[', '/').replaceAll(']', '');
 	}
 
 	isSameField(field) {
@@ -132,7 +132,7 @@ class CField {
 		}
 		else {
 			if (!document.body.contains(this._field)) {
-				this.setGlobalError(message);
+				console.log('Validation error for missing field "' + this.getName() + '": ' + message);
 			}
 			else if (this._error_level === -1 || this._error_level >= level) {
 				this._error_msg = message;

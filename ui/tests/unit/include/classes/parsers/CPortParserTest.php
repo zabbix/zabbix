@@ -30,12 +30,6 @@ class CPortParserTest extends TestCase {
 				]
 			],
 			[
-				'0', [], [
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '0'
-				]
-			],
-			[
 				'123456', [], [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -117,6 +111,30 @@ class CPortParserTest extends TestCase {
 				'{$ASD:  regex:   asd"}', ['usermacros' => true], [
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$ASD:  regex:   asd"}'
+				]
+			],
+			[
+				sprintf('%s', ZBX_MIN_PORT_NUMBER), [], [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s', ZBX_MIN_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MIN_PORT_NUMBER - 1), [], [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				sprintf('%s', ZBX_MAX_PORT_NUMBER), [], [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s', ZBX_MAX_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MAX_PORT_NUMBER + 1), [], [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
 				]
 			]
 		];

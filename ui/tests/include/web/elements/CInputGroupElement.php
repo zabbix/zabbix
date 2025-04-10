@@ -15,7 +15,7 @@
 
 
 require_once 'vendor/autoload.php';
-require_once dirname(__FILE__).'/../CElement.php';
+require_once __DIR__.'/../CElement.php';
 
 /**
  * InputGroup element.
@@ -44,10 +44,11 @@ class CInputGroupElement extends CElement {
 	 * @return $this
 	 */
 	public function changeInputType($new_type) {
-		$this->query('xpath:.//button['.CXPathHelper::fromClass('btn-dropdown-toggle').']')->one()->click();
-		$type_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
-
-		return $type_menu->select($new_type);
+		return $this->query('xpath:.//button['.CXPathHelper::fromClass('btn-dropdown-toggle').']')
+				->asPopupButton()
+				->one()
+				->getMenu()
+				->select($new_type);
 	}
 
 	/**

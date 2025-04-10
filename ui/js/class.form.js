@@ -19,6 +19,7 @@ class CForm {
 		'array': CFieldArray,
 		'checkbox': CFieldCheckBox,
 		'hidden': CFieldHidden,
+		'multiline': CFieldMultiline,
 		'multiselect': CFieldMultiselect,
 		'radio-list': CFieldRadioList,
 		'set': CFieldSet,
@@ -325,7 +326,7 @@ class CForm {
 
 		return validator.validateChanges(this.getAllValues(), fields)
 			.then((result) => {
-				this.setErrors(validator.getErrors(), false);
+				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
 
 				return result;
@@ -357,16 +358,20 @@ class CForm {
 				this.addGeneralErrors(field.getGlobalErrors());
 			}
 			else {
-				this.addGeneralErrors({[key]: errors});
+				errors.forEach((error) => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + key + '": ' + error.message);
+					}
+				});
 			}
 		});
 
 		Object.entries(general_errors).forEach(([key, errors]) => {
-			errors
-				.filter(({message}) => message !== '')
-				.forEach(({message}) => {
-					this.addGeneralErrors({[key]: message});
-				});
+			errors.forEach((error) => {
+				if (error.message !== '') {
+					console.log('Validation error for missing field "' + key + '": ' + error.message);
+				}
+			});
 		});
 
 		if ('' in raw_errors) {
@@ -374,7 +379,7 @@ class CForm {
 		}
 
 		if (focus_error_field) {
-			this.focusErrorField();
+			this.focusErrorField(Object.keys(field_errors));
 		}
 	}
 
@@ -449,9 +454,9 @@ class CForm {
 		});
 	}
 
-	focusErrorField() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrors()) {
+	focusErrorField(field_names) {
+		for (const [key, field] of Object.entries(this.#fields)) {
+			if (field_names.includes(key) && field.hasErrors()) {
 				$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
 				field.focusErrorField();
 				break;

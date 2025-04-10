@@ -243,7 +243,7 @@ class CFormValidator {
 						}
 
 						if (preg_match($value, '') === false) {
-							throw new Exception('[RULES ERROR] Rule "'.$key.'" should not be empty (Path: '.$rule_path.')');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid regex (Path: '.$rule_path.')');
 						}
 
 						$result[$key] = $value;
@@ -438,6 +438,13 @@ class CFormValidator {
 			}
 			else {
 				switch ($key) {
+					case 'regex':
+						if (preg_match($value, '') === false) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid regex (Path: '.$rule_path.')');
+						}
+						$result[$key] = $value;
+						break;
+
 					case 'not_in':
 					case 'in':
 						$result[$key] = $value;
@@ -1663,6 +1670,10 @@ class CFormValidator {
 						= self::getWhenFieldAbsolutePath($api_check[2], $path);
 				}
 			}
+		}
+
+		if (!array_key_exists('fields', $rules)) {
+			return;
 		}
 
 		foreach ($rules['fields'] as $field => $rule_sets) {

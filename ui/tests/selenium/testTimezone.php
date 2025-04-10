@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
 
 /**
- * @backup users, config
+ * @backup users, settings
  */
 class testTimezone extends CWebTest {
 
@@ -106,7 +106,7 @@ class testTimezone extends CWebTest {
 		$user_time = $this->getProblemTime('4_trigger_Average');
 		$this->assertEquals($system_time, $user_time);
 		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.zbx_dbstr('test-timezone')));
-		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
+		$this->assertEquals('system', CDBHelper::getValue('SELECT value_str FROM settings WHERE name=\'default_timezone\''));
 		$this->page->logout();
 	}
 
@@ -209,7 +209,7 @@ class testTimezone extends CWebTest {
 		$this->assertEquals($system_time, $user_time);
 		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
-		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
+		$this->assertEquals('system', CDBHelper::getValue('SELECT value_str FROM settings WHERE name=\'default_timezone\''));
 		$this->page->logout();
 	}
 

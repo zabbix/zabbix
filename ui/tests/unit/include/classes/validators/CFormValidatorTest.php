@@ -2260,6 +2260,28 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'field1' => ['string'],
+					'field2' => ['integer', 'required', 'when' => ['field1', 'regex' => '/^match$/']]
+				]],
+				['field1' => 'notmatch'],
+				['field1' => 'notmatch'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'field1' => ['string'],
+					'field2' => ['integer', 'required', 'when' => ['field1', 'regex' => '/^match$/']]
+				]],
+				['field1' => 'match'],
+				['field1' => 'match'],
+				CFormValidator::ERROR,
+				['/field2' => [
+					['message' => 'Required field is missing.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'field1' => ['integer'],
 					'field2' => ['objects', 'fields' => [
 						'ifield1' => ['integer'],

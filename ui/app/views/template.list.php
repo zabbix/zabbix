@@ -221,7 +221,7 @@ foreach ($data['templates'] as $template) {
 
 	$table->addRow([
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
-		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			$data['allowed_ui_conf_hosts']
 				? new CLink(_('Hosts'),
@@ -255,7 +255,8 @@ foreach ($data['templates'] as $template) {
 		],
 		[
 			new CLink(_('Graphs'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
 					->setArgument('context', 'template')
@@ -289,10 +290,10 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
-		(new CCol($template['vendor_name']))->addClass(ZBX_STYLE_WORDBREAK),
+		$template['vendor_name'],
 		$template['vendor_version'],
-		(new CCol($linked_templates_output))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($linked_to_output))->addClass(ZBX_STYLE_WORDBREAK),
+		$linked_templates_output,
+		$linked_to_output,
 		$data['tags'][$template['templateid']]
 	]);
 }

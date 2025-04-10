@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -565,7 +565,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.notification.edit');
 		$this->zbxTestCheckHeader('Notifications');
 		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestLaunchOverlayDialog('Media');
+		$this->zbxTestLaunchOverlayDialog('New media');
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
