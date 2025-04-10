@@ -68,6 +68,25 @@ class CControllerTriggerEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->hasInput('hostid')) {
+			if ($this->getInput('context') === 'host') {
+				$exists = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => [$this->getInput('hostid')]
+				]);
+			}
+			else {
+				$exists = (bool) API::Template()->get([
+					'output' => [],
+					'templateids' => [$this->getInput('hostid')]
+				]);
+			}
+
+			if (!$exists) {
+				return false;
+			}
+		}
+
 		if ($this->hasInput('triggerid')) {
 			$trigger_id = $this->getInput('triggerid');
 
@@ -96,28 +115,6 @@ class CControllerTriggerEdit extends CController {
 			}
 
 			$this->trigger = reset($triggers);
-			$ids = array_column($this->trigger['hosts'], 'hostid');
-
-			if ($this->getInput('context') === 'host') {
-				$exists = (bool) API::Host()->get([
-					'output' => [],
-					'hostids' => $ids,
-					'triggerids' => $trigger_id,
-					'limit' => 1
-				]);
-			}
-			else {
-				$exists = (bool) API::Template()->get([
-					'output' => [],
-					'templateids' => $ids,
-					'triggerids' => $trigger_id,
-					'limit' => 1
-				]);
-			}
-
-			if (!$exists) {
-				return false;
-			}
 		}
 		else {
 			$this->trigger = null;
