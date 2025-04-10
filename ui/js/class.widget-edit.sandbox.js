@@ -152,6 +152,10 @@ class CWidgetEditSandbox {
 		this.#deactivate();
 	}
 
+	getWidget() {
+		return this.#widget;
+	}
+
 	#fixSizeForType(pos, type) {
 		const result_pos = {
 			...pos,

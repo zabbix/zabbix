@@ -24,6 +24,8 @@ class CWidgetEditDialogue {
 	#dashboard;
 	#dashboard_data;
 
+	#resolve;
+
 	#type;
 	#type_original;
 	#name;
@@ -60,28 +62,32 @@ class CWidgetEditDialogue {
 	}
 
 	run({type, name = null, view_mode = null, fields = null, is_new, sandbox, validator, position_fix}) {
-		this.#type = type;
-		this.#type_original = type;
-		this.#name = name;
-		this.#view_mode = view_mode;
-		this.#fields = fields;
-		this.#fields_original = fields;
+		return new Promise(resolve => {
+			this.#resolve = resolve;
 
-		this.#is_new = is_new;
-		this.#is_unsaved = is_new;
+			this.#type = type;
+			this.#type_original = type;
+			this.#name = name;
+			this.#view_mode = view_mode;
+			this.#fields = fields;
+			this.#fields_original = fields;
 
-		this.#sandbox = sandbox;
-		this.#validator = validator;
+			this.#is_new = is_new;
+			this.#is_unsaved = is_new;
 
-		this.#position_fix = position_fix;
+			this.#sandbox = sandbox;
+			this.#validator = validator;
 
-		this.#validator.onResult({
-			callback: result => this.#onValidatorResult(result),
-			priority: CWidgetEditDialogue.VALIDATOR_PRIORITY_UPDATE
+			this.#position_fix = position_fix;
+
+			this.#validator.onResult({
+				callback: result => this.#onValidatorResult(result),
+				priority: CWidgetEditDialogue.VALIDATOR_PRIORITY_UPDATE
+			});
+
+			this.#open();
+			this.#activate();
 		});
-
-		this.#open();
-		this.#activate();
 	}
 
 	#open() {
@@ -191,7 +197,9 @@ class CWidgetEditDialogue {
 	}
 
 	#onClose(e) {
-		if (e.detail.close_by === Overlay.prototype.CLOSE_BY_USER) {
+		const is_submit = e.detail.close_by === Overlay.prototype.CLOSE_BY_SCRIPT;
+
+		if (!is_submit) {
 			if (!this.#is_new && this.#is_unsaved && !confirm(t('Widget configuration will be reverted.'))) {
 				e.preventDefault();
 
@@ -203,6 +211,8 @@ class CWidgetEditDialogue {
 
 		this.#validator.stop();
 		this.#deactivate();
+
+		this.#resolve(is_submit);
 	}
 
 	#onInput() {

@@ -1485,7 +1485,7 @@ class CDashboard {
 			position_fix: this.#widget_form_position_fix
 		};
 
-		if (dashboard_page !== null && widget !== null) {
+		if (widget !== null) {
 			sandbox_params.dashboard_page = dashboard_page;
 			sandbox_params.widget = widget;
 
@@ -1522,6 +1522,17 @@ class CDashboard {
 
 		sandbox.promiseInit(sandbox_params)
 			.then(() => dialogue.run(dialogue_params))
+			.then(is_submit => {
+				if (is_submit) {
+					const type = sandbox.getWidget().getType();
+
+					if (type !== this._widget_last_type && type !== widget?.getType()) {
+						this._widget_last_type = type;
+
+						updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
+					}
+				}
+			})
 			.catch(exception => {
 				if (typeof exception === 'string') {
 					this._warn(exception);
