@@ -61,6 +61,7 @@ class HostNavigator_CWidgetFieldHostGrouping extends CWidgetField {
 				this.dispatchUpdateEvent();
 			});
 
+		this.#table.addEventListener('input', () => this.dispatchUpdateEvent());
 		this.#table.addEventListener('change', () => {
 			this.#update();
 			this.dispatchUpdateEvent();
