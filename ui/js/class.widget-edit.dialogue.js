@@ -212,7 +212,10 @@ class CWidgetEditDialogue {
 		this.#validator.stop();
 		this.#deactivate();
 
-		this.#resolve(is_submit);
+		this.#resolve({
+			is_submit,
+			position_fix: e.detail.position_fix}
+		);
 	}
 
 	#onInput() {

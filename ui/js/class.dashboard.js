@@ -1522,7 +1522,7 @@ class CDashboard {
 
 		sandbox.promiseInit(sandbox_params)
 			.then(() => dialogue.run(dialogue_params))
-			.then(is_submit => {
+			.then(({is_submit, position_fix}) => {
 				if (is_submit) {
 					const type = sandbox.getWidget().getType();
 
@@ -1532,6 +1532,8 @@ class CDashboard {
 						updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 					}
 				}
+
+				this.#widget_form_position_fix = position_fix;
 			})
 			.catch(exception => {
 				if (typeof exception === 'string') {
