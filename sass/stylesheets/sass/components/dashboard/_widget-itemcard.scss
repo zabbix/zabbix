@@ -101,6 +101,8 @@ div.dashboard-widget-itemcard {
 					column-gap: 10px;
 
 					.center-column {
+						@extend %overflow-ellipsis;
+
 						display: flex;
 						justify-content: center;
 					}
