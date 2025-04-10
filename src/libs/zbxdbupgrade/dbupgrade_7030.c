@@ -413,6 +413,27 @@ static int	DBpatch_7030029(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030030(void)
+{
+	const zbx_db_field_t	field = {"idp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_field_t	field = {"sp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7030032(void)
+{
+	const zbx_db_field_t	field = {"sp_private_key", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -449,5 +470,8 @@ DBPATCH_ADD(7030026, 0, 1)
 DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
 DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
+DBPATCH_ADD(7030032, 0, 1)
 
 DBPATCH_END()
