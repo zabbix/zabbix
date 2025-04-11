@@ -52,6 +52,7 @@ class CSlaSchedulePeriodParser extends CParser {
 
 			if ($day_period_from >= $day_period_to) {
 				$this->error = _('start time must be less than end time');
+
 				return self::PARSE_FAIL;
 			}
 

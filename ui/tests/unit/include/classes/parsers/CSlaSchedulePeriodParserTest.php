@@ -266,7 +266,7 @@ class CSlaSchedulePeriodParserTest extends TestCase {
 	 * @param int    $pos
 	 * @param array  $expected
 	 */
-	public function testParse($source, $pos, $expected) {
+	public function testParse(string $source, int $pos, array $expected) {
 		$parser = new CSlaSchedulePeriodParser();
 
 		$this->assertSame($expected, [
