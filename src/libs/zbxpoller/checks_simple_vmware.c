@@ -3247,7 +3247,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -3268,7 +3268,8 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_CLUSTER, cluster->id,
-			counterid, ZBX_VMWARE_PERF_QUERY_ALL))
+			/* cl object supports aggregate value only, which is not always suitable for "*" instance */
+			counterid, '\0' == *instance ? ZBX_VMWARE_PERF_QUERY_ALL : instance))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -3308,7 +3309,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -3597,7 +3598,7 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -3618,7 +3619,8 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 
 	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_DS, ds->id, counterid,
-			ZBX_VMWARE_PERF_QUERY_ALL))
+			/* ds object supports aggregate value only, which is not always suitable for "*" instance */
+			'\0' == *instance ? ZBX_VMWARE_PERF_QUERY_ALL : instance))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -5402,7 +5404,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
