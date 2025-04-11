@@ -24,7 +24,7 @@ class CAbsoluteDateParserTest extends TestCase {
 	public static function dataProvider() {
 		return [
 			[
-				'2025-04-15', 0,
+				'2025-04-15', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-15'
@@ -32,7 +32,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-04-15', '2025-04-15']]
 			],
 			[
-				'2025-04-5', 0,
+				'2025-04-5', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-5'
@@ -40,7 +40,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-04-05', '2025-04-05']]
 			],
 			[
-				'2025-04-05', 0,
+				'2025-04-05', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-05'
@@ -48,7 +48,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-04-05', '2025-04-05']]
 			],
 			[
-				'2025-4-5', 0,
+				'2025-4-5', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-4-5'
@@ -56,7 +56,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-04-05', '2025-04-05']]
 			],
 			[
-				'2025-01', 0,
+				'2025-01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-01'
@@ -64,7 +64,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-01-01', '2025-01-01']]
 			],
 			[
-				'2025-3', 0,
+				'2025-3', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-3'
@@ -72,7 +72,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-03-01', '2025-03-01']]
 			],
 			[
-				'2025', 0,
+				'2025', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025'
@@ -80,7 +80,15 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => ['2025-01-01', '2025-01-01']]
 			],
 			[
-				'text', 0,
+				'2025-04-15', 0, ['min' => 10, 'max' => ZBX_MAX_DATE],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2025-04-15'
+				],
+				'datetime' => ['values' => ['2025-04-15', '2025-04-15']]
+			],
+			[
+				'2025-04-15', 0, ['min' => 10, 'max' => 1744578000],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -88,7 +96,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'2025-02-30 12:45:34', 0,
+				'2037-04-15', 0, ['min' => ZBX_MAX_DATE],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -96,7 +104,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'2025-11-01 aaa', 0,
+				'1950-04-15', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -104,7 +112,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'2055-11-01', 0,
+				'text', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -112,7 +120,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'202', 0,
+				'2025-02-30 12:45:34', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -120,7 +128,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'20', 0,
+				'2025-11-01 aaa', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -128,7 +136,7 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'2', 0,
+				'2055-11-01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -136,7 +144,31 @@ class CAbsoluteDateParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
-				'', 0,
+				'202', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'20', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -151,31 +183,11 @@ class CAbsoluteDateParserTest extends TestCase {
 	 *
 	 * @param string $source
 	 * @param int    $pos
+	 * @param array  $options
 	 * @param array  $expected
-	 * @param array  $datetime
 	 */
-	public function testParse($source, $pos, array $expected, array $datetime) {
-//		$parser = new CAbsoluteDateParser();
-//
-//		$this->assertSame($expected, [
-//			'rc' => $parser->parse($source, $pos),
-//			'match' => $parser->getMatch()
-//		]);
-//		$this->assertSame(strlen($expected['match']), $parser->getLength());
-//
-//		$tz = array_key_exists('tz', $datetime) ? new DateTimeZone($datetime['tz']) : null;
-//		$ts_from = $parser->getDateTime(true, $tz);
-//		$ts_to = $parser->getDateTime(false, $tz);
-//
-//		$this->assertSame($datetime['values'][0], $ts_from !== null ? $ts_from->format('Y-m-d') : null);
-//		$this->assertSame($datetime['values'][1], $ts_to !== null ? $ts_to->format('Y-m-d') : null);
-//
-//		if ($tz !== null) {
-//			$this->assertSame($datetime['tz'], $ts_from->getTimeZone()->getName());
-//			$this->assertSame($datetime['tz'], $ts_to->getTimeZone()->getName());
-//		}
-
-		$parser = new CAbsoluteDateParser();
+	public function testParse(string $source, int $pos, array $options, array $expected) {
+		$parser = new CAbsoluteDateParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),

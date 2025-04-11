@@ -82,7 +82,7 @@ class CControllerSlaUpdate extends CController {
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteDateParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]
+				'use' => [CAbsoluteDateParser::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
 			],
 			'service_tags' => ['objects', 'required', 'not_empty', 'uniq' => ['tag', 'value'],
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
@@ -113,15 +113,12 @@ class CControllerSlaUpdate extends CController {
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
 
-			$response = array_filter([
-				'form_errors' => $form_errors ?? null,
-				'error' => !$form_errors
-					? [
-						'title' => _('Cannot update SLA'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-					: null
-			]);
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot add SLA'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
@@ -163,21 +160,13 @@ class CControllerSlaUpdate extends CController {
 			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,
 			'schedule' => $schedule,
-			'service_tags' => [],
+			'service_tags' => $this->getInput('service_tags', []),
 			'excluded_downtimes' =>	[]
 		];
 
 		$fields = ['slaid', 'name', 'slo', 'period', 'timezone', 'description', 'excluded_downtimes'];
 
 		$this->getInputs($sla, $fields);
-
-		foreach ($this->getInput('service_tags', []) as $service_tag) {
-			if ($service_tag['tag'] === '' && $service_tag['value'] === '') {
-				continue;
-			}
-
-			$sla['service_tags'][] = $service_tag;
-		}
 
 		$result = API::Sla()->update($sla);
 

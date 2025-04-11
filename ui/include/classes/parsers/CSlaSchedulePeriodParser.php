@@ -15,7 +15,7 @@
 
 
 /**
- * A parser for absolute time in "YYYY[-MM[-DD]]" format.
+ * A parser for time periods.
  */
 class CSlaSchedulePeriodParser extends CParser {
 

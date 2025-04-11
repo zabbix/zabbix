@@ -183,9 +183,6 @@ window.sla_edit_popup = new class {
 			fields.slaid = this.slaid;
 		}
 
-		fields.name = fields.name.trim();
-		fields.slo = fields.slo.trim();
-
 		Object.keys(fields.schedule).forEach(key => {
 			if (key.startsWith("schedule_enabled_") && fields.schedule[key] == null) {
 				delete fields.schedule[key];
@@ -198,9 +195,6 @@ window.sla_edit_popup = new class {
 		if ('service_tags' in fields) {
 			for (const key in fields.service_tags) {
 				const service_tag = fields.service_tags[key];
-
-				service_tag.tag = service_tag.tag.trim();
-				service_tag.value = service_tag.value.trim();
 
 				if (service_tag.tag === '' && service_tag.value === '') {
 					delete fields.service_tags[key];

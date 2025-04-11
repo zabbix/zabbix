@@ -15,12 +15,31 @@
 
 
 /**
- * A parser for absolute time in "YYYY[-MM[-DD]]" format.
+ * A parser for absolute date in "YYYY[-MM[-DD]]" format.
  */
 class CAbsoluteDateParser extends CParser {
 
 	/**
-	 * Parse the given period.
+	 * Supported options:
+	 *   'min' => int  Min allowed UNIX timestamp;
+	 *   'max' => int  Max allowed UNIX timestamp;
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'min' => 0,
+		'max' => ZBX_MAX_DATE
+	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+	}
+
+	/**
+	 * Parse the given date.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -33,16 +52,14 @@ class CAbsoluteDateParser extends CParser {
 		$pattern_Y = '(?P<Y>[12][0-9]{3})';
 		$pattern_m = '(?P<m>[0-9]{1,2})';
 		$pattern_d = '(?P<d>[0-9]{1,2})';
-
 		$pattern = '^'.$pattern_Y.'(-'.$pattern_m.'(-'.$pattern_d.')?)?$';
-
 		$subject = substr($source, $pos);
+
 		if (!preg_match('/'.$pattern.'/', $subject, $matches)) {
 			return self::PARSE_FAIL;
 		}
 
 		$matches += ['m' => 1, 'd' => 1];
-
 		$date = sprintf('%04d-%02d-%02d', $matches['Y'], $matches['m'], $matches['d']);
 		$datetime = date_create($date);
 
@@ -51,11 +68,14 @@ class CAbsoluteDateParser extends CParser {
 		}
 
 		$datetime_errors = $datetime->getLastErrors();
+
 		if ($datetime_errors !== false && $datetime_errors['warning_count'] != 0) {
 			return self::PARSE_FAIL;
 		}
 
-		if (strtotime($date) >= ZBX_MAX_DATE) {
+		$unix_time = strtotime($date);
+
+		if ($unix_time >= $this->options['max'] || $unix_time <= $this->options['min']) {
 			$this->error = _('date is outside the allowed range');
 			return self::PARSE_FAIL;
 		}
@@ -65,7 +85,6 @@ class CAbsoluteDateParser extends CParser {
 
 		return self::PARSE_SUCCESS;
 	}
-
 
 	public function getError(): string {
 		return $this->error;

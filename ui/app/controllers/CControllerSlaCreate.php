@@ -81,7 +81,7 @@ class CControllerSlaCreate extends CController {
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteDateParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]
+				'use' => [CAbsoluteDateParser::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
 			],
 			'service_tags' => ['objects', 'required', 'not_empty', 'uniq' => ['tag', 'value'],
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
@@ -151,21 +151,13 @@ class CControllerSlaCreate extends CController {
 			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,
 			'schedule' => $schedule,
-			'service_tags' => [],
+			'service_tags' => $this->getInput('service_tags', []),
 			'excluded_downtimes' =>	[]
 		];
 
 		$fields = ['name', 'slo', 'period', 'timezone', 'description', 'excluded_downtimes'];
 
 		$this->getInputs($sla, $fields);
-
-		foreach ($this->getInput('service_tags', []) as $service_tag) {
-			if ($service_tag['tag'] === '' && $service_tag['value'] === '') {
-				continue;
-			}
-
-			$sla['service_tags'][] = $service_tag;
-		}
 
 		$result = API::Sla()->create($sla);
 
