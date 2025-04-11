@@ -1,0 +1,1 @@
+........S. [ZBX-25495] reverted escalator query fix for Oracle to optimise MySQL query, also removed redundant 'distinct' from original query (arimdjonoks)

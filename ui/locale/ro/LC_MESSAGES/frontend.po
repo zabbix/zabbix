@@ -5502,6 +5502,14 @@ msgstr ""
 msgid "Create and edit maps"
 msgstr ""
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr ""
@@ -9207,6 +9215,10 @@ msgstr[0] "Grafic șters"
 msgstr[1] "Grafic șters"
 msgstr[2] "Grafic șters"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9255,6 +9267,10 @@ msgid_plural "Graph prototypes deleted"
 msgstr[0] "Prototip grafic șters"
 msgstr[1] "Prototip grafic șters"
 msgstr[2] "Prototip grafic șters"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14538,6 +14554,14 @@ msgstr ""
 msgid "New excluded downtime"
 msgstr ""
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr ""
@@ -14558,6 +14582,10 @@ msgstr ""
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
+msgstr ""
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
 msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
@@ -19822,6 +19850,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -25994,6 +26026,14 @@ msgstr ""
 msgid "no permissions to create and edit maps"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr ""
@@ -26854,6 +26894,14 @@ msgstr[2] ""
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
+msgstr ""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
