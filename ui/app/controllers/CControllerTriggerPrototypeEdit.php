@@ -85,13 +85,13 @@ class CControllerTriggerPrototypeEdit extends CController {
 			if ($this->getInput('context') === 'host') {
 				$exists = (bool) API::Host()->get([
 					'output' => [],
-					'hostids' => [$this->getInput('hostid')]
+					'hostids' => $this->getInput('hostid')
 				]);
 			}
 			else {
 				$exists = (bool) API::Template()->get([
 					'output' => [],
-					'templateids' => [$this->getInput('hostid')]
+					'templateids' => $this->getInput('hostid')
 				]);
 			}
 

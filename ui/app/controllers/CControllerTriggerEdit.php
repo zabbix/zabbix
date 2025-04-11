@@ -72,13 +72,13 @@ class CControllerTriggerEdit extends CController {
 			if ($this->getInput('context') === 'host') {
 				$exists = (bool) API::Host()->get([
 					'output' => [],
-					'hostids' => [$this->getInput('hostid')]
+					'hostids' => $this->getInput('hostid')
 				]);
 			}
 			else {
 				$exists = (bool) API::Template()->get([
 					'output' => [],
-					'templateids' => [$this->getInput('hostid')]
+					'templateids' => $this->getInput('hostid')
 				]);
 			}
 
@@ -88,14 +88,12 @@ class CControllerTriggerEdit extends CController {
 		}
 
 		if ($this->hasInput('triggerid')) {
-			$trigger_id = $this->getInput('triggerid');
-
 			$parameters = [
 				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 					'templateid', 'type', 'state', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode',
 					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name'
 				],
-				'triggerids' => $trigger_id,
+				'triggerids' => $this->getInput('triggerid'),
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 				'selectTriggerDiscovery' => ['parent_triggerid', 'disable_source'],
