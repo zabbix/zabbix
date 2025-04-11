@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-10 15:17+0000\n"
-"Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
+"PO-Revision-Date: 2025-04-11 11:37+0000\n"
+"Last-Translator: sergejs.olonkins <sergejs.olonkins@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13208,7 +13208,7 @@ msgstr "メディアタイプ\"%1$s\"はすでに存在しています。"
 #: include/classes/api/services/CMediatype.php:927
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "メディア タイプ \"%1$s\" はアクション \"%2$s\" によって使用されます。"
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -17583,7 +17583,7 @@ msgstr "パラメータに一致したUDPソケットの数を返す。整数で
 
 #: include/classes/data/CItemData.php:2862
 msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
-msgstr ""
+msgstr "システム起動以降のディスク/メモリ モードの状態変化の回数を返します。状態変化が頻繁に発生する場合は、メモリバッファサイズまたは処理時間を増やす必要があることを示しています。"
 
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
@@ -19275,11 +19275,11 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
-msgstr ""
+msgstr "プロキシ メモリ バッファの統計と可用性。モード (モード: pfree、free、total、used、pused)"
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "前処理マネージャーによって受信された値の統計。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -19487,7 +19487,7 @@ msgstr "文字列関数"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "線幅"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -19522,7 +19522,7 @@ msgstr "サブマップ"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "送信"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -19563,7 +19563,7 @@ msgstr "サポート"
 
 #: include/classes/setup/CSetupWizard.php:517
 msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr ""
+msgstr "Oracle DB のサポートは Zabbix 7.0 以降非推奨となり、将来のバージョンではサポート対象外の予定です。"
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:37
 msgid "Supported formats:"
@@ -20111,7 +20111,7 @@ msgstr "入力値のテスト"
 #: app/controllers/CControllerPopupItemTestSend.php:256
 #: app/views/popup.itemtestedit.view.php:256
 msgid "Test with"
-msgstr ""
+msgstr "テスト"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -20147,13 +20147,13 @@ msgstr "メソッド\"%1$s.%2$s\"は\"auth\"パラメータなしで呼び出し
 #: include/html.inc.php:775
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s, %3$s."
-msgstr ""
+msgstr "%1$s はもう検出されず、%2$s、%3$s も検出されません。"
 
 #: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s."
-msgstr ""
+msgstr "%1$s はもう検出されず、%2$s も検出されません。"
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -20166,11 +20166,11 @@ msgstr "Zabbix用データベースのバージョンが必要なバージョン
 
 #: include/classes/data/CItemData.php:2485
 msgid "The average time a read from the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "仮想ディスクからの読み取りにかかる平均時間、\"url\" - VMware サービスの URL、\"uuid\" - VMware 仮想マシンのグローバル一意識別子、\"instance\" - ディスクデバイスインスタンス"
 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "仮想ディスクへの書き込みにかかる平均時間、\"url\" - VMware サービスの URL、\"uuid\" - VMware 仮想マシンのグローバル一意識別子、\"instance\" - ディスクデバイスインスタンス"
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -20186,7 +20186,7 @@ msgstr "クローンしたテンプレートは\"隠しテキスト\"タイプ�
 
 #: include/classes/api/services/CHost.php:1433
 msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
-msgstr ""
+msgstr "ホスト監視のプロキシまたはプロキシ グループを変更する場合は、フィールド\"monitored_by\"を指定する必要があります。"
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -20203,7 +20203,7 @@ msgstr "グラフはディスカバリされなかったので次のディスカ
 
 #: app/controllers/CControllerHostEdit.php:306 host_prototypes.php:197
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
-msgstr ""
+msgstr "クローン中のホストは、書き込み権限のないホストグループに属しています。書き込み権限のないグループは新しいホストから削除されました。"
 
 #: include/html.inc.php:670
 #, c-format
@@ -20268,7 +20268,7 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 
 #: app/controllers/CControllerTemplateEdit.php:196
 msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
-msgstr ""
+msgstr "クローン中のテンプレートは、書き込み権限のないテンプレートグループに属しています。書き込み権限のないグループは新しいテンプレートから削除されました。"
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -20285,11 +20285,11 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
-msgstr ""
+msgstr "値は LLD ルール更新間隔よりも大きくする必要があります。"
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
-msgstr ""
+msgstr "認証コードが間違っています。もう一度お試しください。"
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20302,11 +20302,11 @@ msgstr "これらのパラメーターは、指定された順序でコマンド
 
 #: app/views/action.list.php:156
 msgid "This action has conditions or operations referencing deleted object(s)."
-msgstr ""
+msgstr "このアクションには、削除されたオブジェクトを参照している条件または操作があります。"
 
 #: app/views/action.list.php:151
 msgid "This action has missing conditions or operations due to previously deleted object(s)."
-msgstr ""
+msgstr "このアクションには、以前に削除されたオブジェクトを参照している条件または操作があります。"
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20355,11 +20355,11 @@ msgstr "トレンド テーブルには圧縮されたチャンクが含まれ�
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "この設定では、タイムスタンプの代わりに現地時間が表示されます。詳細設定で「タイムスタンプを表示」もチェックする必要があります。"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "この設定では、アイテムのタイムスタンプではなくログの時刻が表示されます。詳細設定で\"タイムスタンプを表示\"もチェックする必要があります。"
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -20553,7 +20553,7 @@ msgstr "タイムアウト"
 
 #: app/views/popup.proxy.edit.php:186
 msgid "Timeouts are disabled because the proxy and server versions do not match."
-msgstr ""
+msgstr "プロキシとサーバーのバージョンが一致しないため、タイムアウトは無効になっています。"
 
 #: app/views/administration.timeouts.edit.php:42
 #: app/views/popup.proxy.edit.php:191
@@ -20653,7 +20653,7 @@ msgstr "トータルElasticsearch時間: %1$s"
 
 #: widgets/hostavail/views/widget.view.php:81
 msgid "Total Hosts"
-msgstr ""
+msgstr "ホスト合計数"
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -20662,7 +20662,7 @@ msgstr "トータルSQL時間: %1$s"
 
 #: include/classes/data/CItemData.php:2324
 msgid "Total time elapsed, in seconds, since last operating system boot-up, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "前回のオペレーティング システムの起動からの合計経過時間 (秒)、\"url\" - VMware サービスの URL、\"uuid\" - VMware 仮想マシンのグローバル一意識別子"
 
 #: include/classes/debug/CProfiler.php:147
 #, c-format
@@ -20829,7 +20829,7 @@ msgstr[0] "トリガーをコピーしました"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger count"
-msgstr ""
+msgstr "トリガーのカウント"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -20884,7 +20884,7 @@ msgstr "トリガーラベルタイプ"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger limit"
-msgstr ""
+msgstr "トリガーの制限"
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
@@ -21211,7 +21211,7 @@ msgstr "マップ\"%1$s\"のURLの名前は重複できません。"
 
 #: jsLoader.php:441
 msgid "URL opening confirmation"
-msgstr ""
+msgstr "URL 開封確認"
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -21302,7 +21302,7 @@ msgstr "TimescaleDBのバージョンを取得できません。"
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
-msgstr ""
+msgstr "スキャンできませんか？%1$s の秘密鍵を使用して認証アプリを手動で設定できます:"
 
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
@@ -21341,7 +21341,7 @@ msgstr "利用不可"
 
 #: jsLoader.php:206 jsLoader.php:211
 msgid "Unavailable widget"
-msgstr ""
+msgstr "利用できないウィジェット"
 
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
@@ -21357,7 +21357,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 
 #: widgets/hostnavigator/Widget.php:38
 msgid "Uncategorized"
-msgstr ""
+msgstr "未分類"
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -21462,7 +21462,7 @@ msgstr "単位"
 
 #: widgets/gauge/includes/WidgetForm.php:259
 msgid "Units size"
-msgstr ""
+msgstr "ユニットサイズ"
 
 #: app/controllers/CControllerMediatypeTestSend.php:197
 #: app/partials/action.operations.php:77
@@ -21565,7 +21565,7 @@ msgstr "ミュートを解除"
 #: jsLoader.php:293
 #, c-format
 msgid "Unmute for %1$s"
-msgstr ""
+msgstr "%1$s のミュートを解除"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -21894,7 +21894,7 @@ msgstr "ユーザー\"%1$s\"は代わりにレポート\"%2$s\"を作成した�
 #: include/classes/api/services/CUser.php:937
 #, c-format
 msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
-msgstr ""
+msgstr "内部認証が有効になっているため、ユーザー \"%1$s\" にはパスワードが必要です。"
 
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
@@ -22253,7 +22253,7 @@ msgstr "ユーザー"
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware分散仮想スイッチ、\"url\" - VMwareサービスURL。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1883
 msgid "VMware FetchDVPorts wrapper, \"url\" - VMware service URL, \"uuid\" - VMware DVSwitch global unique identifier, \"filter\" - vmware data object DistributedVirtualSwitchPortCriteria, \"mode\"- state(default)/full. Returns JSON"
