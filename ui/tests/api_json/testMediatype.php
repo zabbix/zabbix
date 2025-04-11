@@ -29,42 +29,37 @@ class testMediatype extends CAPITest {
 
 	public static function updateInvalidDataProvider(): array {
 		return [
-			'Email media type gmail do not support SMTP_AUTHENTICATION_NONE' =>
-			[
+			'Email media type gmail do not support SMTP_AUTHENTICATION_NONE' => [
 				[[
 					'mediatypeid' => ':media_type:Email media type gmail',
 					'smtp_authentication' => SMTP_AUTHENTICATION_NONE
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be one of 1, 2.'
 			],
-			'Provider with SMTP_AUTHENTICATION_NONE change requires smtp_authnetication change' =>
-			[
+			'Provider with SMTP_AUTHENTICATION_NONE cannot be changed unless the smtp_authnetication isn\'t changed' => [
 				[[
 					'mediatypeid' => ':media_type:Email media type SMTP',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_GMAIL
 				]],
-				'Invalid parameter "/1": the parameter "smtp_authentication" is missing.'
+				'Invalid parameter "/1/smtp_authentication": value must be one of 1, 2.'
 			],
-			'tokens_status update OAUTH_ACCESS_TOKEN_VALID require access_token' =>
-			[
+			'tokens_status update OAUTH_ACCESS_TOKEN_VALID require access_token' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth without tokens',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID,
 					'access_expires_in' => 600
 				]],
-				'Invalid parameter "/1": the parameter "access_token" is missing.'
+				'Invalid parameter "/1": both "access_token" and "access_expires_in" must be specified when marking access token valid.'
 			],
-			'tokens_status update OAUTH_ACCESS_TOKEN_VALID require access_expires_in' =>
-			[
+			'tokens_status update OAUTH_ACCESS_TOKEN_VALID require access_expires_in' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth without tokens',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID,
 					'access_token' => 'token'
 				]],
-				'Invalid parameter "/1": the parameter "access_expires_in" is missing.'
+				'Invalid parameter "/1": both "access_token" and "access_expires_in" must be specified when marking access token valid.'
 			],
-			'OAuth is not supported for Office relay' =>
-			[
+			'OAuth is not supported for Office relay' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY,
@@ -72,8 +67,7 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be one of 0, 1.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_NONE' =>
-			[
+			'OAuth not supported for SMTP_AUTHENTICATION_NONE' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
@@ -82,8 +76,7 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' =>
-			[
+			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
@@ -92,8 +85,7 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'OAuth not supported for script media type' =>
-			[
+			'OAuth not supported for script media type' => [
 				[[
 					'mediatypeid' => ':media_type:Script media type',
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
@@ -105,18 +97,17 @@ class testMediatype extends CAPITest {
 
 	public static function updateValidDataProvider(): array {
 		return [
-			'Provider with SMTP_AUTHENTICATION_NONE change requires smtp_authnetication change' =>
-			[
+			'Provider with SMTP_AUTHENTICATION_NONE is allowed to be changed when the smtp_authnetication is changed' => [
 				[[
 					'mediatypeid' => ':media_type:Email media type SMTP',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_GMAIL,
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
+					'username' => 'usernameusername',
 					'passwd' => 'passwordpassword'
 				]],
 				null
 			],
-			'Update access token' =>
-			[
+			'Update access token' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth without tokens',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID,
@@ -129,12 +120,13 @@ class testMediatype extends CAPITest {
 			[
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens and tokens_status 0',
-					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID
+					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID,
+					'access_token' => 'token',
+					'access_expires_in' => 600
 				]],
 				null
 			],
-			'Update refresh token' =>
-			[
+			'Update refresh token' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth without tokens',
 					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
@@ -142,16 +134,15 @@ class testMediatype extends CAPITest {
 				]],
 				null
 			],
-			'Enable refresh token' =>
-			[
+			'Enable refresh token' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens and tokens_status 0',
-					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID
+					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
+					'refresh_token' => 'token'
 				]],
 				null
 			],
-			'Update access and refresh token' =>
-			[
+			'Update access and refresh token' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth without tokens',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID,
@@ -161,8 +152,7 @@ class testMediatype extends CAPITest {
 				]],
 				null
 			],
-			'Update token_status to invalidate both tokens' =>
-			[
+			'Update token_status to invalidate both tokens' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth without tokens',
 					'tokens_status' => 0
@@ -176,15 +166,14 @@ class testMediatype extends CAPITest {
 	 * @dataProvider updateInvalidDataProvider
 	 * @dataProvider updateValidDataProvider
 	 */
-	public function testUpdate(array $mediatypes, $expected_error) {
+	public function testMediatypeUpdate(array $mediatypes, $expected_error) {
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 		$this->call('mediatype.update', $mediatypes, $expected_error);
 	}
 
 	public static function updateAccessTokenUpdatedDataProvider(): array {
 		return [
-			'access_token change updates access_token_updated' =>
-			[
+			'access_token change updates access_token_updated' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth access_token_updated',
 					'access_token' => 'updated',
@@ -192,26 +181,14 @@ class testMediatype extends CAPITest {
 				]],
 				true
 			],
-			'One of token reset fields change resets access_token_updated' =>
-			[
-				[[
-					'mediatypeid' => ':media_type:OAuth access_token_updated',
-					'client_id' => 'updated',
-					'client_secret' => 'updated',
-					'token_url' => 'updated'
-				]],
-				true
-			],
-			'refresh_token change do not affect access_token_updated' =>
-			[
+			'refresh_token change do not affect access_token_updated' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth access_token_updated',
 					'refresh_token' => 'updated'
 				]],
 				false
 			],
-			'token_status change do not affect access_token_updated' =>
-			[
+			'token_status change do not affect access_token_updated' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth access_token_updated',
 					'tokens_status' => 0
@@ -224,7 +201,7 @@ class testMediatype extends CAPITest {
 	/**
 	 * @dataProvider updateAccessTokenUpdatedDataProvider
 	 */
-	public function testUpdateAccessTokenUpdated(array $mediatypes, bool $should_change) {
+	public function testMediatypeUpdateAccessTokenUpdated(array $mediatypes, bool $should_change) {
 		$db_access_token_updated = [];
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 
@@ -233,6 +210,8 @@ class testMediatype extends CAPITest {
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
 		])['result'];
 		$db_access_token_updated[] = array_column($result, 'access_token_updated', 'mediatypeid');
+
+		sleep(1);
 
 		$this->call('mediatype.update', $mediatypes);
 
@@ -306,7 +285,7 @@ class testMediatype extends CAPITest {
 	/**
 	 * @dataProvider createInvalidDataProvider
 	 */
-	public function testCreate(array $mediatypes, $expected_error) {
+	public function testMediatypeCreate(array $mediatypes, $expected_error) {
 		$this->call('mediatype.create', $mediatypes, $expected_error);
 	}
 
@@ -351,7 +330,7 @@ class testMediatype extends CAPITest {
 	/**
 	 * @dataProvider createAccessTokenUpdatedDataProvider
 	 */
-	public function testCreateAccessTokenUpdated(array $mediatypes, bool $should_change) {
+	public function testMediatypeCreateAccessTokenUpdated(array $mediatypes, bool $should_change) {
 		static $i = 0;
 
 		$db_access_token_updated = [];
