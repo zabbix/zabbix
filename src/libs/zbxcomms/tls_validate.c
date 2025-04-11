@@ -733,6 +733,21 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 		}
 	}
 
+	/* Frontend certificate issuer is optional but must be defined only when TLSFrontendAccept contain cert */
+	if (0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL != config_tls->frontend_cert_issuer)
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(config_tls->frontend_cert_issuer),
+				&(config_tls->frontend_accept_modes), config_tls);
+	}
+
+	/* Frontend certificate subject is optional but must be defined only when TLSFrontendAccept contain cert */
+	if (0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) &&
+			NULL != config_tls->frontend_cert_subject)
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(config_tls->frontend_cert_subject),
+				&(config_tls->frontend_accept_modes), config_tls);
+	}
+
 	/* Frontend certificate issuer is optional but must be defined only together with a certificate */
 	if (NULL == config_tls->cert_file && NULL != config_tls->frontend_cert_issuer)
 	{

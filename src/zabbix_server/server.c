@@ -831,14 +831,21 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
-#endif
-#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertSubject", zbx_config_tls->cipher_all,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertIssuer", zbx_config_tls->cipher_all,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSListen", zbx_config_tls->cipher_all,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendAccept", zbx_config_tls->cipher_all,
+		"GnuTLS or OpenSSL"));
+
 #endif
 #if !defined(HAVE_OPENSSL)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
