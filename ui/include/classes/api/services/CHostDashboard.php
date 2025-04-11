@@ -482,9 +482,9 @@ class CHostDashboard extends CApiService {
 		unset($host_widgets);
 
 		$options = [
-			'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid',
-				'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid', 'value_serviceid', 'value_slaid'
-			],
+			'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+				array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+			),
 			'filter' => ['widgetid' => array_keys($widgets)]
 		];
 		$result = DBselect(DB::makeSql('widget_field', $options));
