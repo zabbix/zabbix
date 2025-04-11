@@ -3174,7 +3174,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'SELECT hd.hostid,h.host'.
 			' FROM host_discovery hd,hosts h'.
 			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.lldruleid', $del_itemids)
+				' AND '.dbConditionId('hd.parent_itemid', $del_itemids)
 		), 'hostid');
 
 		if ($db_host_prototypes) {
