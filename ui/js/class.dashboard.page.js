@@ -51,7 +51,6 @@ class CDashboardPage {
 		cell_height,
 		max_columns,
 		max_rows,
-		widget_defaults,
 		is_editable,
 		is_edit_mode,
 		csrf_token = null,
@@ -76,7 +75,6 @@ class CDashboardPage {
 		this._cell_height = cell_height;
 		this._max_columns = max_columns;
 		this._max_rows = max_rows;
-		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._csrf_token = csrf_token;
