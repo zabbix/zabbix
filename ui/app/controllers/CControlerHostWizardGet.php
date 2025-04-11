@@ -203,7 +203,6 @@ class CControllerHostWizardGet extends CController {
 			'snmp_interface_required' => $snmp_interface_required,
 			'ipmi_interface_required' => $ipmi_interface_required,
 			'jmx_interface_required' => $jmx_interface_required
-
 		];
 
 		$response = new CControllerResponseData($data);
