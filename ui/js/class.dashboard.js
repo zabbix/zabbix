@@ -1485,6 +1485,10 @@ class CDashboard {
 		};
 
 		if (widget !== null) {
+			if (dashboard_page !== this._selected_dashboard_page) {
+				this._selectDashboardPage(dashboard_page);
+			}
+
 			sandbox_params.dashboard_page = dashboard_page;
 			sandbox_params.widget = widget;
 
@@ -1493,11 +1497,6 @@ class CDashboard {
 			dialogue_params.view_mode = widget.getViewMode();
 			dialogue_params.fields = widget.getFields();
 			dialogue_params.is_new = false;
-
-			this.#editing_widget_context = {
-				unique_id: widget.getUniqueId(),
-				dashboard_page_unique_id: dashboard_page.getUniqueId()
-			}
 		}
 		else {
 			if (this._widget_last_type === null) {
@@ -1512,11 +1511,11 @@ class CDashboard {
 
 			dialogue_params.type = this._widget_last_type;
 			dialogue_params.is_new = true;
+		}
 
-			this.#editing_widget_context = {
-				unique_id: null,
-				dashboard_page_unique_id: this._selected_dashboard_page.getUniqueId()
-			}
+		this.#editing_widget_context = {
+			unique_id: widget !== null ? widget.getUniqueId() : null,
+			dashboard_page_unique_id: this._selected_dashboard_page.getUniqueId()
 		}
 
 		sandbox.promiseInit(sandbox_params)
