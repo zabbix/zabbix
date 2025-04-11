@@ -839,7 +839,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertSubject", zbx_config_tls->frontend_cert_subject,
 		"GnuTLS or OpenSSL"));
-	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertIssuer", zbx_config_tls->,frontend_cert_issuer,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertIssuer", zbx_config_tls->frontend_cert_issuer,
 		"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSListen", zbx_config_tls->tls_listen,
 		"GnuTLS or OpenSSL"));
