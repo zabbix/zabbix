@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-02-17 01:22+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2025-04-11 09:12+0000\n"
+"Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1780,19 +1780,19 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/data/CItemData.php:1442
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "スワップインの待機の為に費やされたCPU時間、「url」- VMwareサービスURL、「uuid」- VMware仮想マシンのグローバル一意識別子、「instance」- CPUインスタンス"
 
 #: include/classes/data/CItemData.php:1294
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "周期中のCPU使用率（パーセンテージ）は電源管理またはHTに依存します。「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバル一意識別子です。"
 
 #: include/classes/data/CItemData.php:1286
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "周期中の CPU 使用率 (パーセンテージ)、「url」 - VMware サービスの URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1446
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "周期中のCPU使用率（パーセンテージ）、「url」- VMwareサービスURL、「uuid」- VMware仮想マシンのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1074
 msgid "CPU utilization percentage. Returns float"
@@ -2699,7 +2699,7 @@ msgstr "テンプレートをリンクできません"
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "テンプレート \"%3$s\" によって2 回リンクされることになるため、テンプレート \"%1$s\" をホスト \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:872
 #, c-format
@@ -2709,7 +2709,7 @@ msgstr "親テンプレート\"%3$s\"を二重リンクすることになるの�
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "テンプレート \"%3$s\" によって2 回リンクされることになるため、テンプレート \"%1$s\" をホストプロトタイプ \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:869
 #, c-format
@@ -2735,37 +2735,37 @@ msgstr "循環参照(%3$s)になってしまうので、テンプレート\"%1$s
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr ""
+msgstr "ホスト \"%3$s\" によって2 回リンクされることになるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
-msgstr ""
+msgstr "ホストプロトタイプ  \"%3$s\" によって2 回リンクされることになるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:970
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
-msgstr ""
+msgstr "テンプレート \"%3$s\" によって2 回リンクされることになるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "テンプレート \"%3$s\" によって2 回リンクされることになるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "その親テンプレート \"%3$s\" がホスト \"%4$s\" に 2 回リンクされるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "その親テンプレート \"%3$s\" がホスト \"%4$s\" に 2 回リンクされるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "その親テンプレート \"%3$s\" がテンプレート \"%4$s\" に 2 回リンクされるため、テンプレート \"%1$s\" をテンプレート \"%2$s\" にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:866
 #, c-format
@@ -3591,11 +3591,11 @@ msgstr "複製"
 #: app/views/configuration.host.edit.php:63
 #: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:203
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "クローンされたホストのパラメーター値が変更されました。"
 
 #: templates.php:213
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "クローンされたテンプレートのパラメーター値が変更されました。"
 
 #: app/views/administration.token.view.php:65
 #: app/views/administration.user.token.view.php:64
@@ -5683,15 +5683,15 @@ msgstr "ディスカバリオブジェクト"
 
 #: include/classes/data/CItemData.php:1242
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareクラスターの検出、\"url\" - VMwareサービスURL。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1250
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareデータストアのディスカバリ、\"url\" - VMwareサービスURL。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1302
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータストアの検出、「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバルユニークIDです。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1326
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
@@ -5699,19 +5699,19 @@ msgstr "VMwareハイパーバイザーのディスカバリー、\"url\" - VMwar
 
 #: include/classes/data/CItemData.php:1570
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのディスクデバイスの検出、「url」はVMwareサービスのURL、「uuid」はVMware仮想マシンのグローバルユニークIDです。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1582
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンファイルシステムの検出、「url」はVMwareサービスのURL、「uuid」はVMware仮想マシンのグローバルユニークIDです。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1514
 msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのネットワークインターフェースの検出、「url」はVMwareサービスのURL、「uuid」はVMware仮想マシンのグローバルユニークIDです。JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1458
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンの検出、「url」 - VMwareサービスURL。JSON形式で返します。"
 
 #: app/controllers/CControllerAuditLogList.php:214
 #: app/views/configuration.discovery.edit.php:138
@@ -6491,7 +6491,7 @@ msgstr "イベント名"
 
 #: app/views/popup.condition.common.php:642
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "トリガー設定でカスタム イベント名が指定されていない限り、イベント名はトリガー名 (マクロが展開されている) と一致します。"
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -8069,12 +8069,12 @@ msgstr "ホスト名\"%1$s\"を持つホストのプロトタイプはディス�
 #: include/classes/api/services/CHostPrototype.php:1173
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "表示名が「%1$s」であるホストプロトタイプは、ホスト「%3$s」の検出ルール「%2$s」に既に存在します。"
 
 #: include/classes/api/services/CHostPrototype.php:1170
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "表示名が「%1$s」であるホストプロトタイプは、テンプレート「%3$s」の検出ルール「%2$s」に既に存在します。"
 
 #: include/classes/api/services/CHostPrototype.php:1152
 #, c-format
@@ -10516,7 +10516,7 @@ msgstr "LLDマクロ"
 
 #: include/classes/api/services/CItemGeneral.php:709
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのLLDルールがすでに存在します"
 
 #: app/partials/popup.operations.php:259
 #: app/views/configuration.correlation.edit.php:58
@@ -12088,7 +12088,7 @@ msgstr "スクリプト実行のためのネットワークタイムアウト"
 
 #: include/classes/data/CItemData.php:1526
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
-msgstr ""
+msgstr "インターバル中のネットワーク使用率(送信レートと受信レートの組み合わせ)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ネットワークインターフェースのインスタンス"
 
 #: app/views/administration.proxy.list.php:169 include/func.inc.php:196
 msgid "Never"
@@ -12780,7 +12780,7 @@ msgstr "取得不可"
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "一重引用符なしで使用すると、%1$s または %2$s はホスト名として扱われることに注意してください。"
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -12822,7 +12822,7 @@ msgstr "CPU数。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1310
 msgid "Number of available DS paths, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - Datastore name, \"partitionid\" - internal id of physical device from vmware.hv.datastore.discovery"
-msgstr ""
+msgstr "利用可能な DS パスの数、「url」 - VMware サービス URL、「uuid」 - VMware ハイパーバイザーのユニバーサル一意識別子、「datastore」 - データストア名、「partitionid」 - vmware.hv.datastore.discovery からの物理デバイスの内部 ID"
 
 #: include/classes/data/CItemData.php:902
 msgid "Number of currently open file descriptors. Returns integer"
@@ -12875,15 +12875,15 @@ msgstr "障害の数と最も深刻度の高いトリガー名を表示"
 
 #: include/classes/data/CItemData.php:1342
 msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware ハイパーバイザー上のプロセッサ コア数、「url」 - VMware サービス URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1346
 msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware ハイパーバイザー上のプロセッサ スレッド数、「url」 - VMware サービス URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1430
 msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 仮想マシン上のプロセッサ数、「url」 - VMware サービス URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:283
 msgid "Number of rows"
@@ -12960,7 +12960,7 @@ msgstr "テーブルTRENDS_UINT内の値保存数。"
 
 #: include/classes/data/CItemData.php:1414
 msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware ハイパーバイザー上の仮想マシンの数、「url」 - VMware サービスの URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1222
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
@@ -13865,7 +13865,7 @@ msgstr "ピーク時のメモリ使用量: %1$s"
 
 #: include/classes/data/CItemData.php:1426
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "物理CPUへのアクセスを競合しているために仮想マシンが実行できない時間の割合、「url」 - VMwareサービスURL、「uuid」 - VMware仮想マシンのグローバル一意識別子"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
@@ -13873,11 +13873,11 @@ msgstr "パーセンテージ"
 
 #: include/classes/data/CItemData.php:1510
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "消費されているホスト物理メモリの割合、「url」 - VMware サービス URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1434
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "仮想マシンは準備出来ていたが、物理 CPU で実行するようにスケジュールできなかった時間の割合、「url」 - VMware サービスの URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子、「instance」 - CPU インスタンス"
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:151
 msgid "Percentile line (left)"
@@ -14064,7 +14064,7 @@ msgstr "POSTデータの形式"
 
 #: include/classes/data/CItemData.php:1390
 msgid "Power usage , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"max\" - Maximum allowed power usage"
-msgstr ""
+msgstr "電力使用量、「url」- VMware サービスの URL、「uuid」- VMware ハイパーバイザーのグローバル一意識別子、「max」- 最大許容電力使用量"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:864
 msgid "Power value"
@@ -17426,11 +17426,11 @@ msgstr "Zabbix用データベースのバージョンが必要なバージョン
 
 #: include/classes/data/CItemData.php:1546
 msgid "The average time a read from the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "仮想ディスクからの読み取りにかかる平均時間、「url」 - VMware サービスの URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子、「instance」 - ディスクデバイスインスタンス"
 
 #: include/classes/data/CItemData.php:1550
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "仮想ディスクへの書き込みにかかる平均時間、「url」 - VMware サービスの URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子、「instance」 - ディスクデバイスインスタンス"
 
 #: app/controllers/CControllerHostEdit.php:262
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -17474,7 +17474,7 @@ msgstr "グラフはディスカバリされなかったので次のディスカ
 
 #: app/controllers/CControllerHostEdit.php:286 host_prototypes.php:197
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
-msgstr ""
+msgstr "クローン中のホストは、書き込み権限のないホストグループに属しています。書き込み権限のないグループは新しいホストから削除されました。"
 
 #: include/html.inc.php:669
 #, c-format
@@ -17539,7 +17539,7 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 
 #: templates.php:199
 msgid "The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template."
-msgstr ""
+msgstr "クローン中のテンプレートは、書き込み権限のないホストグループに属しています。書き込み権限のないグループは新しいテンプレートから削除されました。"
 
 #: app/views/administration.token.view.php:53
 #: app/views/administration.user.token.view.php:52
@@ -17811,7 +17811,7 @@ msgstr "トータルSQL時間: %1$s"
 
 #: include/classes/data/CItemData.php:1466
 msgid "Total time elapsed, in seconds, since last operating system boot-up, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "前回のオペレーティング システムの起動からの合計経過時間 (秒)、「url」 - VMware サービスの URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子"
 
 #: include/classes/debug/CProfiler.php:147
 #, c-format
@@ -19186,11 +19186,11 @@ msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free,
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware cluster performance counter, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMwareデータストアのパフォーマンスカウンター、<url> - VMwareサービスURL、<id> - VMwareデータストアのuuid、<path> - パフォーマンスカンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
-msgstr ""
+msgstr "VMwareクラスターの状態、\"url\" - VMwareサービスURL、\"name\" - VMwareクラスター名"
 
 #: include/classes/data/CItemData.php:1270
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19203,27 +19203,27 @@ msgstr "VMwareデータストアのバイト単位かトータルからのパー
 
 #: include/classes/data/CItemData.php:1254
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
-msgstr ""
+msgstr "VMwareデータストアのハイパーバイザーのリスト、\"url\" - VMwareサービスURL、\"datastore\" - データストア名"
 
 #: include/classes/data/CItemData.php:1258
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - \"latency\"/\"maxlatency\" - average or maximum"
-msgstr ""
+msgstr "VMware データストアの読み取り統計、\"url\" - VMware サービス URL、\"datastore\" - データストア名、\"mode\" - レイテンシ/最大レイテンシ - 平均または最大"
 
 #: include/classes/data/CItemData.php:1266
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - \"latency\"/\"maxlatency\" - average or maximum"
-msgstr ""
+msgstr "VMware データストアの書き込み統計、\"url\" - VMware サービス URL、\"datastore\" - データストア名、\"mode\" - レイテンシ/最大レイテンシ - 平均または最大"
 
 #: include/classes/data/CItemData.php:1274
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - \"all\" (default), \"skip\" - skip processing of older data"
-msgstr ""
+msgstr "VMwareイベントログ、\"url\"  - VMwareサービスURL、\"mode\" - \"all\" (デフォルト)、\"skip\" - 古いデータの処理をスキップ"
 
 #: include/classes/data/CItemData.php:1358
 msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware ハイパーバイザー の BIOS UUID、\"url\" - VMware サービス URL、\"uuid\" - VMware ハイパーバイザーのグローバル一意識別子"
 
 #: include/classes/data/CItemData.php:1398
 msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーHWベンダー状態センサー、\"url\"  - VMwareサービスURL、\"uuid\" - VMwareハイパーバイザーのグローバルユニークID JSON形式で返します。"
 
 #: include/classes/data/CItemData.php:1370
 msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
