@@ -217,7 +217,7 @@ class CWidgetItemCard extends CWidget {
 
 			case CWidgetItemHistory.VALUE_TYPE_RAW:
 				const curl = this.#getHintboxContentCUrl();
-				curl.setArgument('action', 'widget.itemhistory.binary_value.get');
+				curl.setArgument('action', 'widget.itemcard.binary_value.get');
 
 				this.#addHintbox(button, '', curl);
 				break;
@@ -262,7 +262,7 @@ class CWidgetItemCard extends CWidget {
 
 				const curl = this.#getHintboxContentCUrl(button);
 
-				curl.setArgument('action', 'widget.itemhistory.image_value.get');
+				curl.setArgument('action', 'widget.itemcard.image_value.get');
 				content.src = curl.getUrl();
 				container.innerHTML = '';
 				container.append(content);
