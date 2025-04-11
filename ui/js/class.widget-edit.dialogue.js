@@ -56,6 +56,9 @@ class CWidgetEditDialogue {
 
 	#messages;
 
+	#last_type = null;
+	#last_type_reference = null;
+
 	constructor({dashboard}) {
 		this.#dashboard = dashboard;
 		this.#dashboard_data = dashboard.getData();
@@ -246,9 +249,17 @@ class CWidgetEditDialogue {
 			const fields = result.fields;
 
 			if ('reference' in fields) {
-				fields.reference = !this.#is_new && this.#type === this.#type_original
-					? this.#fields_original.reference
-					: this.#dashboard.createReference();
+				if (!this.#is_new && this.#type === this.#type_original) {
+					fields.reference = this.#fields_original.reference;
+				}
+				else {
+					if (this.#last_type !== this.#type) {
+						this.#last_type = this.#type;
+						this.#last_type_reference = this.#dashboard.createReference();
+					}
+
+					fields.reference = this.#last_type_reference;
+				}
 			}
 
 			if (this.#is_new || this.#is_unsaved) {
