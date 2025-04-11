@@ -390,6 +390,31 @@ static int	DBpatch_7030028(void)
 
 static int	DBpatch_7030029(void)
 {
+	int		i;
+	const char	*values[] = {
+			"web.hosts.graphs.php.sort", "web.hosts.graph.list.sort",
+			"web.hosts.graphs.php.sortorder", "web.hosts.graph.list.sortorder",
+			"web.hosts.graphs.filter_hostids", "web.hosts.graph.list.filter_hostids",
+			"web.hosts.graphs.filter_groupids", "web.hosts.graph.list.filter_groupids",
+			"web.hosts.graphs.filter.active", "web.hosts.graph.list.filter.active",
+			"web.templates.graphs.php.sort", "web.templates.graph.list.sort",
+			"web.templates.graphs.php.sortorder", "web.templates.graph.list.sortorder",
+			"web.templates.graphs.filter_hostids", "web.templates.graph.list.filter_hostids",
+			"web.templates.graphs.filter_groupids", "web.templates.graph.list.filter_groupids",
+			"web.templates.graphs.filter.active", "web.templates.graph.list.filter.active",
+		};
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030030(void)
+{
 	const zbx_db_table_t	table =
 			{"lld_macro_export", "lld_macro_exportid", 0,
 				{
@@ -405,12 +430,12 @@ static int	DBpatch_7030029(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030030(void)
+static int	DBpatch_7030031(void)
 {
 	return DBcreate_index("lld_macro_export", "lld_macro_export_1", "itemid", 0);
 }
 
-static int	DBpatch_7030031(void)
+static int	DBpatch_7030032(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -418,33 +443,33 @@ static int	DBpatch_7030031(void)
 	return DBadd_foreign_key("lld_macro_export", 1, &field);
 }
 
-static int	DBpatch_7030032(void)
+static int	DBpatch_7030033(void)
 {
 	const zbx_db_field_t	field = {"lldruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("item_discovery", &field);
 }
 
-static int	DBpatch_7030033(void)
+static int	DBpatch_7030034(void)
 {
 	return DBcreate_index("item_discovery", "item_discovery_3", "lldruleid", 0);
 }
 
-static int	DBpatch_7030034(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("item_discovery", 3, &field);
 }
 
-static int	DBpatch_7030035(void)
+static int	DBpatch_7030036(void)
 {
 	const zbx_db_field_t	field = {"parent_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("item_discovery", &field);
 }
 
-static int	DBpatch_7030036(void)
+static int	DBpatch_7030037(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update item_discovery id"
 					" set lldruleid=parent_itemid,parent_itemid=NULL"
@@ -460,13 +485,12 @@ static int	DBpatch_7030036(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030037(void)
+static int	DBpatch_7030038(void)
 {
 	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("host_discovery", "parent_itemid", &field);
 }
-
 
 #endif
 
@@ -504,6 +528,7 @@ DBPATCH_ADD(7030026, 0, 1)
 DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
 DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030029, 0, 1)
 DBPATCH_ADD(7030030, 0, 1)
 DBPATCH_ADD(7030031, 0, 1)
 DBPATCH_ADD(7030032, 0, 1)
@@ -512,5 +537,6 @@ DBPATCH_ADD(7030034, 0, 1)
 DBPATCH_ADD(7030035, 0, 1)
 DBPATCH_ADD(7030036, 0, 1)
 DBPATCH_ADD(7030037, 0, 1)
+DBPATCH_ADD(7030038, 0, 1)
 
 DBPATCH_END()

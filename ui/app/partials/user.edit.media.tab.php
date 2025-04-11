@@ -31,6 +31,7 @@ $media_table_info = (new CTable())
 	->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')]);
 
 $media_add_button = (new CButtonLink(_('Add')))
+	->setEnabled($data['can_edit_media'])
 	->addClass('js-add');
 
 $media_form_list->addRow(_('Media'),
@@ -60,17 +61,17 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 		(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
 		[
-			(new CButtonLink(_('Enabled')))
-				->addClass(ZBX_STYLE_GREEN)
-				->addClass('js-status')
-				->setAttribute('data-status_type', 'disable_media'),
-			(new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
+			($data['can_edit_media'] ? new CButtonLink(_('Enabled')) : new CSpan(_('Enabled')))
+				->addClass(ZBX_STYLE_COLOR_POSITIVE)
+				->addClass('js-status'),
+			(new CSpan(_('Disabled')))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		],
 		(new CHorList([
 			(new CButtonLink(_('Edit')))
+				->setEnabled($data['can_edit_media'])
 				->addClass('js-edit'),
 			(new CButtonLink(_('Remove')))
-				->setEnabled(!$data['readonly'])
+				->setEnabled(!$data['readonly'] && $data['can_edit_media'])
 				->addClass('js-remove'),
 			(new CDiv([
 				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
@@ -81,15 +82,15 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
 				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}')
 			]))
-
 		]))
 	]))->setAttribute('data-row_index', '#{row_index}')
 		->setId('medias_#{row_index}')
 );
 
 (new CScriptTag('media_tab.init('.json_encode([
-		'medias' => $data['medias']
-	]).');'))
+	'userid' => $data['userid'],
+	'medias' => $data['medias']
+]).');'))
 	->setOnDocumentReady()
 	->show();
 

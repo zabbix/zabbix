@@ -321,7 +321,7 @@ class testFormUser extends CWebTest {
 
 		$add_button->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals('Media', $dialog->getTitle());
+		$this->assertEquals('New media', $dialog->getTitle());
 		$dialog_form = $dialog->asForm();
 
 		$modal_form = [
@@ -330,12 +330,12 @@ class testFormUser extends CWebTest {
 				'Type' => 'Reference webhook',
 				'Send to' => '',
 				'When active' => '1-7,00:00-24:00',
-				'id:severity_0' => true,
-				'id:severity_1' => true,
-				'id:severity_2' => true,
-				'id:severity_3' => true,
-				'id:severity_4' => true,
-				'id:severity_5' => true,
+				'id:severities_0' => true,
+				'id:severities_1' => true,
+				'id:severities_2' => true,
+				'id:severities_3' => true,
+				'id:severities_4' => true,
+				'id:severities_5' => true,
 				'Enabled' => true
 			],
 			'buttons' => ['Add', 'Cancel']
