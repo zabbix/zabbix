@@ -28,6 +28,7 @@ use API,
 	CSettingsHelper,
 	CSimpleIntervalParser,
 	CSvgGraph,
+	CUpdateIntervalParser,
 	CWebUser,
 	Manager;
 
@@ -191,9 +192,13 @@ class WidgetView extends CControllerDashboardWidgetView
 			$this->getItemValue($item);
 		}
 
+		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
+			$this->prepareItemDelay($item);
+		}
+
 		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
-			$this->adjustHistoryAndTrends($item);
+			$this->prepareItemHistoryAndTrends($item);
 		}
 
 		return $item;
@@ -318,7 +323,7 @@ class WidgetView extends CControllerDashboardWidgetView
 
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 			$triggers = API::Trigger()->get([
-				'itemids' => $this->fields_values['itemid'],
+				'itemids' => $item['itemid'],
 				'skipDependent' => true,
 				'monitored' => true,
 				'preservekeys' => true
@@ -340,7 +345,7 @@ class WidgetView extends CControllerDashboardWidgetView
 		return $problem_count;
 	}
 
-	protected function resolveItemMacros(array &$item) {
+	protected function resolveItemMacros(array &$item): void {
 		if (array_key_exists('key_', $item)) {
 			[$item] = CMacrosResolverHelper::resolveItemKeys([$item]);
 		}
@@ -362,8 +367,33 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 	}
 
-	protected function adjustHistoryAndTrends(array &$item){
+	protected function prepareItemDelay(array &$item): void {
+		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+
+		$item['custom_intervals'] = [];
+		$item['delay_has_errors'] = false;
+
+		// Interval
+		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_'], 'mqtt.get') === 0)) {
+			$item['delay'] = '';
+		}
+		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item['delay'] = $update_interval_parser->getDelay();
+
+			if ($item['delay'][0] === '{') {
+				$item['delay_has_errors'] = true;
+			}
+
+			$item['custom_intervals'] = $update_interval_parser->getIntervals();
+		}
+	}
+
+	protected function prepareItemHistoryAndTrends(array &$item): void {
 		$simple_interval_parser = new CSimpleIntervalParser();
+
+		$item['history_has_errors'] = false;
+		$item['trends_has_errors'] = false;
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 			$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
@@ -376,6 +406,11 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 		else {
 			$item['keep_history'] = 0;
+			$item['history_has_errors'] = true;
+		}
+
+		if ($item['history'] == 0) {
+			$item['history'] = '';
 		}
 
 		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
@@ -390,7 +425,16 @@ class WidgetView extends CControllerDashboardWidgetView
 			}
 			else {
 				$item['keep_trends'] = 0;
+				$item['trends_has_errors'] = true;
 			}
+
+			if ($item['trends'] == 0) {
+				$item['trends'] = '';
+			}
+		}
+		else {
+			$item['trends'] = '';
+			$item['keep_trends'] = 0;
 		}
 	}
 

@@ -42,28 +42,7 @@ elseif ($data['item']) {
 				break;
 
 			case CWidgetFieldItemSections::SECTION_METRICS:
-				$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
-				$custom_intervals = [];
-
-				// Interval
-				if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_'], 'mqtt.get') === 0)) {
-					$item['delay'] = '';
-				}
-				elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-					$item['delay'] = $update_interval_parser->getDelay();
-
-					$custom_intervals = $update_interval_parser->getIntervals();
-				}
-
-				// Trends
-				if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT,
-					ITEM_VALUE_TYPE_BINARY])) {
-					$item['trends'] = '';
-				}
-
-				$sections[] = makeSectionMetrics($item['delay'], $item['history'], $item['trends'], $custom_intervals);
+				$sections[] = makeSectionMetrics($item);
 				break;
 
 			case CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION:
@@ -384,13 +363,13 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 		->addClass('section-triggers');
 }
 
-function makeSectionMetrics(string $interval, string $history, string $trends, array $custom_intervals): CDiv {
+function makeSectionMetrics(array $item): CDiv {
 	$help_icon = null;
 
-	if ($custom_intervals) {
+	if ($item['custom_intervals']) {
 		$table = (new CTableInfo())->setHeader([_('Type'), _('Interval'), _('Period')]);
 
-		foreach ($custom_intervals as $custom_interval) {
+		foreach ($item['custom_intervals'] as $custom_interval) {
 			$table->addRow([
 				$custom_interval['type'] == ITEM_DELAY_FLEXIBLE ? _('Flexible') : _('Scheduling'),
 				$custom_interval['update_interval'],
@@ -403,48 +382,31 @@ function makeSectionMetrics(string $interval, string $history, string $trends, a
 			->setHint($table, ZBX_STYLE_HINTBOX_WRAP);
 	}
 
-	$simple_interval_parser = new CSimpleIntervalParser();
-
-	$history_has_unresolved_macro = false;
-	$trends_has_unresolved_macro = false;
-
-	if ($simple_interval_parser->parse($history) == CSimpleIntervalParser::PARSE_FAIL) {
-		$history_has_unresolved_macro = true;
-	}
-	elseif (!$history) {
-		$history = '';
-	}
-
-	if ($simple_interval_parser->parse($trends) == CSimpleIntervalParser::PARSE_FAIL) {
-		$trends_has_unresolved_macro = true;
-	}
-	elseif (!$trends) {
-		$trends = '';
-	}
-
 	return (new CDiv([
 		(new CDiv([
 			(new CDiv(('Interval')))->addClass('column-header'),
 			(new CDiv([
-				(new CSpan($interval))->setTitle($interval),
+				(new CSpan($item['delay']))
+					->setTitle($item['delay'])
+					->addClass($item['delay_has_errors'] ? ZBX_STYLE_COLOR_NEGATIVE : null),
 				$help_icon
 			]))->addClass('column-value')
 		]))->addClass('column'),
 		(new CDiv(
 			(new CDiv([
 				(new CDiv(_('History')))->addClass('column-header'),
-				(new CSpan($history))
-					->setTitle($history)
+				(new CSpan($item['history']))
+					->setTitle($item['history'])
 					->addClass('column-value')
-					->addClass($history_has_unresolved_macro ? ZBX_STYLE_COLOR_NEGATIVE : null)
+					->addClass($item['history_has_errors'] ? ZBX_STYLE_COLOR_NEGATIVE : null)
 			]))->addClass('column')
 		))->addClass('center-column'),
 		(new CDiv([
 			(new CDiv(_('Trends')))->addClass('column-header'),
-			(new CSpan($trends))
-				->setTitle($trends)
+			(new CSpan($item['trends']))
+				->setTitle($item['trends'])
 				->addClass('column-value')
-				->addClass($trends_has_unresolved_macro ? ZBX_STYLE_COLOR_NEGATIVE : null)
+				->addClass($item['trends_has_errors'] ? ZBX_STYLE_COLOR_NEGATIVE : null)
 		]))->addClass('right-column')
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
