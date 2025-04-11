@@ -1,10 +1,21 @@
 Changes for 7.0.12rc1
 
 New features:
+.......PS. [ZBXNEXT-9877] added zabbix[preprocessing] internal item (asestakovs)
 ........S. [ZBXNEXT-9718] added additional log message to assist in finding which item causes exhaustion of value cache (dgoloscapov)
 .........T [ZBXNEXT-9782] added Pure Storage FlashArray by HTTP templates for the REST API v1 and v2 (aiantsen)
 
 Bug fixes:
+...G...... [ZBX-25210] added 'Server parameter' configuration validation for Zabbix agent 2 (arimdjonoks)
+...G....S. [ZBX-24850] fixed rejected incoming connection from link-local addresses on Windows (mprihodko)
+...G...... [ZBX-25521] ListenPort value won't be included in /status endpoint report if passive mode is off in Zabbix Agent 2 (lsurvilo)
+..F....... [ZBX-26275] fixed new item preprocessing steps being saved with "Custom on fail" enabled (agriscenko)
+........S. [ZBX-26056] fixed undefined behavior when linking template with LLD macro (rtrizna)
+.......PS. [ZBX-23085] fixed vmware.datastore.perfcounter and vmware.cl.perfcounter items for custom instances (MVekslers)
+A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
+...G...... [ZBX-24969] fixed vfs.file.regmatch item in Zabbix agent 2 to stop searching after first match (askolmeisters)
+.........T [ZBX-24388] fixed a trigger expression in the Check Point Next Generation Firewall by SNMP template (aiantsen)
+........S. [ZBX-25495] reverted escalator query fix for Oracle to optimise MySQL query, also removed redundant 'distinct' from original query (arimdjonoks)
 .......PS. [ZBX-26197] fixed max repetition count not being inherited by host created by LLD (dgoloscapov)
 .........T [ZBX-26074] fixed authentication settings in README.md (egordymov)
 ..F....... [ZBX-25603] fixed "Tag for matching" field visibility when "OK event generation" is set to "None" in trigger and trigger prototype configuration forms (esekace)
@@ -3465,6 +3476,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
 ...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
 ..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean and Japanese languages (dfofanovs)
