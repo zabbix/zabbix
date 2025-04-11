@@ -66,7 +66,8 @@
 					ZBX_PREPROC_FAIL_DISCARD_VALUE => _('Discard value'),
 					ZBX_PREPROC_FAIL_SET_VALUE => _('Set value to'),
 					ZBX_PREPROC_FAIL_SET_ERROR => _('Set error to')
-				])),
+				]))
+				->setDisabled(),
 			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
 				->setEnabled(false)
 				->addStyle('display: none;')
