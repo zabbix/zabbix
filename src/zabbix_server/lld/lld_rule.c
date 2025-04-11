@@ -1395,9 +1395,9 @@ static void	lld_override_data_save_opint(zbx_uint64_t itemid, zbx_uint64_t overr
 	}
 	else if (NULL != row->cols[col])
 	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set %s=%s"
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set %s=%d"
 				" where lld_override_operationid=" ZBX_FS_UI64 ";\n",
-				table_name, field_name, row->cols[col], row->rowid);
+				table_name, field_name, atoi(row->cols[col]), row->rowid);
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 
 		zbx_audit_discovery_rule_update_json_update_lld_override_option(ZBX_AUDIT_LLD_CONTEXT,
