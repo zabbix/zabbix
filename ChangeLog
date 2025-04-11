@@ -6,6 +6,7 @@ New features:
 .........T [ZBXNEXT-9782] added Pure Storage FlashArray by HTTP templates for the REST API v1 and v2 (aiantsen)
 
 Bug fixes:
+.......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 ...G...... [ZBX-25210] added 'Server parameter' configuration validation for Zabbix agent 2 (arimdjonoks)
 ...G....S. [ZBX-24850] fixed rejected incoming connection from link-local addresses on Windows (mprihodko)
 ...G...... [ZBX-25521] ListenPort value won't be included in /status endpoint report if passive mode is off in Zabbix Agent 2 (lsurvilo)
@@ -3476,6 +3477,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+.......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ........S. [ZBX-26038] added a 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
 ...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
