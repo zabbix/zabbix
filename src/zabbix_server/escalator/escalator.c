@@ -2890,7 +2890,10 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset, &response);
-	zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
+	if (NULL != response.data)
+		zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);

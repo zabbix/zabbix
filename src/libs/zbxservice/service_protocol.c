@@ -328,9 +328,6 @@ void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, s
 void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_db_service_t *services)
 {
-	if (NULL == data)
-		return;
-
 	const unsigned char	*end = data + size;
 
 	while (data < end)
