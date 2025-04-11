@@ -221,10 +221,9 @@ abstract class CDashboardGeneral extends CApiService {
 
 				if ($widgetids) {
 					$options = [
-						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-							'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
-						],
+						'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+							array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+						),
 						'filter' => ['widgetid' => $widgetids]
 					];
 					$db_widget_fields = DBselect(DB::makeSql('widget_field', $options));
@@ -1064,10 +1063,9 @@ abstract class CDashboardGeneral extends CApiService {
 						unset($db_widget);
 
 						$db_widget_fields = DB::select('widget_field', [
-							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-								'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
-							],
+							'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+								array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+							),
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),
 								'type' => array_keys(self::WIDGET_FIELD_TYPE_COLUMNS)
