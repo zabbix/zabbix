@@ -22,6 +22,7 @@ use API,
 	CControllerResponseData,
 	CHousekeepingHelper,
 	CItemHelper,
+	CMacrosResolverHelper,
 	CParser,
 	CRoleHelper,
 	CSettingsHelper,
@@ -42,20 +43,23 @@ class WidgetView extends CControllerDashboardWidgetView
 	protected function doAction(): void {
 		$item = $this->getItem();
 
+		$context = $this->isTemplateDashboard() && !$this->fields_values['override_hostid'] ? 'template' : 'host';
+
+		$triggers = [];
 		$trigger_parent_templates = [];
 
-		if (array_key_exists('triggers', $item) && $item['triggers']) {
-			$trigger_parent_templates = getTriggerParentTemplates($item['triggers'], ZBX_FLAG_DISCOVERY_NORMAL);
+		if ($item && in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
+			[$triggers, $trigger_parent_templates] = $this->getAndPrepareItemTriggers($item['itemid'], $context);
 		}
 
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'sections' => $this->fields_values['sections'],
-			'context' => $this->isTemplateDashboard() && !$this->fields_values['override_hostid'] ? 'template' : 'host',
+			'context' => $context,
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'error' => null,
 			'item' => $item,
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'item_parent_templates' => getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
+			'triggers' => $triggers,
 			'trigger_parent_templates' => $trigger_parent_templates,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -111,12 +115,6 @@ class WidgetView extends CControllerDashboardWidgetView
 			];
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
-			$options += [
-				'selectTriggers' => ['triggerid']
-			];
-		}
-
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
 			$options += [
 				'selectTags' => ['tag', 'value']
@@ -156,11 +154,14 @@ class WidgetView extends CControllerDashboardWidgetView
 			return null;
 		}
 
+		$item = reset($db_items);
+
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-			$db_items = CArrayHelper::renameObjectsKeys($db_items, ['name_resolved' => 'name']);
+			[$item] = CArrayHelper::renameObjectsKeys([$item], ['name_resolved' => 'name']);
 		}
 
-		$item = reset($db_items);
+		$item['problem_count'] = $this->getItemProblemCount($item);
+		$item['parent_templates'] = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL);
 
 		if ($item['master_itemid']) {
 			$output = ['itemid', 'type'];
@@ -184,44 +185,15 @@ class WidgetView extends CControllerDashboardWidgetView
 			}
 		}
 
-		$item['problem_count'] = array_fill_keys([TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION,
-			TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
-		], 0);
-
-		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-			$triggers = API::Trigger()->get([
-				'itemids' => $this->fields_values['itemid'],
-				'skipDependent' => true,
-				'monitored' => true,
-				'preservekeys' => true
-			]);
-
-			$problems = API::Problem()->get([
-				'output' => ['severity'],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'objectids' => array_keys($triggers),
-				'symptom' => false
-			]);
-
-			foreach ($problems as $problem) {
-				$item['problem_count'][$problem['severity']]++;
-			}
-		}
-
-		if (in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
-			$item['triggers'] = API::Trigger()->get([
-				'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
-					'priority', 'status', 'state', 'error', 'templateid', 'flags'
-				],
-				'selectHosts' => ['hostid', 'name', 'host'],
-				'itemids' => $this->fields_values['itemid'],
-				'preservekeys' => true
-			]);
-		}
+		$this->resolveItemMacros($item);
 
 		if (in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->getItemValue($item);
+		}
+
+		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
+				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
+			$this->adjustHistoryAndTrends($item);
 		}
 
 		return $item;
@@ -232,25 +204,26 @@ class WidgetView extends CControllerDashboardWidgetView
 
 		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 			[$db_item] = CItemHelper::addDataSource([$item], time() - $history_period);
+
 			$source = $db_item['source'];
 		}
 		else {
 			$source = 'history';
 		}
 
-		switch ($item['value_type']) {
-			case ITEM_VALUE_TYPE_LOG:
-				$output = ['itemid', 'value', 'clock', 'ns', 'timestamp'];
-				break;
-			case ITEM_VALUE_TYPE_BINARY:
-				$output = ['itemid', 'clock', 'ns'];
-				break;
-			default:
-				$output = ['itemid', 'value', 'clock', 'ns'];
-				break;
-		}
-
 		if ($source === 'history') {
+			switch ($item['value_type']) {
+				case ITEM_VALUE_TYPE_LOG:
+					$output = ['value', 'clock', 'ns', 'timestamp'];
+					break;
+				case ITEM_VALUE_TYPE_BINARY:
+					$output = ['clock', 'ns'];
+					break;
+				default:
+					$output = ['value', 'clock', 'ns'];
+					break;
+			}
+
 			$db_items_values = API::History()->get([
 				'output' => $output,
 				'history' => $item['value_type'],
@@ -264,7 +237,7 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 		else {
 			$db_items_values = API::Trend()->get([
-				'output' => $output,
+				'output' => ['value_avg', 'clock'],
 				'history' => $item['value_type'],
 				'itemids' => $item['itemid'],
 				'time_from' => $history_period,
@@ -273,37 +246,15 @@ class WidgetView extends CControllerDashboardWidgetView
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => 1
 			]);
+
+			$db_items_values = CArrayHelper::renameObjectsKeys($db_items_values, ['value_avg' => 'value']);
 		}
 
 		$item['last_value'] = $db_items_values
 			? reset($db_items_values)
 			: null;
 
-		$simple_interval_parser = new CSimpleIntervalParser();
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-			$keep_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-		}
-		elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-			$keep_history = timeUnitToSeconds($item['history']);
-		}
-		else {
-			$keep_history = 0;
-		}
-
-		$item['keep_history'] = $keep_history;
-
 		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				$keep_trends = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-			}
-			elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-				$keep_trends = timeUnitToSeconds($item['trends']);
-			}
-			else {
-				$keep_trends = 0;
-			}
-
 			$content_width = $this->getInput('contents_width', 0);
 
 			$item['sparkline'] = $this->getSparkline($item, [
@@ -316,11 +267,6 @@ class WidgetView extends CControllerDashboardWidgetView
 				'contents_width'	=> ceil(max([self::SECTION_MIN_WIDTH, min([self::SECTION_MAX_WIDTH, $content_width])]) / 3)
 			]);
 		}
-		else {
-			$keep_trends = 0;
-		}
-
-		$item['keep_trends'] = $keep_trends;
 	}
 
 	protected function getSparkline(array $sparkline_item, array $options): array {
@@ -363,5 +309,108 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 
 		return $sparkline;
+	}
+
+	protected function getItemProblemCount(array $item): array {
+		$problem_count = array_fill_keys([TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION,
+			TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
+		], 0);
+
+		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			$triggers = API::Trigger()->get([
+				'itemids' => $this->fields_values['itemid'],
+				'skipDependent' => true,
+				'monitored' => true,
+				'preservekeys' => true
+			]);
+
+			$problems = API::Problem()->get([
+				'output' => ['severity'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectids' => array_keys($triggers),
+				'symptom' => false
+			]);
+
+			foreach ($problems as $problem) {
+				$problem_count[$problem['severity']]++;
+			}
+		}
+
+		return $problem_count;
+	}
+
+	protected function resolveItemMacros(array &$item) {
+		if (array_key_exists('key_', $item)) {
+			[$item] = CMacrosResolverHelper::resolveItemKeys([$item]);
+		}
+
+		if (in_array(CWidgetFieldItemSections::SECTION_DESCRIPTION, $this->fields_values['sections'])) {
+			[$item] = CMacrosResolverHelper::resolveItemDescriptions([$item]);
+		}
+
+		$resolve_macro_for_metric_keys = [];
+
+		foreach (['delay', 'history', 'trends'] as $key) {
+			if (array_key_exists($key, $item)) {
+				$resolve_macro_for_metric_keys[] = $key;
+			}
+		}
+
+		if ($resolve_macro_for_metric_keys) {
+			[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $resolve_macro_for_metric_keys);
+		}
+	}
+
+	protected function adjustHistoryAndTrends(array &$item){
+		$simple_interval_parser = new CSimpleIntervalParser();
+
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+			$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
+
+			$item['history'] = $hk_history;
+			$item['keep_history'] = timeUnitToSeconds($hk_history);
+		}
+		elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
+			$item['keep_history'] = timeUnitToSeconds($item['history']);
+		}
+		else {
+			$item['keep_history'] = 0;
+		}
+
+		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+				$hk_trends = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
+
+				$item['trends'] = $hk_trends;
+				$item['keep_trends'] = timeUnitToSeconds($hk_trends);
+			}
+			elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+				$item['keep_trends'] = timeUnitToSeconds($item['trends']);
+			}
+			else {
+				$item['keep_trends'] = 0;
+			}
+		}
+	}
+
+	protected function getAndPrepareItemTriggers(string $itemid, string $context): array {
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
+				'priority', 'status', 'state', 'error', 'templateid', 'flags'
+			],
+			'selectHosts' => ['hostid', 'name', 'host'],
+			'itemids' => $itemid,
+			'preservekeys' => true
+		]);
+
+		$trigger_parent_templates = getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers, [
+			'html' => true,
+			'sources' => ['expression', 'recovery_expression'],
+			'context' => $context
+		]);
+
+		return [$triggers, $trigger_parent_templates];
 	}
 }

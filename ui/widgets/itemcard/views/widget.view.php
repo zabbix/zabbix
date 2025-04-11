@@ -105,7 +105,7 @@ elseif ($data['item']) {
 				break;
 
 			case CWidgetFieldItemSections::SECTION_TRIGGERS:
-				$sections[] = makeSectionTriggers($item, $data['trigger_parent_templates'],
+				$sections[] = makeSectionTriggers($data['triggers'], $item['hostid'], $data['trigger_parent_templates'],
 					$data['allowed_ui_conf_templates'], $data['context']
 				);
 				break;
@@ -128,9 +128,7 @@ elseif ($data['item']) {
 	}
 
 	$body = (new CDiv([
-		makeSectionsHeader($item, $data['context'], $data['item_parent_templates'],
-			$data['allowed_ui_conf_templates']
-		),
+		makeSectionsHeader($item, $data['context'], $data['allowed_ui_conf_templates']),
 		(new CDiv($sections))->addClass(Widget::ZBX_STYLE_SECTIONS)
 	]))->addClass(Widget::ZBX_STYLE_CLASS);
 }
@@ -145,8 +143,7 @@ else {
 	->show();
 
 
-function makeSectionsHeader(array $item, string $context, array $item_parent_templates,
-		bool $allowed_ui_conf_templates): CDiv {
+function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_templates): CDiv {
 	$item_status = '';
 	$problems_indicator = '';
 	$error_text = null;
@@ -212,7 +209,7 @@ function makeSectionsHeader(array $item, string $context, array $item_parent_tem
 			->addClass('path-element');
 	}
 
-	$template = makeItemTemplatePrefix($item['itemid'], $item_parent_templates, ZBX_FLAG_DISCOVERY_NORMAL,
+	$template = makeItemTemplatePrefix($item['itemid'], $item['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
 		$allowed_ui_conf_templates, true
 	);
 
@@ -319,17 +316,17 @@ function makeSectionSingleParameter(string $section_name, string $section_body):
 		->addClass('section-single-parameter');
 }
 
-function makeSectionTriggers(array $item, array $trigger_parent_templates, bool $allowed_ui_conf_templates,
-		string $context): CDiv {
+function makeSectionTriggers(array $item_triggers, string $hostid, array $trigger_parent_templates,
+		bool $allowed_ui_conf_templates, string $context): CDiv {
 	$triggers = [];
 
 	$i = 0;
-	$template_count = count($item['triggers']);
+	$template_count = count($item_triggers);
 	$hint_trigger = [];
 
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
-	foreach ($item['triggers'] as $trigger) {
+	foreach ($item_triggers as $trigger) {
 		$triggers[] = (new CSpan([
 			(new CSpan($trigger['description']))
 				->addClass('trigger-name')
@@ -343,7 +340,7 @@ function makeSectionTriggers(array $item, array $trigger_parent_templates, bool 
 			->setArgument('action', 'popup')
 			->setArgument('popup', 'trigger.edit')
 			->setArgument('triggerid', $trigger['triggerid'])
-			->setArgument('hostid', $item['hostid'])
+			->setArgument('hostid', $hostid)
 			->setArgument('context', $context)
 			->getUrl();
 
@@ -406,8 +403,24 @@ function makeSectionMetrics(string $interval, string $history, string $trends, a
 			->setHint($table, ZBX_STYLE_HINTBOX_WRAP);
 	}
 
-	$history = $history != 0 ? $history : '';
-	$trends = $trends != 0 ? $trends : '';
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	$history_has_unresolved_macro = false;
+	$trends_has_unresolved_macro = false;
+
+	if ($simple_interval_parser->parse($history) == CSimpleIntervalParser::PARSE_FAIL) {
+		$history_has_unresolved_macro = true;
+	}
+	elseif (!$history) {
+		$history = '';
+	}
+
+	if ($simple_interval_parser->parse($trends) == CSimpleIntervalParser::PARSE_FAIL) {
+		$trends_has_unresolved_macro = true;
+	}
+	elseif (!$trends) {
+		$trends = '';
+	}
 
 	return (new CDiv([
 		(new CDiv([
@@ -423,6 +436,7 @@ function makeSectionMetrics(string $interval, string $history, string $trends, a
 				(new CSpan($history))
 					->setTitle($history)
 					->addClass('column-value')
+					->addClass($history_has_unresolved_macro ? ZBX_STYLE_COLOR_NEGATIVE : null)
 			]))->addClass('column')
 		))->addClass('center-column'),
 		(new CDiv([
@@ -430,6 +444,7 @@ function makeSectionMetrics(string $interval, string $history, string $trends, a
 			(new CSpan($trends))
 				->setTitle($trends)
 				->addClass('column-value')
+				->addClass($trends_has_unresolved_macro ? ZBX_STYLE_COLOR_NEGATIVE : null)
 		]))->addClass('right-column')
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
