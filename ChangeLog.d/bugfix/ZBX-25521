@@ -1,0 +1,1 @@
+...G...... [ZBX-25521] ListenPort value won't be included in /status endpoint report if passive mode is off in Zabbix Agent 2 (lsurvilo)
