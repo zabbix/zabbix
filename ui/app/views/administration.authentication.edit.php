@@ -217,7 +217,8 @@ $saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
 $saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
 
 $saml_tab = (new CFormGrid());
-$saml_tab->addItem([
+$saml_tab
+	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
 		new CFormField($data['saml_error']
 			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
@@ -304,106 +305,141 @@ $saml_tab->addItem([
 
 // SSO certificates upload
 if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database') {
-	/*->addItem([
-		(new CLabel(_('IdP certificate'), 'idp_certificate_label'))->setAsteriskMark(),
-		(new CFormField(
-			(new CSimpleButton(_('Change IdP certificate')))
-				->setId('change_idp_certificate')
-				->addClass('saml-enabled')
-				->addClass(ZBX_STYLE_BTN_GREY)
-			)
-		)
-	])*/
-	$saml_tab->addItem([
-		(new CLabel(_('IdP certificate'), 'idp_certificate_label'))->setAsteriskMark(),
-		(new CFormField([
-			(new CTextArea('idp_certificate_file_content', $data['idp_certificate_file_content'] ?? ''))
-				->setId('idp_certificate_file_content')
-				->addClass('saml-enabled')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-				->setRows(3)
-				->setAttribute('placeholder', 'paste PEM-encoded IdP certificate'),
+	$saml_tab
+		->addItem([
+			(new CLabel(_('IdP certificate')))
+				->setAsteriskMark()
+				->addClass('idp-certificate-input'),
 
-			(new CButton('idp_certificate_upload_button', _('Choose file')))
-				->setId('idp_certificate_upload_button')
-				->setAttribute('style', 'margin-left: .3em;')
-				->addClass('saml-enabled')
-				->addClass(ZBX_STYLE_BTN_GREY),
+			(new CFormField(
+				(new CSimpleButton(_('Change IdP certificate')))
+					->setId('idp_certificate_button')
+					->addClass('saml-enabled')
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('saml-identity-buttons')
+			))
+				->addClass('idp-certificate-input')
+				->addStyle(
+					array_key_exists('idp_certificate', $data) && $data['idp_certificate'] != ''
+						? 'display: block' : 'display: none'),
 
-			(new CFile('idp_certificate_file_input'))
-				->setId('idp_certificate_file_input')
-				->addClass('saml-enabled')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('style', 'display: none;'),
-		]))
-	])
-	/*->addItem([
-		(new CLabel(_('SP private key'), 'sp_private_key_label')),
-		(new CFormField(
-			(new CSimpleButton(_('Change SP private key')))
-				->setId('change_sp_private_key')
-				->addClass('saml-enabled')
-				->addClass(ZBX_STYLE_BTN_GREY)
-			)
-		)
-	])*/
-	->addItem([
-		(new CLabel(_('SP private key'), 'sp_private_key_label')),
-		(new CFormField([
-			(new CTextArea('sp_private_key_file_content', $data['sp_private_key_file_content'] ?? ''))
-				->setId('sp_private_key_file_content')
-				->addClass('saml-enabled')
-				->setAttribute('style', 'margin-right: .3em;;')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setRows(3)
-				->setAttribute('placeholder', 'paste PEM-encoded SP private key'),
+			(new CFormField([
+				(new CTextArea('idp_certificate', ''))
+					->setId('idp_certificate')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setRows(3)
+					->setAttribute('placeholder', 'paste PEM-encoded IdP certificate')
+					->addClass('saml-enabled'),
+				(new CDiv([
+					(new CButton('idp_certificate_input_button', _('Choose file')))
+						->setId('idp_certificate_input_button')
+						->addStyle('margin-left: .3em;')
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-enabled'),
+					(new CFile('idp_certificate_input_file'))
+						->setId('idp_certificate_input_file')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->addStyle('display: none;'),
+					(new CSpan())
+						->setId('idp_certificate_input_filename')
+						->setAttribute('style', 'display: block; text-align: center;margin-left: 3px')
+				]))->addStyle('display: inline-block;')
+			]))
+				->addClass('idp-certificate-input')
+				->addStyle(
+					array_key_exists('idp_certificate', $data) && $data['idp_certificate'] == ''
+						? 'display: block' : 'display: none')
+		])
+		->addItem([
+			(new CLabel(_('SP private key'), 'sp_private_key_button'))
+				->setAsteriskMark()
+				->addClass('sp-private-key-input'),
 
-			(new CButton('sp_private_key_upload_button', _('Choose file')))
-				->setId('sp_private_key_upload_button')
-				->addClass('saml-enabled')
-				->addClass(ZBX_STYLE_BTN_GREY),
+			(new CFormField(
+				(new CSimpleButton(_('Change SP private key')))
+					->setId('sp_private_key_button')
+					->addClass('saml-enabled')
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('saml-identity-buttons')
+			))
+				->addClass('sp-private-key-input')
+				->addStyle(
+					array_key_exists('sp_private_key', $data) && $data['sp_private_key'] != ''
+						? 'display: block' : 'display: none'),
 
-			(new CFile('sp_private_key_file_input'))
-				->setId('sp_private_key_file_input')
-				->addClass('saml-enabled')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('style', 'display: none;')
-		]))
-	])
-	/*->addItem([
-		(new CLabel(_('SP certificate'), 'sp_certificate_label')),
-		(new CFormField(
-			(new CSimpleButton(_('Change SP certificate')))
-				->setId('change_sp_certificate')
-				->addClass('saml-enabled')
-				->addClass(ZBX_STYLE_BTN_GREY)
-			)
-		)
-	])*/
-	->addItem([
-		(new CLabel(_('SP certificate'), 'sp_certificate_label')),
-		(new CFormField([
-			(new CTextArea('sp_certificate_file_content', $data['sp_certificate_file_content'] ?? ''))
-				->setId('sp_certificate_file_content')
-				->addClass('saml-enabled')
-				->setAttribute('style', 'margin-right: .3em;;')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setRows(3)
-				->setAttribute('placeholder', 'paste PEM-encoded SP certificate'),
+			(new CFormField([
+				(new CTextArea('sp_private_key', ''))
+					->setId('sp_private_key')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setRows(3)
+					->setAttribute('placeholder', 'paste PEM-encoded SP private key')
+					->addClass('saml-enabled'),
+				(new CDiv([
+					(new CButton('sp_private_key_input_button', _('Choose file')))
+						->setId('sp_private_key_input_button')
+						->addStyle('margin-left: .3em;')
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-enabled'),
+					(new CFile('sp_private_key_input_file'))
+						->setId('sp_private_key_input_file')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->addStyle('display: none;'),
+					(new CSpan())
+						->setId('sp_private_key_input_filename')
+						->setAttribute('style', 'display: block; text-align: center;margin-left: 3px')
+				]))->addStyle('display: inline-block;')
+			]))
+				->addClass('sp-private-key-input')
+				->addStyle(
+					array_key_exists('sp_private_key', $data) && $data['sp_private_key'] == ''
+						? 'display: block' : 'display: none')
+		])
+		->addItem([
+			(new CLabel(_('SP certificate'), 'sp_certificate_button'))
+				->setAsteriskMark()
+				->addClass('sp-certificate-input'),
+			(new CFormField(
+				(new CSimpleButton(_('Change SP certificate')))
+					->setId('sp_certificate_button')
+					->addClass('saml-enabled')
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('saml-identity-buttons')
+			))
+				->addClass('sp-certificate-input')
+				->addStyle(
+					array_key_exists('sp_certificate', $data) && $data['sp_certificate'] != ''
+						? 'display: block' : 'display: none'),
 
-			(new CButton('sp_certificate_upload_button', _('Choose file')))
-				->setId('sp_certificate_upload_button')
-				->addClass('saml-enabled')
-				->addClass(ZBX_STYLE_BTN_GREY),
-
-			(new CFile('sp_certificate_file_input'))
-				->setId('sp_certificate_file_input')
-				->addClass('saml-enabled')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('style', 'display: none;')
-		]))
-	]);
+			(new CFormField([
+				(new CTextArea('sp_certificate', ''))
+					->setId('sp_certificate')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setRows(3)
+					->setAttribute('placeholder', 'paste PEM-encoded SP certificate')
+					->addClass('saml-enabled'),
+				(new CDiv([
+					(new CButton('sp_certificate_input_button', _('Choose file')))
+						->setId('sp_certificate_input_button')
+						->addStyle('margin-left: .3em;')
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-enabled'),
+					(new CFile('sp_certificate_input_file'))
+						->setId('sp_certificate_input_file')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->addStyle('display: none;'),
+					(new CSpan())
+						->setId('sp_certificate_input_filename')
+						->setAttribute('style', 'display: block; text-align: center;margin-left: 3px')
+				]))->addStyle('display: inline-block;')
+			]))
+				->addClass('sp-certificate-input')
+				->addStyle(
+					array_key_exists('sp_certificate', $data) && $data['sp_certificate'] == ''
+						? 'display: block' : 'display: none')
+		]);
 }
 // End SSO certificates
 

@@ -125,6 +125,14 @@
 				);
 			});
 
+			// SSO upload
+			this.form.querySelectorAll('.saml-identity-buttons').forEach(field => {
+				field.addEventListener('click', (e) => {
+					console.log(field)
+				});
+			});
+			// End SSO upload
+
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
 				if (e.target.classList.contains('disabled')) {
 					return;
