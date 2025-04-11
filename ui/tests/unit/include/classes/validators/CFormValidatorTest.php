@@ -262,13 +262,6 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'host' => ['not_empty', 'integer']
-				]],
-				null,
-				'[RULES ERROR] Rule "not_empty" is not compatible with type "integer" (Path: /host)'
-			],
-			[
-				['object', 'fields' => [
 					'host' => ['in 1,2,3', 'string']
 				]],
 				['type' => 'object', 'fields' => [

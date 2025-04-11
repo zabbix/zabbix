@@ -26,50 +26,48 @@ class CAbsoluteDateParser extends CParser {
 	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
-		if (!$this->parseAbsoluteDate($source, $pos)) {
-			return self::PARSE_FAIL;
-		}
+		$this->error = _('invalid date');
+		$this->length = 0;
+		$this->match = '';
 
-		return isset($source[$pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
-	}
-
-	/**
-	 * Parse absolute time.
-	 *
-	 * @param string	$source
-	 * @param int		$pos
-	 *
-	 * @return bool
-	 */
-	private function parseAbsoluteDate($source, &$pos) {
 		$pattern_Y = '(?P<Y>[12][0-9]{3})';
 		$pattern_m = '(?P<m>[0-9]{1,2})';
 		$pattern_d = '(?P<d>[0-9]{1,2})';
 
-		$pattern = $pattern_Y.'(-'.$pattern_m.'(-'.$pattern_d.')?)?';
+		$pattern = '^'.$pattern_Y.'(-'.$pattern_m.'(-'.$pattern_d.')?)?$';
 
-		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
-			return false;
+		$subject = substr($source, $pos);
+		if (!preg_match('/'.$pattern.'/', $subject, $matches)) {
+			return self::PARSE_FAIL;
 		}
 
 		$matches += ['m' => 1, 'd' => 1];
 
 		$date = sprintf('%04d-%02d-%02d', $matches['Y'], $matches['m'], $matches['d']);
-
 		$datetime = date_create($date);
 
 		if ($datetime === false) {
-			return false;
+			return self::PARSE_FAIL;
 		}
 
 		$datetime_errors = $datetime->getLastErrors();
-
 		if ($datetime_errors !== false && $datetime_errors['warning_count'] != 0) {
-			return false;
+			return self::PARSE_FAIL;
 		}
 
-		$pos += strlen($matches[0]);
+		if (strtotime($date) >= ZBX_MAX_DATE) {
+			$this->error = _('date is outside the allowed range');
+			return self::PARSE_FAIL;
+		}
 
-		return true;
+		$this->match = $subject;
+		$this->length = strlen($subject);
+
+		return self::PARSE_SUCCESS;
+	}
+
+
+	public function getError(): string {
+		return $this->error;
 	}
 }
