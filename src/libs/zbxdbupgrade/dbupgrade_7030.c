@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "dbupgrade_common.h"
+#include "zbxtasks.h"
 
 /*
  * 7.4 development database patches
@@ -390,19 +391,69 @@ static int	DBpatch_7030028(void)
 
 static int	DBpatch_7030029(void)
 {
+	int		i;
+	const char	*values[] = {
+			"web.hosts.graphs.php.sort", "web.hosts.graph.list.sort",
+			"web.hosts.graphs.php.sortorder", "web.hosts.graph.list.sortorder",
+			"web.hosts.graphs.filter_hostids", "web.hosts.graph.list.filter_hostids",
+			"web.hosts.graphs.filter_groupids", "web.hosts.graph.list.filter_groupids",
+			"web.hosts.graphs.filter.active", "web.hosts.graph.list.filter.active",
+			"web.templates.graphs.php.sort", "web.templates.graph.list.sort",
+			"web.templates.graphs.php.sortorder", "web.templates.graph.list.sortorder",
+			"web.templates.graphs.filter_hostids", "web.templates.graph.list.filter_hostids",
+			"web.templates.graphs.filter_groupids", "web.templates.graph.list.filter_groupids",
+			"web.templates.graphs.filter.active", "web.templates.graph.list.filter.active",
+		};
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030030(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", (char *)NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_field_t	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_7030032(void)
+{
 	const zbx_db_field_t	field = {"wizard_ready", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_7030030(void)
+static int	DBpatch_7030033(void)
 {
 	const zbx_db_field_t	field = {"readme", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_7030031(void)
+static int	DBpatch_7030034(void)
 {
 	const zbx_db_table_t	table =
 			{"hostmacro_config", "hostmacroid", 0,
@@ -422,7 +473,7 @@ static int	DBpatch_7030031(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030032(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"hostmacroid", NULL, "hostmacro", "hostmacroid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -469,5 +520,8 @@ DBPATCH_ADD(7030029, 0, 1)
 DBPATCH_ADD(7030030, 0, 1)
 DBPATCH_ADD(7030031, 0, 1)
 DBPATCH_ADD(7030032, 0, 1)
+DBPATCH_ADD(7030033, 0, 1)
+DBPATCH_ADD(7030034, 0, 1)
+DBPATCH_ADD(7030035, 0, 1)
 
 DBPATCH_END()

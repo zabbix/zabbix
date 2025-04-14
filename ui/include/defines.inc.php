@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0beta1');
+define('ZABBIX_VERSION',		'7.4.0rc1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7030032);
+define('ZABBIX_DB_VERSION',		7030035);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -578,6 +578,8 @@ define('SYSMAP_SHAPE_BORDER_TYPE_NONE',		0);
 define('SYSMAP_SHAPE_BORDER_TYPE_SOLID',	1);
 define('SYSMAP_SHAPE_BORDER_TYPE_DOTTED',	2);
 define('SYSMAP_SHAPE_BORDER_TYPE_DASHED',	3);
+
+define('SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT',	2);
 
 define('SYSMAP_SHAPE_LABEL_HALIGN_CENTER',	0);
 define('SYSMAP_SHAPE_LABEL_HALIGN_LEFT',	1);
