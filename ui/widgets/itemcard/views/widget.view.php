@@ -105,7 +105,7 @@ elseif ($data['item']) {
 	}
 
 	$body = (new CDiv([
-		makeSectionsHeader($item, $data['context'], $data['allowed_ui_conf_templates']),
+		makeSectionsHeader($item, $data['context'], $data['show_path'], $data['allowed_ui_conf_templates']),
 		(new CDiv($sections))->addClass(Widget::ZBX_STYLE_SECTIONS)
 	]))->addClass(Widget::ZBX_STYLE_CLASS);
 }
@@ -120,7 +120,7 @@ else {
 	->show();
 
 
-function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_templates): CDiv {
+function makeSectionsHeader(array $item, string $context, bool $show_path, bool $allowed_ui_conf_templates): CDiv {
 	$item_status = '';
 	$problems_indicator = '';
 	$error_text = '';
@@ -174,70 +174,72 @@ function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_
 
 	$path = [];
 
-	if ($context === 'host') {
-		$host_url = (new CUrl('zabbix.php'))
+	if ($show_path) {
+		if ($context === 'host') {
+			$host_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'host.edit')
+				->setArgument('hostid', $item['hostid'])
+				->getUrl();
+
+			$path[] = (new CLink($item['hosts'][0]['name'], $host_url))
+				->setTitle($item['hosts'][0]['name'])
+				->addClass('path-element');
+		}
+
+		$template = makeItemTemplatePrefix($item['itemid'], $item['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+			$allowed_ui_conf_templates, true
+		);
+
+		if ($template) {
+			$template = reset($template);
+			if ($path) {
+				$path[] = '>';
+			}
+
+			$path[] = $template->addClass('path-element');
+		}
+
+		$item_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'popup')
-			->setArgument('popup', 'host.edit')
-			->setArgument('hostid', $item['hostid'])
+			->setArgument('popup', 'item.edit')
+			->setArgument('context', $context)
+			->setArgument('itemid', $item['master_itemid'])
 			->getUrl();
 
-		$path[] = (new CLink($item['hosts'][0]['name'], $host_url))
-			->setTitle($item['hosts'][0]['name'])
-			->addClass('path-element');
-	}
+		if ($item['discoveryRule']) {
+			if ($path) {
+				$path[] = '>';
+			}
 
-	$template = makeItemTemplatePrefix($item['itemid'], $item['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
-		$allowed_ui_conf_templates, true
-	);
-
-	if ($template) {
-		$template = reset($template);
-		if ($path) {
-			$path[] = '>';
-		}
-
-		$path[] = $template->addClass('path-element');
-	}
-
-	$item_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'item.edit')
-		->setArgument('context', $context)
-		->setArgument('itemid', $item['master_itemid'])
-		->getUrl();
-
-	if ($item['discoveryRule']) {
-		if ($path) {
-			$path[] = '>';
-		}
-
-		$path[] = (new CLink($item['discoveryRule']['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'item.prototype.list')
-				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
-				->setArgument('context', $context)
-		))
-			->setTitle($item['discoveryRule']['name'])
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_ORANGE);
-	}
-
-	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		if ($path) {
-			$path[] = '>';
-		}
-
-		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$path[] = (new CDiv($item['master_item']['name']))
-				->setTitle($item['master_item']['name'])
-				->addClass('path-element');
-		}
-		else {
-			$path[] = (new CLink($item['master_item']['name'], $item_url))
-				->setTitle($item['master_item']['name'])
+			$path[] = (new CLink($item['discoveryRule']['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
+					->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+					->setArgument('context', $context)
+			))
+				->setTitle($item['discoveryRule']['name'])
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL)
-				->addClass('path-element');
+				->addClass(ZBX_STYLE_ORANGE);
+		}
+
+		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+			if ($path) {
+				$path[] = '>';
+			}
+
+			if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
+				$path[] = (new CDiv($item['master_item']['name']))
+					->setTitle($item['master_item']['name'])
+					->addClass('path-element');
+			}
+			else {
+				$path[] = (new CLink($item['master_item']['name'], $item_url))
+					->setTitle($item['master_item']['name'])
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_TEAL)
+					->addClass('path-element');
+			}
 		}
 	}
 
@@ -248,10 +250,10 @@ function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_
 					->setTitle($item['name'])
 					->setMenuPopup(CMenuPopupHelper::getItem([
 						'itemid' => $item['itemid'],
-						'context' => 'host',
+						'context' => $context,
 						'backurl' => (new CUrl('zabbix.php'))
 							->setArgument('action', 'latest.view')
-							->setArgument('context','host')
+							->setArgument('context', $context)
 							->getUrl()
 					])),
 				$error_text,
