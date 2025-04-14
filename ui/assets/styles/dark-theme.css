@@ -4852,9 +4852,9 @@ div.dashboard-widget-map .sysmap-widget-container {
   display: flex; }
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
-    div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
+    div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection {
       fill: #3a3a3a; }
-      div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+      div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection.selected {
         fill: #4a4a4a;
         stroke: #383838;
         stroke-width: 1px; }
