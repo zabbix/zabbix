@@ -350,7 +350,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			[$item] = CMacrosResolverHelper::resolveItemKeys([$item]);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_DESCRIPTION, $this->fields_values['sections'])) {
+		if (array_key_exists('description', $item)) {
 			[$item] = CMacrosResolverHelper::resolveItemDescriptions([$item]);
 		}
 
@@ -374,7 +374,7 @@ class WidgetView extends CControllerDashboardWidgetView
 		$item['delay_has_errors'] = false;
 
 		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_'], 'mqtt.get') === 0)) {
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_expanded'], 'mqtt.get') === 0)) {
 			$item['delay'] = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {

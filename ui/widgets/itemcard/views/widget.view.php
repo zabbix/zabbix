@@ -34,7 +34,7 @@ elseif ($data['item']) {
 	foreach ($data['sections'] as $section) {
 		switch ($section) {
 			case CWidgetFieldItemSections::SECTION_DESCRIPTION:
-				$sections[] = makeSectionDescription($item['description']);
+				$sections[] = makeSectionDescription($item['description_expanded']);
 				break;
 
 			case CWidgetFieldItemSections::SECTION_ERROR_TEXT:
