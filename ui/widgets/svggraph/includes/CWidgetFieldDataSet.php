@@ -53,7 +53,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'items'					=> ['type' => API_STRINGS_UTF8],
 				'itemids'				=> ['type' => API_IDS],
 				'references'			=> ['type' => API_STRINGS_UTF8],
-				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_PALETTE],
+				'color'					=> ['type' => API_COLOR],
+				'color_palette'			=> ['type' => API_STRING_UTF8],
 				'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 				'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
 				'width'					=> ['type' => API_INT32, 'in' => '0:10'],
@@ -211,6 +212,16 @@ class CWidgetFieldDataSet extends CWidgetField {
 		}
 		unset($data);
 
+		foreach ($value as $data) {
+			if ($data['dataset_type'] == self::DATASET_TYPE_PATTERN_ITEM
+					&& (!array_key_exists('color', $data) || $data['color'] === '')
+					&& (!array_key_exists('color_palette', $data) || $data['color_palette'] === '')) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Data set color'),
+					_('a hexadecimal color code (6 symbols) or color palette code is expected'));
+				break;
+			}
+		}
+
 		if (!$errors) {
 			$this->setValue($value);
 		}
@@ -286,11 +297,20 @@ class CWidgetFieldDataSet extends CWidgetField {
 				}
 			}
 			else {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.'.$index.'.color',
-					'value' => $value['color']
-				];
+				if (array_key_exists('color_palette', $value)) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.$index.'.color_palette',
+						'value' => $value['color_palette']
+					];
+				}
+				else if (array_key_exists('color', $value)) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.$index.'.color',
+						'value' => $value['color']
+					];
+				}
 			}
 
 			if (array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value['override_hostid'])) {

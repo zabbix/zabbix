@@ -215,8 +215,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			}
 
 			$dataset_head[] = (new CColorPicker())
-				->setName($field_name.'['.$row_num.'][color]')
-				->setValue($value['color'])
+				->setColorFieldName($field_name.'['.$row_num.'][color]')
+				->setPaletteFieldName($field_name.'['.$row_num.'][color_palette]')
+				->setValue(array_key_exists('color_palette', $value) ? $value['color_palette'] : $value['color'])
 				->setHasPalette();
 
 			if ($host_pattern_field !== null) {
@@ -365,7 +366,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(
 				(new CColorPicker())
-					->setName($this->field->getName().'['.$ds_num.'][color][]')
+					->setColorFieldName($this->field->getName().'['.$ds_num.'][color][]')
 					->setValue($color)
 					->setInputId('items_'.$ds_num.'_'.$row_num.'_color')
 			))->addClass('table-col-color'),

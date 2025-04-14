@@ -485,19 +485,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$is_color = preg_match('/^[0-9a-f]{6}$/i', $data);
-
-		if ($flags & API_ALLOW_PALETTE) {
-			$is_palette = preg_match('/^'.PALETTE_PREFIX.'(\\d+)$/i', $data);
-
-			if (!$is_color && !$is_palette) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-					_('a hexadecimal color code (6 symbols) or color palette code is expected')
-				);
-				return false;
-			}
-		}
-		else if (!$is_color) {
+		if (preg_match('/^[0-9a-f]{6}$/i', $data) !== 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('a hexadecimal color code (6 symbols) is expected')
 			);
