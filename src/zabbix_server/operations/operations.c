@@ -330,7 +330,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and h.status in (%d,%d)"
-							" and h.flags<>%d"
+							" and h.flags&%d=0"
 							" and h.monitored_by=%u"
 							" and ds.dhostid=" ZBX_FS_UI64,
 							HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
