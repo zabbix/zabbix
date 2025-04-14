@@ -309,12 +309,12 @@ class CSetupWizard extends CForm {
 			$this->setConfig('ZBX_SERVER_TLS_VERIFY_NAME', getRequest('zbx_server_tls_verify_name',
 				$this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', '')));
 
-//			$is_valid = $this->checkServerTLSConfiguration();
-//
-//			if (!$is_valid) {
-//				$this->step_failed = true;
-//				unset($_REQUEST['next']);
-//			}
+			$is_valid = $this->checkServerTLSConfiguration();
+
+			if (!$is_valid) {
+				$this->step_failed = true;
+				unset($_REQUEST['next']);
+			}
 
 			if (hasRequest('next') && array_key_exists(self::STAGE_SETTINGS, getRequest('next'))) {
 				$this->doNext();
@@ -1431,8 +1431,6 @@ class CSetupWizard extends CForm {
 		foreach ($configFields as $field) {
 			$path = $this->getConfig($field, '');
 
-			sdff(file_exists(is_readable($path)));
-			
 			if ($path === '' || !file_exists($path) || !is_readable($path)) {
 				return false;
 			}
