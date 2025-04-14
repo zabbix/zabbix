@@ -988,7 +988,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,maintenanceid,"
 				"proxy_groupid,monitored_by,flags"
 			" from hosts"
-			" where status in (%d,%d) and flags<>%d",
+			" where status in (%d,%d) and flags&%d=0",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 22, NULL);
@@ -3219,7 +3219,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 			" where p.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
-				" and i.flags<>%d"
+				" and i.flags&%d=0"
 			" order by p.itemid",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
@@ -3755,7 +3755,7 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 			" from hosts_groups hg,hosts h"
 			" where hg.hostid=h.hostid"
 			" and h.status in (%d,%d)"
-			" and h.flags<>%d"
+			" and h.flags&%d=0"
 			" order by hg.groupid",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
