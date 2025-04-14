@@ -487,6 +487,11 @@ class CConfigurationExportBuilder {
 				'smtp_authentication' => $media_type['smtp_authentication'],
 				'username' => $media_type['username'],
 				'password' => $media_type['passwd'],
+				'redirection_url' => $media_type['redirection_url'],
+				'client_id' => $media_type['client_id'],
+				'client_secret' => $media_type['client_secret'],
+				'authorization_url' => $media_type['authorization_url'],
+				'token_url' => $media_type['token_url'],
 				'message_format' => $media_type['message_format'],
 				'script_name' => $media_type['exec_path'],
 				'parameters' => self::formatMediaTypeParameters($media_type),
@@ -507,16 +512,6 @@ class CConfigurationExportBuilder {
 
 			if ($media_type['type'] == MEDIA_TYPE_EMAIL) {
 				$result[$i] += ['provider' => $media_type['provider']];
-
-				if ($media_type['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-					$result[$i] += [
-						'redirection_url' => $media_type['redirection_url'],
-						'client_id' => $media_type['client_id'],
-						'client_secret' => $media_type['client_secret'],
-						'authorization_url' => $media_type['authorization_url'],
-						'token_url' => $media_type['token_url']
-					];
-				}
 			}
 		}
 

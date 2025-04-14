@@ -616,7 +616,7 @@ class CMediatype extends CApiService {
 	private static function addRequiredFieldsBySmtpAuthentication(array &$mediatype, array $db_mediatype): void {
 		if ($mediatype['smtp_authentication'] != $db_mediatype['smtp_authentication']) {
 			if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
-				if ($mediatype['provider'] !== CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+				if ($db_mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 					$mediatype += array_intersect_key($db_mediatype, array_flip(['username', 'passwd']));
 				}
 			}
