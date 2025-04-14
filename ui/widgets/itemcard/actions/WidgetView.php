@@ -373,7 +373,6 @@ class WidgetView extends CControllerDashboardWidgetView
 		$item['custom_intervals'] = [];
 		$item['delay_has_errors'] = false;
 
-		// Interval
 		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_'], 'mqtt.get') === 0)) {
 			$item['delay'] = '';
@@ -386,6 +385,9 @@ class WidgetView extends CControllerDashboardWidgetView
 			}
 
 			$item['custom_intervals'] = $update_interval_parser->getIntervals();
+		}
+		else {
+			$item['delay_has_errors'] = true;
 		}
 	}
 
