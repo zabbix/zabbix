@@ -97,11 +97,7 @@ func parsePassiveCheckJSONRequest(rawRequest []byte) (string, time.Duration, err
 	return request.Data[0].Key, time.Duration(timeout) * time.Second, nil
 }
 
-func formatCheckDataPayload(checkResult string, isJSON bool) ([]byte, error) {
-	if !isJSON {
-		return []byte(checkResult), nil
-	}
-
+func formatJSONCheckDataPayload(checkResult string) ([]byte, error) {
 	type valueData struct {
 		Value string `json:"value"`
 	}
@@ -225,7 +221,7 @@ func processJSONRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Sched
 		return
 	}
 
-	payload, err := formatCheckDataPayload(*result, true)
+	payload, err := formatJSONCheckDataPayload(*result)
 	if err != nil {
 		log.Debugf("could not format JSON response: %s", err.Error())
 

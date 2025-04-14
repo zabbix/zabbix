@@ -151,12 +151,11 @@ func Test_parsePassiveCheckJSONRequest(t *testing.T) {
 	}
 }
 
-func Test_formatCheckDataPayload(t *testing.T) {
+func Test_formatJSONCheckDataPayload(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
 		checkInput string
-		isJSON     bool
 	}
 
 	type expectations struct {
@@ -179,40 +178,18 @@ func Test_formatCheckDataPayload(t *testing.T) {
 		expect expectations
 	}{
 		{
-			name: "+validPlainText",
+			name: "+validResponse",
 			args: args{
 				checkInput: "cpu_load: 1.5",
-				isJSON:     false,
-			},
-			expect: expectations{
-				expectedOutput: []byte("cpu_load: 1.5"),
-			},
-		},
-		{
-			name: "+validJSONResponse",
-			args: args{
-				checkInput: "cpu_load: 1.5",
-				isJSON:     true,
 			},
 			expect: expectations{
 				expectedOutput: expectedJSON("cpu_load: 1.5"),
 			},
 		},
 		{
-			name: "+emptyPlainText",
+			name: "+emptyResponse",
 			args: args{
 				checkInput: "",
-				isJSON:     false,
-			},
-			expect: expectations{
-				expectedOutput: []byte(""),
-			},
-		},
-		{
-			name: "+emptyJSONResponse",
-			args: args{
-				checkInput: "",
-				isJSON:     true,
 			},
 			expect: expectations{
 				expectedOutput: expectedJSON(""),
@@ -225,7 +202,7 @@ func Test_formatCheckDataPayload(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			output, err := formatCheckDataPayload(tt.args.checkInput, tt.args.isJSON)
+			output, err := formatJSONCheckDataPayload(tt.args.checkInput)
 
 			if (err != nil) != tt.expect.expectError {
 				t.Fatalf(

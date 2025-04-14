@@ -233,7 +233,7 @@ func (pc *resultCacheMock) WriteCommand(cr *resultcache.CommandResult) {
 
 type mockManager struct {
 	Manager
-	sink      chan performer
+	sink      chan Performer
 	now       time.Time
 	startTime time.Time
 }
@@ -474,7 +474,7 @@ func (m *mockManager) checkPluginTimeline(
 
 type mockExporterTask struct {
 	exporterTask
-	sink chan performer
+	sink chan Performer
 }
 
 func (t *mockExporterTask) perform(s Scheduler) {
@@ -508,7 +508,7 @@ func (t *mockExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 
 type mockCollectorTask struct {
 	taskBase
-	sink chan performer
+	sink chan Performer
 }
 
 func (t *mockCollectorTask) perform(s Scheduler) {
@@ -527,7 +527,7 @@ func (t *mockCollectorTask) getWeight() int {
 
 type mockStarterTask struct {
 	taskBase
-	sink chan performer
+	sink chan Performer
 }
 
 func (t *mockStarterTask) perform(s Scheduler) {
@@ -545,7 +545,7 @@ func (t *mockStarterTask) getWeight() int {
 
 type mockStopperTask struct {
 	taskBase
-	sink chan performer
+	sink chan Performer
 }
 
 func (t *mockStopperTask) perform(s Scheduler) {
@@ -563,7 +563,7 @@ func (t *mockStopperTask) getWeight() int {
 
 type mockWatcherTask struct {
 	taskBase
-	sink       chan performer
+	sink       chan Performer
 	resultSink plugin.ResultWriter
 	items      []*plugin.Item
 	client     ClientAccessor
@@ -615,7 +615,7 @@ func (t *mockWatcherTask) Delay() string {
 
 type mockConfigerTask struct {
 	taskBase
-	sink    chan performer
+	sink    chan Performer
 	options *agent.AgentOptions
 }
 
@@ -934,7 +934,7 @@ func TestTaskDelete(t *testing.T) {
 func TestSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -986,7 +986,7 @@ func TestSchedule(t *testing.T) {
 func TestScheduleCapacity(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 2)
 	for i := range plugins {
@@ -1041,7 +1041,7 @@ func TestScheduleCapacity(t *testing.T) {
 func TestScheduleUpdate(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1110,7 +1110,7 @@ func TestScheduleUpdate(t *testing.T) {
 func TestCollectorSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -1157,7 +1157,7 @@ func TestCollectorSchedule(t *testing.T) {
 func TestCollectorScheduleUpdate(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1232,7 +1232,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 func TestRunner(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1355,7 +1355,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*Request) {
 func TestWatcher(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1451,7 +1451,7 @@ func TestWatcher(t *testing.T) {
 func TestCollectorExporterSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -1504,7 +1504,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 func TestRunnerWatcher(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1601,7 +1601,7 @@ func TestRunnerWatcher(t *testing.T) {
 func TestMultiCollectorExporterSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -1665,7 +1665,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 func TestMultiRunnerWatcher(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -1743,7 +1743,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 func TestPassiveRunner(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1833,7 +1833,7 @@ func TestConfigurator(t *testing.T) {
 		"Debug3": opt3.Params,
 	}
 
-	manager := mockManager{sink: make(chan performer, 10)}
+	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {

@@ -20,6 +20,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -31,8 +32,6 @@ import (
 	"golang.zabbix.com/sdk/zbxnet"
 )
 
-var getLocalIPs localIPGetter = getListLocalIP //nolint:gochecknoglobals
-
 // ServerListener handles passive check requests on dedicated port.
 type ServerListener struct {
 	listenerID int
@@ -41,7 +40,8 @@ type ServerListener struct {
 	options    *agent.AgentOptions
 	bindIP     string
 	lastErr    string
-	stopped    bool
+	// Is accessed by Stop() and run() at the same time.
+	stopped atomic.Bool
 }
 
 type localIPGetter func() []net.IP
@@ -61,7 +61,7 @@ func (sl *ServerListener) handleError(err error) error {
 		return nil
 	}
 
-	if sl.stopped {
+	if sl.stopped.Load() {
 		return err
 	}
 
@@ -172,7 +172,8 @@ func (sl *ServerListener) Start() error {
 
 // Stop terminates listener for passive check handling.
 func (sl *ServerListener) Stop() {
-	sl.stopped = true
+	sl.stopped.Store(true)
+
 	if sl.listener != nil {
 		err := sl.listener.Close()
 		if err != nil {
@@ -183,11 +184,15 @@ func (sl *ServerListener) Stop() {
 
 // ParseListenIP validate ListenIP value.
 func ParseListenIP(options *agent.AgentOptions) ([]string, error) {
+	return parseListenIP(options, getListLocalIP)
+}
+
+func parseListenIP(options *agent.AgentOptions, ipGetter localIPGetter) ([]string, error) {
 	if options.ListenIP == "" || options.ListenIP == "0.0.0.0" {
 		return []string{"0.0.0.0"}, nil
 	}
 
-	lips := getLocalIPs()
+	lips := ipGetter()
 
 	opts := strings.Split(options.ListenIP, ",")
 	ips := make([]string, 0, len(opts))

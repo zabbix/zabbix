@@ -490,7 +490,7 @@ func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 }
 
 // processFinishRequest handles finished tasks
-func (m *Manager) processFinishRequest(task performer) {
+func (m *Manager) processFinishRequest(task Performer) {
 	m.activeTasksNum--
 	p := task.getPlugin()
 	p.releaseCapacity(task)
@@ -612,7 +612,7 @@ run:
 			case *commandRequest:
 				m.processCommandRequest(v)
 				m.processQueue(time.Now())
-			case performer:
+			case Performer:
 				m.processFinishRequest(v)
 				if m.shutdownSeconds != shutdownInactive && m.activeTasksNum+len(m.pluginQueue) == 0 {
 					break run
@@ -779,7 +779,7 @@ func (m *Manager) PerformTask(
 
 // Accepts only tasks that implement performer.
 func (m *Manager) FinishTask(task any) {
-	task, ok := task.(performer)
+	task, ok := task.(Performer)
 	if !ok {
 		return
 	}
@@ -933,7 +933,7 @@ func (m *Manager) addUserParamsPlugin(key string) {
 	m.plugins[key] = pagent
 }
 
-func peekTask(tasks performerHeap) performer {
+func peekTask(tasks performerHeap) Performer {
 	if len(tasks) == 0 {
 		return nil
 	}

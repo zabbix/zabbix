@@ -32,9 +32,6 @@ import (
 func Test_ParseListenIP(t *testing.T) {
 	t.Parallel()
 
-	originalGetter := getLocalIPs
-	defer func() { getLocalIPs = originalGetter }()
-
 	tests := []struct {
 		name      string
 		listenIP  string
@@ -92,13 +89,14 @@ func Test_ParseListenIP(t *testing.T) {
 
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Should not run in parallel, accesses global getLocalIPs.
-			getLocalIPs = func() []net.IP {
+			getLocalIPs := func() []net.IP {
 				return tt.mockIPs
 			}
 
 			opts := &agent.AgentOptions{ListenIP: tt.listenIP}
-			got, err := ParseListenIP(opts)
+			got, err := parseListenIP(opts, getLocalIPs)
 
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("ParseListenIP() error = %v, expectErr = %v", err, tt.expectErr)
@@ -111,12 +109,6 @@ func Test_ParseListenIP(t *testing.T) {
 			}
 		})
 	}
-}
-
-func Test_getListLocalIP(t *testing.T) {
-	t.Parallel()
-
-	_ = getListLocalIP()
 }
 
 func Test_processPlainTextRequest(t *testing.T) {
