@@ -156,7 +156,8 @@ class ZColorPicker extends HTMLElement {
 	/**
 	 * Attributes of color picker.
 	 */
-	#name;
+	#color_field_name;
+	#palette_field_name;
 	#value;
 	#input_id;
 	#has_default;
@@ -180,7 +181,8 @@ class ZColorPicker extends HTMLElement {
 
 			this.classList.add(ZColorPicker.ZBX_STYLE_CLASS);
 
-			this.#name = this.getAttribute('name');
+			this.#color_field_name = this.getAttribute('color-field-name');
+			this.#palette_field_name = this.getAttribute('palette-field-name');
 			this.#value = this.getAttribute('value')?.toUpperCase();
 			this.#input_id = this.getAttribute('input-id');
 			this.#has_default = this.hasAttribute('has-default');
@@ -213,7 +215,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['name', 'value', 'input-id', 'has-default', 'has-palette', 'disabled'];
+		return ['color-field-name', 'palette-field-name', 'value', 'input-id', 'has-default', 'has-palette', 'disabled'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -226,8 +228,12 @@ class ZColorPicker extends HTMLElement {
 		}
 
 		switch (name) {
-			case 'name':
-				this.#name = new_value;
+			case 'color-field-name':
+				this.#color_field_name = new_value;
+				break;
+
+			case 'palette-field-name':
+				this.#palette_field_name = new_value;
 				break;
 
 			case 'value':
@@ -258,17 +264,13 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	#refresh() {
-		this.#hidden_input.name = this.#name;
+		const name = this.#isValidPalette(this.#value) ? this.#palette_field_name : this.#color_field_name;
+
+		this.#hidden_input.name = name;
 		this.#hidden_input.value = this.#value;
+		this.#hidden_input.id = this.#input_id !== null ? this.#input_id : zbx_formatDomId(name);
 
-		if (this.#input_id === null) {
-			this.#hidden_input.id = zbx_formatDomId(this.#name);
-		}
-		else {
-			this.#hidden_input.id = this.#input_id;
-		}
-
-		this.#box.id = `lbl_${zbx_formatDomId(this.#name)}`;
+		this.#box.id = `lbl_${zbx_formatDomId(name)}`;
 		this.#box.title = this.#getTitle(this.#value);
 		this.#box.classList.toggle(ZColorPicker.ZBX_STYLE_IS_PALETTE, this.#isValidPalette(this.#value));
 
@@ -802,12 +804,20 @@ class ZColorPicker extends HTMLElement {
 		return Number(value.match(regex)[1]);
 	}
 
-	get name() {
-		return this.getAttribute('name');
+	get colorFieldName() {
+		return this.getAttribute('color-field-name');
 	}
 
-	set name(name) {
-		this.setAttribute('name', name);
+	set colorFieldName(name) {
+		this.setAttribute('color-field-name', name);
+	}
+
+	get paletteFieldName() {
+		return this.getAttribute('palette-field-name');
+	}
+
+	set paletteFieldName(name) {
+		this.setAttribute('palette-field-name', name);
 	}
 
 	get value() {

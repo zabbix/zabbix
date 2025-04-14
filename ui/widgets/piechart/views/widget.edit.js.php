@@ -186,7 +186,7 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#displayingOptionsTabInit() {
-		const merge_color = document.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[name="merge_color"]');
+		const merge_color = document.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="merge_color"]');
 
 		if (merge_color.value === '') {
 			merge_color.value = '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>';
@@ -742,11 +742,11 @@ window.widget_pie_chart_form = new class {
 		jQuery('#stroke').rangeControl(is_doughnut ? 'enable' : 'disable');
 
 		document.getElementById('merge_percent').disabled = !do_merge_sectors;
-		this.#form.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[name="merge_color"]').disabled = !do_merge_sectors;
+		this.#form.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="merge_color"]').disabled = !do_merge_sectors;
 
 		for (const field of this.#form.querySelectorAll('#value_size_type_0, #value_size_type_1,' +
 			'#value_size_custom_input, #decimal_places, #units_show, #units, #value_bold,' +
-			'.<?= ZBX_STYLE_COLOR_PICKER ?>[name="value_color"]'
+			'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="value_color"]'
 		)) {
 			field.disabled = !is_total_value_visible;
 		}

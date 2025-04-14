@@ -20,6 +20,18 @@ class CColorPicker extends CTag {
 		parent::__construct('z-color-picker', true);
 	}
 
+	public function setColorFieldName(string $name): self {
+		$this->setAttribute('color-field-name', $name);
+
+		return $this;
+	}
+
+	public function setPaletteFieldName(string $name): self {
+		$this->setAttribute('palette-field-name', $name);
+
+		return $this;
+	}
+
 	public function setValue(string $value): self {
 		$this->setAttribute('value', $value);
 

@@ -31,10 +31,11 @@ jQuery(function ($) {
 			opt = $override.data('options'),
 			field_name = opt.makeName(option, opt.getId($override));
 
-		if (option === 'color') {
+		if (option === 'color' || option === 'color_palette') {
 			const color_picker = new ZColorPicker();
 
-			color_picker.name = field_name;
+			color_picker.colorFieldName = opt.makeName('color', opt.getId($override));
+			color_picker.paletteFieldName = opt.makeName('color_palette', opt.getId($override));
 			color_picker.value = value;
 			color_picker.inputId = zbx_formatDomId(field_name);
 			color_picker.hasPalette = true;
