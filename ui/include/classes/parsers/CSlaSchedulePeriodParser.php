@@ -20,6 +20,13 @@
 class CSlaSchedulePeriodParser extends CParser {
 
 	/**
+	 * An error message if IP range is not valid.
+	 *
+	 * @var string
+	 */
+	private $error;
+
+	/**
 	 * Parse the given period.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
