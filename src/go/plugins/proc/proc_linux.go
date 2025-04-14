@@ -251,7 +251,7 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 	return true
 }
 
-func newCpuUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery) {
+func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery) {
 	query = &cpuUtilQuery{procQuery: *q}
 	if q.user != "" {
 		var u *user.User
@@ -282,7 +282,7 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 			continue
 		}
 
-		query := newCpuUtilQuery(&q, stats.cmdlinePattern)
+		query := newCPUUtilQuery(&q, stats.cmdlinePattern)
 
 		queries = append(queries, query)
 		stats.scanid = p.scanid
@@ -513,7 +513,7 @@ func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags in
 		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
 	}
 
-	query = newCpuUtilQuery(q, regxp)
+	query = newCPUUtilQuery(q, regxp)
 
 	if q.name != "" {
 		flags |= procInfoName | procInfoCmdline
