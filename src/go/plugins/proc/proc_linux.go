@@ -251,7 +251,7 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 	return true
 }
 
-func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery) {
+func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) *cpuUtilQuery {
 	query := &cpuUtilQuery{procQuery: *q}
 	if q.user != "" {
 		var u *user.User
@@ -266,6 +266,7 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery) {
 	}
 
 	query.cmdlinePattern = pattern
+
 	return query
 }
 
