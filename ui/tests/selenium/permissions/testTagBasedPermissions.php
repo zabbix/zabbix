@@ -21,12 +21,286 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * Test tag based permissions.
  *
+ * @backup profiles
+ *
  * @dataSource UserPermissions
  */
 class testTagBasedPermissions extends CLegacyWebTest {
+
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class
+		];
+	}
+
+	const URL = 'zabbix.php?action=problem.view';
 	const USER = 'Tag-user';
 	const PASSWORD = 'Zabbix_Test_123';
 	const TRIGGER_HOST = 'Host for tag permissions';
+	protected static $time;
+	protected static $hostgroupids;
+	protected static $hostsids;
+
+	public function prepareProblemsData() {
+		/**
+		 * Change refresh interval so Problems page doesn't refresh automatically,
+		 * and popup dialogs don't disappear.
+		 */
+
+		// Create host group for hosts with item and trigger.
+		CDataHelper::call('hostgroup.create', [
+			['name' => 'First Group for Tag filter permission test'],
+			['name' => 'Second Group for Tag filter permission test']
+		]);
+		self::$hostgroupids = CDataHelper::getIds('name');
+
+		// Create hosts.
+		self::$hostsids = CDataHelper::createHosts([
+			[
+				'host' => 'First Host for tag filter permission test',
+				'groups' => [['groupid' => self::$hostgroupids['First Group for Tag filter permission test']]],
+				'items' => [
+					[
+						'name' => 'First item without tags',
+						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Second item with tag',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item OS',
+								'value' => 'Linux'
+							]
+						]
+					]
+				]
+			],
+			[
+				'host' => 'Second Host for tag filter permission test',
+				'groups' => [['groupid' => self::$hostgroupids['Second Group for Tag filter permission test']]],
+				'items' => [
+					[
+						'name' => 'First item with tag',
+						'key_' => 'trap3-1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item level',
+								'value' => 'Development'
+							]
+						]
+					],
+					[
+						'name' => 'Second item with trigger tag',
+						'key_' => 'trap3-2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Third item with tag',
+						'key_' => 'trap4-1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item department',
+								'value' => 'HR'
+							]
+						]
+					],
+					[
+						'name' => 'Fourth item with trigger tag',
+						'key_' => 'trap4-2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
+
+		// Create triggers based on items.
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'First trigger for tag filter permission check',
+				'expression' => 'last(/First Host for tag filter permission test/trap)<>0', // without tags.
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Second trigger for tag filter permission check',
+				'expression' => 'last(/First Host for tag filter permission test/trap2)<>0', // with item tag.
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Third trigger for tag filter permission check',
+				'expression' => 'last(/First Host for tag filter permission test/trap2)<>0', // with item and trigger tag.
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'tags' => [
+					[
+						'tag' => 'trigger OS',
+						'value' => 'Windows'
+					]
+				]
+			],
+			[
+				'description' => 'Fourth trigger for tag filter permission check',
+				'expression' => 'last(/Second Host for tag filter permission test/trap3-1)<>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Fifth trigger for tag filter permission check',
+				'expression' => 'last(/Second Host for tag filter permission test/trap3-2)<>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'tags' => [
+					[
+						'tag' => 'trigger level',
+						'value' => 'Production'
+					]
+				]
+			],
+			[
+				'description' => 'Sixth trigger for tag filter permission check',
+				'expression' => 'last(/Second Host for tag filter permission test/trap4-1)<>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Seventh trigger for tag filter permission check',
+				'expression' => 'last(/Second Host for tag filter permission test/trap4-2)<>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'tags' => [
+					[
+						'tag' => 'trigger department',
+						'value' => 'QA'
+					]
+				]
+			]
+		]);
+
+		// Create user groups and users for problem tag filter permissions check.
+		CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'User group for problem tag filter permissions',
+				'hostgroup_rights' => [
+					[
+						'id' => self::$hostgroupids['First Group for Tag filter permission test'],
+						'permission' => PERM_READ_WRITE
+					],
+					[
+						'id' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'permission' => PERM_READ_WRITE
+					]
+				],
+				'tag_filters' => [
+					[
+						'groupid' => self::$hostgroupids['First Group for Tag filter permission test'],
+						'tag' => '',
+						'value' => ''
+					],
+					[
+						'groupid' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'tag' => 'trigger level'
+					],
+					[
+						'groupid' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'tag' => 'item department'
+					]
+				]
+			],
+			[
+				'name' => 'User group for problem tag filter permissions 2',
+				'hostgroup_rights' => [
+					[
+						'id' => self::$hostgroupids['First Group for Tag filter permission test'],
+						'permission' => PERM_READ_WRITE
+					],
+					[
+						'id' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'permission' => PERM_READ_WRITE
+					]
+				],
+				'tag_filters' => [
+					[
+						'groupid' => self::$hostgroupids['First Group for Tag filter permission test'],
+						'tag' => '',
+						'value' => ''
+					],
+					[
+						'groupid' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'tag' => 'item level'
+					],
+					[
+						'groupid' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'tag' => 'trigger department'
+					]
+				]
+			],
+			[
+				'name' => 'User group for problem tag filter permissions 3',
+				'hostgroup_rights' => [
+					[
+						'id' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'permission' => PERM_READ_WRITE
+					]
+				],
+				'tag_filters' => [
+					[
+						'groupid' => self::$hostgroupids['Second Group for Tag filter permission test'],
+						'tag' => 'item department'
+					]
+				]
+			]
+		]);
+		$usergroupids = CDataHelper::getIds('name');
+
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'admin for tag filter',
+				'passwd' => 'z@$$ix!#%1',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['User group for problem tag filter permissions']]
+				]
+			],
+			[
+				'username' => 'user for tag filter',
+				'passwd' => 'z@$$ix!#%2',
+				'roleid' => USER_TYPE_ZABBIX_USER,
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['User group for problem tag filter permissions 2']]
+				]
+			]
+		]);
+
+		// Enable guest role for tag permissions test.
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 2, // guest.
+				'usrgrps' => [
+					['usrgrpid' => 8], // Guests.
+					['usrgrpid' => $usergroupids['User group for problem tag filter permissions 3']]
+				]
+			]
+		]);
+
+		self::$time = time();
+		$trigger_data = [
+			'First trigger for tag filter permission check' => ['clock' => self::$time - 120],
+			'Second trigger for tag filter permission check' => ['clock' => self::$time - 121],
+			'Third trigger for tag filter permission check' => ['clock' => self::$time - 122],
+			'Fourth trigger for tag filter permission check' => ['clock' => self::$time - 123],
+			'Fifth trigger for tag filter permission check' => ['clock' => self::$time - 124],
+			'Sixth trigger for tag filter permission check' => ['clock' => self::$time - 125],
+			'Seventh trigger for tag filter permission check' => ['clock' => self::$time - 126]
+		];
+		foreach ($trigger_data as $trigger_name => $clock) {
+			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, $clock);
+		}
+	}
 
 	/**
 	 * Set tags permissions in user groups and login as simple user
@@ -189,7 +463,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//div[contains(@class, "no-data-message")]', 'No data found');
 
 		// Check problem displaying on Problem page
-		$this->zbxTestOpen('zabbix.php?action=problem.view');
+		$this->zbxTestOpen(self::URL);
 		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
@@ -299,7 +573,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestTextPresent($data['trigger_names']);
 
 		// Check problem displaying on Problem page
-		$this->zbxTestOpen('zabbix.php?action=problem.view');
+		$this->zbxTestOpen(self::URL);
 		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
@@ -328,7 +602,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait("//a[contains(@href,'tr_events.php?triggerid=".$triggerid['triggerid']."')]");
 			$this->zbxTestCheckHeader('Event details');
 			// Go back to problem page
-			$this->zbxTestOpen('zabbix.php?action=problem.view');
+			$this->zbxTestOpen(self::URL);
 		}
 	}
 
@@ -403,7 +677,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestTextPresent($data['trigger_names']);
 
 		// Check problem displaying on Problem page
-		$this->zbxTestOpen('zabbix.php?action=problem.view');
+		$this->zbxTestOpen(self::URL);
 		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
@@ -431,7 +705,163 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait("//a[contains(@href,'tr_events.php?triggerid=".$triggerid['triggerid']."')]");
 			$this->zbxTestCheckHeader('Event details');
 			// Go back to problem page
-			$this->zbxTestOpen('zabbix.php?action=problem.view');
+			$this->zbxTestOpen(self::URL);
 		}
+	}
+
+	public static function getProblemsData() {
+		return [
+			// #0 Problem tag filter limited permissions for admin role.
+			[
+				[
+					'user' => 'admin for tag filter',
+					'password' => 'z@$$ix!#%1',
+					'result' => [
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'First trigger for tag filter permission check',
+							'Tags' => ''
+						],
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'Second trigger for tag filter permission check',
+							'Tags' => 'item OS: Linux'
+						],
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'Third trigger for tag filter permission check',
+							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+						],
+						[
+
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Fifth trigger for tag filter permission check',
+							'Tags' => 'trigger level: Production'
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Sixth trigger for tag filter permission check',
+							'Tags' => 'item department: HR'
+						]
+					]
+				]
+			],
+			// #1 Problem tag filter limited permissions for user role.
+			[
+				[
+					'user' => 'user for tag filter',
+					'password' => 'z@$$ix!#%2',
+					'result' => [
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'First trigger for tag filter permission check',
+							'Tags' => ''
+						],
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'Second trigger for tag filter permission check',
+							'Tags' => 'item OS: Linux'
+						],
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'Third trigger for tag filter permission check',
+							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Fourth trigger for tag filter permission check',
+							'Tags' => 'item level: Development'
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Seventh trigger for tag filter permission check',
+							'Tags' => 'trigger department: QA'
+						]
+					]
+				]
+			],
+			// #2 Super admin should see all problem tags without limitations.
+			[
+				[
+					'user' => 'Admin',
+					'password' => 'zabbix',
+					'result' => [
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'First trigger for tag filter permission check',
+							'Tags' => ''
+						],
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'Second trigger for tag filter permission check',
+							'Tags' => 'item OS: Linux'
+						],
+						[
+							'Host' => 'First Host for tag filter permission test',
+							'Problem' => 'Third trigger for tag filter permission check',
+							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Fourth trigger for tag filter permission check',
+							'Tags' => 'item level: Development'
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Fifth trigger for tag filter permission check',
+							'Tags' => 'trigger level: Production'
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Sixth trigger for tag filter permission check',
+							'Tags' => 'item department: HR'
+						],
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Seventh trigger for tag filter permission check',
+							'Tags' => 'trigger department: QA'
+						]
+					]
+				]
+			],
+			// #3 Guest sees only one problem with particular tag.
+			[
+				[
+					'guest' => true,
+					'result' => [
+						[
+							'Host' => 'Second Host for tag filter permission test',
+							'Problem' => 'Sixth trigger for tag filter permission check',
+							'Tags' => 'item department: HR'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @onBeforeOnce prepareProblemsData
+	 *
+	 * @dataProvider getProblemsData
+	 *
+	 * Check that problems page show problems regarding tag filter permissions.
+	 */
+	public function testTagBasedPermissions_TagPermissions($data) {
+		$url = self::URL.
+			'&hostids[]='.self::$hostsids['hostids']['First Host for tag filter permission test'].
+			'&hostids[]='.self::$hostsids['hostids']['Second Host for tag filter permission test'];
+
+		if (array_key_exists('guest', $data)) {
+			$this->page->open($url)->waitUntilReady();
+			$this->query('button:Login')->one()->click();
+			$this->query('link:sign in as guest')->one()->click();
+			$this->page->waitUntilReady();
+		}
+		else {
+			$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
+		}
+
+		$this->assertTableData($data['result']);
 	}
 }
