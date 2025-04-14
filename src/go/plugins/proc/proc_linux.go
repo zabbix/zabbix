@@ -251,22 +251,22 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 	return true
 }
 
-func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery) {
-	query = &cpuUtilQuery{procQuery: *q}
+func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery) {
+	query := &cpuUtilQuery{procQuery: *q}
 	if q.user != "" {
 		var u *user.User
 		var err error
 
 		if u, err = user.Lookup(q.user); err != nil {
-			return
+			return query
 		}
 		if query.userid, _ = strconv.ParseInt(u.Uid, 10, 64); err != nil {
-			return
+			return query
 		}
 	}
 
 	query.cmdlinePattern = pattern
-	return
+	return query
 }
 
 func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
