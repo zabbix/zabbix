@@ -260,7 +260,7 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery) {
 		if u, err = user.Lookup(q.user); err != nil {
 			return query
 		}
-		if query.userid, _ = strconv.ParseInt(u.Uid, 10, 64); err != nil {
+		if query.userid, err = strconv.ParseInt(u.Uid, 10, 64); err != nil {
 			return query
 		}
 	}
