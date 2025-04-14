@@ -45,6 +45,8 @@ div.dashboard-widget-itemcard {
 
 				display: flex;
 				gap: 5px;
+				height: 17px;
+				line-height: 17px;
 
 				.path-element {
 					@extend %overflow-ellipsis;
@@ -114,7 +116,7 @@ div.dashboard-widget-itemcard {
 						flex-direction: column;
 						gap: 5px;
 
-						.column-header {
+						.column-header:not(a) {
 							color: $font-alt-color;
 						}
 
@@ -123,8 +125,9 @@ div.dashboard-widget-itemcard {
 
 							display: block;
 							position: relative;
-							height: 16px;
-							line-height: 16px;
+							height: 17px;
+							line-height: 17px;
+							box-sizing: border-box;
 						}
 
 						.column-value {
@@ -136,10 +139,9 @@ div.dashboard-widget-itemcard {
 							z-sparkline {
 								position: absolute;
 								top: 0;
-								bottom: 0;
 								right: 0;
 								left: 0;
-								height: 18px;
+								height: 17px;
 							}
 						}
 					}
@@ -157,7 +159,7 @@ div.dashboard-widget-itemcard {
 
 							&:not(.btn-link) {
 								width: 100px;
-								height: 54px;
+								height: 53px;
 								background: transparent var(--thumbnail) no-repeat center;
 								background-size: cover;
 								border-color: transparent;

@@ -495,7 +495,8 @@ function makeSectionLatestData(array $item): CDiv {
 				(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
 					->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
 					->setArgument('itemids[]', $item['itemid'])
-			)))->addClass('column-header');
+				))->addClass('column-header')
+			);
 		}
 
 		if ($is_numeric) {
