@@ -121,8 +121,8 @@ type Scheduler interface {
 		commands []*agent.RemoteCommand,
 		now time.Time,
 	)
-	// FinishTask accepts only tasks that implement performer interface
-	FinishTask(task any)
+	// FinishTask accepts only tasks that implement performer interface.
+	FinishTask(task Performer)
 	PerformTask(
 		key string,
 		timeout time.Duration,
@@ -777,13 +777,8 @@ func (m *Manager) PerformTask(
 	return r.Value, r.Error
 }
 
-// Accepts only tasks that implement performer.
-func (m *Manager) FinishTask(task any) {
-	task, ok := task.(Performer)
-	if !ok {
-		return
-	}
-
+// FinishTask executes task finishing on given Performer.
+func (m *Manager) FinishTask(task Performer) {
 	m.input <- task
 }
 

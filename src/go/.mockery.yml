@@ -13,6 +13,10 @@ structname: '{{.InterfaceName}}'
 # One file per interface, named after the interface
 filename: 'mock_{{.InterfaceName}}.go'
 
+# Custom file heading – this text will be prepended to each generated file.
+template-data:
+  boilerplate-file: "./fileheader.txt"
+
 # Use the built-in Testify mocking template
 template: testify
 
