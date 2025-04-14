@@ -383,23 +383,23 @@ class CTemplate extends CHostGeneral {
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
 					'label' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
 					]],
 					'description' =>		['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'description')]
 					]],
 					'required' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'required')]
 					]],
 					'regex' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
 					]],
 					'options' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'options')]
 					]]
 				]]
 			]],
@@ -580,23 +580,23 @@ class CTemplate extends CHostGeneral {
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
 					'label' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
 					]],
 					'description' =>		['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'description')]
 					]],
 					'required' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'required')]
 					]],
 					'regex' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
 					]],
 					'options' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_JSON, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'options')]
 					]]
 				]]
 			]],
