@@ -8081,13 +8081,3 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   content: " /"; }
 .breadcrumbs > :last-child::after {
   content: ""; }
-
-.file-upload-wrapper .file-input-hidden {
-  display: none; }
-  .file-upload-wrapper .file-upload-btn {
-    margin-left: .3em; }
-  .file-upload-wrapper .file-name {
-    margin-top: 5px;
-    display: none; }
-  .file-upload-wrapper .file-name:not([style="display: none;"]) {
-    display: block; }
