@@ -1919,7 +1919,7 @@ void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids
 	if (0 != hosts.values_num)
 	{
 		id_name_pair_vector_split(&hosts, &hostids, &hostnames);
-		zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, audit_context_mode);
+		zbx_db_delete_hosts(&hostids, &hostnames, audit_context_mode);
 	}
 
 	/* delete group prototypes */
@@ -4311,7 +4311,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
  * Comments: auxiliary function for zbx_db_copy_template_elements()           *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+void	zbx_db_copy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		int audit_context_mode, zbx_db_insert_t *db_insert_htemplates)
 {
 	zbx_vector_ptr_t	host_prototypes;
@@ -5797,7 +5797,7 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 	}
 
 	DBcopy_template_items(hostid, lnk_templateids, audit_context_mode);
-	DBcopy_template_host_prototypes(hostid, lnk_templateids, audit_context_mode, db_insert_htemplates);
+	zbx_db_copy_template_host_prototypes(hostid, lnk_templateids, audit_context_mode, db_insert_htemplates);
 
 	zbx_db_insert_execute(db_insert_htemplates);
 	zbx_db_insert_clean(db_insert_htemplates);
@@ -6035,7 +6035,7 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *hostgroupi
  *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
+static void	db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode)
 {
 	int			i;
@@ -6193,7 +6193,7 @@ out:
  *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
+void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode)
 {
 	zbx_vector_uint64_t	host_prototype_ids;
@@ -6220,7 +6220,7 @@ void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, con
 		zbx_db_delete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
 	}
 
-	zbx_db_delete_hosts(hostids, hostnames, audit_context_mode);
+	db_delete_hosts(hostids, hostnames, audit_context_mode);
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);
