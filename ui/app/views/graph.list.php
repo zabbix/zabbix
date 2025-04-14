@@ -184,6 +184,17 @@ foreach ($data['graphs'] as $graph) {
 			->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
+	elseif ($graph['discoveryRulePrototype']) {
+		$name[] = (new CLink($graph['discoveryRulePrototype']['name'],
+			(new CUrl('host_discovery_prototype.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $graph['discoveryRulePrototype']['itemid'])
+				->setArgument('context', $data['context'])
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
+		$name[] = NAME_DELIMITER;
+	}
 
 	$name[] = new CLink($graph['name'], (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')

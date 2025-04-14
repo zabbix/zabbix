@@ -238,6 +238,7 @@ class CXmlConstantName {
 	const SNMP_AGENT = 'SNMP_AGENT';
 	// const SCRIPT = 'SCRIPT'; // Duplicate.
 	const BROWSER = 'BROWSER';
+	const NESTED = 'NESTED';
 
 	const FLOAT = 'FLOAT';
 	const CHAR = 'CHAR';

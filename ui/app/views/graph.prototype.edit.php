@@ -33,7 +33,7 @@ $graph_form = (new CForm())
 
 $is_templated = (bool) $data['templates'];
 $discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
-$readonly = $is_templated || $discovered_graph;
+$readonly = $is_templated || $discovered_graph || $data['discovered_prototype'];
 
 // Preview tab.
 $preview_table = (new CTable())
@@ -51,7 +51,8 @@ if ($data['graphid'] != 0) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'graph_edit_popup.submit();'
+			'action' => 'graph_edit_popup.submit();',
+			'enabled' => !$data['discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),

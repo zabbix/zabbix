@@ -41,6 +41,7 @@ JAVASCRIPT;
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
 		'limited' => false,
+		'readonly' => false,
 		'interfaceid' => getRequest('interfaceid', 0),
 		'name' => getRequest('name', ''),
 		'description' => getRequest('description', ''),
@@ -154,15 +155,26 @@ JAVASCRIPT;
 
 	// hostid
 	if ($data['parent_discoveryid'] != 0) {
-		$discoveryRule = API::DiscoveryRule()->get([
+		$db_parent_discovery = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'selectHosts' => ['flags'],
 			'itemids' => $data['parent_discoveryid'],
 			'editable' => true
 		]);
-		$discoveryRule = reset($discoveryRule);
-		$data['hostid'] = $discoveryRule['hostid'];
-		$data['host'] = $discoveryRule['hosts'][0];
+
+		if (!$db_parent_discovery) {
+			$db_parent_discovery = API::DiscoveryRulePrototype()->get([
+				'output' => ['hostid'],
+				'selectHosts' => ['flags'],
+				'itemids' => $data['parent_discoveryid'],
+				'editable' => true
+			]);
+		}
+
+		$db_parent_discovery = reset($db_parent_discovery);
+
+		$data['hostid'] = $db_parent_discovery['hostid'];
+		$data['host'] = $db_parent_discovery['hosts'][0];
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);
@@ -187,6 +199,12 @@ JAVASCRIPT;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
 		$data['interfaceid'] = $item['interfaceid'];
+
+		// Check for a discovered prototype
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED && $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$data['readonly'] = true;
+			$data['limited'] = true;
+		}
 
 		// discovery rule
 		$flag = ZBX_FLAG_DISCOVERY_RULE;

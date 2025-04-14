@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$readonly = $data['limited'] || $data['discovered_prototype'];
+
 $trigger_form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
 	->setId('trigger-prototype-form')
@@ -51,7 +53,7 @@ if ($data['limited']) {
 $triggers_tab = (new CTabView())
 	->addTab('triggersTab',_('Trigger prototype'),
 		new CPartial('trigger.edit.trigger.tab', $data += [
-			'readonly' => $data['limited'],
+			'readonly' => $readonly,
 			'form_name' => $trigger_form->getName()
 		])
 	)
@@ -61,7 +63,8 @@ $triggers_tab = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'readonly' => $readonly
 		]), TAB_INDICATOR_TAGS
 	)
 	->addTab('dependenciesTab', _('Dependencies'), new CPartial('trigger.edit.dependencies.tab', $data),
@@ -88,7 +91,8 @@ else {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'trigger_edit_popup.submit();'
+			'action' => 'trigger_edit_popup.submit();',
+			'enabled' => !$data['discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),

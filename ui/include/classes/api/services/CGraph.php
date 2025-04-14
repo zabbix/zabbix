@@ -83,6 +83,7 @@ class CGraph extends CGraphGeneral {
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
+			'selectDiscoveryRulePrototype'	=> null,
 			'selectGraphDiscovery'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -371,35 +372,42 @@ class CGraph extends CGraphGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		// adding discoveryRule
-		if ($options['selectDiscoveryRule'] !== null) {
-			$discoveryRules = [];
-			$relationMap = new CRelationMap();
-			$dbRules = DBselect(
+		if ($options['selectDiscoveryRule'] !== null || $options['selectDiscoveryRulePrototype'] !== null) {
+			$lld_links = DBselect(
 				'SELECT id.parent_itemid,gd.graphid'.
-					' FROM graph_discovery gd,item_discovery id,graphs_items gi,items i'.
-					' WHERE '.dbConditionInt('gd.graphid', $graphids).
+				' FROM graph_discovery gd,item_discovery id,graphs_items gi,items i'.
+				' WHERE '.dbConditionId('gd.graphid', $graphids).
 					' AND gd.parent_graphid=gi.graphid'.
-						' AND gi.itemid=id.itemid'.
-						' AND id.parent_itemid=i.itemid'.
-						' AND i.flags='.ZBX_FLAG_DISCOVERY_RULE
+					' AND gi.itemid=id.itemid'.
+					' AND id.parent_itemid=i.itemid'
 			);
+			$relation_map = new CRelationMap();
 
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['graphid'], $relation['parent_itemid']);
+			while ($relation = DBfetch($lld_links)) {
+				$relation_map->addRelation($relation['graphid'], $relation['parent_itemid']);
 			}
 
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$discoveryRules = API::DiscoveryRule()->get([
+			if ($options['selectDiscoveryRule'] !== null) {
+				$lld_rules = API::DiscoveryRule()->get([
 					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $related_ids,
+					'itemids' => $relation_map->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 			}
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+
+			if ($options['selectDiscoveryRulePrototype'] !== null) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => $options['selectDiscoveryRulePrototype'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
+			}
 		}
 
 		// adding graph discovery

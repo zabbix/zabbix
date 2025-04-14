@@ -28,14 +28,14 @@ $form = (new CForm())
 
 $form_grid = new CFormGrid();
 
-if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($data['groupid'] !== null && $data['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 	$discovery_rules = [];
 
-	if ($data['discoveryRules']) {
-		$lld_rule_count = count($data['discoveryRules']);
-		$data['discoveryRules'] = array_slice($data['discoveryRules'], 0, 5);
+	if ($data['parent_lld']) {
+		$lld_rule_count = count($data['parent_lld']);
+		$data['parent_lld'] = array_slice($data['parent_lld'], 0, 5);
 
-		foreach ($data['discoveryRules'] as $lld_rule) {
+		foreach ($data['parent_lld'] as $lld_rule) {
 			if ($data['allowed_ui_conf_hosts'] && $lld_rule['is_editable']
 					&& array_key_exists($lld_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
 				$discovery_rules[] = (new CLink($lld_rule['name'],
@@ -70,7 +70,7 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 $form_grid->addItem([
 	(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 	new CFormField(
-		(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
+		(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] & ZBX_FLAG_DISCOVERY_CREATED))
 			->setAttribute('autofocus', 'autofocus')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()

@@ -96,7 +96,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
 		ITEM_TYPE_DEPENDENT => _('Dependent item'),
 		ITEM_TYPE_SCRIPT => _('Script'),
-		ITEM_TYPE_BROWSER => _('Browser')
+		ITEM_TYPE_BROWSER => _('Browser'),
+		ITEM_TYPE_NESTED => _('Nested')
 	];
 
 	if ($type === null) {
@@ -435,6 +436,19 @@ function getItemParentTemplates(array $items, $flag) {
 				'output' => ['itemid', 'hostid', 'templateid'],
 				'itemids' => array_keys($parent_itemids)
 			]);
+		}
+		elseif ($flag == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+			$db_items = API::DiscoveryRule()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids)
+			]);
+
+			if (!$db_items) {
+				$db_items = API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids)
+				]);
+			}
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_items = API::ItemPrototype()->get([
@@ -2165,6 +2179,19 @@ function getMainItemFieldNames(array $input): array {
 			}
 
 			return $field_names;
+
+		case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+			if ($input['templateid'] == 0) {
+				return ['name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime','description', 'status', 'discover', 'preprocessing', 'lld_macro_paths',
+					'overrides'
+				];
+			}
+			else {
+				return ['lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime', 'description',
+					'status', 'discover'
+				];
+			}
 
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 			if ($input['templateid'] == 0) {

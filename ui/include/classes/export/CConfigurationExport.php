@@ -1428,7 +1428,7 @@ class CConfigurationExport {
 			unset($trigger['hosts']);
 
 			foreach ($trigger['items'] as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($triggers[$idx]);
 					continue 2;
 				}

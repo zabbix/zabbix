@@ -20,21 +20,20 @@
  */
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Discovery rules'))
+	->setTitle(_('Discovery prototypes'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_EDIT))
-	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
-		array_key_exists('itemid', $data) ? $data['itemid'] : 0
-	));
+	->setNavigation(getHostNavigation('lld_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
-$url = (new CUrl('host_discovery.php'))
+$url = (new CUrl('host_discovery_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_discovery.php')))->removeId())
-	->setId('host-discovery-form')
-	->setName('itemForm')
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_discovery_prototypes.php')))->removeId())
+	->setId('host-discovery-prototype-form')
+	->setName('hostDiscoveryPrototypeForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
@@ -48,7 +47,7 @@ $item_tab = (new CFormGrid())->setId('itemFormList');
 
 if (!empty($data['templates'])) {
 	$item_tab->addItem([
-		new CLabel(_('Parent discovery rules')),
+		new CLabel(_('Parent discovery prototypes')),
 		new CFormField($data['templates'])
 	]);
 }
@@ -793,14 +792,21 @@ $item_tab
 	->addItem([
 		new CLabel(_('Description'), 'description'),
 		new CFormField((new CTextArea('description', $data['description'], ['readonly' => $data['readonly']]))
-			->setId('js-item-description-field')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxLength(DB::getFieldLength('hosts', 'description'))
 		)
 	])
 	->addItem([
-		new CLabel(_('Enabled'), 'status'),
-		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
+		new CLabel(_('Create enabled'), 'status'),
+		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))
+			->setChecked($data['status'] == ITEM_STATUS_ACTIVE)
+			->setEnabled(!$data['readonly']))
+	])
+	->addItem([
+		new CLabel(_('Discover'), 'discover'),
+		new CFormField((new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+			->setEnabled(!$data['readonly']))
 	]);
 
 /*
@@ -818,13 +824,13 @@ $condition_tab->addItem([
 				->setId('evaltype')
 				->setValue($data['evaltype'])
 				->addOptions(CSelect::createOptionsFromArray([
-						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-						CONDITION_EVAL_TYPE_AND => _('And'),
-						CONDITION_EVAL_TYPE_OR => _('Or'),
-						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-					]))
-					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-					->setReadonly($data['readonly'])
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+				->setReadonly($data['readonly'])
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
 			(new CSpan(''))->setId('expression'),
@@ -1022,7 +1028,7 @@ $overrides_tab->addItem([
 
 // Append tabs to form.
 $tab = (new CTabView())
-	->addTab('itemTab', $data['caption'], $item_tab)
+	->addTab('itemTab', _('Discovery prototype'), $item_tab)
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormGrid())
 			->setId('item_preproc_list')
@@ -1044,7 +1050,7 @@ if ($data['form_refresh'] == 0) {
 
 // Append buttons to form.
 if (!empty($data['itemid'])) {
-	$buttons = [new CSubmit('clone', _('Clone'))];
+	$buttons = [(new CSubmit('clone', _('Clone')))->setEnabled(!$data['readonly'])];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
 		$buttons[] = (new CSimpleButton(_('Execute now')))
@@ -1056,18 +1062,23 @@ if (!empty($data['itemid'])) {
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
-	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid', 'context']).
-		'&'.CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery.php'),
+	$buttons[] = (new CButtonDelete(
+		_('Delete discovery prototype?'),
+		url_params(['form', 'itemid', 'hostid', 'parent_discoveryid', 'context']).
+			'&'.CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery_prototype.php'),
 		'context'
 	))->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel(url_param('context'));
+	$buttons[] = new CButtonCancel(url_params(['parent_discoveryid', 'context']));
 
-	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);
+	$form_actions = new CFormActions(
+		(new CSubmit('update', _('Update')))->setEnabled(!$data['readonly']),
+		$buttons
+	);
 }
 else {
 	$cancel_button = $data['backurl'] !== null
 		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
-		: new CButtonCancel(url_param('context'));
+		: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
 
 	$form_actions = new CFormActions(
 		new CSubmit('add', _('Add')),
@@ -1107,7 +1118,8 @@ $html_page->show();
 		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
 		'readonly' => $data['limited'],
 		'query_fields' => $data['query_fields'],
-		'headers' => $data['headers']
+		'headers' => $data['headers'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

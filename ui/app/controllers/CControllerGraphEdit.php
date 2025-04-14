@@ -96,7 +96,8 @@ class CControllerGraphEdit extends CController {
 			'graphid' => $this->getInput('graphid', 0),
 			'hostid' => $this->getInput('hostid', 0),
 			'context' => $this->getInput('context'),
-			'normal_only' => $this->getInput('normal_only', 0)
+			'normal_only' => $this->getInput('normal_only', 0),
+			'readonly' => false
 		];
 
 		if ($data['graphid'] != 0) {
@@ -105,15 +106,18 @@ class CControllerGraphEdit extends CController {
 				'selectHosts' => ['hostid'],
 				'graphids' => $data['graphid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 				'selectGraphDiscovery' 	=> ['parent_graphid']
 			];
 
 			$graph = API::Graph()->get($options);
 			$graph = reset($graph);
 
+			$data['parent_lld'] = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
+
 			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
 				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'templateid', 'flags', 'discoveryRule', 'graphDiscovery'
+				'percent_right', 'templateid', 'flags', 'discoveryRule', 'discoveryRulePrototype', 'graphDiscovery'
 			];
 
 			foreach ($fields as $field) {

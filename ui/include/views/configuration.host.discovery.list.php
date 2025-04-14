@@ -224,6 +224,7 @@ $discoveryTable = (new CTableInfo())
 		_('Triggers'),
 		_('Graphs'),
 		_('Hosts'),
+		_('Discovery rules'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
@@ -361,6 +362,14 @@ foreach ($data['discoveries'] as $discovery) {
 					->setArgument('context', $data['context'])
 			),
 			CViewHelper::showNum($discovery['hostPrototypes'])
+		],
+		[
+			new CLink(_('Discovery prototypes'),
+				(new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
+			),
+			CViewHelper::showNum($discovery['discoveryRulePrototypes'])
 		],
 		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],

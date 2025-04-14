@@ -149,6 +149,7 @@
 				trigger_prototype:          <?= json_encode(_('Trigger prototype')) ?>,
 				graph_prototype:            <?= json_encode(_('Graph prototype')) ?>,
 				host_prototype:             <?= json_encode(_('Host prototype')) ?>,
+				discovery_prototype:        <?= json_encode(_('Discovery prototype')) ?>,
 				equals:                     <?= json_encode(_('equals')) ?>,
 				does_not_equal:             <?= json_encode(_('does not equal')) ?>,
 				contains:                   <?= json_encode(_('contains')) ?>,
@@ -884,6 +885,9 @@
 		else if (operationobject === '<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>') {
 			operationobject_name = window.lldoverrides.msg.host_prototype;
 		}
+		else if (operationobject === '<?= OPERATION_OBJECT_LLD_RULE_PROTOTYPE ?>') {
+			operationobject_name = window.lldoverrides.msg.discovery_prototype;
+		}
 
 		return operationobject_name;
 	};
@@ -1052,7 +1056,8 @@
 														'optag'],
 			'<?= OPERATION_OBJECT_TRIGGER_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opseverity', 'optag'],
 			'<?= OPERATION_OBJECT_GRAPH_PROTOTYPE ?>': ['opdiscover'],
-			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'optag', 'opinventory']
+			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'optag', 'opinventory'],
+			'<?= OPERATION_OBJECT_LLD_RULE_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opperiod']
 		};
 
 		jQuery('#operationobject', this.$form)

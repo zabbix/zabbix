@@ -529,15 +529,23 @@ abstract class CItemGeneral extends CApiService {
 					);
 					break;
 
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item prototype with the same UUID already exists')
+					);
+					break;
+
 				case ZBX_FLAG_DISCOVERY_RULE:
+				case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
 						_('LLD rule with the same UUID already exists')
 					);
 					break;
 
-				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+				case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+				case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
 					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
-						_('item prototype with the same UUID already exists')
+						_('LLD rule prototype with the same UUID already exists')
 					);
 					break;
 			}
@@ -668,21 +676,31 @@ abstract class CItemGeneral extends CApiService {
 
 					switch ($items[$i]['flags']) {
 						case ZBX_FLAG_DISCOVERY_NORMAL:
+						case ZBX_FLAG_DISCOVERY_CREATED:
 								$error = $target_is_host
 								? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
 								: _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
 							break;
 
 						case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED:
 							$error = $target_is_host
 								? _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
 								: _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
 							break;
 
 						case ZBX_FLAG_DISCOVERY_RULE:
+						case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 							$error = $target_is_host
 								? _('Cannot inherit LLD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
 								: _('Cannot inherit LLD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
+
+						case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+						case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit LLD rule prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
 							break;
 					}
 
@@ -785,7 +803,21 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key already exists.');
 						break 2;
 
+					case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+					case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule prototype with the same key already exists.')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule prototype with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_RULE_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because a discovered LLD rule with the same key already exists.')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because a discovered LLD rule with the same key already exists.');
+						break 2;
+
 					case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					case ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED:
 						$error = $target_is_host
 							? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key already exists.')
 							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key already exists.');
@@ -799,49 +831,120 @@ abstract class CItemGeneral extends CApiService {
 				}
 				break;
 
-			case ZBX_FLAG_DISCOVERY_RULE:
-				switch ($upd_db_item['flags']) {
-					case ZBX_FLAG_DISCOVERY_NORMAL:
-						$error = $target_is_host
-							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
-							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
-						break 2;
-
-					case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-						$error = $target_is_host
-							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key already exists.')
-							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key already exists.');
-						break 2;
-
-					case ZBX_FLAG_DISCOVERY_CREATED:
-						$error = $target_is_host
-							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
-							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
-						break 2;
-				}
-				break;
-
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				switch ($upd_db_item['flags']) {
-					case ZBX_FLAG_DISCOVERY_NORMAL:
-						$error = $target_is_host
-							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
-							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
-						break 2;
-
 					case ZBX_FLAG_DISCOVERY_RULE:
 						$error = $target_is_host
 							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule with the same key already exists.')
 							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key already exists.');
 						break 2;
 
+					case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+					case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule prototype with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule prototype with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_RULE_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered LLD rule with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered LLD rule with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_NORMAL:
+						$error = $target_is_host
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
+						break 2;
+
 					case ZBX_FLAG_DISCOVERY_CREATED:
+					case ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED:
 						$error = $target_is_host
 							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
 							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
 				break;
+
+				case ZBX_FLAG_DISCOVERY_RULE:
+				case ZBX_FLAG_DISCOVERY_RULE_CREATED:
+					switch ($upd_db_item['flags']) {
+						case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+						case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule prototype with the same key already exists.')
+								: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule prototype with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_RULE_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because a discovered LLD rule with the same key already exists.')
+								: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because a discovered LLD rule with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_NORMAL:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
+								: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key already exists.')
+								: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+								: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+							break 2;
+					}
+					break;
+
+				case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+				case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+					switch ($upd_db_item['flags']) {
+						case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule prototype with the same key already exists.')
+								: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule prototype with the same key already exists.');
+							break 2;
+
+							case ZBX_FLAG_DISCOVERY_RULE:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule with the same key already exists.')
+								: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_RULE_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered LLD rule with the same key already exists.')
+								: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered LLD rule with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_NORMAL:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
+								: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key already exists.')
+								: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key already exists.');
+							break 2;
+
+						case ZBX_FLAG_DISCOVERY_CREATED:
+							$error = $target_is_host
+								? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+								: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+							break 2;
+					}
+					break;
 		}
 
 		if ($error) {
@@ -862,16 +965,22 @@ abstract class CItemGeneral extends CApiService {
 		));
 
 		switch ($item['flags']) {
-			case ZBX_FLAG_DISCOVERY_NORMAL:
-				$error = $target_is_host
-					? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
-					: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
-				break;
-
 			case ZBX_FLAG_DISCOVERY_RULE:
 				$error = $target_is_host
 					? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule with the same key is already inherited from template "%4$s".')
 					: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key is already inherited from template "%4$s".');
+				break;
+
+			case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+				$error = $target_is_host
+					? _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule prototype with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit LLD rule prototype with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule prototype with the same key is already inherited from template "%4$s".');
+				break;
+
+			case ZBX_FLAG_DISCOVERY_NORMAL:
+				$error = $target_is_host
+					? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
 				break;
 
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
@@ -1768,15 +1877,24 @@ abstract class CItemGeneral extends CApiService {
 					break;
 
 				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_template
 						? _('An item prototype with key "%1$s" already exists on the template "%2$s".')
 						: _('An item prototype with key "%1$s" already exists on the host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_RULE:
+				case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 					$error = $target_is_template
 						? _('An LLD rule with key "%1$s" already exists on the template "%2$s".')
 						: _('An LLD rule with key "%1$s" already exists on the host "%2$s".');
+					break;
+
+				case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+				case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED:
+					$error = $target_is_template
+						? _('An LLD rule prototype with key "%1$s" already exists on the template "%2$s".')
+						: _('An LLD rule prototype with key "%1$s" already exists on the host "%2$s".');
 					break;
 			}
 
@@ -2036,7 +2154,7 @@ abstract class CItemGeneral extends CApiService {
 						$check = true;
 					}
 					else {
-						$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						$error = $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
 							? _('an item/item prototype ID is expected')
 							: _('an item ID is expected');
 
@@ -2057,7 +2175,7 @@ abstract class CItemGeneral extends CApiService {
 							}
 						}
 						else {
-							$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+							$error = $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
 								? _('an item/item prototype ID is expected')
 								: _('an item ID is expected');
 
@@ -2106,11 +2224,15 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_master_items = DBfetchArrayAssoc(DBselect(
-				'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
+				'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.lldruleid AS ruleid'.
 				' FROM items i'.
 				' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 				' WHERE '.dbConditionId('i.itemid', $master_itemids).
-					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+					' AND '.dbConditionInt('i.flags', [
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED
+					])
 			), 'itemid');
 		}
 		else {
@@ -2126,7 +2248,7 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $i => $item) {
 			if (!array_key_exists($item['master_itemid'], $db_master_items)) {
-				$error = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				$error = $flags & ZBX_FLAG_DISCOVERY_PROTOTYPE
 					? _('an item/item prototype ID is expected')
 					: _('an item ID is expected');
 
@@ -2138,7 +2260,7 @@ abstract class CItemGeneral extends CApiService {
 			$db_master_item = $db_master_items[$item['master_itemid']];
 
 			if (bccomp($db_master_item['hostid'], $item['hostid']) != 0) {
-				$error = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				$error = $flags & ZBX_FLAG_DISCOVERY_PROTOTYPE
 					? _('cannot be an item/item prototype ID from another host or template')
 					: _('cannot be an item ID from another host or template');
 
@@ -2147,7 +2269,7 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 
-			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
+			if ($flags & ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
 				$item_ruleid = array_key_exists('itemid', $item)
 					? $db_items[$item['itemid']]['ruleid']
 					: $item['ruleid'];
@@ -2211,7 +2333,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	private static function checkCircularDependencies(array $items, array $dep_item_links): void {
 		foreach ($items as $i => $item) {
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+			if (in_array($item['flags'], CDiscoveryRuleGeneral::FLAGS)) {
 				continue;
 			}
 

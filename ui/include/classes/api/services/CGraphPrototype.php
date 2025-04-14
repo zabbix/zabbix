@@ -50,7 +50,7 @@ class CGraphPrototype extends CGraphGeneral {
 		$sqlParts = [
 			'select'	=> ['graphs' => 'g.graphid'],
 			'from'		=> ['graphs' => 'graphs g'],
-			'where'		=> ['g.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE],
+			'where'		=> ['g.flags IN ('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
@@ -83,6 +83,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
+			'selectDiscoveryRulePrototype'	=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -382,26 +383,42 @@ class CGraphPrototype extends CGraphGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		// adding discoveryRule
-		if (!is_null($options['selectDiscoveryRule'])) {
-			$dbRules = DBselect(
+		if ($options['selectDiscoveryRule'] !== null ||$options['selectDiscoveryRulePrototype'] !== null) {
+			$resource = DBselect(
 				'SELECT id.parent_itemid,gi.graphid'.
-					' FROM item_discovery id,graphs_items gi'.
-					' WHERE '.dbConditionInt('gi.graphid', $graphids).
-						' AND gi.itemid=id.itemid'
+					' FROM item_discovery id,graphs_items gi,items i'.
+					' WHERE '.dbConditionId('gi.graphid', $graphids).
+						' AND gi.itemid=id.itemid'.
+						' AND id.parent_itemid=i.itemid'.
+						' AND '.dbConditionInt('i.flags', CDiscoveryRuleGeneral::FLAGS)
 			);
-			$relationMap = new CRelationMap();
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['graphid'], $relation['parent_itemid']);
+			$relation_map = new CRelationMap();
+
+			while ($relation = DBfetch($resource)) {
+				$relation_map->addRelation($relation['graphid'], $relation['parent_itemid']);
 			}
 
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+			if ($options['selectDiscoveryRule'] !== null) {
+				$lld_rules = API::DiscoveryRule()->get([
+					'output' => $options['selectDiscoveryRule'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
+			}
+
+			if ($options['selectDiscoveryRulePrototype'] !== null) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => $options['selectDiscoveryRulePrototype'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
+			}
 		}
 
 		return $result;

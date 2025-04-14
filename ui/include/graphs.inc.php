@@ -160,16 +160,18 @@ function getGraphParentTemplates(array $graphs, $flag) {
 
 	$all_parent_graphids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_graphs = API::GraphPrototype()->get([
 				'output' => ['graphid', 'templateid'],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'graphids' => array_keys($parent_graphids)
 			]);
 		}
@@ -190,7 +192,9 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']['itemid'];
+				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']
+					? $db_graph['discoveryRule']['itemid']
+					: $db_graph['discoveryRulePrototype']['itemid'];
 			}
 
 			if ($db_graph['templateid'] != 0) {
@@ -209,7 +213,7 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			? $hostids[$parent_graph['graphid']]
 			: 0;
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_graph['lld_ruleid'] = array_key_exists($parent_graph['graphid'], $lld_ruleids)
 				? $lld_ruleids[$parent_graph['graphid']]
 				: 0;

@@ -33,6 +33,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'dcheck' => CDCheck::class,
 		'dhost' => CDHost::class,
 		'discoveryrule' => CDiscoveryRule::class,
+		'discoveryruleprototype' => CDiscoveryRulePrototype::class,
 		'drule' => CDRule::class,
 		'dservice' => CDService::class,
 		'event' => CEvent::class,

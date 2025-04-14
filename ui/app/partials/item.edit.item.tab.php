@@ -20,7 +20,8 @@
  */
 
 $item = $data['item'];
-$readonly = $item['templated'] || $item['discovered'];
+$discovered_prototype = array_key_exists('discovered_prototype', $item) ? $item['discovered_prototype'] : false;
+$readonly = $item['templated'] || $item['discovered'] || $discovered_prototype;
 
 if ($item['discovered']) {
 	$discovered_url = (new CUrl('zabbix.php'))
@@ -898,13 +899,16 @@ else {
 			new CLabel(_('Create enabled'), 'status'),
 			new CFormField(
 				(new CCheckBox('status', ITEM_STATUS_ACTIVE))
-					->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
+					->setChecked($item['status'] == ITEM_STATUS_ACTIVE)
+					->setReadonly($discovered_prototype)
+			)
 		])
 		->addItem([
 			new CLabel(_('Discover'), 'discover'),
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($item['discover'] == ZBX_PROTOTYPE_DISCOVER)
+					->setReadonly($discovered_prototype)
 			)
 		]);
 }

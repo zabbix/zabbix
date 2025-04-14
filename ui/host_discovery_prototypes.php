@@ -19,8 +19,8 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of discovery rules');
-$page['file'] = 'host_discovery.php';
+$page['title'] = _('Configuration of discovery prototypes');
+$page['file'] = 'host_discovery_prototype.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -37,7 +37,7 @@ $evalTypes = [
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && !isset({itemid})'],
-	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update")) || (isset({action}) && {action} == "discoveryprototype.updatediscover")'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
@@ -57,6 +57,7 @@ $fields = [
 								],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
+	'discover' =>				[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -214,9 +215,10 @@ $fields = [
 	'overrides' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
+	'parent_discoveryid' => 	[T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null],
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
-										'"discoveryrule.massenable"'
+									IN('"discoveryprototype.massdelete","discoveryprototype.massdisable",'.
+										'"discoveryprototype.massenable","discoveryprototype.updatediscover"'
 									),
 									null
 								],
@@ -228,45 +230,6 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
-	// filter
-	'filter_set' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_hostids' =>					[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>					[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	null],
-	'filter_key' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_type' =>					[T_ZBX_INT, O_OPT, null,
-											IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
-												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-												ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-												ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
-											]),
-											null
-										],
-	'filter_delay' =>					[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
-	'filter_lifetime_type' =>			[T_ZBX_INT, O_OPT, null,
-											IN([-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER,
-												ZBX_LLD_DELETE_IMMEDIATELY
-											]),
-											null
-										],
-	'filter_lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
-											IN([-1, ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER,
-												ZBX_LLD_DISABLE_IMMEDIATELY
-											]),
-											null
-										],
-	'filter_enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_state' =>					[T_ZBX_INT, O_OPT, null,
-											IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
-											null
-										],
-	'filter_status' =>					[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
-											null
-										],
 	'backurl' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
@@ -282,35 +245,45 @@ unset($_REQUEST[$paramsFieldName]);
  */
 $itemid = getRequest('itemid');
 
-if ($itemid) {
-	$items = API::DiscoveryRule()->get([
-		'output' => ['itemid'],
+if (getRequest('parent_discoveryid')) {
+	$db_parent_discovery = API::DiscoveryRule()->get([
+		'itemids' => getRequest('parent_discoveryid'),
+		'output' => ['itemid', 'flags'],
 		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
-		'itemids' => $itemid,
 		'editable' => true
 	]);
 
-	if (!$items) {
+	if (!$db_parent_discovery) {
+		$db_parent_discovery = API::DiscoveryRulePrototype()->get([
+			'itemids' => getRequest('parent_discoveryid'),
+			'output' => ['itemid', 'flags'],
+			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
+			'editable' => true
+		]);
+	}
+
+	$db_parent_discovery = reset($db_parent_discovery);
+
+	if (!$db_parent_discovery || $db_parent_discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		access_deny();
 	}
 
-	$hosts = $items[0]['hosts'];
-}
-else {
-	$hostid = getRequest('hostid');
+	$hosts = $db_parent_discovery['hosts'];
 
-	if ($hostid) {
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
-			'hostids' => $hostid,
-			'templated_hosts' => true,
+	if ($itemid != 0) {
+		$discovery_prototype = API::DiscoveryRulePrototype()->get([
+			'itemids' => $itemid,
+			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		]);
 
-		if (!$hosts) {
+		if (!$discovery_prototype) {
 			access_deny();
 		}
 	}
+}
+else {
+	access_deny();
 }
 
 // Validate backurl.
@@ -319,117 +292,23 @@ if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('ba
 }
 
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
-
-/**
- * Filter.
- */
 $sort_field = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
 $sort_order = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
 
 CProfile::update($prefix.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
 CProfile::update($prefix.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-if (hasRequest('filter_set')) {
-	CProfile::updateArray($prefix.'host_discovery.filter.groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
-	CProfile::updateArray($prefix.'host_discovery.filter.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
-	CProfile::update($prefix.'host_discovery.filter.name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-	CProfile::update($prefix.'host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
-	CProfile::update($prefix.'host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
-	CProfile::update($prefix.'host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
-	CProfile::update($prefix.'host_discovery.filter.lifetime_type', getRequest('filter_lifetime_type', -1),
-		PROFILE_TYPE_INT
-	);
-	CProfile::update($prefix.'host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
-	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime_type',
-		getRequest('filter_enabled_lifetime_type', -1), PROFILE_TYPE_INT
-	);
-	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime', getRequest('filter_enabled_lifetime', ''),
-		PROFILE_TYPE_STR
-	);
-	CProfile::update($prefix.'host_discovery.filter.snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
-	CProfile::update($prefix.'host_discovery.filter.state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
-	CProfile::update($prefix.'host_discovery.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
-}
-elseif (hasRequest('filter_rst')) {
-	CProfile::deleteIdx($prefix.'host_discovery.filter.groupids');
-
-	if (count(CProfile::getArray($prefix.'host_discovery.filter.hostids', [])) != 1) {
-		CProfile::deleteIdx($prefix.'host_discovery.filter.hostids');
-	}
-
-	CProfile::delete($prefix.'host_discovery.filter.name');
-	CProfile::delete($prefix.'host_discovery.filter.key');
-	CProfile::delete($prefix.'host_discovery.filter.type');
-	CProfile::delete($prefix.'host_discovery.filter.delay');
-	CProfile::delete($prefix.'host_discovery.filter.lifetime_type');
-	CProfile::delete($prefix.'host_discovery.filter.lifetime');
-	CProfile::delete($prefix.'host_discovery.filter.enabled_lifetime_type');
-	CProfile::delete($prefix.'host_discovery.filter.enabled_lifetime');
-	CProfile::delete($prefix.'host_discovery.filter.snmp_oid');
-	CProfile::delete($prefix.'host_discovery.filter.state');
-	CProfile::delete($prefix.'host_discovery.filter.status');
-}
-
-$filter = [
-	'groups' => [],
-	'hosts' => [],
-	'name' => CProfile::get($prefix.'host_discovery.filter.name', ''),
-	'key' => CProfile::get($prefix.'host_discovery.filter.key', ''),
-	'type' => CProfile::get($prefix.'host_discovery.filter.type', -1),
-	'delay' => CProfile::get($prefix.'host_discovery.filter.delay', ''),
-	'lifetime_type' => CProfile::get($prefix.'host_discovery.filter.lifetime_type', -1),
-	'lifetime' => CProfile::get($prefix.'host_discovery.filter.lifetime', ''),
-	'enabled_lifetime_type' => CProfile::get($prefix.'host_discovery.filter.enabled_lifetime_type', -1),
-	'enabled_lifetime' => CProfile::get($prefix.'host_discovery.filter.enabled_lifetime', ''),
-	'snmp_oid' => CProfile::get($prefix.'host_discovery.filter.snmp_oid', ''),
-	'state' => CProfile::get($prefix.'host_discovery.filter.state', -1),
-	'status' => CProfile::get($prefix.'host_discovery.filter.status', -1)
-];
-
-$filter_groupids = CProfile::getArray($prefix.'host_discovery.filter.groupids', []);
-$filter_hostids = CProfile::getArray($prefix.'host_discovery.filter.hostids', []);
-
-// Get host groups.
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
-
-// Get hosts.
-if (getRequest('context') === 'host') {
-	$filter['hosts'] = $filter_hostids
-		? CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostids,
-			'editable' => true,
-			'preservekeys' => true
-		]), ['hostid' => 'id'])
-		: [];
-}
-else {
-	$filter['hosts'] = $filter_hostids
-		? CArrayHelper::renameObjectsKeys(API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $filter_hostids,
-			'editable' => true,
-			'preservekeys' => true
-		]), ['templateid' => 'id'])
-		: [];
-}
-
-$filter_hostids = array_keys($filter['hosts']);
-
-sort($filter_hostids);
-
-$checkbox_hash = crc32(implode('', $filter_hostids));
-
 /*
  * Actions
  */
 if (hasRequest('delete') && hasRequest('itemid')) {
-	$result = API::DiscoveryRule()->delete([getRequest('itemid')]);
+	$result = API::DiscoveryRulePrototype()->delete([$itemid]);
 
 	if ($result) {
-		uncheckTableRows($checkbox_hash);
+		uncheckTableRows($db_parent_discovery['itemid']);
 	}
-	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
+
+	show_messages($result, _('d'), _('Cannot delete discovery prototype'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
@@ -448,7 +327,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if (hasRequest('update')) {
 			$options = $overrides ? ['selectOverrides' => ['step']] : [];
 
-			$db_item = API::DiscoveryRule()->get([
+			$db_item = API::DiscoveryRulePrototype()->get([
 				'output' => ['itemid', 'templateid'],
 				'itemids' => $itemid
 			] + $options)[0];
@@ -471,6 +350,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'key_' => $key,
 			'description' => getRequest('description', DB::getDefault('items', 'description')),
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
+			'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
 			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
 			'lld_macro_paths' => prepareLldMacroPaths(getRequest('lld_macro_paths', [])),
 			'filter' => prepareLldFilter([
@@ -592,15 +472,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (!hasErrorMessages()) {
 			if (hasRequest('add')) {
-				$item = ['hostid' => $hostid];
+				$item = [
+					'ruleid' => getRequest('parent_discoveryid'),
+					'hostid' => $hosts[0]['hostid']
+				];
 
 				$item += getSanitizedItemFields($input + [
 						'templateid' => 0,
-						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
 						'hosts' => $hosts
 					]);
 
-				$response = API::DiscoveryRule()->create($item);
+				$response = API::DiscoveryRulePrototype()->create($item);
 
 				if ($response === false) {
 					throw new Exception();
@@ -609,18 +492,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (hasRequest('update')) {
 				$item = getSanitizedItemFields($input + $db_item + [
-						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
 						'hosts' => $hosts
 					]);
 
-				$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
+				$response = API::DiscoveryRulePrototype()->update(['itemid' => $itemid] + $item);
 
 				if ($response === false) {
 					throw new Exception();
 				}
 			}
 		}
-
 	}
 	catch (Exception $e) {
 		$result = false;
@@ -628,24 +510,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if (hasRequest('add')) {
 		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Discovery rule created'));
+			CMessageHelper::setSuccessTitle(_('Discovery prototype created'));
 		}
 		else {
-			CMessageHelper::setErrorTitle(_('Cannot add discovery rule'));
+			CMessageHelper::setErrorTitle(_('Cannot add discovery prototype'));
 		}
 	}
 	else {
 		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Discovery rule updated'));
+			CMessageHelper::setSuccessTitle(_('Discovery prototype updated'));
 		}
 		else {
-			CMessageHelper::setErrorTitle(_('Cannot update discovery rule'));
+			CMessageHelper::setErrorTitle(_('Cannot update discovery prototype'));
 		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		uncheckTableRows($checkbox_hash);
+		uncheckTableRows($db_parent_discovery['itemid']);
 
 		if (hasRequest('backurl')) {
 			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
@@ -653,32 +535,53 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
-	$itemids = getRequest('g_hostdruleid');
-	$status = (getRequest('action') === 'discoveryrule.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+elseif ($itemid != 0 && getRequest('action', '') === 'discoveryprototype.updatediscover') {
+	$result = API::DiscoveryRulePrototype()->update([
+		'itemid' => $itemid,
+		'discover' => getRequest('discover', DB::getDefault('items', 'discover'))
+	]);
 
-	$lld_rules = [];
-	foreach ($itemids as $itemid) {
-		$lld_rules[] = ['itemid' => $itemid, 'status' => $status];
+	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Discovery prototype updated'));
+	}
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot update discovery prototype'));
 	}
 
-	$result = (bool) API::DiscoveryRule()->update($lld_rules);
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
+		$response->redirect();
+	}
+}
+elseif (hasRequest('action')
+		&& str_in_array(getRequest('action'), ['discoveryprototype.massenable', 'discoveryprototype.massdisable'])
+		&& hasRequest('g_hostdruleid')) {
+	$itemids = getRequest('g_hostdruleid');
+	$status = (getRequest('action') === 'discoveryprototype.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+	$discovery_prototypes = [];
+
+	foreach ($itemids as $itemid) {
+		$discovery_prototypes[] = ['itemid' => $itemid, 'status' => $status];
+	}
+
+	$result = (bool) API::DiscoveryRulePrototype()->update($discovery_prototypes);
 
 	$updated = count($itemids);
 
 	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
+		uncheckTableRows();
 
 		$message = $status == ITEM_STATUS_ACTIVE
-			? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
-			: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
+			? _n('Discovery prototype enabled', 'Discovery prototypes enabled', $updated)
+			: _n('Discovery prototype disabled', 'Discovery prototypes disabled', $updated);
 
 		CMessageHelper::setSuccessTitle($message);
 	}
 	else {
 		$message = $status == ITEM_STATUS_ACTIVE
-			? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
-			: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+			? _n('Cannot enable discovery prototype', 'Cannot enable discovery prototypes', $updated)
+			: _n('Cannot disable discovery prototype', 'Cannot disable discovery prototypes', $updated);
 
 		CMessageHelper::setErrorTitle($message);
 	}
@@ -688,27 +591,28 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 		$response->redirect();
 	}
 }
-elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
-	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
+elseif (hasRequest('action') && getRequest('action') === 'discoveryprototype.massdelete' && hasRequest('g_hostdruleid')) {
+	$result = API::DiscoveryRulePrototype()->delete(getRequest('g_hostdruleid'));
 
 	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
+		uncheckTableRows();
 	}
 
 	$host_drules_count = count(getRequest('g_hostdruleid'));
-	$messageSuccess = _n('Discovery rule deleted', 'Discovery rules deleted', $host_drules_count);
-	$messageFailed = _n('Cannot delete discovery rule', 'Cannot delete discovery rules', $host_drules_count);
+	$messageSuccess = _n('Discovery prototype deleted', 'Discovery prototypes deleted', $host_drules_count);
+	$messageFailed = _n('Cannot delete discovery prototype', 'Cannot delete discovery prototypes', $host_drules_count);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
-	$hostdrules = API::DiscoveryRule()->get([
+	$hostdrules = API::DiscoveryRulePrototype()->get([
 		'output' => [],
 		'itemids' => getRequest('g_hostdruleid'),
 		'editable' => true
 	]);
-	uncheckTableRows($checkbox_hash, zbx_objectValues($hostdrules, 'itemid'));
+
+	uncheckTableRows($db_parent_discovery['itemid'], zbx_objectValues($hostdrules, 'itemid'));
 }
 
 /*
@@ -718,7 +622,7 @@ if (hasRequest('form')) {
 	$master_itemid = getRequest('master_itemid', 0);
 
 	if (hasRequest('itemid') && !hasRequest('clone')) {
-		$items = API::DiscoveryRule()->get([
+		$items = API::DiscoveryRulePrototype()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
@@ -727,8 +631,10 @@ if (hasRequest('form')) {
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'itemids' => $itemid
 		]);
+
 		$item = $items[0];
 		$host = $item['hosts'][0];
+
 		unset($item['hosts']);
 
 		if (!hasRequest('form_refresh')) {
@@ -759,10 +665,6 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
-	if ($host['status'] != HOST_STATUS_TEMPLATE && $host['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-		unset($data['types'][ITEM_TYPE_NESTED]);
-	}
-
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
@@ -773,6 +675,7 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+
 	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
 		throw new CAccessDeniedException();
 	}
@@ -874,24 +777,26 @@ if (hasRequest('form')) {
 		$data['counter'] = key($conditions) + 1;
 	}
 
-	echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
+	echo (new CView('configuration.host.discovery.prototype.edit', $data))->getOutput();
 }
 else {
 	$data = [
-		'filter' => $filter,
-		'hostid' => (count($filter_hostids) == 1) ? reset($filter_hostids) : 0,
+		'hostid' => $hosts[0]['hostid'],
+		'parent_discoveryid' => $db_parent_discovery['itemid'],
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
-		'profileIdx' => $prefix.'host_discovery.filter',
-		'active_tab' => CProfile::get($prefix.'host_discovery.filter.active', 1),
-		'checkbox_hash' => $checkbox_hash,
-		'context' => getRequest('context')
+		'active_tab' => CProfile::get($prefix.'discovery_prototypes.filter.active', 1),
+		'checkbox_hash' => $db_parent_discovery['itemid'],
+		'context' => getRequest('context'),
+		'readonly' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
 	];
 
 	// Select LLD rules.
 	$options = [
+		'discoveryids' => $db_parent_discovery['itemid'],
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['hostid', 'name', 'status'],
+		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -905,79 +810,7 @@ else {
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
-	if ($filter_groupids) {
-		$options['groupids'] = $filter_groupids;
-	}
-
-	if ($filter_hostids) {
-		$options['hostids'] = $filter_hostids;
-	}
-
-	if ($filter['name'] !== '') {
-		$options['search']['name'] = $filter['name'];
-	}
-
-	if ($filter['key'] !== '') {
-		$options['search']['key_'] = $filter['key'];
-	}
-
-	if ($filter['type'] != -1) {
-		$options['filter']['type'] = $filter['type'];
-	}
-
-	/*
-	 * Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in item types
-	 * other than trapper and SNMP trap that allow zeros. For example, when a flexible interval is used. Since trapper
-	 * and SNMP trap items contain zeros, but those zeros should not be displayed, they cannot be filtered by entering
-	 * either zero or any other number in filter field.
-	 */
-	if ($filter['delay'] !== '') {
-		if ($filter['type'] == -1 && $filter['delay'] == 0) {
-			$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-				ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX
-			];
-			$options['filter']['delay'] = $filter['delay'];
-		}
-		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT
-				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) == 0)) {
-			$options['filter']['delay'] = -1;
-		}
-		else {
-			$options['filter']['delay'] = $filter['delay'];
-		}
-	}
-
-	if ($filter['lifetime_type'] != -1) {
-		$options['filter']['lifetime_type'] = $filter['lifetime_type'];
-	}
-
-	if ($filter['lifetime'] !== '') {
-		$options['filter']['lifetime'] = $filter['lifetime'];
-	}
-
-	if ($filter['enabled_lifetime_type'] != -1) {
-		$options['filter']['enabled_lifetime_type'] = $filter['enabled_lifetime_type'];
-	}
-
-	if ($filter['enabled_lifetime'] !== '') {
-		$options['filter']['enabled_lifetime'] = $filter['enabled_lifetime'];
-	}
-
-	if ($filter['snmp_oid'] !== '') {
-		$options['filter']['snmp_oid'] = $filter['snmp_oid'];
-	}
-
-	if ($filter['status'] != -1) {
-		$options['filter']['status'] = $filter['status'];
-	}
-
-	if ($filter['state'] != -1) {
-		$options['filter']['status'] = ITEM_STATUS_ACTIVE;
-		$options['filter']['state'] = $filter['state'];
-	}
-
-	$data['discoveries'] = API::DiscoveryRule()->get($options);
+	$data['discoveries'] = API::DiscoveryRulePrototype()->get($options);
 
 	switch ($sort_field) {
 		case 'delay':
@@ -1008,14 +841,16 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sort_order,
-		(new CUrl('host_discovery.php'))->setArgument('context', $data['context'])
+		(new CUrl('discovery_prototypes.php'))
+			->setArgument('context', $data['context'])
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
-	echo (new CView('configuration.host.discovery.list', $data))->getOutput();
+	echo (new CView('configuration.host.discovery.prototype.list', $data))->getOutput();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

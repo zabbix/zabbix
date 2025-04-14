@@ -52,6 +52,14 @@ class CControllerTriggerPrototypeList extends CController {
 		]);
 
 		if (!$discovery_rule) {
+			$discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['name', 'itemid', 'hostid'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
+		if (!$discovery_rule) {
 			return false;
 		}
 
@@ -88,15 +96,26 @@ class CControllerTriggerPrototypeList extends CController {
 			'sortorder' => $sort_order
 		];
 
-		[$lld] = API::DiscoveryRule()->get([
+		$parent_lld = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
 
+		if (!$parent_lld) {
+			$parent_lld = API::DiscoveryRulePrototype()->get([
+				'output' => ['hostid'],
+				'selectHosts' => ['status'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
+		$parent_lld = reset($parent_lld);
+
 		$context = $this->getInput('context');
-		$is_template_lld = $lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
+		$is_template_lld = $parent_lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
 
 		if (($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld)) {
 			$options = [

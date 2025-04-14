@@ -67,7 +67,7 @@ class CItemPrototype extends CItemGeneral {
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
 			'from'		=> ['items' => 'items i'],
-			'where'		=> ['i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE],
+			'where'		=> ['i.flags IN ('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
@@ -99,6 +99,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
+			'selectDiscoveryRulePrototype'	=> null,
 			'selectPreprocessing'			=> null,
 			'selectTags'					=> null,
 			'selectValueMap'				=> null,
@@ -357,7 +358,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected static function validateCreate(array &$items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -365,6 +367,8 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
+		self::checkDiscoveryRules($items);
+
 		self::addHostStatus($items, $db_hosts, $db_templates);
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
@@ -376,7 +380,7 @@ class CItemPrototype extends CItemGeneral {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
-			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'ruleid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
@@ -419,7 +423,6 @@ class CItemPrototype extends CItemGeneral {
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkPreprocessingStepsDuplicates($items);
-		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
@@ -504,6 +507,9 @@ class CItemPrototype extends CItemGeneral {
 		$count = $this->get([
 			'countOutput' => true,
 			'itemids' => array_column($items, 'itemid'),
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'editable' => true
 		]);
 
@@ -1090,8 +1096,7 @@ class CItemPrototype extends CItemGeneral {
 	private static function getChildObjectsUsingName(array $items, array $hostids, array $lld_links): array {
 		$result = DBselect(
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
-				'ht.templateid AS parent_hostid,id.parent_itemid AS ruleid,'.
-				dbConditionCoalesce('id.parent_itemid', 0, 'ruleid').
+				'ht.templateid AS parent_hostid,'.dbConditionCoalesce('id.parent_itemid', 0, 'ruleid').
 			' FROM hosts_templates ht'.
 			' INNER JOIN items i ON ht.hostid=i.hostid'.
 			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
@@ -1347,7 +1352,7 @@ class CItemPrototype extends CItemGeneral {
 		$db_discovery_rules = DB::select('items', [
 			'output' => ['hostid'],
 			'filter' => [
-				'flags' => ZBX_FLAG_DISCOVERY_RULE,
+				'flags' => [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE],
 				'itemid' => $ruleids
 			],
 			'preservekeys' => true
@@ -1459,16 +1464,35 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-		// adding discoveryrule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		$select_lld_rule = $options['selectDiscoveryRule'] !== null
+			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
+		$select_lld_rule_prototype = $options['selectDiscoveryRulePrototype'] !== null
+			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
+
+		if ($select_lld_rule || $select_lld_rule_prototype) {
+			$relation_map = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
+
+			if ($select_lld_rule) {
+				$lld_rules = API::DiscoveryRule()->get([
+					'output' => $options['selectDiscoveryRule'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
+			}
+
+			if ($select_lld_rule_prototype) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => $options['selectDiscoveryRulePrototype'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
+			}
 		}
 
 		// Adding item tags.

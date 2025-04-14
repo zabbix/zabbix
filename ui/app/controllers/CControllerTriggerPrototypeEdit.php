@@ -72,10 +72,18 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 	protected function checkPermissions(): bool {
 		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
+			'output' => ['itemid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
+
+		if (!$discovery_rule) {
+			$discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
 
 		if (!$discovery_rule) {
 			return false;
@@ -154,7 +162,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'parent_discoveryid' => 0,
 			'discover' => $this->hasInput('form_refresh') ? ZBX_PROTOTYPE_NO_DISCOVER : ZBX_PROTOTYPE_DISCOVER,
 			'url' => '',
-			'url_name' => ''
+			'url_name' => '',
+			'discovered_prototype' => false
 		];
 
 		$this->getInputs($data, array_keys($data));
@@ -205,6 +214,9 @@ class CControllerTriggerPrototypeEdit extends CController {
 			else {
 				$data = $trigger;
 			}
+
+			$data['discovered_prototype'] = $trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& $trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		CTriggerGeneralHelper::getDependencies($data);

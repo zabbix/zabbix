@@ -812,7 +812,7 @@ class CUserMacro extends CApiService {
 		$templated_host_prototypeids = DBfetchColumn(DBselect(
 			'SELECT hd.hostid'.
 			' FROM host_discovery hd,items i,hosts h'.
-			' WHERE hd.parent_itemid=i.itemid'.
+			' WHERE hd.lldruleid=i.itemid'.
 				' AND i.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_TEMPLATE.
 				' AND '.dbConditionId('hd.hostid', array_unique(array_column($hostmacros, 'hostid')))

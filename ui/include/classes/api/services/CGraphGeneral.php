@@ -49,7 +49,7 @@ abstract class CGraphGeneral extends CApiService {
 			['name', 'graphtype', 'ymin_type', 'ymin_itemid', 'ymax_type', 'ymax_itemid', 'yaxismin', 'yaxismax']
 		);
 
-		$db_graphs = $this->get([
+		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => ['gitemid', 'itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc',
 				'type'
@@ -57,7 +57,15 @@ abstract class CGraphGeneral extends CApiService {
 			'graphids' => $graphids,
 			'editable' => true,
 			'preservekeys' => true
-		]);
+		];
+
+		if (static::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$options['filter'] = [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			];
+		}
+
+		$db_graphs = $this->get($options);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 			'messageAllowed' => _('Cannot update a discovered graph.')
@@ -591,6 +599,7 @@ abstract class CGraphGeneral extends CApiService {
 				'output' => ['name', 'value_type', 'hostid'],
 				'selectHosts' => ['status'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'itemids' => $itemids,
 				'preservekeys' => true
 			] + $permission_options);
@@ -692,8 +701,14 @@ abstract class CGraphGeneral extends CApiService {
 				$lld_ruleids = [];
 
 				foreach ($graph['gitems'] as $gitem) {
-					if (array_key_exists('discoveryRule', $db_items[$gitem['itemid']])) {
-						$lld_ruleids[$db_items[$gitem['itemid']]['discoveryRule']['itemid']] = true;
+					$db_item = $db_items[$gitem['itemid']];
+
+					if (array_key_exists('discoveryRule', $db_item) && $db_item['discoveryRule']) {
+						$lld_ruleids[$db_item['discoveryRule']['itemid']] = true;
+					}
+
+					if (array_key_exists('discoveryRulePrototype', $db_item) && $db_item['discoveryRulePrototype']) {
+						$lld_ruleids[$db_item['discoveryRulePrototype']['itemid']] = true;
 					}
 				}
 
@@ -1234,7 +1249,7 @@ abstract class CGraphGeneral extends CApiService {
 		foreach ($hostids_by_name as $name => $_hostids) {
 			$flags = $this instanceof CGraph
 					? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-					: [ZBX_FLAG_DISCOVERY_PROTOTYPE];
+					: [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED];
 			$sql = 'SELECT g.graphid,g.name,g.templateid,g.flags'.
 				' FROM graphs g'.
 				' WHERE '.dbConditionString('g.name', [$name]).
@@ -1264,6 +1279,12 @@ abstract class CGraphGeneral extends CApiService {
 				elseif ($this instanceof CGraph && $chd_graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Graph "%1$s" already exists on "%2$s" as a graph created from graph prototype.',
+						$chd_graph['name'], self::getHostName($hostid)
+					));
+				}
+				elseif ($this instanceof CGraphPrototype && $chd_graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" already exists on "%2$s" as a discovered graph prototype.',
 						$chd_graph['name'], self::getHostName($hostid)
 					));
 				}

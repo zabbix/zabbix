@@ -67,12 +67,23 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 	protected function getInputForApi(): array {
 		$input = $this->getFormValues();
 		$input = CItemPrototypeHelper::convertFormInputForApi($input);
-		[$lld_rule] = API::DiscoveryRule()->get([
+		$lld_rule = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
+
+		if (!$lld_rule) {
+			$lld_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid', 'hostid'],
+				'selectHosts' => ['status'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
+		$lld_rule = reset($lld_rule);
 		$input['hosts'] = $lld_rule['hosts'];
 
 		return ['hostid' => $lld_rule['hostid'], 'ruleid' => $lld_rule['itemid']] + getSanitizedItemFields($input);

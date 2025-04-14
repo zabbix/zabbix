@@ -742,6 +742,13 @@ class CControllerPopupGeneric extends CController {
 			]);
 
 			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'itemids' => $this->getInput('parent_discoveryid')
+				]);
+			}
+
+			if (!$lld_rules) {
 				return false;
 			}
 		}

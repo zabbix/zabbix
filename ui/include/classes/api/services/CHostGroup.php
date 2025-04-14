@@ -53,13 +53,6 @@ class CHostGroup extends CApiService {
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
 			'maintenance_from', 'maintenance_status', 'flags'
 		];
-		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
-			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
-			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-			'ipmi_sensor', 'jmx_endpoint', 'interfaceid', 'username', 'publickey', 'privatekey', 'password', 'snmp_oid',
-			'parameters', 'params', 'delay', 'master_itemid', 'lifetime', 'trapper_hosts', 'allow_traps', 'description',
-			'status', 'state', 'error', 'templateid'
-		];
 		$host_prototype_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
 			'custom_interfaces', 'uuid'
 		];
@@ -94,7 +87,8 @@ class CHostGroup extends CApiService {
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
-			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
+			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
@@ -1063,7 +1057,7 @@ class CHostGroup extends CApiService {
 					'/hosts/'.($i + 1), _('object does not exist, or you have no permissions to it')
 				));
 			}
-			elseif ($db_hosts[$host['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+			elseif ($db_hosts[$host['hostid']]['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/hosts/'.($i + 1),
 					_s('cannot update readonly parameter "%1$s" of discovered object', 'groups')
@@ -1179,25 +1173,35 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		// adding discovery rule
-		if ($options['selectDiscoveryRules'] !== null) {
-			// discovered items
-			$discovery_rules = DBFetchArray(DBselect(
-				'SELECT gd.groupid,hd.parent_itemid'.
-					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupids).
+		if ($options['selectDiscoveryRules'] !== null || $options['selectDiscoveryRulePrototypes']) {
+			$lld_links = DBFetchArray(DBselect(
+				'SELECT gd.groupid,hd.lldruleid'.
+				' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
+				' WHERE '.dbConditionId('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
 					' AND gp.hostid=hd.hostid'
 			));
-			$relation_map = $this->createRelationMap($discovery_rules, 'groupid', 'parent_itemid');
+			$relation_map = $this->createRelationMap($lld_links, 'groupid', 'lldruleid');
 
-			$discovery_rules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRules'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			if ($options['selectDiscoveryRules'] !== null) {
+				$lld_rules = API::DiscoveryRule()->get([
+					'output' => $options['selectDiscoveryRules'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'preservekeys' => true
+				]);
 
-			$result = $relation_map->mapMany($result, $discovery_rules, 'discoveryRules');
+				$result = $relation_map->mapMany($result, $lld_rules, 'discoveryRules');
+			}
+
+			if ($options['selectDiscoveryRulePrototypes'] !== null) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => $options['selectDiscoveryRulePrototypes'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapMany($result, $lld_rules, 'discoveryRulePrototypes');
+			}
 		}
 
 		// adding host prototype

@@ -95,10 +95,11 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token, readonly, query_fields, headers}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers, parent_discoveryid}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
+			this.parent_discoveryid = parent_discoveryid;
 
 			$('#conditions')
 				.dynamicRows({
@@ -349,7 +350,10 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('host_discovery.php', location.href);
+						const url = isNaN(parseInt(this.parent_discoveryid))
+							? new URL('host_discovery.php', location.href)
+							: new URL('host_discovery_prototypes.php', location.href)
+								.searchParams.set('parent_discoveryid', this.parent_discoveryid);
 
 						url.searchParams.set('context', this.context);
 

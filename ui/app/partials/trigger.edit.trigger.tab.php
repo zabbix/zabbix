@@ -20,7 +20,8 @@
  */
 
 $discovered_trigger = array_key_exists('discovered_trigger', $data) ? $data['discovered_trigger'] : false;
-$readonly = $data['readonly'];
+$discovered_prototype = array_key_exists('discovered_prototype', $data) ? $data['discovered_prototype'] : false;
+$readonly = $data['readonly'] || $discovered_prototype;
 
 $trigger_form_grid = new CFormGrid();
 if ($data['templates']) {
@@ -301,12 +302,14 @@ if (array_key_exists('parent_discoveryid', $data)) {
 		->addItem([new CLabel(_('Create enabled'), 'status'),
 			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
 				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
+				->setReadonly($discovered_prototype)
 			)
 		])
 		->addItem([new CLabel(_('Discover'), 'discover'),
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+					->setReadonly($discovered_prototype)
 			)
 		]);
 } else {

@@ -111,7 +111,7 @@ class CControllerItemList extends CControllerItem {
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('uncheck')
 		];
-		unset($data['types'][ITEM_TYPE_HTTPTEST]);
+		unset($data['types'][ITEM_TYPE_HTTPTEST], $data['types'][ITEM_TYPE_NESTED]);
 
 		$items = $this->getItems($data['context'], $filter);
 		$data['filtered_count'] = count($items);
@@ -234,6 +234,7 @@ class CControllerItemList extends CControllerItem {
 		// Types
 		$subfilters['subfilter_types']['labels'] = item_type2str();
 		unset($subfilters['subfilter_types']['labels'][ITEM_TYPE_HTTPTEST]);
+		unset($subfilters['subfilter_types']['labels'][ITEM_TYPE_NESTED]);
 
 		// Type of information
 		$subfilters['subfilter_value_types']['labels'] = [

@@ -132,6 +132,7 @@ class CItem extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectDiscoveryRule'		=> null,
+			'selectDiscoveryRulePrototype'	=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
 			'selectValueMap'			=> null,
@@ -1732,48 +1733,35 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		// adding discoveryrule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$discoveryRules = [];
-			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT id1.itemid,id2.parent_itemid'.
-					' FROM item_discovery id1,item_discovery id2,items i'.
-					' WHERE '.dbConditionInt('id1.itemid', $itemids).
-					' AND id1.parent_itemid=id2.itemid'.
-					' AND i.itemid=id1.itemid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_CREATED
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$relationMap->addRelation($rule['itemid'], $rule['parent_itemid']);
-			}
+		$select_lld_rule = $options['selectDiscoveryRule'] !== null
+			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
+		$select_lld_rule_prototype = $options['selectDiscoveryRulePrototype'] !== null
+			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
 
-			// item prototypes
-			// TODO: this should not be in the item API
-			$dbRules = DBselect(
-				'SELECT id.parent_itemid,id.itemid'.
-					' FROM item_discovery id,items i'.
-					' WHERE '.dbConditionInt('id.itemid', $itemids).
-					' AND i.itemid=id.itemid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$relationMap->addRelation($rule['itemid'], $rule['parent_itemid']);
-			}
+		if ($select_lld_rule || $select_lld_rule_prototype) {
+			$relation_map = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
 
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$discoveryRules = API::DiscoveryRule()->get([
+			if ($select_lld_rule) {
+				$lld_rules = API::DiscoveryRule()->get([
 					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $related_ids,
+					'itemids' => $relation_map->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 			}
 
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+			if ($select_lld_rule_prototype) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => $options['selectDiscoveryRulePrototype'],
+					'itemids' => $relation_map->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
+			}
 		}
 
 		// adding item discovery
@@ -1924,10 +1912,14 @@ class CItem extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDependentItems($db_items, $db_lld_rules, $db_item_prototypes);
+		self::addDependentItems($db_items, $db_lld_rules, $db_lld_rule_prototypes, $db_item_prototypes);
 
 		if ($db_lld_rules) {
 			CDiscoveryRule::deleteForce($db_lld_rules);
+		}
+
+		if ($db_lld_rule_prototypes) {
+			CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
 		}
 
 		if ($db_item_prototypes) {
@@ -1969,11 +1961,13 @@ class CItem extends CItemGeneral {
 	 *
 	 * @param array      $db_items
 	 * @param array|null $db_lld_rules
+	 * @param array|null $db_lld_rule_prototypes
 	 * @param array|null $db_item_prototypes
 	 */
 	protected static function addDependentItems(array &$db_items, ?array &$db_lld_rules = null,
-			?array &$db_item_prototypes = null): void {
+			?array &$db_lld_rule_prototypes = null, ?array &$db_item_prototypes = null): void {
 		$db_lld_rules = [];
+		$db_lld_rule_prototypes = [];
 		$db_item_prototypes = [];
 
 		$master_itemids = array_keys($db_items);
@@ -1988,8 +1982,14 @@ class CItem extends CItemGeneral {
 			$master_itemids = [];
 
 			while ($row = DBfetch($result)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE || $row['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED) {
 					$db_lld_rules[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+				}
+				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
+						|| $row['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED) {
+					$master_itemids[] = $row['itemid'];
+
+					$db_lld_rule_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
 				}
 				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$master_itemids[] = $row['itemid'];

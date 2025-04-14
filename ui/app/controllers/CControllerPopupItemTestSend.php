@@ -63,7 +63,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
 			'http_username'			=> 'string',
-			'flags'					=> 'in '. implode(',', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]),
+			'flags'					=> 'in '. implode(',', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_RULE_CREATED, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]),
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
 			'interface'				=> 'array',

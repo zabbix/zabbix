@@ -166,6 +166,7 @@ class CControllerGraphList extends CController {
 		$options = [
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
@@ -173,9 +174,10 @@ class CControllerGraphList extends CController {
 
 		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['status', 'ts_delete']]);
 
-		foreach ($data['graphs'] as $gnum => $graph) {
-			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+		foreach ($data['graphs'] as &$graph) {
+			$graph['graphtype'] = graphType($graph['graphtype']);
 		}
+		unset($graph);
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 

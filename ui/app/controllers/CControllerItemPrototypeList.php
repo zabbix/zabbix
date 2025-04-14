@@ -39,6 +39,14 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			]);
 
 			if (!$ret) {
+				$ret = (bool) API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid'],
+					'itemids' => $this->getInput('parent_discoveryid'),
+					'editable' => true
+				]);
+			}
+
+			if (!$ret) {
 				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
 			}
 		}
@@ -59,12 +67,24 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			$this->updateProfileSort();
 		}
 
-		[$lld] = API::DiscoveryRule()->get([
+		$lld = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
+
+		if (!$lld) {
+			$lld = API::DiscoveryRulePrototype()->get([
+				'output' => ['hostid'],
+				'selectHosts' => ['status'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
+		$lld = reset($lld);
+
 		$data = [
 			'action' => $this->getAction(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),

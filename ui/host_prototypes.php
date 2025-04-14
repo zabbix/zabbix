@@ -77,7 +77,17 @@ if (getRequest('parent_discoveryid')) {
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
 	]);
+
+	if (!$discoveryRule) {
+		$discoveryRule = API::DiscoveryRulePrototype()->get([
+			'itemids' => getRequest('parent_discoveryid'),
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => true
+		]);
+	}
+
 	$discoveryRule = reset($discoveryRule);
+
 	if (!$discoveryRule) {
 		access_deny();
 	}
@@ -374,6 +384,8 @@ if (hasRequest('form')) {
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
+		'discovered_prototype' => $hostid != 0 && $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			&& $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE,
 		'groups' => [],
 		'tags' => getRequest('tags', []),
 		'context' => getRequest('context'),

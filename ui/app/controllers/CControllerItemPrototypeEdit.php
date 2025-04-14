@@ -124,7 +124,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'item' => $item,
 			'host' => $host,
 			'readonly' => (bool) $item['templateid'],
-			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
+			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST, ITEM_TYPE_NESTED])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
@@ -269,11 +269,15 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 					'verify_host', 'allow_traps', 'discover'
 				],
 				'selectDiscoveryRule' => ['itemid', 'templateid'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')
 			]);
 			$item = CItemPrototypeHelper::convertApiInputForForm($item);
+
+			$item['discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		if (!$item) {

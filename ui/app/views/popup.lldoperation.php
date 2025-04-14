@@ -45,7 +45,8 @@ $operations_popup_form_list = (new CFormList())
 				OPERATION_OBJECT_ITEM_PROTOTYPE => _('Item prototype'),
 				OPERATION_OBJECT_TRIGGER_PROTOTYPE => _('Trigger prototype'),
 				OPERATION_OBJECT_GRAPH_PROTOTYPE => _('Graph prototype'),
-				OPERATION_OBJECT_HOST_PROTOTYPE => _('Host prototype')
+				OPERATION_OBJECT_HOST_PROTOTYPE => _('Host prototype'),
+				OPERATION_OBJECT_LLD_RULE_PROTOTYPE => _('Discovery prototype')
 			]))
 			->setId('operationobject')
 			->setReadonly($options['templated'])

@@ -50,6 +50,14 @@ class CControllerGraphPrototypeList extends CController {
 			'editable' => true
 		]);
 
+		if (!$discovery_rule) {
+			$discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid', 'hostid'],
+				'itemids' => getRequest('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
 		$this->discovery_rule = reset($discovery_rule);
 
 		if (!$discovery_rule) {
@@ -120,16 +128,16 @@ class CControllerGraphPrototypeList extends CController {
 		// Get graphs after paging.
 		$options = [
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
 		];
 
 		$data['graphs'] = API::GraphPrototype()->get($options);
 
-		foreach ($data['graphs'] as $gnum => $graph) {
-			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+		foreach ($data['graphs'] as &$graph) {
+			$graph['graphtype'] = graphType($graph['graphtype']);
 		}
+		unset($graph);
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 

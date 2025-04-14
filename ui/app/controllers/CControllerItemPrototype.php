@@ -177,6 +177,15 @@ abstract class CControllerItemPrototype extends CController {
 				'selectHosts' => ['status'],
 				'itemids' => [$this->getInput('parent_discoveryid')]
 			]);
+
+			if (!$lld) {
+				$lld = API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid'],
+					'selectHosts' => ['status'],
+					'itemids' => [$this->getInput('parent_discoveryid')]
+				]);
+			}
+
 			$ret = (bool) $lld;
 
 			if ($ret) {

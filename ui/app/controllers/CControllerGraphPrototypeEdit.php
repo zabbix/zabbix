@@ -86,6 +86,14 @@ class CControllerGraphPrototypeEdit extends CController {
 		]);
 
 		if (!$discovery_rule) {
+			$discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid', 'hostid'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
+		if (!$discovery_rule) {
 			return false;
 		}
 
@@ -119,7 +127,8 @@ class CControllerGraphPrototypeEdit extends CController {
 			'hostid' => $this->discovery_rule['hostid'],
 			'context' => $this->getInput('context'),
 			'normal_only' => $this->getInput('normal_only', 0),
-			'readonly' => $this->getInput('readonly', 0)
+			'readonly' => $this->getInput('readonly', 0),
+			'discovered_prototype' => false
 		];
 
 		if ($data['graphid'] != 0) {
@@ -156,6 +165,9 @@ class CControllerGraphPrototypeEdit extends CController {
 				'graphids' => $data['graphid'],
 				'sortfield' => 'gitemid'
 			]);
+
+			$data['discovered_prototype'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& $graph['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		else {
 			$data['name'] = $this->getInput('name', '');

@@ -40,8 +40,8 @@ $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addIte
 		$discovered_trigger
 			? null
 			: (new CButtonLink(_('Remove')))
-			->addClass('js-remove-dependency')
-			->setAttribute('data-triggerid', '#{triggerid}'),
+				->addClass('js-remove-dependency')
+				->setAttribute('data-triggerid', '#{triggerid}'),
 		(new CInput('hidden', 'dependencies[]', '#{triggerid}'))
 			->setId('dependencies_'.'#{triggerid}')
 	]))->setId('dependency_'.'#{triggerid}')
@@ -71,24 +71,29 @@ elseif (array_key_exists('parent_discoveryid', $data)) {
 			(new CButton('add_dep_trigger', _('Add')))
 				->setAttribute('data-hostid', $data['hostid'])
 				->setId('add-dep-trigger')
-				->addClass(ZBX_STYLE_BTN_LINK),
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->setEnabled(!$data['readonly']),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
 				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				->setId('add-dep-trigger-prototype')
 				->addClass(ZBX_STYLE_BTN_LINK)
+				->setEnabled(!$data['readonly'])
 		])
 		: new CHorList([
 			(new CButton('add_dep_trigger', _('Add')))
 				->setAttribute('data-templateid', $data['hostid'])
 				->setId('add-dep-template-trigger')
-				->addClass(ZBX_STYLE_BTN_LINK),
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->setEnabled(!$data['readonly']),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
 				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				->setId('add-dep-trigger-prototype')
-				->addClass(ZBX_STYLE_BTN_LINK),
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->setEnabled(!$data['readonly']),
 			(new CButton('add_dep_host_trigger', _('Add host trigger')))
 				->setId('add-dep-host-trigger')
 				->addClass(ZBX_STYLE_BTN_LINK)
+				->setEnabled(!$data['readonly'])
 		]);
 }
 

@@ -288,18 +288,65 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 	}
 
+	$db_lld_prototype_parents = [];
+	$prototype_parents_breadcrumbs = null;
+
 	// get lld-rules
 	if ($lld_ruleid != 0) {
 		$db_discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name'],
+			'output' => ['itemid', 'name'],
+			'itemids' => [$lld_ruleid],
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHostPrototypes' => API_OUTPUT_COUNT,
-			'itemids' => [$lld_ruleid],
+			'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 			'editable' => true
 		]);
+
 		$db_discovery_rule = reset($db_discovery_rule);
+
+		if (!$db_discovery_rule) {
+			// Collect the parents of the current discovery prototype
+			$db_discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => [$lld_ruleid],
+				'selectItems' => API_OUTPUT_COUNT,
+				'selectTriggers' => API_OUTPUT_COUNT,
+				'selectGraphs' => API_OUTPUT_COUNT,
+				'selectHostPrototypes' => API_OUTPUT_COUNT,
+				'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+				'editable' => true
+			]);
+
+			$db_discovery_rule = reset($db_discovery_rule);
+
+			$discovery_parent = $db_discovery_rule['discoveryRule'] ?: $db_discovery_rule['discoveryRulePrototype'];
+			$db_lld_prototype_parents[] = $discovery_parent;
+
+			$db_current_discovery = $db_discovery_rule;
+			$parent = $discovery_parent;
+
+			while (!$db_current_discovery['discoveryRule']) {
+				$db_current_discovery = API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid', 'name'],
+					'discoveryruleids' => [$parent['itemid']],
+					'selectDiscoveryRule' => ['itemid', 'name'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+					'editable' => true
+				])[0];
+
+				$parent = $db_current_discovery['discoveryRule'] ?: $db_current_discovery['discoveryRulePrototype'];
+				$db_lld_prototype_parents[] = $parent;
+			}
+			unset($parent);
+
+			$db_lld_prototype_parents = array_reverse($db_lld_prototype_parents);
+		}
 	}
 
 	$list = new CList();
@@ -483,12 +530,38 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
 				$db_discovery_rule['name'],
-				(new CUrl('host_discovery.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $db_discovery_rule['itemid'])
-					->setArgument('context', $context)
+				$db_lld_prototype_parents
+					? (new CUrl('host_discovery_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $db_discovery_rule['itemid'])
+						->setArgument('parent_discoveryid', $discovery_parent['itemid'])
+						->setArgument('context', $context)
+					: (new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $db_discovery_rule['itemid'])
+						->setArgument('context', $context)
 			)
 		);
+
+		if ($db_lld_prototype_parents) {
+			// Create the new breadcrumb's element /.../ contains the all parents of the current discovery prototype
+			$parents_breadcrumbs_data = [];
+
+			foreach ($db_lld_prototype_parents as $parent) {
+				$parent_url = (new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent['itemid'])
+					->setArgument('context', $context)
+					->getUrl();
+
+				$parents_breadcrumbs_data[] = (new CLink($parent['name'], $parent_url))->addClass(ZBX_STYLE_NOWRAP);
+				$parents_breadcrumbs_data[] = new CSpan(' / ');
+			}
+
+			array_pop($parents_breadcrumbs_data);
+
+			$prototype_parents_breadcrumbs = (new CButtonIcon(ZBX_ICON_MORE))
+				->setHint((new CDiv($parents_breadcrumbs_data)));
+		}
 
 		if ($current_element === 'discoveries') {
 			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
@@ -501,6 +574,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
 			)),
+			$prototype_parents_breadcrumbs,
 			$discovery_rule
 		]));
 
@@ -564,6 +638,22 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			}
 			$content_menu->addItem($host_prototypes);
 		}
+
+		// Discovery prototypes
+		$item_prototypes = new CSpan([
+			new CLink(_('Discovery prototypes'),
+				(new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
+			CViewHelper::showNum($db_discovery_rule['discoveryRulePrototypes'])
+		]);
+
+		if ($current_element === 'lld_prototypes') {
+			$item_prototypes->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$content_menu->addItem($item_prototypes);
 	}
 
 	$list->addItem($content_menu);

@@ -599,9 +599,11 @@ abstract class CHostGeneral extends CHostBase {
 	 */
 	protected static function unlinkTemplatesObjects(array $templateids, ?array $hostids = null,
 			bool $clear = false): void {
-		$flags = ($clear)
+		$flags = $clear
 			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
-			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
+			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
+			];
 
 		// triggers
 		$db_triggers = DBselect(

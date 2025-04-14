@@ -41,7 +41,9 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
-		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
+		$item['parent_discoveryid'] = $item['discoveryRule']
+			? $item['discoveryRule']['itemid']
+			: $item['discoveryRulePrototype']['itemid'];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => true

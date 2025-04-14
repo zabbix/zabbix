@@ -413,6 +413,7 @@ class CRouter {
 		'chart7.php'					=> ['CLegacyAction', null, null],
 		'history.php'					=> ['CLegacyAction', null, null],
 		'host_discovery.php'			=> ['CLegacyAction', null, null],
+		'host_discovery_prototypes.php'	=> ['CLegacyAction', null, null],
 		'host_prototypes.php'			=> ['CLegacyAction', null, null],
 		'hostinventories.php'			=> ['CLegacyAction', null, null],
 		'hostinventoriesoverview.php'	=> ['CLegacyAction', null, null],
