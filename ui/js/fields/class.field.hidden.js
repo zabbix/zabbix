@@ -18,11 +18,18 @@ class CFieldHidden extends CField {
 	init() {
 		super.init();
 
-		const observer = new MutationObserver(() => this.onBlur());
+		const observer = new MutationObserver((observations) => {
+			observations.forEach((obs) => {
+				if (obs.target.value !== obs.oldValue) {
+					this.onBlur();
+				}
+			});
+		});
 
 		observer.observe(this._field, {
 			attributes: true,
-			attributeFilter: ['value']
+			attributeFilter: ['value'],
+			attributeOldValue: true
 		});
 	}
 
@@ -46,10 +53,6 @@ class CFieldHidden extends CField {
 		}
 
 		return value.trim();
-	}
-
-	setTabId(tab_id) {
-		this._tab_id = null;
 	}
 
 	setErrors({message, level}) {

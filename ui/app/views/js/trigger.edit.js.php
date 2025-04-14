@@ -447,8 +447,6 @@ window.trigger_edit_popup = new class {
 
 		this.form.findFieldByName('expression').setErrors({message: '', level: 0});
 		this.form.findFieldByName('expr_temp').setErrors({message: '', level: 0});
-		this.form.findFieldByName('expression').setChanged();
-		this.form.findFieldByName('expr_temp').setChanged();
 		this.form.discoverAllFields();
 		this.form.validateChanges(['expression']);
 	}
@@ -568,7 +566,9 @@ window.trigger_edit_popup = new class {
 
 				if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
 					const table = this.form_element.querySelector('#expression-table');
+					const error_container = table.querySelector('.error-container');
 					table.innerHTML = response.body;
+					table.appendChild(error_container);
 					this.expr_temp.value = response.expression;
 
 					if (table.querySelector('tbody').innerHTML !== '') {
@@ -580,7 +580,9 @@ window.trigger_edit_popup = new class {
 				}
 				else {
 					const table = this.form_element.querySelector('#recovery-expression-table');
+					const error_container = table.querySelector('.error-container');
 					table.innerHTML = response.body;
+					table.appendChild(error_container);
 					this.recovery_expr_temp.value = response.expression;
 
 					if (table.querySelector('tbody').innerHTML !== '') {
