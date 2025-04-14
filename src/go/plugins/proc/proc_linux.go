@@ -281,6 +281,7 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 		}
 		var query *cpuUtilQuery
 		if query, stats.err = newCpuUtilQuery(&q, stats.cmdlinePattern); stats.err != nil {
+			queries = append(queries, query)
 			continue
 		}
 		queries = append(queries, query)
