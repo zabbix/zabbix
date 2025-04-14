@@ -89,12 +89,12 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
-			$options['output'] = array_merge($options['output'], ['delay', 'key_']);
+			$options['output'][] = 'delay';
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
-			$options['output'] = array_merge($options['output'], ['history', 'trends']);
+			$options['output'] = array_merge($options['output'], ['key_', 'history', 'trends']);
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
