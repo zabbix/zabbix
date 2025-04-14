@@ -155,11 +155,11 @@ class WidgetView extends CControllerDashboardWidgetView
 			return null;
 		}
 
-		$item = reset($db_items);
-
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-			[$item] = CArrayHelper::renameObjectsKeys([$item], ['name_resolved' => 'name']);
+			$db_items = CArrayHelper::renameObjectsKeys($db_items, ['name_resolved' => 'name']);
 		}
+
+		$item = reset($db_items);
 
 		$item['problem_count'] = $this->getItemProblemCount($item);
 		$item['parent_templates'] = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL);
@@ -177,11 +177,11 @@ class WidgetView extends CControllerDashboardWidgetView
 				'webitems' => true
 			]);
 
-			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-				$db_master_items = CArrayHelper::renameObjectsKeys($db_master_items, ['name_resolved' => 'name']);
-			}
-
 			if ($db_master_items) {
+				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+					$db_master_items = CArrayHelper::renameObjectsKeys($db_master_items, ['name_resolved' => 'name']);
+				}
+
 				$item['master_item'] = reset($db_master_items);
 			}
 		}
