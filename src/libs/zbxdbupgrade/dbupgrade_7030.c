@@ -391,6 +391,31 @@ static int	DBpatch_7030028(void)
 
 static int	DBpatch_7030029(void)
 {
+	int		i;
+	const char	*values[] = {
+			"web.hosts.graphs.php.sort", "web.hosts.graph.list.sort",
+			"web.hosts.graphs.php.sortorder", "web.hosts.graph.list.sortorder",
+			"web.hosts.graphs.filter_hostids", "web.hosts.graph.list.filter_hostids",
+			"web.hosts.graphs.filter_groupids", "web.hosts.graph.list.filter_groupids",
+			"web.hosts.graphs.filter.active", "web.hosts.graph.list.filter.active",
+			"web.templates.graphs.php.sort", "web.templates.graph.list.sort",
+			"web.templates.graphs.php.sortorder", "web.templates.graph.list.sortorder",
+			"web.templates.graphs.filter_hostids", "web.templates.graph.list.filter_hostids",
+			"web.templates.graphs.filter_groupids", "web.templates.graph.list.filter_groupids",
+			"web.templates.graphs.filter.active", "web.templates.graph.list.filter.active",
+		};
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030030(void)
+{
 	zbx_db_insert_t	db_insert;
 	int		ret;
 
@@ -443,5 +468,6 @@ DBPATCH_ADD(7030026, 0, 1)
 DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
 DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
 
 DBPATCH_END()
