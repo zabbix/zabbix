@@ -333,11 +333,9 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 						(new CFile('idp_certificate_input_file'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->addClass('display-none'),
-						(new CSpan())
-							->setAttribute('style', 'display: block; text-align: center;margin-left: 3px')
-					]))->addStyle('display: inline-block;')
-				]))
-					->setId('idp_certificate_create')
+						(new CSpan())->addClass('filename')
+					]))->addClass('file-upload-btn')
+				]))->setId('idp_certificate_create')
 			]))
 		])
 		->addItem([
@@ -367,11 +365,9 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 						(new CFile('sp_private_key_input_file'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->addClass('display-none'),
-						(new CSpan())
-							->setAttribute('style', 'display: block; text-align: center;margin-left: 3px')
-					]))->addStyle('display: inline-block;')
-				]))
-					->setId('sp_private_key_create')
+						(new CSpan())->addClass('filename')
+					]))->addClass('file-upload-btn')
+				]))->setId('sp_private_key_create')
 			]))
 		])
 		->addItem([
@@ -401,11 +397,9 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 						(new CFile('sp_certificate_input_file'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->addClass('display-none'),
-						(new CSpan())
-							->setAttribute('style', 'display: block; text-align: center;margin-left: 3px')
-					]))->addStyle('display: inline-block;')
-				]))
-					->setId('sp_certificate_create')
+						(new CSpan())->addClass('filename')
+					]))->addClass('file-upload-btn')
+				]))->setId('sp_certificate_create')
 			]))
 		]);
 }

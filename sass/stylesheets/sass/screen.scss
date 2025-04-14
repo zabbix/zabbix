@@ -4183,3 +4183,14 @@ z-select {
 		}
 	}
 }
+
+.file-upload-btn {
+	display: inline-block;
+}
+
+.file-upload-btn .filename {
+	display: block;
+	text-align: center;
+	margin-left: 3px;
+}
+
