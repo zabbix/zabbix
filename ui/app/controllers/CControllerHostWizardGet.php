@@ -82,8 +82,7 @@ class CControllerHostWizardGet extends CController {
 				'output' => ['hostid', 'name', 'active_available'],
 				'selectHostGroups' => ['groupid'],
 				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip'],
-				'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
-				'selectParentTemplates' => ['templateid', 'name', 'link_type', 'wizard_ready', 'readme'],
+				'selectMacros' => ['macro', 'value', 'description', 'type'],
 				'hostids' => $this->getInput('hostid')
 			]);
 			$host = $hosts[0];
@@ -113,7 +112,7 @@ class CControllerHostWizardGet extends CController {
 		$templates = API::Template()->get([
 			'output' => ['templateid', 'name', 'wizard_ready', 'readme'],
 			'selectMacros' => ['macro', 'value', 'description', 'type', 'config'],
-			'hostids' => $this->getInput('templateid')
+			'templateids' => $this->getInput('templateid')
 		]);
 		$template = $templates[0];
 
@@ -131,9 +130,8 @@ class CControllerHostWizardGet extends CController {
 			'output' => ['type'],
 			'templateids' => $template['templateid'],
 			'filter' => [
-				'type' => [array_keys(array_flip($agent_interface_types) + array_flip($snmp_interface_types) +
-					array_flip($ipmi_interface_types) + array_flip($jmx_interface_types))
-				],
+				'type' => array_keys(array_flip($agent_interface_types) + array_flip($snmp_interface_types) +
+					array_flip($ipmi_interface_types) + array_flip($jmx_interface_types)),
 				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE]
 			]
 		]);
@@ -163,16 +161,17 @@ class CControllerHostWizardGet extends CController {
 		 * macros that have no config and converts JSON string for list and checkbox config types to array.
 		 */
 		if ($host && $host['macros']) {
-			foreach ($template['macros'] as &$tmpl_macro) {
+			foreach ($template['macros'] as $m => &$tmpl_macro) {
 				// Skip macros that do no have config set up.
 				if ($tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+					unset($template['macros'][$m]);
 					continue;
 				}
 
 				// Converts list and checkbox config type options to array.
 				if ($tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
 						|| $tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-					$tmpl_macro['config']['options'] = json_decode($tmpl_macro['config'], true);
+					$tmpl_macro['config']['options'] = json_decode($tmpl_macro['config']['options'], true);
 				}
 
 				// Use host macro value if macro name matches.
