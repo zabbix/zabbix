@@ -1161,6 +1161,8 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 
 	char	tmp[MAX_STRING_LEN];
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'@'%s'", __func__, service->username, service->url);
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT,
 			get_vmware_service_objects()[service->type].session_manager);
 
@@ -2869,7 +2871,7 @@ static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *serv
  ******************************************************************************/
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password)
 {
-	int			now;
+	time_t			now;
 	zbx_vmware_service_t	*service = NULL;
 	zbx_vmware_t		*vmw = zbx_vmware_get_vmware();
 

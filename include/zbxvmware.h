@@ -389,7 +389,7 @@ typedef struct
 	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
 	int		job_revision;	/* actual revision of the responsible (last created) job */
 	zbx_uint64_t	top_key;	/* id of newest event */
-	zbx_uint64_t	top_time;	/* time of top_key event */
+	time_t		top_time;	/* time of top_key event */
 	int		expect_num;	/* total number of events in the vc queue */
 
 	/* service event log data object that is swapped with new one during service event log update */
