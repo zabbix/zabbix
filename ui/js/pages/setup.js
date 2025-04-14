@@ -59,6 +59,14 @@ const view = new class {
 
 			case STEP_SETTINGS:
 				document.getElementById('default-theme').addEventListener('change', () => form.submit())
+
+				for (const id of ['zbx_server_tls_box', 'zbx_server_tls_verify_name_box']) {
+					document.getElementById(id).addEventListener('change', () => this._updateSetting());
+
+					console.log(document.getElementById(id))
+				}
+
+				this._updateSetting();
 				break;
 		}
 	}
@@ -152,6 +160,45 @@ const view = new class {
 		}
 		else if (encryption_customizable) {
 			verify_host.removeAttribute('disabled');
+		}
+	}
+
+	_updateSetting() {
+		const zbx_server_tls_box = document.getElementById('zbx_server_tls_box');
+		const zbx_server_tls = document.getElementById('zbx_server_tls');
+		const zbx_server_tls_verify_name_box = document.getElementById('zbx_server_tls_verify_name_box');
+		const zbx_server_tls_verify_name = document.getElementById('zbx_server_tls_verify_name');
+
+		const encryption_enabled = zbx_server_tls_box.checked;
+		const verify_name_enabled = zbx_server_tls_verify_name_box.checked;
+
+		const rows = {
+			'zbx_server_tls_ca_file': encryption_enabled,
+			'zbx_server_tls_key_file': encryption_enabled,
+			'zbx_server_tls_cert_file': encryption_enabled,
+			'zbx_server_tls_certificate_issuer': encryption_enabled,
+			'zbx_server_tls_certificate_subject': encryption_enabled,
+			'zbx_server_tls_verify_name_row': encryption_enabled
+		}
+
+		for (let id in rows) {
+			const element = document.getElementById(id);
+
+			element.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
+		}
+
+		if (encryption_enabled) {
+			zbx_server_tls.setAttribute('value', '1');
+		}
+		else {
+			zbx_server_tls.setAttribute('value', '0');
+		}
+
+		if (verify_name_enabled) {
+			zbx_server_tls_verify_name.setAttribute('value', '1');
+		}
+		else {
+			zbx_server_tls_verify_name.setAttribute('value', '0');
 		}
 	}
 };

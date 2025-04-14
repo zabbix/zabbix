@@ -295,6 +295,27 @@ class CSetupWizard extends CForm {
 		elseif ($this->getStep() == self::STAGE_SETTINGS) {
 			$this->setConfig('ZBX_SERVER_NAME', getRequest('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
 
+			$this->setConfig('ZBX_SERVER_TLS', getRequest('zbx_server_tls', $this->getConfig('ZBX_SERVER_TLS', '0')));
+			$this->setConfig('ZBX_SERVER_TLS_CA_FILE', getRequest('zbx_server_tls_ca_file',
+				$this->getConfig('ZBX_SERVER_TLS_CA_FILE', '')));
+			$this->setConfig('ZBX_SERVER_TLS_KEY_FILE', getRequest('zbx_server_tls_key_file',
+				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE', '')));
+			$this->setConfig('ZBX_SERVER_TLS_CERT_FILE', getRequest('zbx_server_tls_cert_file',
+				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE', '')));
+			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', getRequest('zbx_server_tls_certificate_issuer',
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')));
+			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', getRequest('zbx_server_tls_certificate_subject',
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')));
+			$this->setConfig('ZBX_SERVER_TLS_VERIFY_NAME', getRequest('zbx_server_tls_verify_name',
+				$this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', '')));
+
+//			$is_valid = $this->checkServerTLSConfiguration();
+//
+//			if (!$is_valid) {
+//				$this->step_failed = true;
+//				unset($_REQUEST['next']);
+//			}
+
 			if (hasRequest('next') && array_key_exists(self::STAGE_SETTINGS, getRequest('next'))) {
 				$this->doNext();
 			}
@@ -340,6 +361,29 @@ class CSetupWizard extends CForm {
 						break;
 				}
 
+				if ($this->getConfig('ZBX_SERVER_TLS', '0') == '1') {
+					$server_tls_config = [
+						'ACTIVE' => $this->getConfig('ZBX_SERVER_TLS', '0'),
+						'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
+						'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
+						'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
+						'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
+						'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', ''),
+						'VERIFY_NAME' => $this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', '1'),
+					];
+				}
+				else {
+					$server_tls_config = [
+						'ACTIVE' => '0',
+						'CA_FILE' => '',
+						'KEY_FILE' => '',
+						'CERT_FILE' => '',
+						'CERTIFICATE_ISSUER' => '',
+						'CERTIFICATE_SUBJECT' => '',
+						'VERIFY_NAME' => '1',
+					];
+				}
+
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
@@ -358,7 +402,8 @@ class CSetupWizard extends CForm {
 						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
 						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 					] + $db_creds_config + $vault_config,
-					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
+					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
+					'ZBX_SERVER_TLS' => $server_tls_config
 				];
 				die($config->getString());
 			}
@@ -790,11 +835,89 @@ class CSetupWizard extends CForm {
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setValue($this->getConfig('default_theme'))
 					->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
+			)
+			->addRow(null, new CTag('h2', true, _('Encrypt connections to Zabbix server')))
+			->addRow(_('Encrypt connections'),
+				[
+					(new CCheckBox('zbx_server_tls_box'))->setChecked($this->getConfig('ZBX_SERVER_TLS', 0)),
+					(new CTextBox('zbx_server_tls', $this->getConfig('ZBX_SERVER_TLS', '0')))
+						->addClass(ZBX_STYLE_DISPLAY_NONE)
+				]
+			)
+			->addRow(
+				new CLabel([
+					(new CSpan('* '))->addStyle('color: red'),
+					_('TLS CA file')
+				]),
+				(new CTextBox('zbx_server_tls_ca_file', $this->getConfig('ZBX_SERVER_TLS_CA_FILE', '')))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'zbx_server_tls_ca_file',
+				ZBX_STYLE_DISPLAY_NONE
+			)
+			->addRow(
+				new CLabel([
+					(new CSpan('* '))->addStyle('color: red'),
+					_('TLS key file')
+				]),
+				(new CTextBox('zbx_server_tls_key_file', $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', '')))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'zbx_server_tls_key_file',
+				ZBX_STYLE_DISPLAY_NONE
+			)
+			->addRow(
+				new CLabel([
+					(new CSpan('* '))->addStyle('color: red'),
+					_('TLS certificate file')
+				]),
+				(new CTextBox('zbx_server_tls_cert_file', $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', '')))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'zbx_server_tls_cert_file',
+				ZBX_STYLE_DISPLAY_NONE
+			)
+			->addRow(
+				_('TLS certificate issuer'),
+				(new CTextBox('zbx_server_tls_certificate_issuer',
+					$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')
+				))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'zbx_server_tls_certificate_issuer',
+				ZBX_STYLE_DISPLAY_NONE
+			)
+			->addRow(
+				_('TLS certificate subject'),
+				(new CTextBox('zbx_server_tls_certificate_subject',
+					$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
+				))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'zbx_server_tls_certificate_subject',
+				ZBX_STYLE_DISPLAY_NONE
+			)
+			->addRow(_('TLS check name'),
+				[
+					(new CCheckBox('zbx_server_tls_verify_name_box'))
+						->setChecked($this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', 1)),
+					(new CTextBox('zbx_server_tls_verify_name', $this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', 1)))
+						->addClass(ZBX_STYLE_DISPLAY_NONE)
+				],
+				'zbx_server_tls_verify_name_row',
+				ZBX_STYLE_DISPLAY_NONE
 			);
+
+		if ($this->step_failed) {
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, CMessageHelper::getMessages(),
+				_('TLS fields not filled in correctly, or no access to files.'), false, true
+			);
+		}
+		else {
+			$message_box = null;
+		}
 
 		return [
 			new CTag('h1', true, _('Settings')),
-			(new CDiv($table))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
+			(new CDiv([
+				$message_box,
+				$table
+			]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
 
@@ -941,6 +1064,40 @@ class CSetupWizard extends CForm {
 					(new CSpan(_('Zabbix server name')))->addClass(ZBX_STYLE_GREY),
 					$this->getConfig('ZBX_SERVER_NAME')
 				);
+		}
+
+		$server_tls = $this->getConfig('ZBX_SERVER_TLS');
+
+		$table->addRow(
+			(new CSpan(_('Server TLS encryption')))->addClass(ZBX_STYLE_GREY),
+			$server_tls ? 'true' : 'false'
+		);
+
+		if ($server_tls) {
+			$table->addRow(
+				(new CSpan(_('Server TLS encryption CA file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_CA_FILE')
+			)
+			->addRow(
+				(new CSpan(_('Server TLS encryption key file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE')
+			)
+			->addRow(
+				(new CSpan(_('Server TLS encryption certificate file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE')
+			)
+			->addRow(
+				(new CSpan(_('Server TLS encryption certificate issuer')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
+			)
+			->addRow(
+				(new CSpan(_('Server TLS encryption certificate subject')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT')
+			)
+			->addRow(
+				(new CSpan(_('Server TLS encryption check name')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME') ? 'true' : 'false'
+			);
 		}
 
 		return [
@@ -1262,5 +1419,25 @@ class CSetupWizard extends CForm {
 		}
 
 		return $result;
+	}
+
+	private function checkServerTLSConfiguration(): bool {
+		if ((int)$this->getConfig('ZBX_SERVER_TLS') === 0) {
+			return true;
+		}
+
+		$configFields = ['ZBX_SERVER_TLS_CA_FILE', 'ZBX_SERVER_TLS_KEY_FILE', 'ZBX_SERVER_TLS_CERT_FILE'];
+
+		foreach ($configFields as $field) {
+			$path = $this->getConfig($field, '');
+
+			sdff(file_exists(is_readable($path)));
+			
+			if ($path === '' || !file_exists($path) || !is_readable($path)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

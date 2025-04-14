@@ -192,6 +192,34 @@ class CConfigFile {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
+		if (isset($ZBX_SERVER_TLS['ACTIVE'])) {
+			$this->config['ZBX_SERVER_TLS']['ACTIVE'] = $ZBX_SERVER_TLS['ACTIVE'];
+		}
+
+		if (isset($ZBX_SERVER_TLS['CA_FILE'])) {
+			$this->config['ZBX_SERVER_TLS']['CA_FILE'] = $ZBX_SERVER_TLS['CA_FILE'];
+		}
+
+		if (isset($ZBX_SERVER_TLS['KEY_FILE'])) {
+			$this->config['ZBX_SERVER_TLS']['KEY_FILE'] = $ZBX_SERVER_TLS['KEY_FILE'];
+		}
+
+		if (isset($ZBX_SERVER_TLS['CERT_FILE'])) {
+			$this->config['ZBX_SERVER_TLS']['CERT_FILE'] = $ZBX_SERVER_TLS['CERT_FILE'];
+		}
+
+		if (isset($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'])) {
+			$this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'] = $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'];
+		}
+
+		if (isset($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'])) {
+			$this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'] = $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'];
+		}
+
+		if (isset($ZBX_SERVER_TLS['VERIFY_NAME'])) {
+			$this->config['ZBX_SERVER_TLS']['VERIFY_NAME'] = $ZBX_SERVER_TLS['VERIFY_NAME'];
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
@@ -199,7 +227,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH;
+			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -209,6 +237,7 @@ class CConfigFile {
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
+		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
 	public function save() {
@@ -307,6 +336,14 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
+
+$ZBX_SERVER_TLS[\'ACTIVE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['ACTIVE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['KEY_FILE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
+$ZBX_SERVER_TLS[\'VERIFY_NAME\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['VERIFY_NAME'], "'\\").'\';
 ';
 	}
 
@@ -341,5 +378,14 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;
+		$this->config['ZBX_SERVER_TLS'] = [
+			'ACTIVE' => 0,
+			'CA_FILE' => '',
+			'KEY_FILE' => '',
+			'CERT_FILE' => '',
+			'CERTIFICATE_ISSUER' => '',
+			'CERTIFICATE_SUBJECT' => '',
+			'VERIFY_NAME' => 1
+		];
 	}
 }
