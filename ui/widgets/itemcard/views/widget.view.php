@@ -203,11 +203,13 @@ function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'item.edit')
 		->setArgument('context', $context)
-		->setArgument('itemid', $item['itemid'])
+		->setArgument('itemid', $item['master_itemid'])
 		->getUrl();
 
 	if ($item['discoveryRule']) {
-		$path[] = '>';
+		if ($path) {
+			$path[] = '>';
+		}
 
 		$path[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('zabbix.php'))
@@ -221,7 +223,9 @@ function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_
 	}
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$path[] = '>';
+		if ($path) {
+			$path[] = '>';
+		}
 
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
 			$path[] = (new CDiv($item['master_item']['name']))
