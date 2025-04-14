@@ -486,7 +486,7 @@ class CTemplate extends CHostGeneral {
 		];
 
 		$api_input_checkbox_rules = [
-			'type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+			'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 				'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]
@@ -495,26 +495,33 @@ class CTemplate extends CHostGeneral {
 		foreach ($templates as $t => &$template) {
 			if (array_key_exists('macros', $template) && $template['macros']) {
 				$m = 0;
+
 				foreach ($template['macros'] as &$macro) {
 					if (array_key_exists('config', $macro) && ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
 							|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX)) {
 						$options = json_decode($macro['config']['options'], true);
+						$path = '/'.($t + 1).'/macros/'.($m + 1).'/config/options';
 
 						if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
-							if (!CApiInputValidator::validate($api_input_list_rules, $options,
-									'/'.($t + 1).'/macros/'.($m + 1).'/config/options', $error)) {
+							if (!CApiInputValidator::validate($api_input_list_rules, $options, $path, $error)) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 							}
 						}
 						else {
-							if (!CApiInputValidator::validate($api_input_checkbox_rules, $options,
-									'/'.($t + 1).'/macros/'.($m + 1).'/config/options', $error)) {
+							if (!CApiInputValidator::validate($api_input_checkbox_rules, $options, $path, $error)) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+							}
+
+							if (count($options) > 1) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+									_('only one option is allowed')
+								));
 							}
 						}
 
 						$macro['config']['options'] = json_encode($options);
 					}
+
 					$m++;
 				}
 				unset($macro);

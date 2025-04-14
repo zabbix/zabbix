@@ -21,13 +21,6 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	protected $xmlWriter;
 
-	/**
-	 * @var array
-	 */
-	protected $ambiguous_nodes = [
-		'options' => 'option'
-	];
-
 	public function __construct() {
 		$this->xmlWriter = new XMLWriter();
 	}
@@ -60,8 +53,7 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	protected function fromArray(array $array, $parentName = null) {
 		foreach ($array as $name => $value) {
-			if ($newName = $this->mapName($parentName,
-					in_array($parentName, array_keys($this->ambiguous_nodes)) && !is_numeric($name) ? true : false)) {
+			if ($newName = $this->mapName($parentName)) {
 				$this->xmlWriter->startElement($newName);
 			}
 			else {
@@ -89,11 +81,10 @@ class CXmlExportWriter extends CExportWriter {
 	 * Returns sub node name based on parent node name.
 	 *
 	 * @param string $name
-	 * @param bool   $skip
 	 *
 	 * @return bool
 	 */
-	private function mapName($name, $skip = false) {
+	private function mapName($name) {
 		$map = [
 			'conditions' => 'condition',
 			'dashboards' => 'dashboard',
@@ -146,12 +137,9 @@ class CXmlExportWriter extends CExportWriter {
 			'urls' => 'url',
 			'valuemaps' => 'valuemap',
 			'variables' => 'variable',
-			'widgets' => 'widget'
+			'widgets' => 'widget',
+			'options' => 'option'
 		];
-
-		if (!$skip && array_key_exists($name, $this->ambiguous_nodes)) {
-			$map[$name] = $this->ambiguous_nodes[$name];
-		}
 
 		return isset($map[$name]) ? $map[$name] : false;
 	}
