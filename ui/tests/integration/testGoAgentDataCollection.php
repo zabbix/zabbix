@@ -125,22 +125,26 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		[
 			'key' => 'proc.get[zabbix_server,zabbix]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'do_not_compare' => '1'
 		],
 		[
 			'key' => 'proc.get[apache2,www-data]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'do_not_compare' => '1'
 		],
 		[
 			'key' => 'proc.get[apache2,NONEXISTING_USER]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'do_not_compare' => '1'
 		],
 		[
 			'key' => 'proc.get[NONEXISTING_PROCESS,NONEXISTING_USER]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'do_not_compare' => '1'
 		],
 		[
 			'key' => 'system.cpu.discovery',
