@@ -251,16 +251,14 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 	return true
 }
 
-func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery) {
+func newCpuUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery, err error) {
 	query = &cpuUtilQuery{procQuery: *q}
 	if q.user != "" {
 		var u *user.User
-		var err error
-
 		if u, err = user.Lookup(q.user); err != nil {
 			return
 		}
-		if query.userid, _ = strconv.ParseInt(u.Uid, 10, 64); err != nil {
+		if query.userid, err = strconv.ParseInt(u.Uid, 10, 64); err != nil {
 			return
 		}
 	}
@@ -281,9 +279,11 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 			delete(p.queries, q)
 			continue
 		}
-
-		query := newCPUUtilQuery(&q, stats.cmdlinePattern)
-
+		var query *cpuUtilQuery
+		if query, stats.err = newCpuUtilQuery(&q, stats.cmdlinePattern); stats.err != nil {
+			p.Debugf("cannot create CPU utilization query %+v: %s", q, stats.err)
+			continue
+		}
 		queries = append(queries, query)
 		stats.scanid = p.scanid
 		if q.name != "" {
@@ -513,7 +513,9 @@ func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags in
 		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
 	}
 
-	query = newCPUUtilQuery(q, regxp)
+	if query, err = newCpuUtilQuery(q, regxp); err != nil {
+		return nil, 0, fmt.Errorf("cannot create CPU utilization query %+v: %s", q, err.Error())
+	}
 
 	if q.name != "" {
 		flags |= procInfoName | procInfoCmdline
