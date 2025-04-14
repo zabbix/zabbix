@@ -432,6 +432,13 @@ static int	DBpatch_7030030(void)
 	return ret;
 }
 
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_field_t	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -469,5 +476,6 @@ DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
 DBPATCH_ADD(7030029, 0, 1)
 DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
 
 DBPATCH_END()
