@@ -204,6 +204,10 @@ class WidgetView extends CControllerDashboardWidgetView
 			$this->prepareItemHistoryAndTrends($item);
 		}
 
+		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
+			$item['tags'] = CItemHelper::addInheritedTags($item, $item['tags']);
+		}
+
 		return $item;
 	}
 
