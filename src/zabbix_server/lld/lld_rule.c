@@ -1580,7 +1580,7 @@ static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *
 		}
 		else
 		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", row->cols[i]);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%d", atoi(row->cols[i]));
 		}
 
 		if (LLD_OVERRIDE_COL_FORMULA == i || LLD_OVERRIDE_COL_EVALTYPE == i)
