@@ -40,6 +40,7 @@ class CIPParser extends CParser {
 	 *   'usermacros' => true  Enabled support of user macros;
 	 *   'lldmacros' => true   Enabled support of LLD macros;
 	 *   'macros' => true      Enabled support of all macros. Allows array with list of macros.
+	 *   'macros' => []        Allows array with list of macros. Empty array or false means no macros supported.
 	 *
 	 * @var array
 	 */
