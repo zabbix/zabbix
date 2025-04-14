@@ -230,19 +230,23 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 	zbx_vector_poller_item_create(&poller_items);
 #ifdef HAVE_NETSNMP
-	if (1 == poller_config->clear_cache)
+	if (0 != poller_config->clear_cache)
 	{
 		if (0 != poller_config->processing)
-		{
 			goto exit;
-		}
-		else
+
+		if (ZBX_SNMP_POLLER_CLEAR_CACHE == poller_config->clear_cache)
 		{
 			zbx_unset_snmp_bulkwalk_options();
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options(zbx_progname);
-			poller_config->clear_cache = 0;
 		}
+		else if (ZBX_SNMP_POLLER_HOUSEKEEP_CACHE == poller_config->clear_cache)
+		{
+			zbx_housekeep_snmp_engineid_cache();
+		}
+
+		poller_config->clear_cache = 0;
 	}
 #else
 	ZBX_UNUSED(zbx_progname);
@@ -797,7 +801,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 				case ZBX_RTC_SNMP_CACHE_RELOAD:
 
 					if (ZBX_POLLER_TYPE_SNMP == poller_type)
-						poller_config.clear_cache = 1;
+						poller_config.clear_cache = ZBX_SNMP_POLLER_CLEAR_CACHE;
 					break;
 			}
 #endif
@@ -809,8 +813,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
 			last_snmp_engineid_hk_time = time(NULL);
-			zbx_housekeep_snmp_engineid_cache();
-			poller_config.clear_cache = 1;
+			poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
