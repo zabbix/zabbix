@@ -195,7 +195,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 					'label_location', 'show_label', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype',
-					'areatype', 'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'tags', 'evaltype'
+					'areatype', 'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'tags', 'evaltype', 'zindex'
 				],
 				'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
 					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',

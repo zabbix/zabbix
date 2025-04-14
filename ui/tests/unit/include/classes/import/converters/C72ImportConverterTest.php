@@ -19,9 +19,21 @@ class C72ImportConverterTest extends CImportConverterTest {
 	public function importConverterDataProviderMaps(): array {
 		return [
 			[
+				[],
+				[]
+			],
+			[
 				[
 					'maps' => [
 						[
+							'selements' => [
+								[
+									'label' => 'element-01'
+								],
+								[
+									'label' => 'element-02'
+								]
+							],
 							'links' => [
 								[
 									'drawtype' => 3,
@@ -38,6 +50,16 @@ class C72ImportConverterTest extends CImportConverterTest {
 				[
 					'maps' => [
 						[
+							'selements' => [
+								[
+									'label' => 'element-01',
+									'zindex' => '0'
+								],
+								[
+									'label' => 'element-02',
+									'zindex' => '1'
+								]
+							],
 							'background_scale' => CXmlConstantName::MAP_BACKGROUND_SCALE_NONE,
 							'links' => [
 								[
