@@ -16,6 +16,8 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxcachevalue.h"
@@ -26,6 +28,7 @@
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 #include "audit/zbxaudit.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
