@@ -33,7 +33,7 @@ $form_list = (new CFormList())
 	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
 		(new CColorPicker())
-			->setName('problem_unack_color')
+			->setColorFieldName('problem_unack_color')
 			->setValue($data['problem_unack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -46,7 +46,7 @@ $form_list = (new CFormList())
 	])
 	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
 		(new CColorPicker())
-			->setName('problem_ack_color')
+			->setColorFieldName('problem_ack_color')
 			->setValue($data['problem_ack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -59,7 +59,7 @@ $form_list = (new CFormList())
 	])
 	->addRow((new CLabel(_('Unacknowledged RESOLVED events'), 'ok_unack_color'))->setAsteriskMark(), [
 		(new CColorPicker())
-			->setName('ok_unack_color')
+			->setColorFieldName('ok_unack_color')
 			->setValue($data['ok_unack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -72,7 +72,7 @@ $form_list = (new CFormList())
 	])
 	->addRow((new CLabel(_('Acknowledged RESOLVED events'), 'ok_ack_color'))->setAsteriskMark(), [
 		(new CColorPicker())
-			->setName('ok_ack_color')
+			->setColorFieldName('ok_ack_color')
 			->setValue($data['ok_ack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -103,7 +103,7 @@ $form_list = (new CFormList())
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CColorPicker())
-			->setName('severity_color_0')
+			->setColorFieldName('severity_color_0')
 			->setValue($data['severity_color_0'])
 	])
 	->addRow((new CLabel(_('Information'), 'severity_name_1'))->setAsteriskMark(), [
@@ -114,7 +114,7 @@ $form_list = (new CFormList())
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CColorPicker())
-			->setName('severity_color_1')
+			->setColorFieldName('severity_color_1')
 			->setValue($data['severity_color_1'])
 	])
 	->addRow((new CLabel(_('Warning'), 'severity_name_2'))->setAsteriskMark(), [
@@ -125,7 +125,7 @@ $form_list = (new CFormList())
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CColorPicker())
-			->setName('severity_color_2')
+			->setColorFieldName('severity_color_2')
 			->setValue($data['severity_color_2'])
 	])
 	->addRow((new CLabel(_('Average'), 'severity_name_3'))->setAsteriskMark(), [
@@ -136,7 +136,7 @@ $form_list = (new CFormList())
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CColorPicker())
-			->setName('severity_color_3')
+			->setColorFieldName('severity_color_3')
 			->setValue($data['severity_color_3'])
 	])
 	->addRow((new CLabel(_('High'), 'severity_name_4'))->setAsteriskMark(), [
@@ -147,7 +147,7 @@ $form_list = (new CFormList())
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CColorPicker())
-			->setName('severity_color_4')
+			->setColorFieldName('severity_color_4')
 			->setValue($data['severity_color_4'])
 	])
 	->addRow((new CLabel(_('Disaster'), 'severity_name_5'))->setAsteriskMark(), [
@@ -158,7 +158,7 @@ $form_list = (new CFormList())
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CColorPicker())
-			->setName('severity_color_5')
+			->setColorFieldName('severity_color_5')
 			->setValue($data['severity_color_5'])
 	])
 	->addRow(null)
