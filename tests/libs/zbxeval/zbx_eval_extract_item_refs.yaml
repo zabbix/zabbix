@@ -15,3 +15,13 @@ in:
 out:
   refs:
   - "/host/key"
+---
+test case: 'Tets with str'
+in:
+  variant_str:
+  - "1"
+  - "2"
+out:
+  refs:
+  - '4'
+...

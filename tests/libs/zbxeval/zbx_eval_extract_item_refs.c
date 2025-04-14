@@ -28,11 +28,28 @@ static int	compare_vectors_str(zbx_vector_str_t *v1, zbx_vector_str_t *v2)
 
 	for (int i = 0; i < v1->values_num; i++)
 	{
-		if (FAIL == strcmp(v1->values[i],v2->values[i]))
+		if (SUCCEED != strcmp(v1->values[i],v2->values[i]))
 			return FAIL;
 	}
 
 	return SUCCEED;
+}
+
+static void	parse_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *v)
+{
+	for (int i = 0; i < v->values_num; i++)
+	{
+		ctx->stack.values[i].value.data.str = zbx_strdup(NULL, v->values[i]);
+		ctx->stack.values[i].value.type = ZBX_VARIANT_STR;
+	}
+}
+
+static void	print_str_vector(zbx_vector_str_t *v)
+{
+	for (int i = 0; i < v->values_num; i++)
+	{
+		printf("vector value: %s\n", v->values[i]);
+	}
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -41,23 +58,34 @@ void	zbx_mock_test_entry(void **state)
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
-	zbx_vector_str_t	refs, exp_refs;
+	zbx_vector_str_t	refs, exp_refs, parametrs;
 
 	ZBX_UNUSED(state);
 
-	rules = mock_eval_read_rules("in.rules");
-	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
-
-	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
-	else
-		mock_dump_stack(&ctx);
-
 	zbx_vector_str_create(&refs);
+
+	if (SUCCEED == zbx_mock_parameter_exists("in.variant_str"))
+	{
+		zbx_vector_str_create(&parametrs);
+		zbx_mock_extract_yaml_values_str("in.variant_str", &parametrs);
+		parse_item_refs(&ctx, &parametrs);
+	}
+	else
+	{
+		rules = mock_eval_read_rules("in.rules");
+		returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules,
+				&error);
+
+		if (SUCCEED != returned_ret)
+			printf("ERROR: %s\n", error);
+		else
+			mock_dump_stack(&ctx);
+	}
+
 	zbx_eval_extract_item_refs(&ctx, &refs);
 	zbx_vector_str_create(&exp_refs);
 	zbx_mock_extract_yaml_values_str("out.refs", &exp_refs);
-
+	print_str_vector(&refs);
 	zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_str(&refs,&exp_refs));
 	zbx_vector_str_clear_ext(&exp_refs, zbx_str_free);
 	zbx_vector_str_destroy(&exp_refs);

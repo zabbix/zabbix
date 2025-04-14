@@ -1983,7 +1983,7 @@ static int	eval_function_common(const char *name, size_t len, int args_num, zbx_
  ******************************************************************************/
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx)
 {
-	int			i;
+	int			i;		zabbix_log(LOG_LEVEL_INFORMATION, "IT IS WORKING");
 	zbx_expression_query_t	*query;
 	zbx_vector_str_t	filters;
 
