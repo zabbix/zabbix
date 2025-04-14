@@ -513,7 +513,6 @@ func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags in
 	}
 
 	if query, err = newCpuUtilQuery(q, regxp); err != nil {
-		//return nil, 0, fmt.Errorf("cannot create CPU utilization query %+v: %s", q, err.Error())
 		return query, 0, nil
 	}
 
