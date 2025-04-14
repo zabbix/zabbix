@@ -55,9 +55,7 @@ elseif ($data['item']) {
 					ITEM_VALUE_TYPE_BINARY => _('Binary')
 				];
 
-				$information_type = $value_types[$item['value_type']];
-
-				$sections[] = makeSectionSingleParameter(_('Type of information'), $information_type);
+				$sections[] = makeSectionSingleParameter(_('Type of information'), $value_types[$item['value_type']]);
 				break;
 
 			case CWidgetFieldItemSections::SECTION_HOST_INTERFACE:
@@ -125,8 +123,8 @@ else {
 function makeSectionsHeader(array $item, string $context, bool $allowed_ui_conf_templates): CDiv {
 	$item_status = '';
 	$problems_indicator = '';
-	$error_text = null;
-	$item_discovery = null;
+	$error_text = '';
+	$item_discovery = '';
 
 	if ($item['status'] == ITEM_STATUS_ACTIVE) {
 		$problems = [];
@@ -334,9 +332,9 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 			(new CDiv(
 				$trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
 					? [
-					_('Problem'), ': ', $trigger['expression'], BR(),
-					_('Recovery'), ': ', $trigger['recovery_expression']
-				]
+						_('Problem'), ': ', $trigger['expression'], BR(),
+						_('Recovery'), ': ', $trigger['recovery_expression']
+					]
 					: $trigger['expression']
 			))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
@@ -480,9 +478,10 @@ function makeSectionLatestData(array $item): CDiv {
 		$is_numeric = $item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64;
 
 		if ($item['keep_history'] != 0 || $item['keep_trends'] != 0) {
-			$action_column->addItem((new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
-				->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
-				->setArgument('itemids[]', $item['itemid'])
+			$action_column->addItem(
+				(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
+					->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
+					->setArgument('itemids[]', $item['itemid'])
 			)))->addClass('column-header');
 		}
 
