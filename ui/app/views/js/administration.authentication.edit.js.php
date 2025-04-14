@@ -23,7 +23,8 @@
 	const view = new class {
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed
+				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
+				saml_idp_certificate, saml_sp_certificate, saml_sp_private_key
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -55,6 +56,7 @@
 			this.#addMfaMethods(mfa_methods, mfa_default_row_index);
 			this.#setTableVisiblityState(this.mfa_table, mfa_readonly);
 			this.#disableRemoveLinksWithUserGroups(this.mfa_table);
+			this.#showHideSamlChangeIdentityButton(saml_idp_certificate, saml_sp_certificate, saml_sp_private_key);
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
 		}
@@ -126,9 +128,37 @@
 			});
 
 			// SSO upload
-			this.form.querySelectorAll('.saml-identity-buttons').forEach(field => {
-				field.addEventListener('click', (e) => {
-					console.log(field)
+			this.form.querySelectorAll('.saml-change-identity-button').forEach(change_button => {
+				change_button.addEventListener('click', (e) => {
+					const file_content = change_button.closest('div').nextElementSibling;
+
+					file_content.classList.remove('display-none');
+					change_button.classList.add('display-none');
+				});
+			});
+
+			this.form.querySelectorAll('.saml-upload-identity-button').forEach(upload_button => {
+				const file_input = upload_button.parentElement.querySelector('input[type="file"]');
+				const file_content = file_input.closest('div').previousElementSibling;
+				const file_name = upload_button.parentElement.querySelector('span');
+
+				upload_button.addEventListener("click", function() {
+					file_input.click();
+				});
+
+				file_input.addEventListener("change", function(event) {
+					const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+
+					if (file) {
+						const reader = new FileReader();
+
+						reader.onload = function(e) {
+							file_content.value = e.target.result;
+							file_name.textContent = file.name;
+						};
+
+						reader.readAsText(file);
+					}
 				});
 			});
 			// End SSO upload
@@ -752,6 +782,44 @@
 					row.remove();
 				}
 			});
+		}
+
+		#showHideSamlChangeIdentityButton(saml_idp_certificate, saml_sp_certificate, saml_sp_private_key) {
+			const idp_certificate_change = document.getElementById('idp_certificate_change');
+			const idp_certificate_create = document.getElementById('idp_certificate_create');
+
+			const sp_certificate_change = document.getElementById('sp_certificate_change');
+			const sp_certificate_create = document.getElementById('sp_certificate_create');
+
+			const sp_private_key_change = document.getElementById('sp_private_key_change');
+			const sp_private_key_create = document.getElementById('sp_private_key_create');
+
+			if (saml_idp_certificate != '') {
+				idp_certificate_change.classList.remove('display-none');
+				idp_certificate_create.classList.add('display-none');
+			}
+			else {
+				idp_certificate_change.classList.add('display-none');
+				idp_certificate_create.classList.remove('display-none');
+			}
+
+			if (saml_sp_certificate != '') {
+				sp_certificate_change.classList.remove('display-none');
+				sp_certificate_create.classList.add('display-none');
+			}
+			else {
+				sp_certificate_change.classList.add('display-none');
+				sp_certificate_create.classList.remove('display-none');
+			}
+
+			if (saml_sp_private_key != '') {
+				sp_private_key_change.classList.remove('display-none');
+				sp_private_key_create.classList.add('display-none');
+			}
+			else {
+				sp_private_key_change.classList.add('display-none');
+				sp_private_key_create.classList.remove('display-none');
+			}
 		}
 	};
 </script>

@@ -88,7 +88,7 @@ if (!array_key_exists('CERT_STORAGE', $SSO) || ($SSO['CERT_STORAGE'] != 'databas
 }
 else {
 	$certs = [
-		'SP_KEY' =>$saml_settings['sp_private_key'],
+		'SP_KEY' => $saml_settings['sp_private_key'],
 		'SP_CERT' => $saml_settings['sp_certificate'],
 		'IDP_CERT' => $saml_settings['idp_certificate']
 	];
