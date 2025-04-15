@@ -119,6 +119,8 @@ class CWidgetEditSandbox {
 			this.#widget = this.#dashboard.replaceWidgetFromData(this.#dashboard_page, widget, widget_data);
 		}
 
+		this.#widget.enterWidgetEditing(true);
+
 		if (widget_data.type !== widget.getType()) {
 			this.#correctListeners();
 		}

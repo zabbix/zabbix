@@ -41,7 +41,7 @@ const WIDGET_STATE_DESTROYED = 'destroyed';
  * dashboard page and other widgets.
  */
 
-// Widget edit event: informs the dashboard page to enter the editing mode.
+// Widget edit event: informs the dashboard page to enter the dashboard editing mode.
 const WIDGET_EVENT_EDIT = 'widget-edit';
 
 // Widget actions event: informs the dashboard page to display the widget actions popup menu.
@@ -131,7 +131,7 @@ class CWidgetBase {
 	 * @param {number}      cell_width          Dashboard page cell width in percentage.
 	 * @param {number}      cell_height         Dashboard page cell height in pixels.
 	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
-	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
+	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the dashboard editing mode.
 	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
 	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
@@ -751,7 +751,7 @@ class CWidgetBase {
 	// External events management methods.
 
 	/**
-	 * Check whether the widget is in editing mode.
+	 * Check whether the widget is in dashboard editing mode.
 	 *
 	 * @returns {boolean}
 	 */
@@ -760,7 +760,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Set widget to editing mode. This is one-way action.
+	 * Set widget to dashboard editing mode. This is one-way action.
 	 */
 	setEditMode() {
 		this._is_edit_mode = true;
@@ -787,12 +787,12 @@ class CWidgetBase {
 	 */
 	enterWidgetEditing(self) {
 		this._target.classList.add('is-editing');
+		this._button_actions.disabled = true;
 
 		if (self) {
 			this._target.classList.add('is-editing-self');
+			this._button_edit.disabled = true;
 		}
-
-		this._button_actions.disabled = true;
 	}
 
 	/**
@@ -802,6 +802,7 @@ class CWidgetBase {
 		this._target.classList.remove('is-editing', 'is-editing-self');
 
 		this._button_actions.disabled = false;
+		this._button_edit.disabled = false;
 	}
 
 	/**
@@ -1510,7 +1511,8 @@ class CWidgetBase {
 	/**
 	 * Calculate which of the four sides are affected by the resize handle.
 	 *
-	 * @param {HTMLElement} resize_handle  One of eight dots by which the widget can be resized in editing mode.
+	 * @param {HTMLElement} resize_handle  One of eight dots by which the widget can be resized in dashboard editing
+	 *                                     mode.
 	 *
 	 * @returns {{top: boolean, left: boolean, bottom: boolean, right: boolean}}
 	 */
@@ -1532,8 +1534,8 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Add eight resize handles to the widget by which the widget can be resized in editing mode. Invoked when the
-	 * widget is entered (focused).
+	 * Add eight resize handles to the widget by which the widget can be resized in dashboard editing mode. Invoked when
+	 * the widget is entered (focused).
 	 */
 	_addResizeHandles() {
 		this._resizable_handles = {};
@@ -1561,8 +1563,8 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Remove eight resize handles from the widget by which the widget can be resized in editing mode. Invoked when the
-	 * widget is left (unfocused).
+	 * Remove eight resize handles from the widget by which the widget can be resized in dashboard editing mode. Invoked
+	 * when the widget is left (unfocused).
 	 */
 	_removeResizeHandles() {
 		for (const resizable_handle of Object.values(this._resizable_handles)) {
