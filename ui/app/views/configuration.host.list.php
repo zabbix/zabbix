@@ -213,6 +213,7 @@ $header_sortable_status = make_sorting_header(_('Status'), 'status', $data['sort
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader($header_checkbox))->addClass(ZBX_STYLE_CELL_WIDTH),
+		'',
 		$header_sortable_name,
 		_('Items'),
 		_('Triggers'),
@@ -495,6 +496,10 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
+		(new CButtonIcon(ZBX_ICON_MORE))
+			->setMenuPopup(
+				CMenuPopupHelper::getHost($host['hostid'])
+			),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
