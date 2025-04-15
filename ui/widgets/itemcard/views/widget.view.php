@@ -395,7 +395,7 @@ function makeSectionMetrics(array $item): CDiv {
 
 	return (new CDiv([
 		(new CDiv([
-			(new CDiv(('Interval')))->addClass('column-header'),
+			(new CDiv(_('Interval')))->addClass('column-header'),
 			(new CDiv([
 				(new CSpan($item['delay']))
 					->setTitle($item['delay'])
@@ -516,7 +516,7 @@ function makeSectionLatestData(array $item): CDiv {
 
 	return (new CDiv([
 		(new CDiv([
-			(new CDiv(('Last check')))->addClass('column-header'),
+			(new CDiv(_('Last check')))->addClass('column-header'),
 			(new CDiv($last_check_value))->addClass('column-value')
 		]))->addClass('column'),
 		(new CDiv(
