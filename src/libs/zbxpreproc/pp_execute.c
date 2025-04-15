@@ -1076,9 +1076,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE :
 					ZBX_MACRO_ENV_NONSECURE;
 
-			if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params,
-					&hostid, 1, env, NULL))
-				zabbix_log(LOG_LEVEL_WARNING, "cannot resolve user macros");
+			(void)zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params,
+					&hostid, 1, env, NULL);
 
 			user_macros = 1;
 		}
