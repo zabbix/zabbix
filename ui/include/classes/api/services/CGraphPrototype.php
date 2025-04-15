@@ -200,10 +200,10 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
+				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -385,17 +385,17 @@ class CGraphPrototype extends CGraphGeneral {
 
 		if ($options['selectDiscoveryRule'] !== null ||$options['selectDiscoveryRulePrototype'] !== null) {
 			$resource = DBselect(
-				'SELECT id.parent_itemid,gi.graphid'.
+				'SELECT id.lldruleid,gi.graphid'.
 					' FROM item_discovery id,graphs_items gi,items i'.
 					' WHERE '.dbConditionId('gi.graphid', $graphids).
 						' AND gi.itemid=id.itemid'.
-						' AND id.parent_itemid=i.itemid'.
+						' AND id.lldruleid=i.itemid'.
 						' AND '.dbConditionInt('i.flags', CDiscoveryRuleGeneral::FLAGS)
 			);
 			$relation_map = new CRelationMap();
 
 			while ($relation = DBfetch($resource)) {
-				$relation_map->addRelation($relation['graphid'], $relation['parent_itemid']);
+				$relation_map->addRelation($relation['graphid'], $relation['lldruleid']);
 			}
 
 			if ($options['selectDiscoveryRule'] !== null) {
@@ -437,7 +437,7 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		$result = DBselect(
-			'SELECT i.itemid,id.parent_itemid'.
+			'SELECT i.itemid,id.lldruleid'.
 			' FROM items i,item_discovery id'.
 			' WHERE i.itemid=id.itemid'.
 				' AND '.dbConditionId('i.itemid', array_keys($_graph_indexes)).
@@ -448,40 +448,40 @@ class CGraphPrototype extends CGraphGeneral {
 
 		while ($row = DBfetch($result)) {
 			foreach ($_graph_indexes[$row['itemid']] as $i) {
-				if (array_key_exists($row['parent_itemid'], $graph_indexes)
-						&& array_key_exists($graphs[$i]['name'], $graph_indexes[$row['parent_itemid']])
-						&& $graph_indexes[$row['parent_itemid']][$graphs[$i]['name']] != $i) {
+				if (array_key_exists($row['lldruleid'], $graph_indexes)
+						&& array_key_exists($graphs[$i]['name'], $graph_indexes[$row['lldruleid']])
+						&& $graph_indexes[$row['lldruleid']][$graphs[$i]['name']] != $i) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 						_s('value %1$s already exists', '(name)=('.$graphs[$i]['name'].')')
 					));
 				}
 
-				$graph_indexes[$row['parent_itemid']][$graphs[$i]['name']] = $i;
+				$graph_indexes[$row['lldruleid']][$graphs[$i]['name']] = $i;
 			}
 		}
 
 		$result = DBselect(
-			'SELECT DISTINCT g.graphid,g.name,id.parent_itemid'.
+			'SELECT DISTINCT g.graphid,g.name,id.lldruleid'.
 			' FROM graphs g,graphs_items gi,items i,item_discovery id'.
 			' WHERE g.graphid=gi.graphid'.
 				' AND gi.itemid=i.itemid'.
 				' AND i.itemid=id.itemid'.
 				' AND '.dbConditionString('g.name', array_unique(array_column($graphs, 'name'))).
 				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
-				' AND '.dbConditionId('id.parent_itemid', array_keys($graph_indexes))
+				' AND '.dbConditionId('id.lldruleid', array_keys($graph_indexes))
 		);
 
 		while ($row = DBfetch($result)) {
-			if (array_key_exists($row['parent_itemid'], $graph_indexes)
-					&& array_key_exists($row['name'], $graph_indexes[$row['parent_itemid']])) {
-				$graph = $graphs[$graph_indexes[$row['parent_itemid']][$row['name']]];
+			if (array_key_exists($row['lldruleid'], $graph_indexes)
+					&& array_key_exists($row['name'], $graph_indexes[$row['lldruleid']])) {
+				$graph = $graphs[$graph_indexes[$row['lldruleid']][$row['name']]];
 
 				if (!array_key_exists('graphid', $graph) || bccomp($row['graphid'], $graph['graphid']) != 0) {
 					$data = DBfetch(DBselect(
 						'SELECT i.key_,h.host,h.status'.
 						' FROM items i,hosts h'.
 						' WHERE i.hostid=h.hostid'.
-							' AND '.dbConditionId('i.itemid', [$row['parent_itemid']])
+							' AND '.dbConditionId('i.itemid', [$row['lldruleid']])
 					));
 
 					$error = in_array($data['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])

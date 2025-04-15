@@ -69,7 +69,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 
 		if ($options['selectItems'] !== null) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
-				$item_relation_map = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
+				$item_relation_map = $this->createRelationMap($result, 'lldruleid', 'itemid', 'item_discovery');
 
 				$items = API::ItemPrototype()->get([
 					'output' => $options['selectItems'],
@@ -87,7 +87,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
-				$items = zbx_toHash($items, 'parent_itemid');
+				$items = zbx_toHash($items, 'lldruleid');
 
 				foreach ($result as $itemid => $item) {
 					$result[$itemid]['items'] = array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
@@ -100,15 +100,15 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 				$triggers = [];
 				$relation_map = new CRelationMap();
 				$res = DBselect(
-					'SELECT id.parent_itemid,f.triggerid'.
+					'SELECT id.lldruleid,f.triggerid'.
 					' FROM item_discovery id,items i,functions f'.
-					' WHERE '.dbConditionId('id.parent_itemid', $itemids).
+					' WHERE '.dbConditionId('id.lldruleid', $itemids).
 						' AND id.itemid=i.itemid'.
 						' AND i.itemid=f.itemid'
 				);
 
 				while ($relation = DBfetch($res)) {
-					$relation_map->addRelation($relation['parent_itemid'], $relation['triggerid']);
+					$relation_map->addRelation($relation['lldruleid'], $relation['triggerid']);
 				}
 
 				$related_ids = $relation_map->getRelatedIds();
@@ -129,7 +129,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
-				$triggers = zbx_toHash($triggers, 'parent_itemid');
+				$triggers = zbx_toHash($triggers, 'lldruleid');
 
 				foreach ($result as $itemid => $item) {
 					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
@@ -144,15 +144,15 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 				$graphs = [];
 				$relation_map = new CRelationMap();
 				$res = DBselect(
-					'SELECT id.parent_itemid,gi.graphid'.
+					'SELECT id.lldruleid,gi.graphid'.
 					' FROM item_discovery id,items i,graphs_items gi'.
-					' WHERE '.dbConditionId('id.parent_itemid', $itemids).
+					' WHERE '.dbConditionId('id.lldruleid', $itemids).
 						' AND id.itemid=i.itemid'.
 						' AND i.itemid=gi.itemid'
 				);
 
 				while ($relation = DBfetch($res)) {
-					$relation_map->addRelation($relation['parent_itemid'], $relation['graphid']);
+					$relation_map->addRelation($relation['lldruleid'], $relation['graphid']);
 				}
 
 				$related_ids = $relation_map->getRelatedIds();
@@ -173,7 +173,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
-				$graphs = zbx_toHash($graphs, 'parent_itemid');
+				$graphs = zbx_toHash($graphs, 'lldruleid');
 
 				foreach ($result as $itemid => $item) {
 					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
@@ -2044,112 +2044,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		}
 	}
 
-	/**
-	 * @param array $templateids
-	 * @param array $hostids
-	 */
-	public static function linkTemplateObjects(array $templateids, array $hostids): void {
-		$db_items = DB::select('items', [
-			'output' => array_merge(
-				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
-					'enabled_lifetime', 'description', 'status'
-				],
-				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters']),
-				static::FLAGS == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE ? ['discover'] : []
-			),
-			'filter' => [
-				'hostid' => $templateids,
-				'flags' => [static::FLAGS]
-			],
-			'preservekeys' => true
-		]);
-
-		if (!$db_items) {
-			return;
-		}
-
-		self::prepareItemsForApi($db_items);
-		static::addInternalFields($db_items);
-
-		$internal_fields = array_flip(static::FLAGS == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
-			? ['itemid', 'type', 'ruleid']
-			: ['itemid', 'type']
-		);
-
-		$items = [];
-
-		foreach ($db_items as $db_item) {
-			$item = array_intersect_key($db_item, $internal_fields);
-
-			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
-				$item += ['parameters' => []];
-			}
-
-			$items[] = $item + [
-				'preprocessing' => [],
-				'lld_macro_paths' => [],
-				'filter' => [],
-				'overrides' => []
-			];
-		}
-
-		self::addAffectedObjects($items, $db_items);
-
-		$ruleids = array_keys($db_items);
-
-		$items = array_values($db_items);
-
-		foreach ($items as &$item) {
-			if (array_key_exists('parameters', $item)) {
-				$item['parameters'] = array_values($item['parameters']);
-			}
-
-			$item['preprocessing'] = array_values($item['preprocessing']);
-			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
-			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
-
-			foreach ($item['filter']['conditions'] as &$condition) {
-				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					unset($condition['formulaid']);
-				}
-			}
-			unset($condition);
-
-			foreach ($item['overrides'] as &$override) {
-				foreach ($override['filter']['conditions'] as &$condition) {
-					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-						unset($condition['formulaid']);
-					}
-				}
-				unset($condition);
-
-				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
-
-				foreach ($override['operations'] as &$operation) {
-					$operation['optag'] = array_values($operation['optag']);
-					$operation['optemplate'] = array_values($operation['optemplate']);
-				}
-				unset($operation);
-
-				$override['operations'] = array_values($override['operations']);
-			}
-			unset($override);
-
-			$item['overrides'] = array_values($item['overrides']);
-		}
-		unset($item);
-
-		static::inherit($items, [], $hostids);
-
-
-		if (static::FLAGS != ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
-			CItemPrototype::linkTemplateObjects($templateids, $hostids);
-			API::TriggerPrototype()->syncTemplates(['templateids' => $templateids, 'hostids' => $hostids]);
-			API::GraphPrototype()->syncTemplates(['templateids' => $templateids, 'hostids' => $hostids]);
-			API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
-			CDiscoveryRulePrototype::linkTemplateObjects($templateids, $hostids);
-		}
-	}
 
 	/**
 	 * @param array $items
@@ -2283,7 +2177,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.parent_itemid', $del_itemids)
+				' AND '.dbConditionId('id.lldruleid', $del_itemids)
 		), 'itemid');
 
 		if ($db_items) {

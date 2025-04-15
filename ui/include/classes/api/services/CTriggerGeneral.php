@@ -255,18 +255,18 @@ abstract class CTriggerGeneral extends CApiService {
 			// Add discovery rule IDs.
 			if ($this instanceof CTriggerPrototype) {
 				$result = DBselect(
-					'SELECT id.parent_itemid,f.triggerid,i.flags'.
+					'SELECT id.lldruleid,f.triggerid,i.flags'.
 					' FROM item_discovery id,functions f,items i'.
 					' WHERE f.itemid=id.itemid'.
-						' AND i.itemid=id.parent_itemid'.
+						' AND i.itemid=id.lldruleid'.
 						' AND '.dbConditionId('f.triggerid', $triggerids)
 				);
 				$lld_parents = [];
 
 				while ($row = DBfetch($result)) {
 					$lld_parents[$row['triggerid']] = $row['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
-						? ['discoveryRulePrototype' => ['itemid' => $row['parent_itemid']]]
-						: ['discoveryRule' => ['itemid' => $row['parent_itemid']]];
+						? ['discoveryRule' => [], 'discoveryRulePrototype' => ['itemid' => $row['lldruleid']]]
+						: ['discoveryRule' => ['itemid' => $row['lldruleid']], 'discoveryRulePrototype' => []];
 				}
 
 				foreach ($db_triggers as &$db_trigger) {
@@ -1146,7 +1146,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$error_cannot_update = _('Cannot update "%1$s" for templated trigger prototype "%2$s".');
 				$options['output'][] = 'discover';
 				$options['selectDiscoveryRule'] = ['itemid'];
-				$options['selectDiscoveryPrototype'] = ['itemid'];
+				$options['selectDiscoveryRulePrototype'] = ['itemid'];
 				$options['filter'] = [
 					'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
 				];
@@ -1435,7 +1435,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$result = DBselect(
-				'SELECT DISTINCT f.triggerid,id.parent_itemid'.
+				'SELECT DISTINCT f.triggerid,id.lldruleid'.
 				' FROM functions f,item_discovery id'.
 				' WHERE f.itemid=id.itemid'.
 					' AND '.dbConditionId('f.triggerid', array_keys($ins_dependencies + $triggerids))
@@ -1444,7 +1444,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$lld_rules = [];
 
 			while ($row = DBfetch($result)) {
-				$lld_rules[$row['triggerid']] = $row['parent_itemid'];
+				$lld_rules[$row['triggerid']] = $row['lldruleid'];
 			}
 
 			foreach ($ins_dependencies as $triggerid_up => $triggerids) {
@@ -1647,8 +1647,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
 	 * @param array  $db_triggers[<tnum>]['discoveryRulePrototype']  [IN] For trigger prototypes only.
 	 * @param string $db_triggers[<tnum>]['discoveryRulePrototype']['itemid'] [IN]
-	 * @param array  $db_triggers[<tnum>]['discoveryPrototype']      [IN] For trigger prototypes only.
-	 * @param string $db_triggers[<tnum>]['discoveryPrototype']['itemid'] [IN]
 	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
@@ -1957,7 +1955,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$host_keys['status'] = $_db_host['status'];
 
 			if ($class === 'CTriggerPrototype') {
-				$sql = 'SELECT i.itemid,i.key_,i.value_type,i.flags,id.parent_itemid'.
+				$sql = 'SELECT i.itemid,i.key_,i.value_type,i.flags,id.lldruleid'.
 					' FROM items i'.
 						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 					' WHERE i.hostid='.$host_keys['hostid'].
@@ -1983,7 +1981,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$host_keys['keys'][$_db_item['key_']]['flags'] = $_db_item['flags'];
 
 				if ($class === 'CTriggerPrototype' && $_db_item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$host_keys['keys'][$_db_item['key_']]['lld_ruleid'] = $_db_item['parent_itemid'];
+					$host_keys['keys'][$_db_item['key_']]['lld_ruleid'] = $_db_item['lldruleid'];
 				}
 			}
 
@@ -2160,7 +2158,7 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 				elseif ($db_triggers !== null) {
 					$parent_lld_rule = $db_triggers[$trigger['triggerid']]['discoveryRule']
-						?: $db_triggers[$trigger['triggerid']]['discoveryPrototype'];
+						?: $db_triggers[$trigger['triggerid']]['discoveryRulePrototype'];
 
 					if (!idcmp($lld_ruleids[0], $parent_lld_rule['itemid'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update trigger prototype "%1$s": %2$s.',

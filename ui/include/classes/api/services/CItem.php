@@ -132,7 +132,6 @@ class CItem extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectDiscoveryRule'		=> null,
-			'selectDiscoveryRulePrototype'	=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
 			'selectValueMap'			=> null,
@@ -1733,35 +1732,17 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		$select_lld_rule = $options['selectDiscoveryRule'] !== null
-			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
-		$select_lld_rule_prototype = $options['selectDiscoveryRulePrototype'] !== null
-			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
 
-		if ($select_lld_rule || $select_lld_rule_prototype) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
+			$lld_rules = API::DiscoveryRule()->get([
+				'output' => $options['selectDiscoveryRule'],
+				'itemids' => $relation_map->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
 
-			if ($select_lld_rule) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($select_lld_rule_prototype) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
+			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
 		// adding item discovery

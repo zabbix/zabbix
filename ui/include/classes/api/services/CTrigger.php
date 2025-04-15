@@ -114,7 +114,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
-			'selectDiscoveryRulePrototype'	=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
 			'selectTriggerDiscovery'		=> null,
@@ -771,14 +770,9 @@ class CTrigger extends CTriggerGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		$select_lld_rule = ($options['selectDiscoveryRule'] !== null
-			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT);
-		$select_lld_rule_prototype = ($options['selectDiscoveryRulePrototype'] !== null
-			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT);
-
-		if ($select_lld_rule || $select_lld_rule_prototype) {
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$lld_links = DBselect(
-				'SELECT id.parent_itemid,td.triggerid'.
+				'SELECT id.lldruleid,td.triggerid'.
 				' FROM trigger_discovery td,item_discovery id,functions f'.
 				' WHERE '.dbConditionId('td.triggerid', $triggerids).
 					' AND td.parent_triggerid=f.triggerid'.
@@ -787,30 +781,17 @@ class CTrigger extends CTriggerGeneral {
 			$relation_map = new CRelationMap();
 
 			while ($row = DBfetch($lld_links)) {
-				$relation_map->addRelation($row['triggerid'], $row['parent_itemid']);
+				$relation_map->addRelation($row['triggerid'], $row['lldruleid']);
 			}
 
-			if ($select_lld_rule) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
+			$lld_rules = API::DiscoveryRule()->get([
+				'output' => $options['selectDiscoveryRule'],
+				'itemids' => $relation_map->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
 
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($select_lld_rule_prototype) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
+			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
 		// adding last event

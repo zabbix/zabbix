@@ -1145,6 +1145,96 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	}
 
 	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public static function linkTemplateObjects(array $templateids, array $hostids): void {
+		$db_items = DB::select('items', [
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status', 'discover'
+				],
+				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
+			),
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
+				'hostid' => $templateids
+			],
+			'preservekeys' => true
+		]);
+
+		if (!$db_items) {
+			return;
+		}
+
+		self::prepareItemsForApi($db_items);
+		static::addInternalFields($db_items);
+
+		$items = [];
+
+		foreach ($db_items as $db_item) {
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type', 'ruleid']));
+
+			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
+				$item += ['parameters' => []];
+			}
+
+			$items[] = $item + [
+				'preprocessing' => [],
+				'lld_macro_paths' => [],
+				'filter' => [],
+				'overrides' => []
+			];
+		}
+
+		self::addAffectedObjects($items, $db_items);
+
+		$items = array_values($db_items);
+
+		foreach ($items as &$item) {
+			if (array_key_exists('parameters', $item)) {
+				$item['parameters'] = array_values($item['parameters']);
+			}
+
+			$item['preprocessing'] = array_values($item['preprocessing']);
+			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
+			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
+
+			foreach ($item['filter']['conditions'] as &$condition) {
+				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+			}
+			unset($condition);
+
+			foreach ($item['overrides'] as &$override) {
+				foreach ($override['filter']['conditions'] as &$condition) {
+					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+						unset($condition['formulaid']);
+					}
+				}
+				unset($condition);
+
+				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
+
+				foreach ($override['operations'] as &$operation) {
+					$operation['optag'] = array_values($operation['optag']);
+					$operation['optemplate'] = array_values($operation['optemplate']);
+				}
+				unset($operation);
+
+				$override['operations'] = array_values($override['operations']);
+			}
+			unset($override);
+
+			$item['overrides'] = array_values($item['overrides']);
+		}
+		unset($item);
+
+		static::inherit($items, [], $hostids);
+	}
+
+	/**
 	 * @param array $ruleids
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {

@@ -75,7 +75,6 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
 	 * @param string|array  $options['selectDiscoveryRule']                Return a "discoveryRule" property with the low-level discovery rule that created the host.
-	 * @param string|array  $options['selectDiscoveryRulePrototype']       Return a "discoveryRulePrototype" property with the low-level discovery rule prototype that created the host.
 	 * @param string|array  $options['selectHostDiscovery']                Return a "hostDiscovery" property with host discovery object data.
 	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
 	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
@@ -156,7 +155,6 @@ class CHost extends CHostGeneral {
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
 			'selectDiscoveryRule'				=> null,
-			'selectDiscoveryRulePrototype'		=> null,
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
@@ -1879,12 +1877,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$select_lld_rule = $options['selectDiscoveryRule'] !== null
-			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
-		$select_lld_rule_prototype = $options['selectDiscoveryRulePrototype'] !== null
-			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
-
-		if ($select_lld_rule || $select_lld_rule_prototype) {
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$lld_links = DBFetchArray(DBselect(
 				'SELECT hd.hostid,hd2.lldruleid'.
 				' FROM host_discovery hd,host_discovery hd2'.
@@ -1893,25 +1886,13 @@ class CHost extends CHostGeneral {
 			));
 			$relation_map = $this->createRelationMap($lld_links, 'hostid', 'lldruleid');
 
-			if ($select_lld_rule) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'preservekeys' => true
-				]);
+			$lld_rules = API::DiscoveryRule()->get([
+				'output' => $options['selectDiscoveryRule'],
+				'itemids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
 
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($select_lld_rule_prototype) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
+			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
 		if ($options['selectHostDiscovery'] !== null) {

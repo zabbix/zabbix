@@ -203,10 +203,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
+				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -578,7 +578,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		if ($select_lld_rules || $select_lld_rule_prototypes) {
 			$lld_links = DBselect(
-				'SELECT id.parent_itemid,f.triggerid'.
+				'SELECT id.lldruleid,f.triggerid'.
 				' FROM item_discovery id,functions f'.
 				' WHERE '.dbConditionId('f.triggerid', $triggerPrototypeIds).
 					' AND f.itemid=id.itemid'
@@ -586,7 +586,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$relation_map = new CRelationMap();
 
 			while ($row = DBfetch($lld_links)) {
-				$relation_map->addRelation($row['triggerid'], $row['parent_itemid']);
+				$relation_map->addRelation($row['triggerid'], $row['lldruleid']);
 			}
 
 			if ($select_lld_rules) {

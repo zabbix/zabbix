@@ -163,15 +163,15 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		// discoveryids
-		if (!is_null($options['discoveryids'])) {
+		if ($options['discoveryids'] !== null) {
 			zbx_value2array($options['discoveryids']);
 
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
+				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -446,7 +446,7 @@ class CItemPrototype extends CItemGeneral {
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$ins_items_discovery[] = [
 					'itemid' => $item['itemid'],
-					'parent_itemid' => $item['ruleid']
+					'lldruleid' => $item['ruleid']
 				];
 			}
 
@@ -650,7 +650,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected static function addInternalFields(array &$db_items): void {
 		$result = DBselect(
-			'SELECT i.itemid,i.hostid,i.templateid,i.flags,h.status AS host_status,id.parent_itemid AS ruleid'.
+			'SELECT i.itemid,i.hostid,i.templateid,i.flags,h.status AS host_status,id.lldruleid AS ruleid'.
 			' FROM items i,hosts h,item_discovery id'.
 			' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=id.itemid'.
@@ -1096,7 +1096,7 @@ class CItemPrototype extends CItemGeneral {
 	private static function getChildObjectsUsingName(array $items, array $hostids, array $lld_links): array {
 		$result = DBselect(
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
-				'ht.templateid AS parent_hostid,'.dbConditionCoalesce('id.parent_itemid', 0, 'ruleid').
+				'ht.templateid AS parent_hostid,'.dbConditionCoalesce('id.lldruleid', 0, 'ruleid').
 			' FROM hosts_templates ht'.
 			' INNER JOIN items i ON ht.hostid=i.hostid'.
 			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
@@ -1288,7 +1288,7 @@ class CItemPrototype extends CItemGeneral {
 			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
-				' AND '.dbConditionId('id.parent_itemid', $ruleids).
+				' AND '.dbConditionId('id.lldruleid', $ruleids).
 				' AND '.dbConditionId('i.templateid', [0], true)
 		);
 
@@ -1470,7 +1470,7 @@ class CItemPrototype extends CItemGeneral {
 			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
 
 		if ($select_lld_rule || $select_lld_rule_prototype) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
+			$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
 
 			if ($select_lld_rule) {
 				$lld_rules = API::DiscoveryRule()->get([
