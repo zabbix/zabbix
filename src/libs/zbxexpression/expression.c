@@ -763,6 +763,11 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		/* ZBX_MACRO_TYPE_MESSAGE_NORMAL and ZBX_MACRO_TYPE_MESSAGE_RECOVERY. Therefore the code is not duplicated */
 		/* but few conditions are added below where behavior differs. */
 		{
+			zbx_dc_um_handle_t	*um_handle2 = NULL;
+
+			if (ZBX_TOKEN_USER_MACRO != token.type)
+				um_handle2 = zbx_dc_open_user_macros_masked();
+
 			const zbx_db_event	*c_event;
 
 			c_event = ((NULL != r_event) ? r_event : event);
@@ -2113,6 +2118,9 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
+
+			if (NULL != um_handle2)
+				zbx_dc_close_user_macros(um_handle2);
 		}
 		else if (0 != (macro_type & (ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION | ZBX_MACRO_TYPE_TRIGGER_COMMENTS |
 					ZBX_MACRO_TYPE_EVENT_NAME)))
