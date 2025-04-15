@@ -301,8 +301,6 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHostPrototypes' => API_OUTPUT_COUNT,
 			'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 			'editable' => true
 		]);
 

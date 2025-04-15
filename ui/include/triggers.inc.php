@@ -1686,6 +1686,7 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 				'output' => ['triggerid', 'templateid'],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'triggerids' => array_keys($parent_triggerids)
 			]);
 		}
@@ -1708,7 +1709,8 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 			}
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_trigger['triggerid']] = $db_trigger['discoveryRule']['itemid'];
+				$parent_lld = $db_trigger['discoveryRule'] ?: $db_trigger['discoveryRulePrototype'];
+				$lld_ruleids[$db_trigger['triggerid']] = $parent_lld['itemid'];
 			}
 
 			if ($db_trigger['templateid'] != 0) {

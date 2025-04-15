@@ -67,7 +67,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
 			'status_codes'			=> 'string',
-			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]),
 			'timeout'				=> 'string',
 			'username'				=> 'string',
 			'url'					=> 'string',
@@ -101,7 +101,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
 		$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
 		$this->test_type = (int) $this->getInput('test_type');
-		$this->is_item_testable = in_array($this->item_type, $testable_item_types);
+		$this->is_item_testable = in_array($this->item_type, $testable_item_types)
+			&& $this->item_type != ITEM_TYPE_NESTED;
 
 		// Check if key is valid for item types it's mandatory.
 		if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
@@ -135,6 +136,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				case self::ZBX_TEST_TYPE_LLD:
 					$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
 					break;
+
+				case self::ZBX_TEST_TYPE_LLD_PROTOTYPE:
+					$api_input_rules = CDiscoveryRulePrototype::getPreprocessingValidationRules();
+					break;
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
@@ -143,7 +148,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				return false;
 			}
 
-			if ($this->test_type != self::ZBX_TEST_TYPE_LLD) {
+			if (!in_array($this->test_type, [self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE])) {
 				$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
 					'type' =>	['type' => API_ANY],
 					'params' =>	['type' => API_ANY]

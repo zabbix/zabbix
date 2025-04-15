@@ -79,18 +79,22 @@ class CControllerItemTagsList extends CController {
 				$items = API::ItemPrototype()->get([
 					'output' => ['itemid', 'templateid', 'hostid'],
 					'selectDiscoveryRule' => ['name', 'templateid'],
+					'selectDiscoveryRulePrototype' => ['name', 'templateid'],
 					'itemids' => [$this->getInput('itemid')]
 				]);
 			}
-			else if ($items[0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				unset($items[0]['discoveryRule']);
-			}
-			else if ($items[0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+			elseif ($items[0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				$data['readonly'] = 1;
 			}
 
 			if ($items) {
 				$item = reset($items);
+
+				$item['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					unset($item['parent_lld']);
+				}
 			}
 		}
 

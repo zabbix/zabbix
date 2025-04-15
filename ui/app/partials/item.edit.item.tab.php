@@ -20,8 +20,7 @@
  */
 
 $item = $data['item'];
-$discovered_prototype = array_key_exists('discovered_prototype', $item) ? $item['discovered_prototype'] : false;
-$readonly = $item['templated'] || $item['discovered'] || $discovered_prototype;
+$readonly = $item['templated'] || $item['discovered'];
 
 if ($item['discovered']) {
 	$discovered_url = (new CUrl('zabbix.php'))
@@ -900,7 +899,7 @@ else {
 			new CFormField(
 				(new CCheckBox('status', ITEM_STATUS_ACTIVE))
 					->setChecked($item['status'] == ITEM_STATUS_ACTIVE)
-					->setReadonly($discovered_prototype)
+					->setReadonly($item['discovered'])
 			)
 		])
 		->addItem([
@@ -908,7 +907,7 @@ else {
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($item['discover'] == ZBX_PROTOTYPE_DISCOVER)
-					->setReadonly($discovered_prototype)
+					->setReadonly($item['discovered'])
 			)
 		]);
 }

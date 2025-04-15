@@ -269,15 +269,11 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 					'verify_host', 'allow_traps', 'discover'
 				],
 				'selectDiscoveryRule' => ['itemid', 'templateid'],
-				'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')
 			]);
 			$item = CItemPrototypeHelper::convertApiInputForForm($item);
-
-			$item['discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
-				&& $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		if (!$item) {

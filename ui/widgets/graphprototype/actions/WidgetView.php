@@ -66,7 +66,8 @@ class WidgetView extends CControllerWidgetIterator {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['hostid', 'name'],
-			'selectDiscoveryRule' => ['hostid']
+			'selectDiscoveryRule' => ['hostid'],
+			'selectDiscoveryRulePrototype' => ['hostid']
 		];
 
 		if ($this->fields_values['override_hostid']) {
@@ -75,6 +76,7 @@ class WidgetView extends CControllerWidgetIterator {
 				'output' => ['name'],
 				'graphids' => reset($this->fields_values['graphid'])
 			]);
+
 			if ($graph_prototype) {
 				$graph_prototype = reset($graph_prototype);
 			}
@@ -93,6 +95,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 		// Use this graph prototype as base for collecting created graphs.
 		$graph_prototype = API::GraphPrototype()->get($options);
+
 		if ($graph_prototype) {
 			$graph_prototype = reset($graph_prototype);
 		}
@@ -104,9 +107,11 @@ class WidgetView extends CControllerWidgetIterator {
 
 		// Do not collect graphs while editing a template dashboard.
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			$parent_lld = $graph_prototype['discoveryRule'] ?: $graph_prototype['discoveryRulePrototype'];
+
 			$graphs_created_all = API::Graph()->get([
 				'output' => ['graphid', 'name'],
-				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
+				'hostids' => [$parent_lld['hostid']],
 				'selectDiscoveryData' => ['graphid', 'parent_graphid'],
 				'selectHosts' => ['name'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
@@ -174,7 +179,8 @@ class WidgetView extends CControllerWidgetIterator {
 		}
 		else {
 			$host_names = array_column($graph_prototype['hosts'], 'name', 'hostid');
-			$host_name = $host_names[$graph_prototype['discoveryRule']['hostid']];
+			$parent_lld = $graph_prototype['discoveryRule'] ?: $graph_prototype['discoveryRulePrototype'];
+			$host_name = $host_names[$parent_lld['hostid']];
 
 			$widget_name = $this->isTemplateDashboard()
 				? $graph_prototype['name']
@@ -197,7 +203,8 @@ class WidgetView extends CControllerWidgetIterator {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
-			'selectDiscoveryRule' => ['hostid']
+			'selectDiscoveryRule' => ['hostid'],
+			'selectDiscoveryRulePrototype' => ['hostid']
 		];
 
 		if ($this->fields_values['override_hostid']) {
@@ -235,9 +242,11 @@ class WidgetView extends CControllerWidgetIterator {
 
 		// Do not collect items while editing a template dashboard.
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			$parent_lld = $item_prototype['discoveryRule'] ?: $item_prototype['discoveryRulePrototype'];
+
 			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name_resolved'],
-				'hostids' => [$item_prototype['discoveryRule']['hostid']],
+				'hostids' => [$parent_lld['hostid']],
 				'selectDiscoveryData' => ['itemid', 'parent_itemid'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 			]);

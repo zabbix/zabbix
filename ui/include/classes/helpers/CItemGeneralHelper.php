@@ -118,8 +118,8 @@ JAVASCRIPT;
 	public static function addInheritedTags(array $item, array $item_tags): array {
 		$tags = [];
 
-		if (array_key_exists('discoveryRule', $item)) {
-			$parent_templates = getItemParentTemplates([$item['discoveryRule']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
+		if (array_key_exists('parent_lld', $item)) {
+			$parent_templates = getItemParentTemplates([$item['parent_lld']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
 		}
 		else {
 			$parent_templates = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
@@ -213,7 +213,7 @@ JAVASCRIPT;
 			'valuemap' => [],
 			'master_item' => [],
 			'templated' => (bool) $item['templateid'],
-			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'discovered' => $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 			'http_authtype' => ZBX_HTTP_AUTH_NONE,
 			'http_username' => '',
 			'http_password' => '',

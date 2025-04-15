@@ -106,24 +106,23 @@ class CControllerGraphEdit extends CController {
 				'selectHosts' => ['hostid'],
 				'graphids' => $data['graphid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
-				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+				'selectGraphDiscovery' 	=> ['parent_graphid'],
 				'selectDiscoveryData' => ['parent_graphid']
 			];
 
 			$graph = API::Graph()->get($options);
 			$graph = reset($graph);
 
-			$data['parent_lld'] = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
-
 			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
 				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'templateid', 'flags', 'discoveryRule', 'discoveryRulePrototype', 'discoveryData'
+				'percent_right', 'templateid', 'flags', 'discoveryData'
 			];
 
 			foreach ($fields as $field) {
 				$data[$field] = $graph[$field];
 			}
 
+			$data['parent_lld'] = $graph['discoveryRule'];
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 

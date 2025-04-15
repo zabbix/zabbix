@@ -671,7 +671,7 @@ if (hasRequest('form')) {
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
-	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
+	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD_PROTOTYPE;
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');

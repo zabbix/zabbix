@@ -24,6 +24,7 @@ abstract class CControllerPopupItemTest extends CController {
 	const ZBX_TEST_TYPE_ITEM = 0;
 	const ZBX_TEST_TYPE_ITEM_PROTOTYPE = 1;
 	const ZBX_TEST_TYPE_LLD = 2;
+	const ZBX_TEST_TYPE_LLD_PROTOTYPE = 3;
 
 	/**
 	 * Max-length of input fields that can contain resolved macro values. Used in views for input fields.
@@ -407,7 +408,8 @@ abstract class CControllerPopupItemTest extends CController {
 						$item_flags = [
 							self::ZBX_TEST_TYPE_ITEM => ZBX_FLAG_DISCOVERY_NORMAL,
 							self::ZBX_TEST_TYPE_ITEM_PROTOTYPE => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-							self::ZBX_TEST_TYPE_LLD => ZBX_FLAG_DISCOVERY_RULE
+							self::ZBX_TEST_TYPE_LLD => ZBX_FLAG_DISCOVERY_RULE,
+							self::ZBX_TEST_TYPE_LLD_PROTOTYPE => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
 						];
 						$item_flag = $item_flags[$this->getInput('test_type')];
 					}

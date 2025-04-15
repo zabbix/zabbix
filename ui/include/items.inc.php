@@ -454,7 +454,8 @@ function getItemParentTemplates(array $items, $flag) {
 			$db_items = API::ItemPrototype()->get([
 				'output' => ['itemid', 'hostid', 'templateid'],
 				'itemids' => array_keys($parent_itemids),
-				'selectDiscoveryRule' => ['itemid']
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid']
 			]);
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
@@ -474,7 +475,8 @@ function getItemParentTemplates(array $items, $flag) {
 			$hostids[$db_item['itemid']] = $db_item['hostid'];
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
+				$parent_lld = $db_item['discoveryRule'] ?: $db_item['discoveryRulePrototype'];
+				$lld_ruleids[$db_item['itemid']] = $parent_lld['itemid'];
 			}
 
 			if ($db_item['templateid'] != 0) {
