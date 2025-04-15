@@ -3639,5 +3639,4 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 			]]
 		];
 	}
-	//TODO check ALL prototypes and compare them with "non-prototype" schemes if they can be reused, like graph item
 }
