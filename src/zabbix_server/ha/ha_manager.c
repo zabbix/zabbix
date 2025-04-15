@@ -403,22 +403,28 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled,auditlog_mode "
-			"from config")))
+	if (NULL == (result = ha_db_select(info, "select name, value_str, value_int from settings"
+			" where name in ('ha_failover_delay', 'auditlog_enabled', 'auditlog_mode')")))
 	{
 		return FAIL;
 	}
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (SUCCEED != zbx_is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
-			THIS_SHOULD_NEVER_HAPPEN;
-
-		info->auditlog_enabled = atoi(row[1]);
-		info->auditlog_mode = atoi(row[2]);
+		if (0 == strcmp(row[0], "ha_failover_delay"))
+		{
+			if (SUCCEED != zbx_is_time_suffix(row[1], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+		else if (0 == strcmp(row[0], "auditlog_enabled"))
+		{
+			info->auditlog_enabled = atoi(row[2]);
+		}
+		else if (0 == strcmp(row[0], "auditlog_mode"))
+		{
+			info->auditlog_mode = atoi(row[2]);
+		}
 	}
-	else
-		THIS_SHOULD_NEVER_HAPPEN;
 
 	zbx_db_free_result(result);
 
@@ -651,7 +657,7 @@ static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = ha_db_select(info, "select " ZBX_DB_TIMESTAMP() " from config")))
+	if (NULL == (result = ha_db_select(info, "select " ZBX_DB_TIMESTAMP() " from settings limit 1")))
 		goto out;
 
 	if (NULL != (row = zbx_db_fetch(result)))
@@ -1414,7 +1420,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = ha_db_select(info, "select configid,ha_failover_delay from config")))
+	if (NULL == (result = ha_db_select(info, "select value_str from settings where name='ha_failover_delay'")))
 	{
 		error = "database error";
 		goto out;
@@ -1423,19 +1429,23 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 	memcpy(&delay, message->data, sizeof(delay));
 
 	if (NULL != (row = zbx_db_fetch(result)) &&
-		SUCCEED == ha_db_execute(info, "update config set ha_failover_delay=%d", delay))
+		SUCCEED == ha_db_execute(info, "update settings set value_str='%ds' where name='ha_failover_delay'",
+		delay))
 	{
-		zbx_uint64_t	configid;
+#define DELAY_STR_BUFSZ		32
+		char	delay_str[DELAY_STR_BUFSZ] = {0};
 
 		info->failover_delay = delay;
-		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %ds", delay);
+		zbx_snprintf(delay_str, sizeof(delay_str), "%ds", delay);
 
-		ZBX_STR2UINT64(configid, row[0]);
+		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %s", delay_str);
+
 		zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
-		zbx_audit_settings_create_entry(ZBX_AUDIT_HA_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, configid);
-		zbx_audit_settings_update_field_int(ZBX_AUDIT_HA_CONTEXT, configid, "settings.ha_failover_delay",
-				atoi(row[1]), delay);
+		zbx_audit_settings_create_entry(ZBX_AUDIT_HA_CONTEXT, ZBX_AUDIT_ACTION_UPDATE);
+		zbx_audit_settings_update_field_str(ZBX_AUDIT_HA_CONTEXT, "settings.ha_failover_delay", row[0],
+				delay_str);
 		ha_flush_audit(info);
+#undef DELAY_STR_BUFSZ
 	}
 	else
 		error = "database error";
@@ -1931,6 +1941,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 				while (nextcheck <= ticks_num)
 					nextcheck += delay;
+
+				zbx_handle_log();
 			}
 
 			if (ZBX_DB_OK <= info.db_status || ZBX_NODE_STATUS_ACTIVE != info.ha_status)

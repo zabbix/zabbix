@@ -29,7 +29,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>				'in '.implode(',', ['host', 'template']),
+			'context' =>				'required|in '.implode(',', ['host', 'template']),
 			'hostid' =>					'db hosts.hostid',
 			'triggerid' =>				'db triggers.triggerid',
 			'name' =>					'string',
@@ -81,6 +81,25 @@ class CControllerTriggerPrototypeEdit extends CController {
 			return false;
 		}
 
+		if ($this->hasInput('hostid')) {
+			if ($this->getInput('context') === 'host') {
+				$exists = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $this->getInput('hostid')
+				]);
+			}
+			else {
+				$exists = (bool) API::Template()->get([
+					'output' => [],
+					'templateids' => $this->getInput('hostid')
+				]);
+			}
+
+			if (!$exists) {
+				return false;
+			}
+		}
+
 		if ($this->hasInput('triggerid')) {
 			$trigger_prototypes = API::TriggerPrototype()->get([
 				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
@@ -88,6 +107,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name', 'discover'
 				],
 				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid', 'templateid'],
 				'triggerids' => $this->getInput('triggerid'),
 				'selectItems' => ['itemid', 'templateid', 'flags'],
 				'selectDependencies' => ['triggerid'],
@@ -153,7 +173,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 				}
 
 				if (($data['show_inherited_tags'] == 0 || !$this->trigger_prototype)
-					&& (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN))) {
+						&& (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN))) {
 					continue;
 				}
 

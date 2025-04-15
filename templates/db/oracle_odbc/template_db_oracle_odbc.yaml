@@ -2050,7 +2050,6 @@ zabbix_export:
                          Y.NAME,
                          Y.CONTENTS,
                          Y.STATUS;
-                
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'Gets the statistics of the tablespace.'

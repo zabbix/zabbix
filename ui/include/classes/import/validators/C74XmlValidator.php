@@ -569,6 +569,13 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY
 	];
 
+	private array $MAP_LINK_DRAWTYPE = [
+		CXmlConstantValue::SINGLE_LINE => CXmlConstantName::SINGLE_LINE,
+		CXmlConstantValue::BOLD_LINE => CXmlConstantName::BOLD_LINE,
+		CXmlConstantValue::DOTTED_LINE => CXmlConstantName::DOTTED_LINE,
+		CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE
+	];
+
 	/**
 	 * Get validation rules schema.
 	 *
@@ -3085,6 +3092,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'height' =>					['type' => XML_STRING | XML_REQUIRED],
 					'label_type' =>				['type' => XML_STRING | XML_REQUIRED],
 					'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
+					'show_element_label' =>		['type' => XML_STRING, 'type' => XML_STRING, 'default' => CXmlConstantValue::SHOW_LABEL_ALWAYS, 'in' => [CXmlConstantValue::SHOW_LABEL_AUTO_HIDE => CXmlConstantName::SHOW_LABEL_AUTO_HIDE, CXmlConstantValue::SHOW_LABEL_ALWAYS => CXmlConstantName::SHOW_LABEL_ALWAYS]],
+					'show_link_label' =>		['type' => XML_STRING, 'type' => XML_STRING, 'default' => CXmlConstantValue::SHOW_LABEL_ALWAYS, 'in' => [CXmlConstantValue::SHOW_LABEL_AUTO_HIDE => CXmlConstantName::SHOW_LABEL_AUTO_HIDE, CXmlConstantValue::SHOW_LABEL_ALWAYS => CXmlConstantName::SHOW_LABEL_ALWAYS]],
 					'highlight' =>				['type' => XML_STRING | XML_REQUIRED],
 					'expandproblem' =>			['type' => XML_STRING | XML_REQUIRED],
 					'markelements' =>			['type' => XML_STRING | XML_REQUIRED],
@@ -3109,6 +3118,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'background' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 						'name' =>					['type' => XML_STRING]
 					]],
+					'background_scale' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::MAP_BACKGROUND_SCALE_COVER, 'in' => [CXmlConstantValue::MAP_BACKGROUND_SCALE_NONE => CXmlConstantName::MAP_BACKGROUND_SCALE_NONE, CXmlConstantValue::MAP_BACKGROUND_SCALE_COVER => CXmlConstantName::MAP_BACKGROUND_SCALE_COVER]],
 					'iconmap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 						'name' =>					['type' => XML_STRING]
 					]],
@@ -3126,6 +3136,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
+							'show_label' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SHOW_LABEL_DEFAULT, 'in' => [CXmlConstantValue::SHOW_LABEL_DEFAULT => CXmlConstantName::SHOW_LABEL_DEFAULT, CXmlConstantValue::SHOW_LABEL_AUTO_HIDE => CXmlConstantName::SHOW_LABEL_AUTO_HIDE, CXmlConstantValue::SHOW_LABEL_ALWAYS => CXmlConstantName::SHOW_LABEL_ALWAYS]],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
 							'y' =>						['type' => XML_STRING | XML_REQUIRED],
 							'elementsubtype' =>			['type' => XML_STRING | XML_REQUIRED],
@@ -3160,7 +3171,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									'value' =>					['type' => XML_STRING],
 									'operator' =>				['type' => XML_STRING]
 								]]
-							]]
+							]],
+							'zindex' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'shapes' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'shape', 'rules' => [
@@ -3195,23 +3207,56 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							'zindex' =>				['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'links' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'link', 'rules' => [
-						'link' =>					['type' => XML_ARRAY, 'rules' => [
-							'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
-							'color' =>					['type' => XML_STRING | XML_REQUIRED],
-							'label' =>					['type' => XML_STRING | XML_REQUIRED],
-							'selementid1' =>			['type' => XML_STRING | XML_REQUIRED],
-							'selementid2' =>			['type' => XML_STRING | XML_REQUIRED],
-							'linktriggers' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
-								'linktrigger' =>            ['type' => XML_ARRAY, 'rules' => [
-									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
-									'color' =>					['type' => XML_STRING | XML_REQUIRED],
-									'trigger' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-										'description' =>			['type' => XML_STRING | XML_REQUIRED],
-										'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-										'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+					'links' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'link', 'rules' => [
+						'link' =>				['type' => XML_ARRAY, 'rules' => [
+							'selementid1' =>		['type' => XML_STRING | XML_REQUIRED],
+							'selementid2' =>		['type' => XML_STRING | XML_REQUIRED],
+							'label' =>				['type' => XML_STRING, 'default' => ''],
+							'show_label' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SHOW_LABEL_DEFAULT, 'in' => [CXmlConstantValue::SHOW_LABEL_DEFAULT => CXmlConstantName::SHOW_LABEL_DEFAULT, CXmlConstantValue::SHOW_LABEL_AUTO_HIDE => CXmlConstantName::SHOW_LABEL_AUTO_HIDE, CXmlConstantValue::SHOW_LABEL_ALWAYS => CXmlConstantName::SHOW_LABEL_ALWAYS]],
+							'drawtype' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->MAP_LINK_DRAWTYPE],
+							'color' =>				['type' => XML_STRING, 'default' => '000000'],
+							'indicator_type' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::INDICATOR_TYPE_STATIC_LINK, 'in' => [CXmlConstantValue::INDICATOR_TYPE_STATIC_LINK => CXmlConstantName::INDICATOR_TYPE_STATIC_LINK, CXmlConstantValue::INDICATOR_TYPE_TRIGGER => CXmlConstantName::INDICATOR_TYPE_TRIGGER, CXmlConstantValue::INDICATOR_TYPE_ITEM_VALUE => CXmlConstantName::INDICATOR_TYPE_ITEM_VALUE]],
+							'linktriggers' =>		['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'indicator_type', 'in' => [CXmlConstantValue::INDICATOR_TYPE_TRIGGER => CXmlConstantName::INDICATOR_TYPE_TRIGGER]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
+									'linktrigger' =>	['type' => XML_ARRAY, 'rules' => [
+										'drawtype' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->MAP_LINK_DRAWTYPE],
+										'color' =>			['type' => XML_STRING, 'default' => '000000'],
+										'trigger' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'description' =>			['type' => XML_STRING | XML_REQUIRED],
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
+										]]
 									]]
-								]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'item' =>				['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'indicator_type', 'in' => [CXmlConstantValue::INDICATOR_TYPE_ITEM_VALUE => CXmlConstantName::INDICATOR_TYPE_ITEM_VALUE]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+									'host' =>	['type' => XML_STRING | XML_REQUIRED],
+									'key' =>	['type' => XML_STRING | XML_REQUIRED]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'thresholds' =>			['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'indicator_type', 'in' => [CXmlConstantValue::INDICATOR_TYPE_ITEM_VALUE => CXmlConstantName::INDICATOR_TYPE_ITEM_VALUE]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'threshold', 'rules' => [
+									'threshold' =>	['type' => XML_ARRAY, 'rules' => [
+										'threshold' =>	['type' => XML_STRING | XML_REQUIRED],
+										'drawtype' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->MAP_LINK_DRAWTYPE],
+										'color' =>		['type' => XML_STRING, 'default' => '000000']
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'highlights' =>			['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'indicator_type', 'in' => [CXmlConstantValue::INDICATOR_TYPE_ITEM_VALUE => CXmlConstantName::INDICATOR_TYPE_ITEM_VALUE]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'highlight', 'rules' => [
+									'highlight' =>	['type' => XML_ARRAY, 'rules' => [
+										'pattern' =>	['type' => XML_STRING | XML_REQUIRED],
+										'sortorder' =>	['type' => XML_STRING | XML_REQUIRED],
+										'drawtype' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->MAP_LINK_DRAWTYPE],
+										'color' =>		['type' => XML_STRING, 'default' => '000000']
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
 							]]
 						]]
 					]]
@@ -3280,7 +3325,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return bool
 	 */
-	public function requiredMapElement(array $parent_data = null) {
+	public function requiredMapElement(?array $parent_data = null) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:

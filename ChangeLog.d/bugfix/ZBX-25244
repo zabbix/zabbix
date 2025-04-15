@@ -1,1 +1,0 @@
-........S. [ZBX-25244] fixed {PROXY.NAME} and {PROXY.DESCRIPTION} macros to be resolved when proxy group is used (asestakovs)

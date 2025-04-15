@@ -26,7 +26,7 @@
 		audit_key_authpassphrase[AUDIT_DETAILS_KEY_LEN],						\
 		audit_key_privpassphrase[AUDIT_DETAILS_KEY_LEN], audit_key_authprotocol[AUDIT_DETAILS_KEY_LEN],	\
 		audit_key_privprotocol[AUDIT_DETAILS_KEY_LEN], audit_key_contextname[AUDIT_DETAILS_KEY_LEN],	\
-		audit_key[AUDIT_DETAILS_KEY_LEN];								\
+		audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_max_repetitions[AUDIT_DETAILS_KEY_LEN];		\
 														\
 	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
@@ -52,13 +52,15 @@
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.privprotocol", interfaceid);		\
 	zbx_snprintf(audit_key_contextname, sizeof(audit_key_contextname),					\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.contextname", interfaceid);		\
+	zbx_snprintf(audit_key_max_repetitions, sizeof(audit_key_max_repetitions),				\
+			#auditentry".interfaces[" ZBX_FS_UI64 "].details.max_repetitions", interfaceid);	\
 
 #define PREPARE_AUDIT_SNMP_INTERFACE(funcname, auditentry)							\
 void	zbx_audit_##funcname##_update_json_add_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
 		zbx_uint64_t version, zbx_uint64_t bulk, const char *community, const char *securityname,	\
 		zbx_uint64_t securitylevel, const char *authpassphrase, const char *privpassphrase,		\
 		zbx_uint64_t authprotocol, zbx_uint64_t privprotocol, const char *contextname,			\
-		zbx_uint64_t interfaceid)									\
+		int max_repetitions, zbx_uint64_t interfaceid)							\
 {														\
 PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)								\
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);	\
@@ -82,6 +84,8 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)								\
 			audit_key_privprotocol, privprotocol, "interface_snmp", "privprotocol");		\
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD,			\
 			audit_key_contextname, contextname, "interface_snmp", "contextname");			\
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD,			\
+			audit_key_max_repetitions, max_repetitions, "interface_snmp", "max_repetitions");	\
 }														\
 														\
 void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
@@ -91,7 +95,8 @@ void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_
 		zbx_uint64_t securitylevel_new, const char *authpassphrase_old, const char *authpassphrase_new,	\
 		const char *privpassphrase_old, const char *privpassphrase_new, zbx_uint64_t authprotocol_old,	\
 		zbx_uint64_t authprotocol_new, zbx_uint64_t privprotocol_old, zbx_uint64_t privprotocol_new,	\
-		const char *contextname_old, const char *contextname_new, zbx_uint64_t interfaceid)		\
+		const char *contextname_old, const char *contextname_new, int max_repetitions_old,		\
+		int max_repetitions_new, zbx_uint64_t interfaceid)						\
 {														\
 PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_UPDATE, audit_key);	\
@@ -113,6 +118,8 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 			privprotocol_new);									\
 	zbx_audit_update_json_update_string(hostid, AUDIT_HOST_ID, audit_key_contextname, contextname_old,	\
 			contextname_new);									\
+	zbx_audit_update_json_update_int(hostid, AUDIT_HOST_ID, audit_key_max_repetitions,			\
+			max_repetitions_old, max_repetitions_new);						\
 }														\
 
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
@@ -290,6 +297,7 @@ PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, privpassphrase, const char*, 
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, authprotocol, zbx_uint64_t, uint64)				\
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, privprotocol, zbx_uint64_t, uint64)				\
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, contextname, const char*, string)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, max_repetitions, int, int)				\
 
 PREPARE_AUDIT_HOST(host, host, ZBX_AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST(host_prototype, hostprototype, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE)

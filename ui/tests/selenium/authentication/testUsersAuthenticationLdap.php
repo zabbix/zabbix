@@ -14,13 +14,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testFormAuthentication.php';
 
 /**
- * @backup config, userdirectory, usrgrp
+ * @backup settings, userdirectory, usrgrp
  *
  * @dataSource LoginUsers
  */
@@ -98,14 +98,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			'Group name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'Group member attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'Reference attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
-			'Group filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'],
-			'User group membership attribute' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'],
+			'Group filter' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'
+			],
+			'User group membership attribute' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'
+			],
 			'User name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User last name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User group mapping' => ['visible' => false],
 			'Media type mapping' => ['visible' => false ],
 			'StartTLS' => ['visible'  => false, 'value' => false],
-			'Search filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})']
+			'Search filter' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})'
+			]
 		];
 
 		foreach ($server_fields as $label => $attributes) {
@@ -553,6 +559,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$form->selectTab('LDAP settings');
 		}
 
+		$userdirectory_sql = 'SELECT value_userdirectoryid FROM settings WHERE name=\'ldap_userdirectoryid\'';
 		foreach ($table->getRows() as $row) {
 			$radio = $row->getColumn('Default');
 			$user_directoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory_ldap WHERE host='
@@ -561,22 +568,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 			// Check if LDAP server is set as Default.
 			if ($radio->query('name:ldap_default_row_index')->one()->isAttributePresent('checked') === true) {
-				$this->assertEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertEquals($user_directoryid, CDBHelper::getValue($userdirectory_sql));
 			}
 			else {
 				// Set another LDAP server as default.
-				$this->assertNotEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertNotEquals($user_directoryid, CDBHelper::getValue($userdirectory_sql));
 				$radio->query('name:ldap_default_row_index')->one()->click();
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-				$this->assertEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertEquals($user_directoryid, CDBHelper::getValue($userdirectory_sql));
 			}
 		}
 
 		// Default LDAP server host name.
-		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid IN '.
-				'(SELECT ldap_userdirectoryid FROM config)'
-		);
+		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid IN ('.$userdirectory_sql.')');
 
 		$form->selectTab('LDAP settings');
 
@@ -584,8 +589,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$table->findRow('Host', $hostname)->getColumn('Action')->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap udl INNER JOIN config co ON '.
-				'udl.userdirectoryid = co.ldap_userdirectoryid');
+		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid=('.
+				'SELECT value_userdirectoryid FROM settings WHERE name=\'ldap_userdirectoryid\')'
+		);
 
 		// Check that old LDAP server (by host name) is not default now.
 		$this->assertNotEquals($hostname, $new_hostname);
@@ -815,9 +821,64 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 									'Attribute' => 'test discord'
 								],
 								[
-									'Name' => 'Test iLert mapping',
+									'Name' => 'Test iLert mapping (disabled)',
 									'Media type' => 'iLert',
-									'Attribute' => 'test iLert'
+									'Attribute' => 'test iLert',
+									'Create enabled' => '1'
+								],
+								[
+									'Name' => 'Test Brevis - macro',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'test macro',
+									'When active' => '{$TEST.MACRO}'
+								],
+								[
+									'Name' => 'Test Brevis - time period',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'test time period',
+									'When active' => '1-5,12:00-13:00'
+								],
+								[
+									'Name' => 'Test Brevis with severity: Not classified',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity not classified',
+									'Use if severity' => 'Not classified'
+								],
+								[
+									'Name' => 'Test Brevis with severity: Information',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity information',
+									'Use if severity' => 'Information'
+								],
+								[
+									'Name' => 'Test Brevis with severity: Warning',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity warning',
+									'Use if severity' => 'Warning'
+								],
+								[
+									'Name' => 'Test Brevis with severity: Average',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity average',
+									'Use if severity' => 'Average'
+								],
+								[
+									'Name' => 'Test Brevis with severity: High',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity high',
+									'Use if severity' => 'High'
+								],
+								[
+									'Name' => 'Test Brevis with severity: Disaster',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity disaster',
+									'Use if severity' => 'Disaster'
+								],
+								[
+									'Name' => 'Test Brevis with no severity',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity none',
+									'Use if severity' => []
 								]
 							]
 						]
@@ -856,13 +917,91 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Test Discord mapping',
-								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'mediatypeid' => 71,
+								'attribute' => 'test discord',
+								'period' => '1-7,00:00-24:00',
+								'severity' => 63,
+								'active' => 0
 							],
 							[
-								'name' => 'Test iLert mapping',
-								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
+								'name' => 'Test iLert mapping (disabled)',
+								'mediatypeid' => 76,
+								'attribute' => 'test iLert',
+								'period' => '1-7,00:00-24:00',
+								'severity' => 63,
+								'active' => 1
+							],
+							[
+								'name' => 'Test Brevis - macro',
+								'mediatypeid' => 70,
+								'attribute' => 'test macro',
+								'severity' => 63,
+								'period' => '{$TEST.MACRO}',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis - time period',
+								'mediatypeid' => 70,
+								'attribute' => 'test time period',
+								'severity' => 63,
+								'period' => '1-5,12:00-13:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with severity: Not classified',
+								'mediatypeid' => 70,
+								'attribute' => 'severity not classified',
+								'severity' => 1,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with severity: Information',
+								'mediatypeid' => 70,
+								'attribute' => 'severity information',
+								'severity' => 2,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with severity: Warning',
+								'mediatypeid' => 70,
+								'attribute' => 'severity warning',
+								'severity' => 4,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with severity: Average',
+								'mediatypeid' => 70,
+								'attribute' => 'severity average',
+								'severity' => 8,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with severity: High',
+								'mediatypeid' => 70,
+								'attribute' => 'severity high',
+								'severity' => 16,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with severity: Disaster',
+								'mediatypeid' => 70,
+								'attribute' => 'severity disaster',
+								'severity' => 32,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Brevis with no severity',
+								'mediatypeid' => 70,
+								'attribute' => 'severity none',
+								'severity' => 0,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
 							]
 						]
 					]
@@ -911,7 +1050,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Group filter' => 'test_update_to_groupOfNames',
 								'User name attribute' => 'test_update_to_groupOfNames',
 								'User last name attribute' => 'test_update_to_groupOfNames'
-							]
+							],
+							'Media type mapping' => []
 						]
 					],
 					'db_check' => [
@@ -947,6 +1087,267 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						]
 					]
 				]
+			],
+			// #8 Update JIT remove media mapping.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'start_ldap' => [
+						'Name' => 'test_remove_media_mapping',
+						'Host' => '111.020.050',
+						'Port' => 888,
+						'Base DN' => 'test_remove_media_mapping',
+						'Search attribute' => 'test_remove_media_mapping',
+						'Bind DN' => 'test_remove_media_mapping',
+						'Description' => 'test_remove_media_mapping',
+						'Configure JIT provisioning' => true,
+						'Group configuration' => 'memberOf',
+						'Group name attribute' => 'test_remove_media_mapping',
+						'User group membership attribute' => 'test_remove_media_mapping',
+						'User name attribute' => 'test_remove_media_mapping',
+						'User last name attribute' => 'test_remove_media_mapping'
+					],
+					'start_group_mapping' => [
+						[
+							'LDAP group pattern' => 'NEW group pattern',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
+					'start_media_mapping' => [
+						[
+							'Name' => 'Test iLert mapping',
+							'Media type' => 'iLert',
+							'Attribute' => 'test iLert'
+						],
+						[
+							'Name' => 'Test Discord mapping (disable)',
+							'Media type' => 'Discord',
+							'Attribute' => 'test discord',
+							'Create enabled' => '1'
+						],
+						[
+							'Name' => 'Test Email mapping with non-default time period',
+							'Media type' => 'Email',
+							'Attribute' => 'test email',
+							'When active' => '2-4,00:00-23:00'
+						],
+						[
+							'Name' => 'Test Gmail mapping with custom severity',
+							'Media type' => 'Gmail',
+							'Attribute' => 'test gmail',
+							'Use if severity' => ['Information', 'Disaster']
+						]
+					],
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'test_remove_media_mapping',
+								'Host' => '111.020.050',
+								'Port' => 888,
+								'Base DN' => 'test_remove_media_mapping',
+								'Search attribute' => 'test_remove_media_mapping',
+								'Bind DN' => 'test_remove_media_mapping',
+								'Description' => 'test_remove_media_mapping',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'memberOf',
+								'Group name attribute' => 'test_remove_media_mapping',
+								'User group membership attribute' => 'test_remove_media_mapping',
+								'User name attribute' => 'test_remove_media_mapping',
+								'User last name attribute' => 'test_remove_media_mapping'
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => 'test_remove_media_mapping', 'description' => 'test_remove_media_mapping', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '111.020.050',
+								'port' => 888,
+								'base_dn' => 'test_remove_media_mapping',
+								'bind_dn' => 'test_remove_media_mapping',
+								'search_attribute' => 'test_remove_media_mapping',
+								'group_name' => 'test_remove_media_mapping',
+								'user_username' => 'test_remove_media_mapping',
+								'user_lastname' => 'test_remove_media_mapping'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'NEW group pattern',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+						]
+					]
+				]
+			],
+			// #9 Update LDAP with adding JIT (groupOfNames).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'start_ldap' => [
+						'Name' => 'test_update_media_mapping',
+						'Host' => '111.020.050',
+						'Port' => 888,
+						'Base DN' => 'test_update_media_mapping',
+						'Search attribute' => 'test_update_media_mapping',
+						'Bind DN' => 'test_update_media_mapping',
+						'Description' => 'test_update_media_mapping',
+						'Configure JIT provisioning' => true,
+						'Group configuration' => 'memberOf',
+						'Group name attribute' => 'test_update_media_mapping',
+						'User group membership attribute' => 'test_update_media_mapping',
+						'User name attribute' => 'test_update_media_mapping',
+						'User last name attribute' => 'test_update_media_mapping'
+					],
+					'start_group_mapping' => [
+						[
+							'LDAP group pattern' => 'NEW group pattern',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
+					'start_media_mapping' => [
+						[
+							'Name' => 'Test iLert mapping',
+							'Media type' => 'iLert',
+							'Attribute' => 'test iLert'
+						],
+						[
+							'Name' => 'Test Discord mapping (disable)',
+							'Media type' => 'Discord',
+							'Attribute' => 'test discord',
+							'Create enabled' => '1'
+						],
+						[
+							'Name' => 'Test Email mapping with non-default time period',
+							'Media type' => 'Email',
+							'Attribute' => 'test email',
+							'When active' => '2-4,00:00-23:00'
+						],
+						[
+							'Name' => 'Test Gmail mapping with custom severity',
+							'Media type' => 'Gmail',
+							'Attribute' => 'test gmail',
+							'Use if severity' => ['Information', 'Disaster']
+						]
+					],
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'ldap_with_jit_groupOfNames',
+								'Host' => '111.222.333',
+								'Port' => '',
+								'Base DN' => 'base dn',
+								'Search attribute' => 'search attribute',
+								'Bind DN' => 'bind dn test',
+								'Description' => 'test description with jit',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => 'test group base dn',
+								'Group name attribute' => 'test group name attribute',
+								'Group member attribute' => 'test group member',
+								'Reference attribute' => 'test reference attribute',
+								'Group filter' => 'test group filter',
+								'User name attribute' => 'user name attribute',
+								'User last name attribute' => 'user last name'
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'New media mapping - SMS',
+									'Media type' => 'SMS',
+									'Attribute' => 'test sms',
+									'When active' => '{$TEST}',
+									'Use if severity' => ['Information', 'Warning', 'Disaster'],
+									'Create enabled' => '1'
+								]
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => 'ldap_with_jit_groupOfNames', 'description' => 'test description with jit', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '111.222.333',
+								'port' => 0,
+								'base_dn' => 'base dn',
+								'bind_dn' => 'bind dn test',
+								'search_attribute' => 'search attribute',
+								'group_basedn' => 'test group base dn',
+								'group_name' => 'test group name attribute',
+								'group_member' => 'test group member',
+								'user_ref_attr' => 'test reference attribute',
+								'group_filter' => 'test group filter',
+								'user_username' => 'user name attribute',
+								'user_lastname' => 'user last name'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'NEW group pattern',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'Test iLert mapping',
+								'mediatypeid' => 76,
+								'attribute' => 'test iLert',
+								'period' => '1-7,00:00-24:00',
+								'severity' => 63,
+								'active' => 0
+							],
+							[
+								'name' => 'Test Discord mapping (disable)',
+								'mediatypeid' => 71,
+								'attribute' => 'test discord',
+								'period' => '1-7,00:00-24:00',
+								'severity' => 63,
+								'active' => 1
+							],
+							[
+								'name' => 'Test Email mapping with non-default time period',
+								'mediatypeid' => 1,
+								'attribute' => 'test email',
+								'severity' => 63,
+								'period' => '2-4,00:00-23:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Test Gmail mapping with custom severity',
+								'mediatypeid' => 34,
+								'attribute' => 'test gmail',
+								'severity' => 34,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'New media mapping - SMS',
+								'mediatypeid' => 3,
+								'attribute' => 'test sms',
+								'severity' => 38,
+								'period' => '{$TEST}',
+								'active' => 1
+							]
+						]
+					]
+				]
 			]
 		];
 	}
@@ -970,6 +1371,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 			if (array_key_exists('start_group_mapping', $data)) {
 				$server_settings['servers_settings'][0]['User group mapping'] =	$data['start_group_mapping'];
+			}
+
+			if (array_key_exists('start_media_mapping', $data)) {
+				$server_settings['servers_settings'][0]['Media type mapping'] =	$data['start_media_mapping'];
 			}
 
 			$this->checkLdap($server_settings, 'button:Add');
@@ -1151,7 +1556,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Host' => 'test',
 								'Port' => '001',
 								'Base DN' => 'test',
-								'Search attribute' => 'tets',
+								'Search attribute' => 'test',
 								'Configure JIT provisioning' => true
 							]
 						]
@@ -1172,7 +1577,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test',
 								'Base DN' => 'test',
-								'Search attribute' => 'tets',
+								'Search attribute' => 'test',
 								'Configure JIT provisioning' => true
 							],
 							'User group mapping' => [[]]
@@ -1191,7 +1596,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #9 Media mapping dialog form validation.
+			// #9 Media mapping dialog form validation with default values.
 			[
 				[
 					'servers_settings' => [
@@ -1200,7 +1605,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test no media',
 								'Base DN' => 'test no media',
-								'Search attribute' => 'tets no media',
+								'Search attribute' => 'test no media',
 								'Configure JIT provisioning' => true
 							],
 							'Media type mapping' => [[]]
@@ -1210,6 +1615,327 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'mapping_error_details' => [
 						'Incorrect value for field "name": cannot be empty.',
 						'Incorrect value for field "attribute": cannot be empty.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #10 Media mapping dialog form validation with missing data in name, attribute, time period fields.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'When active' => ''
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "attribute": cannot be empty.',
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #11 Media mapping dialog form validation with spaces in name, attribute, time period fields.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => ' ',
+									'Attribute' => ' ',
+									'When active' => ' '
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "attribute": cannot be empty.',
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #12 Media mapping dialog form validation with missing time period only.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with no time period',
+									'Attribute' => 'notimeperiod',
+									'When active' => ''
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #13 Media mapping dialog form validation with invalid characters in time period field.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => 'text'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #14 Media mapping dialog form validation with invalid time used in time period field #1.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '1-7, 00:00-24:01'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #15 Media mapping dialog form validation with invalid time used in time period field #2.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '1-8,11:11-22:22'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #16 Media mapping dialog form validation with invalid time used in time period field #3.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '6-5, 11:11-22:22'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #17 Media mapping dialog form validation with invalid time used in time period field #4.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '0-1, 00:00-11:11'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #18 Media mapping dialog form validation with invalid time used in time period field #5.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '1-7, 22:22-22:21'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #19 Media mapping validation with two mappings, that contain same type and attribute.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping',
+									'Attribute' => 'same_attribute'
+								],
+								[
+									'Name' => 'Media mapping with same attribute',
+									'Attribute' => 'same_attribute'
+								]
+							]
+						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
 					'ldap_error_details' => [
@@ -1305,12 +2031,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'кириллица1',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'кириллица'
 							],
 							[
 								'name' => 'кириллица2',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => 'кириллица'
 							]
 						]
@@ -1455,12 +2181,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '~`!@#$%^7*()_+=/1',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							],
 							[
 								'name' => '~`!@#$%^7*()_+=/2',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						]
@@ -1561,6 +2287,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 									'Name' => '   leading.trailing   ',
 									'Media type' => 'Discord',
 									'Attribute' => '   leading.trailing   '
+									// TODO: uncomment When active value, after ZBX-24720 is fixed
+									// 'When active' => '   1-7,00:00-24:00   '
 								]
 							]
 						]
@@ -1601,7 +2329,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'leading.trailing',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'leading.trailing'
 							]
 						]
@@ -1754,12 +2482,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_long_valu',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => STRING_255
 							],
 							[
 								'name' => '2ong_value_long_value_long_value_long_value_long_value_long_valu',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => STRING_255
 							]
 						]
@@ -1842,14 +2570,69 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							'Media type mapping' => [
 								[
-									'Name' => 'Create Test Discord mapping',
+									'Name' => 'Create Test Discord mapping with default values',
 									'Media type' => 'Discord',
 									'Attribute' => 'test discord'
 								],
 								[
-									'Name' => 'Create Test iLert mapping',
+									'Name' => 'Create Test iLert mapping with disabled status',
 									'Media type' => 'iLert',
-									'Attribute' => 'test iLert'
+									'Attribute' => 'test iLert',
+									'Create enabled' => '1'
+								],
+								[
+									'Name' => 'Create Test Brevis mapping with user macro in time period',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'test macro',
+									'When active' => '{$TEST.MACRO}'
+								],
+								[
+									'Name' => 'Create Test Brevis mapping with non-default time period',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'test time period',
+									'When active' => '1-5,12:00-13:00'
+								],
+								[
+									'Name' => 'Create Test Brevis with severity: Not classified',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity not classified',
+									'Use if severity' => 'Not classified'
+								],
+								[
+									'Name' => 'Create Test Brevis with severity: Information',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity information',
+									'Use if severity' => 'Information'
+								],
+								[
+									'Name' => 'Create Test Brevis with severity: Warning',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity warning',
+									'Use if severity' => 'Warning'
+								],
+								[
+									'Name' => 'Create Test Brevis with severity: Average',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity average',
+									'Use if severity' => 'Average'
+								],
+								[
+									'Name' => 'Create Test Brevis with severity: High',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity high',
+									'Use if severity' => 'High'
+								],
+								[
+									'Name' => 'Create Test Brevis with severity: Disaster',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity disaster',
+									'Use if severity' => 'Disaster'
+								],
+								[
+									'Name' => 'Create Test Brevis with no severity',
+									'Media type' => 'Brevis.one',
+									'Attribute' => 'severity none',
+									'Use if severity' => []
 								]
 							]
 						]
@@ -1889,14 +2672,92 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						],
 						'userdirectory_media' => [
 							[
-								'name' => 'Create Test Discord mapping',
-								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'name' => 'Create Test Discord mapping with default values',
+								'mediatypeid' => 71,
+								'attribute' => 'test discord',
+								'period' => '1-7,00:00-24:00',
+								'severity' => 63,
+								'active' => 0
 							],
 							[
-								'name' => 'Create Test iLert mapping',
-								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
+								'name' => 'Create Test iLert mapping with disabled status',
+								'mediatypeid' => 76,
+								'attribute' => 'test iLert',
+								'period' => '1-7,00:00-24:00',
+								'severity' => 63,
+								'active' => 1
+							],
+							[
+								'name' => 'Create Test Brevis mapping with user macro in time period',
+								'mediatypeid' => 70,
+								'attribute' => 'test macro',
+								'severity' => 63,
+								'period' => '{$TEST.MACRO}',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis mapping with non-default time period',
+								'mediatypeid' => 70,
+								'attribute' => 'test time period',
+								'severity' => 63,
+								'period' => '1-5,12:00-13:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with severity: Not classified',
+								'mediatypeid' => 70,
+								'attribute' => 'severity not classified',
+								'severity' => 1,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with severity: Information',
+								'mediatypeid' => 70,
+								'attribute' => 'severity information',
+								'severity' => 2,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with severity: Warning',
+								'mediatypeid' => 70,
+								'attribute' => 'severity warning',
+								'severity' => 4,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with severity: Average',
+								'mediatypeid' => 70,
+								'attribute' => 'severity average',
+								'severity' => 8,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with severity: High',
+								'mediatypeid' => 70,
+								'attribute' => 'severity high',
+								'severity' => 16,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with severity: Disaster',
+								'mediatypeid' => 70,
+								'attribute' => 'severity disaster',
+								'severity' => 32,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
+							],
+							[
+								'name' => 'Create Test Brevis with no severity',
+								'mediatypeid' => 70,
+								'attribute' => 'severity none',
+								'severity' => 0,
+								'period' => '1-7,00:00-24:00',
+								'active' => 0
 							]
 						]
 					]
@@ -1963,7 +2824,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getCreateData
 	 */

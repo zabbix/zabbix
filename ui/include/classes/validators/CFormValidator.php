@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -248,7 +243,7 @@ class CFormValidator {
 						}
 
 						if (preg_match($value, '') === false) {
-							throw new Exception('[RULES ERROR] Rule "'.$key.'" should not be empty (Path: '.$rule_path.')');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid regex (Path: '.$rule_path.')');
 						}
 
 						$result[$key] = $value;
@@ -443,6 +438,13 @@ class CFormValidator {
 			}
 			else {
 				switch ($key) {
+					case 'regex':
+						if (preg_match($value, '') === false) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid regex (Path: '.$rule_path.')');
+						}
+						$result[$key] = $value;
+						break;
+
 					case 'not_in':
 					case 'in':
 						$result[$key] = $value;
@@ -783,7 +785,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateId(array $rules, &$value, string &$error = null): bool {
+	private static function validateId(array $rules, &$value, ?string &$error = null): bool {
 		if (!self::isId($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid identifier.'));
 
@@ -816,7 +818,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateInt32(array $rules, &$value, string &$error = null): bool {
+	private static function validateInt32(array $rules, &$value, ?string &$error = null): bool {
 		if (!self::isInt32($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
 
@@ -867,7 +869,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFloat($rules, &$value, &$error = null): bool {
+	private static function validateFloat($rules, &$value, ?string &$error = null): bool {
 		if (!self::is_float($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid floating-point value.'));
 
@@ -914,7 +916,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	public static function validateStringUtf8(array $rules, &$value, &$error = null): bool {
+	public static function validateStringUtf8(array $rules, &$value, ?string &$error = null): bool {
 		$value_check = is_numeric($value) ? (string) $value : $value;
 
 		if (!is_string($value_check) || mb_check_encoding($value_check, 'UTF-8') !== true) {
@@ -1057,7 +1059,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	public function validateObject(array $rules, &$value, &$error = null, string &$path = ''): bool {
+	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = ''): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
@@ -1096,7 +1098,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateObjects(array $rules, &$objects_values, &$error = null, string &$path = ''): bool {
+	private function validateObjects(array $rules, &$objects_values, ?string &$error = null, string &$path = ''): bool {
 		if (!is_array($objects_values)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
@@ -1143,7 +1145,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateArray(array $rules, &$array_values, &$error = null, string $path = ''): bool {
+	private function validateArray(array $rules, &$array_values, ?string &$error = null, string $path = ''): bool {
 		if (!is_array($array_values)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
@@ -1179,7 +1181,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateDistinctness(array $rules, $array_values, string &$path, &$error = null): bool {
+	private static function validateDistinctness(array $rules, $array_values, string &$path, ?string &$error = null): bool {
 		foreach ($rules['uniq'] as $field_names) {
 			$values = array_map(fn ($entry) => array_intersect_key($entry, array_flip($field_names)), $array_values);
 			$unique_values = [];
@@ -1200,7 +1202,7 @@ class CFormValidator {
 		return true;
 	}
 
-	private function validateApiUniq(array $check, string &$path, &$error = null): bool {
+	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
 		[$api, $method] = explode('.', $method);
 
@@ -1363,7 +1365,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkNumericIn(array $rules, $value, string &$error = null): bool {
+	private static function checkNumericIn(array $rules, $value, ?string &$error = null): bool {
 		if (!array_key_exists('in', $rules)) {
 			return true;
 		}
@@ -1408,7 +1410,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkNumericNotIn(array $rules, $value, string &$error = null): bool {
+	private static function checkNumericNotIn(array $rules, $value, ?string &$error = null): bool {
 		if (!array_key_exists('not_in', $rules)) {
 			return true;
 		}
@@ -1453,7 +1455,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkStringIn(array $rules, $value, string &$error = null): bool {
+	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
 		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'])) {
 			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['in']));
 			$error = _n('This value must be %1$s.', 'This value must be one of %1$s.',  $values, count($rules['in']));
@@ -1474,7 +1476,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkStringNotIn(array $rules, $value, string &$error = null): bool {
+	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
 		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'])) {
 			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['not_in']));
 			$error = _n('This value cannot be %1$s.', 'This value cannot be one of %1$s.',  $values, count($rules['not_in']));
@@ -1661,6 +1663,10 @@ class CFormValidator {
 						= self::getWhenFieldAbsolutePath($api_check[2], $path);
 				}
 			}
+		}
+
+		if (!array_key_exists('fields', $rules)) {
+			return;
 		}
 
 		foreach ($rules['fields'] as $field => $rule_sets) {

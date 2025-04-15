@@ -1062,10 +1062,6 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
-				if (array_key_exists(0, $values)) {
-					unset($values[0]);
-				}
-
 				$approx_width = 0;
 
 				foreach ($values as $value) {
@@ -1173,44 +1169,43 @@ class CSvgGraph extends CSvg {
 					 */
 					$path_point = [];
 					foreach ($point as $type => $value) {
-						$in_range = ($max_value >= $value && $min_value <= $value);
-						if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
-							$x = $this->canvas_x + $this->canvas_width
-								- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
+						$x = $this->canvas_x + $this->canvas_width
+							- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
-							if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
+						if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
+							$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								calculateLogarithmicRelativePosition($max_negative_power, $min_negative_power,
+									$min_positive_power, $max_positive_power, $value
+								)
+							]);
+						}
+						else {
+							if ($max_value - $min_value == INF) {
 								$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-									calculateLogarithmicRelativePosition($max_negative_power, $min_negative_power,
-										$min_positive_power, $max_positive_power, $value
-									)
+									$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
 								]);
 							}
 							else {
-								if ($max_value - $min_value == INF) {
-									$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-										$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
-									]);
-								}
-								else {
-									$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-										$max_value - $value, 1 / ($max_value - $min_value)
-									]);
-								}
+								$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+									$max_value - $value, 1 / ($max_value - $min_value)
+								]);
 							}
-
-							if (!$in_range) {
-								$y = ($value > $max_value) ? max($y_min, $y) : min($y_max, $y);
-							}
-
-							$path_point[$type] = [
-								(int) ceil($x),
-								(int) ceil($y),
-								convertUnits([
-									'value' => $value,
-									'units' => $metric['units']
-								])
-							];
 						}
+
+						if ($value < $min_value || $value > $max_value) {
+							$y = $metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
+								? CSvgGraphMetricsPoint::Y_OUT_OF_RANGE
+								: ($value > $max_value ? max($y_min, $y) : min($y_max, $y));
+						}
+
+						$path_point[$type] = [
+							(int) ceil($x),
+							(int) ceil($y),
+							convertUnits([
+								'value' => $value,
+								'units' => $metric['units']
+							])
+						];
 					}
 
 					$paths[$part_index][] = $path_point;
@@ -1537,11 +1532,6 @@ class CSvgGraph extends CSvg {
 
 		if ($this->show_right_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
-
-			// Do not draw label at the bottom of right Y axis to avoid label overlapping with horizontal axis arrow.
-			if (array_key_exists(0, $grid_values)) {
-				unset($grid_values[0]);
-			}
 
 			$this->addItem(
 				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))

@@ -107,7 +107,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateByType(array $field_names, array &$items, array $db_items = null): void {
+	protected static function validateByType(array $field_names, array &$items, ?array $db_items = null): void {
 		$checked_fields = array_fill_keys($field_names, ['type' => API_ANY]);
 
 		foreach ($items as $i => &$item) {
@@ -415,8 +415,8 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkHostsAndTemplates(array $items, array &$db_hosts = null,
-			array &$db_templates = null): void {
+	protected static function checkHostsAndTemplates(array $items, ?array &$db_hosts = null,
+			?array &$db_templates = null): void {
 		$hostids = array_unique(array_column($items, 'hostid'));
 
 		$db_templates = API::Template()->get([
@@ -493,7 +493,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkUuidDuplicates(array $items, array $db_items = null): void {
+	protected static function checkUuidDuplicates(array $items, ?array $db_items = null): void {
 		$item_indexes = [];
 
 		foreach ($items as $i => $item) {
@@ -1270,7 +1270,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $hostids
 	 * @param bool       $is_dep_items  Inherit called for dependent items.
 	 */
-	abstract protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+	abstract protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void;
 
 	/**
@@ -1451,8 +1451,8 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updateParameters(array &$items, array &$db_items = null,
-			array &$upd_itemids = null): void {
+	protected static function updateParameters(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
 		$del_item_parameterids = [];
@@ -1561,8 +1561,8 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updatePreprocessing(array &$items, array &$db_items = null,
-			array &$upd_itemids = null): void {
+	protected static function updatePreprocessing(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		$ins_item_preprocs = [];
 		$upd_item_preprocs = [];
 		$del_item_preprocids = [];
@@ -1654,7 +1654,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updateTags(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
+	protected static function updateTags(array &$items, ?array &$db_items = null, ?array &$upd_itemids = null): void {
 		$ins_tags = [];
 		$del_itemtagids = [];
 
@@ -1730,7 +1730,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException if item keys are not unique.
 	 */
-	protected static function checkDuplicates(array $items, array $db_items = null): void {
+	protected static function checkDuplicates(array $items, ?array $db_items = null): void {
 		$host_keys = [];
 
 		foreach ($items as $item) {
@@ -1790,7 +1790,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
+	protected static function checkHostInterfaces(array $items, ?array $db_items = null): void {
 		foreach ($items as $i => &$item) {
 			$interface_type = itemTypeInterface($item['type']);
 
@@ -2237,7 +2237,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkValueMaps(array $items, array $db_items = null): void {
+	protected static function checkValueMaps(array $items, ?array $db_items = null): void {
 		$item_indexes = [];
 
 		foreach ($items as $i => $item) {

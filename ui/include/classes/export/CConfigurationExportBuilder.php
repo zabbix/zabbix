@@ -314,7 +314,7 @@ class CConfigurationExportBuilder {
 	 * @param array $templates
 	 * @param array $simple_triggers
 	 */
-	protected function formatTemplates(array $templates, array $simple_triggers = null) {
+	protected function formatTemplates(array $templates, ?array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($templates, ['host']);
@@ -356,7 +356,7 @@ class CConfigurationExportBuilder {
 	 * @param array $hosts
 	 * @param array $simple_triggers
 	 */
-	protected function formatHosts(array $hosts, array $simple_triggers = null) {
+	protected function formatHosts(array $hosts, ?array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($hosts, ['host']);
@@ -429,6 +429,8 @@ class CConfigurationExportBuilder {
 				'height' => $map['height'],
 				'label_type' => $map['label_type'],
 				'label_location' => $map['label_location'],
+				'show_element_label' => $map['show_element_label'],
+				'show_link_label' => $map['show_link_label'],
 				'highlight' => $map['highlight'],
 				'expandproblem' => $map['expandproblem'],
 				'markelements' => $map['markelements'],
@@ -451,6 +453,7 @@ class CConfigurationExportBuilder {
 				'label_string_image' => $map['label_string_image'],
 				'expand_macros' => $map['expand_macros'],
 				'background' => $map['backgroundid'],
+				'background_scale' => $map['background_scale'],
 				'iconmap' => $map['iconmap'],
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
@@ -1602,14 +1605,31 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($links, ['selementpos1', 'selementpos2']);
 
 		foreach ($links as $link) {
-			$result[] = [
-				'drawtype' => $link['drawtype'],
-				'color' => $link['color'],
-				'label' => $link['label'],
+			$data = [
 				'selementid1' => $link['selementid1'],
 				'selementid2' => $link['selementid2'],
-				'linktriggers' => $this->formatMapLinkTriggers($link['linktriggers'])
+				'label' => $link['label'],
+				'show_label' => $link['show_label'],
+				'drawtype' => $link['drawtype'],
+				'color' => $link['color'],
+				'indicator_type' => $link['indicator_type']
 			];
+
+			if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+				$data['linktriggers'] = $this->formatMapLinkTriggers($link['linktriggers']);
+			}
+			elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				$data['item'] = $link['item'];
+
+				if ($link['thresholds']) {
+					$data['thresholds'] = $link['thresholds'];
+				}
+				elseif ($link['highlights']) {
+					$data['highlights'] = $link['highlights'];
+				}
+			}
+
+			$result[] = $data;
 		}
 
 		return $result;
@@ -1662,6 +1682,7 @@ class CConfigurationExportBuilder {
 				'elementtype' => $element['elementtype'],
 				'label' => $element['label'],
 				'label_location' => $element['label_location'],
+				'show_label' => $element['show_label'],
 				'x' => $element['x'],
 				'y' => $element['y'],
 				'elementsubtype' => $element['elementsubtype'],
@@ -1678,7 +1699,8 @@ class CConfigurationExportBuilder {
 				'icon_maintenance' => $element['iconid_maintenance'],
 				'urls' => $this->formatMapElementUrls($element['urls']),
 				'evaltype' => $element['evaltype'],
-				'tags' => $this->formatTags($element['tags'])
+				'tags' => $this->formatTags($element['tags']),
+				'zindex' => $element['zindex']
 			];
 		}
 

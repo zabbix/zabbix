@@ -15,8 +15,8 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CElementQuery.php';
-require_once dirname(__FILE__).'/CommandExecutor.php';
+require_once __DIR__.'/CElementQuery.php';
+require_once __DIR__.'/CommandExecutor.php';
 
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Chrome\ChromeOptions;
@@ -221,8 +221,8 @@ class CPage {
 		if (self::$cookie === null || $sessionid !== $cookie['sessionid']) {
 			$data = ['sessionid' => $sessionid];
 
-			$config = CDBHelper::getRow('SELECT session_key FROM config WHERE configid=1');
-			$data['sign'] = hash_hmac('sha256', json_encode($data), $config['session_key'], false);
+			$session_key = CDBHelper::getValue('SELECT value_str FROM settings WHERE name=\'session_key\'');
+			$data['sign'] = hash_hmac('sha256', json_encode($data), $session_key, false);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
@@ -607,9 +607,12 @@ class CPage {
 	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
+	 * @param int $scenario  	Scenario TEST_BAD means that passed credentials are invalid, TEST_GOOD - user successfully logged in
 	 * @param string $url		Direct link to certain Zabbix page
+	 *
+	 * @return $this
 	 */
-	public function userLogin($alias, $password, $url = 'index.php') {
+	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php') {
 		if (self::$cookie === null) {
 			$this->driver->get(PHPUNIT_URL);
 		}
@@ -621,13 +624,17 @@ class CPage {
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 
-		// Make sure that logged in page is opened.
-		try {
-			$this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists();
+		// Check login result.
+		$sign_out = $this->query('class:zi-sign-out')->exists();
+
+		if ($scenario === TEST_GOOD && !$sign_out) {
+			throw new \Exception('"Sign out" button is not found on the page. Probably user is not logged in.');
 		}
-		catch (\Exception $ex) {
-			throw new \Exception('"User settings" menu is not found on page. Probably user is not logged in.');
+		elseif ($scenario === TEST_BAD && $sign_out) {
+			throw new \Exception('"Sign out" button is found on the page. Probably user is logged in, but shouldn\'t.');
 		}
+
+		return $this;
 	}
 
 	/**

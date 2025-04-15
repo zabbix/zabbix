@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrationGeneral {
 
@@ -722,8 +722,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_period": cannot be empty.',
-						'Incorrect value for field "blink_period": cannot be empty.',
+						'Incorrect value for field "ok_period": a time unit is expected.',
+						'Incorrect value for field "blink_period": a time unit is expected.',
 						'Incorrect value for field "severity_name_0": cannot be empty.',
 						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_1": cannot be empty.',
@@ -805,7 +805,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 
 	/**
 	 * TODO: Backup is needed because of DEV-1673, and can be removed after bug is fixed.
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getCheckFormData
 	 */

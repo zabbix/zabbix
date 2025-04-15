@@ -648,7 +648,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows($checkbox_hash);
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}
@@ -684,7 +684,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -769,6 +769,9 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
+		throw new CAccessDeniedException();
+	}
 
 	$default_timeout = DB::getDefault('items', 'timeout');
 	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
@@ -884,7 +887,7 @@ else {
 	// Select LLD rules.
 	$options = [
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
+		'selectHosts' => ['hostid', 'name', 'status'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,

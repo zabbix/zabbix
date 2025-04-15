@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -32,7 +32,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 
-		$this->zbxTestCheckTitle('User profile');
+		$this->zbxTestCheckTitle('Profile');
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('Global view');
@@ -46,7 +46,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
-		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
+		$this->zbxTestCheckHeader('Profile');
 		$this->zbxTestInputTypeOverwrite('refresh', '60');
 
 		$this->zbxTestClickWait('cancel');
@@ -111,7 +111,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 
-		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
 		$form->query('button:Change password')->waitUntilClickable()->one()->click();
 		foreach (['current_password', 'password1', 'password2'] as $id) {
 			$form->query('id', $id)->waitUntilVisible()->one();
@@ -141,7 +141,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
-				$this->zbxTestCheckTitle('User profile');
+				$this->zbxTestCheckTitle('Profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
@@ -362,7 +362,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckTitle('User profile');
+				$this->zbxTestCheckTitle('Profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
@@ -460,8 +460,8 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * @dataProvider messaging
 	 */
 	public function testFormUserProfile_MessagesTimeout($data) {
-		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
-		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
+		$this->zbxTestLogin('zabbix.php?action=userprofile.notification.edit');
+		$this->zbxTestCheckHeader('Notifications');
 		$this->zbxTestTabSwitch('Frontend notifications');
 
 		if (array_key_exists('messages_disabled', $data)) {
@@ -562,11 +562,10 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * @dataProvider media
 	 */
 	public function testFormUserProfile_Media($data) {
-		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
-		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
-		$this->zbxTestTabSwitch('Media');
+		$this->zbxTestLogin('zabbix.php?action=userprofile.notification.edit');
+		$this->zbxTestCheckHeader('Notifications');
 		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestLaunchOverlayDialog('Media');
+		$this->zbxTestLaunchOverlayDialog('New media');
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);

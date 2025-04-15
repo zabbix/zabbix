@@ -797,11 +797,19 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  */
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
+	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
+
 	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
 
 	if ($is_numeric_data) {
-		$display_value = $value;
+		$converted_value = convertUnitsRaw([
+			'value' => $value,
+			'units' => $units
+		] + $convert_options);
+
+		$display_value = $converted_value['value'].
+			($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '');
 	}
 	else {
 		switch ($item['value_type']) {
@@ -833,14 +841,7 @@ function formatAggregatedHistoryValueRaw($value, array $item, int $function, boo
 		}
 	}
 
-	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
-
 	if ($is_numeric_data) {
-		$converted_value = convertUnitsRaw([
-			'value' => $value,
-			'units' => $units
-		] + $convert_options);
-
 		return [
 			'value' => $converted_value['value'],
 			'units' => $converted_value['units'],
@@ -897,18 +898,19 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			if ($mapped_value !== false) {
-				return [
-					'value' => $mapped_value.' ('.$value.')',
-					'units' => '',
-					'is_mapped' => true
-				];
-			}
-
 			$converted_value = convertUnitsRaw([
 				'value' => $value,
 				'units' => $item['units']
 			] + $convert_options);
+
+			if ($mapped_value !== false) {
+				return [
+					'value' => $mapped_value.' ('.$converted_value['value'].
+						($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '').')',
+					'units' => '',
+					'is_mapped' => true
+				];
+			}
 
 			return [
 				'value' => $converted_value['value'],
@@ -2411,7 +2413,7 @@ function getInheritedTimeouts(string $proxyid): array {
  *
  * @return array
  */
-function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+function getEnabledItemTypeCountByHostId(int $item_type, array $hostids): array {
 	if (!$hostids) {
 		return [];
 	}
@@ -2420,8 +2422,28 @@ function getItemTypeCountByHostId(int $item_type, array $hostids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'hostids' => $hostids,
-		'filter' => ['type' => $item_type]
+		'filter' => ['type' => $item_type, 'status' => ITEM_STATUS_ACTIVE]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
+}
+
+/**
+ * @param array $interfaceids
+ *
+ * @return array
+ */
+function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
+	if (!$interfaceids) {
+		return [];
+	}
+
+	$items_count = API::Item()->get([
+		'countOutput' => true,
+		'groupCount' => true,
+		'interfaceids' => $interfaceids,
+		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+	]);
+
+	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];
 }

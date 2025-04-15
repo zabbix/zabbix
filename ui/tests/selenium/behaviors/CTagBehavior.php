@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CBehavior.php';
+require_once __DIR__.'/../../include/CBehavior.php';
 
 /**
  * Behavior for tag related tests.
