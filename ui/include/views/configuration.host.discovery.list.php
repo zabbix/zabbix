@@ -347,22 +347,21 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Graph prototypes'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-			? [
-				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $discovery['itemid'])
-						->setArgument('context', $data['context'])
-				),
-				CViewHelper::showNum($discovery['hostPrototypes'])
-			]
-			: '',
+		[
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
+			),
+			CViewHelper::showNum($discovery['hostPrototypes'])
+		],
 		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
