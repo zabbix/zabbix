@@ -663,12 +663,7 @@ class ZColorPicker extends HTMLElement {
 	 * @param {string} value
 	 */
 	#updateApplyButton(value) {
-		value = value.toUpperCase();
-
-		const button = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`);
-		const color = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR}[data-color="${value}"]`);
-
-		button.disabled = color !== null || !ZColorPicker.#isValidSolid(value);
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`).disabled = !isColorHex(`#${value}`);
 	}
 
 	/**
