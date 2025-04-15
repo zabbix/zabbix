@@ -629,7 +629,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: When allocating shared memory with default zbx_shmem_create()    *
- *           function the available memory will reduced by the allocator      *
+ *           function the available memory will be reduced by the allocator   *
  *           overhead. This function estimates the overhead and requests      *
  *           enough memory so the available memory is greater or equal to the *
  *           requested size.                                                  *
@@ -638,25 +638,25 @@ out:
 int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
-#define TIMEKEEPER_ALIGN8(x)	(((x) + 7) & (~7u))
+#define MEMALLOC_ALIGN8(x)	(((x) + 7) & (~7u))
 	zbx_uint64_t	base = 0;
 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	base = base + sizeof(zbx_shmem_info_t);
-	base = TIMEKEEPER_ALIGN8(base);
-	base = base + ZBX_SHMEM_BUCKET_COUNT * 8;
-	base = (base + strlen(descr) + 1);
-	base = (base + strlen(param) + 1);
-	base = TIMEKEEPER_ALIGN8(base);
+	base += sizeof(zbx_shmem_info_t);
+	base = MEMALLOC_ALIGN8(base);
+	base += ZBX_SHMEM_BUCKET_COUNT * 8;
+	base += strlen(descr) + 1;
+	base += strlen(param) + 1;
+	base = MEMALLOC_ALIGN8(base);
 	size += base;
 
 	size += 8;
 	size += 2 * SHMEM_SIZE_FIELD;
 
 	return zbx_shmem_create(info, size, descr, param, allow_oom, error);
-#undef TIMEKEEPER_ALIGN8
+#undef MEMALLOC_ALIGN8
 }
 
 void	zbx_shmem_destroy(zbx_shmem_info_t *info)
