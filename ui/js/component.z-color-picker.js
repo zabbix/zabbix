@@ -622,7 +622,7 @@ class ZColorPicker extends HTMLElement {
 	 * @param {string} value
 	 */
 	#updatePreview(value) {
-		value = value.toUpperCase();
+		let changed = true;
 
 		if (isColorHex(`#${value}`)) {
 			this.#preview.style.background = `#${value}`;
@@ -633,10 +633,15 @@ class ZColorPicker extends HTMLElement {
 		else if (this.#isValidPalette(value)) {
 			this.#preview.style.background = '';
 		}
+		else {
+			changed = false;
+		}
 
-		this.#preview.title = this.#getTitle(value, false);
+		if (changed) {
+			this.#preview.title = this.#getTitle(value, false);
 
-		this.#updateEmptyState(this.#preview, value);
+			this.#updateEmptyState(this.#preview, value);
+		}
 	}
 
 	/**
