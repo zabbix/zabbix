@@ -215,8 +215,9 @@ div.dashboard-widget-itemcard {
 				}
 
 				&.section-single-parameter {
+					grid-template-columns: 1fr 2fr;
 
-					&.section-body {
+					.section-body {
 						@extend %overflow-ellipsis;
 					}
 				}
