@@ -16095,7 +16095,7 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 		const zbx_uint64_t *hostids, int hostids_num, char **error)
 {
 	zbx_token_t	token;
-	int		pos = 0, ret = SUCCEED;
+	int		pos = 0, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() '%s'", __func__, *text);
 
@@ -16117,7 +16117,7 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 				if (SUCCEED == zbx_token_find(*text + token.loc.l, 0, &inner_token,
 						ZBX_TOKEN_SEARCH_BASIC))
 				{
-					(void)zbx_calculate_macro_function(*text + token.loc.l,
+					ret = zbx_calculate_macro_function(*text + token.loc.l,
 							&inner_token.data.func_macro, &out);
 					value = out;
 				}
@@ -16138,8 +16138,8 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
 						(int)(token.loc.r - token.loc.l + 1), *text +
 						token.loc.l);
+				goto out;
 			}
-			ret = FAIL;
 		}
 		else
 			zbx_replace_string(text, token.loc.l, &token.loc.r, value);
@@ -16148,6 +16148,8 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 		zbx_free(out);
 	}
 
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() '%s'", __func__, *text);
 
 	return ret;
