@@ -291,6 +291,10 @@ class CFormValidator {
 				const next_level_matching_rulesets = [];
 
 				matching_rulesets.forEach(({type, fields, field}) => {
+					if (fields === undefined) {
+						fields = {};
+					}
+
 					if (type === 'object' || type === 'objects') {
 						next_level_matching_rulesets.push(...filterMatchingRuleSets(fields[part], path_so_far));
 					}
@@ -748,6 +752,10 @@ class CFormValidator {
 				const next_level_rules = [];
 
 				for (const rule of rules) {
+					if (rule.fields === undefined) {
+						return false;
+					}
+
 					if (!this.#isTypeObject(rule) || !(part in rule.fields)) {
 						return false;
 					}

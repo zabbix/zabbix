@@ -20,7 +20,11 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js'];
+$page['scripts'] = ['class.linkform.js', 'class.massshapeform.js', 'class.shapeform.js',
+	'class.massform.js', 'class.selementform.js', 'class.selement.js', 'class.shape.js', 'class.link.js',
+	'class.imagecache.js', 'class.svgcanvas.js', 'class.svgtextarea.js', 'class.svgelement.js', 'class.svgmap.js',
+	'class.svgmapelement.js', 'class.svgmaplink.js', 'class.svgmapshape.js', 'class.cmap.js', 'sysmap.js'
+];
 $page['type'] = detect_page_type();
 
 if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
