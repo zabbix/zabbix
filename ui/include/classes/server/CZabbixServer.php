@@ -596,7 +596,7 @@ class CZabbixServer {
 				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
-				stream_context_set_option($context, 'ssl', 'verify_peer_name', $ZBX_SERVER_TLS['VERIFY_NAME']);
+				stream_context_set_option($context, 'ssl', 'verify_peer_name', (bool)$ZBX_SERVER_TLS['VERIFY_NAME']);
 			}
 
 			if (!$socket = @stream_socket_client(
@@ -621,7 +621,12 @@ class CZabbixServer {
 						break;
 
 					default:
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+						if ($ZBX_SERVER_TLS['ACTIVE']) {
+							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n;\n3. Incorrect TLS configuration.\n", $this->host);
+						}
+						else {
+							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+						}
 				}
 
 				$this->error = rtrim($dErrorMsg.$errorMsg);
