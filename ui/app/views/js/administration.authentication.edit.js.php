@@ -130,10 +130,16 @@
 			// SSO upload
 			this.form.querySelectorAll('.saml-change-identity-button').forEach(change_button => {
 				change_button.addEventListener('click', (e) => {
-					const file_content = change_button.closest('div').nextElementSibling;
+					const file_content_wrapper = change_button.closest('div').nextElementSibling;
+					const file_content = file_content_wrapper.querySelector('textarea');
 
-					file_content.classList.remove('display-none');
+					const parentDiv = change_button.closest('div');
+					const is_change_button = document.getElementById('is_' + parentDiv.id);
+
+					file_content_wrapper.classList.remove('display-none');
 					change_button.classList.add('display-none');
+					file_content.value = '';
+					is_change_button.value = 0;
 				});
 			});
 
@@ -306,10 +312,12 @@
 		_authFormSubmit() {
 			const fields_to_trim = ['#http_strip_domains', '#idp_entityid', '#sso_url', '#slo_url',
 				'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
-				'#saml_user_lastname'
+				'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
 			];
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
-				elem.value = elem.value.trim();
+				if (elem) {
+					elem.value = elem.value.trim();
+				}
 			});
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
@@ -787,38 +795,47 @@
 		#showHideSamlChangeIdentityButton(saml_idp_certificate, saml_sp_certificate, saml_sp_private_key) {
 			const idp_certificate_change = document.getElementById('idp_certificate_change');
 			const idp_certificate_create = document.getElementById('idp_certificate_create');
+			const is_idp_certificate_change = document.getElementById('is_idp_certificate_change');
 
 			const sp_certificate_change = document.getElementById('sp_certificate_change');
 			const sp_certificate_create = document.getElementById('sp_certificate_create');
+			const is_sp_certificate_change = document.getElementById('is_sp_certificate_change');
 
 			const sp_private_key_change = document.getElementById('sp_private_key_change');
 			const sp_private_key_create = document.getElementById('sp_private_key_create');
+			const is_sp_private_key_change = document.getElementById('is_sp_private_key_change');
 
 			if (saml_idp_certificate != '') {
+				is_idp_certificate_change.value = 1;
 				idp_certificate_change.classList.remove('display-none');
 				idp_certificate_create.classList.add('display-none');
 			}
 			else {
 				idp_certificate_change.classList.add('display-none');
 				idp_certificate_create.classList.remove('display-none');
+				is_idp_certificate_change.value = 0;
 			}
 
 			if (saml_sp_certificate != '') {
 				sp_certificate_change.classList.remove('display-none');
 				sp_certificate_create.classList.add('display-none');
+				is_sp_certificate_change.value = 1;
 			}
 			else {
 				sp_certificate_change.classList.add('display-none');
 				sp_certificate_create.classList.remove('display-none');
+				is_sp_certificate_change.value = 0;
 			}
 
 			if (saml_sp_private_key != '') {
 				sp_private_key_change.classList.remove('display-none');
 				sp_private_key_create.classList.add('display-none');
+				is_sp_private_key_change.value = 1;
 			}
 			else {
 				sp_private_key_change.classList.add('display-none');
 				sp_private_key_create.classList.remove('display-none');
+				is_sp_private_key_change.value = 0;
 			}
 		}
 	};

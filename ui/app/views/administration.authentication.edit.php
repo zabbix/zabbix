@@ -307,15 +307,19 @@ $saml_tab
 if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database') {
 	$saml_tab
 		->addItem([
-			(new CLabel(_('IdP certificate')))->setAsteriskMark(),
+			(new CLabel([
+				_('IdP certificate'),
+				makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt'))
+			]))->setAsteriskMark(),
 			(new CFormField([
+				(new CInput('hidden', 'is_idp_certificate_change', 0))
+					->setId('is_idp_certificate_change'),
 				(new CDiv([
 					(new CSimpleButton(_('Change IdP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
 						->addClass('saml-enabled')
-				]))
-					->setId('idp_certificate_change'),
+				]))->setId('idp_certificate_change'),
 				(new CDiv([
 					(new CTextArea('idp_certificate', ''))
 						->setId('idp_certificate')
@@ -339,15 +343,19 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 			]))
 		])
 		->addItem([
-			(new CLabel(_('SP private key')))->setAsteriskMark(),
+			(new CLabel([
+				_('SP private key'),
+				makeHelpIcon(_('Allowed file extensions for upload: .key, .pem, .txt'))
+			])),
 			(new CFormField([
+				(new CInput('hidden', 'is_sp_private_key_change', 0))
+					->setId('is_sp_private_key_change'),
 				(new CDiv([
 					(new CSimpleButton(_('Change SP private key')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
 						->addClass('saml-enabled')
-				]))
-					->setId('sp_private_key_change'),
+				]))->setId('sp_private_key_change'),
 				(new CDiv([
 					(new CTextArea('sp_private_key', ''))
 						->setId('sp_private_key')
@@ -371,15 +379,19 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 			]))
 		])
 		->addItem([
-			(new CLabel(_('SP certificate')))->setAsteriskMark(),
+			(new CLabel([
+				_('SP certificate'),
+				makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt'))
+			])),
 			(new CFormField([
+				(new CInput('hidden', 'is_sp_certificate_change', 0))
+					->setId('is_sp_certificate_change'),
 				(new CDiv([
 					(new CSimpleButton(_('Change SP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
 						->addClass('saml-enabled')
-				]))
-					->setId('sp_certificate_change'),
+				]))->setId('sp_certificate_change'),
 				(new CDiv([
 					(new CTextArea('sp_certificate', ''))
 						->setId('sp_certificate')

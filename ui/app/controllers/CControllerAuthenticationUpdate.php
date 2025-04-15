@@ -73,7 +73,13 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
-			'mfa_removed_mfaids' =>				'array_id'
+			'mfa_removed_mfaids' =>				'array_id',
+			'idp_certificate' =>				'string',
+			'sp_certificate' =>					'string',
+			'sp_private_key' =>					'string',
+			'is_idp_certificate_change' =>		'in 0,1',
+			'is_sp_certificate_change' =>		'in 0,1',
+			'is_sp_private_key_change' =>		'in 0,1'
 		];
 
 		if ($ALLOW_HTTP_AUTH) {
@@ -188,6 +194,12 @@ class CControllerAuthenticationUpdate extends CController {
 			'sp_entityid'
 		]);
 
+		$saml_certificate_fields = [
+			'idp_certificate',
+			'sp_certificate',
+			'sp_private_key'
+		];
+
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
 
@@ -201,6 +213,46 @@ class CControllerAuthenticationUpdate extends CController {
 				error(_('Invalid SAML JIT provisioning media type mapping configuration.'));
 
 				return false;
+			}
+		}
+
+		foreach ($saml_certificate_fields as $field_name) {
+			if ($this->getInput('is_'.$field_name.'_change') === '0') {
+				$value = trim($this->getInput($field_name));
+
+				if ($field_name == 'idp_certificate' && $value === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty')));
+
+					return false;
+				}
+
+				if ($value !== '') {
+					if ($field_name == 'idp_certificate' || $field_name == 'sp_certificate') {
+						//$is_certificate = openssl_x509_read($value);
+						$is_certificate = $this->validateCertificateContent($value);
+
+						if (!$is_certificate) {
+							error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('invalid certificate')));
+
+							return false;
+						}
+					}
+					elseif ($field_name == 'sp_private_key') {
+						$is_private_key = openssl_pkey_get_private($value);
+
+						if (!$is_private_key) {
+							error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('invalid private key')));
+
+							return false;
+						}
+					}
+
+					if (strlen($value) > 10000) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('to long (maximum 10000 characters)')));
+
+						return false;
+					}
+				}
 			}
 		}
 
@@ -650,6 +702,37 @@ class CControllerAuthenticationUpdate extends CController {
 				return false;
 			}
 		}
+
+		return true;
+	}
+
+	private function validateCertificateContent($certificate_content) {
+		// Check if the certificate is in PEM format (starting and ending with correct lines)
+		if (strpos($certificate_content, '-----BEGIN CERTIFICATE-----') === false ||
+			strpos($certificate_content, '-----END CERTIFICATE-----') === false) {
+			echo "Invalid certificate format. The file is not a valid PEM certificate.";
+			return;
+		}
+
+		// Try to parse the certificate using OpenSSL
+		/*$cert = openssl_x509_read($certificate_content);
+		if ($cert === false) {
+			echo "Failed to read the certificate. The content is invalid.";
+			return;
+		}*/
+
+		// If the certificate is valid, you can check the extensions here
+		//$parsed_cert = openssl_x509_parse($cert);
+
+		// Check if extensions are present in the certificate
+		/*if (isset($parsed_cert['extensions'])) {
+			// You can further validate the extensions here
+			$extensions = $parsed_cert['extensions'];
+			echo "Certificate Extensions:\n";
+			print_r($extensions);
+		} else {
+			echo "No extensions found in the certificate.";
+		}*/
 
 		return true;
 	}
