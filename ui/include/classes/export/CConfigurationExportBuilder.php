@@ -335,6 +335,8 @@ class CConfigurationExportBuilder {
 				'name' => $template['name'],
 				'description' => $template['description'],
 				'vendor' => $vendor,
+				'wizard_ready' => $template['wizard_ready'],
+				'readme' => $template['readme'],
 				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
