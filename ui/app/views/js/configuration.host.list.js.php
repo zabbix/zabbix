@@ -145,6 +145,14 @@
 		},
 
 		initEvents() {
+			document.querySelector('.js-host-wizard').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('host.wizard');
+			});
+
+			document.querySelector('.js-create-host').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
+			});
+
 			const form = document.forms['hosts'];
 
 			form.addEventListener('click', e => {
@@ -191,10 +199,6 @@
 
 			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
 				this.massDeleteHosts(e.target);
-			});
-
-			document.querySelector('.js-create-host').addEventListener('click', () => {
-				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
 			});
 		},
 

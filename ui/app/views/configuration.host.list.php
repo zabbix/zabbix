@@ -28,24 +28,28 @@ if ($data['uncheck']) {
 $html_page = (new CHtmlPage())
 	->setTitle(_('Hosts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_LIST))
-	->setControls((new CTag('nav', true, (new CList())
-			->addItem(
-				(new CSimpleButton(_('Create host')))
-					->addClass('js-create-host')
-			)
-			->addItem(
-				(new CButton('form', _('Import')))
-					->onClick(
-						'return PopUp("popup.import", {
-							rules_preset: "host", '.
-							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
-						'"}, {
-							dialogueid: "popup_import",
-							dialogue_class: "modal-popup-generic"
-						});'
-					)
-					->removeId()
-			)
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CSimpleButton(_('Host Wizard')))->addClass('js-host-wizard')
+				)
+				->addItem(
+					(new CSimpleButton(_('Create host')))->addClass('js-create-host')
+				)
+				->addItem(
+					(new CButton('form', _('Import')))
+						->onClick(
+							'return PopUp("popup.import", {
+								rules_preset: "host", '.
+								CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
+							'"}, {
+								dialogueid: "popup_import",
+								dialogue_class: "modal-popup-generic"
+							});'
+						)
+						->removeId()
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 

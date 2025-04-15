@@ -339,7 +339,7 @@ class testPageSearch extends CWebTest {
 
 			// Check expanding functionality.
 			$widget_body = $widget->query('class:section-body')->one();
-			$toggle_button = $widget->query('class:section-toggle')->one();
+			$toggle_button = $widget->query('class:toggle')->one();
 			$this->assertEquals('Collapse', $toggle_button->getAttribute('title'));
 
 			$toggle_button->click();

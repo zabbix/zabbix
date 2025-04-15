@@ -43,6 +43,7 @@ const ZBX_STYLE_COLLAPSED = 'collapsed';
 const ZBX_STYLE_DRAG_ICON = 'drag-icon';
 const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
+const ZBX_STYLE_TOGGLE = 'toggle';
 
 const ZBX_STYLE_LINK_ALT = 'link-alt';
 

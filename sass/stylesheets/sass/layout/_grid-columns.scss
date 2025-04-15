@@ -9,4 +9,16 @@
 	&.columns-3 {
 		grid-template-columns: repeat(3, 1fr);
 	}
+
+	&.columns-4 {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	.column-first {
+		grid-column-start: 1;
+	}
+
+	.column-last {
+		grid-column-end: -1;
+	}
 }
