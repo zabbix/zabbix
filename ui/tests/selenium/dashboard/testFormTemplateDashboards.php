@@ -1170,6 +1170,7 @@ class testFormTemplateDashboards extends CWebTest {
 	private function checkSettings($data, $old_values, $status = 'created', $check = 'dashboard action') {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
+				COverlayDialogElement::ensureNotPresent();
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {

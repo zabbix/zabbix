@@ -234,6 +234,11 @@ class testPageAdministrationScripts extends CWebTest {
 		foreach ([false, true] as $status) {
 			$filter->expand($status);
 			$this->assertTrue($filter->isExpanded($status));
+			CElementQuery::wait()->until(function () use ($status) {
+				return (CDBHelper::getCount('SELECT NULL FROM profiles'.
+						' WHERE idx='.zbx_dbstr('web.scripts.filter.active').' AND userid=1') === ($status ? 0 : 1));
+				}, 'Failed to wait for a record in the DB that filter is '.($status ? 'open' : 'close')
+			);
 		}
 
 		// Check filter labels and default values.
