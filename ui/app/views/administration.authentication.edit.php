@@ -307,10 +307,7 @@ $saml_tab
 if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database') {
 	$saml_tab
 		->addItem([
-			(new CLabel([
-				_('IdP certificate'),
-				makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt'))
-			]))->setAsteriskMark(),
+			(new CLabel(_('IdP certificate')))->setAsteriskMark(),
 			(new CFormField([
 				(new CInput('hidden', 'is_idp_certificate_change', 0))
 					->setId('is_idp_certificate_change'),
@@ -328,6 +325,7 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 						->setRows(3)
 						->setAttribute('placeholder', 'paste PEM-encoded IdP certificate')
 						->addClass('saml-enabled'),
+					makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt')),
 					(new CDiv([
 						(new CButton('idp_certificate_input_button', _('Choose file')))
 							->addStyle('margin-left: .3em;')
@@ -343,10 +341,7 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 			]))
 		])
 		->addItem([
-			(new CLabel([
-				_('SP private key'),
-				makeHelpIcon(_('Allowed file extensions for upload: .key, .pem, .txt'))
-			])),
+			(new CLabel(_('SP private key'))),
 			(new CFormField([
 				(new CInput('hidden', 'is_sp_private_key_change', 0))
 					->setId('is_sp_private_key_change'),
@@ -364,6 +359,7 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 						->setRows(3)
 						->setAttribute('placeholder', 'paste PEM-encoded SP private key')
 						->addClass('saml-enabled'),
+					makeHelpIcon(_('Allowed file extensions for upload: .key, .pem, .txt')),
 					(new CDiv([
 						(new CButton('sp_private_key_input_button', _('Choose file')))
 							->addStyle('margin-left: .3em;')
@@ -379,10 +375,7 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 			]))
 		])
 		->addItem([
-			(new CLabel([
-				_('SP certificate'),
-				makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt'))
-			])),
+			(new CLabel(_('SP certificate'))),
 			(new CFormField([
 				(new CInput('hidden', 'is_sp_certificate_change', 0))
 					->setId('is_sp_certificate_change'),
@@ -400,6 +393,7 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 						->setRows(3)
 						->setAttribute('placeholder', 'paste PEM-encoded SP certificate')
 						->addClass('saml-enabled'),
+					makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt')),
 					(new CDiv([
 						(new CButton('sp_certificate_input_button', _('Choose file')))
 							->addStyle('margin-left: .3em;')
