@@ -557,8 +557,8 @@ class ZColorPicker extends HTMLElement {
 		const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
 		const box_rect = this.#box.getBoundingClientRect();
 		const dialog_rect = this.#dialog.getBoundingClientRect();
-		const dialog_max_width = 402;
-		const dialog_max_height = 344;
+		const dialog_max_width = this.#has_palette ? 402 : 382;
+		const dialog_max_height = this.#has_palette ? 344 : 303;
 
 		const space_right = wrapper_rect.width + wrapper_rect.left - box_rect.left - box_rect.width;
 		const space_left = box_rect.left - wrapper_rect.left;
@@ -571,16 +571,32 @@ class ZColorPicker extends HTMLElement {
 		const fits_above = dialog_max_height <= space_above;
 
 		const pos = {
-			left: fits_right || !fits_right && !fits_left
-				? box_rect.left + box_rect.width
-				: box_rect.left - dialog_rect.width,
-			top: fits_below || !fits_below && !fits_above
-				? box_rect.top
-				: box_rect.top + box_rect.height - dialog_rect.height
+			left: null,
+			right: null,
+			top: null
 		};
 
-		this.#dialog.style.left = `${pos.left}px`;
-		this.#dialog.style.top = `${pos.top}px`;
+		if (fits_right) {
+			pos.left = box_rect.left + box_rect.width;
+		}
+		else if (fits_left) {
+			pos.right = wrapper_rect.width + wrapper_rect.left - box_rect.left;
+		}
+		else {
+			pos.left = box_rect.left + box_rect.width;
+		}
+
+		if (fits_below) {
+			pos.top = box_rect.top;
+		}
+		else if (fits_above) {
+			pos.top = box_rect.top + box_rect.height - dialog_rect.height;
+		}
+		else {
+			pos.top = box_rect.top - (dialog_max_height - space_below);
+		}
+
+		Object.entries(pos).forEach(([key, value]) => this.#dialog.style[key] = value !== null ? `${value}px` : null);
 	}
 
 	/**
@@ -675,8 +691,6 @@ class ZColorPicker extends HTMLElement {
 
 		this.#dialog.querySelector(`.${tab.dataset.content}`)
 			.classList.add(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
-
-		this.#positionDialog();
 	}
 
 	/**
