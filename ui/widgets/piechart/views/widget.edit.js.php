@@ -519,7 +519,7 @@ window.widget_form = new class extends CWidgetForm {
 	#selectWidget(row = null, exclude_typed_references = []) {
 		const widgets = ZABBIX.Dashboard.getReferableWidgets({
 			type: CWidgetsData.DATA_TYPE_ITEM_ID,
-			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+			widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 		});
 
 		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
@@ -659,7 +659,7 @@ window.widget_form = new class extends CWidgetForm {
 		const widgets = ZABBIX.Dashboard
 			.getReferableWidgets({
 				type: CWidgetsData.DATA_TYPE_ITEM_ID,
-				widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+				widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 			})
 			.reduce((map, widget) => map.set(widget.getFields().reference, widget.getHeaderName()), new Map());
 

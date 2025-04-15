@@ -44,6 +44,8 @@ class CDashboardPage {
 	// Minimum distance of mouse movement in pixels to assume that user is interacting intentionally.
 	static PLACEHOLDER_RESIZE_TRIGGER_DISTANCE = 25;
 
+	#is_widget_editing = false;
+
 	constructor(target, {
 		data,
 		dashboard,
@@ -240,6 +242,43 @@ class CDashboardPage {
 			this._activateWidgetResizing();
 			this.resetWidgetPlaceholder();
 		}
+	}
+
+	/**
+	 * Is framework in widget editing state?
+	 *
+	 * @returns {boolean}
+	 */
+	#isWidgetEditing() {
+		return this.#is_widget_editing;
+	}
+
+	/**
+	 * Enter widget editing state.
+	 *
+	 * @param {CWidget} for_widget  Widget, which is about to be edited.
+	 */
+	enterWidgetEditing(for_widget) {
+		this.#is_widget_editing = true;
+
+		for (const widget of this._widgets.keys()) {
+			widget.enterWidgetEditing(widget === for_widget);
+		}
+
+		this.resetWidgetPlaceholder();
+	}
+
+	/**
+	 * Leave widget editing state.
+	 */
+	leaveWidgetEditing() {
+		this.#is_widget_editing = false;
+
+		for (const widget of this._widgets.keys()) {
+			widget.leaveWidgetEditing();
+		}
+
+		this.resetWidgetPlaceholder();
 	}
 
 	isUserInteracting() {
@@ -1007,6 +1046,12 @@ class CDashboardPage {
 	}
 
 	resetWidgetPlaceholder() {
+		if (this.#isWidgetEditing()) {
+			this._deactivateWidgetPlaceholder();
+
+			return;
+		}
+
 		if (this._widget_placeholder_is_active && this._widget_placeholder_is_edit_mode !== this._is_edit_mode) {
 			this._deactivateWidgetPlaceholder();
 		}

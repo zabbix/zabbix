@@ -166,6 +166,7 @@ $translate_strings = [
 		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
+		'Editing other objects is not allowed in dashboard editing mode.' => _('Editing other objects is not allowed in dashboard editing mode.'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
 		'Failed to paste widget.' => _('Failed to paste widget.'),
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),

@@ -93,6 +93,17 @@ class CWidgetEditDialogue {
 		});
 	}
 
+	promiseTrySubmit() {
+		this.#overlay.setLoading();
+
+		return this.#promiseSubmitReadiness()
+			.then(() => {
+				this.#overlay.unsetLoading();
+
+				return this.#trySubmit();
+			});
+	}
+
 	#open() {
 		this.#overlay = PopUp(`widget.${this.#type}.edit`, {
 			templateid: this.#dashboard_data.templateid ?? undefined,
@@ -172,31 +183,12 @@ class CWidgetEditDialogue {
 	}
 
 	#onSubmitRequest() {
-		this.#update();
-
-		const on_result = () => {
-			if (this.#messages.length > 0) {
+		this.#promiseSubmitReadiness()
+			.then(() => {
 				this.#overlay.unsetLoading();
 
-				this.#setError({messages: this.#messages});
-			}
-			else {
-				this.#sandbox.apply();
-
-				overlayDialogueDestroy(this.#overlay.dialogueid);
-			}
-		};
-
-		if (this.#validator.inProgress()) {
-			this.#validator.onResult({
-				callback: on_result,
-				priority: CWidgetEditDialogue.VALIDATOR_PRIORITY_SUBMIT,
-				once: true
+				this.#trySubmit();
 			});
-		}
-		else {
-			on_result();
-		}
 	}
 
 	#onClose(e) {
@@ -217,8 +209,8 @@ class CWidgetEditDialogue {
 
 		this.#resolve({
 			is_submit,
-			position_fix: e.detail.position_fix}
-		);
+			position_fix: e.detail.position_fix
+		});
 	}
 
 	#onInput() {
@@ -271,6 +263,38 @@ class CWidgetEditDialogue {
 					is_configured: this.#messages.length === 0
 				});
 			}
+		}
+	}
+
+	#promiseSubmitReadiness() {
+		return new Promise(resolve => {
+			this.#update();
+
+			if (this.#validator.inProgress()) {
+				this.#validator.onResult({
+					callback: resolve,
+					priority: CWidgetEditDialogue.VALIDATOR_PRIORITY_SUBMIT,
+					once: true
+				});
+			}
+			else {
+				resolve();
+			}
+		});
+	}
+
+	#trySubmit() {
+		if (this.#messages.length > 0) {
+			this.#setError({messages: this.#messages});
+
+			return false;
+		}
+		else {
+			this.#sandbox.apply();
+
+			overlayDialogueDestroy(this.#overlay.dialogueid);
+
+			return true;
 		}
 	}
 

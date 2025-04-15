@@ -299,7 +299,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	#getWidgets() {
 		const widgets = ZABBIX.Dashboard.getReferableWidgets({
 			type: this.#in_type,
-			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+			widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 		});
 
 		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));

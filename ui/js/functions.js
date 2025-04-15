@@ -444,12 +444,14 @@ function overlayPreloaderDestroy(id) {
  *
  * @param {string} dialogueid
  * @param {string} close_by    Indicates the initiator of closing action.
+ *
+ * @returns {boolean}  Whether the dialog was closed (or wasn't opened).
  */
 function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_BY_SCRIPT) {
 	const overlay = overlays_stack.getById(dialogueid);
 
 	if (overlay === undefined) {
-		return;
+		return true;
 	}
 
 	const is_default_prevented = !overlay.$dialogue[0].dispatchEvent(
@@ -465,7 +467,7 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 	);
 
 	if (close_by === Overlay.prototype.CLOSE_BY_USER && is_default_prevented) {
-		return;
+		return false;
 	}
 
 	if (overlay.xhr !== undefined) {
@@ -481,6 +483,8 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 	jQuery(`[data-dialogueid="${dialogueid}"]`).remove();
 
 	removeFromOverlaysStack(dialogueid);
+
+	return true;
 }
 
 /**

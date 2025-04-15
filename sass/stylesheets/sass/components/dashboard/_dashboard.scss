@@ -200,6 +200,32 @@
 			display: none;
 		}
 	}
+
+	&.dashboard-is-busy {
+		.dashboard-navigation-tabs {
+			.sortable {
+				li {
+					pointer-events: none;
+
+					div {
+						opacity: 0.75;
+					}
+				}
+			}
+		}
+	}
+
+	@if $ui-transitions {
+		.dashboard-navigation-tabs {
+			.sortable {
+				li {
+					div {
+						transition: opacity $ui-transition-duration ease-out;
+					}
+				}
+			}
+		}
+	}
 }
 
 .dashboard-grid-widget-blocker {
@@ -857,10 +883,22 @@
 			}
 		}
 
+		&.is-editing {
+			&:not(.is-editing-self) {
+				.dashboard-grid-widget-container {
+					opacity: 0.75;
+				}
+			}
+		}
+
 		@if $ui-transitions {
 			&:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
 				transition-property: height, top;
 				transition-duration: 0.15s;
+			}
+
+			.dashboard-grid-widget-container {
+				transition: opacity $ui-transition-duration ease-out;
 			}
 		}
 	}

@@ -16,6 +16,7 @@
 const ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES = 'btn-dashboard-page-properties';
 const ZBX_STYLE_DASHBOARD_IS_MULTIPAGE = 'dashboard-is-multipage';
 const ZBX_STYLE_DASHBOARD_IS_EDIT_MODE = 'dashboard-is-edit-mode';
+const ZBX_STYLE_DASHBOARD_IS_BUSY = 'dashboard-is-busy';
 const ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
 const ZBX_STYLE_DASHBOARD_SELECTED_TAB = 'selected-tab';
 
@@ -45,9 +46,14 @@ class CDashboard {
 
 	#broadcast_cache = new Map();
 
-	#editing_widget_context = null;
+	#selected_tab = null;
 
-	#widget_form_position_fix = null;
+	#are_tabs_blocked = false;
+
+	#widget_edit_context = null;
+	#widget_edit_dialogue = null;
+	#widget_edit_queue = null;
+	#widget_edit_position_fix = null;
 
 	constructor(target, {
 		containers,
@@ -171,6 +177,8 @@ class CDashboard {
 
 		if (this._is_edit_mode) {
 			this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
+
+			this.#preventUnrelatedEditors();
 		}
 
 		if (!this._is_edit_mode) {
@@ -212,6 +220,8 @@ class CDashboard {
 
 		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 
+		this.#preventUnrelatedEditors();
+
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			if (!dashboard_page.isEditMode()) {
 				dashboard_page.setEditMode();
@@ -228,6 +238,20 @@ class CDashboard {
 		if (is_internal_call) {
 			this.fire(DASHBOARD_EVENT_EDIT);
 		}
+	}
+
+	#preventUnrelatedEditors() {
+		ZABBIX.EventHub.subscribe({
+			require: {
+				context: CPopupManager.EVENT_CONTEXT,
+				event: CPopupManagerEvent.EVENT_OPEN
+			},
+			callback: ({event})=> {
+				event.preventDefault();
+
+				this._warn(t('Editing other objects is not allowed in dashboard editing mode.'));
+			}
+		});
 	}
 
 	_startSlideshow() {
@@ -433,7 +457,7 @@ class CDashboard {
 
 	_createBusyCondition() {
 		if (this._busy_conditions.size === 0) {
-			this.fire(DASHBOARD_EVENT_BUSY);
+			this.#enterBusyState();
 		}
 
 		const busy_condition = {};
@@ -447,8 +471,28 @@ class CDashboard {
 		this._busy_conditions.delete(busy_condition);
 
 		if (this._busy_conditions.size === 0) {
-			this.fire(DASHBOARD_EVENT_IDLE);
+			this.#leaveBusyState();
 		}
+	}
+
+	#enterBusyState() {
+		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_BUSY);
+
+		if (!this._is_kiosk_mode) {
+			this.#blockTabs();
+		}
+
+		this.fire(DASHBOARD_EVENT_BUSY);
+	}
+
+	#leaveBusyState() {
+		this._target.classList.remove(ZBX_STYLE_DASHBOARD_IS_BUSY);
+
+		if (!this._is_kiosk_mode) {
+			this.#unblockTabs();
+		}
+
+		this.fire(DASHBOARD_EVENT_IDLE);
 	}
 
 	isUnsaved() {
@@ -940,7 +984,7 @@ class CDashboard {
 					fields: response.widgets[0].fields,
 					widgetid: null,
 					pos: new_widget_pos,
-					is_new: true,
+					is_new: false,
 					is_configured: response.widgets[0].is_configured
 				});
 
@@ -1472,16 +1516,37 @@ class CDashboard {
 	}
 
 	editWidget({dashboard_page = null, widget = null, new_widget_pos = null} = {}) {
+		if (this.#isWidgetEditing()) {
+			if (this.#widget_edit_queue !== null) {
+				this.#widget_edit_queue = {dashboard_page, widget, new_widget_pos};
+
+				return;
+			}
+
+			this.#widget_edit_queue = {dashboard_page, widget, new_widget_pos};
+
+			this.#widget_edit_dialogue.promiseTrySubmit()
+				.then(success => {
+					if (!success) {
+						this.#widget_edit_queue = null;
+					}
+				});
+
+			return;
+		}
+
 		const sandbox = new CWidgetEditSandbox({dashboard: this});
+
 		const validator = new CWidgetEditValidator({dashboard: this});
-		const dialogue = new CWidgetEditDialogue({dashboard: this});
+
+		this.#widget_edit_dialogue = new CWidgetEditDialogue({dashboard: this});
 
 		const sandbox_params = {};
 
 		const dialogue_params = {
 			sandbox,
 			validator,
-			position_fix: this.#widget_form_position_fix
+			position_fix: this.#widget_edit_position_fix
 		};
 
 		if (widget !== null) {
@@ -1513,14 +1578,22 @@ class CDashboard {
 			dialogue_params.is_new = true;
 		}
 
-		this.#editing_widget_context = {
+		this.#widget_edit_context = {
 			unique_id: widget !== null ? widget.getUniqueId() : null,
 			dashboard_page_unique_id: this._selected_dashboard_page.getUniqueId()
 		}
 
+		const busy_condition = this._createBusyCondition();
+
 		sandbox.promiseInit(sandbox_params)
-			.then(() => dialogue.run(dialogue_params))
+			.then(() => {
+				this._selected_dashboard_page.enterWidgetEditing(sandbox.getWidget());
+
+				return this.#widget_edit_dialogue.run(dialogue_params);
+			})
 			.then(({is_submit, position_fix}) => {
+				this._selected_dashboard_page.leaveWidgetEditing();
+
 				if (is_submit) {
 					const type = sandbox.getWidget().getType();
 
@@ -1529,9 +1602,15 @@ class CDashboard {
 
 						updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 					}
+
+					if (this.#widget_edit_queue !== null) {
+						const {dashboard_page, widget, new_widget_pos} = this.#widget_edit_queue;
+
+						setTimeout(() => this.editWidget({dashboard_page, widget, new_widget_pos}));
+					}
 				}
 
-				this.#widget_form_position_fix = position_fix;
+				this.#widget_edit_position_fix = position_fix;
 			})
 			.catch(exception => {
 				if (typeof exception === 'string') {
@@ -1541,16 +1620,22 @@ class CDashboard {
 				}
 
 				throw exception;
+			})
+			.finally(() => {
+				this.#widget_edit_context = null;
+				this.#widget_edit_dialogue = null;
+				this.#widget_edit_queue = null;
+
+				this._deleteBusyCondition(busy_condition);
 			});
 	}
 
-	getEditingWidgetContext() {
-		return this.#editing_widget_context;
+	#isWidgetEditing() {
+		return this.#widget_edit_context !== null;
 	}
 
-	_isEditingWidget() {
-		// Form name is used as dialogue ID.
-		return overlays_stack.getById(CWidgetForm.FORM_NAME_PRIMARY) !== undefined;
+	getWidgetEditingContext() {
+		return this.#widget_edit_context;
 	}
 
 	_getDashboardPageActionsContextMenu(dashboard_page) {
@@ -1718,6 +1803,8 @@ class CDashboard {
 
 		this._tabs.getTarget().insertBefore(tab, null);
 		this._tabs_dashboard_pages.set(tab, dashboard_page);
+
+		this._updateTabsNavigationButtons();
 	}
 
 	_updateTab(dashboard_page) {
@@ -1763,30 +1850,54 @@ class CDashboard {
 
 		this._tabs.getTarget().removeChild(data.tab);
 		this._tabs_dashboard_pages.delete(data.tab);
+
+		if (this.#selected_tab === data.tab) {
+			this.#selected_tab = null;
+		}
+
+		this._updateTabsNavigationButtons();
 	}
 
 	_selectTab(dashboard_page) {
+		this.#selected_tab = this._dashboard_pages.get(dashboard_page).tab;
+
 		this._tabs.getTarget().querySelectorAll(`.${ZBX_STYLE_DASHBOARD_SELECTED_TAB}`).forEach(element => {
 			element.classList.remove(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		})
 
-		const data = this._dashboard_pages.get(dashboard_page);
-
-		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
-		this._updateNavigationButtons(dashboard_page);
-		this._tabs.scrollIntoView(data.tab);
+		this.#selected_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
+		this._updateTabsNavigationButtons();
+		this._tabs.scrollIntoView(this.#selected_tab);
 	}
 
-	_updateNavigationButtons(dashboard_page = null) {
+	#blockTabs() {
+		this.#are_tabs_blocked = true;
+
+		this._tabs.enableSorting(false);
+
+		this._updateTabsNavigationButtons();
+	}
+
+	#unblockTabs() {
+		this.#are_tabs_blocked = false;
+
+		this._tabs.enableSorting(this._is_edit_mode);
+
+		this._updateTabsNavigationButtons();
+	}
+
+	_updateTabsNavigationButtons() {
 		this._containers.navigation.classList.toggle(ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE,
 			this._tabs.isScrollable()
 		);
 
-		if (dashboard_page !== null) {
-			const tab = this._dashboard_pages.get(dashboard_page).tab;
-
-			this._buttons.previous_page.disabled = tab.previousElementSibling === null;
-			this._buttons.next_page.disabled = tab.nextElementSibling === null;
+		if (this.#are_tabs_blocked || this.#selected_tab === null) {
+			this._buttons.previous_page.disabled = true;
+			this._buttons.next_page.disabled = true;
+		}
+		else {
+			this._buttons.previous_page.disabled = this.#selected_tab.previousElementSibling === null;
+			this._buttons.next_page.disabled = this.#selected_tab.nextElementSibling === null;
 		}
 	}
 
@@ -2063,7 +2174,7 @@ class CDashboard {
 
 					jQuery(placeholder).menuPopup(menu, placeholder_event, {
 						closeCallback: () => {
-							if (!this._isEditingWidget()) {
+							if (!this.#isWidgetEditing()) {
 								dashboard_page.resetWidgetPlaceholder();
 							}
 						}
@@ -2071,10 +2182,6 @@ class CDashboard {
 				}
 				else {
 					this.editWidget({new_widget_pos});
-
-					if (!this._isEditingWidget()) {
-						dashboard_page.resetWidgetPlaceholder();
-					}
 				}
 			},
 
@@ -2146,11 +2253,11 @@ class CDashboard {
 			},
 
 			tabsResize: () => {
-				this._updateNavigationButtons();
+				this._updateTabsNavigationButtons();
 			},
 
 			tabsDragEnd: () => {
-				this._updateNavigationButtons();
+				this._updateTabsNavigationButtons();
 			},
 
 			tabsSort: () => {

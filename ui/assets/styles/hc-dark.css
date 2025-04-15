@@ -1695,6 +1695,10 @@ button {
   display: none; }
 .dashboard.dashboard-is-edit-mode .btn-dashboard-toggle-slideshow, .dashboard:not(.dashboard-is-multipage) .btn-dashboard-toggle-slideshow {
   display: none; }
+.dashboard.dashboard-is-busy .dashboard-navigation-tabs .sortable li, .dashboard.dashboard-is-busy .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li, .host-dashboard-header-navigation .host-dashboard-navigation .dashboard.dashboard-is-busy .host-dashboard-navigation-tabs .sortable li {
+  pointer-events: none; }
+  .dashboard.dashboard-is-busy .dashboard-navigation-tabs .sortable li div, .dashboard.dashboard-is-busy .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div, .host-dashboard-header-navigation .host-dashboard-navigation .dashboard.dashboard-is-busy .host-dashboard-navigation-tabs .sortable li div {
+    opacity: 0.75; }
 
 .dashboard-grid-widget-blocker {
   position: absolute;
@@ -2060,6 +2064,8 @@ button {
     border-color: #353535; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #353535; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self) .dashboard-grid-widget-container {
+  opacity: 0.75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus .ui-resizable-handle {

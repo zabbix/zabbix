@@ -781,6 +781,30 @@ class CWidgetBase {
 	}
 
 	/**
+	 * Enter widget editing state.
+	 *
+	 * @param {boolean} self  Whether this particular widget is about to be edited.
+	 */
+	enterWidgetEditing(self) {
+		this._target.classList.add('is-editing');
+
+		if (self) {
+			this._target.classList.add('is-editing-self');
+		}
+
+		this._button_actions.disabled = true;
+	}
+
+	/**
+	 * Leave widget editing state.
+	 */
+	leaveWidgetEditing() {
+		this._target.classList.remove('is-editing', 'is-editing-self');
+
+		this._button_actions.disabled = false;
+	}
+
+	/**
 	 * Find whether the widget is currently entered (focused) my mouse or keyboard. Only one widget can be entered at a
 	 * time.
 	 *
