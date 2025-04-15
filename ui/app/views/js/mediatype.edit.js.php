@@ -104,25 +104,24 @@ window.mediatype_edit_popup = new class {
 			const oauth_fields = ['redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
 				'tokens_status'
 			];
-			const mediatype = getFormFields(this.form);
-			let mediatype_oauth = Object.fromEntries(
-				Object.entries(mediatype).filter(([key]) => oauth_fields.includes(key))
+			const fields = getFormFields(this.form);
+			let oauth = Object.fromEntries(
+				Object.entries(fields).filter(([key]) => oauth_fields.includes(key))
 			);
 			let data = {
-				...mediatype_oauth,
-				update: 'tokens_status' in mediatype ? 1 : 0,
-				advanced_form: mediatype.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
+				update: 'tokens_status' in fields ? 1 : 0,
+				advanced_form: fields.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
 			};
 
-			if ('mediatypeid' in mediatype) {
-				data.mediatypeid = mediatype.mediatypeid;
+			if ('mediatypeid' in fields) {
+				data.mediatypeid = fields.mediatypeid;
 			}
 
-			if (!Object.keys(mediatype_oauth).length) {
-				mediatype_oauth = {...this.oauth_defaults_by_provider[mediatype.provider], client_secret: ''};
+			if (!Object.keys(oauth).length) {
+				oauth = {...this.oauth_defaults_by_provider[fields.provider], client_secret: ''};
 			}
 
-			const overlay = PopUp('oauth.edit', {...data, ...mediatype_oauth}, {dialogue_class: 'modal-popup-generic'});
+			const overlay = PopUp('oauth.edit', {...data, ...oauth}, {dialogue_class: 'modal-popup-generic'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#setOAuth(e.detail));
 		});
@@ -135,14 +134,14 @@ window.mediatype_edit_popup = new class {
 			this.mediatype.smtp_authentication = e.target.value;
 
 			if (e.target.value == <?= SMTP_AUTHENTICATION_OAUTH ?>) {
-				this.#setOAuth({});
+				this.#setOAuth();
 			}
 		});
 	}
 
 	clone({title, buttons}) {
 		this.mediatypeid = null;
-		this.#setOAuth({});
+		this.#setOAuth();
 
 		this.#toggleChangePasswordButton();
 		this.overlay.setProperties({title, buttons});
@@ -223,7 +222,7 @@ window.mediatype_edit_popup = new class {
 	 *
 	 * @param {object} oauth  Key value pair of OAuth fields.
 	 */
-	#setOAuth(oauth) {
+	#setOAuth(oauth = {}) {
 		const oauth_fields_container = this.form.querySelector('#js-oauth-fields');
 
 		this.form.querySelector('#js-oauth-status')?.remove();
@@ -622,7 +621,7 @@ window.mediatype_edit_popup = new class {
 			this.form.querySelector(
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 			).checked = true;
-			this.#setOAuth({});
+			this.#setOAuth();
 		}
 
 		const authentication = this.form.querySelector('#smtp_authentication');
