@@ -39,6 +39,16 @@ class CAbsoluteTimeParser extends CParser {
 	private $error;
 
 	/**
+	 * Supported options:
+	 *   'min' => int  Min allowed UNIX timestamp;
+	 *   'max' => int  Max allowed UNIX timestamp;
+	 *
+	 * @var array
+	 */
+	private $options;
+
+
+	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
