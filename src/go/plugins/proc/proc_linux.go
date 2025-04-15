@@ -19,6 +19,8 @@ package proc
 
 /*
 #include <unistd.h>
+#include <stdlib.h>
+#include <pwd.h>
 */
 import "C"
 
@@ -32,6 +34,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unsafe"
 
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
@@ -251,23 +254,51 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 	return true
 }
 
-func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) *cpuUtilQuery {
+type uid struct {
+	Uid uint32
+}
+
+type userNotFoundError struct {
+	Name string
+}
+
+func (err *userNotFoundError) Error() string {
+	return fmt.Sprintf("User `%s` not found!", err.Name)
+}
+
+func getUIDByName(userName string) (*uid, error) {
+	userNameC := C.CString(userName)
+	defer C.free(unsafe.Pointer(userNameC))
+	passwdC, err := C.getpwnam(userNameC)
+
+	if passwdC == nil {
+		return nil, err
+	} else {
+		return &uid{uint32(passwdC.pw_uid)}, nil
+	}
+}
+
+func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error) {
 	query := &cpuUtilQuery{procQuery: *q}
 	if q.user != "" {
-		var u *user.User
 		var err error
+		var uid *uid
+		uid, err = getUIDByName(q.user)
 
-		if u, err = user.Lookup(q.user); err != nil {
-			return query
-		}
-		if query.userid, err = strconv.ParseInt(u.Uid, 10, 64); err != nil {
-			return query
+		if uid == nil {
+			if err != nil {
+				return nil, err
+			}
+			u := &userNotFoundError{}
+			return query, u
+		} else {
+			query.userid = int64(uid.Uid)
 		}
 	}
 
 	query.cmdlinePattern = pattern
 
-	return query
+	return query, nil
 }
 
 func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
@@ -283,7 +314,16 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 			continue
 		}
 
-		query := newCPUUtilQuery(&q, stats.cmdlinePattern)
+		var query *cpuUtilQuery
+
+		query, stats.err = newCPUUtilQuery(&q, stats.cmdlinePattern)
+
+		u := &userNotFoundError{}
+		if stats.err != nil {
+			if !errors.As(stats.err, &u) {
+				continue
+			}
+		}
 
 		queries = append(queries, query)
 		stats.scanid = p.scanid
@@ -319,6 +359,7 @@ func (p *Plugin) Collect() (err error) {
 	for _, p := range processes {
 		var monitored bool
 		for _, q := range queries {
+
 			if q.match(p) {
 				q.pids = append(q.pids, p.pid)
 				monitored = true
@@ -368,9 +409,11 @@ func (p *Plugin) Collect() (err error) {
 	p.mutex.Lock()
 	for _, q := range queries {
 		if stat, ok := p.queries[q.procQuery]; ok {
+
 			if stat.scanid != p.scanid {
 				continue
 			}
+
 			var last *cpuUtilData
 			if stat.tail != stat.head {
 				last = &stat.history[stat.tail.dec()]
@@ -462,8 +505,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if stats, ok := p.queries[query]; ok {
 		stats.accessed = now
 		if stats.err != nil {
-			p.Debugf("CPU utilization gathering error %s", err)
-			return nil, stats.err
+			return 0, nil
 		}
 		if stats.tail == stats.head {
 			return
@@ -513,8 +555,11 @@ func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags in
 	if err != nil {
 		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
 	}
+	query, err = newCPUUtilQuery(q, regxp)
 
-	query = newCPUUtilQuery(q, regxp)
+	if err != nil {
+		return nil, 0, err
+	}
 
 	if q.name != "" {
 		flags |= procInfoName | procInfoCmdline
@@ -756,9 +801,13 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 	}
 
 	var count int
-
+	u := &userNotFoundError{}
 	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
+
 	if err != nil {
+		if errors.As(err, &u) {
+			return 0, nil
+		}
 		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
 	}
 
