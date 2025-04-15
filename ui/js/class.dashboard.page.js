@@ -1302,7 +1302,8 @@ class CDashboardPage {
 					const widget_view = widget.getView();
 
 					if (widget_view.querySelector(`.${widget.getCssClass('header')}`).contains(e.target)
-							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)) {
+							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)
+							&& !widget_view.querySelector(`.${widget.getCssClass('controls')}`).contains(e.target)) {
 						drag_widget = widget;
 						break;
 					}

@@ -23,6 +23,7 @@ class CWidgetIterator extends CWidget {
 		this._css_classes = {
 			...this._css_classes,
 			actions: 'dashboard-grid-iterator-actions',
+			controls: 'dashboard-grid-iterator-controls',
 			container: 'dashboard-grid-iterator-container',
 			contents: 'dashboard-grid-iterator-contents',
 			messages: 'dashboard-grid-iterator-messages',
@@ -536,7 +537,7 @@ class CWidgetIterator extends CWidget {
 		this._target.style.minHeight = null;
 
 		this._pager = document.createElement('div');
-		this._pager.classList.add('dashboard-grid-iterator-pager');
+		this._pager.classList.add(this._css_classes.controls, 'dashboard-grid-iterator-pager');
 
 		this._button_previous_page = document.createElement('button');
 		this._button_previous_page.type = 'button';

@@ -199,6 +199,7 @@ class CWidgetBase {
 	#initialize() {
 		this._css_classes = {
 			actions: 'dashboard-grid-widget-actions',
+			controls: 'dashboard-grid-widget-controls',
 			container: 'dashboard-grid-widget-container',
 			contents: 'dashboard-grid-widget-contents',
 			messages: 'dashboard-grid-widget-messages',
