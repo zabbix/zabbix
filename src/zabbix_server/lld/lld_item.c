@@ -4651,6 +4651,12 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	if (0 == item_prototypes.values_num)
 		goto out;
 
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	{
+		for (int i = 0; i < item_prototypes.values_num; i++)
+			lld_item_prototype_dump(item_prototypes.values[i]);
+	}
+
 	zbx_vector_lld_item_full_ptr_create(&items);
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);

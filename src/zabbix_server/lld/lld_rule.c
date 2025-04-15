@@ -2723,14 +2723,14 @@ void	lld_rule_get_prototype_overrides(zbx_vector_lld_item_prototype_ptr_t *item_
 	zbx_vector_lld_override_data_ptr_destroy(&overrides);
 }
 
-zbx_hash_t	lld_row_index_hash(const void *v)
+static zbx_hash_t	lld_row_index_hash(const void *v)
 {
 	const zbx_lld_row_ruleid_t	*index = (const zbx_lld_row_ruleid_t *)v;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(&index->data, sizeof(index->data), 0);
 }
 
-int	lld_row_index_compare(const void *v1, const void *v2)
+static int	lld_row_index_compare(const void *v1, const void *v2)
 {
 	const zbx_lld_row_ruleid_t        *index1 = (const zbx_lld_row_ruleid_t *)v1;
 	const zbx_lld_row_ruleid_t        *index2 = (const zbx_lld_row_ruleid_t *)v2;
@@ -2762,14 +2762,14 @@ typedef struct
 }
 zbx_lld_row_itemids_t;
 
-zbx_hash_t	lld_row_itemids_hash(const void *v)
+static zbx_hash_t	lld_row_itemids_hash(const void *v)
 {
 	const zbx_lld_row_itemids_t	*index = (const zbx_lld_row_itemids_t *)v;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(&index->lld_row, sizeof(index->lld_row), 0);
 }
 
-int	lld_row_itemids_compare(const void *v1, const void *v2)
+static int	lld_row_itemids_compare(const void *v1, const void *v2)
 {
 	const zbx_lld_row_itemids_t        *index1 = (const zbx_lld_row_itemids_t *)v1;
 	const zbx_lld_row_itemids_t        *index2 = (const zbx_lld_row_itemids_t *)v2;
