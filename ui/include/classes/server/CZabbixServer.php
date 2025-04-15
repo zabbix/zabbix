@@ -628,6 +628,32 @@ class CZabbixServer {
 				return false;
 			}
 
+			if ($ZBX_SERVER_TLS['ACTIVE'] && ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
+					|| $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== '')) {
+				$params = stream_context_get_params($socket);
+				$cert = $params['options']['ssl']['peer_certificate'];
+
+				$parsed_cert = openssl_x509_parse($cert);
+
+				$subject_string = implode(', ', array_map(static fn($k, $v) => "$k=$v",
+					array_keys($parsed_cert['subject']), $parsed_cert['subject']));
+				$issuer_string  = implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($parsed_cert['issuer']),
+					$parsed_cert['issuer']));
+
+
+				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
+					&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
+					$this->error = _('Issuer of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
+					return false;
+				}
+
+				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
+					&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
+					$this->error = _('Subject of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
+					return false;
+				}
+			}
+
 			$this->socket = $socket;
 		}
 
