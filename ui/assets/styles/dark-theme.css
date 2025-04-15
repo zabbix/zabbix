@@ -4796,7 +4796,7 @@ div.dashboard-widget-itemcard .item-card {
         div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
           align-items: flex-end;
           text-align: right; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
             width: 100%; }
           div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
             overflow: hidden; }
