@@ -565,7 +565,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.notification.edit');
 		$this->zbxTestCheckHeader('Notifications');
 		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestLaunchOverlayDialog('Media');
+		$this->zbxTestLaunchOverlayDialog('New media');
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);

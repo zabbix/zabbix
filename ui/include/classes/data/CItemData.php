@@ -373,6 +373,7 @@ final class CItemData {
 			'zabbix[items_unsupported]',
 			'zabbix[java,,<param>]',
 			'zabbix[lld_queue]',
+			'zabbix[preprocessing]',
 			'zabbix[preprocessing_queue]',
 			'zabbix[process,<type>,<mode>,<state>]',
 			'zabbix[proxy,<name>,<param>]',
@@ -2863,6 +2864,13 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#lld.queue'
+				]
+			],
+			'zabbix[preprocessing]' => [
+				'description' => _('Statistics of values received by the preprocessing manager.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#preprocessing'
 				]
 			],
 			'zabbix[preprocessing_queue]' => [

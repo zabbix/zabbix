@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-09 18:58+0000\n"
+"PO-Revision-Date: 2025-04-06 14:51+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1376,6 +1376,14 @@ msgstr "También se usa como etiqueta de leyenda para conjuntos de datos agregad
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativamente, puede instalarlo manualmente:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr "Siempre"
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Cantidad de memoria física de huésped que se intercambia al espacio de intercambio, \"url\": URL del servicio de VMware, \"uuid\": identificador único global de la máquina virtual de VMware"
@@ -1829,6 +1837,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Auto"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr "Ocultar automáticamente"
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "Acceso automático"
@@ -1950,6 +1966,10 @@ msgstr "Color de fondo"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Imagen de fondo"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr "Escalar fondo"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -3287,6 +3307,11 @@ msgstr "No se pudo encontrar el ítem \"%1$s\" en \"%2$s\" usado como valor mín
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "No se pudo encontrar el ítem \"%1$s\" en \"%2$s\" usado como valor mínimo del eje Y del prototipo de gráfica \"%3$s\" de la regla de descubrimiento \"%4$s\" en \"%5$s\"."
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr "No se puede encontrar la métrica \"%1$s\" en \"%2$s\" usada en un enlace del mapa \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -5363,6 +5388,14 @@ msgstr "Crear y editar mantenimiento"
 msgid "Create and edit maps"
 msgstr "Crear y editar mapas"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr "Cree y edite sus propios medios"
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr "Crear y editar medios de usuario"
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Crear fondo"
@@ -5970,6 +6003,11 @@ msgstr "Base de datos TLS cifrado"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "Base de datos TLS archivo de clave"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr "Se produjo un error en la base de datos."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -9052,6 +9090,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gráfico eliminado"
 msgstr[1] "Gráficos eliminados"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9098,6 +9140,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Prototipo de gráfico eliminado"
 msgstr[1] "Prototipos de gráfico eliminados"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11223,6 +11269,10 @@ msgstr "Aumentar en"
 #: include/actions.inc.php:2008 include/html.inc.php:971
 msgid "Indefinitely"
 msgstr "Indefinidamente"
+
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr "Tipo de indicador"
 
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
@@ -14336,6 +14386,14 @@ msgstr "Nuevo valor de etiqueta de evento"
 msgid "New excluded downtime"
 msgstr "Nuevo tiempo de inactividad excluido"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nuevo equipo"
@@ -14357,6 +14415,10 @@ msgstr "Nuevo prototipo de métrica"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Nuevo periodo de mantenimiento"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr "Nuevos medios"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -16763,6 +16825,10 @@ msgstr "Prometheus a JSON"
 msgid "Properties"
 msgstr "Propiedades"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr "Proporcionalmente"
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "Protocolo"
@@ -19106,6 +19172,12 @@ msgstr "Mostrar encabezado"
 msgid "Show hosts in maintenance"
 msgstr "Mostrar equipos en mantenimiento"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr "Mostrar etiqueta"
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "Mostrar etiquetas"
@@ -19123,6 +19195,14 @@ msgstr "Mostrar leyenda"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Mostrar líneas"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr "Mostrar etiquetas de enlaces"
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr "Mostrar etiquetas de elementos del mapa"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19580,6 +19660,10 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Estático"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr "Enlace estático"
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Estadísticas y disponibilidad de caché de escritura de Zabbix. Caché - valores (modos: all, float, uint, str, log, text, not supported), historial (modos: pfree, free, total, used, pused), índice (modos: pfree, free, total, used, pused), tendencia (modos: pfree, free, total, used, pused)."
@@ -19587,6 +19671,10 @@ msgstr "Estadísticas y disponibilidad de caché de escritura de Zabbix. Caché 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadísticas y disponibilidad de búfer de memoria del proxy. Modo (modos: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -24365,6 +24453,18 @@ msgstr "ascii(): devuelve el código ASCII del carácter más a la izquierda del
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - El arcoseno de un valor como ángulo, expresado en radianes"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr "se requiere al menos 1 enlace destacado"
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr "se requiere al menos 1 umbral de enlace"
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr "se requiere al menos un iniciador de enlace"
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24420,6 +24520,10 @@ msgstr "baselinewma() - Calcula la línea de base promediando períodos de datos
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Comprueba si un valor pertenece al rango dado (1 - dentro del rango, 0 - en caso contrario)"
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr "la métrica binaria no es compatible"
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -24939,6 +25043,10 @@ msgstr "existe"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - Número de Euler elevado a una potencia de un valor"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr "esperando código de color hexadecimal (6 símbolos)"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - Número de Euler a una potencia de un valor menos 1"
@@ -25063,6 +25171,10 @@ msgstr "grupo de equipos"
 msgid "host group with the same UUID already exists"
 msgstr "ya existe un grupo de equipos con el mismo UUID"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr "se espera el ID de la métrica de equipo"
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -25080,6 +25192,10 @@ msgstr "patrones de equipo"
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "ya existe un prototipo de equipo con el mismo UUID"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr "se espera el ID del iniciador del equipo"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25140,6 +25256,10 @@ msgstr "recuento de elementos incorrecto"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expresión incorrecta a partir de \"%1$s\""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr "tipo de valor de métrica incorrecto"
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25700,6 +25820,14 @@ msgstr "no hay permisos para convertir problemas de síntomas en problemas de ca
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
 msgstr "sin permisos para crear y editar mapas"
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr "sin permisos para crear y editar medios propios"
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr "sin permisos para crear y editar medios de usuario"
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
@@ -26561,6 +26689,14 @@ msgstr[1] "los valores deben ser %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "el valor debe estar entre \"%1$s\" y \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

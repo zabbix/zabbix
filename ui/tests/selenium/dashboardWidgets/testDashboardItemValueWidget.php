@@ -3257,6 +3257,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min',
+						'Decimal places' => '0',
 						'Time period' => 'Custom'
 					],
 					'item_data' => [
@@ -3281,6 +3282,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
+						'Decimal places' => '2',
 						'Time period' => 'Custom',
 						'id:time_period_from' => 'now-2h',
 						'id:time_period_to' => 'now-1h'
@@ -3300,7 +3302,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3322,7 +3324,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)'
+					'expected_value' => 'Up (1.00)'
 				]
 			],
 			// Item with value mapping, aggregation function 'avg' and Custom time period.
@@ -3431,7 +3433,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3461,7 +3463,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Down (0)'
+					'expected_value' => 'Down (0.00)'
 				]
 			],
 			// Item with value mapping and aggregation function 'not used'.
@@ -3487,7 +3489,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],

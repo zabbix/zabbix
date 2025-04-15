@@ -16,6 +16,10 @@
 
 class CGraphHelper extends CGraphGeneralHelper {
 
+	public static function validateNumberRangeWithPrecision(string $value, int $min, int $max, int $scale): bool {
+		return !(!is_numeric($value) || $value < $min || $value > $max || round($value, $scale) != $value);
+	}
+
 	/**
 	 * @param string $src_templateid
 	 * @param string $dst_templateid

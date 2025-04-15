@@ -90,11 +90,12 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode);
-void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
-		int audit_context_mode);
 
 void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
+
+void	zbx_db_copy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+		int audit_context_mode, zbx_db_insert_t *db_insert_htemplates);
 
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
@@ -186,5 +187,8 @@ int	zbx_macro_event_trigger_expr_resolv(zbx_macro_resolv_data_t *p, va_list args
 int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t token_type, char **value,
 		char **error, va_list args);
 int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **value, char **error, va_list args);
+
+int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old);
+void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids);
 
 #endif /* ZABBIX_DBWRAP_H */
