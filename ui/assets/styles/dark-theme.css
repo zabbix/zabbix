@@ -2103,7 +2103,7 @@ button {
     border-color: #212121; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #212121; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self) .dashboard-grid-widget-container {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-container {
   opacity: 0.75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
   transition-property: height, top;
@@ -2152,9 +2152,13 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #1c1c1c;
     border-top: 0; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-container {
+  opacity: 0.75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
   transition-property: height, top;
   transition-duration: 0.15s; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .dashboard-grid-iterator-container {
+  transition: opacity 0.3s ease-out; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
   transition-property: height, top;
   transition-duration: 0s; }

@@ -2064,7 +2064,7 @@ button {
     border-color: #353535; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #353535; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self) .dashboard-grid-widget-container {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-container {
   opacity: 0.75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
@@ -2108,6 +2108,8 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #303030;
     border-top: 0; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-container {
+  opacity: 0.75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder {
   position: absolute;
   z-index: 999; }

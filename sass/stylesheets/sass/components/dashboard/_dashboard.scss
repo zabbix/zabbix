@@ -883,11 +883,9 @@
 			}
 		}
 
-		&.is-editing {
-			&:not(.is-editing-self) {
-				.dashboard-grid-widget-container {
-					opacity: 0.75;
-				}
+		&.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) {
+			.dashboard-grid-widget-container {
+				opacity: 0.75;
 			}
 		}
 
@@ -983,10 +981,20 @@
 			}
 		}
 
+		&.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) {
+			.dashboard-grid-iterator-container {
+				opacity: 0.75;
+			}
+		}
+
 		@if $ui-transitions {
 			&:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
 				transition-property: height, top;
 				transition-duration: 0.15s;
+			}
+
+			.dashboard-grid-iterator-container {
+				transition: opacity $ui-transition-duration ease-out;
 			}
 
 			.dashboard-grid-widget {
