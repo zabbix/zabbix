@@ -39,22 +39,10 @@ class CAbsoluteTimeParser extends CParser {
 	private $error;
 
 	/**
-	 * Supported options:
-	 *   'min' => int  Min allowed UNIX timestamp;
-	 *   'max' => int  Max allowed UNIX timestamp;
-	 *
-	 * @var array
-	 */
-	private $options = [
-		'min' => 0,
-		'max' => ZBX_MAX_DATE
-	];
-
-	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
-		$this->options = $options + $this->options;
+		$this->options = $options;
 	}
 
 	/**
@@ -124,7 +112,8 @@ class CAbsoluteTimeParser extends CParser {
 
 		$unix_time = strtotime($date);
 
-		if ($unix_time >= $this->options['max'] || $unix_time <= $this->options['min']) {
+		if ((array_key_exists('max', $this->options) && $unix_time >= $this->options['max'])
+				|| (array_key_exists('min', $this->options) && $unix_time <= $this->options['min'])) {
 			$this->error = _('date is outside the allowed range');
 
 			return false;
