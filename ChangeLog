@@ -34,6 +34,7 @@ New features:
 .........T [ZBXNEXT-9654] added Azure SQL Managed Instance by HTTP template (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-26253] fixed large data transfers being uncompressed without authorization (vso)
 A.F.....S. [ZBX-23760] fixed ability to enable disabled action with invalid custom formula due to missing action conditions (agriscenko, dgoloscapov)
 A......... [ZBX-18432] fixed inability to view certain problems and events by users with specific permissions on tags when permissions on all tags are given to specific host group (dpankins)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
@@ -64,6 +65,8 @@ Changes for 6.0.38
 Changes for 6.0.38rc1
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A......... [ZBX-26258] restricted access to user related fields using user.get, alert.get, role.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 ..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
 ..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
 ...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
@@ -93,6 +96,7 @@ New features:
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+..F....... [ZBX-26254] fixed reflected XSS in valuemap export URL (talbergs)
 ........S. [ZBX-25542] added SQL_ATTR_QUERY_TIMEOUT timeout for ODBC monitoring (sboidenko)
 ..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
 ...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
@@ -3451,6 +3455,8 @@ Changes for 5.0.46
 Changes for 5.0.46rc1
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A......... [ZBX-26258] restricted access to user related fields using user.get, alert.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 
