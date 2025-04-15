@@ -81,12 +81,11 @@ foreach ($data['macros'] as $i => $macro) {
 
 	$table
 		->addRow([
-				(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
-			], 'form_row'
-		)
+			(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+		], 'form_row')
 		->addRow(
 			(new CCol())
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)

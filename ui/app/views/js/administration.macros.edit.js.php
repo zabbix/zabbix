@@ -98,16 +98,8 @@
 					})
 						.then((response) => response.json())
 						.then((response) => {
-							if ('form_errors' in response) {
-								form.renderErrors(response.form_errors, true, true);
-							}
-							else if ('error' in response) {
-								throw {error: response.error};
-							}
-							else {
-								postMessageOk(response.success.title);
-								location.href = location.href;
-							}
+							postMessageOk(response.success.title);
+							location.href = location.href;
 						})
 						.catch((exception) => {
 							for (const element of form_element.parentNode.children) {
