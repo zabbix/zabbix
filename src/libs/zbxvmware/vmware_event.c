@@ -1051,10 +1051,10 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			(0 == node_count && 0 < soap_retry--)) && 0 == *skip_old &&
 			(0 == events->values_num || LAST_KEY(events) != last_key + 1));
 
-	if (0 == *evt_top_key)
+	if (0 == *evt_top_key && 0 != events->values_num)
 	{
-		*evt_top_key = 0 != events->values_num ? events->values[0]->key : last_key;
-		*evt_top_time = 0 != events->values_num ? events->values[0]->timestamp : last_ts;
+		*evt_top_key = events->values[0]->key;
+		*evt_top_time = events->values[0]->timestamp;
 	}
 
 	if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events))
@@ -1241,6 +1241,10 @@ static time_t	vmware_evt_endtime(const zbx_vmware_eventlog_state_t *eventlog, co
 
 	if (end_time > now)
 		end_time = 0;	/* it could be in case of incorrect esxi time */
+
+	/* fuse to protect write cache from overload - load only 12 hours per pool session */
+	if (end_time - eventlog->last_ts > SEC_PER_DAY / 2)
+		end_time = eventlog->last_ts + SEC_PER_DAY / 2;
 
 	return end_time;
 
