@@ -207,7 +207,7 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 			->setArgument('itemid', $item['master_itemid'])
 			->getUrl();
 
-		if ($item['discoveryRule']) {
+		if (array_key_exists('discoveryRule', $item)) {
 			if ($path) {
 				$path[] = '>';
 			}

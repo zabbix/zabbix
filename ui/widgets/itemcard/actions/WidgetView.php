@@ -80,7 +80,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			],
 			'selectHosts' => ['hostid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 			'selectItemDiscovery' => ['itemdiscoveryid', 'itemid', 'parent_itemid', 'status', 'ts_delete', 'ts_disable',
 				'disable_source'
 			],
@@ -202,6 +202,10 @@ class WidgetView extends CControllerDashboardWidgetView
 		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->prepareItemHistoryAndTrends($item);
+		}
+
+		if (!$item['discoveryRule']) {
+			unset($item['discoveryRule']);
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
