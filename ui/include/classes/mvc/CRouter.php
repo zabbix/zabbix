@@ -138,7 +138,7 @@ class CRouter {
 		'host.update'								=> ['CControllerHostUpdate',							'layout.json',			null],
 		'host.view'									=> ['CControllerHostView',								'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'							=> ['CControllerHostViewRefresh',						'layout.json',			'monitoring.host.view.refresh'],
-		'host.wizard.edit'							=> ['CControllerHostWizardEdit',						'layout.json',			null],
+		'host.wizard.edit'							=> ['CControllerHostWizardEdit',						'layout.json',			'host.wizard.edit'],
 		'host.wizard.get'							=> ['CControllerHostWizardGet',							'layout.json',			null],
 		'hostgroup.create'							=> ['CControllerHostGroupCreate',						'layout.json',			null],
 		'hostgroup.delete'							=> ['CControllerHostGroupDelete',						'layout.json',			null],

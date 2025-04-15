@@ -128,6 +128,7 @@ class CControllerHostWizardEdit extends CController {
 		}
 
 		$data = [
+			'form_action' => $linked_templates ? 'host.wizard.update' : 'host.wizard.create',
 			'templates' => $wizard_ready_templates,
 			'linked_templates' => array_keys($linked_templates),
 			'old_template_count' => $vendor_template_count - $wizard_vendor_template_count,
