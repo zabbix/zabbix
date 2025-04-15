@@ -60,9 +60,21 @@ class C72ImportConverter extends CConverter {
 				}
 			}
 			unset($link);
+
+			$map['selements'] = self::convertMapElements($map['selements']);
 		}
 		unset($map);
 
 		return $maps;
+	}
+
+	private static function convertMapElements(array $selements): array {
+		$i = 0;
+		foreach ($selements as &$selement) {
+			$selement['zindex'] = (string) $i++;
+		}
+		unset($selement);
+
+		return $selements;
 	}
 }

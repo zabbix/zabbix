@@ -29,7 +29,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>				'in '.implode(',', ['host', 'template']),
+			'context' =>				'required|in '.implode(',', ['host', 'template']),
 			'hostid' =>					'db hosts.hostid',
 			'triggerid' =>				'db triggers.triggerid',
 			'name' =>					'string',
@@ -79,6 +79,25 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 		if (!$discovery_rule) {
 			return false;
+		}
+
+		if ($this->hasInput('hostid')) {
+			if ($this->getInput('context') === 'host') {
+				$exists = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $this->getInput('hostid')
+				]);
+			}
+			else {
+				$exists = (bool) API::Template()->get([
+					'output' => [],
+					'templateids' => $this->getInput('hostid')
+				]);
+			}
+
+			if (!$exists) {
+				return false;
+			}
 		}
 
 		if ($this->hasInput('triggerid')) {
