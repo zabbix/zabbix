@@ -20,14 +20,140 @@
 
 ?>
 
-window.host_wizard_edit = {
-	overlay: null,
-	dialogue: null,
-	form: null,
-	templates: [],
-	linked_templates: [],
-	old_template_count: 0,
-	wizard_hide_welcome: false,
+const HostWizardStep = {
+	WELCOME: 0,
+	SELECT_TEMPLATE: 1,
+	CREATE_HOST: 2
+}
+
+window.host_wizard_edit = new class {
+	#templates;
+	#linked_templates;
+	#current_step;
+
+	#overlay;
+	#dialogue;
+
+	#back_button;
+	#next_button;
+
+	#template_step_welcome;
+	#template_step_select_template;
+	#template_templates_section;
+	#template_card;
+
+	#step_from_body;
+
+	init({templates, linked_templates, wizard_hide_welcome}) {
+		this.#templates = templates;
+		this.#linked_templates = linked_templates;
+		this.#current_step = wizard_hide_welcome ? HostWizardStep.SELECT_TEMPLATE : HostWizardStep.WELCOME;
+
+		this.#template_step_welcome = new Template(
+			document.getElementById('host-wizard-step-welcome').innerHTML
+		);
+		this.#template_step_select_template = new Template(
+			document.getElementById('host-wizard-step-select-template').innerHTML
+		);
+		this.#template_templates_section = new Template(
+			document.getElementById('host-wizard-templates-section').innerHTML
+		);
+		this.#template_card = new Template(
+			document.getElementById('host-wizard-template-card').innerHTML
+		);
+
+		this.#overlay = overlays_stack.getById('host.wizard.edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#step_from_body = this.#dialogue.querySelector('.step-form-body');
+
+		this.#back_button = this.#dialogue.querySelector('.js-back').addEventListener('click', () => {
+			const first_step = wizard_hide_welcome ? HostWizardStep.SELECT_TEMPLATE : HostWizardStep.WELCOME;
+
+			this.#current_step = Math.max(first_step, this.#current_step - 1);
+			this.#back_button.style.display = this.#current_step === first_step ? 'none' : '';
+		});
+
+		this.#next_button = this.#dialogue.querySelector('.js-next').addEventListener('click', () => {
+			const last_step = Math.max(...Object.values(HostWizardStep));
+
+			this.#current_step = Math.min(last_step, this.#current_step + 1);
+			this.#next_button.style.display = this.#current_step === last_step ? 'none' : '';
+		});
+
+		this.#updateStep();
+		this.#updateForm();
+	}
+
+	#updateStep() {
+		const step_render = {
+			HostWizardStep.WELCOME: () => this.#renderWelcome(),
+			HostWizardStep.SELECT_TEMPLATE: () => this.#renderSelectTemplate(),
+			HostWizardStep.CREATE_HOST: () => this.#renderCreateHost()
+		}[this.#current_step];
+
+		if (step_render !== undefined) {
+			this.#step_from_body.replaceWith(step_render());
+		}
+	}
+
+	#renderWelcome() {
+		return this.#template_step_welcome.evaluateToElement();
+	}
+
+	#renderSelectTemplate() {
+		const content = this.#template_step_select_template.evaluateToElement();
+
+		return content;
+	}
+
+	#renderCreateHost() {
+		return this.#template_step_welcome.evaluateToElement();
+	}
+
+	#updateForm() {
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	showMultistepForm(wizard_hide_welcome) {
+		if (!wizard_hide_welcome) {
+			this.showStep('welcomeStep');
+		}
+		else {
+			this.showStep('selectTemplates');
+		}
+	}
+
+	showStep(step) {
+		switch (step) {
+			case 'welcomeStep':
+				this.showStepWelcome();
+				break;
+			case 'selectTemplates':
+				this.showStepSelectTemplates();
+				break;
+		}
+	}
+
+	showStepWelcome() {
+
+	}
+
+	showStepSelectTemplates() {
+
+	}
+
+/*
 
 	init({templates, linked_templates, old_template_count, wizard_hide_welcome}) {
 		this.overlay = overlays_stack.getById('host.wizard.edit');
@@ -83,16 +209,7 @@ window.host_wizard_edit = {
 		);
 	},
 
-
-
-	/**
-	 * Normalize field values.
-	 *
-	 * @param {Object}  fields    Fields from host form.
-	 * @param {boolean} is_clone  Submit fields for clone instead of update.
-	 *
-	 * @return {Object}  Processed fields from host form.
-	 */
+/
 	preprocessFormFields(fields, is_clone) {
 		this.trimFields(fields);
 		fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
@@ -231,4 +348,5 @@ window.host_wizard_edit = {
 
 		form.parentNode.insertBefore(message_box, form);
 	}
-};
+	*/
+}

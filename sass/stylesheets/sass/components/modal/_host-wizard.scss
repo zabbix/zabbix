@@ -7,6 +7,15 @@
 		.overlay-dialogue-header {
 			margin: 0;
 			padding: 56px 56px 16px 56px;
+
+			h4 {
+				min-height: 1.2em;
+			}
+
+			.btn-icon,
+			.btn-overlay-close {
+				margin-top: 0;
+			}
 		}
 
 		.overlay-dialogue-body {
@@ -14,6 +23,7 @@
 			padding: 0 56px 32px 56px;
 			width: initial;
 			min-height: 384px;
+			max-height: calc(100vh - 300px);
 		}
 
 		.overlay-dialogue-footer {

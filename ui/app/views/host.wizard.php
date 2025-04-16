@@ -67,7 +67,7 @@ echo json_encode($output);
 
 
 
-function welcomeMessage(): array {
+function welcomeMessage(): CTemplateTag {
 	return [
 		(new CSection())
 			->addItem(
@@ -221,19 +221,19 @@ function componentRadioCardList() {
 			]
 		];
 
-//		$list->addItem(
-//			(new CDiv())
-//				->addItem([
-//					(new CLabel([
-//						$template,
-//						(new CSpan(
-//							(new CInput('radio', 'applications', strtolower($template)))
-//								->setAttribute('checked', $template === 'Apache' ? '' : null)
-//						))->addClass('radio-card-selector')
-//					]))->addClass('radio-card-label'),
-//
-//				])
-//				->addClass('radio-card')
+		$list->addItem(
+			(new CDiv())
+				->addItem([
+					(new CLabel([
+						$template,
+						(new CSpan(
+							(new CInput('radio', 'applications', strtolower($template)))
+								->setAttribute('checked', $template === 'Apache' ? '' : null)
+						))->addClass('radio-card-selector')
+					]))->addClass('radio-card-label'),
+
+				])
+				->addClass('radio-card')
 	}
 
 	return (new CRadioCardList('applications', 'Apache'))

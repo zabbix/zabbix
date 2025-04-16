@@ -146,7 +146,7 @@
 
 		initEvents() {
 			document.querySelector('.js-host-wizard').addEventListener('click', () => {
-				ZABBIX.PopupManager.open('host.wizard');
+				ZABBIX.PopupManager.open('host.wizard.edit');
 			});
 
 			document.querySelector('.js-create-host').addEventListener('click', () => {

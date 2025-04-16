@@ -5476,11 +5476,17 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-header {
       margin: 0;
       padding: 56px 56px 16px 56px; }
+      .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-header h4 {
+        min-height: 1.2em; }
+      .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-header .btn-icon,
+      .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-header .btn-overlay-close {
+        margin-top: 0; }
     .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-body {
       margin: 0;
       padding: 0 56px 32px 56px;
       width: initial;
-      min-height: 384px; }
+      min-height: 384px;
+      max-height: calc(100vh - 300px); }
     .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer {
       display: flex;
       align-items: baseline;
