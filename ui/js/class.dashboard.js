@@ -51,7 +51,6 @@ class CDashboard {
 
 	#are_tabs_blocked = false;
 
-	#widget_edit_context = null;
 	#widget_edit_dialogue = null;
 	#widget_edit_queue = null;
 	#widget_edit_position_fix = null;
@@ -1579,11 +1578,6 @@ class CDashboard {
 			dialogue_params.is_new = true;
 		}
 
-		this.#widget_edit_context = {
-			unique_id: widget !== null ? widget.getUniqueId() : null,
-			dashboard_page_unique_id: this._selected_dashboard_page.getUniqueId()
-		}
-
 		const busy_condition = this._createBusyCondition();
 
 		sandbox.promiseInit(sandbox_params)
@@ -1623,7 +1617,6 @@ class CDashboard {
 				throw exception;
 			})
 			.finally(() => {
-				this.#widget_edit_context = null;
 				this.#widget_edit_dialogue = null;
 				this.#widget_edit_queue = null;
 
@@ -1632,11 +1625,24 @@ class CDashboard {
 	}
 
 	#isWidgetEditing() {
-		return this.#widget_edit_context !== null;
+		return this.#widget_edit_dialogue !== null;
 	}
 
 	getWidgetEditingContext() {
-		return this.#widget_edit_context;
+		let unique_id = null;
+
+		for (const widget of this._selected_dashboard_page.getWidgets()) {
+			if (widget.isWidgetEditing(true)) {
+				unique_id = widget.getUniqueId();
+
+				break;
+			}
+		}
+
+		return {
+			unique_id,
+			dashboard_page_unique_id: this._selected_dashboard_page.getUniqueId()
+		};
 	}
 
 	_getDashboardPageActionsContextMenu(dashboard_page) {

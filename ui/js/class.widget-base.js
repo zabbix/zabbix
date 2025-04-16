@@ -782,6 +782,18 @@ class CWidgetBase {
 	}
 
 	/**
+	 * Is widget in editing state?
+	 *
+	 * @param {boolean} self  Is this particular widget being edited.
+	 *
+	 * @returns {boolean}
+	 */
+	isWidgetEditing(self = false) {
+		return this._target.classList.contains('is-editing')
+			&& (this._target.classList.contains('is-editing-self') || !self);
+	}
+
+	/**
 	 * Enter widget editing state.
 	 *
 	 * @param {boolean} self  Whether this particular widget is about to be edited.
