@@ -63,7 +63,7 @@ class testMediatype extends CAPITest {
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'provider' => CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY,
-					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
+					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be one of 0, 1.'
 			],

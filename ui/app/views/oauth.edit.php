@@ -135,7 +135,7 @@ if ($data['advanced_form']) {
 			->setAsteriskMark()
 			->setId('oauth-auth-endpoint-label'),
 		(new CFormField([
-			(new CTextBox('authorization_url', $data['authorization_url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('authorization_url', $data['authorization_url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		]))->setId('oauth-auth-endpoint-field')
 	])
 	->addItem([
