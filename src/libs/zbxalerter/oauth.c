@@ -118,7 +118,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	do													\
 	{													\
 		*error = zbx_dsprintf(NULL, "Access token retrieval failed: mediatype \"%s\": " message,	\
-				mediatype_name, ##__VA_ARGS__);							\
+				mediatype_name, __VA_ARGS__);							\
 	}													\
 	while (0)
 
@@ -151,7 +151,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("error field not found in OAuth server response");
+			SET_ERROR("%s", "error field not found in OAuth server response");
 			goto out;
 		}
 
@@ -160,7 +160,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error_description", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("error_description field not found in OAuth server response");
+			SET_ERROR("%s", "error_description field not found in OAuth server response");
 			goto out;
 		}
 
@@ -172,19 +172,19 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	{
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "token_type", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("token_type field not found in OAuth server response");
+			SET_ERROR("%s", "token_type field not found in OAuth server response");
 			goto out;
 		}
 
 		if (0 != strcmp(tmp, "Bearer"))
 		{
-			SET_ERROR("token_type is not \"Bearer\" in OAuth server response");
+			SET_ERROR("%s", "token_type is not \"Bearer\" in OAuth server response");
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "access_token", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("access_token field not found in OAuth server response");
+			SET_ERROR("%s", "access_token field not found in OAuth server response");
 			goto out;
 		}
 
@@ -193,7 +193,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "expires_in", &tmp, &tmp_alloc, NULL))
 		{
-			SET_ERROR("expires_in field not found in OAuth server response");
+			SET_ERROR("%s", "expires_in field not found in OAuth server response");
 			goto out;
 		}
 
