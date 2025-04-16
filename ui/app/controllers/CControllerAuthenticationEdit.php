@@ -67,7 +67,10 @@ class CControllerAuthenticationEdit extends CController {
 			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
-			'mfa_removed_mfaids' =>				'array_id'
+			'mfa_removed_mfaids' =>				'array_id',
+			'idp_certificate' =>				'string',
+			'sp_certificate' =>					'string',
+			'sp_private_key' =>					'string'
 		];
 
 		if ($ALLOW_HTTP_AUTH) {
@@ -173,7 +176,10 @@ class CControllerAuthenticationEdit extends CController {
 				'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
 				'passwd_min_length' => '',
 				'passwd_check_rules' => 0,
-				'mfa_status' => MFA_DISABLED
+				'mfa_status' => MFA_DISABLED,
+				'idp_certificate' =>				'',
+				'sp_certificate' =>					'',
+				'sp_private_key' =>					''
 			];
 
 			if ($ALLOW_HTTP_AUTH) {
@@ -258,7 +264,10 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_user_lastname' => '',
 					'scim_status' => '',
 					'saml_provision_groups' => [],
-					'saml_provision_media' => []
+					'saml_provision_media' => [],
+					'idp_certificate' =>				'',
+					'sp_certificate' =>					'',
+					'sp_private_key' =>					''
 				];
 			}
 

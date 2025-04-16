@@ -1551,15 +1551,15 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'idp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_certificate')],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_certificate')],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_private_key')],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sso_url' =>			['type' => API_MULTIPLE, 'rules' => [

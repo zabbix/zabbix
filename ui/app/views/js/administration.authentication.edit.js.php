@@ -145,8 +145,14 @@
 
 			this.form.querySelectorAll('.saml-upload-identity-button').forEach(upload_button => {
 				const file_input = upload_button.parentElement.querySelector('input[type="file"]');
-				const file_content = file_input.closest('div').previousElementSibling;
+				const file_content = file_input.closest('div').previousElementSibling.previousElementSibling;
 				const file_name = upload_button.parentElement.querySelector('span');
+
+				file_content.addEventListener("input", function() {
+					if (this.value == '') {
+						file_name.textContent = '';
+					}
+				});
 
 				upload_button.addEventListener("click", function() {
 					file_input.click();

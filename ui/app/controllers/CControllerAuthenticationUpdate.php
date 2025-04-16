@@ -74,12 +74,9 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
 			'mfa_removed_mfaids' =>				'array_id',
-			'idp_certificate' =>				'string',
-			'sp_certificate' =>					'string',
-			'sp_private_key' =>					'string',
-			'is_idp_certificate_change' =>		'in 0,1',
-			'is_sp_certificate_change' =>		'in 0,1',
-			'is_sp_private_key_change' =>		'in 0,1'
+			'idp_certificate' =>				'db userdirectory_saml.idp_certificate',
+			'sp_certificate' =>					'db userdirectory_saml.sp_certificate',
+			'sp_private_key' =>					'db userdirectory_saml.sp_private_key'
 		];
 
 		if ($ALLOW_HTTP_AUTH) {
@@ -194,12 +191,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'sp_entityid'
 		]);
 
-		$saml_certificate_fields = [
-			'idp_certificate',
-			'sp_certificate',
-			'sp_private_key'
-		];
-
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
 
@@ -216,7 +207,16 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
-		foreach ($saml_certificate_fields as $field_name) {
+		$saml_certificate_fields = [
+			'idp_certificate',
+			'sp_certificate',
+			'sp_private_key'
+		];
+
+		//$value = trim($this->getInput('idp_certificate', ''));
+		//$is_certificate = openssl_x509_read($value);
+
+		/*foreach ($saml_certificate_fields as $field_name) {
 			if ($this->getInput('is_'.$field_name.'_change') === '0') {
 				$value = trim($this->getInput($field_name));
 
@@ -228,7 +228,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 				if ($value !== '') {
 					if ($field_name == 'idp_certificate' || $field_name == 'sp_certificate') {
-						//$is_certificate = openssl_x509_read($value);
+						$is_certificate = openssl_x509_read($value);
 						$is_certificate = $this->validateCertificateContent($value);
 
 						if (!$is_certificate) {
@@ -254,7 +254,7 @@ class CControllerAuthenticationUpdate extends CController {
 					}
 				}
 			}
-		}
+		}*/
 
 		foreach ($saml_fields as $field_name => $field_value) {
 			if ($field_value === '') {
@@ -600,7 +600,10 @@ class CControllerAuthenticationUpdate extends CController {
 			'encrypt_nameid' => 0,
 			'encrypt_assertions' => 0,
 			'provision_status' => JIT_PROVISIONING_DISABLED,
-			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED
+			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
+			'idp_certificate' => '',
+			'sp_certificate' => '',
+			'sp_private_key' => '',
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
 
@@ -734,6 +737,38 @@ class CControllerAuthenticationUpdate extends CController {
 			echo "No extensions found in the certificate.";
 		}*/
 
+		return true;
+	}
+
+	function is_valid_certificate($value) {
+		// Fix common encoding issues (from textarea or JSON input)
+		$value = trim($value);
+		$value = str_replace(["\\n", "\r\n", "\r"], "\n", $value);
+
+		// Ensure proper PEM structure
+		if (!str_starts_with($value, '-----BEGIN CERTIFICATE-----') ||
+			!str_ends_with($value, '-----END CERTIFICATE-----')) {
+			echo " Certificate missing proper PEM headers/footers.\n";
+			return false;
+		}
+
+		// Prevent invalid whitespaces in middle
+		$lines = explode("\n", $value);
+		$lines = array_map('trim', $lines);
+		$value = implode("\n", $lines);
+
+		// Try parsing
+		$cert = @openssl_x509_read($value);
+
+		if ($cert === false) {
+			echo " Invalid certificate format or structure.\n";
+			while ($msg = openssl_error_string()) {
+				echo "OpenSSL error: $msg\n";
+			}
+			return false;
+		}
+
+		echo " Certificate is valid.\n";
 		return true;
 	}
 }

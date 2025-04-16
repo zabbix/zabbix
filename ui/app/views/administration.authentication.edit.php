@@ -307,7 +307,7 @@ $saml_tab
 if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database') {
 	$saml_tab
 		->addItem([
-			(new CLabel(_('IdP certificate')))->setAsteriskMark(),
+			(new CLabel(_('IdP certificate'))),
 			(new CFormField([
 				(new CInput('hidden', 'is_idp_certificate_change', 0))
 					->setId('is_idp_certificate_change'),
@@ -334,7 +334,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 							->addClass('saml-enabled'),
 						(new CFile('idp_certificate_input_file'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->addClass('display-none'),
+							->addClass('display-none')
+							->setAttribute('accept', '.cer, .crt, .pem, .txt'),
 						(new CSpan())->addClass('filename')
 					]))->addClass('file-upload-btn')
 				]))->setId('idp_certificate_create')
@@ -368,7 +369,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 							->addClass('saml-enabled'),
 						(new CFile('sp_private_key_input_file'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->addClass('display-none'),
+							->addClass('display-none')
+							->setAttribute('accept', '.key, .pem, .txt'),
 						(new CSpan())->addClass('filename')
 					]))->addClass('file-upload-btn')
 				]))->setId('sp_private_key_create')
@@ -402,7 +404,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 							->addClass('saml-enabled'),
 						(new CFile('sp_certificate_input_file'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->addClass('display-none'),
+							->addClass('display-none')
+							->setAttribute('accept', '.cer, .crt, .pem, .txt'),
 						(new CSpan())->addClass('filename')
 					]))->addClass('file-upload-btn')
 				]))->setId('sp_certificate_create')
