@@ -94,12 +94,12 @@ elseif ($data['item']) {
 				);
 				break;
 
-			case CWidgetFieldItemSections::SECTION_TAGS:
-				$sections[] = makeSectionTags($item['tags']);
-				break;
-
 			case CWidgetFieldItemSections::SECTION_LATEST_DATA:
 				$sections[] = makeSectionLatestData($item);
+				break;
+
+			case CWidgetFieldItemSections::SECTION_TAGS:
+				$sections[] = makeSectionTags($item['tags']);
 				break;
 		}
 	}
@@ -159,6 +159,7 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
 						->setArgument('hostids', [$item['hostid']])
+						->setArgument('triggerids', $item['triggerids'])
 						->setArgument('filter_set', '1')
 				)
 				: new CSpan();
@@ -431,29 +432,6 @@ function makeSectionMetrics(array $item): CDiv {
 		->addClass('section-metrics');
 }
 
-function makeSectionTags(array $item_tags): CDiv {
-	$tags = [];
-
-	foreach ($item_tags as $tag) {
-		$tag = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
-
-		$tags[] = (new CSpan($tag))
-			->addClass(ZBX_STYLE_TAG)
-			->setHint($tag);
-	}
-
-	if ($tags) {
-		$tags[] = (new CButtonIcon(ZBX_ICON_MORE))->setHint($tags, ZBX_STYLE_HINTBOX_WRAP);
-	}
-
-	return (new CDiv(
-		(new CDiv($tags))->addClass('tags')
-	))
-
-		->addClass(Widget::ZBX_STYLE_SECTION)
-		->addClass('section-tags');
-}
-
 function makeSectionLatestData(array $item): CDiv {
 	$value = $item['last_value'];
 	$last_check_value = '';
@@ -538,4 +516,27 @@ function makeSectionLatestData(array $item): CDiv {
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-latest-data');
+}
+
+function makeSectionTags(array $item_tags): CDiv {
+	$tags = [];
+
+	foreach ($item_tags as $tag) {
+		$tag = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
+
+		$tags[] = (new CSpan($tag))
+			->addClass(ZBX_STYLE_TAG)
+			->setHint($tag);
+	}
+
+	if ($tags) {
+		$tags[] = (new CButtonIcon(ZBX_ICON_MORE))->setHint($tags, ZBX_STYLE_HINTBOX_WRAP);
+	}
+
+	return (new CDiv(
+		(new CDiv($tags))->addClass('tags')
+	))
+
+		->addClass(Widget::ZBX_STYLE_SECTION)
+		->addClass('section-tags');
 }

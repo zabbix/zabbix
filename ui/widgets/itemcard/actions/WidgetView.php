@@ -50,7 +50,7 @@ class WidgetView extends CControllerDashboardWidgetView
 		$trigger_parent_templates = [];
 
 		if ($item && in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
-			[$triggers, $trigger_parent_templates] = $this->getAndPrepareItemTriggers($item['itemid'], $context);
+			[$triggers, $trigger_parent_templates] = $this->getAndPrepareItemTriggers($item['triggerids'], $context);
 		}
 
 		$data = [
@@ -84,6 +84,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			'selectItemDiscovery' => ['itemdiscoveryid', 'itemid', 'parent_itemid', 'status', 'ts_delete', 'ts_disable',
 				'disable_source'
 			],
+			'selectTriggers' => ['triggerid'],
 			'webitems' => true
 		];
 
@@ -164,6 +165,7 @@ class WidgetView extends CControllerDashboardWidgetView
 
 		$item = reset($db_items);
 
+		$item['triggerids'] = array_column($item['triggers'], 'triggerid');
 		$item['problem_count'] = $this->getItemProblemCount($item);
 		$item['parent_templates'] = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL);
 
@@ -280,7 +282,9 @@ class WidgetView extends CControllerDashboardWidgetView
 				'history'	=> $this->fields_values['sparkline']['history'],
 				'from'		=> $this->fields_values['sparkline']['time_period']['from_ts'],
 				'to'		=> $this->fields_values['sparkline']['time_period']['to_ts'],
-				'contents_width'	=> ceil(max([self::SECTION_MIN_WIDTH, min([self::SECTION_MAX_WIDTH, $content_width])]) / 3)
+				'contents_width'	=> ceil(
+					max([self::SECTION_MIN_WIDTH, min([self::SECTION_MAX_WIDTH, $content_width])]) / 3
+				)
 			]);
 		}
 	}
@@ -334,7 +338,7 @@ class WidgetView extends CControllerDashboardWidgetView
 
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 			$triggers = API::Trigger()->get([
-				'itemids' => $item['itemid'],
+				'triggerids' => $item['triggerids'],
 				'skipDependent' => true,
 				'monitored' => true,
 				'preservekeys' => true
@@ -451,13 +455,13 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 	}
 
-	protected function getAndPrepareItemTriggers(string $itemid, string $context): array {
+	protected function getAndPrepareItemTriggers(array $triggerids, string $context): array {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
 				'priority', 'status', 'state', 'error', 'templateid', 'flags'
 			],
 			'selectHosts' => ['hostid', 'name', 'host'],
-			'itemids' => $itemid,
+			'triggerids' => $triggerids,
 			'preservekeys' => true
 		]);
 
