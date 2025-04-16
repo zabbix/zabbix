@@ -83,7 +83,7 @@ elseif ($data['item']) {
 
 			case CWidgetFieldItemSections::SECTION_TRIGGERS:
 				$sections[] = makeSectionTriggers($data['triggers'], $item['hostid'], $data['trigger_parent_templates'],
-					$data['allowed_ui_conf_templates'], $data['context']
+					$data['allowed_ui_conf_templates'], $data['context'], $data['is_context_editable']
 				);
 				break;
 
@@ -105,7 +105,7 @@ elseif ($data['item']) {
 	}
 
 	$body = (new CDiv([
-		makeSectionsHeader($item, $data['context'], $data['show_path'], $data['allowed_ui_conf_templates']),
+		makeSectionsHeader($item, $data['context'], $data['is_context_editable'], $data['allowed_ui_conf_templates']),
 		(new CDiv($sections))->addClass(Widget::ZBX_STYLE_SECTIONS)
 	]))->addClass(Widget::ZBX_STYLE_CLASS);
 }
@@ -300,7 +300,7 @@ function makeSectionSingleParameter(string $section_name, string $section_body):
 }
 
 function makeSectionTriggers(array $item_triggers, string $hostid, array $trigger_parent_templates,
-		bool $allowed_ui_conf_templates, string $context): CDiv {
+		bool $allowed_ui_conf_templates, string $context, string $is_context_editable): CDiv {
 	$triggers = [];
 
 	$i = 0;
@@ -319,13 +319,20 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 
 		$hint_trigger[] = $trigger['description'];
 
-		$trigger_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'popup')
-			->setArgument('popup', 'trigger.edit')
-			->setArgument('triggerid', $trigger['triggerid'])
-			->setArgument('hostid', $hostid)
-			->setArgument('context', $context)
-			->getUrl();
+		if ($is_context_editable) {
+			$trigger_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'trigger.edit')
+				->setArgument('triggerid', $trigger['triggerid'])
+				->setArgument('hostid', $hostid)
+				->setArgument('context', $context)
+				->getUrl();
+
+			$trigger_description = new CLink($trigger['description'], $trigger_url);
+		}
+		else {
+			$trigger_description = new CSpan($trigger['description']);
+		}
 
 		$hint_table->addRow([
 			CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
@@ -333,7 +340,7 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 				makeTriggerTemplatePrefix($trigger['triggerid'], $trigger_parent_templates,
 					ZBX_FLAG_DISCOVERY_NORMAL, $allowed_ui_conf_templates
 				),
-				new CLink($trigger['description'], $trigger_url)
+				$trigger_description
 			],
 			(new CDiv(
 				$trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION

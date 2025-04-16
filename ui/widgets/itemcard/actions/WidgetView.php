@@ -57,7 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'sections' => $this->fields_values['sections'],
 			'context' => $context,
-			'show_path' => $context === 'host'
+			'is_context_editable' => $context === 'host'
 				? CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				: CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
