@@ -1412,6 +1412,9 @@ class CImportDataAdapterTest extends TestCase {
 		$adapter = $this->getAdapter($this->getMediaTypeXml());
 
 		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
+		$defaults += array_intersect_key(DB::getDefaults('media_type_oauth'), array_flip([
+			'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url'
+		]));
 
 		$this->assertEquals([
 			[
