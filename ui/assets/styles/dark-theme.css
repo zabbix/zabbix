@@ -4031,7 +4031,7 @@ section {
     cursor: default;
     color: #525252;
     background-color: transparent;
-    border: none; }
+    border-color: transparent; }
     .ui-tabs-nav .ui-state-disabled .ui-tabs-anchor:hover {
       background-color: transparent;
       box-shadow: none; }
