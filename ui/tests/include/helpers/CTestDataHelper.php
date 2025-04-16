@@ -896,6 +896,10 @@ class CTestDataHelper {
 	}
 
 	public static function createMediatypes(array $mediatypes): void {
+		if (!$mediatypes) {
+			return;
+		}
+
 		self::convertUserGroupReferences($mediatypes);
 
 		$result = CDataHelper::call('mediatype.create', $mediatypes);
