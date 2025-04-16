@@ -273,9 +273,9 @@ func getUIDByName(userName string) (*uid, error) {
 
 	if passwdC == nil {
 		return nil, err
-	} else {
-		return &uid{uint32(passwdC.pw_uid)}, nil
 	}
+
+	return &uid{uint32(passwdC.pw_uid)}, nil
 }
 
 func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error) {
@@ -290,10 +290,11 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 				return nil, err
 			}
 			u := &userNotFoundError{}
+
 			return query, u
-		} else {
-			query.userid = int64(uid.Uid)
 		}
+
+		query.userid = int64(uid.Uid)
 	}
 
 	query.cmdlinePattern = pattern
@@ -313,7 +314,6 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 			delete(p.queries, q)
 			continue
 		}
-
 		var query *cpuUtilQuery
 
 		query, stats.err = newCPUUtilQuery(&q, stats.cmdlinePattern)
@@ -324,7 +324,6 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 				continue
 			}
 		}
-
 		queries = append(queries, query)
 		stats.scanid = p.scanid
 		if q.name != "" {
@@ -359,7 +358,6 @@ func (p *Plugin) Collect() (err error) {
 	for _, p := range processes {
 		var monitored bool
 		for _, q := range queries {
-
 			if q.match(p) {
 				q.pids = append(q.pids, p.pid)
 				monitored = true
@@ -409,11 +407,9 @@ func (p *Plugin) Collect() (err error) {
 	p.mutex.Lock()
 	for _, q := range queries {
 		if stat, ok := p.queries[q.procQuery]; ok {
-
 			if stat.scanid != p.scanid {
 				continue
 			}
-
 			var last *cpuUtilData
 			if stat.tail != stat.head {
 				last = &stat.history[stat.tail.dec()]
