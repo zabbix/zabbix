@@ -3792,7 +3792,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 	{
 		zbx_vmware_datastore_t	*datastore = service->data->datastores.values[i];
 
-		if (0 != ids.values_num &&
+		if (NULL != filter_uuid && '\0' != *filter_uuid &&
 				FAIL == zbx_vector_str_bsearch(&ids, datastore->id, ZBX_DEFAULT_STR_COMPARE_FUNC))
 		{
 			continue;
