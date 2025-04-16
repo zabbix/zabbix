@@ -492,9 +492,11 @@ function makeSectionLatestData(array $item): CDiv {
 
 		if ($item['keep_history'] != 0 || $item['keep_trends'] != 0) {
 			$action_column->addItem(
-				(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
-					->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
-					->setArgument('itemids[]', $item['itemid'])
+				(new CDiv(
+					(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
+						->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
+						->setArgument('itemids[]', $item['itemid'])
+					))
 				))->addClass('column-header')
 			);
 		}
