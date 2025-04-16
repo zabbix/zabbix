@@ -78,6 +78,8 @@ class CRoleHelper {
 	public const ACTIONS_MANAGE_SLA = 'actions.manage_sla';
 	public const ACTIONS_INVOKE_EXECUTE_NOW = 'actions.invoke_execute_now';
 	public const ACTIONS_CHANGE_PROBLEM_RANKING = 'actions.change_problem_ranking';
+	public const ACTIONS_EDIT_OWN_MEDIA = 'actions.edit_own_media';
+	public const ACTIONS_EDIT_USER_MEDIA = 'actions.edit_user_media';
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
@@ -304,7 +306,13 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_MANAGE_SLA;
 		}
 
-		$rules = array_merge($rules, [self::ACTIONS_INVOKE_EXECUTE_NOW, self::ACTIONS_CHANGE_PROBLEM_RANKING]);
+		$rules = array_merge($rules, [self::ACTIONS_INVOKE_EXECUTE_NOW, self::ACTIONS_CHANGE_PROBLEM_RANKING,
+			self::ACTIONS_EDIT_OWN_MEDIA
+		]);
+
+		if ($user_type === USER_TYPE_SUPER_ADMIN) {
+			$rules[] = self::ACTIONS_EDIT_USER_MEDIA;
+		}
 
 		return $rules;
 	}
@@ -538,8 +546,13 @@ class CRoleHelper {
 
 		$labels += [
 			self::ACTIONS_INVOKE_EXECUTE_NOW => _('Invoke "Execute now" on read-only hosts'),
-			self::ACTIONS_CHANGE_PROBLEM_RANKING => _('Change problem ranking')
+			self::ACTIONS_CHANGE_PROBLEM_RANKING => _('Change problem ranking'),
+			self::ACTIONS_EDIT_OWN_MEDIA => _('Create and edit own media')
 		];
+
+		if ($user_type === USER_TYPE_SUPER_ADMIN) {
+			$labels += [self::ACTIONS_EDIT_USER_MEDIA => _('Create and edit user media')];
+		}
 
 		return $labels;
 	}

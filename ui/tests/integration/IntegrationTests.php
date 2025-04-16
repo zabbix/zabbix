@@ -42,6 +42,7 @@ require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 require_once dirname(__FILE__).'/testDiscoveryRules.php';
 require_once dirname(__FILE__).'/testAutoregistration.php';
+require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
@@ -54,6 +55,7 @@ require_once dirname(__FILE__).'/testProxyHa.php';
 require_once dirname(__FILE__).'/testBrowserMonitoring.php';
 require_once dirname(__FILE__).'/testHostConnMacroValidation.php';
 require_once dirname(__FILE__).'/testConfigVariables.php';
+require_once dirname(__FILE__).'/testLLDLinking.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -66,6 +68,7 @@ class IntegrationTests {
 		}
 		$suite->addTestSuite('testDiscoveryRules');
 		$suite->addTestSuite('testAutoregistration');
+		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testBinaryValueTypeDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
@@ -103,6 +106,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testBrowserMonitoring');
 		$suite->addTestSuite('testHostConnMacroValidation');
 		$suite->addTestSuite('testConfigVariables');
+		$suite->addTestSuite('testLLDLinking');
 
 		return $suite;
 	}

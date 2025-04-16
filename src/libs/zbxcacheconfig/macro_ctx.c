@@ -103,7 +103,7 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%u", item->interface.port);
+				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
@@ -120,9 +120,8 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 
 	if (NULL != replace_to)
 	{
-		char	*esc;
+		char	*esc = zbx_dyn_escape_string(*replace_to, "\\");
 
-		esc = zbx_dyn_escape_string(*replace_to, "\\");
 		zbx_free(*replace_to);
 		*replace_to = esc;
 	}
@@ -149,7 +148,7 @@ int	zbx_macro_allowed_hosts_resolv(zbx_macro_resolv_data_t *p, va_list args, cha
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
 
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else
 		{
@@ -180,13 +179,13 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
 
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%u", item->interface.port);
+				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
@@ -223,7 +222,7 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
 
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_ITEM_ID))
 		{
@@ -245,7 +244,7 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%u", item->interface.port);
+				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
