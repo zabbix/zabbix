@@ -158,6 +158,14 @@ class testMediatype extends CAPITest {
 					'tokens_status' => 0
 				]],
 				null
+			],
+			'Update media type with "parameters" to media type without "parameters"' => [
+				[[
+					'mediatypeid' => ':media_type:Media type with parameters',
+					'type' => MEDIA_TYPE_SMS,
+					'gsm_modem' => '/dev/ttyS0'
+				]],
+				null
 			]
 		];
 	}
@@ -378,6 +386,12 @@ class testMediatype extends CAPITest {
 				'name' => 'Script media type',
 				'type' => MEDIA_TYPE_EXEC,
 				'exec_path' => 'testscript'
+			],
+			[
+				'name' => 'Media type with parameters',
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'parameters' => [['name' => 'param1', 'value' => 'value1']],
+				'script' => 'return'
 			],
 			[
 				'name' => 'Email media type gmail',
