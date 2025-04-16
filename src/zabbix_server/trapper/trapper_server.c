@@ -31,11 +31,15 @@
 #include "zbxjson.h"
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
-		zbx_get_config_forks_f get_config_forks)
+		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		j;
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		return;
 
 	if (0 == get_config_forks(ZBX_PROCESS_TYPE_REPORTMANAGER))
 	{
@@ -75,9 +79,12 @@ out:
  * Parameters:  sock           - [IN] request socket                          *
  *              jp             - [IN] request data                            *
  *              config_timeout - [IN]                                         *
+ *              config_tls     - [IN]                                         *
+ *              config_frontend_allowed_ip - [IN]                             *
  *                                                                            *
  ******************************************************************************/
-static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
+static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
+	const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -96,6 +103,9 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	unsigned char		type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_user_init(&user);
@@ -223,6 +233,7 @@ fail:
 	zbx_json_free(&json);
 
 	zbx_user_free(&user);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
@@ -230,18 +241,23 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
-		zbx_get_config_forks_f get_config_forks)
+		zbx_get_config_forks_f get_config_forks,
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 	ZBX_UNUSED(get_program_type_cb);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
-		trapper_process_report_test(sock, jp, config_comms->config_timeout, get_config_forks);
+		trapper_process_report_test(sock, jp, config_comms->config_timeout, get_config_forks,
+			config_tls, config_frontend_allowed_ip);
+
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
 	{
-		trapper_process_alert_send(sock, jp, config_comms->config_timeout);
+		trapper_process_alert_send(sock, jp, config_comms->config_timeout, config_tls,
+			config_frontend_allowed_ip);
+
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
@@ -250,16 +266,20 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
 				config_comms->config_ssl_key_location);
+
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_DATA))
 	{
 		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
+
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_HISTORY_PUSH))
 	{
-		trapper_process_history_push(sock, jp, config_comms->config_timeout);
+		trapper_process_history_push(sock, jp, config_comms->config_timeout, config_tls,
+			config_frontend_allowed_ip);
+
 		return SUCCEED;
 	}
 
