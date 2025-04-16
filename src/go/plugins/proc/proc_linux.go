@@ -68,7 +68,6 @@ type userNotFoundError struct {
 	Name string
 }
 
-
 var impl Plugin = Plugin{
 	stats:   make(map[int64]*procStat),
 	queries: make(map[procQuery]*cpuUtilStats),
