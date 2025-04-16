@@ -333,15 +333,7 @@ class CAudit {
 			[
 				'paths' => ['mediatype.passwd'],
 				'conditions' => [
-					[
-						'provider' => [CMediatypeHelper::EMAIL_PROVIDER_SMTP, CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY,
-							CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY
-						],
-						'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
-					],
-					[
-						'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365]
-					]
+					['smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD]
 				]
 			],
 			[

@@ -821,26 +821,25 @@ class CMediatype extends CApiService {
 				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
 
 				$mediatype += array_intersect_key($type_field_defaults, $field_names);
+			}
+			elseif ($mediatype['type'] == MEDIA_TYPE_EMAIL) {
+				self::addFieldDefaultsBySmtpSecurity($mediatype, $db_mediatype, $type_field_defaults);
+				self::addFieldDefaultsBySmtpAuthentication($mediatype, $db_mediatype, $type_field_defaults);
+			}
+			elseif ($mediatype['type'] == MEDIA_TYPE_SMS) {
+				$mediatype += ['maxsessions' => DB::getDefault('media_type', 'maxsessions')];
+			}
+			elseif ($mediatype['type'] == MEDIA_TYPE_EXEC) {
+				if ($db_mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+					$mediatype += ['parameters' => []];
+				}
+			}
+			elseif ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+				if ($db_mediatype['type'] == MEDIA_TYPE_EXEC) {
+					$mediatype += ['parameters' => []];
+				}
 
-				if ($mediatype['type'] == MEDIA_TYPE_EMAIL) {
-					self::addFieldDefaultsBySmtpSecurity($mediatype, $db_mediatype, $type_field_defaults);
-					self::addFieldDefaultsBySmtpAuthentication($mediatype, $db_mediatype, $type_field_defaults);
-				}
-				elseif ($mediatype['type'] == MEDIA_TYPE_SMS) {
-					$mediatype += ['maxsessions' => DB::getDefault('media_type', 'maxsessions')];
-				}
-				elseif ($mediatype['type'] == MEDIA_TYPE_EXEC) {
-					if ($db_mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
-						$mediatype += ['parameters' => []];
-					}
-				}
-				elseif ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
-					if ($db_mediatype['type'] == MEDIA_TYPE_EXEC) {
-						$mediatype += ['parameters' => []];
-					}
-
-					self::addFieldDefaultsByShowEventMenu($mediatype, $db_mediatype, $type_field_defaults);
-				}
+				self::addFieldDefaultsByShowEventMenu($mediatype, $db_mediatype, $type_field_defaults);
 			}
 		}
 		unset($mediatype);
