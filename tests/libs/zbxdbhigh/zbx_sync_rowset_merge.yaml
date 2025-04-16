@@ -230,7 +230,7 @@ out:
       flags: 0x00000006
       cols: ["1", "2", "3"]
     - rowid: 2
-      flags: 0x00000006
+      flags: 0x00000002
       cols: ["1", "2", "2"]
     - rowid: 3
       flags: 0x00000004
