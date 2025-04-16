@@ -73,7 +73,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"hk_services_mode",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"1"},
 	{"hk_services",			ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		"365d"},
 	{"hk_sessions_mode",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"1"},
-	{"hk_sessions",			ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		"365d"},
+	{"hk_sessions",			ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		"31d"},
 	{"hk_trends_global",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"0"},
 	{"hk_trends_mode",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"1"},
 	{"hk_trends",			ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		"365d"},
