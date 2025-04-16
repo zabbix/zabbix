@@ -2105,6 +2105,33 @@ button {
     border-color: #212121; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-container {
   opacity: 0.75; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-header,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-contents {
+  border-width: 3px;
+  border-color: #768d99; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-header {
+  margin: -2px -2px 0 -2px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-contents {
+  margin: calc(2rem - 2px) -2px -2px -2px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
+  margin-top: -2px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
+  height: 2rem;
+  margin-top: -2rem; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header.ui-draggable-dragging .dashboard-grid-widget-header {
+  border-color: #212121;
+  border-width: 1px;
+  padding: 2px 2px 0 12px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header.ui-draggable-dragging .dashboard-grid-widget-contents {
+  z-index: 5; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-n {
+  top: 3px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-e {
+  right: 3px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-s {
+  bottom: 4px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-w {
+  left: 3px; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
   transition-property: height, top;
   transition-duration: 0.15s; }
