@@ -1300,10 +1300,12 @@ class CDashboardPage {
 
 				for (const widget of this._widgets.keys()) {
 					const widget_view = widget.getView();
+					const widget_view_header = widget_view.querySelector(`.${widget.getCssClass('header')}`);
+					const widget_view_actions = widget_view.querySelector(`.${widget.getCssClass('actions')}`);
+					const widget_view_controls = widget_view.querySelector(`.${widget.getCssClass('controls')}`);
 
-					if (widget_view.querySelector(`.${widget.getCssClass('header')}`).contains(e.target)
-							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)
-							&& !widget_view.querySelector(`.${widget.getCssClass('controls')}`).contains(e.target)) {
+					if (widget_view_header.contains(e.target) && !widget_view_actions.contains(e.target)
+							&& (widget_view_controls === null || !widget_view_controls.contains(e.target))) {
 						drag_widget = widget;
 						break;
 					}

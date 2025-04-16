@@ -794,15 +794,6 @@ var timeControl = {
 		this.processObjects();
 	},
 
-	disableAllSBox: function() {
-		jQuery.each(this.objectList, function(i, obj) {
-			if (obj.loadSBox == 1) {
-				jQuery('#'+obj.containerid).removeClass('dashboard-widget-graph-link');
-			}
-		});
-		jQuery(document).off('dblclick mousedown', 'img');
-	},
-
 	/**
 	 * Update object timeline data. Will reload page when timeConrol.refreshPage is set to true.
 	 *

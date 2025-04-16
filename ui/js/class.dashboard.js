@@ -38,6 +38,7 @@ class CDashboard {
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
+	static EVENT_REFERRED_UPDATE = 'dashboard-referred-update';
 	static EVENT_FEEDBACK = 'dashboard-feedback';
 
 	static WIDGET_EDIT_INPUT_THROTTLE_MS = 500;
@@ -2375,6 +2376,24 @@ class CDashboard {
 				);
 			},
 
+			referredUpdate: ({descriptor}) => {
+				if (!('type' in descriptor) || !this.#broadcast_cache.has(descriptor.type)) {
+					return;
+				}
+
+				const is_referred = ZABBIX.EventHub.hasSubscribers({
+					context: 'dashboard',
+					event_type: 'broadcast',
+					reference: CDashboard.REFERENCE_DASHBOARD,
+					type: descriptor.type
+				});
+
+				this.fire(CDashboard.EVENT_REFERRED_UPDATE, {
+					type: descriptor.type,
+					is_referred
+				});
+			},
+
 			feedback: ({data, descriptor}) => {
 				if (!('type' in descriptor) || !this.#broadcast_cache.has(descriptor.type)) {
 					return;
@@ -2439,6 +2458,18 @@ class CDashboard {
 			if (this._buttons.next_page !== null) {
 				this._buttons.next_page.addEventListener('click', this._events.kioskModeNextPageClick);
 			}
+		}
+
+		for (const require_type of [CEventHubEvent.TYPE_SUBSCRIBE, CEventHubEvent.TYPE_UNSUBSCRIBE]) {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: 'dashboard',
+					event_type: 'broadcast',
+					reference: CDashboard.REFERENCE_DASHBOARD
+				},
+				require_type,
+				callback: this._events.referredUpdate
+			});
 		}
 
 		ZABBIX.EventHub.subscribe({

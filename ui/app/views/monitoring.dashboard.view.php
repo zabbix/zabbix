@@ -226,10 +226,8 @@ $html_page = (new CHtmlPage())
 					->setId('dashboard-direct-link')
 			)
 			->addClass(ZBX_STYLE_SELECTED)
-	])));
-
-if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requirements'])) {
-	$html_page->addItem(
+	])))
+	->addItem(
 		(new CFilter())
 			->setProfile($data['dashboard_time_period']['profileIdx'], $data['dashboard_time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -237,8 +235,9 @@ if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requi
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 			->preventHistoryUpdates()
+			->disableInitialCheck()
+			->setHidden()
 	);
-}
 
 $dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 

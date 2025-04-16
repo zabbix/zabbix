@@ -36,10 +36,6 @@ class CWidgetSvgGraph extends CWidget {
 		}
 	}
 
-	onEdit() {
-		this._deactivateGraph();
-	}
-
 	onFeedback({type, value}) {
 		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
 			this._startUpdating();

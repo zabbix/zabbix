@@ -949,6 +949,7 @@ window.widget_form = new class extends CWidgetForm {
 
 	#update_preview_abort_controller = null;
 	#update_preview_loading_timeout = null;
+	#update_preview_had_errors = false;
 
 	_updatePreview() {
 		if (this.#update_preview_abort_controller !== null) {
@@ -1048,9 +1049,12 @@ window.widget_form = new class extends CWidgetForm {
 					throw {error: response.error};
 				}
 
-				for (const element of this._form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
+				// Do not remove initial messages displayed by CWidgetEditDialogue.
+				if (this.#update_preview_had_errors) {
+					for (const element of this._form.parentNode.children) {
+						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+							element.parentNode.removeChild(element);
+						}
 					}
 				}
 
@@ -1099,6 +1103,8 @@ window.widget_form = new class extends CWidgetForm {
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this._form.parentNode.insertBefore(message_box, this._form);
+
+				this.#update_preview_had_errors = true;
 			});
 	}
 
