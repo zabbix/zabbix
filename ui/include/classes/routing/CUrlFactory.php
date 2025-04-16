@@ -24,10 +24,6 @@ class CUrlFactory {
 	 * @var array
 	 */
 	protected static $contextConfigs = [
-		'graphs.php' => [
-			'remove' => ['graphid'],
-			'add' => ['hostid', 'parent_discoveryid']
-		],
 		'host_discovery.php' => [
 			'remove' => ['itemid'],
 			'add' => ['hostid']

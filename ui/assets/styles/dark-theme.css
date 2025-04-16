@@ -571,9 +571,6 @@ svg a {
   height: 10px;
   margin-right: 10px; }
 
-.list-table thead th .text-vertical:lang(ja), .list-table thead th .text-vertical:lang(ko), .list-table thead th .text-vertical:lang(zh) {
-  transform: unset; }
-
 .ui-resizable-border-n {
   border-top: 1px solid #768d99;
   height: 5px;
@@ -2356,14 +2353,14 @@ button {
     color: #737373;
     white-space: nowrap;
     vertical-align: bottom; }
-    .list-table thead th .text-vertical {
+    .list-table thead th z-vertical {
+      display: inline-block;
+      position: relative;
       max-height: 150px;
       min-width: 22px;
       overflow: hidden;
       text-overflow: ellipsis;
-      writing-mode: vertical-lr;
-      line-height: 22px;
-      transform: rotate(180deg); }
+      line-height: 22px; }
     .list-table thead th .arrow-up {
       margin-left: 3px;
       border-bottom-color: #737373; }
@@ -4771,9 +4768,9 @@ div.dashboard-widget-map .sysmap-widget-container {
   display: flex; }
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
-    div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
+    div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection {
       fill: #3a3a3a; }
-      div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+      div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection.selected {
         fill: #4a4a4a;
         stroke: #383838;
         stroke-width: 1px; }
@@ -6362,9 +6359,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .qr-code {
   height: 190px;
   width: 190px;
-  margin: 20px auto;
-  color: #f2f2f2;
-  background-color: #2b2b2b; }
+  margin: 20px auto; }
 
 .qr-code img {
   image-rendering: pixelated; }
@@ -7787,26 +7782,30 @@ svg {
   float: left;
   line-height: 24px; }
 
-#itemsTable .table-col-handle {
+#graph-tab #items-table .table-col-handle {
   width: 12px; }
-#itemsTable .table-col-no {
+#graph-tab #items-table .table-col-no {
   width: 20px; }
-#itemsTable .table-col-name-normal {
+#graph-tab #items-table .table-col-name-normal {
   width: 285px; }
-#itemsTable .table-col-name {
+#graph-tab #items-table .table-col-name {
   width: 365px; }
-#itemsTable .table-col-type {
+#graph-tab #items-table .table-col-type {
   width: 85px; }
-#itemsTable .table-col-function {
+#graph-tab #items-table .table-col-function {
   width: 85px; }
-#itemsTable .table-col-draw-style {
+#graph-tab #items-table .table-col-draw-style {
   width: 85px; }
-#itemsTable .table-col-y-axis-side {
+#graph-tab #items-table .table-col-y-axis-side {
   width: 85px; }
-#itemsTable .table-col-color {
+#graph-tab #items-table .table-col-color {
   width: 55px; }
-#itemsTable .table-col-action {
+#graph-tab #items-table .table-col-action {
   width: 55px; }
+#graph-tab .yaxis-select {
+  margin-right: 3px; }
+#graph-tab .graph-items {
+  max-width: 750px; }
 
 .z-select.z-select-host-interface .description:not(:empty),
 z-select.z-select-host-interface .description:not(:empty) {

@@ -21,7 +21,6 @@
 #include "zbxcacheconfig.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
 #include "audit/zbxaudit.h"
@@ -30,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 
 #define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
 
@@ -279,11 +279,14 @@ static int	validate_item_config(ZBX_SOCKADDR *peer_addr, ZBX_SOCKADDR *client_ad
 
 	if ('\0' != *item->trapper_hosts)
 	{
-		char	*allowed_peers;
-		int	ret = FAIL;
+		char			*allowed_peers;
+		int			ret = FAIL;
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		zbx_substitute_simple_macros_allowed_hosts(item, &allowed_peers);
+		zbx_substitute_macros(&allowed_peers, NULL, 0, zbx_macro_allowed_hosts_resolv, um_handle, item);
+
+		zbx_dc_close_user_macros(um_handle);
 
 		if (SUCCEED == (ret = zbx_tcp_check_allowed_peers_info(peer_addr, allowed_peers)))
 		{
