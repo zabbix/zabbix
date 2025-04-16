@@ -4848,9 +4848,9 @@ div.dashboard-widget-map .sysmap-widget-container {
   display: flex; }
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
-    div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
+    div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection {
       fill: #3b3b3b; }
-      div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+      div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection.selected {
         fill: #575757;
         stroke: #797676;
         stroke-width: 1px; }
@@ -4891,7 +4891,7 @@ div.dashboard-widget-map .btn-back-map-container {
       height: 24px;
       vertical-align: middle; }
 
-div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection.selected {
   stroke-width: 2px; }
 div.dashboard-widget-map .btn-back-map-container a {
   border-bottom: 0; }

@@ -102,10 +102,10 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
-					'operationtype' => 2
+					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
 		]);
@@ -124,10 +124,10 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
-					'operationtype' => 6,
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' =>
 					$templateids_for_api_call
 				]
@@ -163,10 +163,10 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
-					'operationtype' => 6,
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' =>
 					$templateids_for_api_call_collision_description
 				]
@@ -341,25 +341,25 @@ class testTriggerLinking extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname'		=>  self::HOST_NAME,
+				'Hostname'	=>	self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
-				'HostMetadata' => 'first_XSTRATA'
+				'DebugLevel'	=>	4,
+				'LogFileSize'	=>	0,
+				'LogFile'	=>	self::getLogPath(self::COMPONENT_AGENT),
+				'PidFile'	=>	 PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'HostMetadata'	=>	'first_XSTRATA'
 			],
 
 			self::COMPONENT_AGENT2 => [
-				'Hostname'		=>  self::HOST_NAME,
+				'Hostname'	=>	self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_AGENT2),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
-				'HostMetadata' => 'second_XSTRATA'
+				'DebugLevel'	=>	4,
+				'LogFileSize'	=>	0,
+				'LogFile'	=>	self::getLogPath(self::COMPONENT_AGENT2),
+				'PidFile'	=>	PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
+				'HostMetadata'	=>	'second_XSTRATA'
 			]
 		];
 	}

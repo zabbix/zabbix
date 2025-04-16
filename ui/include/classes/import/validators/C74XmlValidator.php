@@ -3171,7 +3171,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									'value' =>					['type' => XML_STRING],
 									'operator' =>				['type' => XML_STRING]
 								]]
-							]]
+							]],
+							'zindex' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'shapes' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'shape', 'rules' => [
