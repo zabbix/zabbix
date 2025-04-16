@@ -300,7 +300,7 @@ function makeSectionSingleParameter(string $section_name, string $section_body):
 }
 
 function makeSectionTriggers(array $item_triggers, string $hostid, array $trigger_parent_templates,
-		bool $allowed_ui_conf_templates, string $context, string $is_context_editable): CDiv {
+		bool $allowed_ui_conf_templates, string $context, bool $is_context_editable): CDiv {
 	$triggers = [];
 
 	$i = 0;
