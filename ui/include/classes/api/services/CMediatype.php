@@ -1255,7 +1255,11 @@ class CMediatype extends CApiService {
 		$mediatypeids = ['parameters' => [], 'message_templates' => []];
 
 		foreach ($mediatypes as $mediatype) {
-			if (array_key_exists('parameters', $mediatype)) {
+			$db_mediatype = &$db_mediatypes[$mediatype['mediatypeid']];
+
+			if (array_key_exists('parameters', $mediatype)
+					|| ($mediatype['type'] != $db_mediatype['type']
+						&& in_array($db_mediatype['type'], [MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]))) {
 				$mediatypeids['parameters'][] = $mediatype['mediatypeid'];
 				$db_mediatypes[$mediatype['mediatypeid']]['parameters'] = [];
 			}
