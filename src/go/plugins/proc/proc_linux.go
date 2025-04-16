@@ -60,6 +60,15 @@ type PluginExport struct {
 	plugin.Base
 }
 
+type uid struct {
+	UID uint32
+}
+
+type userNotFoundError struct {
+	Name string
+}
+
+
 var impl Plugin = Plugin{
 	stats:   make(map[int64]*procStat),
 	queries: make(map[procQuery]*cpuUtilStats),
@@ -241,14 +250,6 @@ type procStat struct {
 	err        error
 }
 
-type uid struct {
-	UID uint32
-}
-
-type userNotFoundError struct {
-	Name string
-}
-
 func (q *cpuUtilQuery) match(p *procInfo) bool {
 	if q.name != "" && q.name != p.name && q.name != p.arg0 {
 		return false
@@ -268,6 +269,7 @@ func (err *userNotFoundError) Error() string {
 
 func getUIDByName(userName string) (*uid, error) {
 	userNameC := C.CString(userName)
+
 	defer C.free(unsafe.Pointer(userNameC))
 	passwdC, err := C.getpwnam(userNameC)
 
