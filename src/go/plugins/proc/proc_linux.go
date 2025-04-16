@@ -241,6 +241,14 @@ type procStat struct {
 	err        error
 }
 
+type uid struct {
+	UID uint32
+}
+
+type userNotFoundError struct {
+	Name string
+}
+
 func (q *cpuUtilQuery) match(p *procInfo) bool {
 	if q.name != "" && q.name != p.name && q.name != p.arg0 {
 		return false
@@ -252,14 +260,6 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 		return false
 	}
 	return true
-}
-
-type uid struct {
-	Uid uint32
-}
-
-type userNotFoundError struct {
-	Name string
 }
 
 func (err *userNotFoundError) Error() string {
@@ -294,7 +294,7 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 			return query, u
 		}
 
-		query.userid = int64(uid.Uid)
+		query.userid = int64(uid.UID)
 	}
 
 	query.cmdlinePattern = pattern
