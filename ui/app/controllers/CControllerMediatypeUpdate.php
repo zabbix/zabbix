@@ -73,6 +73,12 @@ class CControllerMediatypeUpdate extends CController {
 				error($email_validator->getError());
 				$ret = false;
 			}
+
+			if ($ret && $this->getInput('smtp_authentication') == SMTP_AUTHENTICATION_OAUTH
+					&& !$this->hasInput('tokens_status')) {
+				error(_s('Field "%1$s" is mandatory.', 'oauth'));
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
