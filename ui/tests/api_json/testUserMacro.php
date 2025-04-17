@@ -406,7 +406,7 @@ class testUserMacro extends CAPITest {
 						$hostmacro['config'] += self::macroConfigDefaults();
 
 						foreach (array_keys($hostmacro['config']) as $config_key) {
-							$this->assertEquals($dbRow[$config_key], $hostmacro[$config_key]);
+							$this->assertEquals($dbRow[$config_key], $hostmacro['config'][$config_key]);
 						}
 					}
 				}
