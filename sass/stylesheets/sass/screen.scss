@@ -4184,13 +4184,18 @@ z-select {
 	}
 }
 
-.file-upload-btn {
+.file-upload-wrapper {
 	display: inline-block;
 }
 
-.file-upload-btn .filename {
+.file-upload-wrapper .file-upload-btn {
+	margin-left: .3em;
+}
+
+.file-upload-wrapper .filename {
 	display: block;
 	text-align: center;
 	margin-left: 3px;
 }
+
 

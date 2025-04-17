@@ -596,6 +596,7 @@ class CControllerAuthenticationUpdate extends CController {
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
 
+		// we need any of these fields if there is input, otherwise ignored
 		$this->getInputs($saml_data, [
 			'idp_certificate',
 			'sp_certificate',

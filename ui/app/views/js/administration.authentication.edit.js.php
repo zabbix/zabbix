@@ -23,7 +23,8 @@
 	const view = new class {
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed
+				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
+				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -40,6 +41,9 @@
 			this.jit_provision_interval = this.form.querySelector('[name="jit_provision_interval"]');
 			this.ldap_auth_enabled = this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]');
 			this.mfa_table = document.getElementById('mfa-methods');
+			this.saml_idp_certificate_exists = saml_idp_certificate_exists;
+			this.saml_sp_certificate_exists = saml_sp_certificate_exists;
+			this.saml_sp_private_key_exists = saml_sp_private_key_exists;
 			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
 			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
@@ -138,7 +142,12 @@
 
 					input.classList.remove('display-none');
 					button.classList.add('display-none');
+
 					textarea.value = '';
+
+					if (textarea.classList.length === 0) {
+						textarea.removeAttribute('class');
+					}
 				});
 			});
 
@@ -316,31 +325,57 @@
 
 		_authFormSubmit() {
 			const fields_to_trim = ['#http_strip_domains', '#idp_entityid', '#sso_url', '#slo_url',
-				'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
-				'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
+			'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
+			'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
 			];
+
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
 				if (elem) {
 					elem.value = elem.value.trim();
 				}
 			});
 
-			/*const idp_certificate = document.getElementById('idp_certificate');
-			const sp_certificate = document.getElementById('sp_certificate');
-			const sp_private_key = document.getElementById('sp_private_key');
+			let warning_msg = [];
 
-			const warning_msg1 = <?php /*= json_encode(
-			_('Are you sure that you want to erase IdP certificate? Continue?')
-			) */?>;
+			const idp_certificate_input = document.getElementById('idp_certificate');
+			// if texarea is available for input and it's empty
+			if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
+					&& idp_certificate_input.value === '') {
+				warning_msg.push(<?= json_encode(
+					_('Erasing IdP certificate will affect authentication method. Continue?')
+				) ?>);
+			}
 
-			return ((idp_certificate.disabled === false && idp_certificate.value !== '') || confirm(warning_msg1));*/
+			const sp_certificate_input = document.getElementById('sp_certificate');
+			if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
+					&& sp_certificate_input.value === '') {
+				warning_msg.push(<?= json_encode(
+					_('Erasing SP certificate will affect authentication method. Continue?')
+				) ?>);
+			}
+
+			const sp_private_key_input = document.getElementById('sp_private_key');
+			if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
+					&& sp_private_key_input.value === '') {
+				warning_msg.push(<?= json_encode(
+					_('Erasing SP private key will affect authentication method. Continue?')
+				) ?>);
+			}
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
-			const warning_msg = <?= json_encode(
-				_('Switching authentication method will reset all except this session! Continue?')
-			) ?>;
+			if (auth_type != this.db_authentication_type) {
+				warning_msg.push(<?= json_encode(
+					_('Switching authentication method will reset all except this session! Continue?')
+				) ?>);
+			}
 
-			return (auth_type == this.db_authentication_type || confirm(warning_msg));
+			if (warning_msg.length > 0) {
+				const combined = warning_msg.join('\n\n');
+
+				return confirm(combined);
+			}
+
+			return true;
 		}
 
 		_addLdapServers(ldap_servers, ldap_default_row_index) {
@@ -816,6 +851,10 @@
 				if (input.classList.contains('display-none')) {
 					textarea.classList.remove('saml-enabled');
 					textarea.disabled = true;
+				}
+
+				if (textarea.classList.length === 0) {
+					textarea.removeAttribute('class');
 				}
 			});
 		}
