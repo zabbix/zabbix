@@ -68,9 +68,9 @@ class CControllerAuthenticationEdit extends CController {
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
 			'mfa_removed_mfaids' =>				'array_id',
-			'idp_certificate' =>				'string',
-			'sp_certificate' =>					'string',
-			'sp_private_key' =>					'string'
+			'idp_certificate' =>				'db userdirectory_saml.idp_certificate',
+			'sp_certificate' =>					'db userdirectory_saml.sp_certificate',
+			'sp_private_key' =>					'db userdirectory_saml.sp_private_key'
 		];
 
 		if ($ALLOW_HTTP_AUTH) {
@@ -177,9 +177,9 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_min_length' => '',
 				'passwd_check_rules' => 0,
 				'mfa_status' => MFA_DISABLED,
-				'idp_certificate' =>				'',
-				'sp_certificate' =>					'',
-				'sp_private_key' =>					''
+				'idp_certificate' => '',
+				'sp_certificate' => '',
+				'sp_private_key' => ''
 			];
 
 			if ($ALLOW_HTTP_AUTH) {
@@ -226,6 +226,10 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_servers'] = [];
 			foreach ($userdirectories as $userdirectory) {
 				if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+					$userdirectory['idp_certificate'] = array_key_exists('idp_certificate', $userdirectory) && $userdirectory['idp_certificate'] != '';
+					$userdirectory['sp_certificate'] = array_key_exists('sp_certificate', $userdirectory) && $userdirectory['sp_certificate'] != '';
+					$userdirectory['sp_private_key'] = array_key_exists('sp_private_key', $userdirectory) && $userdirectory['sp_private_key'] != '';
+
 					$saml_configuration = $userdirectory;
 				}
 				else {
@@ -265,9 +269,9 @@ class CControllerAuthenticationEdit extends CController {
 					'scim_status' => '',
 					'saml_provision_groups' => [],
 					'saml_provision_media' => [],
-					'idp_certificate' =>				'',
-					'sp_certificate' =>					'',
-					'sp_private_key' =>					''
+					'idp_certificate' => '',
+					'sp_certificate' => '',
+					'sp_private_key' => ''
 				];
 			}
 

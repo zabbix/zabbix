@@ -307,21 +307,19 @@ $saml_tab
 if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database') {
 	$saml_tab
 		->addItem([
-			(new CLabel(_('IdP certificate'))),
+			(new CLabel(_('IdP certificate')))->addClass('saml-identity-label'),
 			(new CFormField([
-				(new CInput('hidden', 'is_idp_certificate_change', 0))
-					->setId('is_idp_certificate_change'),
 				(new CDiv([
 					(new CSimpleButton(_('Change IdP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
 						->addClass('saml-enabled')
-				]))->setId('idp_certificate_change'),
+				]))
+					->addClass('saml-change-identity-div')
+					->addClass($data['idp_certificate'] === true ? 'display-on' : 'display-none'),
 				(new CDiv([
 					(new CTextArea('idp_certificate', ''))
-						->setId('idp_certificate')
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired()
 						->setRows(3)
 						->setAttribute('placeholder', 'paste PEM-encoded IdP certificate')
 						->addClass('saml-enabled'),
@@ -338,25 +336,25 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 							->setAttribute('accept', '.cer, .crt, .pem, .txt'),
 						(new CSpan())->addClass('filename')
 					]))->addClass('file-upload-btn')
-				]))->setId('idp_certificate_create')
-			]))
+				]))
+					->addClass('saml-add-identity-div')
+					->addClass($data['idp_certificate'] === true ? 'display-none' : 'display-on')
+			]))->addClass('saml-identity')
 		])
 		->addItem([
-			(new CLabel(_('SP private key'))),
+			(new CLabel(_('SP private key')))->addClass('saml-identity-label'),
 			(new CFormField([
-				(new CInput('hidden', 'is_sp_private_key_change', 0))
-					->setId('is_sp_private_key_change'),
 				(new CDiv([
 					(new CSimpleButton(_('Change SP private key')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
 						->addClass('saml-enabled')
-				]))->setId('sp_private_key_change'),
+				]))
+					->addClass('saml-change-identity-div')
+					->addClass($data['sp_private_key'] === true ? 'display-on' : 'display-none'),
 				(new CDiv([
 					(new CTextArea('sp_private_key', ''))
-						->setId('sp_private_key')
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired()
 						->setRows(3)
 						->setAttribute('placeholder', 'paste PEM-encoded SP private key')
 						->addClass('saml-enabled'),
@@ -373,25 +371,25 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 							->setAttribute('accept', '.key, .pem, .txt'),
 						(new CSpan())->addClass('filename')
 					]))->addClass('file-upload-btn')
-				]))->setId('sp_private_key_create')
-			]))
+				]))
+					->addClass('saml-add-identity-div')
+					->addClass($data['sp_private_key'] === true ? 'display-none' : 'display-on')
+			]))->addClass('saml-identity')
 		])
 		->addItem([
-			(new CLabel(_('SP certificate'))),
+			(new CLabel(_('SP certificate')))->addClass('saml-identity-label'),
 			(new CFormField([
-				(new CInput('hidden', 'is_sp_certificate_change', 0))
-					->setId('is_sp_certificate_change'),
 				(new CDiv([
 					(new CSimpleButton(_('Change SP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
 						->addClass('saml-enabled')
-				]))->setId('sp_certificate_change'),
+				]))
+					->addClass('saml-change-identity-div')
+					->addClass($data['sp_certificate'] === true ? 'display-on' : 'display-none'),
 				(new CDiv([
 					(new CTextArea('sp_certificate', ''))
-						->setId('sp_certificate')
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired()
 						->setRows(3)
 						->setAttribute('placeholder', 'paste PEM-encoded SP certificate')
 						->addClass('saml-enabled'),
@@ -408,8 +406,10 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] == 'database'
 							->setAttribute('accept', '.cer, .crt, .pem, .txt'),
 						(new CSpan())->addClass('filename')
 					]))->addClass('file-upload-btn')
-				]))->setId('sp_certificate_create')
-			]))
+				]))
+					->addClass('saml-add-identity-div')
+					->addClass($data['sp_certificate'] === true ? 'display-none' : 'display-on')
+			]))->addClass('saml-identity')
 		]);
 }
 // End SSO certificates
@@ -837,10 +837,7 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'templates' => $templates,
 		'mfa_methods' => $data['mfa_methods'],
 		'mfa_default_row_index' => $data['mfa_default_row_index'],
-		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
-		'saml_idp_certificate' => $data['idp_certificate'] ?? null,
-		'saml_sp_certificate' => $data['sp_certificate'] ?? null,
-		'saml_sp_private_key' => $data['sp_private_key'] ?? null
+		'is_http_auth_allowed' => $data['is_http_auth_allowed']
 	]).');'
 ))
 	->setOnDocumentReady()
