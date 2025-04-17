@@ -691,7 +691,7 @@ class CUserMacro extends CApiService {
 					['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'required')]
 				]],
 				'regex' =>				['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
+					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_REGEX, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
 				]],
 				'options' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -920,7 +920,6 @@ class CUserMacro extends CApiService {
 		$this->validateDelete($hostmacroids, $db_hostmacros);
 
 		DB::delete('hostmacro', ['hostmacroid' => $hostmacroids]);
-		DB::delete('hostmacro_config', ['hostmacroid' => $hostmacroids]);
 
 		if ($tpl_hostmacros = $this->getMacrosToInherit($db_hostmacros)) {
 			$this->inherit($tpl_hostmacros, true);

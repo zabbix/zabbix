@@ -127,6 +127,244 @@ class testUserMacro extends CAPITest {
 					'hostid' => '90020'
 				],
 				'expected_error' => 'Invalid parameter "/1/value": incorrect syntax near "/".'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '90020',
+					'config' => []
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "config".'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/config": the parameter "type" is missing.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG0}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_NOCONF
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config": the parameter "label" is missing.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT,
+						'label' => 'Config'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG2}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT,
+						'label' => 'Config',
+						'description' => 'Config',
+						'required' => ZBX_WIZARD_FIELD_REQUIRED,
+						'regex' => '/^[a-zA-Z0-9_]+$/',
+						'options' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT,
+						'label' => 'Config',
+						'regex' => '/^[a-z(A-Z0-9_]+$/'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": invalid regular expression.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_LIST,
+						'label' => 'Config'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config": the parameter "options" is missing.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG2}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_LIST,
+						'label' => 'Config',
+						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 2","value":"option2"}]'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_LIST,
+						'label' => 'Config',
+						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 1","value":"option1"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/2": value (value, text)=(option1, Option 1) already exists.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_LIST,
+						'label' => 'Config',
+						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "checked".'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_LIST,
+						'label' => 'Config',
+						'regex' => '/^[a-zA-Z0-9_]+$/',
+						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 2","value":"option2"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_LIST,
+						'label' => 'Config',
+						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 2","value":"option2"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'label' => 'Config'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config": the parameter "options" is missing.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG3}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'label' => 'Config',
+						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'label' => 'Config',
+						'options' => '[{"unchecked":"option2"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "checked" is missing.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'label' => 'Config',
+						'options' => '[{"checked":"option1", "unchecked":"option2"},{"checked":"option3", "unchecked":"option4"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'label' => 'Config',
+						'regex' => '/^[a-zA-Z0-9_]+$/',
+						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'label' => 'Config',
+						'required' => ZBX_WIZARD_FIELD_REQUIRED,
+						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be 0.'
 			]
 		];
 	}
@@ -153,8 +391,35 @@ class testUserMacro extends CAPITest {
 					$expect['hostmacroid'] = $id;
 					$this->assertEquals($dbRow, $expect);
 				}
+
+				if (array_key_exists('config', $hostmacro)) {
+					$dbResult = DBSelect('select * from hostmacro_config where hostmacroid='.zbx_dbstr($id));
+					$dbRow = DBFetch($dbResult);
+
+					if ($hostmacro['config']['type'] === ZBX_WIZARD_FIELD_NOCONF) {
+						$this->assertFalse($dbRow);
+					}
+					else {
+						$hostmacro['config'] += self::macroConfigDefaults();
+
+						foreach (array_keys($hostmacro['config']) as $config_key) {
+							$this->assertEquals($dbRow[$config_key], $hostmacro[$config_key]);
+						}
+					}
+				}
 			}
 		}
+	}
+
+	private static function macroConfigDefaults(): array {
+		return [
+			'type' => ZBX_WIZARD_FIELD_NOCONF,
+			'label' => '',
+			'description' => '',
+			'required' => ZBX_WIZARD_FIELD_NOT_REQUIRED,
+			'regex' => '',
+			'options' => ''
+		];
 	}
 
 	public static function globalmacro_create() {
