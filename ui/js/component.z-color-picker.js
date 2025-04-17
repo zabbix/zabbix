@@ -95,11 +95,13 @@ class ZColorPicker extends HTMLElement {
 	static #dialog_template = `
 		<div class="${ZColorPicker.ZBX_STYLE_DIALOG} ${ZBX_STYLE_OVERLAY_DIALOGUE}">
 			<ul class="${ZColorPicker.ZBX_STYLE_TABS}">
-				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_SOLID}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_SOLID}" tabindex="0">
-					<span>${t('Solid color')}</span>
+				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_SOLID}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_SOLID}">
+					<input type="radio" id="${ZColorPicker.ZBX_STYLE_TAB_SOLID}" name="${ZColorPicker.ZBX_STYLE_TAB}"/>
+					<label for="${ZColorPicker.ZBX_STYLE_TAB_SOLID}">${t('Solid color')}</label>
 				</li>
-				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_PALETTE}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE}" tabindex="0">
-					<span>${t('Palette')}</span>
+				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_PALETTE}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_PALETTE}">
+					<input type="radio" id="${ZColorPicker.ZBX_STYLE_TAB_PALETTE}" name="${ZColorPicker.ZBX_STYLE_TAB}"/>
+					<label for="${ZColorPicker.ZBX_STYLE_TAB_PALETTE}">${t('Palette')}</label>
 				</li>
 			</ul>
 			<div class="${ZColorPicker.ZBX_STYLE_CONTENTS}">
@@ -308,6 +310,8 @@ class ZColorPicker extends HTMLElement {
 				const tab = e.target.closest(`.${ZColorPicker.ZBX_STYLE_TAB}`);
 
 				if (tab !== null) {
+					e.preventDefault();
+
 					this.#selectTab(tab);
 
 					return;
@@ -367,6 +371,36 @@ class ZColorPicker extends HTMLElement {
 						}
 
 						break;
+
+					case KEY_TAB:
+						const focusables = Array.from(
+							this.#dialog.querySelectorAll(`
+								input:not([tabindex^="-"]):not([disabled]),
+								button:not([tabindex^="-"]):not([disabled]),
+								[tabindex]:not([tabindex^="-"]):not([disabled])
+							`)
+						// Take only visible elements.
+						).filter(element => element.offsetParent !== null);
+
+						const first_focusable = focusables[0];
+						const last_focusable = focusables[focusables.length - 1];
+
+						// shift + tab
+						if (e.shiftKey) {
+							if (document.activeElement === first_focusable) {
+								e.preventDefault();
+								last_focusable.focus();
+							}
+						}
+						// tab
+						else {
+							if (document.activeElement === last_focusable) {
+								e.preventDefault();
+								first_focusable.focus();
+							}
+						}
+
+						break;
 				}
 			},
 
@@ -406,6 +440,8 @@ class ZColorPicker extends HTMLElement {
 			documentKeydown: e => {
 				if (e.which === KEY_ESCAPE) {
 					this.#closeDialog();
+
+					this.#box.focus();
 				}
 			},
 
@@ -485,7 +521,10 @@ class ZColorPicker extends HTMLElement {
 			.style.display = this.#has_default ? 'none' : '';
 
 		this.#dialog.querySelectorAll(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)
-			.forEach(input => input.checked = false);
+			.forEach(input => {
+				input.checked = false;
+				input.setAttribute('tabindex', '-1');
+			});
 
 		if (ZColorPicker.#isValidSolid(this.#value)) {
 			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
@@ -512,7 +551,12 @@ class ZColorPicker extends HTMLElement {
 
 			if (input !== null) {
 				input.checked = true;
+				input.setAttribute('tabindex', '0');
 			}
+		}
+
+		if (this.#dialog.querySelector(`input[name="${ZColorPicker.PALETTE_PREFIX}"]:checked`) === null) {
+			this.#dialog.querySelector(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)?.setAttribute('tabindex', '0');
 		}
 
 		this.#positionDialog();
@@ -681,16 +725,20 @@ class ZColorPicker extends HTMLElement {
 			return;
 		}
 
-		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SELECTED}`)
-			?.classList.remove(ZColorPicker.ZBX_STYLE_TAB_SELECTED);
+		this.#dialog.querySelectorAll(`.${ZColorPicker.ZBX_STYLE_TAB}`)
+			.forEach(t => {
+				t.classList.remove(ZColorPicker.ZBX_STYLE_TAB_SELECTED);
+				t.querySelector('input')?.setAttribute('tabindex', '-1');
+			});
 
 		tab.classList.add(ZColorPicker.ZBX_STYLE_TAB_SELECTED);
+		tab.querySelector('input')?.setAttribute('tabindex', '0');
 
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_CONTENT_SELECTED}`)
 			?.classList.remove(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
 
 		this.#dialog.querySelector(`.${tab.dataset.content}`)
-			.classList.add(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
+			?.classList.add(ZColorPicker.ZBX_STYLE_CONTENT_SELECTED);
 	}
 
 	/**
