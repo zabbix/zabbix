@@ -112,12 +112,12 @@ class CControllerMediatypeCreate extends CController {
 					'smtp_verify_host', 'smtp_authentication', 'message_format'
 				]);
 
+				$smtp_username = $this->getInput('smtp_username', '');
 				$smtp_email = $this->getInput('smtp_email', '');
 
 				$mediatype['provider'] = $this->hasInput('provider') ? $this->getInput('provider') : null;
 				$mediatype['smtp_server'] = $this->getInput('smtp_server', '');
 				$mediatype['smtp_email'] = $smtp_email;
-				$mediatype['passwd'] = $this->getInput('passwd', '');
 
 				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 					preg_match('/.*<(?<email>.*[^>])>$/i', $smtp_email, $match);
@@ -128,7 +128,7 @@ class CControllerMediatypeCreate extends CController {
 					$mediatype['smtp_helo'] = $domain;
 
 					if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
-						$mediatype['username'] = $clean_email;
+						$smtp_username = $clean_email;
 					}
 
 					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
@@ -138,15 +138,16 @@ class CControllerMediatypeCreate extends CController {
 						$mediatype['smtp_server'] = $formatted_domain.$static_part;
 					}
 				}
-				elseif ($this->hasInput('smtp_username')) {
-					$mediatype['username'] = $this->getInput('smtp_username');
-				}
 
 				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$this->getInputs($mediatype, [
 						'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
 						'tokens_status', 'access_token', 'access_expires_in', 'refresh_token'
 					]);
+				}
+				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
+					$mediatype['username'] = $smtp_username;
+					$mediatype['passwd'] = $this->getInput('passwd');
 				}
 				break;
 
