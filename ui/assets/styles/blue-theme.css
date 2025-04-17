@@ -4091,23 +4091,32 @@ z-color-picker {
   width: fit-content;
   height: 30px;
   margin-bottom: 10px;
+  line-height: 30px;
   border-bottom: 1px solid #ebeef0; }
-  .color-picker-dialog .color-picker-tabs .color-picker-tab {
+  .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected input:focus + label {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+  .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected label {
+    padding-bottom: 6px;
+    color: #1f2c33;
+    background: transparent;
+    border-bottom: 3px solid #0275b8;
+    cursor: default; }
+    .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected label:hover, .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected label:focus, .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected label:active {
+      background: transparent; }
+  .color-picker-dialog .color-picker-tabs .color-picker-tab input {
+    position: absolute;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    opacity: 0; }
+  .color-picker-dialog .color-picker-tabs .color-picker-tab label {
     padding: 8px 10px;
     color: #0275b8;
     outline: none;
     cursor: pointer;
     transition: background 0.2s ease-out; }
-    .color-picker-dialog .color-picker-tabs .color-picker-tab:hover, .color-picker-dialog .color-picker-tabs .color-picker-tab:focus, .color-picker-dialog .color-picker-tabs .color-picker-tab:active {
+    .color-picker-dialog .color-picker-tabs .color-picker-tab label:hover, .color-picker-dialog .color-picker-tabs .color-picker-tab label:focus, .color-picker-dialog .color-picker-tabs .color-picker-tab label:active {
       background: #e8f5ff; }
-    .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected {
-      padding-bottom: 6px;
-      color: #1f2c33;
-      background: transparent;
-      border-bottom: 3px solid #0275b8;
-      cursor: default; }
-      .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected:hover, .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected:focus, .color-picker-dialog .color-picker-tabs .color-picker-tab.color-picker-tab-selected:active {
-        background: transparent; }
 .color-picker-dialog .color-picker-contents .color-picker-content {
   display: none; }
   .color-picker-dialog .color-picker-contents .color-picker-content.color-picker-content-selected {

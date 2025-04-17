@@ -37,35 +37,54 @@ z-color-picker {
 		width: fit-content;
 		height: 30px;
 		margin-bottom: 10px;
+		line-height: 30px;
 		border-bottom: 1px solid $table-border-color;
 
 		.color-picker-tab {
-			padding: 8px 10px;
-			color: $link-color;
-			outline: none;
-			cursor: pointer;
-
-			@if $ui-transitions {
-				transition: background $ui-controls-transition-duration ease-out;
-			}
-
-			&:hover,
-			&:focus,
-			&:active {
-				background: $ui-hover-bg-color;
-			}
-
 			&.color-picker-tab-selected {
-				padding-bottom: 6px;
-				color: $font-color;
-				background: transparent;
-				border-bottom: 3px solid $ui-tab-bg-selected-color;
-				cursor: default;
+				input {
+					&:focus + label {
+						box-shadow: 0 0 0 2px $btn-focus-outline-color;
+					}
+				}
+
+				label {
+					padding-bottom: 6px;
+					color: $font-color;
+					background: transparent;
+					border-bottom: 3px solid $ui-tab-bg-selected-color;
+					cursor: default;
+
+					&:hover,
+					&:focus,
+					&:active {
+						background: transparent;
+					}
+				}
+			}
+
+			input {
+				position: absolute;
+				top: auto;
+				width: 1px;
+				height: 1px;
+				opacity: 0;
+			}
+
+			label {
+				padding: 8px 10px;
+				color: $link-color;
+				outline: none;
+				cursor: pointer;
+
+				@if $ui-transitions {
+					transition: background $ui-controls-transition-duration ease-out;
+				}
 
 				&:hover,
 				&:focus,
 				&:active {
-					background: transparent;
+					background: $ui-hover-bg-color;
 				}
 			}
 		}
