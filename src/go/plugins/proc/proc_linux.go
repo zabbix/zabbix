@@ -290,9 +290,8 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 			if err != nil {
 				return nil, err
 			}
-			u := &userNotFoundError{}
 
-			return query, u
+			return query, &userNotFoundError{}
 		}
 
 		query.userid = int64(uid.UID)
@@ -319,8 +318,8 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 
 		query, stats.err = newCPUUtilQuery(&q, stats.cmdlinePattern)
 
-		u := &userNotFoundError{}
 		if stats.err != nil {
+			u := &userNotFoundError{}
 			if !errors.As(stats.err, &u) {
 				continue
 			}
@@ -798,10 +797,10 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 	}
 
 	var count int
-	u := &userNotFoundError{}
 	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
 
 	if err != nil {
+		u := &userNotFoundError{}
 		if errors.As(err, &u) {
 			return 0, nil
 		}
