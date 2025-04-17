@@ -1652,9 +1652,9 @@ class CUserDirectory extends CApiService {
 		]];
 	}
 
-	public static function resetSamlCertificates(array $values, int $userdirectoryid):array {
+	public static function resetSamlCertificates(int $userdirectoryid):array {
 		return DB::update('userdirectory_saml',  [
-			'values' => $values,
+			'values' => ['idp_certificate' => '', 'sp_certificate' => '', 'sp_private_key' => ''],
 			'where' => ['userdirectoryid' => $userdirectoryid]
 		]);
 	}
