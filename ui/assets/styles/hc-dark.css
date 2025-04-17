@@ -4095,8 +4095,10 @@ z-color-picker {
       border: 1px solid #666666; }
       .color-picker-dialog .color-picker-controls .color-picker-input-wrap .color-picker-preview::after {
         line-height: 14px; }
-      .color-picker-dialog .color-picker-controls .color-picker-input-wrap .color-picker-preview.color-picker-no-color::after {
-        font-size: 18px; }
+      .color-picker-dialog .color-picker-controls .color-picker-input-wrap .color-picker-preview.color-picker-no-color {
+        background: #ffffff; }
+        .color-picker-dialog .color-picker-controls .color-picker-input-wrap .color-picker-preview.color-picker-no-color::after {
+          font-size: 18px; }
 
 .color-picker-preview::after {
   position: absolute;

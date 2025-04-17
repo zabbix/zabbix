@@ -167,6 +167,8 @@ z-color-picker {
 				}
 
 				&.color-picker-no-color {
+					background: #ffffff;
+
 					&::after {
 						font-size: $icon-default-size;
 					}
