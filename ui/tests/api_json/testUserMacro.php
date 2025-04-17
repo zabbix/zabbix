@@ -381,7 +381,10 @@ class testUserMacro extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['macro'], $hostmacro['macro']);
 				$this->assertEquals($dbRow['value'], $hostmacro['value']);
-				$this->assertEquals($dbRow['type'], $hostmacro['type']);
+
+				if (array_key_exists('type', $hostmacro)) {
+					$this->assertEquals($dbRow['type'], $hostmacro['type']);
+				}
 
 				if (array_key_exists('description', $hostmacro)) {
 					$this->assertEquals($dbRow['description'], $hostmacro['description']);
