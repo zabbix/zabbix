@@ -40,15 +40,7 @@ window.oauth_edit_popup = new class {
 		this.#initForm();
 		this.#initFormEvents();
 
-		this.updateFieldsVisibility();
-	}
-
-	updateFieldsVisibility() {
-		if (this.advanced_form) {
-			const automatic = this.form.querySelector('[name="authorization_mode"][value="auto"]');
-
-			this.form.querySelector('[name="code"]').toggleAttribute('disabled', automatic.checked);
-		}
+		this.#updateFieldsVisibility();
 	}
 
 	submit() {
@@ -130,7 +122,15 @@ window.oauth_edit_popup = new class {
 		const target = event.target;
 
 		if (target.matches('[name="authorization_mode"]')) {
-			this.updateFieldsVisibility();
+			this.#updateFieldsVisibility();
+		}
+	}
+
+	#updateFieldsVisibility() {
+		if (this.advanced_form) {
+			const automatic = this.form.querySelector('[name="authorization_mode"][value="auto"]');
+
+			this.form.querySelector('[name="code"]').toggleAttribute('disabled', automatic.checked);
 		}
 	}
 
@@ -148,14 +148,16 @@ window.oauth_edit_popup = new class {
 			}
 		}
 
-		const params = [
-			...Object.values(data.authorization_url_parameters),
-			...Object.values(data.token_url_parameters)
-		];
+		if (this.advanced_form) {
+			const params = [
+				...Object.values(data.authorization_url_parameters),
+				...Object.values(data.token_url_parameters)
+			];
 
-		for (const param of params) {
-			param.name = param.name.trim();
-			param.value = param.value.trim();
+			for (const param of params) {
+				param.name = param.name.trim();
+				param.value = param.value.trim();
+			}
 		}
 
 		return data;
