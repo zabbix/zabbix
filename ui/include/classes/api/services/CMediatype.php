@@ -105,8 +105,8 @@ class CMediatype extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// filter
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields('media_type', $output_fields)],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields('media_type', $output_fields)],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('media_type', $output_fields), DB::getFilterFields('media_type_oauth', $output_fields))],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('media_type', $output_fields), DB::getSearchFields('media_type_oauth', $output_fields))],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectMessageTemplates' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -687,7 +687,7 @@ class CMediatype extends CApiService {
 
 		if (array_key_exists('access_token', $mediatype) !== array_key_exists('access_expires_in', $mediatype)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('both access_token and access_expires_in should be either present or absent')
+				_('both "access_token" and "access_expires_in" should be either present or absent')
 			));
 		}
 	}
