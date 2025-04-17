@@ -712,6 +712,64 @@ void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const cha
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	lld_override_lldrule(const zbx_vector_lld_override_ptr_t *overrides, const char *name, const char **delay,
+		unsigned char *status, unsigned char *discover)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (int i = 0; i < overrides->values_num; i++)
+	{
+		const zbx_lld_override_t	*override = overrides->values[i];
+
+		for (int j = 0; j < override->override_operations.values_num; j++)
+		{
+			const zbx_lld_override_operation_t	*override_operation =
+					override->override_operations.values[j];
+
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_LLDRULE != override_operation->operationtype)
+				continue;
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
+					__func__, override_operation->override_operationid, override_operation->value,
+					name);
+
+			if (FAIL == regexp_strmatch_condition(name, override_operation->value,
+					override_operation->operator))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "%s():FAIL", __func__);
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
+
+			if (NULL != override_operation->delay)
+				*delay = override_operation->delay;
+
+			if (NULL != status)
+			{
+				switch (override_operation->status)
+				{
+					case ZBX_PROTOTYPE_STATUS_ENABLED:
+						*status = ITEM_STATUS_ACTIVE;
+						break;
+					case ZBX_PROTOTYPE_STATUS_DISABLED:
+						*status = ITEM_STATUS_DISABLED;
+						break;
+					case ZBX_PROTOTYPE_STATUS_COUNT:
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
+
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+				*discover = override_operation->discover;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	lld_override_trigger(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover)
 {
@@ -888,6 +946,30 @@ int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *
 					override->override_operations.values[j];
 
 			if (ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM == override_operation->operationtype &&
+					SUCCEED == regexp_strmatch_condition(name, override_operation->value,
+					override_operation->operator))
+			{
+				return ZBX_PROTOTYPE_NO_DISCOVER == override_operation->discover ? FAIL : SUCCEED;
+			}
+		}
+	}
+
+	return ZBX_PROTOTYPE_NO_DISCOVER == override_default ? FAIL : SUCCEED;
+}
+
+int	lld_validate_lldrule_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
+		unsigned char override_default)
+{
+	for (int i = 0; i < overrides->values_num; i++)
+	{
+		const zbx_lld_override_t	*override = overrides->values[i];
+
+		for (int j = 0; j < override->override_operations.values_num; j++)
+		{
+			const zbx_lld_override_operation_t	*override_operation =
+					override->override_operations.values[j];
+
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_LLDRULE == override_operation->operationtype &&
 					SUCCEED == regexp_strmatch_condition(name, override_operation->value,
 					override_operation->operator))
 			{

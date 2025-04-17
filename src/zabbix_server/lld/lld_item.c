@@ -1693,8 +1693,15 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 
 	zbx_vector_db_tag_ptr_create(&item->override_tags);
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
-			&item->status, &discover);
+	if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	{
+		lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
+				&item->status, &discover);
+	}
+	else
+	{
+		lld_override_lldrule(&lld_row->overrides, item->name, &delay, &item->status, &discover);
+	}
 
 	item->key_ = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
@@ -1919,8 +1926,15 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	trends = item_prototype->trends;
 	discover = item_prototype->discover;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags, NULL,
-			&discover);
+	if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	{
+		lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
+				NULL, &discover);
+	}
+	else
+	{
+		lld_override_lldrule(&lld_row->overrides, item->name, &delay, NULL, &discover);
+	}
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2336,10 +2350,21 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 					continue;
 				}
 
-				if (SUCCEED != lld_validate_item_override_no_discover(&lld_row->overrides,
-						ref->item->name, item_prototype->discover))
+				if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 				{
-					continue;
+					if (SUCCEED != lld_validate_item_override_no_discover(&lld_row->overrides,
+							ref->item->name, item_prototype->discover))
+					{
+						continue;
+					}
+				}
+				else
+				{
+					if (SUCCEED != lld_validate_lldrule_override_no_discover(&lld_row->overrides,
+							ref->item->name, item_prototype->discover))
+					{
+						continue;
+					}
 				}
 
 				item_index_local.parent_itemid = ref->item->parent_itemid;
