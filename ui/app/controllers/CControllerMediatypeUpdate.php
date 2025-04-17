@@ -143,15 +143,15 @@ class CControllerMediatypeUpdate extends CController {
 					}
 				}
 
-				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
+					$mediatype['username'] = $smtp_username;
+					$mediatype['passwd'] = $this->getInput('passwd');
+				}
+				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$this->getInputs($mediatype, [
 						'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
 						'tokens_status', 'access_token', 'access_expires_in', 'refresh_token'
 					]);
-				}
-				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
-					$mediatype['username'] = $smtp_username;
-					$mediatype['passwd'] = $this->getInput('passwd');
 				}
 				break;
 
