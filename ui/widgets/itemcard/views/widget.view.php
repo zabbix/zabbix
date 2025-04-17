@@ -312,9 +312,9 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 
 	foreach ($item_triggers as $trigger) {
 		$triggers[] = (new CSpan([
-			(new CSpan($trigger['description']))
+			(new CSpan($trigger['description_expanded']))
 				->addClass('trigger-name')
-				->setTitle($trigger['description']),
+				->setTitle($trigger['description_expanded']),
 			++$i < $template_count ? (new CSpan(', '))->addClass('delimiter') : null
 		]))->addClass('trigger');
 

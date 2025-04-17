@@ -49,8 +49,13 @@ class WidgetView extends CControllerDashboardWidgetView
 		$triggers = [];
 		$trigger_parent_templates = [];
 
-		if ($item && in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
-			[$triggers, $trigger_parent_templates] = $this->getAndPrepareItemTriggers($item['triggerids'], $context);
+		if ($item && $item['triggers']
+				&& in_array(CWidgetFieldItemSections::SECTION_TRIGGERS, $this->fields_values['sections'])) {
+			$triggers = $this->getAndPrepareItemTriggers($item['triggerids'], $context);
+
+			if ($triggers) {
+				$trigger_parent_templates = getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL);
+			}
 		}
 
 		$data = [
@@ -465,13 +470,20 @@ class WidgetView extends CControllerDashboardWidgetView
 			'preservekeys' => true
 		]);
 
-		$trigger_parent_templates = getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL);
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers, [
+		if (!$triggers) {
+			return [];
+		}
+
+		$expanded_trigger_description = CMacrosResolverHelper::resolveTriggerNames($triggers);
+
+		foreach ($expanded_trigger_description as $key => $trigger) {
+			$triggers[$key]['description_expanded'] = $trigger['description'];
+		}
+
+		return CMacrosResolverHelper::resolveTriggerExpressions($triggers, [
 			'html' => true,
 			'sources' => ['expression', 'recovery_expression'],
 			'context' => $context
 		]);
-
-		return [$triggers, $trigger_parent_templates];
 	}
 }
