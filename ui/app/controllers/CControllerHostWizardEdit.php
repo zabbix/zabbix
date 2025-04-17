@@ -71,6 +71,7 @@ class CControllerHostWizardEdit extends CController {
 		$wizard_ready_templates = API::template()->get([
 			'output' => ['templateid', 'name', 'description', 'vendor_version'],
 			'filter' => ['wizard_ready' => '1'],
+			'selectTemplateGroups' => ['name'],
 			'selectTags' => ['tag', 'value'],
 			'selectItems' => ['type'],
 			'selectDiscoveries' => ['type']
