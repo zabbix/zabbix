@@ -789,8 +789,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		/* ZBX_MACRO_TYPE_MESSAGE_NORMAL and ZBX_MACRO_TYPE_MESSAGE_RECOVERY. Therefore the code is not duplicated */
 		/* but few conditions are added below where behavior differs. */
 		{
-
-
 			const zbx_db_event	*c_event;
 
 			c_event = ((NULL != r_event) ? r_event : event);
@@ -2352,7 +2350,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				c_interface = &dc_item->interface;
 			}
 
-			if ((ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)) &&
+			if (SUCCEED == token_is_user_macro(m, &token) &&
 					0 == (ZBX_MACRO_TYPE_QUERY_FILTER & macro_type))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &c_hostid, 1, &replace_to);
@@ -2563,7 +2561,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_ALERT_EMAIL) &&
-				(ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)))
+				SUCCEED == token_is_user_macro(m, &token))
 		{
 			if ((EVENT_SOURCE_INTERNAL == event->source && EVENT_OBJECT_TRIGGER == event->object) ||
 					EVENT_SOURCE_TRIGGERS == event->source)
