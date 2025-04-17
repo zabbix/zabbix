@@ -4004,8 +4004,7 @@ z-color-picker {
     padding: 0;
     color: #000000;
     background: #ffffff;
-    border: 1px solid #888888;
-    justify-items: center; }
+    border: 1px solid #888888; }
     z-color-picker .color-picker-box:disabled {
       background: #9f9f9f !important;
       border-color: #9f9f9f;
@@ -4119,6 +4118,8 @@ z-color-picker {
 .color-picker-is-palette {
   background: transparent !important; }
   .color-picker-is-palette .color-picker-palette-icon {
+    position: relative;
+    left: 1px;
     display: flex !important;
     gap: 1px;
     width: calc(100% - 2px);

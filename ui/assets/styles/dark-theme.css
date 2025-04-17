@@ -4083,16 +4083,13 @@ z-color-picker {
     padding: 0;
     color: #f2f2f2;
     background: #ffffff;
-    border: 1px solid #4f4f4f;
-    justify-items: center; }
+    border: 1px solid #4f4f4f; }
     z-color-picker .color-picker-box:disabled {
       background: #525252 !important;
       border-color: #525252;
       opacity: .35; }
     z-color-picker .color-picker-box .color-picker-palette-icon {
       display: none; }
-      z-color-picker .color-picker-box .color-picker-palette-icon .color-picker-palette-icon-part {
-        transition: background 0.2s ease-out; }
 
 .color-picker-dialog .color-picker-tabs {
   display: flex;
@@ -4201,6 +4198,8 @@ z-color-picker {
 .color-picker-is-palette {
   background: transparent !important; }
   .color-picker-is-palette .color-picker-palette-icon {
+    position: relative;
+    left: 1px;
     display: flex !important;
     gap: 1px;
     width: calc(100% - 2px);
@@ -4208,7 +4207,8 @@ z-color-picker {
     .color-picker-is-palette .color-picker-palette-icon .color-picker-palette-icon-part {
       flex-grow: 1;
       height: 100%;
-      background: var(--color); }
+      background: var(--color);
+      transition: background 0.2s ease-out; }
       .color-picker-is-palette .color-picker-palette-icon .color-picker-palette-icon-part:first-of-type {
         border-top-left-radius: 1px;
         border-bottom-left-radius: 1px; }

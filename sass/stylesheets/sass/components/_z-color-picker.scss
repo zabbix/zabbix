@@ -11,7 +11,6 @@ z-color-picker {
 		color: $font-color;
 		background: #ffffff;
 		border: 1px solid $form-border-color;
-		justify-items: center;
 
 		&:disabled {
 			background: $form-disabled-font-color !important;
@@ -21,12 +20,6 @@ z-color-picker {
 
 		.color-picker-palette-icon {
 			display: none;
-
-			.color-picker-palette-icon-part {
-				@if $ui-transitions {
-					transition: background $ui-controls-transition-duration ease-out;
-				}
-			}
 		}
 	}
 }
@@ -218,6 +211,8 @@ z-color-picker {
 	background: transparent !important;
 
 	.color-picker-palette-icon {
+		position: relative;
+		left: 1px;
 		display: flex !important;
 		gap: 1px;
 		width: calc(100% - 2px);
@@ -227,6 +222,10 @@ z-color-picker {
 			flex-grow: 1;
 			height: 100%;
 			background: var(--color);
+
+			@if $ui-transitions {
+				transition: background $ui-controls-transition-duration ease-out;
+			}
 
 			&:first-of-type {
 				border-top-left-radius: 1px;
