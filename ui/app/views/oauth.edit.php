@@ -47,7 +47,7 @@ $form_grid = (new CFormGrid())
 				BR(),
 				_('The URL must comply with the OAuth provider\'s policy.')
 			])
-		]))
+		], 'redirection_url'))
 			->setId('oauth-redirection-label')
 			->setAsteriskMark(),
 		(new CFormField([
@@ -67,7 +67,7 @@ $form_grid = (new CFormGrid())
 		(new CLabel([
 			_('Client ID'),
 			makeHelpIcon(_('The client identifier registered within the authorization server.'))
-		]))
+		], 'client_id'))
 			->setAsteriskMark()
 			->setId('oauth-clientid-label'),
 		(new CFormField(
@@ -104,7 +104,7 @@ $form_grid->addItem([
 	(new CLabel([
 		_('Client secret'),
 		makeHelpIcon(_('The client secret registered within the authorization server.'))
-	]))
+	], 'client_secret'))
 		->setAsteriskMark()
 		->setId('oauth-client-secret-label'),
 	(new CFormField($client_secrect))->setId('oauth-client-secret-field')
@@ -131,7 +131,7 @@ if ($data['advanced_form']) {
 		(new CLabel([
 			_('Authorization endpoint'),
 			makeHelpIcon(_('Authorization server URL for requesting user authorization.'))
-		]))
+		], 'authorization_url'))
 			->setAsteriskMark()
 			->setId('oauth-auth-endpoint-label'),
 		(new CFormField([

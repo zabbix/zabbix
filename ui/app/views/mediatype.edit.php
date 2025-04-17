@@ -150,11 +150,11 @@ $oauth_fields = [];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 	$oauth_fields = [
-		new CVar('redirection_url', $data['redirection_url']),
-		new CVar('client_id', $data['client_id']),
-		new CVar('authorization_url', $data['authorization_url']),
-		new CVar('token_url', $data['token_url']),
-		new CVar('tokens_status', $data['tokens_status'])
+		(new CVar('redirection_url', $data['redirection_url']))->removeId(),
+		(new CVar('client_id', $data['client_id']))->removeId(),
+		(new CVar('authorization_url', $data['authorization_url']))->removeId(),
+		(new CVar('token_url', $data['token_url']))->removeId(),
+		(new CVar('tokens_status', $data['tokens_status']))->removeId()
 	];
 
 	if ($data['access_token_updated'] > 0) {
