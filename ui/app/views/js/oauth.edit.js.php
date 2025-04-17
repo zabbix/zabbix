@@ -52,7 +52,7 @@ window.oauth_edit_popup = new class {
 	}
 
 	submit() {
-		const data = getFormFields(this.form);
+		const data = this.#trimValues(getFormFields(this.form));
 
 		this.#validateFields(data)
 			.then(response => this.#popupAuthenticate(response.oauth_popup_url, response.oauth)
@@ -137,6 +137,28 @@ window.oauth_edit_popup = new class {
 	#submitDataToOpener(detail) {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 		this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail}));
+	}
+
+	#trimValues(data) {
+		const fields = ['redirection_url', 'client_id', 'client_secret', 'authorization_url', 'code', 'token_url'];
+
+		for (const field of fields) {
+			if (field in data) {
+				data[field] = data[field].trim();
+			}
+		}
+
+		const params = [
+			...Object.values(data.authorization_url_parameters),
+			...Object.values(data.token_url_parameters)
+		];
+
+		for (const param of params) {
+			param.name = param.name.trim();
+			param.value = param.value.trim();
+		}
+
+		return data;
 	}
 
 	#validateFields(data) {
