@@ -76,4 +76,15 @@ class CColorPicker extends CTag {
 
 		return $this;
 	}
+
+	public function showClear(bool $show_clear = true): self {
+		if ($show_clear) {
+			$this->setAttribute('show-clear', '');
+		}
+		else {
+			$this->removeAttribute('show-clear');
+		}
+
+		return $this;
+	}
 }
