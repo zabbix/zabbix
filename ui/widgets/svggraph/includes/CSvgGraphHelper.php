@@ -225,9 +225,9 @@ class CSvgGraphHelper {
 				? (int)timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = array_key_exists('color_palette', $data_set)
-				? getPaletteColors($data_set['color_palette'], count($items))
-				: getColorVariations($data_set['color'], count($items));
+			$colors = array_key_exists('color', $data_set)
+				? getColorVariations($data_set['color'], count($items))
+				: getPaletteColors($data_set['color_palette'], count($items));
 
 			foreach ($items as $item) {
 				$data_set['color'] = array_shift($colors);
@@ -443,10 +443,10 @@ class CSvgGraphHelper {
 
 			// Apply override options to matching metrics.
 			if ($metrics_matched) {
-				$colors = (array_key_exists('color', $override) && $override['color'] !== '' || array_key_exists('color_palette', $override) && $override['color_palette'] !== '')
-					? (array_key_exists('color_palette', $override)
-						? getPaletteColors($override['color_palette'], count($metrics_matched))
-						: getColorVariations($override['color'], count($metrics_matched)))
+				$colors = (array_key_exists('color', $override) || array_key_exists('color_palette', $override))
+					? (array_key_exists('color', $override)
+						? getColorVariations($override['color'], count($metrics_matched))
+						: getPaletteColors($override['color_palette'], count($metrics_matched)))
 					: null;
 
 				if (array_key_exists('transparency', $override)) {
