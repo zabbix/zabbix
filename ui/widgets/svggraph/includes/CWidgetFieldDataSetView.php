@@ -222,7 +222,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			$dataset_head[] = (new CColorPicker())
 				->setColorFieldName($field_name.'['.$row_num.'][color]')
 				->setPaletteFieldName($field_name.'['.$row_num.'][color_palette]')
-				->setValue(array_key_exists('color_palette', $value) ? $value['color_palette'] : $value['color'])
+				->setValue(array_key_exists('color', $value) ? $value['color'] : $value['color_palette'])
 				->setHasPalette();
 
 			if ($host_pattern_field !== null) {
