@@ -342,14 +342,6 @@ class ZColorPicker extends HTMLElement {
 			dialogKeydown: e => {
 				switch (e.which) {
 					case KEY_ENTER:
-						const tab = e.target.closest(`.${ZColorPicker.ZBX_STYLE_TAB}`);
-
-						if (tab !== null) {
-							this.#selectTab(tab);
-
-							return;
-						}
-
 						const selected_tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SELECTED}`);
 
 						if (selected_tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_SOLID)) {
