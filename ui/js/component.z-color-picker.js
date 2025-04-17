@@ -165,6 +165,7 @@ class ZColorPicker extends HTMLElement {
 	#has_default;
 	#has_palette;
 	#disabled;
+	#show_clear;
 
 	#events;
 
@@ -190,6 +191,7 @@ class ZColorPicker extends HTMLElement {
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('has-palette');
 			this.#disabled = this.hasAttribute('disabled');
+			this.#show_clear = this.hasAttribute('show-clear');
 
 			this.#hidden_input = new Template(ZColorPicker.#hidden_input_template).evaluateToElement();
 			this.#box = new Template(ZColorPicker.#box_template).evaluateToElement();
@@ -217,7 +219,8 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'value', 'input-id', 'has-default', 'has-palette', 'disabled'];
+		return ['color-field-name', 'palette-field-name', 'value', 'input-id', 'has-default', 'has-palette', 'disabled',
+			'show-clear'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -256,6 +259,10 @@ class ZColorPicker extends HTMLElement {
 
 			case 'disabled':
 				this.#disabled = new_value !== null;
+				break;
+
+			case 'show-clear':
+				this.#show_clear = new_value !== null;
 				break;
 
 			default:
@@ -518,7 +525,7 @@ class ZColorPicker extends HTMLElement {
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_DEFAULT}`)
 			.style.display = this.#has_default ? '' : 'none';
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_CLEAR}`)
-			.style.display = this.#has_default ? 'none' : '';
+			.style.display = !this.#has_default && this.#show_clear ? '' : 'none';
 
 		this.#dialog.querySelectorAll(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)
 			.forEach(input => {
@@ -940,6 +947,19 @@ class ZColorPicker extends HTMLElement {
 		}
 		else {
 			this.removeAttribute('disabled');
+		}
+	}
+
+	get showClear() {
+		return this.hasAttribute('show-clear');
+	}
+
+	set showClear(show_clear) {
+		if (show_clear) {
+			this.setAttribute('show-clear', '');
+		}
+		else {
+			this.removeAttribute('show-clear');
 		}
 	}
 }
