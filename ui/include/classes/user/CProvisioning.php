@@ -65,7 +65,7 @@ class CProvisioning {
 				'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages', 'sign_assertions',
 				'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
 				'encrypt_assertions', 'search_filter', 'group_basedn', 'group_name', 'group_member', 'user_ref_attr',
-				'group_filter', 'group_membership', 'idp_certificate', 'sp_certificate', 'sp_private_key'
+				'group_filter', 'group_membership'
 			],
 			'userdirectoryids' => [$userdirectoryid],
 			'selectProvisionMedia' => ['userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active',
@@ -82,6 +82,12 @@ class CProvisioning {
 		if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
 			$userdirectory += DB::select('userdirectory_ldap', [
 				'output' => ['bind_password'],
+				'filter' => ['userdirectoryid' => $userdirectoryid]
+			])[0];
+		}
+		elseif ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+			$userdirectory += DB::select('userdirectory_saml', [
+				'output' => ['idp_certificate', 'sp_certificate', 'sp_private_key'],
 				'filter' => ['userdirectoryid' => $userdirectoryid]
 			])[0];
 		}

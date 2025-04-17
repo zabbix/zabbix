@@ -226,9 +226,11 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_servers'] = [];
 			foreach ($userdirectories as $userdirectory) {
 				if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-					$userdirectory['idp_certificate'] = array_key_exists('idp_certificate', $userdirectory) && $userdirectory['idp_certificate'] != '';
-					$userdirectory['sp_certificate'] = array_key_exists('sp_certificate', $userdirectory) && $userdirectory['sp_certificate'] != '';
-					$userdirectory['sp_private_key'] = array_key_exists('sp_private_key', $userdirectory) && $userdirectory['sp_private_key'] != '';
+					unset(
+						$userdirectory['idp_certificate'],
+						$userdirectory['sp_certificate'],
+						$userdirectory['sp_private_key']
+					);
 
 					$saml_configuration = $userdirectory;
 				}

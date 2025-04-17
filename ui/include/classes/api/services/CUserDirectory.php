@@ -121,6 +121,15 @@ class CUserDirectory extends CApiService {
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
+				$row['idp_certificate_status'] = (int)($row['idp_certificate'] !== '');
+				$row['idp_certificate'] = $row['idp_certificate_status'] > 0 ? md5($row['idp_certificate']) : '';
+
+				$row['sp_certificate_status'] = (int)($row['sp_certificate'] !== '');
+				$row['sp_certificate'] = $row['sp_certificate_status'] > 0 ? md5($row['sp_certificate']) : '';
+
+				$row['sp_private_key_status'] = (int)($row['sp_private_key'] !== '');
+				$row['sp_private_key'] = $row['sp_private_key_status'] > 0 ? md5($row['sp_private_key']) : '';
+
 				$db_userdirectories[$row['userdirectoryid']] += $row;
 			}
 		}
@@ -532,10 +541,22 @@ class CUserDirectory extends CApiService {
 				);
 
 				if ($upd_userdirectory_saml) {
-					$upd_userdirectories_saml[] = [
-						'values' => $upd_userdirectory_saml,
-						'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
-					];
+					if ($db_userdirectory['idp_certificate'] == md5($upd_userdirectory_saml['idp_certificate'])) {
+						unset($upd_userdirectory_saml['idp_certificate']);
+					}
+					if ($db_userdirectory['sp_certificate'] == md5($upd_userdirectory_saml['sp_certificate'])) {
+						unset($upd_userdirectory_saml['sp_certificate']);
+					}
+					if ($db_userdirectory['sp_private_key'] == md5($upd_userdirectory_saml['sp_private_key'])) {
+						unset($upd_userdirectory_saml['sp_certificate']);
+					}
+
+					if (count($upd_userdirectory_saml) > 0) {
+						$upd_userdirectories_saml[] = [
+							'values' => $upd_userdirectory_saml,
+							'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+						];
+					}
 				}
 			}
 		}
@@ -1629,5 +1650,12 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
 		]];
+	}
+
+	public static function resetSamlCertificates(array $values, int $userdirectoryid):array {
+		return DB::update('userdirectory_saml',  [
+			'values' => $values,
+			'where' => ['userdirectoryid' => $userdirectoryid]
+		]);
 	}
 }
