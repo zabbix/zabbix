@@ -348,9 +348,13 @@ class ZColorPicker extends HTMLElement {
 							const color = e.target.closest(`.${ZColorPicker.ZBX_STYLE_COLOR}`);
 
 							if (color !== null) {
+								e.preventDefault();
+
 								this.#selectColor(color.dataset.color);
 							}
 							else if (e.target.closest(`.${ZColorPicker.ZBX_STYLE_INPUT}`) === this.#input) {
+								e.preventDefault();
+
 								this.#selectColor(this.#input.value);
 							}
 						}
@@ -358,6 +362,8 @@ class ZColorPicker extends HTMLElement {
 							const palette = e.target.closest(`.${ZColorPicker.ZBX_STYLE_PALETTE_ROW}`);
 
 							if (palette !== null) {
+								e.preventDefault();
+
 								this.#selectPalette(palette);
 							}
 						}
@@ -381,6 +387,7 @@ class ZColorPicker extends HTMLElement {
 						if (e.shiftKey) {
 							if (document.activeElement === first_focusable) {
 								e.preventDefault();
+
 								last_focusable.focus();
 							}
 						}
@@ -388,6 +395,7 @@ class ZColorPicker extends HTMLElement {
 						else {
 							if (document.activeElement === last_focusable) {
 								e.preventDefault();
+
 								first_focusable.focus();
 							}
 						}
@@ -572,6 +580,10 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	#closeDialog() {
+		if (!this.#is_dialog_open) {
+			return;
+		}
+
 		this.#dialog.removeEventListener('keydown', this.#events.dialogKeydown);
 		this.#dialog.removeEventListener('click', this.#events.dialogClick);
 
@@ -748,6 +760,8 @@ class ZColorPicker extends HTMLElement {
 		this.#closeDialog();
 
 		this.dispatchEvent(new Event('change', {bubbles: true}));
+
+		this.#box.focus();
 	}
 
 	/**
@@ -763,8 +777,6 @@ class ZColorPicker extends HTMLElement {
 		}
 
 		this.#selectColor(color);
-
-		this.#closeDialog();
 	}
 
 	/**
@@ -784,6 +796,8 @@ class ZColorPicker extends HTMLElement {
 		this.#closeDialog();
 
 		this.dispatchEvent(new Event('change', {bubbles: true}));
+
+		this.#box.focus();
 	}
 
 	/**
