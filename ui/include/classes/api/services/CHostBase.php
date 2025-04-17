@@ -1970,24 +1970,6 @@ abstract class CHostBase extends CApiService {
 				'nopermissions' => true
 			]);
 
-			if ($this instanceof CTemplate && $this->outputIsRequested('config', $options['selectMacros'])) {
-				$hostmacro_config = API::getApiService()->select('hostmacro_config', [
-					'output' => ['type', 'label', 'description', 'required', 'regex', 'options'],
-					'filter' => ['hostmacroid' => array_keys($macros)],
-					'preservekeys' => true
-				]);
-				$hostmacro_config = $this->unsetExtraFields($hostmacro_config, ['hostmacroid'], []);
-				$relation_map = $this->createRelationMap($macros, 'hostmacroid', 'hostmacroid');
-				$macros = $relation_map->mapOne($macros, $hostmacro_config, 'config');
-
-				foreach ($macros as &$macro) {
-					if (!$macro['config']) {
-						$macro['config'] = DB::getDefaults('hostmacro_config');
-					}
-				}
-				unset($macro);
-			}
-
 			$relation_map = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
 			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
 			$result = $relation_map->mapMany($result, $macros, 'macros',
