@@ -318,7 +318,7 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 			++$i < $template_count ? (new CSpan(', '))->addClass('delimiter') : null
 		]))->addClass('trigger');
 
-		$hint_trigger[] = $trigger['description'];
+		$hint_trigger[] = $trigger['description_expanded'];
 
 		if ($is_context_editable) {
 			$trigger_url = (new CUrl('zabbix.php'))
