@@ -1805,7 +1805,8 @@ button {
   border: 1px solid #303030;
   border-bottom: 0;
   background-color: #2b2b2b;
-  z-index: 3; }
+  z-index: 3;
+  transition: opacity 0.3s ease-out; }
   .dashboard-grid-widget-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
@@ -1848,7 +1849,8 @@ button {
   padding-bottom: 8px;
   overflow: auto;
   border: 1px solid #303030;
-  background-color: #2b2b2b; }
+  background-color: #2b2b2b;
+  transition: opacity 0.3s ease-out; }
   .dashboard-grid-widget-contents .list-table {
     border: 0; }
     .dashboard-grid-widget-contents .list-table tbody tr:last-child th, .dashboard-grid-widget-contents .list-table tbody tr:last-child td {
@@ -1885,7 +1887,7 @@ button {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
     height: 0;
-    transition: height 0.3s, margin-top 0.3s, box-shadow 0.3s; }
+    transition: height 0.3s ease-out, margin-top 0.3s ease-out, box-shadow 0.3s ease-out, opacity 0.3s ease-out; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
@@ -1969,7 +1971,7 @@ button {
   right: 0;
   bottom: 0;
   overflow: visible;
-  transition: margin-top 0.3s ease-out; }
+  transition: margin-top 0.3s ease-out, opacity 0.3s ease-out; }
 
 .dashboard-grid-iterator-placeholder {
   position: absolute;
@@ -2064,14 +2066,6 @@ button {
 
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-actions {
   opacity: 1; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-  transition: none; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-  transition: none; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget-mask {
-  display: block; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator-mask {
-  display: block; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget .ui-resizable-handle {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-focus .ui-resizable-handle {
@@ -2103,35 +2097,9 @@ button {
     border-color: #212121; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #212121; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-container {
-  opacity: 0.75; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-header,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-contents {
-  border-width: 3px;
-  border-color: #768d99; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-header {
-  margin: -2px -2px 0 -2px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .dashboard-grid-widget-contents {
-  margin: calc(2rem - 2px) -2px -2px -2px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
-  margin-top: -2px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
-  height: 2rem;
-  margin-top: -2rem; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header.ui-draggable-dragging .dashboard-grid-widget-header {
-  border-color: #212121;
-  border-width: 1px;
-  padding: 2px 2px 0 12px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self.dashboard-grid-widget-hidden-header.ui-draggable-dragging .dashboard-grid-widget-contents {
-  z-index: 5; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-n {
-  top: 3px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-e {
-  right: 3px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-s {
-  bottom: 4px; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing-self .ui-resizable-w {
-  left: 3px; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-header,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-contents {
+  opacity: .75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
   transition-property: height, top;
   transition-duration: 0.15s; }
@@ -2179,8 +2147,9 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #1c1c1c;
     border-top: 0; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-container {
-  opacity: 0.75; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-header,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-contents {
+  opacity: .75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
   transition-property: height, top;
   transition-duration: 0.15s; }
@@ -2199,6 +2168,52 @@ button {
     right: .25rem;
     bottom: .25rem;
     background-color: #010101; }
+.dashboard.dashboard-is-edit-mode .highlight {
+  z-index: 5;
+  position: absolute;
+  transition: top 0.3s ease-out; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
+    border-top: 3px solid #768d99;
+    top: calc(.25rem - 1px);
+    right: calc(.25rem - 1px);
+    left: calc(.25rem - 1px);
+    height: 0; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-e {
+    border-right: 3px solid #768d99;
+    top: calc(.25rem - 1px);
+    right: calc(.25rem - 1px);
+    bottom: calc(.25rem - 1px);
+    width: 0; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-s {
+    border-bottom: 3px solid #768d99;
+    right: calc(.25rem - 1px);
+    bottom: calc(.25rem - 1px);
+    left: calc(.25rem - 1px);
+    height: 0; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-w {
+    border-left: 3px solid #768d99;
+    top: calc(.25rem - 1px);
+    bottom: calc(.25rem - 1px);
+    left: calc(.25rem - 1px);
+    width: 0; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus:not(.ui-resizable-resizing) .highlight-n,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus:not(.ui-resizable-resizing) .highlight-e,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus:not(.ui-resizable-resizing) .highlight-w, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.ui-draggable-dragging .highlight-n,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.ui-draggable-dragging .highlight-e,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.ui-draggable-dragging .highlight-w {
+  top: calc(-1.75rem - 1px); }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing) .highlight-n,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing) .highlight-e,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing) .highlight-w, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .highlight-n,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .highlight-e,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .highlight-w {
+  top: calc(-1.75rem - 1px); }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing).dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-n,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing).dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-e,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing).dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-w, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-n,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-e,
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-w {
+  top: calc(-4rem - 5px); }
 
 @keyframes zoom-in-out {
   0% {

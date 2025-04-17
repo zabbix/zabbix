@@ -222,7 +222,6 @@ class CWidgetBase {
 		this._is_updating_paused = false;
 		this._update_retry_sec = 3;
 		this._show_preloader_asap = true;
-		this._resizable_handles = [];
 		this._hide_preloader_animation_frame = null;
 
 		this._events = {};
@@ -805,6 +804,14 @@ class CWidgetBase {
 		if (self) {
 			this._target.classList.add('is-editing-self');
 			this._button_edit.disabled = true;
+
+			for (const direction of ['n', 'e', 's', 'w']) {
+				const highlight = document.createElement('div');
+
+				highlight.classList.add('highlight', `highlight-${direction}`);
+
+				this._target.append(highlight);
+			}
 		}
 	}
 
@@ -816,6 +823,10 @@ class CWidgetBase {
 
 		this._button_actions.disabled = false;
 		this._button_edit.disabled = false;
+
+		for (const highlight of this._target.querySelectorAll('.highlight')) {
+			highlight.remove();
+		}
 	}
 
 	/**
@@ -1551,8 +1562,6 @@ class CWidgetBase {
 	 * the widget is entered (focused).
 	 */
 	_addResizeHandles() {
-		this._resizable_handles = {};
-
 		for (const direction of ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw']) {
 			const resizable_handle = document.createElement('div');
 
@@ -1571,7 +1580,6 @@ class CWidgetBase {
 			}
 
 			this._target.append(resizable_handle);
-			this._resizable_handles[direction] = resizable_handle;
 		}
 	}
 
@@ -1580,11 +1588,9 @@ class CWidgetBase {
 	 * when the widget is left (unfocused).
 	 */
 	_removeResizeHandles() {
-		for (const resizable_handle of Object.values(this._resizable_handles)) {
+		for (const resizable_handle of this._target.querySelectorAll('.ui-resizable-handle')) {
 			resizable_handle.remove();
 		}
-
-		this._resizable_handles = {};
 	}
 
 	/**
