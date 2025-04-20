@@ -294,7 +294,8 @@ int	zbx_trends_parse_range(time_t from, const char *param, time_t *start, time_t
 		return FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:" ZBX_FS_I64 " end:" ZBX_FS_I64, __func__, *start, *end);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:" ZBX_FS_TIME_T " end:" ZBX_FS_TIME_T, __func__,
+			(zbx_fs_time_t)(*start), (zbx_fs_time_t)(*end));
 
 	return SUCCEED;
 }
@@ -435,17 +436,17 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, tim
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select %s from %s"
 				" where itemid=" ZBX_FS_UI64
-					" and clock>=" ZBX_FS_I64
-					" and clock<=" ZBX_FS_I64,
-				eval_multi, table, itemid, start, end);
+					" and clock>=" ZBX_FS_TIME_T
+					" and clock<=" ZBX_FS_TIME_T,
+				eval_multi, table, itemid, (zbx_fs_time_t)start, (zbx_fs_time_t)end);
 	}
 	else
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select %s from %s"
 				" where itemid=" ZBX_FS_UI64
-					" and clock=" ZBX_FS_I64,
-				eval_single, table, itemid, start);
+					" and clock=" ZBX_FS_TIME_T,
+				eval_single, table, itemid, (zbx_fs_time_t)start);
 	}
 
 	result = zbx_db_select("%s", sql);
@@ -497,11 +498,11 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 
 	if (start != end)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=" ZBX_FS_I64 " and clock<=" ZBX_FS_I64,
-				start, end);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=" ZBX_FS_TIME_T " and clock<="
+				ZBX_FS_TIME_T, (zbx_fs_time_t)start, (zbx_fs_time_t)end);
 	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=" ZBX_FS_I64, start);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=" ZBX_FS_TIME_T, (zbx_fs_time_t)start);
 
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
@@ -562,11 +563,11 @@ static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid,
 
 	if (start != end)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=" ZBX_FS_I64 " and clock<=" ZBX_FS_I64,
-				start, end);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=" ZBX_FS_TIME_T " and clock<="
+				ZBX_FS_TIME_T, (zbx_fs_time_t)start, (zbx_fs_time_t)end);
 	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=" ZBX_FS_I64, start);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=" ZBX_FS_TIME_T, (zbx_fs_time_t)start);
 
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);

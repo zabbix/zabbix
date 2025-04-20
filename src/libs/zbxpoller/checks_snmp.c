@@ -305,7 +305,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		ret = FAIL;
 		item_context->ret = NOTSUPPORTED;
 		SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "Invalid SNMP engineId length "
-				"\"" ZBX_FS_UI64 "\"", session->securityEngineIDLen));
+				"\"" ZBX_FS_SIZE_T "\"", (zbx_fs_size_t)session->securityEngineIDLen));
 
 		goto out;
 	}
@@ -3304,7 +3304,7 @@ stop:
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:"
 				ZBX_FS_SIZE_T " error:%s",
 				__func__, zbx_result_string(snmp_context->item.ret), snmp_context->item.itemid,
-				zbx_get_event_string(event), event, *fd, snmp_context->results_offset,
+				zbx_get_event_string(event), event, *fd, (zbx_fs_size_t)snmp_context->results_offset,
 				snmp_context->item.result.msg);
 	}
 	else
@@ -3312,7 +3312,7 @@ stop:
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:" ZBX_FS_SIZE_T
 				" state:%s",
 				__func__, snmp_context->item.itemid, zbx_get_event_string(event), event, *fd,
-				snmp_context->results_offset, zbx_task_state_to_str(task_ret));
+				(zbx_fs_size_t)snmp_context->results_offset, zbx_task_state_to_str(task_ret));
 	}
 
 	return task_ret;

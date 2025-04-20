@@ -192,8 +192,8 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		return get_content_type(easyhandle);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "name '%s' value '%s' amount:%lu index:%lu origin:%u",
-			type->name, type->value, type->amount, type->index, type->origin);
+	zabbix_log(LOG_LEVEL_DEBUG, "name '%s' value '%s' amount:" ZBX_FS_SIZE_T " index:" ZBX_FS_SIZE_T " origin:%u",
+			type->name, type->value, (zbx_fs_size_t)type->amount, (zbx_fs_size_t)type->index, type->origin);
 
 	return type->value;
 }

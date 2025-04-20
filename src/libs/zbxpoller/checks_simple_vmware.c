@@ -1068,8 +1068,9 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 	time_t		timestamp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T " events:%d top event id:"
-			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key, evt_state->last_ts,
-			events->values_num, events->values[0]->key, events->values[0]->timestamp);
+			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key,
+			(zbx_fs_time_t)evt_state->last_ts, events->values_num, events->values[0]->key,
+			(zbx_fs_time_t)(events->values[0]->timestamp));
 
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
