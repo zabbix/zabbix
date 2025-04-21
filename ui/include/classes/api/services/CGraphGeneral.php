@@ -26,13 +26,19 @@ abstract class CGraphGeneral extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const FLAGS = null;
-
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
 	const ERROR_MISSING_GRAPH_NAME = 'missingGraphName';
 	const ERROR_MISSING_GRAPH_ITEMS = 'missingGraphItems';
 	const ERROR_MISSING_REQUIRED_VALUE = 'missingRequiredValue';
 	const ERROR_GRAPH_SUM = 'graphSum';
+
+	private static function isGraph(): bool {
+		return static::class === 'CGraph';
+	}
+
+	private static function isGraphPrototype(): bool {
+		return static::class === 'CGraphPrototype';
+	}
 
 	/**
 	 * Update graphs.
@@ -59,7 +65,7 @@ abstract class CGraphGeneral extends CApiService {
 			'preservekeys' => true
 		];
 
-		if (static::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if (self::isGraphPrototype()) {
 			$options['filter'] = [
 				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
 			];
@@ -594,7 +600,7 @@ abstract class CGraphGeneral extends CApiService {
 			'preservekeys' => true
 		] + $permission_options);
 
-		if (static::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if (self::isGraphPrototype()) {
 			$db_items += API::ItemPrototype()->get([
 				'output' => ['name', 'value_type', 'hostid'],
 				'selectHosts' => ['status'],
@@ -609,7 +615,7 @@ abstract class CGraphGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (static::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if (self::isGraphPrototype()) {
 			$this->checkDiscoveryRuleCount($graphs, $db_items);
 		}
 
@@ -624,15 +630,9 @@ abstract class CGraphGeneral extends CApiService {
 				$item = $db_items[$gitem['itemid']];
 
 				if (!in_array($item['value_type'], $allowed_value_types)) {
-					switch (static::FLAGS) {
-						case ZBX_FLAG_DISCOVERY_NORMAL:
-							$error = _('Cannot add a non-numeric item "%1$s" to graph "%2$s".');
-							break;
-
-						case  ZBX_FLAG_DISCOVERY_PROTOTYPE:
-							$error = _('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".');
-							break;
-					}
+					$error = self::isGraph()
+						? _('Cannot add a non-numeric item "%1$s" to graph "%2$s".')
+						: _('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".');
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['name'], $graph['name']));
 				}
@@ -870,28 +870,19 @@ abstract class CGraphGeneral extends CApiService {
 		$duplicates = DB::select('graphs', [
 			'output' => ['uuid'],
 			'filter' => [
-				'flags' => static::FLAGS,
+				'flags' => self::isGraph() ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'uuid' => array_keys($graph_indexes)
 			],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			switch (static::FLAGS) {
-				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($graph_indexes[$duplicates[0]['uuid']] + 1),
-						_('graph with the same UUID already exists')
-					);
-					break;
-
-				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($graph_indexes[$duplicates[0]['uuid']] + 1),
-						_('graph prototype with the same UUID already exists')
-					);
-					break;
-			}
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+				'/'.($graph_indexes[$duplicates[0]['uuid']] + 1),
+				self::isGraph()
+					? _('graph with the same UUID already exists')
+					: _('graph prototype with the same UUID already exists')
+			));
 		}
 	}
 

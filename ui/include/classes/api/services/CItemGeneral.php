@@ -91,6 +91,22 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected const CHUNK_SIZE = 1000;
 
+	private static function isItem(): bool {
+		return static::class === 'CItem';
+	}
+
+	private static function isItemPrototype(): bool {
+		return static::class === 'CItemPrototype';
+	}
+
+	protected static function isDiscoveryRule(): bool {
+		return static::class === 'CDiscoveryRule';
+	}
+
+	protected static function isDiscoveryRulePrototype(): bool {
+		return static::class === 'CDiscoveryRulePrototype';
+	}
+
 	/**
 	 * @abstract
 	 *
@@ -2205,7 +2221,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$dep_item_links = self::getDependentItemLinks($items, $del_links);
 
-		if (!$inherited && $db_items) {
+		if (!$inherited && $db_items && (self::isItem() || self::isItemPrototype())) {
 			self::checkCircularDependencies($items, $dep_item_links);
 		}
 	}
@@ -2333,10 +2349,6 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	private static function checkCircularDependencies(array $items, array $dep_item_links): void {
 		foreach ($items as $i => $item) {
-			if (in_array($item['flags'], CDiscoveryRuleGeneral::FLAGS)) {
-				continue;
-			}
-
 			$master_itemid = $item['master_itemid'];
 
 			while ($master_itemid != 0) {

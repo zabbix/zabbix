@@ -28,13 +28,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
 	];
 
-	public const FLAGS = [
-		ZBX_FLAG_DISCOVERY_RULE,
-		ZBX_FLAG_DISCOVERY_RULE_CREATED,
-		ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
-		ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED
-	];
-
 	/**
 	 * @inheritDoc
 	 */
@@ -619,7 +612,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	 * @return array
 	 */
 	protected static function getValidationRules(): array {
-		$fields = [
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>			['type' => API_ANY],
 			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
@@ -647,24 +640,22 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			]],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'discover' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => static fn(): bool => self::isDiscoveryRulePrototype(), 'type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'preprocessing' =>			self::getPreprocessingValidationRules(),
 			'lld_macro_paths' =>		self::getLldMacroPathsValidationRules(),
 			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
 			'overrides' =>				self::getOverridesValidationRules()
-		];
-
-		if (static::FLAGS == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
-			$fields['discover'] = ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])];
-		}
-
-		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => $fields];
+		]];
 	}
 
 	/**
 	 * @return array
 	 */
 	protected static function getInheritedValidationRules(): array {
-		$fields = [
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>			['type' => API_ANY],
 			'uuid' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>					['type' => API_ANY],
@@ -689,17 +680,15 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			]],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'discover' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => static fn(): bool => self::isDiscoveryRulePrototype(), 'type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'preprocessing' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'lld_macro_paths' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
 			'overrides' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
-		];
-
-		if (static::FLAGS == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
-			$fields['discover'] = ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])];
-		}
-
-		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => $fields];
+		]];
 	}
 
 	/**

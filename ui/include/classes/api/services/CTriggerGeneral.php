@@ -19,7 +19,13 @@
  */
 abstract class CTriggerGeneral extends CApiService {
 
-	protected const FLAGS = null;
+	private static function isTrigger(): bool {
+		return static::class === 'CTrigger';
+	}
+
+	private static function isTriggerPrototype(): bool {
+		return static::class === 'CTriggerPrototype';
+	}
 
 	/**
 	 * @abstract
@@ -665,28 +671,19 @@ abstract class CTriggerGeneral extends CApiService {
 		$duplicates = DB::select('triggers', [
 			'output' => ['uuid'],
 			'filter' => [
-				'flags' => static::FLAGS,
+				'flags' => self::isTrigger() ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'uuid' => array_keys($trigger_indexes)
 			],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			switch (static::FLAGS) {
-				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($trigger_indexes[$duplicates[0]['uuid']] + 1),
-						_('trigger with the same UUID already exists')
-					);
-					break;
-
-				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($trigger_indexes[$duplicates[0]['uuid']] + 1),
-						_('trigger prototype with the same UUID already exists')
-					);
-					break;
-			}
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+				'/'.($trigger_indexes[$duplicates[0]['uuid']] + 1),
+				self::isTrigger()
+					? _('trigger with the same UUID already exists')
+					: _('trigger prototype with the same UUID already exists')
+			));
 		}
 	}
 

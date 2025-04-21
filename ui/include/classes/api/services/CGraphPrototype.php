@@ -23,8 +23,6 @@ class CGraphPrototype extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype', 'discover'];
 
-	protected const FLAGS = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 	public function __construct() {
 		parent::__construct();
 
@@ -367,8 +365,6 @@ class CGraphPrototype extends CGraphGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$graphids = array_keys($result);
-
 		// adding Items
 		if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
@@ -383,45 +379,72 @@ class CGraphPrototype extends CGraphGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		if ($options['selectDiscoveryRule'] !== null ||$options['selectDiscoveryRulePrototype'] !== null) {
-			$resource = DBselect(
-				'SELECT id.lldruleid,gi.graphid'.
-					' FROM item_discovery id,graphs_items gi,items i'.
-					' WHERE '.dbConditionId('gi.graphid', $graphids).
-						' AND gi.itemid=id.itemid'.
-						' AND id.lldruleid=i.itemid'.
-						' AND '.dbConditionInt('i.flags', CDiscoveryRuleGeneral::FLAGS)
-			);
-			$relation_map = new CRelationMap();
-
-			while ($relation = DBfetch($resource)) {
-				$relation_map->addRelation($relation['graphid'], $relation['lldruleid']);
-			}
-
-			if ($options['selectDiscoveryRule'] !== null) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($options['selectDiscoveryRulePrototype'] !== null) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
-		}
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
 
 		return $result;
+	}
+
+	private static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		$resource = DBselect(
+			'SELECT gi.graphid,id.lldruleid'.
+			' FROM graphs_items gi,item_discovery id,items i'.
+			' WHERE gi.itemid=id.itemid'.
+				' AND id.lldruleid=i.itemid'.
+				' AND '.dbConditionId('gi.graphid', array_keys($result)).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+		);
+
+		$relation_map = new CRelationMap();
+
+		while ($row = DBfetch($resource)) {
+			$relation_map->addRelation($row['graphid'], $row['lldruleid']);
+		}
+
+		$lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => $relation_map->getRelatedIds(),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
+	}
+
+	private static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototype'] === null) {
+			return;
+		}
+
+		$resource = DBselect(
+			'SELECT gi.graphid,id.lldruleid'.
+			' FROM graphs_items gi,item_discovery id,items i'.
+			' WHERE gi.itemid=id.itemid'.
+				' AND id.lldruleid=i.itemid'.
+				' AND '.dbConditionId('gi.graphid', array_keys($result)).
+				' AND '.dbConditionInt('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$relation_map = new CRelationMap();
+
+		while ($row = DBfetch($resource)) {
+			$relation_map->addRelation($row['graphid'], $row['lldruleid']);
+		}
+
+		$lld_rule_prototypes = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototype'],
+			'itemids' => $relation_map->getRelatedIds(),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $lld_rule_prototypes, 'discoveryRulePrototype');
 	}
 
 	/**

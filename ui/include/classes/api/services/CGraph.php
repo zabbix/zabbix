@@ -23,8 +23,6 @@ class CGraph extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
 
-	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
-
 	public function __construct() {
 		parent::__construct();
 
