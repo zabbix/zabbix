@@ -110,13 +110,13 @@ void	zbx_variant_set_str(zbx_variant_t *value, char *text)
 }
 
 void	zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl)
-{printf("DBL\n");
+{
 	value->data.dbl = value_dbl;
 	value->type = ZBX_VARIANT_DBL;
 }
 
 void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64)
-{printf("UI64\n");
+{
 	value->data.ui64 = value_ui64;
 	value->type = ZBX_VARIANT_UI64;
 }

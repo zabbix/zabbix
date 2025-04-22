@@ -1020,7 +1020,7 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 		data += zbx_deserialize_uint31_compact(data, &loc_r);
 
 		data += zbx_deserialize_char(data, &var_type);
-printf("VARIANT:%d\n",var_type);
+
 		switch (var_type)
 		{
 			case ZBX_VARIANT_UI64:
@@ -1241,7 +1241,6 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs)
 {
 	int	i;
-	zabbix_log(LOG_LEVEL_INFORMATION, "stack values: %d\n", ctx->stack.values_num);
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
