@@ -706,13 +706,13 @@ class CUserMacro extends CApiService {
 		}
 
 		$templateids = API::Template()->get([
-			'output' => 'templateid',
+			'output' => ['templateid'],
 			'templateids' => array_keys($all_hostids),
 			'preservekeys' => true
 		]);
 
 		foreach ($hostmacros as $index => $hostmacro) {
-			// config is supported only for template macros
+			// Config is supported only for template macros.
 			if (!array_key_exists('config', $hostmacro)) {
 				continue;
 			}
@@ -1237,7 +1237,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$templates = API::Template()->get([
-			'output' => 'templateid',
+			'output' => ['templateid'],
 			'templateids' => array_keys(array_flip(array_column($result, 'hostid'))),
 			'preservekeys' => true
 		]);
