@@ -188,7 +188,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->prepareItemHistoryAndTrends($item);
 		}
 
-		if (!$item['discoveryRule']) {
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			unset($item['discoveryRule']);
 		}
 
