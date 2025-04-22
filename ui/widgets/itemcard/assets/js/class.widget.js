@@ -136,6 +136,7 @@ class CWidgetItemCard extends CWidget {
 		const fetchValue = url => {
 			const binary_data = this.#binary_data_cache.get(url);
 			const button = url === this.#binary_button.url ? this.#binary_button.button : null;
+
 			return new Promise((resolve, reject) => {
 				if (binary_data !== undefined) {
 					resolve(binary_data);
