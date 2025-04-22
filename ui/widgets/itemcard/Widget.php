@@ -42,4 +42,13 @@ class Widget extends CWidget {
 			]
 		];
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Empty value.' => _('Empty value.'),
+				'Image loading error.' => _('Image loading error.')
+			]
+		];
+	}
 }
