@@ -215,8 +215,8 @@ int	lld_extract_entries(zbx_hashset_t *entries, zbx_vector_lld_entry_ptr_t *entr
 		if (NULL == (lld_array = zbx_jsonobj_get_value(lld_obj, ZBX_PROTO_TAG_DATA)) ||
 				ZBX_JSON_TYPE_ARRAY != lld_array->type)
 		{
-			*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
-					ZBX_PROTO_TAG_DATA);
+			*error = zbx_dsprintf(*error, "Expected an array but received an object without a \"%s\""
+					" array.", ZBX_PROTO_TAG_DATA);
 			return FAIL;
 		}
 	}
