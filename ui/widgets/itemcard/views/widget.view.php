@@ -263,8 +263,7 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 			]))->addClass('item-name'),
 			$problems_indicator
 		]))->addClass('section-item'),
-		(new CDiv($path))
-			->addClass('section-path')
+		(new CDiv($path))->addClass('section-path')
 	]))->addClass('sections-header');
 }
 
@@ -528,7 +527,6 @@ function makeSectionTags(array $item_tags): CDiv {
 	return (new CDiv(
 		(new CDiv($tags))->addClass('tags')
 	))
-
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-tags');
 }
