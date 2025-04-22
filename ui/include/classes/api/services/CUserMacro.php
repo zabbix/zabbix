@@ -672,7 +672,7 @@ class CUserMacro extends CApiService {
 		}
 	}
 
-	private function checkMacroConfig(array $hostmacros, array $db_hostmacros = null): void {
+	private function checkMacroConfig(array $hostmacros, ?array $db_hostmacros = null): void {
 		$api_macro_config_rules =
 			['type' => API_OBJECT, 'fields' => [
 				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
