@@ -55,8 +55,6 @@ class CWidgetItemCard extends CWidget {
 	}
 
 	onResize() {
-		super.onResize();
-
 		this.#adjustSections();
 	}
 
