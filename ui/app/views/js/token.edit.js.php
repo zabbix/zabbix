@@ -138,7 +138,7 @@ window.token_edit_popup = {
 	},
 
 	close() {
-		this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close'));
+		this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('token-edit.close'));
 	},
 
 	removePopupMessages() {
@@ -222,9 +222,20 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+				// Popup Manager shall not intercept this event.
+				this.overlay.$dialogue[0].addEventListener('dialogue.close', e => {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+
+					// Set timeout to overcome browser preventing page reload on ESC key.
+					setTimeout(() => {
+						this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
+					});
+				}, {capture: true});
+
+				this.overlay.$dialogue[0].addEventListener('token-edit.close', () => {
 					this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
-				}, {once: true});
+				});
 
 				this.overlay.setProperties({...response, prevent_navigation: false});
 			})
