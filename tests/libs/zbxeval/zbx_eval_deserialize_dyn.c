@@ -49,7 +49,7 @@ static int	compare_ctx_no_rules(zbx_eval_context_t *ctx1, zbx_eval_context_t *ct
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_eval_context_t	ctx1;
+	zbx_eval_context_t	ctx1,*ctx2;
 	unsigned char		*data;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
@@ -67,8 +67,12 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_eval_serialize(&ctx1, NULL, &data);
 
-	zbx_eval_context_t	*ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
-			ZBX_EVAL_EXTRACT_ALL);
+	if (SUCCEED == zbx_mock_parameter_exists("in.skip_ids"))
+		ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
+				ZBX_EVAL_EXTRACT_VAR_STR);
+	else
+		ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
+				ZBX_EVAL_EXTRACT_ALL);
 
 	zbx_mock_assert_int_eq("return value:", SUCCEED, compare_ctx_no_rules(&ctx1, ctx2));
 	zbx_free(data);

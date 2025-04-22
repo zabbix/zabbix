@@ -40,6 +40,15 @@ void	zbx_mock_test_entry(void **state)
 	else
 		mock_dump_stack(&ctx);
 
+	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	{
+		for (int i = 0; i < ctx.stack.values_num; i++)
+		{
+			zbx_variant_set_ui64(&ctx.stack.values[i].value,
+					zbx_mock_get_parameter_uint64("in.variant_data"));
+		}
+	}
+
 	zbx_eval_get_functionids_ordered(&ctx, &functionids);
 	zbx_eval_clear(&ctx);
 	zbx_vector_uint64_create(&functionids_out);

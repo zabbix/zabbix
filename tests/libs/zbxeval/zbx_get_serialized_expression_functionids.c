@@ -40,6 +40,34 @@ void	zbx_mock_test_entry(void **state)
 	else
 		mock_dump_stack(&ctx);
 
+	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	{
+		if (SUCCEED == strcmp("ZBX_VARIANT_STR",zbx_mock_get_parameter_string("in.variant")))
+		{
+			for (int i = 0; i < ctx.stack.values_num; i++)
+			{
+				zbx_variant_set_str(&ctx.stack.values[i].value, zbx_strdup(NULL,
+						zbx_mock_get_parameter_string("in.variant")));
+			}
+		}
+		else if (SUCCEED == strcmp("ZBX_VARIANT_UI64",zbx_mock_get_parameter_string("in.variant")))
+		{
+			for (int i = 0; i < ctx.stack.values_num; i++)
+			{
+				zbx_variant_set_ui64(&ctx.stack.values[i].value,
+						zbx_mock_get_parameter_uint64("in.variant_ui64_data"));
+			}
+		}
+		else if (SUCCEED == strcmp("ZBX_VARIANT_DBL",zbx_mock_get_parameter_string("in.variant")))
+		{
+			for (int i = 0; i < ctx.stack.values_num; i++)
+			{
+				zbx_variant_set_dbl(&ctx.stack.values[i].value,
+						zbx_mock_get_parameter_float("in.variant_dbl_data"));
+			}
+		}
+	}
+
 	zbx_eval_serialize(&ctx, NULL, &data);
 	zbx_vector_uint64_create(&functionids);
 	zbx_get_serialized_expression_functionids(zbx_mock_get_parameter_string("in.expression"), data, &functionids);
