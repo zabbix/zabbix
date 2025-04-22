@@ -4,13 +4,13 @@
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
 -- host groups
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, 'API Host for read permissions', 'API Host for read permissions', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'API Host for deny permissions', 'API Host for deny permissions', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (90020, '90020', '90020', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (90021, '90021', '90021', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50009, 'API Host', 'API Host', 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50010, 'API Template', 'API Template', 3, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50012, 'API Host for read permissions', 'API Host for read permissions', 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50013, 'API disabled host', 'API disabled host', 1, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50014, 'API Host for deny permissions', 'API Host for deny permissions', 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (90020, '90020', '90020', 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (90021, '90021', '90021', 0, '', '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50023,50012,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50024,50013,1,1,1,'127.0.0.1','','10050');
@@ -45,7 +45,7 @@ INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50009,0,'f04424f8880d4bc8a3b
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50010,0,'7a6aac19b9dc42a1afb7582a8e3d4283','API host group delete3');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50011,0,'a93383e7641547fe9572f36e6937f9fb','API host group delete4');
 -- discovered host groups
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '', '');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50014,0,'31e39dc724624c97b2e93caba8517465','API group for host prototype');
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,400660);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50108, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
@@ -53,7 +53,7 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (50015,0,'de6322aebbae4f53acfc87747da877d8','API discovery group {#HV.NAME}',4);
 INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name) VALUES (1, 50015, 50108, 'API discovery group {#HV.NAME}');
 -- host prototype for delete
-INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
+INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces, readme) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1, '');
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NULL,400660);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50112, 50015, '', 50014, NULL);
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50028,50015,1,2,1,'127.0.0.1','','10050');
@@ -67,7 +67,7 @@ INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (52005,1,'1785b8abeb844a85a76
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (52006,1,'77f66d8c2dae4802a6c73ca6acb4e1db','API template group with template 2');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (52007,1,'e006fa58254e4961b7f0437c919909e8','API template group to delete 2');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (52008,1,'720287feafa340278a5fd726b687c752','API template group to delete 3');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50020, 'API Template 2', 'API Template 2', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50020, 'API Template 2', 'API Template 2', 3, '', '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55001, 50020, 52005);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55002, 50020, 52006);
 
@@ -278,7 +278,7 @@ INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (62002, 0, 'f40b2a0aa36d40
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (62003, 0, '589d36644b7742dc9fef13ac0625f38c', 'maintenance_has_group_and_host');
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (62004, 0, 'bf806430c23c422b8bdb5dc7f4af2ca6', 'maintenance_group_1');
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (62005, 0, '4136fdc8ad2a46af913f5fdb82a72d1f', 'maintenance_group_2');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (61003, 'maintenance_has_group_and_host', 'maintenance_has_group_and_host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (61003, 'maintenance_has_group_and_host', 'maintenance_has_group_and_host', 0, '', '');
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60002, 'maintenance_has_only_group', '', 1539723600, 1539810000);
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60003, 'maintenance_has_group_and_host', '', 1539723600, 1539810000);
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60005, 'maintenance_two_groups', '', 1539723600, 1539810000);
@@ -297,7 +297,7 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 
 -- testItemDelete
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50018, 0, '23178c337bcd476b8a052daabcaaf861', 'with_lld_discovery');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (120004, 'with_lld_discovery', 'with_lld_discovery', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (120004, 'with_lld_discovery', 'with_lld_discovery', 0, '', '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (120004, 120004, 50018);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (2004, 120004, 1, 1, 1, '127.0.0.1', '', '10050');
 
@@ -387,8 +387,8 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,e
 -- testtriggerfilter
 insert into hstgrp (groupid,type,uuid,name) values (139000,0,'0a02d2e17dc04329acf4c74d535ae768','triggerstester');
 insert into hstgrp (groupid,type,uuid,name) values (139003,1,'950a7dee672e4617b08e919359500520','triggerstester');
-insert into hosts (hostid,host,name,status,description) values (130000,'triggerstester','triggerstester',0,'');
-insert into hosts (hostid,host,name,status,description) values (131000,'triggerstestertmpl','triggerstestertmpl',3,'');
+insert into hosts (hostid,host,name,status,description, readme) values (130000,'triggerstester','triggerstester',0,'', '');
+insert into hosts (hostid,host,name,status,description, readme) values (131000,'triggerstestertmpl','triggerstestertmpl',3,'', '');
 insert into hosts_groups (hostgroupid, hostid, groupid) values (139100, 130000, 139000);
 insert into hosts_groups (hostgroupid, hostid, groupid) values (139200, 131000, 139003);
 insert into items (itemid,hostid,type,name,key_,params,query_fields,description,posts,headers) values (132000,130000,2,'triggerstesteritem','triggerstesteritem','','','','','');
@@ -428,7 +428,7 @@ INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (1
 -- testDiscoveryRule
 INSERT INTO hstgrp (groupid, type, uuid, name) values (1004, 0, '1dcc10f0362545648a94256ca3260e8a', 'testDiscoveryRule');
 
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (1017, 'test.discovery.rule.host.1', 'test.discovery.rule.host.1', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (1017, 'test.discovery.rule.host.1', 'test.discovery.rule.host.1', 0, '', '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (1010, 1017, 1, 1, 1, '127.0.0.1', '', '10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1017, 1017, 1004);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers                 ) VALUES (2600, 1017, 'item.1.1.1.1'                  ,  2, 'item.1.1.1.1'                  , 1, '90d', 0, NULL, NULL, '','', '', '', '');
@@ -436,7 +436,7 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers                 ) VALUES (2604, 1017, 'item.2'                        ,  2, 'item.2'                        , 1, '90d', 0, NULL, NULL, '','', '', '', '');
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime, lifetime_type, enabled_lifetime, enabled_lifetime_type, query_fields, flags) VALUES (2605, 1017, 'dependent.lld.3'               , 18, 'dependent.lld.3'               , 4, '90d', '365d', 0, 2604, NULL, '', '', '', '', '30d', 0, '0', 2, '', 1);
 
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (1018, 'test.discovery.rule.host.2', 'test.discovery.rule.host.2', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (1018, 'test.discovery.rule.host.2', 'test.discovery.rule.host.2', 0, '', '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (1011, 1018, 1, 1, 1, '127.0.0.1', '', '10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1018, 1018, 1004);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers                 ) VALUES (2606, 1018, 'item.1'                        ,  2, 'item.1'                        , 1, '90d', 0, NULL, NULL, '','', '', '', '');
@@ -447,7 +447,7 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 -- testHistory
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (1005, 0, '0326c9db6487496b9beb6ca353cac1d0', 'history.get/hosts');
 
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (120005, 'history.get.host.1', 'history.get.host.1', 1, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (120005, 'history.get.host.1', 'history.get.host.1', 1, '', '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1019, 120005, 1005);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (1012, 120005, 1, '127.0.0.1', 1, '10050', 1);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers) VALUES (133758, 120005, 'item1', 2, 'item1', 3, '90d', 0, NULL, NULL, '','', '', '', '');
@@ -613,7 +613,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1001
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10018,'5d');
 
 -- LLD with overrides and template constraint
-INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131001,NULL,'Overrides template constraint',3,-1,2,'','',NULL,0,0,0,'Overrides template constraint',0,NULL,'',1,1,'','','','',0);
+INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover,readme) VALUES (131001,NULL,'Overrides template constraint',3,-1,2,'','',NULL,0,0,0,'Overrides template constraint',0,NULL,'',1,1,'','','','',0,'');
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (139001,1,'27e5744a60894c7c88c8df39573df06e','Overrides',0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
@@ -627,8 +627,8 @@ INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_oper
 
 -- graph prototype
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (139002,0,'c8aa3b02b1af4b049fcf88be47e5f892','test_graph_prototype',0);
-INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131002,NULL,'item',0,-1,2,'','',NULL,0,0,0,'item',0,NULL,'',1,1,'','','','',0);
-INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131003,NULL,'item_prototype',0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','',0);
+INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover,readme) VALUES (131002,NULL,'item',0,-1,2,'','',NULL,0,0,0,'item',0,NULL,'',1,1,'','','','',0,'');
+INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover,readme) VALUES (131003,NULL,'item_prototype',0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','',0,'');
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139203,131003,139002);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139202,131002,139002);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133767,2,'',131003,'rule','a','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
@@ -642,9 +642,9 @@ INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxiss
 -- test discovered host groups after import parent host
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50025, 0, '45d1ca90cd844dd98762e118ea3208fc', 'Master group');
 INSERT INTO hstgrp (groupid, type, uuid, name, flags) VALUES (50026, 0, '5421d5c696c347478bee88fe39d2040f', 'host group discovered', 4);
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012, 'discovered', 'discovered', 0, 4, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99012, 'discovered', 'discovered', 0, 4, '', '');
 INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params,query_fields, description, posts, headers) VALUES (58735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '','', '', '', '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (50110, 99011, 'host group {#VALUE}');
 INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (50111, 99011, 50025);
@@ -689,21 +689,21 @@ INSERT INTO token (tokenid, userid, creator_userid, name, description) VALUES (2
 -- test filtering by tags
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50027, 0, '4d58962e533a4dbf9bfd1cb247f5b698', 'Group of hosts with wide usage of tags/Hosts');
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50028, 1, '1179640da419439a812d9b0025349ad5', 'Group of hosts with wide usage of tags/Templates');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99013, 'Host OS - Windows', 'Host OS - Windows', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99014, 'Host Browser - Firefox', 'Host Browser - Firefox', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99015, 'Host OS - Linux', 'Host OS - Linux', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99016, 'Host Browser - Chrome', 'Host Browser - Chrome', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99017, 'Host without tags', 'Host without tags', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99018, 'Host with very general tags only', 'Host with very general tags only', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99019, 'Host OS - Android', 'Host OS - Android', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99020, 'Host Browser - IE', 'Host Browser - IE', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99021, 'Host OS', 'Host OS', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99022, 'Host OS - Mac', 'Host OS - Mac', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99023, 'Host Browser', 'Host Browser', 0, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99024, 'Template OS - Windows', 'Template OS - Windows', 3, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99025, 'Template Browser - FF', 'Template Browser - FF', 3, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99026, 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Ubuntu Bionic Beaver', 3, 0, '');
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99027, 'Workstation', 'Workstation', 3, 0, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99013, 'Host OS - Windows', 'Host OS - Windows', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99014, 'Host Browser - Firefox', 'Host Browser - Firefox', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99015, 'Host OS - Linux', 'Host OS - Linux', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99016, 'Host Browser - Chrome', 'Host Browser - Chrome', 0, 0, ''. '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99017, 'Host without tags', 'Host without tags', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99018, 'Host with very general tags only', 'Host with very general tags only', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99019, 'Host OS - Android', 'Host OS - Android', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99020, 'Host Browser - IE', 'Host Browser - IE', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99021, 'Host OS', 'Host OS', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99022, 'Host OS - Mac', 'Host OS - Mac', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99023, 'Host Browser', 'Host Browser', 0, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99024, 'Template OS - Windows', 'Template OS - Windows', 3, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99025, 'Template Browser - FF', 'Template Browser - FF', 3, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99026, 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Ubuntu Bionic Beaver', 3, 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99027, 'Workstation', 'Workstation', 3, 0, '', '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50023, 99013, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50024, 99014, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50025, 99015, 50027);
@@ -794,8 +794,8 @@ INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1015, 5003, 
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1016, 5003, 'OS', 'Win7');
 
 -- test trigger validation
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Trigger validation test host', 'Trigger validation test host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99029, 'Trigger validation test template', 'Trigger validation test template', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99028, 'Trigger validation test host', 'Trigger validation test host', 0, '', '');
+INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99029, 'Trigger validation test template', 'Trigger validation test template', 3, '', '');
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50029, 0, '7466f5cb569f48e89eef772c6e4baacf', 'Trigger validation test host group');
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50030, 1, '38da8a76c4a742479292151c2e404dae', 'Trigger validation test host group');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50038, 99028, 50029);

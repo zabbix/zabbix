@@ -321,9 +321,9 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate host discovery in DB.
 		foreach ($discovered_hosts as $discovered_host) {
-			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES ('.
+			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES ('.
 					zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['discovered_host_name']).
-					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\')'
+					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\', \'\')'
 			);
 			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid, lastcheck, ts_delete, disable_source, ts_disable, status)'.
 					' VALUES ('.zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['host_prototypeid']).', '.
