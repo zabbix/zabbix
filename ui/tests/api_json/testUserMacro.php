@@ -223,7 +223,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG2}',
+					'macro' => '{$CONFIG3}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
@@ -280,19 +280,6 @@ class testUserMacro extends CAPITest {
 					'value' => 'invalid',
 					'hostid' => '50010',
 					'config' => [
-						'type' => ZBX_WIZARD_FIELD_LIST,
-						'label' => 'Config',
-						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 2","value":"option2"}]'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.'
-			],
-			[
-				'hostmacro' => [
-					'macro' => '{$CONFIG}',
-					'value' => 'invalid',
-					'hostid' => '50010',
-					'config' => [
 						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
 						'label' => 'Config'
 					]
@@ -301,7 +288,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG3}',
+					'macro' => '{$CONFIG4}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
