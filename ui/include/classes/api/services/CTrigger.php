@@ -115,7 +115,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
 			'selectTriggerDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
-			'selectDiscoveryData'			=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -124,7 +123,10 @@ class CTrigger extends CTriggerGeneral {
 			'limit'							=> null,
 			'limitSelects'					=> null
 		];
+
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -525,6 +527,25 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+		]];
+
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * Add triggers.
 	 *
 	 * Trigger params: expression, description, type, priority, status, comments, url_name, url, templateid
@@ -891,6 +912,12 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
+		$this->addRelatedDiscoveryData($options, $result);
+
+		return $result;
+	}
+
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] !== null && $options['selectDiscoveryData'] !== API_OUTPUT_COUNT) {
 			foreach ($result as &$trigger) {
 				$trigger['discoveryData'] = [];
@@ -907,7 +934,7 @@ class CTrigger extends CTriggerGeneral {
 			$trigger_discoveries = DBselect(
 				'SELECT '.implode(',', $sql_select).
 				' FROM trigger_discovery'.
-				' WHERE '.dbConditionInt('triggerid', $triggerids)
+				' WHERE '.dbConditionInt('triggerid', array_keys($result))
 			);
 
 			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
@@ -917,8 +944,6 @@ class CTrigger extends CTriggerGeneral {
 				$result[$triggerid]['discoveryData'] = $trigger_discovery;
 			}
 		}
-
-		return $result;
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {

@@ -82,7 +82,6 @@ class CGraph extends CGraphGeneral {
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectGraphDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
-			'selectDiscoveryData'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -90,7 +89,10 @@ class CGraph extends CGraphGeneral {
 			'sortorder'					=> '',
 			'limit'						=> null
 		];
+
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->validateGet($options);
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -302,6 +304,25 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['graphid', 'parent_graphid', 'lastcheck', 'status', 'ts_delete']), 'default' => null]
+		]];
+
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * Delete graphs.
 	 *
 	 * @param array $graphids
@@ -411,6 +432,12 @@ class CGraph extends CGraphGeneral {
 			$result = $relation_map->mapOne($result, $graph_discoveries, 'graphDiscovery');
 		}
 
+		$this->addRelatedDiscoveryData($options, $result);
+
+		return $result;
+	}
+
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] !== null) {
 			$graph_discoveries = API::getApiService()->select('graph_discovery', [
 				'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
@@ -423,9 +450,8 @@ class CGraph extends CGraphGeneral {
 
 			$result = $relation_map->mapOne($result, $graph_discoveries, 'discoveryData');
 		}
-
-		return $result;
 	}
+
 
 	/**
 	 * @inheritdoc

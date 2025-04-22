@@ -157,7 +157,6 @@ class CHost extends CHostGeneral {
 			'selectHttpTests'					=> null,
 			'selectDiscoveryRule'				=> null,
 			'selectHostDiscovery'				=> null, // Deprecated, use selectDiscoveryData instead.
-			'selectDiscoveryData'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
 			'selectValueMaps'					=> null,
@@ -1914,18 +1913,7 @@ class CHost extends CHostGeneral {
 			$result = $relation_map->mapOne($result, $host_discoveries, 'hostDiscovery');
 		}
 
-		if ($options['selectDiscoveryData'] !== null) {
-			$discovery_data = API::getApiService()->select('host_discovery', [
-				'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
-				'filter' => ['hostid' => $hostids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
-
-			$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid']);
-
-			$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
-		}
+		$this->addRelatedDiscoveryData($options, $result);
 
 		if ($options['selectTags'] !== null) {
 			foreach ($result as &$row) {
@@ -2007,6 +1995,21 @@ class CHost extends CHostGeneral {
 		$result = $relation_map->mapMany($result, $groups, 'hostgroups');
 	}
 
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] !== null) {
+			$discovery_data = API::getApiService()->select('host_discovery', [
+				'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
+				'filter' => ['hostid' => array_keys($result)],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
+
+			$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid']);
+
+			$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
+		}
+	}
+
 	/**
 	 * Validates the input parameters for the get() method.
 	 *
@@ -2024,7 +2027,8 @@ class CHost extends CHostGeneral {
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])]
+			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
+			'selectDiscoveryData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['host', 'hostid', 'parent_hostid', 'parent_itemid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);

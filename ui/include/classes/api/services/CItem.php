@@ -133,7 +133,6 @@ class CItem extends CItemGeneral {
 			'selectGraphs'				=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
-			'selectDiscoveryData'		=> null,
 			'selectPreprocessing'		=> null,
 			'selectValueMap'			=> null,
 			'countOutput'				=> false,
@@ -464,10 +463,10 @@ class CItem extends CItemGeneral {
 	 * @throws APIException if the input is invalid
 	 */
 	private function validateGet(array $options) {
-		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
-			'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])]
+			'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -1764,18 +1763,7 @@ class CItem extends CItemGeneral {
 			$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
 		}
 
-		if ($options['selectDiscoveryData'] !== null) {
-			$discovery_data = API::getApiService()->select('item_discovery', [
-				'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemdiscoveryid', 'itemid']),
-				'filter' => ['itemid' => array_keys($result)],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
-
-			$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid']);
-
-			$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
-		}
+		$this->addRelatedDiscoveryData($options, $result);
 
 		$requested_output = array_filter([
 			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
@@ -1843,6 +1831,23 @@ class CItem extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] !== null) {
+			return;
+		}
+
+		$discovery_data = API::getApiService()->select('item_discovery', [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemdiscoveryid', 'itemid']),
+			'filter' => ['itemid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
+
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid']);
+
+		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
