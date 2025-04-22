@@ -2135,7 +2135,7 @@ function prepareItemParameters(array $parameters): array {
 function getSanitizedItemFields(array $input): array {
 	$field_names = getMainItemFieldNames($input);
 
-	if ($input['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!($input['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
 		$field_names = array_merge($field_names, getTypeItemFieldNames($input));
 		$field_names = getConditionalItemFieldNames($field_names, $input);
 	}
@@ -2184,16 +2184,22 @@ function getMainItemFieldNames(array $input): array {
 
 		case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
 			if ($input['templateid'] == 0) {
-				return ['name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+				$field_names = ['name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
 					'enabled_lifetime','description', 'status', 'discover', 'preprocessing', 'lld_macro_paths',
 					'overrides'
 				];
 			}
 			else {
-				return ['lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime', 'description',
+				$field_names = ['lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime', 'description',
 					'status', 'discover'
 				];
 			}
+
+			if (array_key_exists('itemid', $input) || $input['filter']['conditions']) {
+				$field_names[] = 'filter';
+			}
+
+			return $field_names;
 
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 			if ($input['templateid'] == 0) {
@@ -2304,6 +2310,9 @@ function getTypeItemFieldNames(array $input): array {
 			return $input['templateid'] == 0
 				? ['parameters', 'params', 'timeout', 'delay']
 				: ['delay'];
+
+		case ITEM_TYPE_NESTED:
+			return [];
 	}
 }
 

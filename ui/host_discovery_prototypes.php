@@ -51,6 +51,7 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({type})'.
 										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
 										' && {type} != '.ITEM_TYPE_DEPENDENT.
+										' && {type} != '.ITEM_TYPE_NESTED.
 										' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
 											' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 									_('Update interval')
