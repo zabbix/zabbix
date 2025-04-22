@@ -1432,10 +1432,10 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			$form = $widget->edit();
 		}
 		else {
+			$widget = $dashboard->getWidgets()->last();
 			$overlay = $dashboard->addWidget();
 			$form = $overlay->asForm();
 			$form->getField('Type')->fill('Problems by severity');
-			$widget = $dashboard->getWidgets()->last();
 		}
 		$form->getField('Name')->fill('Widget to be cancelled');
 

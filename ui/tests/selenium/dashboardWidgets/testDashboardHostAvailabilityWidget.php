@@ -600,10 +600,10 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			$form = $widget->edit();
 		}
 		else {
+			$widget = $dashboard->getWidgets()->last();
 			$overlay = $dashboard->edit()->addWidget();
 			$form = $overlay->asForm();
-			$form->getField('Type')->fill('Host availability');
-			$widget = $dashboard->getWidgets()->last();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host availability')]);
 		}
 
 		$form->getField('Name')->fill('Widget to be cancelled');

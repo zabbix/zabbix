@@ -1065,7 +1065,7 @@ class testFormAction extends CLegacyWebTest {
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->waitUntilVisible()->getAttribute('maxlength'));
 		$this->assertEquals(65535, $operation_details->getField('id:operation_opmessage_message')->waitUntilVisible()->getAttribute('maxlength'));
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium undefined']//button[@title='Close']");
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@title='Close']");
 	}
 
 	public static function update() {

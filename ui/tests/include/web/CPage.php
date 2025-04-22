@@ -111,6 +111,7 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
+		$capabilities->setCapability('unhandledPromptBehavior', 'ignore');
 		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
 
 		if (strpos($phpunit_driver_address, ':') === false) {
@@ -131,6 +132,7 @@ class CPage {
 	 */
 	public function cleanup() {
 		$this->resetViewport();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_DEFAULT);
 
 		if (self::$cookie !== null) {
 			foreach ($this->driver->manage()->getCookies() as $cookie) {

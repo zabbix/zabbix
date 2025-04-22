@@ -24,11 +24,18 @@ use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Exception\UnknownErrorException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 
 /**
  * Helper class that allows custom command execution.
  */
 class CommandExecutor extends HttpCommandExecutor {
+
+	const STRATEGY_DEFAULT = 'default';
+	const STRATEGY_ALERT_ACCEPT = 'accept';
+	const STRATEGY_ALERT_DISMISS = 'dismiss';
+
+	protected static $alert_strategy = self::STRATEGY_DEFAULT;
 
 	/**
 	 * Original executor object.
@@ -46,12 +53,31 @@ class CommandExecutor extends HttpCommandExecutor {
 		$this->executor = $executor;
 	}
 
+	public static function setAlertStrategy($strategy) {
+		self::$alert_strategy = $strategy;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public function execute(WebDriverCommand $command) {
 		try {
 			return $this->executor->execute($command);
+		}
+		catch (UnexpectedAlertOpenException $exception) {
+			switch (self::$alert_strategy) {
+				case self::STRATEGY_ALERT_ACCEPT:
+					CElementQuery::getPage()->acceptAlert();
+					break;
+
+				case self::STRATEGY_ALERT_DISMISS:
+					CElementQuery::getPage()->dismissAlert();
+					break;
+
+				default:
+					CElementQuery::getPage()->dismissAlert();
+					throw $exception;
+			}
 		}
 		// Allow single communication timeout during test execution
 		catch (WebDriverCurlException $exception) {
