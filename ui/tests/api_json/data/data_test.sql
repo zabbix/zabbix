@@ -692,7 +692,7 @@ INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50028, 1, '1179640da41943
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99013, 'Host OS - Windows', 'Host OS - Windows', 0, 0, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99014, 'Host Browser - Firefox', 'Host Browser - Firefox', 0, 0, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99015, 'Host OS - Linux', 'Host OS - Linux', 0, 0, '', '');
-INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99016, 'Host Browser - Chrome', 'Host Browser - Chrome', 0, 0, ''. '');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99016, 'Host Browser - Chrome', 'Host Browser - Chrome', 0, 0, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99017, 'Host without tags', 'Host without tags', 0, 0, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99018, 'Host with very general tags only', 'Host with very general tags only', 0, 0, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99019, 'Host OS - Android', 'Host OS - Android', 0, 0, '', '');
