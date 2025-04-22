@@ -192,12 +192,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($item['discoveryRule']);
 		}
 		else {
-			$item['is_discovery_rule_editable'] = $item['discoveryRule']
-				&& API::DiscoveryRule()->get([
-					'output' => [],
-					'itemids' => $item['discoveryRule']['itemid'],
-					'editable' => true
-				]);
+			$item['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $item['discoveryRule']['itemid'],
+				'editable' => true
+			]);
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {

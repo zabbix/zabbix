@@ -206,27 +206,20 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 				$path[] = '>';
 			}
 
-			if ($item['discoveryRule']) {
-				if ($item['is_discovery_rule_editable']) {
-					$path[] = (new CLink($item['discoveryRule']['name'],
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'item.prototype.list')
-							->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
-							->setArgument('context', $context)
-					))
-						->setTitle($item['discoveryRule']['name'])
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_ORANGE);
-				}
-				else {
-					$path[] = (new CSpan($item['discoveryRule']['name']))
-						->setTitle($item['discoveryRule']['name'])
-						->addClass(ZBX_STYLE_ORANGE);
-				}
+			if ($item['is_discovery_rule_editable']) {
+				$path[] = (new CLink($item['discoveryRule']['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'item.prototype.list')
+						->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+						->setArgument('context', $context)
+				))
+					->setTitle($item['discoveryRule']['name'])
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
 			}
 			else {
-				$path[] = (new CSpan(_('Inaccessible discovery rule')))
-					->setTitle(_('Inaccessible discovery rule'))
+				$path[] = (new CSpan($item['discoveryRule']['name']))
+					->setTitle($item['discoveryRule']['name'])
 					->addClass(ZBX_STYLE_ORANGE);
 			}
 		}
