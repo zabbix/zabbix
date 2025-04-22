@@ -399,7 +399,7 @@ class testUserMacro extends CAPITest {
 					$dbResult = DBSelect('select * from hostmacro_config where hostmacroid='.zbx_dbstr($id));
 					$dbRow = DBFetch($dbResult);
 
-					if ($hostmacro['config']['type'] === ZBX_WIZARD_FIELD_NOCONF) {
+					if ($hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
 						$this->assertFalse($dbRow);
 					}
 					else {

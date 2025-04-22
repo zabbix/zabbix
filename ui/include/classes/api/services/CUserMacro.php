@@ -499,7 +499,7 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacros as $index => &$hostmacro) {
 			$hostmacro['hostmacroid'] = $hostmacroids[$index];
 
-			if (array_key_exists('config', $hostmacro) && $hostmacro['config']['type'] !== ZBX_WIZARD_FIELD_NOCONF) {
+			if (array_key_exists('config', $hostmacro) && $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
 				$add_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
 			}
 		}
@@ -523,9 +523,7 @@ class CUserMacro extends CApiService {
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 			'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])],
-			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
-			]]
+			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
@@ -729,9 +727,11 @@ class CUserMacro extends CApiService {
 
 			$path .= '/config';
 
-			if ($db_hostmacros !== null && array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)) {
+			if ($db_hostmacros !== null && array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)
+					&& (!array_key_exists('type', $hostmacro['config'])
+						|| $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF)) {
 				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
-				$hostmacro['config'] += array_intersect_key($db_hostmacro['config']);
+				$hostmacro['config'] += $db_hostmacro['config'];
 			}
 
 			if (!CApiInputValidator::validate($api_macro_config_rules, $hostmacro['config'], $path, $error)) {
@@ -847,13 +847,22 @@ class CUserMacro extends CApiService {
 		]);
 
 		foreach ($hostmacros as $hostmacro) {
-			if (!array_key_exists('config', $hostmacro) || $hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+			if (!array_key_exists('config', $hostmacro)) {
+				continue;
+			}
+
+			if (array_key_exists('type', $hostmacro['config'])
+					&& $hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
 				$del_hostmacros_configids[] = $hostmacro['hostmacroid'];
 				continue;
 			}
 
 			if (!array_key_exists($hostmacro['hostmacroid'], $db_hostmacro_configs)) {
-				$add_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
+				if (array_key_exists('type', $hostmacro['config'])
+						&& $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+					$add_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
+				}
+
 				continue;
 			}
 
