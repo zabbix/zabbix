@@ -81,7 +81,6 @@ class CGraph extends CGraphGeneral {
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
-			'selectGraphDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -310,14 +309,13 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateGet(array $options): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['graphid', 'parent_graphid', 'lastcheck', 'status', 'ts_delete']), 'default' => null]
+	protected function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectGraphDiscovery' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['graphid', 'parent_graphid', 'lastcheck', 'status', 'ts_delete']), 'default' => null],
+			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_graphid', 'lastcheck', 'status', 'ts_delete']), 'default' => null]
 		]];
 
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
@@ -438,18 +436,20 @@ class CGraph extends CGraphGeneral {
 	}
 
 	protected function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] !== null) {
-			$graph_discoveries = API::getApiService()->select('graph_discovery', [
-				'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
-				'filter' => ['graphid' => array_keys($result)],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
-
-			$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid']);
-
-			$result = $relation_map->mapOne($result, $graph_discoveries, 'discoveryData');
+		if ($options['selectDiscoveryData'] === null) {
+			return;
 		}
+
+		$graph_discoveries = API::getApiService()->select('graph_discovery', [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
+			'filter' => ['graphid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
+
+		$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid']);
+
+		$result = $relation_map->mapOne($result, $graph_discoveries, 'discoveryData');
 	}
 
 	/**

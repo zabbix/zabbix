@@ -132,7 +132,6 @@ class CItem extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectDiscoveryRule'		=> null,
-			'selectItemDiscovery'		=> null, // Deprecated, use selectDiscoveryData instead.
 			'selectPreprocessing'		=> null,
 			'selectValueMap'			=> null,
 			'countOutput'				=> false,
@@ -145,8 +144,6 @@ class CItem extends CItemGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 		$this->validateGet($options);
-
-		$this->checkDeprecatedParam($options, 'selectItemDiscovery');
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -462,14 +459,14 @@ class CItem extends CItemGeneral {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private function validateGet(array $options) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+	private function validateGet(array &$options) {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectItemDiscovery' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
+			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
@@ -1834,7 +1831,7 @@ class CItem extends CItemGeneral {
 	}
 
 	protected function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] !== null) {
+		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
 

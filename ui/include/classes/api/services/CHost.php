@@ -156,7 +156,6 @@ class CHost extends CHostGeneral {
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
 			'selectDiscoveryRule'				=> null,
-			'selectHostDiscovery'				=> null, // Deprecated, use selectDiscoveryData instead.
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
 			'selectValueMaps'					=> null,
@@ -171,8 +170,6 @@ class CHost extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
-
-		$this->checkDeprecatedParam($options, 'selectHostDiscovery');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1996,18 +1993,20 @@ class CHost extends CHostGeneral {
 	}
 
 	protected function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] !== null) {
-			$discovery_data = API::getApiService()->select('host_discovery', [
-				'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
-				'filter' => ['hostid' => array_keys($result)],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
-
-			$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid']);
-
-			$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
+		if ($options['selectDiscoveryData'] === null) {
+			return;
 		}
+
+		$discovery_data = API::getApiService()->select('host_discovery', [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
+			'filter' => ['hostid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
+
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid']);
+
+		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 	}
 
 	/**
@@ -2017,9 +2016,8 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateGet(array $options) {
-		// Validate input parameters.
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+	protected function validateGet(array &$options) {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'inheritedTags' =>				['type' => API_BOOLEAN, 'default' => false],
 			'selectInheritedTags' =>		['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
@@ -2028,12 +2026,11 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
 			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
-			'selectDiscoveryData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['host', 'hostid', 'parent_hostid', 'parent_itemid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectHostDiscovery' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['host', 'hostid', 'parent_hostid', 'parent_itemid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
+			'selectDiscoveryData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['host', 'parent_hostid', 'parent_itemid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
