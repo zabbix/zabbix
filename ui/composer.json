@@ -7,9 +7,8 @@
 		"symfony/yaml": "v5.1.3",
 		"onelogin/php-saml": "4.0",
 		"pragmarx/google2fa": "^8.0",
-		"duosecurity/duo_universal_php": "^1.0",
-      	"ext-openssl": "*"
-    },
+		"duosecurity/duo_universal_php": "^1.0"
+	},
 	"autoload": {
 		"psr-4": {
 			"SCIM\\": "include/classes/scim/"
