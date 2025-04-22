@@ -302,7 +302,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO[\'SETTINGS\']       = [];
 // Comment out or set value to \'file\' if you are using file system storage.
 $SSO[\'CERT_STORAGE\']     = \'database\';
-//Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
+// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
 //$SSO[\'SP_KEY\']         = \'conf/certs/sp.key\';
 //$SSO[\'SP_CERT\']        = \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']       = \'conf/certs/idp.crt\'
