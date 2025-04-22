@@ -16,6 +16,10 @@
 			.btn-overlay-close {
 				margin-top: 0;
 			}
+
+			.btn-overlay-close {
+				margin-right: 0;
+			}
 		}
 
 		.overlay-dialogue-body {
@@ -36,6 +40,10 @@
 				margin-right: auto;
 			}
 		}
+	}
+
+	output {
+		margin: 0;
 	}
 
 	section {
@@ -73,10 +81,23 @@
 		}
 	}
 
+	.grid-columns {
+		.form-fields-inline {
+			display: flex;
+			gap: 16px;
+
+			.radio-list-control {
+				label {
+					margin: 0;
+				}
+			}
+		}
+	}
+
 	.form-field {
 		display: grid;
 
-		label {
+		> label {
 			margin-bottom: 4px;
 			line-height: 16px;
 		}
@@ -110,59 +131,6 @@
 			&.selected {
 				background: $ui-bg-selected-color;
 				color: $ui-selected-color;
-			}
-		}
-	}
-
-	.radio-card-list {
-		gap: 16px;
-		align-items: stretch;
-
-		.radio-card {
-			display: grid;
-			padding: 16px;
-			border: 1px solid $form-border-color;
-			border-radius: 2px;
-			white-space: normal;
-
-			&:has(input[type="radio"]:checked) {
-				border-color: $form-radio-selected-color;
-			}
-		}
-
-		.radio-card-label {
-			position: relative;
-			padding-right: 26px;
-			line-height: 18px;
-			cursor: pointer;
-
-			.radio-card-selector {
-				display: flex;
-				border: 1px solid $form-border-color;
-				border-radius: 50%;
-				position: absolute;
-				top: 1px;
-				right: 0;
-
-				input[type="radio"] {
-					top: 0;
-					margin-right: 0;
-					width: 14px;
-					height: 14px;
-					opacity: 0;
-				}
-
-				&:has(input[type="radio"]:checked)::after {
-					content: '';
-					position: absolute;
-					display: block;
-					width: 8px;
-					height: 8px;
-					top: 3px;
-					left: 3px;
-					background-color: $form-radio-selected-color;
-					border-radius: 50%;
-				}
 			}
 		}
 	}

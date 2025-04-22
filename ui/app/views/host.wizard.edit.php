@@ -97,7 +97,7 @@ function stepSelectTemplate($old_template_count): array {
 	return [
 		new CTemplateTag('host-wizard-step-select-template',
 			(new CDiv([
-				makeMessageBox('info', [], _s('Some templates (%1$s) are hidden. Custom templates are not supported.',
+				makeMessageBox(ZBX_STYLE_MSG_INFO, [], _s('Some templates (%1$s) are hidden. Custom templates are not supported.',
 					$old_template_count)
 				),
 
@@ -119,32 +119,33 @@ function stepSelectTemplate($old_template_count): array {
 					)
 					->addItem(
 						(new CDiv([
-							(new CFormField([
+							new CFormField([
 								new CLabel(_('Data collection')),
 								(new CRadioButtonList('data-collection', ZBX_TEMPLATE_DATA_COLLECTION_ANY))
 									->addValue(_('All'), ZBX_TEMPLATE_DATA_COLLECTION_ANY)
 									->addValue(_('Agent-based'), ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED)
 									->addValue(_('Agentless'), ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS)
 									->setModern()
-							])),
-							(new CFormField([
+							]),
+							new CFormField([
 								new CLabel(_('Agent mode')),
 								(new CRadioButtonList('agent-mode', ZBX_TEMPLATE_AGENT_MODE_ANY))
 									->addValue(_('All'), ZBX_TEMPLATE_AGENT_MODE_ANY)
 									->addValue(_('Active'), ZBX_TEMPLATE_AGENT_MODE_ACTIVE)
 									->addValue(_('Passive'), ZBX_TEMPLATE_AGENT_MODE_PASSIVE)
 									->setModern()
-							])),
-							new CLabel(_('Show templates')),
-							(new CRadioButtonList('agent-mode', ZBX_TEMPLATE_SHOW_ANY))
-								->addValue(_('All'), ZBX_TEMPLATE_SHOW_ANY)
-								->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
-								->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
-								->setModern()
+							]),
+							new CFormField([
+								new CLabel(_('Show templates')),
+								(new CRadioButtonList('show-templates', ZBX_TEMPLATE_SHOW_ANY))
+									->addValue(_('All'), ZBX_TEMPLATE_SHOW_ANY)
+									->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
+									->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
+									->setModern()
+							])
 						]))
-							->addClass(ZBX_STYLE_GRID_COLUMNS)
-							->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+							->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
 					)
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
@@ -163,9 +164,144 @@ function stepSelectTemplate($old_template_count): array {
 				(new CDiv())->setId('host-wizard-templates')
 			]))->addClass('step-form-body')
 		),
-		new CTemplateTag('host-wizard-templates-section',
-			(new CSectionCollapsible())->setToggleLabel(_('#{title}').' (#{count})')
+
+
+
+
+		new CTemplateTag('host-wizard-step-create-host',
+			(new CDiv([
+				(new CSection())
+					->addItem(
+						(new CDiv([
+							new CTag('h1', true, _('Create or select a host')),
+							new CTag('p', true, _('The template you selected (Apache by HTTP) must be linked to a host – an entity in Zabbix that represents your monitoring target.')),
+							new CTag('p', true, _('Hosts are organized into host groups for easier management and access control.'))
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_MARKDOWN)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+				(new CSection())
+					->addItem(
+						new CFormField([
+							new CLabel(_('Data collection')),
+							new CDiv()
+						])
+					)
+					->addItem(
+						(new CFormField([
+							(new CCheckBox('do-not-show-welcome'))->setLabel(_('Do not show welcome screen'))
+						]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+			]))->addClass('step-form-body')
 		),
+
+
+
+
+		new CTemplateTag('host-wizard-step-install-agent',
+			(new CDiv([
+				(new CSection())
+					->addItem(
+						(new CDiv([
+							new CTag('h1', true, _('Install Zabbix agent')),
+							new CTag('p', true, _('The template you selected (Apache by HTTP, this is just an example) requires Zabbix agent to be installed and running on your monitoring target.')),
+							new CTag('p', true, _('Skip OS selection if you already have Zabbix agent installed.'))
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_MARKDOWN)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+				(new CSection())
+					->addItem(
+						(new CDiv([
+							(new CTag('h6', true, [new CSpan('1.'), _('Configure encryption')]))
+								->addClass('list-item'),
+							new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_MARKDOWN)
+					)
+					->addItem(
+						(new CFormField([
+							new CLabel(_('Pre-shared key identity')),
+							new CTextBox('pre-shared-key-identity'),
+							(new CDiv(
+								_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+							))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+						]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addItem(
+						(new CFormField([
+							new CLabel(_('Pre-shared key identity')),
+							new CTextBox('pre-shared-key-identity'),
+							(new CDiv(
+								_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+							))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+						]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addItem(
+						(new CDiv([
+							(new CTag('h6', true, [new CSpan('2.'), _('Select the OS of your monitoring target')]))
+								->addClass('list-item'),
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_MARKDOWN)
+					)
+					->addItem(
+						(new CFormField(
+							(new CRadioCardList('monitoring-os'))
+								->addValue(['label' => _('Linux'), 'value' => 'linux'])
+								->addValue(['label' => _('Windows'), 'value' => 'windows'])
+								->addValue(['label' => _('Other'), 'value' => 'other'])
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+						))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addItem(
+						(new CFormField([
+							new CLabel(_('Select the OS distribution')),
+							(new CRadioCardList('monitoring-os-distribution'))
+								->addValue(['label' => _('Windows 10/Server 2016 or later'), 'value' => 'windows-new'])
+								->addValue(['label' => _('Older version'), 'value' => 'windows-old'])
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+						]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addItem(
+						(new CDiv([
+							(new CTag('h6', true, [new CSpan('3.'), _('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
+								->addClass('list-item'),
+							new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
+							new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.'))
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_MARKDOWN)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+			]))->addClass('step-form-body')
+		),
+
+
+
+
+		new CTemplateTag('host-wizard-templates-section',
+			(new CSectionCollapsible())
+				->setToggleLabel(_('#{title}').' (#{count})')
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_GRID_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMNS_4)
+						->addClass(CRadioCardList::ZBX_STYLE_CLASS)
+						->addClass('templates-card-list')
+				)
+		),
+
 		new CTemplateTag('host-wizard-template-card',
 			(new CDiv())
 				->addItem(
@@ -173,8 +309,8 @@ function stepSelectTemplate($old_template_count): array {
 						'#{title}',
 						(new CSpan(
 							new CInput('radio', 'template', '#{templateid)')
-						))->addClass('radio-card-selector')
-					]))->addClass('radio-card-label'),
+						))->addClass(CRadioCardList::ZBX_STYLE_CLASS_SELECTOR)
+					]))->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
 				)
 				->addItem(
 					(new CDiv([
@@ -199,7 +335,7 @@ function stepSelectTemplate($old_template_count): array {
 							->addClass('js-template-info-collapse')
 					]))->addClass('template-info-toggles')
 				)
-				->addClass('radio-card')
+				->addClass(CRadioCardList::ZBX_STYLE_CLASS_CARD)
 		)
 	];
 }

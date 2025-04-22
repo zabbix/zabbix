@@ -2134,8 +2134,9 @@ define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MARKDOWN', 'markdown');
 define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
-define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
+define('ZBX_STYLE_MSG_GOOD', 'msg-good');
+define('ZBX_STYLE_MSG_INFO', 'msg-info');
 define('ZBX_STYLE_MSG_WARNING', 'msg-warning');
 define('ZBX_STYLE_MSG_GLOBAL', 'msg-global');
 define('ZBX_STYLE_MSG_GLOBAL_FOOTER', 'msg-global-footer');
@@ -2277,6 +2278,7 @@ define('ZBX_STYLE_GRID_COLUMNS_3', 'columns-3');
 define('ZBX_STYLE_GRID_COLUMNS_4', 'columns-4');
 define('ZBX_STYLE_GRID_COLUMN_FIRST', 'column-first');
 define('ZBX_STYLE_GRID_COLUMN_LAST', 'column-last');
+define('ZBX_STYLE_GRID_COLUMN_FULL', 'column-full');
 
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 define('ZBX_STYLE_COLUMNS_NOWRAP', 'columns-nowrap');

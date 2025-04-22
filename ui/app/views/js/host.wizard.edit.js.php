@@ -20,34 +20,59 @@
 
 ?>
 
-const HostWizardStep = {
-	WELCOME: 0,
-	SELECT_TEMPLATE: 1,
-	CREATE_HOST: 2
-}
-
 window.host_wizard_edit = new class {
+
+	STEP_WELCOME = 0;
+	STEP_SELECT_TEMPLATE = 1;
+	STEP_CREATE_HOST = 2;
+	STEP_INSTALL_AGENT = 3;
+
+	/**
+	 * @type {Map<number, object>}
+	 */
 	#templates;
 	#linked_templates;
-	#current_step;
 
+	#current_step;
+	#first_step;
+	#last_step;
+
+	/**
+	 * @type {Overlay}
+	 */
 	#overlay;
 	#dialogue;
 
+	/**
+	 * @type {HTMLButtonElement}
+	 */
 	#back_button;
+
+	/**
+	 * @type {HTMLButtonElement}
+	 */
 	#next_button;
 
 	#template_step_welcome;
 	#template_step_select_template;
+	#template_step_create_host;
+	#template_step_install_agent;
+
 	#template_templates_section;
 	#template_card;
 
-	#step_from_body;
+	#form = {
+		search_query: ''
+	}
 
 	init({templates, linked_templates, wizard_hide_welcome}) {
-		this.#templates = templates;
+		this.#templates = templates.reduce((templates_map, template) => {
+			return templates_map.set(template.templateid, template);
+		}, new Map());
+
 		this.#linked_templates = linked_templates;
-		this.#current_step = wizard_hide_welcome ? HostWizardStep.SELECT_TEMPLATE : HostWizardStep.WELCOME;
+		this.#first_step = wizard_hide_welcome ? this.STEP_SELECT_TEMPLATE : this.STEP_WELCOME;
+		this.#last_step = this.STEP_INSTALL_AGENT;
 
 		this.#template_step_welcome = new Template(
 			document.getElementById('host-wizard-step-welcome').innerHTML
@@ -55,6 +80,13 @@ window.host_wizard_edit = new class {
 		this.#template_step_select_template = new Template(
 			document.getElementById('host-wizard-step-select-template').innerHTML
 		);
+		this.#template_step_create_host = new Template(
+			document.getElementById('host-wizard-step-create-host').innerHTML
+		);
+		this.#template_step_install_agent = new Template(
+			document.getElementById('host-wizard-step-install-agent').innerHTML
+		);
+
 		this.#template_templates_section = new Template(
 			document.getElementById('host-wizard-templates-section').innerHTML
 		);
@@ -64,36 +96,44 @@ window.host_wizard_edit = new class {
 
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
-		this.#step_from_body = this.#dialogue.querySelector('.step-form-body');
 
-		this.#back_button = this.#dialogue.querySelector('.js-back').addEventListener('click', () => {
-			const first_step = wizard_hide_welcome ? HostWizardStep.SELECT_TEMPLATE : HostWizardStep.WELCOME;
+		this.#back_button = this.#dialogue.querySelector('.js-back');
+		this.#back_button.addEventListener('click', () => this.#gotoBackStep());
 
-			this.#current_step = Math.max(first_step, this.#current_step - 1);
-			this.#back_button.style.display = this.#current_step === first_step ? 'none' : '';
-		});
+		this.#next_button = this.#dialogue.querySelector('.js-next');
+		this.#next_button.addEventListener('click', () => this.#gotoNextStep());
 
-		this.#next_button = this.#dialogue.querySelector('.js-next').addEventListener('click', () => {
-			const last_step = Math.max(...Object.values(HostWizardStep));
-
-			this.#current_step = Math.min(last_step, this.#current_step + 1);
-			this.#next_button.style.display = this.#current_step === last_step ? 'none' : '';
-		});
-
-		this.#updateStep();
+		this.#gotoStep(this.STEP_INSTALL_AGENT);
+		//this.#gotoStep(this.#first_step);
 		this.#updateForm();
 	}
 
-	#updateStep() {
+	#gotoBackStep() {
+		this.#gotoStep(Math.max(this.#first_step, this.#current_step - 1));
+	}
+
+	#gotoNextStep() {
+		this.#gotoStep(Math.min(this.#last_step, this.#current_step + 1));
+	}
+
+	#gotoStep(step) {
+		this.#current_step = step;
+
 		const step_render = {
-			HostWizardStep.WELCOME: () => this.#renderWelcome(),
-			HostWizardStep.SELECT_TEMPLATE: () => this.#renderSelectTemplate(),
-			HostWizardStep.CREATE_HOST: () => this.#renderCreateHost()
+			[this.STEP_WELCOME]: () => this.#renderWelcome(),
+			[this.STEP_SELECT_TEMPLATE]: () => this.#renderSelectTemplate(),
+			[this.STEP_CREATE_HOST]: () => this.#renderCreateHost(),
+			[this.STEP_INSTALL_AGENT]: () => this.#renderInstallAgent()
 		}[this.#current_step];
 
 		if (step_render !== undefined) {
-			this.#step_from_body.replaceWith(step_render());
+			this.#dialogue.querySelector('.step-form-body').replaceWith(step_render());
 		}
+
+		this.#overlay.unsetLoading();
+
+		this.#back_button.toggleAttribute('disabled', this.#current_step === this.#first_step);
+		this.#next_button.toggleAttribute('disabled', this.#current_step === this.#last_step);
 	}
 
 	#renderWelcome() {
@@ -101,20 +141,84 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderSelectTemplate() {
-		const content = this.#template_step_select_template.evaluateToElement();
+		let template_classes = Array.from(this.#templates)
+			.filter(([templateid, template]) => {
+				if (this.#form.search_query.trim() !== '') {
+					return template.name.toLowerCase().includes(this.#form.search_query)
+						|| template.description.toLowerCase().includes(this.#form.search_query)
+						|| template.tags.some(({tag, value}) => {
+							return tag.toLowerCase().includes(this.#form.search_query)
+								|| value.toLowerCase().includes(this.#form.search_query);
+						});
+				}
 
-		return content;
+				return true;
+			})
+			.reduce((map, [templateid, {tags}]) => {
+				for (const {tag, value} of tags) {
+					if (tag === 'class') {
+						map.set(value, [...(map.get(value) || []), templateid]);
+					}
+				}
+
+				return map
+			}, new Map());
+
+		template_classes = new Map([...template_classes.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+
+		const step = this.#template_step_select_template.evaluateToElement();
+		const step_body = step.querySelector('#host-wizard-templates');
+
+		let is_first = true;
+
+		for (const [title, templateids] of template_classes) {
+			const section = this.#template_templates_section.evaluateToElement({
+				title: title.charAt(0).toUpperCase() + title.slice(1),
+				count: templateids.length
+			});
+
+			if (is_first) {
+				is_first = false;
+			}
+			else {
+				section.classList.add('collapsed');
+			}
+
+			const card_list = section.querySelector('.templates-card-list');
+
+			for (const templateid of templateids) {
+				const card = this.#makeCard(this.#templates.get(templateid));
+
+				card_list.appendChild(card)
+			}
+
+			step_body.appendChild(section);
+		}
+
+		return step;
 	}
 
 	#renderCreateHost() {
-		return this.#template_step_welcome.evaluateToElement();
+		return this.#template_step_create_host.evaluateToElement();
+	}
+
+	#renderInstallAgent() {
+		return this.#template_step_install_agent.evaluateToElement();
 	}
 
 	#updateForm() {
 
 	}
 
+	#makeCard(template) {
+		const card = this.#template_card.evaluateToElement({
+			title: template.name
+		});
 
+		card.querySelector('.js-template-info-collapse').style.display = 'none';
+
+		return card;
+	}
 
 
 

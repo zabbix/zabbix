@@ -1,16 +1,21 @@
 .grid-columns {
 	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 1fr;
 	align-items: start;
 
 	&.columns-2 {
+		grid-auto-flow: initial;
 		grid-template-columns: repeat(2, 1fr);
 	}
 
 	&.columns-3 {
+		grid-auto-flow: initial;
 		grid-template-columns: repeat(3, 1fr);
 	}
 
 	&.columns-4 {
+		grid-auto-flow: initial;
 		grid-template-columns: repeat(4, 1fr);
 	}
 
@@ -20,5 +25,9 @@
 
 	.column-last {
 		grid-column-end: -1;
+	}
+
+	.column-full {
+		grid-column: 1/-1;
 	}
 }

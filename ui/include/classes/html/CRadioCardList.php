@@ -15,12 +15,15 @@
 
 
 class CRadioCardList extends CList {
-	private const ZBX_STYLE_CLASS = 'radio-card-list';
+	public const ZBX_STYLE_CLASS = 'radio-card-list';
+	public const ZBX_STYLE_CLASS_CARD = 'radio-card';
+	public const ZBX_STYLE_CLASS_LABEL = 'radio-card-label';
+	public const ZBX_STYLE_CLASS_SELECTOR = 'radio-card-selector';
 
 	private string $name;
 	private string $value;
 
-	private bool $enabled = false;
+	private bool $enabled = true;
 	private bool $readonly = false;
 
 	private bool $autofocused = false;
@@ -28,21 +31,18 @@ class CRadioCardList extends CList {
 
 	/**
 	 * Array of value elements.
-	 *
-	 * @property array
-	 *     string 'name'       Input form element label.
-	 *     string 'value'     Input form element value.
-	 *     string 'id'        Input form element id attribute.
 	 */
 	protected array $values = [];
 
-	public function __construct($name, $value) {
+	public function __construct($name, $value = '') {
 		parent::__construct();
 
 		$this->name = $name;
 		$this->value = $value;
 
-		$this->setId(zbx_formatDomId($name));
+		$this
+			->setId(zbx_formatDomId($name))
+			->addClass(self::ZBX_STYLE_CLASS);
 	}
 
 	public function setValues(array $values): self {
@@ -93,7 +93,6 @@ class CRadioCardList extends CList {
 	}
 
 	public function toString($destroy = true) {
-
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
@@ -120,17 +119,16 @@ class CRadioCardList extends CList {
 				$radio->setAttribute('readonly', 'readonly');
 			}
 
-			if ($this->modern) {
-				$this->addItem((new CListItem([$radio, new CLabel($value['name'], $value['id'])]))->addClass(
-					array_key_exists('class', $value) ? $value['class'] : null
-				));
-			}
-			else {
-				$radio->addClass(ZBX_STYLE_CHECKBOX_RADIO);
-				$this->addItem((new CListItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]))
-					->addClass(array_key_exists('class', $value) ? $value['class'] : null)
-				);
-			}
+			$this->addItem(
+				(new CListItem([
+					(new CLabel([
+						$value['label'],
+						(new CSpan($radio))->addClass(self::ZBX_STYLE_CLASS_SELECTOR),
+					]))->addClass(self::ZBX_STYLE_CLASS_LABEL),
+					$value['content'] ?? null
+				]))->addClass(self::ZBX_STYLE_CLASS_CARD)
+			);
+
 		}
 
 		if ($this->getAttribute('aria-required') === 'true') {
