@@ -19,6 +19,7 @@ namespace Widgets\PieChart\Actions;
 use API,
 	CAggFunctionData,
 	CArrayHelper,
+	CColorPicker,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
@@ -321,8 +322,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$colors = array_key_exists('color', $data_set)
-			? getColorVariations($data_set['color'], count($items))
-			: getPaletteColors($data_set['color_palette'], count($items));
+			? CColorPicker::getColorVariations($data_set['color'], count($items))
+			: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
 
 		unset($data_set['hosts'], $data_set['items'], $data_set['color'], $data_set['color_palette']);
 

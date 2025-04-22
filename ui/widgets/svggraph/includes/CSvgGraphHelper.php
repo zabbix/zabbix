@@ -18,6 +18,7 @@ namespace Widgets\SvgGraph\Includes;
 
 use API,
 	CArrayHelper,
+	CColorPicker,
 	CHousekeepingHelper,
 	CItemHelper,
 	CMacrosResolverHelper,
@@ -226,8 +227,8 @@ class CSvgGraphHelper {
 				: 0;
 
 			$colors = array_key_exists('color', $data_set)
-				? getColorVariations($data_set['color'], count($items))
-				: getPaletteColors($data_set['color_palette'], count($items));
+				? CColorPicker::getColorVariations($data_set['color'], count($items))
+				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
 
 			foreach ($items as $item) {
 				$data_set['color'] = array_shift($colors);
@@ -445,8 +446,8 @@ class CSvgGraphHelper {
 			if ($metrics_matched) {
 				$colors = (array_key_exists('color', $override) || array_key_exists('color_palette', $override))
 					? (array_key_exists('color', $override)
-						? getColorVariations($override['color'], count($metrics_matched))
-						: getPaletteColors($override['color_palette'], count($metrics_matched)))
+						? CColorPicker::getColorVariations($override['color'], count($metrics_matched))
+						: CColorPicker::getPaletteColors($override['color_palette'], count($metrics_matched)))
 					: null;
 
 				if (array_key_exists('transparency', $override)) {
