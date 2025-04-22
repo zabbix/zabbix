@@ -153,14 +153,7 @@
 
 			this.form.querySelectorAll('.saml-upload-identity-button').forEach(upload_button => {
 				const file_input = upload_button.parentElement.querySelector('input[type="file"]');
-				const file_content = file_input.closest('div').previousElementSibling.previousElementSibling;
-				const file_name = upload_button.parentElement.querySelector('span');
-
-				file_content.addEventListener('input', function() {
-					if (this.value == '') {
-						file_name.textContent = '';
-					}
-				});
+				const file_content = file_input.closest('div').previousElementSibling;
 
 				upload_button.addEventListener('click', function() {
 					file_input.click();
@@ -174,7 +167,6 @@
 
 						reader.onload = function(e) {
 							file_content.value = e.target.result;
-							file_name.textContent = file.name;
 						};
 
 						reader.readAsText(file);
@@ -337,13 +329,20 @@
 
 			let warning_msg = [];
 
+			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
+				if (auth_type != this.db_authentication_type) {
+					warning_msg.push(<?= json_encode(
+					_('Switching authentication method will reset all except this session!')
+				) ?>);
+			}
+
 			const idp_certificate_input = document.getElementById('idp_certificate');
 			if (idp_certificate_input) {
 				// if texarea is available for input and it's empty
 				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
 						&& idp_certificate_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('Erasing IdP certificate will affect authentication method. Continue?')
+						_('You are about to erase existing IdP certificate.')
 					) ?>);
 				}
 			}
@@ -354,7 +353,7 @@
 				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
 						&& sp_certificate_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('Erasing SP certificate will affect authentication method. Continue?')
+						_('You are about to erase existing SP certificate.')
 					) ?>);
 				}
 			}
@@ -364,22 +363,24 @@
 				if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
 						&& sp_private_key_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('Erasing SP private key will affect authentication method. Continue?')
+						_('You are about to erase existing SP private key.')
 					) ?>);
 				}
 			}
 
-			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
-			if (auth_type != this.db_authentication_type) {
-				warning_msg.push(<?= json_encode(
-					_('Switching authentication method will reset all except this session! Continue?')
-				) ?>);
-			}
-
 			if (warning_msg.length > 0) {
-				const combined = warning_msg.join('\n\n');
+				let confirmText = '';
 
-				return confirm(combined);
+				warning_msg.forEach((msg, index) => {
+					if (warning_msg.length === 1) {
+						confirmText = `${msg}\n`;
+					}
+					else {
+						confirmText += `${index + 1}. ${msg}\n`;
+					}
+				});
+
+				return confirm(confirmText);
 			}
 
 			return true;

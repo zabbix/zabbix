@@ -321,9 +321,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 					(new CTextArea('idp_certificate', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setRows(3)
-						->setAttribute('placeholder', 'paste PEM-encoded IdP certificate')
+						->setAttribute('placeholder', 'PEM-encoded IdP certificate')
 						->addClass('saml-enabled'),
-					makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt')),
 					(new CDiv([
 						(new CButton('idp_certificate_input_button', _('Choose file')))
 							->addClass('file-upload-btn')
@@ -331,10 +330,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 							->addClass('saml-upload-identity-button')
 							->addClass('saml-enabled'),
 						(new CFile('idp_certificate_input_file'))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->addClass('display-none')
-							->setAttribute('accept', '.cer, .crt, .pem, .txt'),
-						(new CSpan())->addClass('filename')
+							->setAttribute('accept', '.cer, .crt, .pem, .txt')
 					]))->addClass('file-upload-wrapper')
 				]))
 					->addClass('saml-add-identity-div')
@@ -356,9 +353,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 					(new CTextArea('sp_private_key', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setRows(3)
-						->setAttribute('placeholder', 'paste PEM-encoded SP private key')
+						->setAttribute('placeholder', 'PEM-encoded SP private key')
 						->addClass('saml-enabled'),
-					makeHelpIcon(_('Allowed file extensions for upload: .key, .pem, .txt')),
 					(new CDiv([
 						(new CButton('sp_private_key_input_button', _('Choose file')))
 							->addClass('file-upload-btn')
@@ -366,10 +362,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 							->addClass('saml-upload-identity-button')
 							->addClass('saml-enabled'),
 						(new CFile('sp_private_key_input_file'))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->addClass('display-none')
-							->setAttribute('accept', '.key, .pem, .txt'),
-						(new CSpan())->addClass('filename')
+							->setAttribute('accept', '.key, .pem, .txt')
 					]))->addClass('file-upload-wrapper')
 				]))
 					->addClass('saml-add-identity-div')
@@ -391,9 +385,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 					(new CTextArea('sp_certificate', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setRows(3)
-						->setAttribute('placeholder', 'paste PEM-encoded SP certificate')
+						->setAttribute('placeholder', 'PEM-encoded SP certificate')
 						->addClass('saml-enabled'),
-					makeHelpIcon(_('Allowed file extensions for upload: .cer, .crt, .pem, .txt')),
 					(new CDiv([
 						(new CButton('sp_certificate_input_button', _('Choose file')))
 							->addClass('file-upload-btn')
@@ -401,10 +394,8 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 							->addClass('saml-upload-identity-button')
 							->addClass('saml-enabled'),
 						(new CFile('sp_certificate_input_file'))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->addClass('display-none')
-							->setAttribute('accept', '.cer, .crt, .pem, .txt'),
-						(new CSpan())->addClass('filename')
+							->setAttribute('accept', '.cer, .crt, .pem, .txt')
 					]))->addClass('file-upload-wrapper')
 				]))
 					->addClass('saml-add-identity-div')
