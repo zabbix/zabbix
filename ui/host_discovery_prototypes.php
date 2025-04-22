@@ -63,7 +63,7 @@ $fields = [
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
 										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
-										ITEM_TYPE_BROWSER
+										ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -235,6 +235,7 @@ $fields = [
 	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
 	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
+
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -264,7 +265,7 @@ if (getRequest('parent_discoveryid')) {
 
 	$db_parent_discovery = reset($db_parent_discovery);
 
-	if (!$db_parent_discovery || $db_parent_discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!$db_parent_discovery || $db_parent_discovery['hosts'][0]['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 		access_deny();
 	}
 
@@ -792,7 +793,7 @@ else {
 				&& $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
 	];
 
-	// Select LLD rules.
+	// Select LLD prototypes.
 	$options = [
 		'discoveryids' => $db_parent_discovery['itemid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -804,8 +805,6 @@ else {
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
 		'editable' => true,
 		'templated' => ($data['context'] === 'template'),
-		'filter' => [],
-		'search' => [],
 		'sortfield' => $sort_field,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
@@ -841,12 +840,12 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sort_order,
-		(new CUrl('discovery_prototypes.php'))
+		(new CUrl('host_discovery_prototypes.php'))
 			->setArgument('context', $data['context'])
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	);
 
-	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
+	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view

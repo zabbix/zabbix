@@ -81,8 +81,8 @@ $csrf_token = CCsrfTokenHelper::get('host_discovery_prototypes.php');
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
-		$data['allowed_ui_conf_templates']
+	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'],
+		ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
