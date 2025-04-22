@@ -17,7 +17,8 @@
 namespace Widgets\PieChart\Includes;
 
 use API,
-	CApiInputValidator;
+	CApiInputValidator,
+	CColorPicker;
 
 use Zabbix\Widgets\CWidgetField;
 
@@ -42,7 +43,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 	];
 
 	// First palette from predefined palettes.
-	private const DEFAULT_PALETTE = PALETTE_PREFIX.'0';
+	private const DEFAULT_PALETTE = CColorPicker::PALETTE_PREFIX.'0';
 
 	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
