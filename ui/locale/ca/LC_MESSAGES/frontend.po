@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-20 21:01+0000\n"
+"PO-Revision-Date: 2025-04-10 19:38+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -5387,6 +5387,14 @@ msgstr "Crear i editar manteniment"
 msgid "Create and edit maps"
 msgstr "Crear i editar mapes"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr "Crear i editar suports propis"
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr "Crear i editar suports d'usuaris"
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Crea fons"
@@ -9081,6 +9089,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gràfic esborrat"
 msgstr[1] "Gràfics esborrats"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr "Edició de gràfics"
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9127,6 +9139,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip de gràfic"
 msgstr[1] "S'han esborrat els prototips de gràfics"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr "Edició de prototip de gràfic"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -14369,6 +14385,14 @@ msgstr "Nou esdeveniment d'etiqueta de valors"
 msgid "New excluded downtime"
 msgstr "Nou temps d'inactivitat exclòs"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr "Nou gràfic"
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr "Nou prototip de gràfic"
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nou equip"
@@ -14390,6 +14414,10 @@ msgstr "Nou prototip d'element"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Nou període de manteniment"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr "Nou mitjà de suport"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -19642,6 +19670,10 @@ msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbi
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat del buffer de memòria proxy. Mode (modes: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Estadístiques dels valors rebuts pel gestor de preprocessament."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -25788,6 +25820,14 @@ msgstr "no hi a permisos per convertir el símptoma dels problemes en causes"
 msgid "no permissions to create and edit maps"
 msgstr "no hi ha permís per crear i editar mapes"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr "no hi ha permís per crear i editar el propi suport"
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr "no hi ha permís per crear i suport d'usuaris"
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "sense permís per esborrar problemes"
@@ -26648,6 +26688,14 @@ msgstr[1] "els valors han d'ésser un d'entre %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\" dígits després del punt decimal"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

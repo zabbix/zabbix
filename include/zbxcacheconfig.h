@@ -1287,8 +1287,8 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);
 int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replace_to);
-int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
-		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error);
+void	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
@@ -1576,5 +1576,14 @@ int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
+
+int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_allowed_hosts_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
 
 #endif
