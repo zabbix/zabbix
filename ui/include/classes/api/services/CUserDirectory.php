@@ -70,6 +70,7 @@ class CUserDirectory extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options) {
+		global $SSO;
 		$this->validateGet($options);
 
 		if (!$options['countOutput']) {
@@ -121,14 +122,11 @@ class CUserDirectory extends CApiService {
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
-				$row['idp_certificate_status'] = (int)($row['idp_certificate'] !== '');
-				$row['idp_certificate'] = $row['idp_certificate_status'] > 0 ? md5($row['idp_certificate']) : '';
-
-				$row['sp_certificate_status'] = (int)($row['sp_certificate'] !== '');
-				$row['sp_certificate'] = $row['sp_certificate_status'] > 0 ? md5($row['sp_certificate']) : '';
-
-				$row['sp_private_key_status'] = (int)($row['sp_private_key'] !== '');
-				$row['sp_private_key'] = $row['sp_private_key_status'] > 0 ? md5($row['sp_private_key']) : '';
+				if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database')) {
+					$row['idp_certificate'] = $this->hashSamlCertificateValue($row['idp_certificate']);
+					$row['sp_certificate'] = $this->hashSamlCertificateValue($row['sp_certificate']);
+					$row['sp_private_key'] = $this->hashSamlCertificateValue($row['sp_private_key']);
+				}
 
 				$db_userdirectories[$row['userdirectoryid']] += $row;
 			}
@@ -499,6 +497,7 @@ class CUserDirectory extends CApiService {
 	 * @return array
 	 */
 	public function update(array $userdirectories): array {
+		global $SSO;
 		$this->validateUpdate($userdirectories, $db_userdirectories);
 
 		self::addFieldDefaultsByType($userdirectories, $db_userdirectories);
@@ -541,14 +540,20 @@ class CUserDirectory extends CApiService {
 				);
 
 				if ($upd_userdirectory_saml) {
-					if ($db_userdirectory['idp_certificate'] == md5($upd_userdirectory_saml['idp_certificate'])) {
-						unset($upd_userdirectory_saml['idp_certificate']);
-					}
-					if ($db_userdirectory['sp_certificate'] == md5($upd_userdirectory_saml['sp_certificate'])) {
-						unset($upd_userdirectory_saml['sp_certificate']);
-					}
-					if ($db_userdirectory['sp_private_key'] == md5($upd_userdirectory_saml['sp_private_key'])) {
-						unset($upd_userdirectory_saml['sp_certificate']);
+					if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database')) {
+						// if db value and new value are different then remove field from update
+						if (array_key_exists('idp_certificate', $upd_userdirectory_saml)
+								&& $db_userdirectory['idp_certificate'] === $this->hashSamlCertificateValue($upd_userdirectory_saml['idp_certificate'])) {
+							unset($upd_userdirectory_saml['idp_certificate']);
+						}
+						if (array_key_exists('sp_certificate', $upd_userdirectory_saml)
+								&& $db_userdirectory['sp_certificate'] == $this->hashSamlCertificateValue($upd_userdirectory_saml['sp_certificate'])) {
+							unset($upd_userdirectory_saml['sp_certificate']);
+						}
+						if (array_key_exists('sp_private_key', $upd_userdirectory_saml)
+								&& $db_userdirectory['sp_private_key'] == $this->hashSamlCertificateValue($upd_userdirectory_saml['sp_private_key'])) {
+							unset($upd_userdirectory_saml['sp_private_key']);
+						}
 					}
 
 					if (count($upd_userdirectory_saml) > 0) {
@@ -1479,6 +1484,7 @@ class CUserDirectory extends CApiService {
 	}
 
 	private static function getValidationRules(bool $is_update = false): array {
+		global $SSO;
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
 		$specific_fields = $is_update
@@ -1494,6 +1500,24 @@ class CUserDirectory extends CApiService {
 				'userdirectory_mediaid' =>	['type' => API_ANY]
 			]]
 			: ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => self::getProvisionMediaValidationFields()];
+
+		$saml_certificates = [];
+		if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database') {
+			$saml_certificates = [
+				'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_CERTIFICATE, 'length' => 10000],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_CERTIFICATE, 'length' => 10000],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_PRIVATE_KEY, 'length' => 10000],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+			];
+		}
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => $specific_fields + [
 			'idp_type' =>			['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
@@ -1571,18 +1595,6 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_certificate')],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_certificate')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_private_key')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
 			'sso_url' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sso_url')],
 										['else' => true, 'type' => API_UNEXPECTED]
@@ -1649,7 +1661,11 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])]] + $provision_media_rule,
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
-		]];
+		] + $saml_certificates ];
+	}
+
+	private function hashSamlCertificateValue($value): string {
+		return $value !== '' ? md5($value) : '';
 	}
 
 	public static function resetSamlCertificates(int $userdirectoryid):array {

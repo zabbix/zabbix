@@ -119,7 +119,7 @@ class CProvisioning {
 			IDP_TYPE_SAML	=> ['idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid',
 				'nameid_format', 'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
 				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions', 'group_name', 'user_username',
-				'user_lastname', 'scim_status', 'idp_certificate', 'sp_certificate', 'sp_private_key'
+				'user_lastname', 'scim_status'
 			]
 		];
 
@@ -357,5 +357,13 @@ class CProvisioning {
 		}
 
 		return $user;
+	}
+
+	public static function getSamlCertificatesForDatabaseStorage($userdirectoryid)
+	{
+		return DB::select('userdirectory_saml', [
+			'output' => ['idp_certificate', 'sp_certificate', 'sp_private_key'],
+			'filter' => ['userdirectoryid' => $userdirectoryid]
+		])[0];
 	}
 }

@@ -338,28 +338,35 @@
 			let warning_msg = [];
 
 			const idp_certificate_input = document.getElementById('idp_certificate');
-			// if texarea is available for input and it's empty
-			if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
-					&& idp_certificate_input.value === '') {
-				warning_msg.push(<?= json_encode(
-					_('Erasing IdP certificate will affect authentication method. Continue?')
-				) ?>);
+			if (idp_certificate_input) {
+				// if texarea is available for input and it's empty
+				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
+						&& idp_certificate_input.value === '') {
+					warning_msg.push(<?= json_encode(
+						_('Erasing IdP certificate will affect authentication method. Continue?')
+					) ?>);
+				}
 			}
 
+
 			const sp_certificate_input = document.getElementById('sp_certificate');
-			if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
-					&& sp_certificate_input.value === '') {
-				warning_msg.push(<?= json_encode(
-					_('Erasing SP certificate will affect authentication method. Continue?')
-				) ?>);
+			if (sp_certificate_input) {
+				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
+						&& sp_certificate_input.value === '') {
+					warning_msg.push(<?= json_encode(
+						_('Erasing SP certificate will affect authentication method. Continue?')
+					) ?>);
+				}
 			}
 
 			const sp_private_key_input = document.getElementById('sp_private_key');
-			if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
-					&& sp_private_key_input.value === '') {
-				warning_msg.push(<?= json_encode(
-					_('Erasing SP private key will affect authentication method. Continue?')
-				) ?>);
+			if (sp_private_key_input) {
+				if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
+						&& sp_private_key_input.value === '') {
+					warning_msg.push(<?= json_encode(
+						_('Erasing SP private key will affect authentication method. Continue?')
+					) ?>);
+				}
 			}
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;

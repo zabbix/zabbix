@@ -207,47 +207,6 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
-		$this->getInputs($saml_certificate_fields, [
-			'idp_certificate',
-			'sp_certificate',
-			'sp_private_key'
-		]);
-
-		foreach ($saml_certificate_fields as $field_name => $field_value) {
-			if (!$this->hasInput($field_name)) {
-				continue;
-			}
-
-			$value = trim($this->getInput($field_name));
-
-			if ($value !== '') {
-				if (strlen($value) > 10000) {
-					error(_s('Incorrect value for %1$s.', $field_name).' '.
-						_s('%1$d characters exceeds maximum length of %2$d characters', strlen($value), 10000));
-
-					return false;
-				} else {
-					if ($field_name == 'idp_certificate' || $field_name == 'sp_certificate') {
-						$is_certificate = @openssl_x509_read($value);
-
-						if (!$is_certificate) {
-							error(_s('Provided %1$s is not a valid %2$s.', $field_name, 'certificate'));
-
-							return false;
-						}
-					} elseif ($field_name == 'sp_private_key') {
-						$is_private_key = openssl_pkey_get_private($value);
-
-						if (!$is_private_key) {
-							error(_s('Provided %1$s is not a valid %2$s.', $field_name, 'key'));
-
-							return false;
-						}
-					}
-				}
-			}
-		}
-
 		foreach ($saml_fields as $field_name => $field_value) {
 			if ($field_value === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty')));

@@ -54,6 +54,12 @@ if (!is_array($SSO)) {
 
 $SSO += ['SETTINGS' => []];
 
+$certs_data = [
+	'SP_KEY'	=> '',
+	'SP_CERT'	=> '',
+	'IDP_CERT'	=> ''
+];
+
 /** @var CUser $service */
 $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
@@ -62,20 +68,17 @@ $provisioning_enabled = ($provisioning->isProvisioningEnabled()
 	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
 );
 
-if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
-		&& $SSO['SETTINGS']['baseurl'] !== '') {
-	Utils::setBaseURL((string) $SSO['SETTINGS']['baseurl']);
+if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database')) {
+	$db_certs = CProvisioning::getSamlCertificatesForDatabaseStorage($userdirectoryid);
+
+	$certs = [
+		'SP_KEY' => $db_certs['sp_private_key'],
+		'SP_CERT' => $db_certs['sp_certificate'],
+		'IDP_CERT' => $db_certs['idp_certificate']
+	];
 }
-
-if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETTINGS']['use_proxy_headers']) {
-	Utils::setProxyVars(true);
-}
-
-$baseurl = Utils::getSelfURLNoQuery();
-$relay_state = null;
-$saml_settings = $provisioning->getIdpConfig();
-
-if (!array_key_exists('CERT_STORAGE', $SSO) || ($SSO['CERT_STORAGE'] != 'database')) {
+else {
+	CUserDirectory::resetSamlCertificates($userdirectoryid);
 	$certs = [
 		'SP_KEY' => 'conf/certs/sp.key',
 		'SP_CERT' => 'conf/certs/sp.crt',
@@ -86,14 +89,30 @@ if (!array_key_exists('CERT_STORAGE', $SSO) || ($SSO['CERT_STORAGE'] != 'databas
 	$certs = array_map('file_get_contents', $certs);
 	$certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
 }
-else {
-	$certs = [
-		'SP_KEY' => $saml_settings['sp_private_key'],
-		'SP_CERT' => $saml_settings['sp_certificate'],
-		'IDP_CERT' => $saml_settings['idp_certificate']
-	];
+
+if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
+		&& $SSO['SETTINGS']['baseurl'] !== '') {
+	Utils::setBaseURL((string) $SSO['SETTINGS']['baseurl']);
 }
 
+if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETTINGS']['use_proxy_headers']) {
+	Utils::setProxyVars(true);
+}
+
+$certs_values = [];
+foreach ($certs as $key => $cert) {
+	if (str_contains($key, '_KEY')) {
+		$certs_values[$key] = Utils::getStringBetween($cert, '-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
+	}
+	else {
+		$certs_values[$key] = Utils::getStringBetween($cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
+	}
+}
+unset($cert);
+
+$baseurl = Utils::getSelfURLNoQuery();
+$relay_state = null;
+$saml_settings = $provisioning->getIdpConfig();
 $settings = [
 	'sp' => [
 		'entityId' => $saml_settings['sp_entityid'],
@@ -104,14 +123,8 @@ $settings = [
 			'url' => $baseurl.'?sls'
 		],
 		'NameIDFormat' => $saml_settings['nameid_format'],
-		'x509cert' => Utils::getStringBetween(
-			$certs['SP_CERT'],
-			'-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----'
-		),
-		'privateKey' => Utils::getStringBetween(
-			$certs['SP_KEY'],
-			'-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----'
-		)
+		'x509cert' => $certs_values['SP_CERT'],
+		'privateKey' => $certs_values['SP_KEY'],
 	],
 	'idp' => [
 		'entityId' => $saml_settings['idp_entityid'],
@@ -121,10 +134,7 @@ $settings = [
 		'singleLogoutService' => [
 			'url' => $saml_settings['slo_url']
 		],
-		'x509cert' => Utils::getStringBetween(
-			$certs['IDP_CERT'],
-			'-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----'
-		)
+		'x509cert' => $certs_values['IDP_CERT'],
 	],
 	'security' => [
 		'nameIdEncrypted' => (bool) $saml_settings['encrypt_nameid'],
