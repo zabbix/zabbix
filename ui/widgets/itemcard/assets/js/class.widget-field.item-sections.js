@@ -13,7 +13,7 @@
 **/
 
 
-class CWidgetFieldHostSections {
+class CWidgetFieldItemSections {
 
 	/**
 	 * @type {HTMLTableElement};
