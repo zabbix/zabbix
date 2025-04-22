@@ -35,15 +35,6 @@ static int	compare_vectors_str(zbx_vector_str_t *v1, zbx_vector_str_t *v2)
 	return SUCCEED;
 }
 
-static void	parse_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *v)
-{
-	for (int i = 0; i < v->values_num; i++)
-	{
-		ctx->stack.values[i].value.data.str = zbx_strdup(NULL, v->values[i]);
-		ctx->stack.values[i].value.type = ZBX_VARIANT_STR;
-	}
-}
-
 void	zbx_mock_test_entry(void **state)
 {
 	int			returned_ret;
