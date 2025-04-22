@@ -29,6 +29,10 @@ $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.create-placeholder.js');
+$this->addJsFile('class.widget-field.js');
+$this->addJsFile('class.widget-field-event.js');
+$this->addJsFile('class.widget-form.js');
+$this->addJsFile('class.widget-form-event.js');
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
