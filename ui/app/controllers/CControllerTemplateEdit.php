@@ -24,19 +24,20 @@ class CControllerTemplateEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'templateid' =>				'db hosts.hostid',
-			'template_name' =>			'db hosts.host',
-			'visiblename' =>			'db hosts.name',
-			'templates' =>				'array_db hosts.hostid',
-			'add_templates' =>			'array_db hosts.hostid',
-			'groupids' =>				'array_db hosts_groups.groupid',
-			'groups' =>					'array',
-			'description' =>			'db hosts.description',
-			'tags' =>					'array',
-			'macros' =>					'array',
-			'show_inherited_macros' =>	'in 0,1',
-			'valuemaps' =>				'array',
-			'clone' =>					'in 1'
+			'templateid' =>						'db hosts.hostid',
+			'template_name' =>					'db hosts.host',
+			'visiblename' =>					'db hosts.name',
+			'templates' =>						'array_db hosts.hostid',
+			'template_add_templates' =>			'array_db hosts.hostid',
+			'groupids' =>						'array_db hosts_groups.groupid',
+			'template_groups_new' =>			'array',
+			'template_groups' =>				'array',
+			'description' =>					'db hosts.description',
+			'tags' =>							'array',
+			'macros' =>							'array',
+			'show_inherited_template_macros' =>	'in 0,1',
+			'valuemaps' =>						'array',
+			'clone' =>							'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -89,12 +90,12 @@ class CControllerTemplateEdit extends CController {
 				'visible_name' => $this->getInput('visiblename', ''),
 				'linked_templates' => [],
 				'templates' => $this->getInput('templates', []),
-				'add_templates' => [],
+				'template_add_templates' => [],
 				'original_templates' => [],
 				'groups_ms' => [],
 				'description' => $this->getInput('description', ''),
 				'tags' => $this->getInput('tags', []),
-				'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
+				'show_inherited_template_macros' => $this->getInput('show_inherited_template_macros', 0),
 				'valuemaps' => array_values($this->getInput('valuemaps', [])),
 				'readonly' => false,
 				'vendor' => [],
@@ -102,7 +103,7 @@ class CControllerTemplateEdit extends CController {
 			];
 
 			// Add already linked and new templates when cloning element.
-			$request_add_templates = $this->getInput('add_templates', []);
+			$request_add_templates = $this->getInput('template_add_templates', []);
 
 			if ($data['templates'] || $request_add_templates) {
 				$templates = API::Template()->get([
@@ -114,9 +115,9 @@ class CControllerTemplateEdit extends CController {
 				$data['linked_templates'] = array_intersect_key($templates, array_flip($data['templates']));
 				CArrayHelper::sort($data['linked_templates'], ['name']);
 
-				$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+				$data['template_add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
 
-				foreach ($data['add_templates'] as &$template) {
+				foreach ($data['template_add_templates'] as &$template) {
 					$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
 				}
 				unset($template);
@@ -169,7 +170,10 @@ class CControllerTemplateEdit extends CController {
 			$data['macros'] = $macros;
 
 			// Prepare groups data.
-			$groups = $this->getInput('groups', []);
+			$groups = $this->getInput('template_groups', []);
+			foreach ($this->getInput('template_groups_new', []) as $name) {
+				$groups[] = ['new' => $name];
+			}
 
 			// Remove inaccessible groups from request, but leave "new".
 			foreach ($groups as $group) {
@@ -330,10 +334,10 @@ class CControllerTemplateEdit extends CController {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 		// Insert empty row when no macros are present.
-		if (!$data['macros'] && $data['show_inherited_macros'] == 0) {
+		if (!$data['macros'] && $data['show_inherited_template_macros'] == 0) {
 			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 
-			if ($data['show_inherited_macros']) {
+			if ($data['show_inherited_template_macros']) {
 				$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 			}
 
@@ -341,7 +345,7 @@ class CControllerTemplateEdit extends CController {
 		}
 
 		// Add inherited macros to template macros.
-		if ($data['show_inherited_macros']) {
+		if ($data['show_inherited_template_macros']) {
 			$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
 		}
 
@@ -363,6 +367,11 @@ class CControllerTemplateEdit extends CController {
 
 		$data['warnings'] = $warnings;
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['js_validation_rules'] = $data['templateid'] === null
+				? CControllerTemplateCreate::getValidationRules()
+				: CControllerTemplateUpdate::getValidationRules();
+
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
@@ -372,14 +381,14 @@ class CControllerTemplateEdit extends CController {
 			'template_name' => '',
 			'visible_name' => '',
 			'linked_templates' => [],
-			'add_templates' => [],
+			'template_add_templates' => [],
 			'original_templates' => [],
 			'templates' => [],
 			'groups_ms' => [],
 			'description' => '',
 			'tags' => [],
 			'macros' => [],
-			'show_inherited_macros' => 0,
+			'show_inherited_template_macros' => 0,
 			'valuemaps' => [],
 			'readonly' => false,
 			'vendor' => [],
