@@ -452,7 +452,6 @@ class CGraph extends CGraphGeneral {
 		}
 	}
 
-
 	/**
 	 * @inheritdoc
 	 */
