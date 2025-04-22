@@ -32,7 +32,7 @@ class ImageValueGet extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemid' =>	'int32|required',
+			'itemid' =>	'id|required',
 			'clock' =>	'int32|required',
 			'ns' =>		'int32|required'
 		];
@@ -65,8 +65,6 @@ class ImageValueGet extends CController {
 			}
 		}
 
-		$this->setResponse(
-			(new CControllerResponseData($result))->disableView()
-		);
+		$this->setResponse(new CControllerResponseData($result));
 	}
 }

@@ -35,8 +35,7 @@ use API,
 use Widgets\ItemCard\Includes\CWidgetFieldItemSections;
 use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
 
-class WidgetView extends CControllerDashboardWidgetView
-{
+class WidgetView extends CControllerDashboardWidgetView {
 
 	private const SECTION_MAX_WIDTH = 600;
 	private const SECTION_MIN_WIDTH = 300;
@@ -80,8 +79,8 @@ class WidgetView extends CControllerDashboardWidgetView
 
 	private function getItem(): ?array {
 		$options = [
-			'output' => ['itemid', 'hostid', 'templateid', 'error', 'flags', 'master_itemid', 'type', 'state',
-				'status'
+			'output' => ['itemid', 'type', 'hostid', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
+				'units', 'templateid', 'flags', 'description', 'inventory_link', 'master_itemid', 'state', 'error'
 			],
 			'selectHosts' => ['hostid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
@@ -93,30 +92,10 @@ class WidgetView extends CControllerDashboardWidgetView
 			'webitems' => true
 		];
 
-		if (in_array(CWidgetFieldItemSections::SECTION_DESCRIPTION, $this->fields_values['sections'])) {
-			$options['output'][] = 'description';
-		}
-
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
-			$options['output'][] = 'delay';
-		}
-
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
-			$options['output'] = array_merge($options['output'], ['key_', 'history', 'trends']);
-		}
-
 		if (in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
-			$options['output'][] = 'units';
 			$options += [
 				'selectValueMap' => ['mappings']
 			];
-		}
-
-		if (in_array(CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
-				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
-			$options['output'][] = 'value_type';
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_HOST_INTERFACE, $this->fields_values['sections'])) {
@@ -129,10 +108,6 @@ class WidgetView extends CControllerDashboardWidgetView
 			$options += [
 				'selectTags' => ['tag', 'value']
 			];
-		}
-
-		if (in_array(CWidgetFieldItemSections::SECTION_HOST_INVENTORY, $this->fields_values['sections'])) {
-			$options['output'][] = 'inventory_link';
 		}
 
 		$options['output'][] = $this->isTemplateDashboard() && !$this->fields_values['override_hostid']
@@ -196,7 +171,9 @@ class WidgetView extends CControllerDashboardWidgetView
 			}
 		}
 
-		$this->resolveItemMacros($item);
+		[$item] = CMacrosResolverHelper::resolveItemKeys([$item]);
+		[$item] = CMacrosResolverHelper::resolveItemDescriptions([$item]);
+		[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], ['delay', 'history', 'trends']);
 
 		if (in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->getItemValue($item);
@@ -363,28 +340,6 @@ class WidgetView extends CControllerDashboardWidgetView
 		}
 
 		return $problem_count;
-	}
-
-	protected function resolveItemMacros(array &$item): void {
-		if (array_key_exists('key_', $item)) {
-			[$item] = CMacrosResolverHelper::resolveItemKeys([$item]);
-		}
-
-		if (array_key_exists('description', $item)) {
-			[$item] = CMacrosResolverHelper::resolveItemDescriptions([$item]);
-		}
-
-		$resolve_macro_for_metric_keys = [];
-
-		foreach (['delay', 'history', 'trends'] as $key) {
-			if (array_key_exists($key, $item)) {
-				$resolve_macro_for_metric_keys[] = $key;
-			}
-		}
-
-		if ($resolve_macro_for_metric_keys) {
-			[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $resolve_macro_for_metric_keys);
-		}
 	}
 
 	protected function prepareItemDelay(array &$item): void {

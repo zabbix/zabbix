@@ -35,7 +35,7 @@ class ValueCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemid' =>			'int32|required',
+			'itemid' =>			'id|required',
 			'clock' =>			'int32|required',
 			'ns' =>				'int32|required'
 		];
@@ -44,11 +44,11 @@ class ValueCheck extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
+				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				], JSON_THROW_ON_ERROR)]))->disableView()
+				], JSON_THROW_ON_ERROR)])
 			);
 		}
 
@@ -93,8 +93,6 @@ class ValueCheck extends CController {
 			}
 		}
 
-		$this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode($result, JSON_THROW_ON_ERROR)]))->disableView()
-		);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($result, JSON_THROW_ON_ERROR)]));
 	}
 }
