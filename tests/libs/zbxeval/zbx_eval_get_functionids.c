@@ -50,11 +50,6 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
-	else
-		mock_dump_stack(&ctx);
-
 	zbx_eval_get_functionids(&ctx, &functionids);
 	zbx_eval_clear(&ctx);
 

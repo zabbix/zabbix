@@ -44,14 +44,6 @@ static void	parse_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *v)
 	}
 }
 
-static void	print_str_vector(zbx_vector_str_t *v)
-{
-	for (int i = 0; i < v->values_num; i++)
-	{
-		printf("vector value: %s\n", v->values[i]);
-	}
-}
-
 void	zbx_mock_test_entry(void **state)
 {
 	int			returned_ret;
@@ -85,7 +77,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_eval_extract_item_refs(&ctx, &refs);
 	zbx_vector_str_create(&exp_refs);
 	zbx_mock_extract_yaml_values_str("out.refs", &exp_refs);
-	print_str_vector(&refs);
+
 	zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_str(&refs,&exp_refs));
 	zbx_vector_str_clear_ext(&exp_refs, zbx_str_free);
 	zbx_vector_str_destroy(&exp_refs);
