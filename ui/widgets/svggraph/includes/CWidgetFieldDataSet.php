@@ -295,7 +295,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 						'value' => $value['color']
 					];
 				}
-				else if (array_key_exists('color_palette', $value)) {
+				elseif (array_key_exists('color_palette', $value)) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 						'name' => $this->name.'.'.$index.'.color_palette',
