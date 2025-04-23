@@ -95,7 +95,10 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 
 			unset($interfaces[$key]['isNew']);
-			$interfaces[$key]['main'] = INTERFACE_SECONDARY;
+
+			if (!array_key_exists('main', $interfaces[$key])) {
+				$interfaces[$key]['main'] = INTERFACE_SECONDARY;
+			}
 		}
 
 		$main_interfaces = $this->getInput('mainInterfaces', []);
