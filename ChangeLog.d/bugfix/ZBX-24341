@@ -1,0 +1,1 @@
+........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
