@@ -121,7 +121,7 @@ type Scheduler interface {
 		commands []*agent.RemoteCommand,
 		now time.Time,
 	)
-	// FinishTask accepts only tasks that implement performer interface.
+	// FinishTask executes task finishing on given Performer.
 	FinishTask(task Performer)
 	PerformTask(
 		key string,

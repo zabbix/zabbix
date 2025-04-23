@@ -44,8 +44,6 @@ type ServerListener struct {
 	stopped atomic.Bool
 }
 
-type localIPGetter func() []net.IP
-
 func (sl *ServerListener) handleError(err error) error {
 	var netErr net.Error
 
@@ -184,15 +182,15 @@ func (sl *ServerListener) Stop() {
 
 // ParseListenIP validate ListenIP value.
 func ParseListenIP(options *agent.AgentOptions) ([]string, error) {
-	return parseListenIP(options, getListLocalIP)
+	lips := getListLocalIP()
+
+	return parseListenIP(options, lips)
 }
 
-func parseListenIP(options *agent.AgentOptions, ipGetter localIPGetter) ([]string, error) {
+func parseListenIP(options *agent.AgentOptions, lips []net.IP) ([]string, error) {
 	if options.ListenIP == "" || options.ListenIP == "0.0.0.0" {
 		return []string{"0.0.0.0"}, nil
 	}
-
-	lips := ipGetter()
 
 	opts := strings.Split(options.ListenIP, ",")
 	ips := make([]string, 0, len(opts))

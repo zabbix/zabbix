@@ -90,13 +90,9 @@ func Test_ParseListenIP(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			// Should not run in parallel, accesses global getLocalIPs.
-			getLocalIPs := func() []net.IP {
-				return tt.mockIPs
-			}
 
 			opts := &agent.AgentOptions{ListenIP: tt.listenIP}
-			got, err := parseListenIP(opts, getLocalIPs)
+			got, err := parseListenIP(opts, tt.mockIPs)
 
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("ParseListenIP() error = %v, expectErr = %v", err, tt.expectErr)
@@ -286,7 +282,7 @@ func Test_sendTaskErrorResponse(t *testing.T) {
 
 	tests := []testCase{
 		{
-			name:    "+plaintext",
+			name:    "+plainText",
 			errText: "invalid item key",
 			isJSON:  false,
 			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
@@ -295,7 +291,7 @@ func Test_sendTaskErrorResponse(t *testing.T) {
 			},
 		},
 		{
-			name:    "+json",
+			name:    "+JSON",
 			errText: "timeout reached",
 			isJSON:  true,
 			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {
@@ -304,7 +300,7 @@ func Test_sendTaskErrorResponse(t *testing.T) {
 			},
 		},
 		{
-			name:    "-write fails",
+			name:    "-writeFails",
 			errText: "write error",
 			isJSON:  true,
 			setup: func(t *testing.T, conn *mockcomms.ConnectionInterface) {

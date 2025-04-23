@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
@@ -313,7 +314,7 @@ func (c *Connection) RemoteIP() string {
 func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (*Connection, error) {
 	conn, err := l.listener.Accept()
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to accept connection")
 	}
 
 	c := &Connection{
@@ -338,8 +339,11 @@ func (c *Connection) SetCompress(compress bool) {
 	c.compress = compress
 }
 
-func (c *Listener) Close() (err error) {
-	return c.listener.Close()
+// Close stops the listener.
+func (l *Listener) Close() error {
+	err := l.listener.Close()
+
+	return errs.Wrap(err, "failed to close listener")
 }
 
 func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,

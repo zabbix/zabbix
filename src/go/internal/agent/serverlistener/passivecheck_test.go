@@ -72,7 +72,7 @@ func Test_parsePassiveCheckJSONRequest(t *testing.T) {
 		expect     expectations
 	}{
 		{
-			name:       "+validTimeout",
+			name:       "+timeout",
 			givenInput: `{"request":"passive checks","data":[{"key":"system.cpu.load","timeout":"3"}]}`,
 			expect: expectations{
 				key:     "system.cpu.load",
@@ -178,7 +178,7 @@ func Test_formatJSONCheckDataPayload(t *testing.T) {
 		expect expectations
 	}{
 		{
-			name: "+validResponse",
+			name: "+valid",
 			args: args{
 				checkInput: "cpu_load: 1.5",
 			},
@@ -247,7 +247,7 @@ func Test_formatCheckErrorPayload(t *testing.T) {
 		expect expectations
 	}{
 		{
-			name: "+validPlainTextError",
+			name: "+plainTextError",
 			args: args{
 				errText: "Timeout occurred",
 				isJSON:  false,
@@ -257,7 +257,7 @@ func Test_formatCheckErrorPayload(t *testing.T) {
 			},
 		},
 		{
-			name: "+validJSONError",
+			name: "+JSONError",
 			args: args{
 				errText: "Timeout occurred",
 				isJSON:  true,
@@ -336,7 +336,7 @@ func Test_formatJSONParsingError(t *testing.T) {
 		expect expectations
 	}{
 		{
-			name: "+validJSONParsingError",
+			name: "+JSONParsingError",
 			args: args{
 				errText: "Invalid JSON format",
 			},
