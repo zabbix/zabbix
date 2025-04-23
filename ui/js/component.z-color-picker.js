@@ -274,12 +274,13 @@ class ZColorPicker extends HTMLElement {
 
 	#refresh() {
 		const name = this.#isValidPalette(this.#value) ? this.#palette_field_name : this.#color_field_name;
+		const id = name.replaceAll('[', '_').replaceAll(']', '');
 
 		this.#hidden_input.name = name;
 		this.#hidden_input.value = this.#value;
-		this.#hidden_input.id = this.#input_id !== null ? this.#input_id : zbx_formatDomId(name);
+		this.#hidden_input.id = this.#input_id !== null ? this.#input_id : id;
 
-		this.#box.id = `lbl_${zbx_formatDomId(name)}`;
+		this.#box.id = `lbl_${id}`;
 		this.#box.title = this.#getTitle(this.#value);
 		this.#box.classList.toggle(ZColorPicker.ZBX_STYLE_IS_PALETTE, this.#isValidPalette(this.#value));
 
