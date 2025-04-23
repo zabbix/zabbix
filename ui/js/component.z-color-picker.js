@@ -847,7 +847,7 @@ class ZColorPicker extends HTMLElement {
 		else if (is_palette_allowed && this.#isValidPalette(value)) {
 			const number = ZColorPicker.#getPaletteRowNumber(value);
 
-			return `${t('Palette')} ${number + 1}`;
+			return t('Palette %1$d').replace('%1$d', (number + 1).toString());
 		}
 		else {
 			return '';
