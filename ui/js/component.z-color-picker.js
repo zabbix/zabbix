@@ -412,6 +412,23 @@ class ZColorPicker extends HTMLElement {
 				}
 			},
 
+			dialogKeyup: e => {
+				switch (e.which) {
+					case KEY_ARROW_DOWN:
+					case KEY_ARROW_LEFT:
+					case KEY_ARROW_RIGHT:
+					case KEY_ARROW_UP:
+						if (e.target.name === ZColorPicker.PALETTE_PREFIX) {
+							this.#dialog.querySelectorAll(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)
+								.forEach(input => input.setAttribute('tabindex', '-1'));
+
+							e.target.setAttribute('tabindex', '0');
+						}
+
+						break;
+				}
+			},
+
 			inputChange: e => {
 				const value = e.target.value;
 
@@ -570,6 +587,7 @@ class ZColorPicker extends HTMLElement {
 		this.#positionDialog();
 
 		this.#dialog.addEventListener('keydown', this.#events.dialogKeydown);
+		this.#dialog.addEventListener('keyup', this.#events.dialogKeyup);
 		this.#dialog.addEventListener('click', this.#events.dialogClick);
 
 		this.#input.addEventListener('input', this.#events.inputChange);
@@ -593,6 +611,7 @@ class ZColorPicker extends HTMLElement {
 		}
 
 		this.#dialog.removeEventListener('keydown', this.#events.dialogKeydown);
+		this.#dialog.removeEventListener('keyup', this.#events.dialogKeyup);
 		this.#dialog.removeEventListener('click', this.#events.dialogClick);
 
 		this.#input.removeEventListener('input', this.#events.inputChange);
