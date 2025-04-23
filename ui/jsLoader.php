@@ -488,6 +488,7 @@ $translate_strings = [
 		'D' => _x('D', 'Default color option'),
 		'No color' => _('No color'),
 		'Palette' => _('Palette'),
+		'Palette %1$d' => _('Palette %1$d'),
 		'Solid color' => _('Solid color'),
 		'Use default' => _('Use default')
 	]
