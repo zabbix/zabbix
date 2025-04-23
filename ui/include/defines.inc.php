@@ -1982,7 +1982,6 @@ define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_COLLAPSIBLE', 'collapsible');
 define('ZBX_STYLE_COLLAPSED', 'collapsed');
-define('ZBX_STYLE_COLOR_PREVIEW_BOX', 'color-preview-box');
 define('ZBX_STYLE_COLOR_ICON', 'color-icon');
 define('ZBX_STYLE_COLOR_NEGATIVE', 'color-negative');
 define('ZBX_STYLE_COLOR_POSITIVE', 'color-positive');
