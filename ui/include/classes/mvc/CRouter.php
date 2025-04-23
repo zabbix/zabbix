@@ -82,7 +82,7 @@ class CRouter {
 		'dashboard.list'							=> [CControllerDashboardList::class,								'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.page.properties.check'			=> [CControllerDashboardPagePropertiesCheck::class,					'layout.json',			null],
 		'dashboard.page.properties.edit'			=> [CControllerDashboardPagePropertiesEdit::class,					'layout.json',			'dashboard.page.properties.edit'],
-		'dashboard.print'							=> [CControllerDashboardPrint::class,								'layout.print',		    'monitoring.dashboard.print'],
+		'dashboard.print'							=> [CControllerDashboardPrint::class,								'layout.print',			'monitoring.dashboard.print'],
 		'dashboard.properties.check'				=> [CControllerDashboardPropertiesCheck::class,						'layout.json',			null],
 		'dashboard.properties.edit'					=> [CControllerDashboardPropertiesEdit::class,						'layout.json',			'dashboard.properties.edit'],
 		'dashboard.share.update'					=> [CControllerDashboardShareUpdate::class,							'layout.json',			null],
