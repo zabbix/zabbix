@@ -151,7 +151,7 @@ class CControllerMediatypeUpdate extends CController {
 
 				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {
 					$mediatype['username'] = $smtp_username;
-					$mediatype['passwd'] = $this->getInput('passwd');
+					$this->getInputs($mediatype, ['passwd']);
 				}
 				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$this->getInputs($mediatype, [
