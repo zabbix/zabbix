@@ -72,6 +72,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 	$space_field = $form->registerField(new CWidgetFieldRangeControlView($fields['space']));
 	$merge_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge']));
 	$merge_percent_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percent']));
+	/** @var CWidgetFieldColorView $merge_color_field */
 	$merge_color_field = $form->registerField(new CWidgetFieldColorView($fields['merge_color']));
 	$total_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['total_show']));
 	$value_size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['value_size_type']));
@@ -80,6 +81,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
 	$units_field = $form->registerField(new CWidgetFieldTextBoxView($fields['units']));
 	$value_bold_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['value_bold']));
+	/** @var CWidgetFieldColorView $value_color_field */
 	$value_color_field = $form->registerField(new CWidgetFieldColorView($fields['value_color']));
 
 	return (new CDiv())
@@ -113,7 +115,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 						$merge_field->getView(),
 						($merge_percent_field->getView())->setWidth(ZBX_TEXTAREA_NUMERIC_SMALL_WIDTH),
 						' % ',
-						$merge_color_field->getViewNew()
+						$merge_color_field->withNewView()->getView()
 					])
 				])
 
@@ -146,7 +148,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				])
 				->addItem([
 					$value_color_field->getLabel(),
-					new CFormField($value_color_field->getViewNew())
+					new CFormField($value_color_field->withNewView()->getView())
 				])->setId('show_total_fields')
 		);
 }

@@ -18,6 +18,8 @@ use Zabbix\Widgets\Fields\CWidgetFieldColor;
 
 class CWidgetFieldColorView extends CWidgetFieldView {
 
+	private bool $new_view = false;
+
 	public function __construct(CWidgetFieldColor $field) {
 		$this->field = $field;
 	}
@@ -26,13 +28,23 @@ class CWidgetFieldColorView extends CWidgetFieldView {
 		return 'lbl_'.$this->field->getName();
 	}
 
-	public function getView(): CColor {
+	public function getView(): CTag {
+		if ($this->new_view) {
+			return $this->getViewNew();
+		}
+
 		return (new CColor($this->field->getName(), $this->field->getValue()))
 			->appendColorPickerJs(false)
 			->enableUseDefault(!$this->field->hasAllowInherited());
 	}
 
-	public function getViewNew(): CColorPicker {
+	public function withNewView(): self {
+		$this->new_view = true;
+
+		return $this;
+	}
+
+	private function getViewNew(): CColorPicker {
 		return (new CColorPicker())
 			->setColorFieldName($this->field->getName())
 			->setValue($this->field->getValue())
