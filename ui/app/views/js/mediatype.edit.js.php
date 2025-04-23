@@ -218,7 +218,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	/**
-	 * Set form OAuth input fields, remove UI updated status.
+	 * Set form OAuth input fields and UI status message.
 	 *
 	 * @param {object} oauth  Key value pair of OAuth fields and oauth status message.
 	 */

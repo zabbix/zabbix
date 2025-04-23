@@ -146,7 +146,6 @@ $mediatype_form_grid = (new CFormGrid())
 	]);
 
 $oauth_status = [];
-$oauth_fields = [];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 	$oauth_status = [
