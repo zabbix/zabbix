@@ -184,10 +184,10 @@ class ZColorPicker extends HTMLElement {
 
 			this.classList.add(ZColorPicker.ZBX_STYLE_CLASS);
 
-			this.#color_field_name = this.getAttribute('color-field-name');
-			this.#palette_field_name = this.getAttribute('palette-field-name');
-			this.#value = this.getAttribute('value')?.toUpperCase();
-			this.#input_id = this.getAttribute('input-id');
+			this.#color_field_name = this.hasAttribute('color-field-name') ? this.getAttribute('color-field-name') : '';
+			this.#palette_field_name = this.hasAttribute('palette-field-name') ? this.getAttribute('palette-field-name') : '';
+			this.#value = this.hasAttribute('value') ? this.getAttribute('value').toUpperCase() : '';
+			this.#input_id = this.hasAttribute('input-id') ? this.getAttribute('input-id') : '';
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('has-palette');
 			this.#disabled = this.hasAttribute('disabled');
@@ -880,7 +880,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	get colorFieldName() {
-		return this.getAttribute('color-field-name');
+		return this.hasAttribute('color-field-name') ? this.getAttribute('color-field-name') : '';
 	}
 
 	set colorFieldName(name) {
@@ -888,7 +888,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	get paletteFieldName() {
-		return this.getAttribute('palette-field-name');
+		return this.hasAttribute('palette-field-name') ? this.getAttribute('palette-field-name') : '';
 	}
 
 	set paletteFieldName(name) {
@@ -896,7 +896,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	get value() {
-		return this.getAttribute('value');
+		return this.hasAttribute('value') ? this.getAttribute('value') : '';
 	}
 
 	set value(value) {
@@ -904,7 +904,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	get inputId() {
-		return this.getAttribute('input-id');
+		return this.hasAttribute('input-id') ? this.getAttribute('input-id') : '';
 	}
 
 	set inputId(input_id) {
