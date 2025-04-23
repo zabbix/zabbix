@@ -515,8 +515,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'lifetime_type' => ['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])]
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -527,7 +526,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			'countOutput' => true,
 			'itemids' => array_column($items, 'itemid'),
 			'filter' => [
-				'flags' => [ZBX_FLAG_DISCOVERY_RULE]
+				'flags' => [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED]
 			],
 			'editable' => true
 		]);
@@ -551,6 +550,18 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$db_item = $db_items[$item['itemid']];
 			$item['host_status'] = $db_item['host_status'];
 
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED) {
+				$api_input_rules = self::getDiscoveredValidationRules();
+			}
+			else {
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'lifetime_type' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
 			$item += ['lifetime_type' => $db_item['lifetime_type']];
 
 			$item += $item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY
@@ -560,6 +571,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$api_input_rules = $db_item['templateid'] == 0
 				? self::getValidationRules()
 				: self::getInheritedValidationRules();
+			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -589,6 +601,27 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
+	}
+
+	private static function getDiscoveredValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>			['type' => API_ANY],
+			'uuid' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'itemid' =>					['type' => API_ANY],
+			'name' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'type' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'key_' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'lifetime_type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'lifetime' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'enabled_lifetime_type' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'enabled_lifetime' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'description' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'lld_macro_paths' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'filter' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'overrides' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+		]];
 	}
 
 	/**

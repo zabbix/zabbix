@@ -607,6 +607,9 @@ abstract class CGraphGeneral extends CApiService {
 				'selectDiscoveryRule' => ['itemid'],
 				'selectDiscoveryRulePrototype' => ['itemid'],
 				'itemids' => $itemids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+				],
 				'preservekeys' => true
 			] + $permission_options);
 		}
