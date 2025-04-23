@@ -461,11 +461,12 @@ class CItem extends CItemGeneral {
 	 */
 	private function validateGet(array &$options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
-			'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'selectItemDiscovery' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
-			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
+			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -1744,22 +1745,7 @@ class CItem extends CItemGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		// adding item discovery
-		if ($options['selectItemDiscovery'] !== null) {
-			$item_discoveries = API::getApiService()->select('item_discovery', [
-				'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemdiscoveryid', 'itemid']),
-				'filter' => ['itemid' => array_keys($result)],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($item_discoveries, 'itemid', 'itemdiscoveryid');
-
-			$item_discoveries = $this->unsetExtraFields($item_discoveries, ['itemid', 'itemdiscoveryid'],
-				$options['selectItemDiscovery']
-			);
-
-			$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
-		}
-
+		$this->addRelatedItemDiscovery($options, $result);
 		$this->addRelatedDiscoveryData($options, $result);
 
 		$requested_output = array_filter([
@@ -1830,7 +1816,25 @@ class CItem extends CItemGeneral {
 		return $result;
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+	private function addRelatedItemDiscovery(array $options, array &$result): void {
+		if ($options['selectItemDiscovery'] === null) {
+			return;
+		}
+
+		$item_discoveries = API::getApiService()->select('item_discovery', [
+			'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemdiscoveryid', 'itemid']),
+			'filter' => ['itemid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($item_discoveries, 'itemid', 'itemdiscoveryid');
+
+		$item_discoveries = $this->unsetExtraFields($item_discoveries, ['itemid', 'itemdiscoveryid'],
+			$options['selectItemDiscovery']
+		);
+
+		$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
+	}
+	private function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}

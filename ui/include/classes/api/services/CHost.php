@@ -75,8 +75,6 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
 	 * @param string|array  $options['selectDiscoveryRule']                Return a "discoveryRule" property with the low-level discovery rule that created the host.
-	 * @param string|array  $options['selectHostDiscovery']                Return a "hostDiscovery" property with host discovery object data. - DEPRECATED.
-	 * @param string|array  $options['selectDiscoveryData']                Return a "discoveryData" property with host discovery object data.
 	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
 	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
 	 * @param bool          $options['countOutput']                        Return host count as output.
@@ -1895,21 +1893,7 @@ class CHost extends CHostGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		if ($options['selectHostDiscovery'] !== null) {
-			$host_discoveries = API::getApiService()->select('host_discovery', [
-				'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
-				'filter' => ['hostid' => $hostids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($host_discoveries, 'hostid', 'hostid');
-
-			$host_discoveries = $this->unsetExtraFields($host_discoveries, ['hostid'],
-				$options['selectHostDiscovery']
-			);
-
-			$result = $relation_map->mapOne($result, $host_discoveries, 'hostDiscovery');
-		}
-
+		$this->addRelatedHostDiscovery($options, $result);
 		$this->addRelatedDiscoveryData($options, $result);
 
 		if ($options['selectTags'] !== null) {
@@ -1992,7 +1976,26 @@ class CHost extends CHostGeneral {
 		$result = $relation_map->mapMany($result, $groups, 'hostgroups');
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+	private function addRelatedHostDiscovery(array $options, array &$result): void {
+		if ($options['selectHostDiscovery'] === null) {
+			return;
+		}
+
+		$host_discoveries = API::getApiService()->select('host_discovery', [
+			'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
+			'filter' => ['hostid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($host_discoveries, 'hostid', 'hostid');
+
+		$host_discoveries = $this->unsetExtraFields($host_discoveries, ['hostid'],
+			$options['selectHostDiscovery']
+		);
+
+		$result = $relation_map->mapOne($result, $host_discoveries, 'hostDiscovery');
+	}
+
+	private function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
@@ -2018,16 +2021,16 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateGet(array &$options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'inheritedTags' =>				['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' =>		['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
-			'withProblemsSuppressed' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
-			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
-			'selectHostDiscovery' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['host', 'hostid', 'parent_hostid', 'parent_itemid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
-			'selectDiscoveryData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['host', 'parent_hostid', 'parent_itemid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			'selectInheritedTags' =>	['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
+			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
+			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
+			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
+			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['host', 'hostid', 'parent_hostid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['host', 'parent_hostid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {

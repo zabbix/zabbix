@@ -534,8 +534,8 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	protected function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectTriggerDiscovery' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
-			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -882,68 +882,44 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		// adding trigger discovery
-		if ($options['selectTriggerDiscovery'] !== null && $options['selectTriggerDiscovery'] !== API_OUTPUT_COUNT) {
-			foreach ($result as &$trigger) {
-				$trigger['triggerDiscovery'] = [];
-			}
-			unset($trigger);
-
-			$sql_select = ['triggerid'];
-			foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
-				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
-					$sql_select[] = $field;
-				}
-			}
-
-			$trigger_discoveries = DBselect(
-				'SELECT '.implode(',', $sql_select).
-				' FROM trigger_discovery'.
-				' WHERE '.dbConditionInt('triggerid', $triggerids)
-			);
-
-			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
-				$triggerid = $trigger_discovery['triggerid'];
-				unset($trigger_discovery['triggerid']);
-
-				$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
-			}
-		}
-
+		$this->addRelatedTriggerDiscovery($options, $result);
 		$this->addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] === null || $options['selectDiscoveryData'] === API_OUTPUT_COUNT) {
+	private function addRelatedTriggerDiscovery(array $options, array &$result): void {
+		if ($options['selectTriggerDiscovery'] === null) {
 			return;
 		}
 
-		foreach ($result as &$trigger) {
-			$trigger['discoveryData'] = [];
+		$trigger_discovery = API::getApiService()->select('trigger_discovery', [
+			'output' => $this->outputExtend($options['selectTriggerDiscovery'], ['triggerid']),
+			'filter' => ['triggerid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($trigger_discovery, 'triggerid', 'triggerid');
+
+		$trigger_discovery = $this->unsetExtraFields($trigger_discovery, ['triggerid']);
+
+		$result = $relation_map->mapOne($result, $trigger_discovery, 'triggerDiscovery');
+	}
+
+	private function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
 		}
-		unset($trigger);
 
-		$sql_select = ['triggerid'];
-		foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
-			if ($this->outputIsRequested($field, $options['selectDiscoveryData'])) {
-				$sql_select[] = $field;
-			}
-		}
+		$discovery_data = API::getApiService()->select('trigger_discovery', [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['triggerid']),
+			'filter' => ['triggerid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($discovery_data, 'triggerid', 'triggerid');
 
-		$trigger_discoveries = DBselect(
-			'SELECT '.implode(',', $sql_select).
-			' FROM trigger_discovery'.
-			' WHERE '.dbConditionInt('triggerid', array_keys($result))
-		);
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['triggerid']);
 
-		while ($trigger_discovery = DBfetch($trigger_discoveries)) {
-			$triggerid = $trigger_discovery['triggerid'];
-			unset($trigger_discovery['triggerid']);
-
-			$result[$triggerid]['discoveryData'] = $trigger_discovery;
-		}
+		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
