@@ -1112,11 +1112,11 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 				zbx_db_value_t	*value;
 				int		reset_index = -1;
 
-				for (int i = 0; i < reset_fields.values_num; i++)
+				for (int k = 0; k < reset_fields.values_num; k++)
 				{
-					if (reset_fields.values[i] == (zbx_uint64_t)j)
+					if (reset_fields.values[k] == (zbx_uint64_t)j)
 					{
-						reset_index = (int)reset_fields.values[i];
+						reset_index = (int)reset_fields.values[k];
 						break;
 					}
 				}
