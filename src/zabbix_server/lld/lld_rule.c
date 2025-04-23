@@ -2841,6 +2841,9 @@ static void	lld_rule_process_nested_rules(zbx_uint64_t hostid, const zbx_vector_
 	{
 		const zbx_lld_item_full_t	*item = items->values[i];
 
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
 		if (ITEM_TYPE_NESTED_LLD != item->prototype->type ||
 				0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 		{
