@@ -25,16 +25,16 @@ window.oauth_edit_popup = new class {
 		this.overlay = null;
 		this.dialogue = null;
 		this.form = null;
-		this.advanced_form = false;
+		this.is_advanced_form = false;
 		this.oauth_popup = null;
 		this.messages = {};
 	}
 
-	init({oauth, advanced_form, messages}) {
+	init({is_advanced_form, messages}) {
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.advanced_form = advanced_form;
+		this.is_advanced_form = is_advanced_form;
 		this.messages = messages;
 
 		this.#initForm();
@@ -49,7 +49,7 @@ window.oauth_edit_popup = new class {
 		this.#validateFields(data)
 			.then(response => this.#popupAuthenticate(response.oauth_popup_url, response.oauth)
 				.then(response => this.#submitDataToOpener(response), (error) => {
-					if (this.advanced_form) {
+					if (this.is_advanced_form) {
 						this.form.querySelector('[name="authorization_mode"][value="manual"]').click();
 						this.form.querySelector('[name="code"]').focus();
 
@@ -63,7 +63,7 @@ window.oauth_edit_popup = new class {
 	}
 
 	#initForm() {
-		if (this.advanced_form) {
+		if (this.is_advanced_form) {
 			const options = {
 				template: '#oauth-parameter-row-tmpl',
 				allow_empty: false,
@@ -127,7 +127,7 @@ window.oauth_edit_popup = new class {
 	}
 
 	#updateFieldsVisibility() {
-		if (this.advanced_form) {
+		if (this.is_advanced_form) {
 			const automatic = this.form.querySelector('[name="authorization_mode"][value="auto"]');
 
 			this.form.querySelector('[name="code"]').toggleAttribute('disabled', automatic.checked);
@@ -148,7 +148,7 @@ window.oauth_edit_popup = new class {
 			}
 		}
 
-		if (this.advanced_form) {
+		if (this.is_advanced_form) {
 			const params = [
 				...Object.values(data.authorization_url_parameters),
 				...Object.values(data.token_url_parameters)

@@ -216,14 +216,13 @@ else {
 $form_grid->addItem(
 	(new CScriptTag('
 		oauth_edit_popup.init('.json_encode([
-			'update' => $data['update'] == 0,
-			'advanced_form' => $data['advanced_form'] == 1,
+			'is_advanced_form' => $data['advanced_form'] == 1,
 			'messages' => [
 				'popup_closed' => _('Complete authentication to get tokens.'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),
 				'authorization_error' => _('Cannot get authorization code.')
 			]
-		], JSON_FORCE_OBJECT) .');
+		]) .');
 	'))->setOnDocumentReady()
 );
 

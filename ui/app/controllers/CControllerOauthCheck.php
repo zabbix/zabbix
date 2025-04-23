@@ -32,7 +32,6 @@ class CControllerOauthCheck extends CController {
 			'token_url_parameters' =>			'array',
 			'authorization_mode' =>				'string|in auto,manual',
 			'code' =>							'string|not_empty',
-			'update' =>							'in 0,1',
 			'advanced_form' =>					'in 0,1'
 		];
 
