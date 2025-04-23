@@ -73,6 +73,9 @@ class CHostPrototypeHelper {
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectDiscoveryRulePrototype' => ['itemid'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 	}

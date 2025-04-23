@@ -53,7 +53,7 @@ class CControllerGraphPrototypeList extends CController {
 		if (!$discovery_rule) {
 			$discovery_rule = API::DiscoveryRulePrototype()->get([
 				'output' => ['itemid', 'hostid'],
-				'itemids' => getRequest('parent_discoveryid'),
+				'itemids' => $this->getInput('parent_discoveryid'),
 				'editable' => true
 			]);
 		}

@@ -26,6 +26,10 @@ class CLldRulePrototypeHelper extends CItemGeneralHelper {
 	public static function copy(array $src_options, array $dst_hosts, array $dst_itemids): bool {
 		$src_items = CLldRuleHelper::getSourceLldRules(true, $src_options);
 
+		if (!$src_items) {
+			return true;
+		}
+
 		try {
 			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
 			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
@@ -59,10 +63,6 @@ class CLldRulePrototypeHelper extends CItemGeneralHelper {
 					'hosts' => [$dst_host]
 				] + $dst_item);
 			}
-		}
-
-		if (!$dst_items) {
-			return true;
 		}
 
 		$response = API::DiscoveryRulePrototype()->create($dst_items);

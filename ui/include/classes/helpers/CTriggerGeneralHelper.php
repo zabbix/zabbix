@@ -277,6 +277,11 @@ class CTriggerGeneralHelper {
 		if ($data['discoveryRule']) {
 			$parent_templates = getItemParentTemplates([$data['discoveryRule']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
 		}
+		elseif (array_key_exists('discoveryRulePrototype', $data) && $data['discoveryRulePrototype']) {
+			$parent_templates = getItemParentTemplates([$data['discoveryRulePrototype']],
+				ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
+			)['templates'];
+		}
 		else {
 			$parent_templates = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		}

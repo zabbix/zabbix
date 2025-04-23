@@ -167,9 +167,16 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		$src_items = $is_lld_prototype
 			? API::DiscoveryRulePrototype()->get($options + [
 				'selectDiscoveryRule' => ['itemid'],
-				'selectDiscoveryRulePrototype' => ['itemid']
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE]
+				]
 			])
-			: API::DiscoveryRule()->get($options);
+			: API::DiscoveryRule()->get($options + [
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_RULE]
+				]
+			]);
 
 		foreach ($src_items as &$src_item) {
 			foreach ($src_item['filter']['conditions'] as &$condition) {

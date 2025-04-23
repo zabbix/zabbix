@@ -164,6 +164,9 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 			'selectHosts' => ['hostid', 'host'],
 			'selectDiscoveryRule' => ['itemid', 'hostid'],
 			'selectDiscoveryRulePrototype' => ['itemid', 'hostid'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 

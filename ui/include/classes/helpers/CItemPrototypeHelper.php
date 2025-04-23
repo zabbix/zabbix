@@ -220,6 +220,9 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectDiscoveryRulePrototype' => ['itemid'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 	}

@@ -269,6 +269,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 					'verify_host', 'allow_traps', 'discover'
 				],
 				'selectDiscoveryRule' => ['itemid', 'templateid'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')

@@ -28,7 +28,7 @@ if ($data['is_templated']) {
 	]);
 }
 
-if ($data['parent_lld']) {
+if (array_key_exists('parent_lld', $data) && $data['parent_lld']) {
 	$graph_tab->addItem([
 		new CLabel(_('Discovered by')),
 		new CFormField(

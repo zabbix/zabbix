@@ -426,18 +426,19 @@ function getItemParentTemplates(array $items, $flag) {
 
 	$all_parent_itemids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 			$db_items = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'hostid', 'templateid'],
 				'itemids' => array_keys($parent_itemids)
 			]);
 		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+		elseif ($flag & ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
 			$db_items = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'hostid', 'templateid'],
 				'itemids' => array_keys($parent_itemids)
@@ -450,7 +451,7 @@ function getItemParentTemplates(array $items, $flag) {
 				]);
 			}
 		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		elseif ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_items = API::ItemPrototype()->get([
 				'output' => ['itemid', 'hostid', 'templateid'],
 				'itemids' => array_keys($parent_itemids),
@@ -474,7 +475,7 @@ function getItemParentTemplates(array $items, $flag) {
 			$data['templates'][$db_item['hostid']] = [];
 			$hostids[$db_item['itemid']] = $db_item['hostid'];
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$parent_lld = $db_item['discoveryRule'] ?: $db_item['discoveryRulePrototype'];
 				$lld_ruleids[$db_item['itemid']] = $parent_lld['itemid'];
 			}
@@ -495,7 +496,7 @@ function getItemParentTemplates(array $items, $flag) {
 			? $hostids[$parent_item['itemid']]
 			: 0;
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
 				? $lld_ruleids[$parent_item['itemid']]
 				: 0;
