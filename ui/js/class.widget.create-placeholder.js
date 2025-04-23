@@ -22,6 +22,7 @@ class CWidgetCreatePlaceholder extends CWidget {
 	}
 
 	promiseUpdate() {
-		return Promise.resolve();
+		// Return never-resolving promise to keep loader spinning.
+		return new Promise(() => {});
 	}
 }
