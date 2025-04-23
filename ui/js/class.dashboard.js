@@ -1582,7 +1582,13 @@ class CDashboard {
 
 		sandbox.promiseInit(sandbox_params)
 			.then(() => {
-				this._selected_dashboard_page.enterWidgetEditing(sandbox.getWidget());
+				this.#widget_edit_dialogue.addEventListener(CWidgetEditDialogue.EVENT_LOAD, () => {
+					this._selected_dashboard_page.enterWidgetEditing(sandbox.getWidget(), {is_exclusive: true});
+				});
+
+				this.#widget_edit_dialogue.addEventListener(CWidgetEditDialogue.EVENT_READY, () => {
+					this._selected_dashboard_page.enterWidgetEditing(sandbox.getWidget(), {is_exclusive: false});
+				});
 
 				return this.#widget_edit_dialogue.run(dialogue_params);
 			})

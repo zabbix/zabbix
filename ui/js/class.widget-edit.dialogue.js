@@ -16,7 +16,10 @@
 /**
  * Widget editor component for dialogue management and event coordination.
  */
-class CWidgetEditDialogue {
+class CWidgetEditDialogue extends EventTarget {
+
+	static EVENT_LOAD = 'load';
+	static EVENT_READY = 'ready';
 
 	static VALIDATOR_PRIORITY_UPDATE = 0;
 	static VALIDATOR_PRIORITY_SUBMIT = 1;
@@ -60,6 +63,8 @@ class CWidgetEditDialogue {
 	#last_type_reference = null;
 
 	constructor({dashboard}) {
+		super();
+
 		this.#dashboard = dashboard;
 		this.#dashboard_data = dashboard.getData();
 	}
@@ -90,6 +95,8 @@ class CWidgetEditDialogue {
 
 			this.#open();
 			this.#activate();
+
+			this.dispatchEvent(new CustomEvent(CWidgetEditDialogue.EVENT_LOAD));
 		});
 	}
 
@@ -159,6 +166,8 @@ class CWidgetEditDialogue {
 		this.#fields = fields;
 
 		this.#validator.check({type, name, fields});
+
+		this.dispatchEvent(new CustomEvent(CWidgetEditDialogue.EVENT_READY));
 	}
 
 	#onReloadRequest() {

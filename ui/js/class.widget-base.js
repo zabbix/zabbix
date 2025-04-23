@@ -795,15 +795,17 @@ class CWidgetBase {
 	/**
 	 * Enter widget editing state.
 	 *
-	 * @param {boolean} self  Whether this particular widget is about to be edited.
+	 * @param {boolean} self          Whether this particular widget is about to be edited.
+	 * @param {boolean} is_exclusive  Whether to prevent switching to editing another widgets.
 	 */
-	enterWidgetEditing(self) {
+	enterWidgetEditing(self, {is_exclusive}) {
 		this._target.classList.add('is-editing');
+
 		this._button_actions.disabled = true;
+		this._button_edit.disabled = self || is_exclusive;
 
 		if (self) {
 			this._target.classList.add('is-editing-self');
-			this._button_edit.disabled = true;
 
 			for (const direction of ['n', 'e', 's', 'w']) {
 				const highlight = document.createElement('div');
