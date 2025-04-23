@@ -50,6 +50,25 @@ const ZBX_STYLE_LINK_ALT = 'link-alt';
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';
 
+const ZBX_STYLE_NA_BG = 'na-bg';
+const ZBX_STYLE_INFO_BG = 'info-bg';
+const ZBX_STYLE_WARNING_BG = 'warning-bg';
+const ZBX_STYLE_AVERAGE_BG = 'average-bg';
+const ZBX_STYLE_HIGH_BG = 'high-bg';
+const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
+
+const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
+const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
+const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
+const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
+const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
+const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+
+const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
+
+const ZBX_STYLE_TAG = 'tag';
+const ZBX_STYLE_TAGS_LIST = 'tags-list';
+
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';
@@ -95,28 +114,24 @@ const TRIGGER_SEVERITY_AVERAGE = 3;
 const TRIGGER_SEVERITY_HIGH = 4;
 const TRIGGER_SEVERITY_DISASTER = 5;
 
-const ZBX_STYLE_NA_BG = 'na-bg';
-const ZBX_STYLE_INFO_BG = 'info-bg';
-const ZBX_STYLE_WARNING_BG = 'warning-bg';
-const ZBX_STYLE_AVERAGE_BG = 'average-bg';
-const ZBX_STYLE_HIGH_BG = 'high-bg';
-const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
-
-const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
-const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
-const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
-const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
-const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
-const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
-
-const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
-
 const PERM_READ = 2;
 
 const TAG_EVAL_TYPE_AND_OR = 0;
 
 const MAINTENANCE_TYPE_NORMAL = 0;
 const MAINTENANCE_TYPE_NODATA = 1;
+
+const ZBX_TEMPLATE_DATA_COLLECTION_ANY = -1;
+const ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED = 0;
+const ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS = 1;
+
+const ZBX_TEMPLATE_AGENT_MODE_ANY = -1;
+const ZBX_TEMPLATE_AGENT_MODE_ACTIVE = 0;
+const ZBX_TEMPLATE_AGENT_MODE_PASSIVE = 1;
+
+const ZBX_TEMPLATE_SHOW_ANY = -1;
+const ZBX_TEMPLATE_SHOW_LINKED = 0;
+const ZBX_TEMPLATE_SHOW_NOT_LINKED = 1;
 
 const SYSMAP_BACKGROUND_SCALE_COVER = 1;
 

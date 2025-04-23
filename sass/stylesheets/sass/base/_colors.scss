@@ -37,6 +37,11 @@ $disabled-bg-color: #ebebeb !default;
 $disabled-item-color: #768d99 !default;
 $disabled-item-bg-color: #ccd5d9 !default;
 
+$progress-complete-color: #0275b8 !default;
+$progress-current-color: #768d99 !default;
+$progress-error-color: $negative-color !default;
+$progress-default-color: #ccd5d9 !default;
+
 // Layout.
 $header-bg-color: #ffffff !default;
 

@@ -811,6 +811,8 @@ function toggleSection(toggle, profile_idx = '') {
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
+	section.dispatchEvent(new CustomEvent(!is_collapsed ? 'collapse' : 'expand'));
+
 	if (profile_idx !== '') {
 		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
 	}

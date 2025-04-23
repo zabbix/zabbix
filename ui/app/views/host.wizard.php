@@ -125,7 +125,7 @@ function selectTemplate(): array {
 				(new CDiv([
 					(new CFormField([
 						new CLabel(_('Data collection')),
-						(new CRadioButtonList('data-collection', 0))
+						(new CRadioButtonList('data_collection', 0))
 							->addValue(_('All'), 0)
 							->addValue(_('Agent-based'), 1)
 							->addValue(_('Agentless'), 2)
@@ -133,7 +133,7 @@ function selectTemplate(): array {
 					])),
 					(new CFormField([
 						new CLabel(_('Agent mode')),
-						(new CRadioButtonList('agent-mode', 0))
+						(new CRadioButtonList('agent_mode', 0))
 							->addValue(_('All'), 0)
 							->addValue(_('Active'), 1)
 							->addValue(_('Passive'), 2)

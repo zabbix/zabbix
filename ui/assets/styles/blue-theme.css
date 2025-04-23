@@ -5548,7 +5548,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer .dialogue-cancel {
         margin-right: auto; }
   .modal-popup-host-wizard output {
-    margin: 0; }
+    margin: 16px 0 0; }
   .modal-popup-host-wizard section {
     margin-top: 32px;
     margin-bottom: 0;
@@ -5570,6 +5570,33 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       .modal-popup-host-wizard section.grid-columns .section-head,
       .modal-popup-host-wizard section.grid-columns .section-body {
         display: contents; }
+  .modal-popup-host-wizard .progress {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-items: end;
+    gap: 8px;
+    line-height: 18px; }
+    .modal-popup-host-wizard .progress .progress-step {
+      position: relative;
+      padding-bottom: 8px; }
+      .modal-popup-host-wizard .progress .progress-step::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 0;
+        border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, #ccd5d9);
+        border-radius: 2px; }
+      .modal-popup-host-wizard .progress .progress-step.progress-step-complete {
+        --pregress-step-color: #0275b8; }
+      .modal-popup-host-wizard .progress .progress-step.progress-step-current {
+        --pregress-step-color: #768d99; }
+      .modal-popup-host-wizard .progress .progress-step.progress-step-error {
+        --pregress-step-color: #e33734; }
+      .modal-popup-host-wizard .progress .progress-step.progress-step-disabled {
+        --progress-stype-style: dashed; }
   .modal-popup-host-wizard .grid-columns .form-fields-inline {
     display: flex;
     gap: 16px; }
@@ -5580,14 +5607,21 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .form-field > label {
       margin-bottom: 4px;
       line-height: 16px; }
-    .modal-popup-host-wizard .form-field input {
+    .modal-popup-host-wizard .form-field input,
+    .modal-popup-host-wizard .form-field textarea {
       border-radius: 2px; }
+    .modal-popup-host-wizard .form-field .multiselect {
+      width: 100%; }
     .modal-popup-host-wizard .form-field .form-fields-hint {
       margin-top: 4px;
       font-size: 11px;
       line-height: 16px;
       white-space: initial;
       color: #5e7988; }
+  .modal-popup-host-wizard .pre-shared-key-field {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 4px; }
   .modal-popup-host-wizard .template-subfilter {
     display: flex;
     gap: 4px 16px;
@@ -5611,6 +5645,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .templates-card-list .template-tags label {
     color: #768d99; }
   .modal-popup-host-wizard .templates-card-list .template-tags .tags-list {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -5623,9 +5658,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     line-height: 16px; }
     .modal-popup-host-wizard .templates-card-list .template-tags .btn-icon::before {
       font-size: 16px; }
-  .modal-popup-host-wizard .templates-card-list .template-description {
+  .modal-popup-host-wizard .templates-card-list .template-info-toggles {
     align-self: end; }
-    .modal-popup-host-wizard .templates-card-list .template-description .btn-link {
+    .modal-popup-host-wizard .templates-card-list .template-info-toggles .btn-link {
       float: right;
       color: #1f2c33; }
 

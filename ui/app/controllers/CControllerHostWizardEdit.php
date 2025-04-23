@@ -118,18 +118,19 @@ class CControllerHostWizardEdit extends CController {
 		}
 		unset($template);
 
-		$linked_templates = [];
+		$hostid = $this->hasInput('hostid') ? $this->getInput('hostid') : null;
 
-		if ($this->hasInput('hostid')) {
-			$linked_templates = API::template()->get([
+		$linked_templates = $hostid != null
+			? API::template()->get([
 				'output' => ['templateid'],
-				'hostids' => $this->getInput('hostid'),
+				'hostids' => $hostid,
 				'preservekeys' => true
-			]);
-		}
+			])
+			: [];
 
 		$data = [
-			'form_action' => $linked_templates ? 'host.wizard.update' : 'host.wizard.create',
+			'form_action' => $hostid != null ? 'host.wizard.update' : 'host.wizard.create',
+			'hostid' => $hostid,
 			'templates' => $wizard_ready_templates,
 			'linked_templates' => array_keys($linked_templates),
 			'old_template_count' => $vendor_template_count - $wizard_vendor_template_count,

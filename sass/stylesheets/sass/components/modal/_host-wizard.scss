@@ -43,7 +43,7 @@
 	}
 
 	output {
-		margin: 0;
+		margin: 16px 0 0;
 	}
 
 	section {
@@ -81,6 +81,47 @@
 		}
 	}
 
+	.progress {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: 1fr;
+		align-items: end;
+		gap: 8px;
+		line-height: 18px;
+
+		.progress-step {
+			position: relative;
+			padding-bottom: 8px;
+
+			&::after {
+				content: '';
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				height: 0;
+				border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, $progress-default-color);
+				border-radius: 2px;
+			}
+
+			&.progress-step-complete {
+				--pregress-step-color: $progress-complete-color;
+			}
+
+			&.progress-step-current {
+				--pregress-step-color: $progress-current-color;
+			}
+
+			&.progress-step-error {
+				--pregress-step-color: $progress-error-color;
+			}
+
+			&.progress-step-disabled {
+				--progress-stype-style: dashed;
+			}
+		}
+	}
+
 	.grid-columns {
 		.form-fields-inline {
 			display: flex;
@@ -102,8 +143,13 @@
 			line-height: 16px;
 		}
 
-		input {
+		input,
+		textarea {
 			border-radius: 2px;
+		}
+
+		.multiselect {
+			width: 100%;
 		}
 
 		.form-fields-hint {
@@ -113,6 +159,12 @@
 			white-space: initial;
 			color: $form-field-hint-color;
 		}
+	}
+
+	.pre-shared-key-field {
+		display: grid;
+		grid-template-columns: 1fr max-content;
+		gap: 4px;
 	}
 
 	.template-subfilter {
@@ -152,6 +204,7 @@
 			}
 
 			.tags-list {
+				position: relative;
 				display: flex;
 				flex-wrap: wrap;
 				gap: 8px;
@@ -173,7 +226,7 @@
 			}
 		}
 
-		.template-description {
+		.template-info-toggles {
 			align-self: end;
 
 			.btn-link {
@@ -181,5 +234,8 @@
 				color: $font-color;
 			}
 		}
+
+		.template-info-toggles {}
+
 	}
 }

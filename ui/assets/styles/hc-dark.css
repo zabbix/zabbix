@@ -5547,14 +5547,21 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .form-field > label {
       margin-bottom: 4px;
       line-height: 16px; }
-    .modal-popup-host-wizard .form-field input {
+    .modal-popup-host-wizard .form-field input,
+    .modal-popup-host-wizard .form-field textarea {
       border-radius: 2px; }
+    .modal-popup-host-wizard .form-field .multiselect {
+      width: 100%; }
     .modal-popup-host-wizard .form-field .form-fields-hint {
       margin-top: 4px;
       font-size: 11px;
       line-height: 16px;
       white-space: initial;
       color: #5e7988; }
+  .modal-popup-host-wizard .pre-shared-key-field {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 4px; }
   .modal-popup-host-wizard .template-subfilter {
     display: flex;
     gap: 4px 16px;

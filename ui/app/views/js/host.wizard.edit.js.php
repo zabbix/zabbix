@@ -60,20 +60,64 @@ window.host_wizard_edit = new class {
 
 	#template_templates_section;
 	#template_card;
+	#template_tag;
+	#template_tag_more;
 
-	#form = {
-		search_query: ''
-	}
+	#form_data;
+
+	#form_default_data = {
+		template_search_query: '',
+		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
+		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
+		show_templates: ZBX_TEMPLATE_SHOW_ANY,
+		tls_psk: '',
+		tls_psk_identity: '',
+		monitoring_os: -1,
+		monitoring_os_distribution: -1
+	};
+
+	#sections_expanded = new Map();
 
 	init({templates, linked_templates, wizard_hide_welcome}) {
+		this.#initViewTemplates();
+
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
-
 		this.#linked_templates = linked_templates;
 		this.#first_step = wizard_hide_welcome ? this.STEP_SELECT_TEMPLATE : this.STEP_WELCOME;
 		this.#last_step = this.STEP_INSTALL_AGENT;
 
+		this.#overlay = overlays_stack.getById('host.wizard.edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+
+		this.#form_data = this.#initReactiveData(this.#form_default_data, (property, value) => {
+			this.#updateForm(property, value);
+		});
+
+		this.#dialogue.addEventListener('input', ({target}) => {
+			if (target.name in this.#form_data) {
+				this.#form_data[target.name] = target.value;
+			}
+		});
+
+		this.#dialogue.addEventListener('click', ({target}) => {
+			if (target.classList.contains('js-generate-pre-shared-key')) {
+				this.#form_data.tls_psk = this.#generatePSK();
+			}
+		});
+
+		this.#back_button = this.#dialogue.querySelector('.js-back');
+		this.#back_button.addEventListener('click', () => this.#gotoBackStep());
+
+		this.#next_button = this.#dialogue.querySelector('.js-next');
+		this.#next_button.addEventListener('click', () => this.#gotoNextStep());
+
+		this.#gotoStep(this.STEP_SELECT_TEMPLATE);
+		//this.#gotoStep(this.#first_step);
+	}
+
+	#initViewTemplates() {
 		this.#template_step_welcome = new Template(
 			document.getElementById('host-wizard-step-welcome').innerHTML
 		);
@@ -93,19 +137,12 @@ window.host_wizard_edit = new class {
 		this.#template_card = new Template(
 			document.getElementById('host-wizard-template-card').innerHTML
 		);
-
-		this.#overlay = overlays_stack.getById('host.wizard.edit');
-		this.#dialogue = this.#overlay.$dialogue[0];
-
-		this.#back_button = this.#dialogue.querySelector('.js-back');
-		this.#back_button.addEventListener('click', () => this.#gotoBackStep());
-
-		this.#next_button = this.#dialogue.querySelector('.js-next');
-		this.#next_button.addEventListener('click', () => this.#gotoNextStep());
-
-		this.#gotoStep(this.STEP_INSTALL_AGENT);
-		//this.#gotoStep(this.#first_step);
-		this.#updateForm();
+		this.#template_tag = new Template(
+			document.getElementById('host-wizard-template-tag').innerHTML
+		);
+		this.#template_tag_more = new Template(
+			document.getElementById('host-wizard-template-tag-more').innerHTML
+		);
 	}
 
 	#gotoBackStep() {
@@ -119,36 +156,149 @@ window.host_wizard_edit = new class {
 	#gotoStep(step) {
 		this.#current_step = step;
 
-		const step_render = {
-			[this.STEP_WELCOME]: () => this.#renderWelcome(),
-			[this.STEP_SELECT_TEMPLATE]: () => this.#renderSelectTemplate(),
-			[this.STEP_CREATE_HOST]: () => this.#renderCreateHost(),
-			[this.STEP_INSTALL_AGENT]: () => this.#renderInstallAgent()
-		}[this.#current_step];
-
-		if (step_render !== undefined) {
-			this.#dialogue.querySelector('.step-form-body').replaceWith(step_render());
+		switch (this.#current_step) {
+			case this.STEP_WELCOME:
+				this.#renderWelcome();
+				break;
+			case this.STEP_SELECT_TEMPLATE:
+				this.#renderSelectTemplate();
+				break;
+			case this.STEP_CREATE_HOST:
+				this.#renderCreateHost();
+				break;
+			case this.STEP_INSTALL_AGENT:
+				this.#renderInstallAgent()
 		}
-
-		this.#overlay.unsetLoading();
 
 		this.#back_button.toggleAttribute('disabled', this.#current_step === this.#first_step);
 		this.#next_button.toggleAttribute('disabled', this.#current_step === this.#last_step);
+
+		this.#updateForm();
+
+		this.#overlay.unsetLoading();
 	}
 
 	#renderWelcome() {
-		return this.#template_step_welcome.evaluateToElement();
+		const step = this.#template_step_welcome.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
 	#renderSelectTemplate() {
+		const step = this.#template_step_select_template.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+	}
+
+	#renderCreateHost() {
+		const step = this.#template_step_create_host.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+
+		jQuery("#hostid, #groups_", step).multiSelect();
+	}
+
+	#renderInstallAgent() {
+		const step = this.#template_step_install_agent.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+	}
+
+	#updateForm(property, value) {
+		if (property !== undefined) {
+			this.#updateField(property, value);
+		}
+		else {
+			for (const [property, value] of Object.entries(this.#form_data)) {
+				this.#updateField(property, value);
+			}
+		}
+
+		switch (this.#current_step) {
+			case this.STEP_WELCOME:
+				this.#renderWelcome();
+				break;
+			case this.STEP_SELECT_TEMPLATE:
+				const step_body = document.querySelector('.js-templates');
+
+				step_body.innerHTML = '';
+				for (const section of this.#getCardListSections()) {
+					step_body.appendChild(section);
+				}
+				break;
+			case this.STEP_CREATE_HOST:
+				this.#renderCreateHost();
+				break;
+			case this.STEP_INSTALL_AGENT:
+				const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
+
+				if (windows_distribution_select !== null) {
+					windows_distribution_select.style.display = this.#form_data.monitoring_os === 'windows' ? '' : 'none';
+				}
+				break;
+		}
+	}
+
+	#updateField(property, value) {
+		const field = this.#dialogue.querySelector(`[name="${property}"]`);
+
+		if (field === null) {
+			return;
+		}
+
+		switch (field.type) {
+			case 'checkbox':
+				field.checked = Boolean(value);
+				break;
+			case 'radio':
+				for (const radio of this.#dialogue.querySelectorAll(`[name="${property}"]`)) {
+					radio.checked = radio.value == value;
+				}
+				break;
+			default:
+				field.value = value;
+		}
+	}
+
+	#initReactiveData(initial_data, on_change_callback) {
+		return new Proxy(initial_data, {
+			set(target, property, value) {
+				if (target[property] !== value) {
+					target[property] = value;
+					on_change_callback(property, value);
+				}
+
+				return true;
+			}
+		});
+	}
+
+	#generatePSK() {
+		const array = new Uint8Array(32);
+		window.crypto.getRandomValues(array);
+
+		return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+	}
+
+	#getCardListSections() {
 		let template_classes = Array.from(this.#templates)
 			.filter(([templateid, template]) => {
-				if (this.#form.search_query.trim() !== '') {
-					return template.name.toLowerCase().includes(this.#form.search_query)
-						|| template.description.toLowerCase().includes(this.#form.search_query)
+				if (this.#form_data.data_collection != ZBX_TEMPLATE_DATA_COLLECTION_ANY
+						&& !template.data_collection.includes(Number(this.#form_data.data_collection))) {
+					return false;
+				}
+
+				if (this.#form_data.agent_mode != ZBX_TEMPLATE_AGENT_MODE_ANY
+						&& !template.agent_mode.includes(Number(this.#form_data.agent_mode))) {
+					return false;
+				}
+
+				if (this.#form_data.template_search_query.trim() !== '') {
+					return template.name.toLowerCase().includes(this.#form_data.template_search_query)
+						|| template.description.toLowerCase().includes(this.#form_data.template_search_query)
 						|| template.tags.some(({tag, value}) => {
-							return tag.toLowerCase().includes(this.#form.search_query)
-								|| value.toLowerCase().includes(this.#form.search_query);
+							return tag.toLowerCase().includes(this.#form_data.template_search_query)
+								|| value.toLowerCase().includes(this.#form_data.template_search_query);
 						});
 				}
 
@@ -166,10 +316,7 @@ window.host_wizard_edit = new class {
 
 		template_classes = new Map([...template_classes.entries()].sort((a, b) => a[0].localeCompare(b[0])));
 
-		const step = this.#template_step_select_template.evaluateToElement();
-		const step_body = step.querySelector('#host-wizard-templates');
-
-		let is_first = true;
+		const sections = [];
 
 		for (const [title, templateids] of template_classes) {
 			const section = this.#template_templates_section.evaluateToElement({
@@ -177,11 +324,11 @@ window.host_wizard_edit = new class {
 				count: templateids.length
 			});
 
-			if (is_first) {
-				is_first = false;
-			}
-			else {
-				section.classList.add('collapsed');
+			const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(title);
+			this.#sections_expanded.set(title, expanded);
+
+			if (!expanded && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
+				toggleSection(section.querySelector('.toggle'));
 			}
 
 			const card_list = section.querySelector('.templates-card-list');
@@ -192,22 +339,13 @@ window.host_wizard_edit = new class {
 				card_list.appendChild(card)
 			}
 
-			step_body.appendChild(section);
+			section.addEventListener('expand', () => this.#sections_expanded.set(title, true));
+			section.addEventListener('collapse', () => this.#sections_expanded.set(title, false));
+
+			sections.push(section);
 		}
 
-		return step;
-	}
-
-	#renderCreateHost() {
-		return this.#template_step_create_host.evaluateToElement();
-	}
-
-	#renderInstallAgent() {
-		return this.#template_step_install_agent.evaluateToElement();
-	}
-
-	#updateForm() {
-
+		return sections;
 	}
 
 	#makeCard(template) {
@@ -215,10 +353,63 @@ window.host_wizard_edit = new class {
 			title: template.name
 		});
 
+		const tags_list = card.querySelector(`.${ZBX_STYLE_TAGS_LIST}`);
+
+		/**
+		 * @type {HTMLDivElement}
+		 */
+		const temp_tag_list = tags_list.cloneNode(false);
+
+		temp_tag_list.style.visibility = 'hidden';
+		temp_tag_list.style.position = 'absolute';
+		temp_tag_list.style.width = '195px';
+		temp_tag_list.style.maxHeight = '40px';
+		temp_tag_list.style.pointerEvents = 'none';
+		temp_tag_list.style.zIndex = '-1';
+
+		document.body.appendChild(temp_tag_list);
+
+		let all_fits = true;
+
+		for (let i = 0; i < template.tags.length; i++) {
+			const tag_element = this.#template_tag.evaluateToElement(template.tags[i]);
+
+			temp_tag_list.appendChild(tag_element);
+
+			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+				temp_tag_list.removeChild(tag_element);
+				all_fits = false;
+				break;
+			}
+		}
+
+		if (!all_fits) {
+			temp_tag_list.appendChild(this.#template_tag_more.evaluateToElement());
+
+			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+				const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
+
+				temp_tag_list.removeChild(tags[tags.length - 1]);
+			}
+		}
+
+		tags_list.innerHTML = temp_tag_list.innerHTML;
+
 		card.querySelector('.js-template-info-collapse').style.display = 'none';
 
 		return card;
 	}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
