@@ -798,7 +798,7 @@ class CWidgetBase {
 	 * @param {boolean} self          Whether this particular widget is about to be edited.
 	 * @param {boolean} is_exclusive  Whether to prevent switching to editing another widgets.
 	 */
-	enterWidgetEditing(self, {is_exclusive}) {
+	enterWidgetEditing(self, {is_exclusive = false} = {}) {
 		this._target.classList.add('is-editing');
 
 		this._button_actions.disabled = true;

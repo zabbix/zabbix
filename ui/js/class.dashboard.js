@@ -1587,7 +1587,7 @@ class CDashboard {
 				});
 
 				this.#widget_edit_dialogue.addEventListener(CWidgetEditDialogue.EVENT_READY, () => {
-					this._selected_dashboard_page.enterWidgetEditing(sandbox.getWidget(), {is_exclusive: false});
+					this._selected_dashboard_page.enterWidgetEditing(sandbox.getWidget());
 				});
 
 				return this.#widget_edit_dialogue.run(dialogue_params);

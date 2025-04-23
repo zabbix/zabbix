@@ -259,7 +259,7 @@ class CDashboardPage {
 	 * @param {CWidget} for_widget    Widget, which is about to be edited.
 	 * @param {boolean} is_exclusive  Whether to prevent switching to editing another widgets.
 	 */
-	enterWidgetEditing(for_widget, {is_exclusive}) {
+	enterWidgetEditing(for_widget, {is_exclusive = false} = {}) {
 		this.#is_widget_editing = true;
 
 		for (const widget of this._widgets.keys()) {
