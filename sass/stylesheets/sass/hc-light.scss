@@ -993,3 +993,16 @@ td.inactive-bg {
 		}
 	}
 }
+
+.file-upload-wrapper {
+	display: inline-block;
+}
+
+.file-upload-wrapper .file-upload-btn {
+	margin-left: .3em;
+}
+
+.saml-change-identity-button {
+	width: 100%;
+	max-width: 200px;
+}
