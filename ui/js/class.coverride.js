@@ -37,7 +37,7 @@ jQuery(function ($) {
 			color_picker.colorFieldName = opt.makeName('color', opt.getId($override));
 			color_picker.paletteFieldName = opt.makeName('color_palette', opt.getId($override));
 			color_picker.value = value;
-			color_picker.inputId = zbx_formatDomId(field_name);
+			color_picker.inputId = field_name.replace(/\]/g, '_').replace(/\[/g, '_');
 			color_picker.hasPalette = true;
 
 			return $('<div>')
