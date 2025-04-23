@@ -58,7 +58,7 @@ type Connection struct {
 	timeoutMode int
 }
 
-// ConnectionInterface is inteface for connection with Server or Proxy.
+// ConnectionInterface is interface for connection with Server or Proxy.
 type ConnectionInterface interface {
 	Close() (err error)
 	Read() (data []byte, err error)
