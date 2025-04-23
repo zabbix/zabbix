@@ -12,7 +12,7 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-global $SSO;
+
 
 /**
  * @var CView $this
@@ -303,8 +303,8 @@ $saml_tab
 		)
 	]);
 
-// SSO certificates upload
-if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database') {
+if (array_key_exists('idp_certificate_status', $data) && array_key_exists('sp_certificate_status', $data)
+		&& array_key_exists('sp_private_key_status', $data)) {
 	$saml_tab
 		->addItem([
 			(new CLabel(_('IdP certificate')))->addClass('saml-identity-label'),
@@ -403,7 +403,6 @@ if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database
 			]))->addClass('saml-identity')
 		]);
 }
-// End SSO certificates
 
 $saml_tab->addItem([
 		new CLabel(_('Sign')),
@@ -829,9 +828,9 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'mfa_methods' => $data['mfa_methods'],
 		'mfa_default_row_index' => $data['mfa_default_row_index'],
 		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
-		'saml_idp_certificate_exists' => $data['idp_certificate_status'] ?? false,
-		'saml_sp_certificate_exists' => $data['sp_certificate_status'] ?? false,
-		'saml_sp_private_key_exists' => $data['sp_private_key_status'] ?? false,
+		'saml_idp_certificate_exists' => array_key_exists('idp_certificate_status', $data) ? $data['idp_certificate_status'] : false,
+		'saml_sp_certificate_exists' => array_key_exists('sp_certificate_status', $data) ? $data['sp_certificate_status'] : false,
+		'saml_sp_private_key_exists' => array_key_exists('sp_private_key_status', $data) ? $data['sp_private_key_status'] : false,
 	]).');'
 ))
 	->setOnDocumentReady()
