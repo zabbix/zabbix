@@ -220,13 +220,23 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Set form OAuth input fields, remove UI updated status.
 	 *
-	 * @param {object} oauth  Key value pair of OAuth fields.
+	 * @param {object} oauth  Key value pair of OAuth fields and oauth status message.
 	 */
 	#setOAuth(oauth = {}) {
-		const oauth_fields_container = this.form.querySelector('#js-oauth-fields');
+		const status_container = this.form.querySelector('#js-oauth-status');
 
-		this.form.querySelector('#js-oauth-status')?.remove();
-		oauth_fields_container.innerHTML = '';
+		status_container.innerText = '';
+		status_container.style.display = 'none';
+
+		if ('message' in oauth) {
+			const italic = document.createElement('em');
+
+			italic.innerText = oauth.message;
+			status_container.append(italic);
+			status_container.style.display = '';
+
+			delete oauth.message;
+		}
 
 		for (const [name, value] of Object.entries(oauth)) {
 			const input = document.createElement('input');
@@ -235,7 +245,7 @@ window.mediatype_edit_popup = new class {
 			input.type = 'hidden';
 			input.value = value;
 
-			oauth_fields_container.append(input);
+			status_container.append(input);
 		}
 	}
 

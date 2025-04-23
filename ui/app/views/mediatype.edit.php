@@ -149,26 +149,18 @@ $oauth_status = [];
 $oauth_fields = [];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-	$oauth_fields = [
+	$oauth_status = [
 		(new CVar('redirection_url', $data['redirection_url']))->removeId(),
 		(new CVar('client_id', $data['client_id']))->removeId(),
 		(new CVar('authorization_url', $data['authorization_url']))->removeId(),
 		(new CVar('token_url', $data['token_url']))->removeId(),
-		(new CVar('tokens_status', $data['tokens_status']))->removeId()
+		(new CVar('tokens_status', $data['tokens_status']))->removeId(),
+		italic(_s('Configured %1$s ago', zbx_date2age($data['access_token_updated'])))
 	];
 
-	if ($data['access_token_updated'] > 0) {
-		$oauth_status[] = [
-			italic(_s('Configured %1$s ago', zbx_date2age($data['access_token_updated']), time())),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-		];
-	}
-
 	if (!($data['tokens_status'] & OAUTH_REFRESH_TOKEN_VALID)) {
-		$oauth_status[] = [
-			makeErrorIcon(_('Refresh token is invalid or outdated.')),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-		];
+		$oauth_status[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$oauth_status[] = makeErrorIcon(_('Refresh token is invalid or outdated.'));
 	}
 }
 
@@ -177,12 +169,13 @@ $mediatype_form_grid->addItem([
 		->setId('oauth-token-label')
 		->setAsteriskMark(),
 	(new CFormField([
-		$oauth_status ? (new CSpan($oauth_status))->setId('js-oauth-status') : null,
+		(new CSpan($oauth_status))
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+			->setId('js-oauth-status'),
 		(new CButtonLink(_('Configure')))
 			->setId('js-oauth-configure')
 			->setEnabled(!array_key_exists('curl_error', $data)),
-		array_key_exists('curl_error', $data) ? makeErrorIcon($data['curl_error']) : null,
-		(new CSpan($oauth_fields))->setId('js-oauth-fields')
+		array_key_exists('curl_error', $data) ? makeErrorIcon($data['curl_error']) : null
 	]))->setId('oauth-token-field')
 ]);
 
