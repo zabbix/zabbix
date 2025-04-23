@@ -192,6 +192,8 @@ class CWidgetEditDialogue extends EventTarget {
 	}
 
 	#onSubmitRequest() {
+		this.#overlay.setLoading();
+
 		this.#promiseSubmitReadiness()
 			.then(() => {
 				this.#overlay.unsetLoading();
