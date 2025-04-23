@@ -311,9 +311,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
+			$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
 			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->click();
 			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
-			$dialog->query('id:expr_temp')->waitUntilVisible();
+			$dialog->query('xpath:.//textarea[@id="expr_temp"]')->waitUntilVisible();
 
 			if ($data['constructor'] === 'open_close') {
 				$dialog->query('button:Close expression constructor')->waitUntilClickable()->one()->click();
@@ -357,9 +358,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestTextPresent('Expression');
-			$this->zbxTestAssertVisibleId('expr_temp');
-			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
-			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'readonly');
+			$this->zbxTestAssertVisibleXpath('//textarea[@id="expr_temp"]');
+			$this->zbxTestAssertAttribute('//textarea[@id="expr_temp"]', 'rows', 7);
+			$this->zbxTestAssertAttribute('//textarea[@id="expr_temp"]', 'readonly');
 			$this->zbxTestTextPresent('Close expression constructor');
 			$this->zbxTestAssertNotVisibleXpath('//input[@name="expression"]');
 
@@ -950,8 +951,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'description' => 'triggerName',
 					'expression' => 'default',
 					'error_msg' => 'Cannot add trigger prototype',
-					'inline_errors' => [
-						'Name' => 'Trigger prototype "triggerName" already exists on "Simple form test host".'
+					'errors' => [
+						'Trigger prototype "triggerName" already exists on "Simple form test host".'
 					]
 				]
 			]
