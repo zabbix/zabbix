@@ -129,12 +129,7 @@ class testWidgets extends CWebTest {
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
 		// Close all dialogs.
-		$dialogs = COverlayDialogElement::find()->all();
-
-		$dialog_count = $dialogs->count();
-		for ($i = $dialog_count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
-		}
+		COverlayDialogElement::closeAll();
 	}
 
 	/**

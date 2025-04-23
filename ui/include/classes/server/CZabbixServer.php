@@ -591,6 +591,7 @@ class CZabbixServer {
 
 			$protocol = '';
 			$context = stream_context_create([]);
+
 			if ($ZBX_SERVER_TLS['ACTIVE']) {
 				$protocol = 'tls://';
 				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
@@ -599,14 +600,8 @@ class CZabbixServer {
 				stream_context_set_option($context, 'ssl', 'verify_peer_name', (bool)$ZBX_SERVER_TLS['VERIFY_NAME']);
 			}
 
-			if (!$socket = @stream_socket_client(
-				$protocol . $this->host . ':' . $this->port,
-				$errorCode,
-				$errorMsg,
-				$this->connect_timeout,
-				STREAM_CLIENT_CONNECT,
-				$context
-			)) {
+			if (!$socket = @stream_socket_client($protocol . $this->host . ':' . $this->port, $errorCode, $errorMsg,
+					$this->connect_timeout, STREAM_CLIENT_CONNECT, $context)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
@@ -622,7 +617,7 @@ class CZabbixServer {
 
 					default:
 						if ($ZBX_SERVER_TLS['ACTIVE']) {
-							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n;\n3. Incorrect TLS configuration.\n", $this->host);
+							$dErrorMsg = _("Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.");
 						}
 						else {
 							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
@@ -645,15 +640,14 @@ class CZabbixServer {
 				$issuer_string  = implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($parsed_cert['issuer']),
 					$parsed_cert['issuer']));
 
-
 				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
-					&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
+						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
 					$this->error = _('Issuer of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
 					return false;
 				}
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
-					&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
+						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
 					$this->error = _('Subject of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
 					return false;
 				}

@@ -62,8 +62,6 @@ const view = new class {
 
 				for (const id of ['zbx_server_tls_box', 'zbx_server_tls_verify_name_box']) {
 					document.getElementById(id).addEventListener('change', () => this._updateSetting());
-
-					console.log(document.getElementById(id))
 				}
 
 				this._updateSetting();
@@ -178,13 +176,19 @@ const view = new class {
 			'zbx_server_tls_cert_file': encryption_enabled,
 			'zbx_server_tls_certificate_issuer': encryption_enabled,
 			'zbx_server_tls_certificate_subject': encryption_enabled,
-			'zbx_server_tls_verify_name_row': encryption_enabled
+			'zbx_server_tls_verify_name_box': encryption_enabled,
 		}
 
 		for (let id in rows) {
-			const element = document.getElementById(id);
+			const input = document.querySelector(`#${id}`);
+			const label = document.querySelector(`label[for="${id}"]`);
 
-			element.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
+			input.parentElement.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
+			label.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
+
+			if (!encryption_enabled) {
+				input.value = null;
+			}
 		}
 
 		if (encryption_enabled) {

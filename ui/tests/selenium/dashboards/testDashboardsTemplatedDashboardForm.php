@@ -4409,7 +4409,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @return array
 	 */
 	protected function fillWidgetConfigurationFrom($data, $update = false) {
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady(30)->one();
 		$form = $dialog->asForm();
 		$form->fill($data['fields']);
 

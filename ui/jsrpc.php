@@ -79,6 +79,19 @@ switch ($data['method']) {
 			CSessionHelper::set('serverCheckTime', time());
 		}
 
+		$message = '';
+
+		if (!CSessionHelper::get('serverCheckResult') ) {
+			global $ZBX_SERVER_TLS;
+
+			if ($ZBX_SERVER_TLS['ACTIVE']) {
+				$message = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+			}
+			else {
+				$message = _('Zabbix server is not running: the information displayed may not be current.');
+			}
+		}
+
 		$result = [
 			'result' => (bool) CSessionHelper::get('serverCheckResult'),
 			'message' => CSessionHelper::get('serverCheckResult')
