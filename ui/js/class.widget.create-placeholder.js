@@ -15,14 +15,24 @@
 
 class CWidgetCreatePlaceholder extends CWidget {
 
+	#update_promise;
+	#update_promise_reject;
+
 	onStart() {
 		for (const button of this._header.querySelectorAll('button')) {
 			button.disabled = true;
 		}
+
+		this.#update_promise = new Promise((resolve, reject) => {
+			this.#update_promise_reject = reject;
+		});
+	}
+
+	onDestroy() {
+		this.#update_promise_reject();
 	}
 
 	promiseUpdate() {
-		// Return never-resolving promise to keep loader spinning.
-		return new Promise(() => {});
+		return this.#update_promise;
 	}
 }
