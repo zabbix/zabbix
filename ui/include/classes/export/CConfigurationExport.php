@@ -894,7 +894,8 @@ class CConfigurationExport {
 	 *
 	 * @return array
 	 */
-	protected function prepareDiscoveryRules(array $items) {
+	protected function prepareDiscoveryRules(array $items, bool $is_lld_rule_prototype = false)
+	{
 		$templateids = [];
 
 		foreach ($items as &$item) {
@@ -992,13 +993,14 @@ class CConfigurationExport {
 		$options = [
 			'output' => $this->dataFields['item_prototype'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
 			'discoveryids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		];
 
-		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 
 		$item_prototypes = API::ItemPrototype()->get($options);
 
@@ -1059,7 +1061,9 @@ class CConfigurationExport {
 				$item_prototype['valuemap']['name'] = $db_valuemaps[$item_prototype['valuemapid']]['name'];
 			}
 
-			$items[$item_prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $item_prototype;
+			$parent_lld = $item_prototype['discoveryRule'] ?: $item_prototype['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['itemPrototypes'][] = $item_prototype;
 		}
 
 		// gather graph prototypes
@@ -1067,24 +1071,28 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'discoveryids' => array_column($items, 'itemid'),
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRulePrototype' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		];
 
-		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 
 		$graphs = API::GraphPrototype()->get($options);
 
 		$graphs = $this->prepareGraphs($graphs);
 
 		foreach ($graphs as $graph) {
-			$items[$graph['discoveryRule']['itemid']]['graphPrototypes'][] = $graph;
+			$parent_lld = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['graphPrototypes'][] = $graph;
 		}
 
 		// gather trigger prototypes
 		$options = [
 			'output' => $this->dataFields['trigger_prototype'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRulePrototype' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectHosts' => ['status'],
 			'selectItems' => ['itemid', 'flags', 'type'],
@@ -1093,14 +1101,16 @@ class CConfigurationExport {
 			'preservekeys' => true
 		];
 
-		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 
 		$triggers = API::TriggerPrototype()->get($options);
 
 		$triggers = $this->prepareTriggers($triggers);
 
 		foreach ($triggers as $trigger) {
-			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
+			$parent_lld = $trigger['discoveryRule'] ?: $trigger['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['triggerPrototypes'][] = $trigger;
 		}
 
 		// gather host prototypes
@@ -1110,6 +1120,7 @@ class CConfigurationExport {
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRulePrototype' => API_OUTPUT_EXTEND,
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -1141,10 +1152,47 @@ class CConfigurationExport {
 			}
 			unset($group_link);
 
-			$items[$host_prototype['discoveryRule']['itemid']]['hostPrototypes'][] = $host_prototype;
+
+			$parent_lld = $host_prototype['discoveryRule'] ?: $host_prototype['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['hostPrototypes'][] = $host_prototype;
+		}
+
+		if (!$is_lld_rule_prototype) {
+			$this->gatherDiscoveryPrototypes($items, $items);
 		}
 
 		return $items;
+	}
+
+	private function gatherDiscoveryPrototypes(array $lld_rules, array &$items, bool $is_lld_rule_prototype = false): void
+	{
+		$discovery_prototypes = API::DiscoveryRulePrototype()->get([
+			'output' => CDiscoveryRulePrototype::OUTPUT_FIELDS,
+			'discoveryids' => array_keys($lld_rules),
+			'selectDiscoveryRule' => ['itemid', 'key_'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'key_'],
+			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'preservekeys' => true
+		]);
+
+		if ($discovery_prototypes) {
+			$this->gatherDiscoveryPrototypes($discovery_prototypes,$items, true);
+		}
+
+		if ($is_lld_rule_prototype) {
+			$lld_rules = $this->prepareDiscoveryRules($lld_rules, true);
+			foreach ($lld_rules as &$lld_rule) {
+				$parent_lld = $lld_rule['discoveryRule'] ?: $lld_rule['discoveryRulePrototype'];
+
+				$lld_rule['parent_discovery_rule'] = ['key' => $parent_lld['key_']];
+				$items[$lld_rule['itemid']] = $lld_rule;
+			}
+			unset($discovery_prototype);
+		}
 	}
 
 	/**

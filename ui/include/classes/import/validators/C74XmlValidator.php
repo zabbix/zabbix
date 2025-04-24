@@ -1461,6 +1461,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
+							'parent_discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
+								'key' => ['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'discover' => ['type' => XML_STRING],
 							'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
 								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
 								['else' => true, 'type' => XML_IGNORE_TAG]
@@ -2675,6 +2679,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
+							'parent_discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
+								'key' => ['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'discover' => ['type' => XML_STRING],
 							'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
 								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
 								['else' => true, 'type' => XML_IGNORE_TAG]

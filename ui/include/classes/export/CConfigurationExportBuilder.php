@@ -657,7 +657,7 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
-				'uuid' => $discoveryRule['uuid'],
+				'uuid' => $discoveryRule['uuid'] ?? '',
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -703,7 +703,9 @@ class CConfigurationExportBuilder {
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => self::formatLldMacroPaths($discoveryRule['lld_macro_paths']),
 				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
-				'overrides' => self::formatLldOverrides($discoveryRule['overrides'])
+				'overrides' => self::formatLldOverrides($discoveryRule['overrides']),
+				'parent_discovery_rule' => $discoveryRule['parent_discovery_rule'] ?? '',
+				'discover' => $discoveryRule['discover'] ?? ''
 			];
 
 			if (!$data['filter']['conditions']) {
@@ -975,6 +977,21 @@ class CConfigurationExportBuilder {
 				'inventory_mode' => $hostPrototype['inventory_mode'],
 				'custom_interfaces' => $hostPrototype['custom_interfaces'],
 				'interfaces' => $this->formatHostPrototypeInterfaces($hostPrototype['interfaces'])
+			];
+		}
+
+		return $result;
+	}
+
+	protected function formatDiscoveryRulePrototypes(array $discovery_rule_prototypes) {
+		$result = [];
+
+		foreach ($discovery_rule_prototypes as $discovery_rule_prototype) {
+			$result[] = [
+				'itemid' => $discovery_rule_prototype['itemid'],
+				'name' => $discovery_rule_prototype['name'],
+				'key' => $discovery_rule_prototype['key_'],
+				'parent_discovery_rule_prototype' => $discovery_rule_prototype['parent_discovery_rule_prototype'],
 			];
 		}
 
