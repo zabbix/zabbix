@@ -24,7 +24,7 @@ require_once __DIR__.'/../../include/CWebTest.php';
  * @dataSource DynamicItemWidgets
  * @onBefore prepareData
  */
-class testDashboardURLWidget extends CWebTest {
+class testDashboardURLWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior to the test.

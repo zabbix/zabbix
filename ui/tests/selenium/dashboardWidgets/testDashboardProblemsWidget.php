@@ -35,7 +35,7 @@ class testDashboardProblemsWidget extends CWebTest {
 	 */
 	public function onBeforeTestCase() {
 		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ALERT_ACCEPT);
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
 	}
 
 	/**

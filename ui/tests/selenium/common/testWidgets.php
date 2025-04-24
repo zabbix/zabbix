@@ -48,13 +48,13 @@ class testWidgets extends CWebTest {
 			' wf.value_graphid, wf.value_hostid';
 
 	/**
-	 * Callback executed before every test case.
+	 * Callback executed before every test case. Automatically accept the alert.
 	 *
 	 * @before
 	 */
 	public function onBeforeTestCase() {
 		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ALERT_ACCEPT);
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
 	}
 
 	/**

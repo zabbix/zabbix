@@ -32,8 +32,8 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 class CommandExecutor extends HttpCommandExecutor {
 
 	const STRATEGY_DEFAULT = 'default';
-	const STRATEGY_ALERT_ACCEPT = 'accept';
-	const STRATEGY_ALERT_DISMISS = 'dismiss';
+	const STRATEGY_ACCEPT_ALERT = 'accept';
+	const STRATEGY_DISMISS_ALERT = 'dismiss';
 
 	protected static $alert_strategy = self::STRATEGY_DEFAULT;
 
@@ -53,6 +53,11 @@ class CommandExecutor extends HttpCommandExecutor {
 		$this->executor = $executor;
 	}
 
+	/**
+	 * Defines how alerts should be handled during test execution.
+	 *
+	 * @param string $strategy    available alert strategies: do nothing and remain open, accept or dismiss
+	 */
 	public static function setAlertStrategy($strategy) {
 		self::$alert_strategy = $strategy;
 	}
@@ -66,11 +71,11 @@ class CommandExecutor extends HttpCommandExecutor {
 		}
 		catch (UnexpectedAlertOpenException $exception) {
 			switch (self::$alert_strategy) {
-				case self::STRATEGY_ALERT_ACCEPT:
+				case self::STRATEGY_ACCEPT_ALERT:
 					CElementQuery::getPage()->acceptAlert();
 					break;
 
-				case self::STRATEGY_ALERT_DISMISS:
+				case self::STRATEGY_DISMISS_ALERT:
 					CElementQuery::getPage()->dismissAlert();
 					break;
 

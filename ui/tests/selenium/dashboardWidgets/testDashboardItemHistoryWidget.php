@@ -2052,7 +2052,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				}
 
 				$column_overlay->waitUntilNotVisible();
-				$form = COverlayDialogElement::get('Edit widget')->asForm();
+				$form = COverlayDialogElement::get($update ? 'Edit widget' : 'Add widget')->asForm();
 			}
 		}
 
@@ -2201,10 +2201,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
 			$form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+			$overlay_title = 'Edit widget';
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
+			$overlay_title = 'Add widget';
 		}
 
 		$form->fill([
@@ -2225,7 +2227,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
-			$form = COverlayDialogElement::get('Edit widget')->asForm();
+			// Initialize $form again after reload and name change.
+			$form = COverlayDialogElement::get($overlay_title)->asForm();
 			$form->submit();
 
 			// Check that changes took place on the unsaved dashboard.
