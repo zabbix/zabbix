@@ -249,7 +249,7 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'trigger', 'trigger prototype']);
+		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype']);
 
 		switch ($object) {
 			case 'trigger':
@@ -482,7 +482,7 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'trigger', 'trigger prototype']);
+		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype']);
 
 		switch ($object) {
 			case 'trigger':
