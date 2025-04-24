@@ -445,9 +445,9 @@ window.trigger_edit_popup = new class {
 			this.expression_constructor_active = false;
 		}
 
+		this.form.discoverAllFields();
 		this.form.findFieldByName('expression').setErrors({message: '', level: 0});
 		this.form.findFieldByName('expr_temp').setErrors({message: '', level: 0});
-		this.form.discoverAllFields();
 		this.form.validateChanges(['expression']);
 	}
 
@@ -499,9 +499,9 @@ window.trigger_edit_popup = new class {
 			this.recovery_expression_constructor_active = false;
 		}
 
+		this.form.discoverAllFields();
 		this.form.findFieldByName('recovery_expression').setErrors({message: '', level: 0});
 		this.form.findFieldByName('recovery_expr_temp').setErrors({message: '', level: 0});
-		this.form.discoverAllFields();
 		this.form.validateChanges(['recovery_expression']);
 	}
 
