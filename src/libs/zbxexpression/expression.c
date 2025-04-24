@@ -2490,9 +2490,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 		}
 		else if (0 == indexed_macro &&
-				0 != (macro_type & (ZBX_MACRO_TYPE_ITEM_KEY | ZBX_MACRO_TYPE_PARAMS_FIELD |
-						ZBX_MACRO_TYPE_LLD_FILTER | ZBX_MACRO_TYPE_ALLOWED_HOSTS |
-						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD | ZBX_MACRO_TYPE_QUERY_FILTER)))
+				0 != (macro_type & (ZBX_MACRO_TYPE_ITEM_KEY)))
 		{
 			zbx_uint64_t			c_hostid, c_itemid;
 			const char			*host, *name;
@@ -2515,8 +2513,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				c_interface = &dc_item->interface;
 			}
 
-			if ((ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)) &&
-					0 == (ZBX_MACRO_TYPE_QUERY_FILTER & macro_type))
+			if ((ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &c_hostid, 1, &replace_to);
 
@@ -2586,36 +2583,14 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == strcmp(m, MVAR_HOST_PORT))
 			{
-				if (0 == (macro_type & ZBX_MACRO_TYPE_ALLOWED_HOSTS))
+				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
-					{
-						zbx_dsprintf(replace_to, "%u", c_interface->port);
-					}
-					else
-					{
-						ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-								ZBX_DC_REQUEST_HOST_PORT);
-					}
+					zbx_dsprintf(replace_to, "%u", c_interface->port);
 				}
-			}
-			else if (0 != (macro_type & ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD))
-			{
-				if (0 == strcmp(m, MVAR_ITEM_ID))
+				else
 				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY))
-				{
-					replace_to = zbx_strdup(replace_to, dc_item->key);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
-				{
-					replace_to = zbx_strdup(replace_to, dc_item->key_orig);
-				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
-				{
-					ret = zbx_dc_get_host_inventory_by_itemid(m, dc_item->itemid, &replace_to);
+					ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
+							ZBX_DC_REQUEST_HOST_PORT);
 				}
 			}
 		}
@@ -2702,15 +2677,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				zbx_dc_get_user_macro(um_handle, m, NULL, 0, &replace_to);
 
 			pos = token.loc.r;
-		}
-
-		if (0 != (macro_type & ZBX_MACRO_TYPE_QUERY_FILTER) && NULL != replace_to)
-		{
-			char	*esc;
-
-			esc = zbx_dyn_escape_string(replace_to, "\\");
-			zbx_free(replace_to);
-			replace_to = esc;
 		}
 
 		if ((ZBX_TOKEN_FUNC_MACRO == token.type || ZBX_TOKEN_USER_FUNC_MACRO == token.type) &&
@@ -2917,12 +2883,6 @@ int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_even
 {
 	return substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
 			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
-}
-
-void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers)
-{
-	substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			item, allowed_peers, ZBX_MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
 }
 
 /******************************************************************************

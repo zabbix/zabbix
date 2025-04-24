@@ -19839,6 +19839,10 @@ msgstr "Štatistiky a dostupnosť vyrovnávacej pamäte Zabbix. Cache - jedna z 
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Štatistiky a dostupnosť vyrovnávacej pamäte proxy. Režim (režimy: pfree, free, total, used, pussed)."
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265

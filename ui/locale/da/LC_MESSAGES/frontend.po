@@ -19670,6 +19670,10 @@ msgstr "Statistik og tilgængelighed af Zabbix skrivecache. Cache - en af værdi
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Statistik og tilgængelighed af proxyhukommelsesbuffer. Mode (tilstande: pfree, free, total, used, pused)."
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
