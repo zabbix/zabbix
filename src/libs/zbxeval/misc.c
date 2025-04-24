@@ -724,7 +724,7 @@ int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error,
 					ret = SUCCEED_PARTIAL;
 					break;
 				}
-				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r); printf("VALUE: %s", value);
 				ret = resolver(token->type, &value, error, pargs);
 				break;
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
