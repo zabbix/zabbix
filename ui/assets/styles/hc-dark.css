@@ -1684,8 +1684,7 @@ button {
 
 .dashboard-grid {
   position: relative;
-  margin: -4px;
-  z-index: 3; }
+  margin: -4px; }
   .dashboard-grid.reserve-header-lines-1 {
     margin-top: 2rem; }
   .dashboard-grid.reserve-header-lines-2 {
@@ -1771,8 +1770,7 @@ button {
   align-items: flex-start;
   border: 1px solid #444444;
   border-bottom: 0;
-  background-color: #000000;
-  z-index: 3; }
+  background-color: #000000; }
   .dashboard-grid-widget-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
@@ -1850,7 +1848,8 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: 0; }
+    height: 0;
+    z-index: 11; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
@@ -1866,8 +1865,7 @@ button {
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
     height: 2rem;
     margin-top: -2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-    z-index: 5; }
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
   .dashboard-grid-widget.dashboard-grid-widget-focus .dashboard-grid-widget-actions {
     opacity: 1; }
 
@@ -1894,7 +1892,7 @@ button {
   border-bottom: 0;
   background-color: #000000;
   opacity: 0;
-  z-index: 3; }
+  z-index: 11; }
   .dashboard-grid-iterator-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
@@ -1975,18 +1973,16 @@ button {
     display: flex; }
   .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-contents {
     display: none; }
-  .dashboard-grid-iterator.dashboard-grid-iterator-focus {
-    z-index: 5; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
-      margin-top: -2rem;
-      height: 2rem;
-      box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-      opacity: 1; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
-      opacity: 1; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
-      margin-top: calc(-4rem - 8px);
-      height: calc(4rem + 8px); }
+  .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
+    margin-top: -2rem;
+    height: 2rem;
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+    opacity: 1; }
+  .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
+    opacity: 1; }
+  .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
+    margin-top: calc(-4rem - 8px);
+    height: calc(4rem + 8px); }
   .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents {
     position: absolute;
     top: .25rem;
@@ -2056,9 +2052,6 @@ button {
     border-color: #353535; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #353535; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-header,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) .dashboard-grid-widget-contents {
-  opacity: .75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus .ui-resizable-handle {
@@ -2101,9 +2094,6 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #303030;
     border-top: 0; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-header,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) .dashboard-grid-iterator-contents {
-  opacity: .75; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder {
   position: absolute;
   z-index: 999; }
@@ -2115,50 +2105,41 @@ button {
     bottom: .25rem;
     background-color: #020202; }
 .dashboard.dashboard-is-edit-mode .highlight {
-  z-index: 5;
-  position: absolute; }
+  position: absolute;
+  z-index: 10; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
-    border-top: 3px solid #bbbbbb;
+    border-bottom: 3px solid #bbbbbb;
     top: calc(.25rem - 1px);
     right: calc(.25rem - 1px);
     left: calc(.25rem - 1px);
-    height: 0; }
+    height: 0;
+    z-index: 11; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-e {
-    border-right: 3px solid #bbbbbb;
+    border-left: 3px solid #bbbbbb;
     top: calc(.25rem - 1px);
     right: calc(.25rem - 1px);
     bottom: calc(.25rem - 1px);
     width: 0; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-s {
-    border-bottom: 3px solid #bbbbbb;
+    border-top: 3px solid #bbbbbb;
     right: calc(.25rem - 1px);
     bottom: calc(.25rem - 1px);
     left: calc(.25rem - 1px);
     height: 0; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-w {
-    border-left: 3px solid #bbbbbb;
+    border-right: 3px solid #bbbbbb;
     top: calc(.25rem - 1px);
     bottom: calc(.25rem - 1px);
     left: calc(.25rem - 1px);
     width: 0; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus:not(.ui-resizable-resizing) .highlight-n,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus:not(.ui-resizable-resizing) .highlight-e,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus:not(.ui-resizable-resizing) .highlight-w, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.ui-draggable-dragging .highlight-n,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.ui-draggable-dragging .highlight-e,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-hidden-header.ui-draggable-dragging .highlight-w {
-  top: calc(-1.75rem - 1px); }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing) .highlight-n,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing) .highlight-e,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing) .highlight-w, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .highlight-n,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .highlight-e,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .highlight-w {
-  top: calc(-1.75rem - 1px); }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing).dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-n,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing).dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-e,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus:not(.ui-resizable-resizing).dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-w, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-n,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-e,
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .highlight-w {
-  top: calc(-4rem - 5px); }
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle .ui-resizable-dot {
+  z-index: 10; }
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-n,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-n .ui-resizable-dot, .dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-nw,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-nw .ui-resizable-dot, .dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-ne,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-ne .ui-resizable-dot {
+  z-index: 11; }
 
 .dashboard-grid-widget-contents .list-table th:first-child, .dashboard-grid-widget-contents .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:first-child {
   padding-left: 10px; }

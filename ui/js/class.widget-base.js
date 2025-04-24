@@ -804,7 +804,7 @@ class CWidgetBase {
 		this._button_actions.disabled = true;
 		this._button_edit.disabled = self || is_exclusive;
 
-		if (self) {
+		if (self && !this._target.classList.contains('is-editing-self')) {
 			this._target.classList.add('is-editing-self');
 
 			for (const direction of ['n', 'e', 's', 'w']) {
@@ -813,6 +813,13 @@ class CWidgetBase {
 				highlight.classList.add('highlight', `highlight-${direction}`);
 
 				this._target.append(highlight);
+			}
+		}
+		else if (!self) {
+			this._target.classList.remove('is-editing-self');
+
+			for (const highlight of this._target.querySelectorAll('.highlight')) {
+				highlight.remove();
 			}
 		}
 	}

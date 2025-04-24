@@ -171,9 +171,6 @@
 	position: relative;
 	margin: -4px;
 
-	// For widget sliding headers to appear over the breadcrumbs.
-	z-index: 3;
-
 	&.reserve-header-lines-1 {
 		margin-top: 2rem;
 	}
@@ -325,10 +322,6 @@
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
 	background-color: $ui-bg-color;
-
-	// For floating headers to appear over other widgets.
-	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	z-index: 3;
 
 	h4 {
 		flex-grow: 1;
@@ -494,6 +487,7 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
 			height: 0;
+			z-index: 11;
 
 			@if $ui-transitions {
 				transition: height $ui-transition-duration ease-out,
@@ -534,7 +528,6 @@
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-				z-index: 5;
 			}
 		}
 	}
@@ -570,6 +563,7 @@
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 	opacity: 0;
+	z-index: 11;
 
 	// Transition for opacity is set for best border disappearance on different themes.
 	@if $ui-transitions {
@@ -578,9 +572,6 @@
 					opacity .15s .15s ease-out,
 					box-shadow $ui-transition-duration ease-out;
 	}
-
-	// Not to loose hovered header while widget underneath is updating.
-	z-index: 3;
 
 	h4 {
 		flex-grow: 1;
@@ -706,8 +697,6 @@
 	}
 
 	&.dashboard-grid-iterator-focus {
-		z-index: 5;
-
 		.dashboard-grid-iterator-header {
 			margin-top: -2rem;
 			height: 2rem;
@@ -1003,19 +992,20 @@
 	}
 
 	.highlight {
-		z-index: 5;
 		position: absolute;
+		z-index: 10;
 
 		&.highlight-n {
-			border-top: 3px solid $form-focus-border-color;
+			border-bottom: 3px solid $form-focus-border-color;
 			top: calc(.25rem - 1px);
 			right: calc(.25rem - 1px);
 			left: calc(.25rem - 1px);
 			height: 0;
+			z-index: 11;
 		}
 
 		&.highlight-e {
-			border-right: 3px solid $form-focus-border-color;
+			border-left: 3px solid $form-focus-border-color;
 			top: calc(.25rem - 1px);
 			right: calc(.25rem - 1px);
 			bottom: calc(.25rem - 1px);
@@ -1023,7 +1013,7 @@
 		}
 
 		&.highlight-s {
-			border-bottom: 3px solid $form-focus-border-color;
+			border-top: 3px solid $form-focus-border-color;
 			right: calc(.25rem - 1px);
 			bottom: calc(.25rem - 1px);
 			left: calc(.25rem - 1px);
@@ -1031,44 +1021,28 @@
 		}
 
 		&.highlight-w {
-			border-left: 3px solid $form-focus-border-color;
+			border-right: 3px solid $form-focus-border-color;
 			top: calc(.25rem - 1px);
 			bottom: calc(.25rem - 1px);
 			left: calc(.25rem - 1px);
 			width: 0;
 		}
-
-		@if $ui-transitions {
-			transition: top $ui-transition-duration ease-out;
-		}
 	}
 
-	.dashboard-grid-widget.dashboard-grid-widget-hidden-header {
-		&.dashboard-grid-widget-focus:not(.ui-resizable-resizing),
-		&.ui-draggable-dragging {
-			.highlight-n,
-			.highlight-e,
-			.highlight-w {
-				top: calc(-1.75rem - 1px);
-			}
+
+
+	.ui-resizable-handle {
+		&,
+		.ui-resizable-dot {
+			z-index: 10;
 		}
-	}
 
-	.dashboard-grid-iterator {
-		&.dashboard-grid-iterator-focus:not(.ui-resizable-resizing),
-		&.ui-draggable-dragging {
-			.highlight-n,
-			.highlight-e,
-			.highlight-w {
-				top: calc(-1.75rem - 1px);
-			}
-
-			&.dashboard-grid-iterator-hidden-header.iterator-double-header {
-				.highlight-n,
-				.highlight-e,
-				.highlight-w {
-					top: calc(-4rem - 5px);
-				}
+		&.ui-resizable-n,
+		&.ui-resizable-nw,
+		&.ui-resizable-ne {
+			&,
+			.ui-resizable-dot {
+				z-index: 11;
 			}
 		}
 	}
