@@ -700,6 +700,10 @@ function validate_trigger_expression(overlay) {
 			overlayDialogueDestroy(overlay.dialogueid);
 
 			obj.dispatchEvent(new Event('change'));
+
+			if (window.trigger_edit_popup) {
+				window.trigger_edit_popup.form.validateChanges(['expression', 'recovery_expression']);
+			}
 		},
 		dataType: 'json',
 		type: 'POST'
