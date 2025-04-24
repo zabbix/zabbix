@@ -87,6 +87,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 	data->access_expires_in = (time_t)atoi(row[6]);
 	data->tokens_status = (unsigned char)atoi(row[7]);
 
+	data->old_tokens_status = data->tokens_status;
+
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
@@ -232,8 +234,6 @@ out:
 
 void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result)
 {
-	data->old_tokens_status = data->tokens_status;
-
 	if (SUCCEED != fetch_result)
 	{
 		data->tokens_status &= ZBX_OAUTH_TOKEN_REFRESH_VALID;
@@ -246,15 +246,26 @@ void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetc
 		data->tokens_status |= ZBX_OAUTH_TOKEN_ACCESS_VALID;
 
 		if (NULL != data->old_refresh_token)
+		{
 			data->tokens_status |= ZBX_OAUTH_TOKEN_REFRESH_VALID;
-
-		zbx_db_execute("update media_type_oauth"
-				" set access_token='%s',access_token_updated=" ZBX_FS_TIME_T ",access_expires_in=%d,"
-				"refresh_token='%s',tokens_status=%hhu"
-				" where mediatypeid="ZBX_FS_UI64,
-				data->access_token, data->access_token_updated, data->access_expires_in,
-				data->refresh_token, data->tokens_status,
-				mediatypeid);
+			zbx_db_execute("update media_type_oauth set"
+					" access_token='%s',access_token_updated=" ZBX_FS_TIME_T ","
+					"access_expires_in=%d,refresh_token='%s',tokens_status=%hhu"
+					" where mediatypeid="ZBX_FS_UI64,
+					data->access_token, data->access_token_updated, data->access_expires_in,
+					data->refresh_token, data->tokens_status,
+					mediatypeid);
+		}
+		else
+		{
+			zbx_db_execute("update media_type_oauth set"
+					" access_token='%s',access_token_updated=" ZBX_FS_TIME_T ","
+					"access_expires_in=%d,tokens_status=%hhu"
+					" where mediatypeid="ZBX_FS_UI64,
+					data->access_token, data->access_token_updated, data->access_expires_in,
+					data->tokens_status,
+					mediatypeid);
+		}
 	}
 }
 
