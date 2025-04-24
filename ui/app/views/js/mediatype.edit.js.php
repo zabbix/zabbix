@@ -125,18 +125,6 @@ window.mediatype_edit_popup = new class {
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#setOAuth(e.detail));
 		});
-
-		this.form.querySelector('#smtp_authentication').addEventListener('change', (e) => {
-			if (e.target.value === undefined || e.target.value == this.mediatype.smtp_authentication) {
-				return;
-			}
-
-			this.mediatype.smtp_authentication = e.target.value;
-
-			if (e.target.value == <?= SMTP_AUTHENTICATION_OAUTH ?>) {
-				this.#setOAuth();
-			}
-		});
 	}
 
 	clone({title, buttons}) {
