@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbx_item_constants.h"
 #include "zbxproxybuffer.h"
+#include "zbxtime.h"
 
 static char	*sql = NULL;
 static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
