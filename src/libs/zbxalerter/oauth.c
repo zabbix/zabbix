@@ -135,11 +135,15 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	char	*posts = zbx_strdcatf(NULL, "grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s",
 			data->client_id, data->client_secret, data->refresh_token);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): post data:%s", __func__, posts);
+
 	if (SUCCEED != zbx_http_req(data->token_url, header, timeout, NULL, NULL, config_source_ip,
 			config_ssl_ca_location, NULL, NULL, &out, posts, &response_code, error))
 	{
 		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): result:%s", __func__, ZBX_NULL2STR(out));
 
 	if (SUCCEED != zbx_json_open(out, &jp))
 	{
