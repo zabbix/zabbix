@@ -305,6 +305,14 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		}
 	}
 
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$this->addRelatedDiscoveryData($options, $result);
+
+		return $result;
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 

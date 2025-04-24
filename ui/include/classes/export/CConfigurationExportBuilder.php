@@ -657,7 +657,6 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
-				'uuid' => $discoveryRule['uuid'] ?? '',
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -703,17 +702,27 @@ class CConfigurationExportBuilder {
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => self::formatLldMacroPaths($discoveryRule['lld_macro_paths']),
 				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
-				'overrides' => self::formatLldOverrides($discoveryRule['overrides']),
-				'parent_discovery_rule' => $discoveryRule['parent_discovery_rule'] ?? '',
-				'discover' => $discoveryRule['discover'] ?? ''
+				'overrides' => self::formatLldOverrides($discoveryRule['overrides'])
 			];
 
 			if (!$data['filter']['conditions']) {
 				unset($data['filter']);
 			}
 
+			if (isset($discoveryRule['uuid'])) {
+				$data['uuid'] = $discoveryRule['uuid'];
+			}
+
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
+			}
+
+			if (isset($discoveryRule['parent_discovery_rule'])) {
+				$data['parent_discovery_rule'] = $discoveryRule['parent_discovery_rule'];
+			}
+
+			if (isset($discoveryRule['discover'])) {
+				$data['discover'] = $discoveryRule['discover'];
 			}
 
 			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
@@ -977,21 +986,6 @@ class CConfigurationExportBuilder {
 				'inventory_mode' => $hostPrototype['inventory_mode'],
 				'custom_interfaces' => $hostPrototype['custom_interfaces'],
 				'interfaces' => $this->formatHostPrototypeInterfaces($hostPrototype['interfaces'])
-			];
-		}
-
-		return $result;
-	}
-
-	protected function formatDiscoveryRulePrototypes(array $discovery_rule_prototypes) {
-		$result = [];
-
-		foreach ($discovery_rule_prototypes as $discovery_rule_prototype) {
-			$result[] = [
-				'itemid' => $discovery_rule_prototype['itemid'],
-				'name' => $discovery_rule_prototype['name'],
-				'key' => $discovery_rule_prototype['key_'],
-				'parent_discovery_rule_prototype' => $discovery_rule_prototype['parent_discovery_rule_prototype'],
 			];
 		}
 
