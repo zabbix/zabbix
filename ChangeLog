@@ -1,11 +1,16 @@
 Changes for 7.4.0rc1
 
 New features:
+..F.I..PS. [ZBXNEXT-9910] changed default user session storage period from 365d to 31d (aluchko, askolmeisters)
+A.F.....S. [ZBXNEXT-7527] added support of host prototypes on discovered hosts (wczerneha, wiper)
+A.F.I..... [ZBXNEXT-875] implemented map element stacking order control (Ivo)
 .......PS. [ZBXNEXT-5968] increased configuration max cache sizes for HistoryCacheSize, HistoryIndexCacheSize, TrendCacheSize (rtrizna)
 .......PS. [ZBXNEXT-9877] added zabbix[preprocessing] internal item (asestakovs)
 .........T [ZBXNEXT-9646] added Juniper MX by NETCONF template (egordymov)
 
 Bug fixes:
+........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
+..F....... [ZBX-26277] fixed disabled media types being shown in black color (aluchko)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 ..F....... [ZBX-26293] fixed permission issue opening trigger configuration form from context menu (gcalenko)
 ...G....S. [ZBX-24850] fixed rejected incoming connection from link-local addresses on Windows (mprihodko)
@@ -116,6 +121,18 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.6
+
+7.2.6rc1 was released as 7.2.6 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.6rc1
@@ -240,6 +257,7 @@ A.F....... [ZBXNEXT-9624] added support for PHP 8.4 (talbergs)
 .........T [ZBXNEXT-9545] fixed proofreading findings in Nvidia by Zabbix agent 2 templates (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-26253] fixed large data transfers being uncompressed without authorization (vso)
 A.F.....S. [ZBX-23760] added prevention of deleting host groups, templates, hosts, triggers, services, discovery rules, and discovery checks if they are used in action conditions or operations (agriscenko, dgoloscapov)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group; fixed "provisioned" property type for user Media object (jfreibergs)
 A......... [ZBX-18432] fixed inability to view certain problems and events by users with specific permissions on tags when permissions on all tags are given to specific host group (dpankins)
@@ -298,6 +316,8 @@ New features:
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 Smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A.F....... [ZBX-26258] restricted access to user related fields using user.get, alert.get, role.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 .......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
 .......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
 ..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
@@ -337,6 +357,7 @@ Changes for 7.2.2
 Changes for 7.2.2rc1
 
 Bug fixes:
+A......... [ZBX-26257] fixed SQL injection vulnerability when calling "get" methods with "groupBy" parameter (agriscenko)
 .......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
 .......PS. [ZBX-25776] fixed Zabbix server crash when testing some internal items (arimdjonoks)
@@ -532,6 +553,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.12
+
+7.0.12rc1 was released as 7.0.12 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.12rc1
 
 New features:
@@ -652,6 +685,7 @@ A.F....... [ZBXNEXT-9624] added support for PHP 8.4 (talbergs)
 .........T [ZBXNEXT-9654] added Azure SQL Managed Instance by HTTP template (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-26253] fixed large data transfers being uncompressed without authorization (vso)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group; fixed "provisioned" property type for user Media object (jfreibergs)
 A......... [ZBX-18432] fixed inability to view certain problems and events by users with specific permissions on tags when permissions on all tags are given to specific host group (dpankins)
 A.F.....S. [ZBX-23760] added prevention of deleting host groups, templates, hosts, triggers, services, discovery rules, and discovery checks if they are used in action conditions or operations (agriscenko, dgoloscapov)
@@ -712,6 +746,8 @@ New features:
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 Smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A.F....... [ZBX-26258] restricted access to user related fields using user.get, alert.get, role.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 .......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
 ..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
 ..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
@@ -758,6 +794,7 @@ New features:
 .........T [ZBXNEXT-9572] added Juniper MX by SNMP template (egordymov)
 
 Bug fixes:
+A......... [ZBX-26257] fixed SQL injection vulnerability when calling "get" methods with "groupBy" parameter (agriscenko)
 .......PS. [ZBX-25373] fixed possibility to insert duplicate triggers via LLD (dgoloscapov)
 .......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
 ........S. [ZBX-25754] fixed LLD rollback when reaching 30k dependent item limit (wiper)
@@ -797,6 +834,7 @@ New features:
 A.F....... [ZBXNEXT-8690] implemented a new filter in media types list view to display actions based on the scope of their media type usage (Ivo)
 
 Bug fixes:
+..F....... [ZBX-26254] fixed reflected XSS in valuemap export URL (talbergs)
 .......PS. [ZBX-25497] added support for VMware perfCounter measured in gigabytes (MVekslers)
 ........S. [ZBX-25686] fixed an SQL error in network discovery action processing (wiper)
 .......P.. [ZBX-25664] fixed nested transactions on Zabbix proxy when using hybrid buffer (dgoloscapov)
@@ -4005,6 +4043,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.41rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.40
+
+6.0.40rc1 was released as 6.0.40 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.40rc1
 
 New features:
@@ -4041,6 +4091,7 @@ New features:
 .........T [ZBXNEXT-9654] added Azure SQL Managed Instance by HTTP template (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-26253] fixed large data transfers being uncompressed without authorization (vso)
 A.F.....S. [ZBX-23760] fixed ability to enable disabled action with invalid custom formula due to missing action conditions (agriscenko, dgoloscapov)
 A......... [ZBX-18432] fixed inability to view certain problems and events by users with specific permissions on tags when permissions on all tags are given to specific host group (dpankins)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
@@ -4071,6 +4122,8 @@ Changes for 6.0.38
 Changes for 6.0.38rc1
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A......... [ZBX-26258] restricted access to user related fields using user.get, alert.get, role.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 ..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
 ..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
 ...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
@@ -4100,6 +4153,7 @@ New features:
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+..F....... [ZBX-26254] fixed reflected XSS in valuemap export URL (talbergs)
 ........S. [ZBX-25542] added SQL_ATTR_QUERY_TIMEOUT timeout for ODBC monitoring (sboidenko)
 ..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
 ...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
@@ -7458,6 +7512,8 @@ Changes for 5.0.46
 Changes for 5.0.46rc1
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A......... [ZBX-26258] restricted access to user related fields using user.get, alert.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 

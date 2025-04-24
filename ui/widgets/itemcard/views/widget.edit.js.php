@@ -14,11 +14,11 @@
 **/
 
 
-use Widgets\HostCard\Includes\CWidgetFieldHostSections;
+use Widgets\ItemCard\Includes\CWidgetFieldItemSections;
 
 ?>
 
-window.widget_hostcard_form = new class {
+window.widget_itemcard_form = new class {
 
 	/**
 	 * @type {HTMLFormElement};
@@ -47,20 +47,24 @@ window.widget_hostcard_form = new class {
 		document.getElementById('add-row').disabled = sections.length > 0
 			&& sections.length === sections[0].getOptions().length;
 
-		let show_inventory_field = false;
+		let has_latest_data_section = false;
 
 		for (const element of sections) {
-			if (element.value == <?= CWidgetFieldHostSections::SECTION_INVENTORY ?>) {
-				show_inventory_field = true;
+			if (element.value == <?= CWidgetFieldItemSections::SECTION_LATEST_DATA ?>) {
+				has_latest_data_section = true;
 
 				break;
 			}
 		}
 
-		for (const element of this.#form.querySelectorAll('.js-row-inventory-fields')) {
-			element.style.display = show_inventory_field ? '' : 'none';
+		for (const element of this.#form.querySelectorAll('.js-sparkline-row')) {
+			element.style.display = has_latest_data_section ? '' : 'none';
+
+			for (const input of element.querySelectorAll('.input')) {
+				input.disabled = !has_latest_data_section;
+			}
 		}
 
-		jQuery('#inventory_').multiSelect(show_inventory_field ? 'enable' : 'disable');
+		this.#form.fields['sparkline[time_period]'].disabled = !has_latest_data_section;
 	}
 };
