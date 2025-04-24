@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testUserMacro extends CAPITest {
 
-	public static function hostmacro_create() {
+	public static function hostmacroCreateData() {
 		return [
 			[
 				'hostmacro' => [
@@ -229,7 +229,16 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_LIST,
 						'label' => 'Config',
-						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 2","value":"option2"}]'
+						'options' => [
+							[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							],
+							[
+								'value' => 'option2',
+								'text' => 'Option 2'
+							]
+						]
 					]
 				],
 				'expected_error' => null
@@ -242,7 +251,16 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_LIST,
 						'label' => 'Config',
-						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 1","value":"option1"}]'
+						'options' => [
+							[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							],
+							[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/options/2": value (value, text)=(option1, Option 1) already exists.'
@@ -269,7 +287,16 @@ class testUserMacro extends CAPITest {
 						'type' => ZBX_WIZARD_FIELD_LIST,
 						'label' => 'Config',
 						'regex' => '/^[a-zA-Z0-9_]+$/',
-						'options' => '[{"text":"Option 1","value":"option1"},{"text":"Option 2","value":"option2"}]'
+						'options' => [
+							[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							],
+							[
+								'value' => 'option2',
+								'text' => 'Option 2'
+							]
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.'
@@ -294,7 +321,10 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
 						'label' => 'Config',
-						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+						'options' => [[
+							'checked' => 'option1',
+							'unchecked' => 'option2'
+						]]
 					]
 				],
 				'expected_error' => null
@@ -307,7 +337,7 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
 						'label' => 'Config',
-						'options' => '[{"unchecked":"option2"}]'
+						'options' => [['unchecked' => 'option2']]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "checked" is missing.'
@@ -320,7 +350,16 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
 						'label' => 'Config',
-						'options' => '[{"checked":"option1", "unchecked":"option2"},{"checked":"option3", "unchecked":"option4"}]'
+						'options' => [
+							[
+								'checked' => 'option1',
+								'unchecked' => 'option2'
+							],
+							[
+								'checked' => 'option3',
+								'unchecked' => 'option4'
+							]
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.'
@@ -334,7 +373,10 @@ class testUserMacro extends CAPITest {
 						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
 						'label' => 'Config',
 						'regex' => '/^[a-zA-Z0-9_]+$/',
-						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+						'options' => [[
+							'checked' => 'option1',
+							'unchecked' => 'option2'
+						]]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.'
@@ -348,16 +390,19 @@ class testUserMacro extends CAPITest {
 						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
 						'label' => 'Config',
 						'required' => ZBX_WIZARD_FIELD_REQUIRED,
-						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+						'options' => [[
+							'checked' => 'option1',
+							'unchecked' => 'option2'
+						]]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/required": value must be 0.'
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config','required').'.'
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider hostmacro_create
+	 * @dataProvider hostmacroCreateData
 	 */
 	public function testUserMacro_Create($hostmacro, $expected_error, $expect = []) {
 		$result = $this->call('usermacro.create', $hostmacro, $expected_error);
@@ -390,7 +435,7 @@ class testUserMacro extends CAPITest {
 						$this->assertFalse($dbRow);
 					}
 					else {
-						$hostmacro['config'] += self::macroConfigDefaults();
+						$hostmacro['config'] += DB::getDefaults('hostmacro_config');
 
 						foreach (array_keys($hostmacro['config']) as $config_key) {
 							$this->assertEquals($dbRow[$config_key], $hostmacro['config'][$config_key]);
@@ -401,18 +446,7 @@ class testUserMacro extends CAPITest {
 		}
 	}
 
-	private static function macroConfigDefaults(): array {
-		return [
-			'type' => ZBX_WIZARD_FIELD_NOCONF,
-			'label' => '',
-			'description' => '',
-			'required' => ZBX_WIZARD_FIELD_NOT_REQUIRED,
-			'regex' => '',
-			'options' => ''
-		];
-	}
-
-	public static function globalmacro_create() {
+	public static function globalmacroCreateData() {
 		return [
 			// Check unexpected parameter
 			[
@@ -529,8 +563,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_create
-	*/
+	 * @dataProvider globalmacroCreateData
+	 */
 	public function testUserMacro_CreateGlobal($globalmacro, $expected_error) {
 		$result = $this->call('usermacro.createglobal', $globalmacro, $expected_error);
 
@@ -548,7 +582,7 @@ class testUserMacro extends CAPITest {
 		}
 	}
 
-	public static function globalmacro_failed() {
+	public static function globalmacroFailedData() {
 		return [
 			// Check unexpected parameter
 			[
@@ -678,8 +712,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_failed
-	*/
+	 * @dataProvider globalmacroFailedData
+	 */
 	public function testUserMacro_FailedCreateUpdateGlobal($globalmacro, $expected_error) {
 		$methods = ['usermacro.createglobal', 'usermacro.updateglobal'];
 
@@ -696,7 +730,7 @@ class testUserMacro extends CAPITest {
 		}
 	}
 
-	public static function hostmacro_update() {
+	public static function hostmacroUpdateData() {
 		return [
 			[
 				'hostmacro' => [
@@ -723,20 +757,815 @@ class testUserMacro extends CAPITest {
 						'description' => 'notes'
 					]
 				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10000',
+						'config' => [
+							'label' => 'update label for noconf'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/label": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10000',
+						'config' => [
+							'description' => 'update description for noconf'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/description": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10000',
+						'config' => [
+							'required' => ZBX_WIZARD_FIELD_REQUIRED
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config', 'required').'.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10000',
+						'config' => [
+							'regex' => '/^[a-zA-Z0-9]*$/'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10000',
+						'config' => [
+							'options' => [[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10001',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_NOCONF
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [[
+					'hostmacroid' => '10001'
+				]]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'label' => 'label_2_upd',
+							'description' => 'description_2_upd',
+							'required' => ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'regex' => ''
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
+							'label' => 'label_2_upd',
+							'description' => 'description_2_upd',
+							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'regex' => '',
+							'options' => ''
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'regex' => '/^([a-zA-Z0-9]*$/'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": invalid regular expression.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'label' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/label": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'required' => 9999
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be one of '.
+					implode(', ', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED]).'.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'options' => [[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => [[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]]
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10002',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_LIST,
+							'label' => 'label_2_upd',
+							'description' => 'description_2_upd',
+							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'regex' => '',
+							'options' => '[{"value":"option1","text":"Option 1"}]'
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'options' => [
+								[
+									'value' => 'option4',
+									'text' => 'Option 4'
+								],
+								[
+									'value' => 'option5',
+									'text' => 'Option 5'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_LIST,
+							'label' => 'label_3',
+							'description' => '',
+							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'regex' => '',
+							'options' => '[{"value":"option4","text":"Option 4"},{"value":"option5","text":"Option 5"}]'
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'regex' => '/^[a-zA-Z0-9]*$/'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'options' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'options' => [[]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "value" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+					'hostmacro' => [
+						[
+							'hostmacroid' => '10003',
+							'config' => [
+								'options' => [[
+									'value' => 'option1'
+								]]
+							]
+						]
+					],
+					'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "text" is missing.',
+					'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'options' => [[
+								'checked' => 1,
+								'unchecked' => 0
+							]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "checked".',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10003',
+						'config' => [
+							'options' => [
+								[
+									'value' => 'option1',
+									'text' => 'Option 1'
+								],
+								[
+									'value' => 'option1',
+									'text' => 'Option 1'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/2": value (value, text)=(option1, Option 1) already exists.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "value".',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'required' => ZBX_WIZARD_FIELD_REQUIRED
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config', 'required').'.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'regex' => '/^[a-zA-Z0-9]*$/'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'options' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'options' => [[]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "checked" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'options' => [['checked' => 1]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "unchecked" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'options' => [
+								[
+									'checked' => 1,
+									'unchecked' => 0
+								],
+								[
+									'checked' => 'option1',
+									'unchecked' => 'option2'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'options' => [[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "value".',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'required' => ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'description' => 'description_4_upd'
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_LIST,
+							'label' => 'label_4',
+							'description' => 'description_4_upd',
+							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'regex' => '',
+							'options' => '[{"value":"option1","text":"Option 1"}]'
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_TEXT
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
+							'label' => 'label_4',
+							'description' => 'description_4_upd',
+							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
+							'regex' => '',
+							'options' => ''
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_NOCONF
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [[
+					'hostmacroid' => '10004'
+				]]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'required' => ZBX_WIZARD_FIELD_REQUIRED
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config','required').'.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'regex' => '/^[a-zA-Z0-9]*$/'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/regex": value must be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'options' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'options' => [[]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "checked" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'options' => [['checked' => 1]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "unchecked" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'options' => [
+								[
+									'checked' => 1,
+									'unchecked' => 0
+								],
+								[
+									'checked' => 'option1',
+									'unchecked' => 'option2'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'options' => [[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "value".',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "checked".',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options": cannot be empty.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => [[]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "value" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => [['value' => 'option1']]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "text" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => [[
+								'checked' => 1,
+								'unchecked' => 0
+							]]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "checked".',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => [
+								[
+									'value' => 'option1',
+									'text' => 'Option 1'
+								],
+								[
+									'value' => 'option1',
+									'text' => 'Option 1'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/2": value (value, text)=(option1, Option 1) already exists.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_LIST,
+							'options' => [[
+								'value' => 'option1',
+								'text' => 'Option 1'
+							]]
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10005',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_LIST,
+							'label' => 'label_5',
+							'description' => '',
+							'required' => DB::getDefault('hostmacro_config','required'),
+							'regex' => '',
+							'options' => '[{"value":"option1","text":"Option 1"}]'
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10006',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_TEXT,
+							'label' => 'label_6_upd',
+							'description' => 'description_6_upd',
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10006',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
+							'label' => 'label_6_upd',
+							'description' => 'description_6_upd',
+							'required' => DB::getDefault('hostmacro_config','required'),
+							'regex' => '',
+							'options' => ''
+						]
+					]
+				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider hostmacro_update
+	 * @dataProvider hostmacroUpdateData
 	 */
 	public function testUserMacro_Update($hostmacros, $expected_error, $expect) {
 		$result = $this->call('usermacro.update', $hostmacros, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['hostmacroids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hostmacro where hostmacroid='.zbx_dbstr($id));
+				$dbResult = DBSelect('SELECT * FROM hostmacro WHERE hostmacroid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
+
+				if (array_key_exists('config', $hostmacros[$key])) {
+					$db_result_config = DBSelect(
+						'SELECT type,label,description,required,regex,options'.
+						' FROM hostmacro_config'.
+						' WHERE hostmacroid='.zbx_dbstr($id)
+					);
+					$db_row_config = DBFetch($db_result_config);
+
+					if ($db_row_config !== false && !array_key_exists('type', $hostmacros[$key]['config'])) {
+						$hostmacros[$key]['config']['type'] = $db_row_config['type'];
+					}
+
+					if ($hostmacros[$key]['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+						$this->assertFalse($db_row_config);
+					}
+					else {
+						$this->assertNotEmpty($db_row_config['label']);
+
+						if ($hostmacros[$key]['config']['type'] == ZBX_WIZARD_FIELD_TEXT) {
+							$this->assertEmpty($db_row_config['options']);
+						}
+
+						if ($hostmacros[$key]['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
+							$this->assertEmpty($db_row_config['regex']);
+							$this->assertNotEmpty($db_row_config['options']);
+						}
+
+						if ($hostmacros[$key]['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+							$this->assertEmpty($db_row_config['regex']);
+							$this->assertEquals($db_row_config['required'],
+								DB::getDefault('hostmacro_config','required')
+							);
+							$this->assertNotEmpty($db_row_config['options']);
+						}
+
+						$dbRow['config'] = $db_row_config;
+					}
+				}
 
 				foreach ($expect[$key] as $field => $value) {
 					$this->assertEquals($dbRow[$field], $expect[$key][$field]);
@@ -745,7 +1574,87 @@ class testUserMacro extends CAPITest {
 		}
 	}
 
-	public static function globalmacro_update() {
+	public static function hostmacroDeleteData() {
+		return [
+			[
+				'hostmacro' => [
+					''
+				],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'hostmacro' => [
+					'123456'
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'hostmacro' => [
+					'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'hostmacro' => [
+					'.'
+				],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'hostmacro' => [
+					'10007',
+					'123456'
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'hostmacro' => [
+					'10007',
+					'abc'
+				],
+				'expected_error' => 'Invalid parameter "/2": a number is expected.'
+			],
+			[
+				'hostmacro' => [
+					'10007',
+					''
+				],
+				'expected_error' => 'Invalid parameter "/2": a number is expected.'
+			],
+			[
+				'hostmacro' => [
+					'10007',
+					'10007'
+				],
+				'expected_error' => 'Invalid parameter "/2": value (10007) already exists.'
+			],
+			[
+				'hostmacro' => [
+					'10007'
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostmacroDeleteData
+	 */
+	public function testUserMacro_Delete($hostmacro, $expected_error) {
+		$result = $this->call('usermacro.delete', $hostmacro, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['hostmacroids'] as $id) {
+				$db_result = 'SELECT * FROM hostmacro WHERE hostmacroid='.zbx_dbstr($id);
+				$this->assertEquals(0, CDBHelper::getCount($db_result));
+
+				$db_result = 'SELECT * FROM hostmacro_config WHERE hostmacroid='.zbx_dbstr($id);
+				$this->assertEquals(0, CDBHelper::getCount($db_result));
+			}
+		}
+	}
+
+	public static function globalmacroUpdateData() {
 		return [
 			// Check macro id
 			[
@@ -854,7 +1763,7 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider globalmacro_update
+	 * @dataProvider globalmacroUpdateData
 	 */
 	public function testUserMacro_UpdateGlobal($globalmacros, $expected_error, $expect = []) {
 		$result = $this->call('usermacro.updateglobal', $globalmacros, $expected_error);
@@ -885,7 +1794,7 @@ class testUserMacro extends CAPITest {
 		}
 	}
 
-	public static function globalmacro_delete() {
+	public static function globalmacroDeleteData() {
 		return [
 			[
 				'globalmacro' => [
@@ -956,20 +1865,20 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_delete
-	*/
+	 * @dataProvider globalmacroDeleteData
+	 */
 	public function testUserMacro_DeleteGlobal($globalmacro, $expected_error) {
 		$result = $this->call('usermacro.deleteglobal', $globalmacro, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['globalmacroids'] as $id) {
-				$dbResult = 'select * from globalmacro where globalmacroid='.zbx_dbstr($id);
+				$dbResult = 'SELECT * FROM globalmacro WHERE globalmacroid='.zbx_dbstr($id);
 				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 		}
 	}
 
-	public static function globalmacro_permissions() {
+	public static function globalmacroPermissionsData() {
 		return [
 			// Check zabbix admin permissions to create, update and delete global macro.
 			[
@@ -1053,7 +1962,7 @@ class testUserMacro extends CAPITest {
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
 	 *
-	 * @dataProvider globalmacro_permissions
+	 * @dataProvider globalmacroPermissionsData
 	 */
 	public function testUserMacro_UserPermissionsGlobal($method, $user, $globalmacro, $expected_error) {
 		$this->authorize($user['user'], $user['password']);

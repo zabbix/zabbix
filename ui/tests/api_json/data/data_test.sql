@@ -151,6 +151,40 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (17,'{
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1,90020,'{$HOST_MACRO_1}','value','description');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (2,90020,'{$HOST_MACRO_2}','value','');
 
+-- host macro config
+insert into hstgrp (groupid,type,uuid,name) values (140000,1,'4a3eacc0c4c2ed517aded53241e7630d ','Template group for macro config testing');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140000,'macro config tmpl test noconf','macro config tmpl test noconf',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140001,'macro config tmpl test text update 1','macro config tmpl test text update 1',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140002,'macro config tmpl test text update 2','macro config tmpl test text update 2',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140003,'macro config tmpl test list update 1','macro config tmpl test list update 1',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140004,'macro config tmpl test list update 2','macro config tmpl test list update 2',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140005,'macro config tmpl test checkbox update 1','macro config tmpl test checkbox update 1',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140006,'macro config tmpl test checkbox update 2','macro config tmpl test checkbox update 2',3,'', 0, '');
+insert into hosts (hostid,host,name,status,description, wizard_ready, readme) values (140007,'macro config tmpl test any delete','macro config tmpl test any delete',3,'', 0, '');
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140000, 140000, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140001, 140001, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140002, 140002, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140003, 140003, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140004, 140004, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140005, 140005, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140006, 140006, 140000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (140007, 140007, 140000);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10000,140000,'{$TMPL_MACRO_1}','value_1','description_1');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10001,140001,'{$TMPL_MACRO_2}','value_2','description_2');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10002,140002,'{$TMPL_MACRO_3}','value_3','description_3');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10003,140003,'{$TMPL_MACRO_4}','value_4','description_4');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10004,140004,'{$TMPL_MACRO_5}','value_5','description_5');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10005,140005,'{$TMPL_MACRO_6}','value_6','description_6');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10006,140006,'{$TMPL_MACRO_7}','value_7','description_7');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10007,140007,'{$TMPL_MACRO_8}','value_8','description_8');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10001,1,'label_1','',0,'','');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10002,1,'label_2','description_2',1,'/^[a-zA-Z0-9]*$/','');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10003,2,'label_3','',0,'','[{"value":"option1","text":"Option 1"},{"value":"option2","text":"Option 2"},{"value":"","text":"Option 3"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10004,2,'label_4','description_4',1,'','[{"value":"option1","text":"Option 1"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10005,3,'label_5','',0,'','[{"checked":"1","unchecked":"0"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10006,3,'label_6','description_6',0,'','[{"checked":"option1","unchecked":"option2"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, label, description, required, regex, options) VALUES (10007,2,'label_7','description_7',1,'','[{"value":"option1","text":"Option 1"}]');
+
 -- icon map
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (1,'API icon map',2);
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (1,1,2,1,'api icon map expression',0);
