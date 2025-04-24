@@ -903,7 +903,769 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]],
-					'discovery_rules' => $this->getDiscoveryRuleValidationRules(),
+					'discovery_rules' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
+						'discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
+							'name' => ['type' => XML_STRING | XML_REQUIRED],
+							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
+							'snmp_oid' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'key' => ['type' => XML_STRING | XML_REQUIRED],
+							'delay' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'allow_traps' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'allowed_hosts' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'params' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ipmi_sensor' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'authtype' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'username' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'password' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'publickey' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'privatekey' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'filter' => ['type' => XML_ARRAY, 'rules' => [
+								'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
+								'formula' => ['type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'conditions' => ['type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+										'condition' => ['type' => XML_ARRAY, 'rules' => [
+											'macro' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+											'formulaid' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+										'condition' => ['type' => XML_ARRAY, 'rules' => [
+											'macro' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+											'formulaid' => ['type' => XML_IGNORE_TAG]
+										]]
+									]]
+								]]
+							]],
+							'lifetime_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
+							'lifetime' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'enabled_lifetime_type' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'enabled_lifetime' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'description' => ['type' => XML_STRING, 'default' => ''],
+							'interface_ref' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_INTERFACE], 'type' => XML_STRING],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'item_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
+								'item_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+									'snmp_oid' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'key' => ['type' => XML_STRING | XML_REQUIRED],
+									'delay' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'history' => ['type' => XML_STRING, 'default' => '31d'],
+									'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
+									'trends' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'allow_traps' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'allowed_hosts' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'units' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'params' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ipmi_sensor' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'authtype' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'username' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'password' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'publickey' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'privatekey' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'description' => ['type' => XML_STRING, 'default' => ''],
+									'valuemap' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::CHAR => CXmlConstantName::CHAR, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'logtimefmt' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::LOG => CXmlConstantName::LOG]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+										'step' => ['type' => XML_ARRAY, 'rules' => [
+											'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+											'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
+													'parameter' => ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'error_handler' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+												['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'error_handler_params' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
+													['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
+													['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]]
+										]]
+									]],
+									'interface_ref' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_INTERFACE], 'type' => XML_STRING],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'master_item' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'key' => ['type' => XML_STRING | XML_REQUIRED]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'timeout' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'url' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'query_fields' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+											'query_field' => ['type' => XML_ARRAY, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED],
+												'value' => ['type' => XML_STRING, 'default' => '']
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+											'parameter' => ['type' => XML_ARRAY, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED],
+												'value' => ['type' => XML_STRING, 'default' => '']
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'status_codes' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'follow_redirects' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'post_type' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'posts' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'http_proxy' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'headers' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+											'header' => ['type' => XML_ARRAY, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED],
+												'value' => ['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'retrieve_mode' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'request_method' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'output_format' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::OUTPUT_FORMAT_RAW, 'in' => [CXmlConstantValue::OUTPUT_FORMAT_RAW => CXmlConstantName::RAW, CXmlConstantValue::OUTPUT_FORMAT_JSON => CXmlConstantName::JSON]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ssl_cert_file' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ssl_key_file' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ssl_key_password' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'verify_peer' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'verify_host' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+											'recovery_expression' => ['type' => XML_STRING, 'default' => ''],
+											'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+											'correlation_tag' => ['type' => XML_STRING, 'default' => ''],
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'event_name' => ['type' => XML_STRING, 'default' => ''],
+											'opdata' => ['type' => XML_STRING, 'default' => ''],
+											'url_name' => ['type' => XML_STRING, 'default' => ''],
+											'url' => ['type' => XML_STRING, 'default' => ''],
+											'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+											'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+											'description' => ['type' => XML_STRING, 'default' => ''],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+											'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' => ['type' => XML_ARRAY, 'rules' => [
+													'name' => ['type' => XML_STRING | XML_REQUIRED],
+													'expression' => ['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' => ['type' => XML_STRING, 'default' => '']
+												]]
+											]],
+											'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' => ['type' => XML_ARRAY, 'rules' => [
+													'tag' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING, 'default' => '']
+												]]
+											]]
+										]]
+									]]
+								]]
+							]],
+							'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+								'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'expression' => ['type' => XML_STRING | XML_REQUIRED],
+									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'recovery_expression' => ['type' => XML_STRING, 'default' => ''],
+									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' => ['type' => XML_STRING, 'default' => ''],
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'event_name' => ['type' => XML_STRING, 'default' => ''],
+									'opdata' => ['type' => XML_STRING, 'default' => ''],
+									'url_name' => ['type' => XML_STRING, 'default' => ''],
+									'url' => ['type' => XML_STRING, 'default' => ''],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'description' => ['type' => XML_STRING, 'default' => ''],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]]
+								]]
+							]],
+							'graph_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
+								'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'width' => ['type' => XML_STRING, 'default' => '900'],
+									'height' => ['type' => XML_STRING, 'default' => '200'],
+									'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
+									'yaxismax' => ['type' => XML_STRING, 'default' => '100'],
+									'show_work_period' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_triggers' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
+									'show_legend' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_3d' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'percent_left' => ['type' => XML_STRING, 'default' => '0'],
+									'percent_right' => ['type' => XML_STRING, 'default' => '0'],
+									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
+									'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'ex_rules' => [$this, 'getYMinItemExtendedRules']],
+									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
+									'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'ex_rules' => [$this, 'getYMaxItemExtendedRules']],
+									'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'ex_validate' => [$this, 'validateGraphItems'], 'rules' => [
+										'graph_item' => ['type' => XML_ARRAY, 'rules' => [
+											'sortorder' => ['type' => XML_STRING, 'default' => '0'],
+											'drawtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
+											'color' => ['type' => XML_STRING, 'default' => '009600'],
+											'yaxisside' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE],
+											'calc_fnc' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
+											'item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'host' => ['type' => XML_STRING | XML_REQUIRED],
+												'key' => ['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]]
+									]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
+								]]
+							]],
+							'host_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+								'host_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'host' => ['type' => XML_STRING | XML_REQUIRED],
+									'name' => ['type' => XML_STRING, 'default' => ''],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'inventory_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE],
+									'group_links' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
+										'group_link' => ['type' => XML_ARRAY, 'rules' => [
+											'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]]
+									]],
+									'group_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
+										'group_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+										'template' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'macros' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+										'macro' => ['type' => XML_ARRAY, 'rules' => [
+											'macro' => ['type' => XML_STRING | XML_REQUIRED],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'description' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'custom_interfaces' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
+									'interfaces' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'custom_interfaces', 'in' => [CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
+											'interface' => ['type' => XML_ARRAY, 'rules' => [
+												'default' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+												'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
+												'useip' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+												'ip' => ['type' => XML_STRING, 'default' => '127.0.0.1'],
+												'dns' => ['type' => XML_STRING, 'default' => ''],
+												'port' => ['type' => XML_STRING, 'default' => '10050'],
+												'details' => ['type' => XML_MULTIPLE, 'rules' => [
+													['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
+														'version' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
+														'bulk' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+														'community' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'max_repetitions' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'contextname' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'securityname' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'securitylevel' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'authprotocol' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'authpassphrase' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'privprotocol' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'privpassphrase' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]]
+													]],
+													['else' => true, 'type' => XML_IGNORE_TAG]
+												]]
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]]
+								]]
+							]],
+							'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'master_item' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+									'key' => ['type' => XML_STRING | XML_REQUIRED]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'timeout' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'url' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'query_fields' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+									'query_field' => ['type' => XML_ARRAY, 'rules' => [
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
+										'value' => ['type' => XML_STRING, 'default' => '']
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+									'parameter' => ['type' => XML_ARRAY, 'rules' => [
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
+										'value' => ['type' => XML_STRING, 'default' => '']
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'status_codes' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'follow_redirects' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'post_type' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'posts' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'http_proxy' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'headers' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+									'header' => ['type' => XML_ARRAY, 'rules' => [
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
+										'value' => ['type' => XML_STRING | XML_REQUIRED]
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'retrieve_mode' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'request_method' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ssl_cert_file' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ssl_key_file' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ssl_key_password' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'verify_peer' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'verify_host' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'lld_macro_paths' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
+								'lld_macro_path' => ['type' => XML_ARRAY, 'rules' => [
+									'lld_macro' => ['type' => XML_STRING | XML_REQUIRED],
+									'path' => ['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+								'step' => ['type' => XML_ARRAY, 'rules' => [
+									'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
+									'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
+											'parameter' => ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'error_handler' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'error_handler_params' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]]
+								]]
+							]],
+							'overrides' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
+								'override' => ['type' => XML_ARRAY, 'rules' => [
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'step' => ['type' => XML_STRING | XML_REQUIRED],
+									'stop' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
+									'filter' => ['type' => XML_ARRAY, 'rules' => [
+										'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
+										'formula' => ['type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										'conditions' => ['type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+												'condition' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+													'macro' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING, 'default' => ''],
+													'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+													'formulaid' => ['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]],
+											['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+												'condition' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+													'macro' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING, 'default' => ''],
+													'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+													'formulaid' => ['type' => XML_IGNORE_TAG]
+												]]
+											]]
+										]]
+									]],
+									'operations' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
+										'operation' => ['type' => XML_ARRAY, 'rules' => [
+											'operationobject' => ['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE],
+											'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'discover' => ['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+											'status' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'delay' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'history' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'trends' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'severity' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'tags' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+													'tag' => ['type' => XML_ARRAY, 'rules' => [
+														'tag' => ['type' => XML_STRING | XML_REQUIRED],
+														'value' => ['type' => XML_STRING, 'default' => '']
+													]]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'templates' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+													'template' => ['type' => XML_ARRAY, 'rules' => [
+														'name' => ['type' => XML_STRING | XML_REQUIRED]
+													]]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'inventory_mode' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]]
+										]]
+									]]
+								]]
+							]]
+						]]
+					]],
 					'httptests' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
 						'httptest' => ['type' => XML_ARRAY, 'rules' => [
 							'name' => ['type' => XML_STRING | XML_REQUIRED],
@@ -1357,7 +2119,767 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]],
-					'discovery_rules' => $this->getDiscoveryRuleValidationRules(true),
+					'discovery_rules' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
+						'discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
+							'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+							'name' => ['type' => XML_STRING | XML_REQUIRED],
+							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
+							'snmp_oid' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'key' => ['type' => XML_STRING | XML_REQUIRED],
+							'delay' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'allow_traps' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'allowed_hosts' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'params' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ipmi_sensor' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'authtype' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'username' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'password' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'publickey' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'privatekey' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'filter' => ['type' => XML_ARRAY, 'rules' => [
+								'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
+								'formula' => ['type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'conditions' => ['type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+										'condition' => ['type' => XML_ARRAY, 'rules' => [
+											'macro' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+											'formulaid' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+										'condition' => ['type' => XML_ARRAY, 'rules' => [
+											'macro' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+											'formulaid' => ['type' => XML_IGNORE_TAG]
+										]]
+									]]
+								]]
+							]],
+							'lifetime_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
+							'lifetime' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'enabled_lifetime_type' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'enabled_lifetime' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
+									['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+									['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'description' => ['type' => XML_STRING, 'default' => ''],
+							'item_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
+								'item_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+									'snmp_oid' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'key' => ['type' => XML_STRING | XML_REQUIRED],
+									'delay' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'history' => ['type' => XML_STRING, 'default' => '31d'],
+									'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
+									'trends' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'allow_traps' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'allowed_hosts' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'units' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'params' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ipmi_sensor' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'authtype' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'username' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'password' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'publickey' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'privatekey' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'description' => ['type' => XML_STRING, 'default' => ''],
+									'valuemap' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::CHAR => CXmlConstantName::CHAR, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'logtimefmt' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::LOG => CXmlConstantName::LOG]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+										'step' => ['type' => XML_ARRAY, 'rules' => [
+											'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+											'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
+													'parameter' => ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'error_handler' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+												['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'error_handler_params' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
+													['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
+													['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]]
+										]]
+									]],
+									'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'master_item' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'key' => ['type' => XML_STRING | XML_REQUIRED]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'timeout' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'url' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'query_fields' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+											'query_field' => ['type' => XML_ARRAY, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED],
+												'value' => ['type' => XML_STRING, 'default' => '']
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+											'parameter' => ['type' => XML_ARRAY, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED],
+												'value' => ['type' => XML_STRING, 'default' => '']
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'status_codes' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'follow_redirects' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'post_type' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'posts' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'http_proxy' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'headers' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+											'header' => ['type' => XML_ARRAY, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED],
+												'value' => ['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'retrieve_mode' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'request_method' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'output_format' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::OUTPUT_FORMAT_RAW, 'in' => [CXmlConstantValue::OUTPUT_FORMAT_RAW => CXmlConstantName::RAW, CXmlConstantValue::OUTPUT_FORMAT_JSON => CXmlConstantName::JSON]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ssl_cert_file' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ssl_key_file' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'ssl_key_password' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'verify_peer' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'verify_host' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+											'recovery_expression' => ['type' => XML_STRING, 'default' => ''],
+											'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+											'correlation_tag' => ['type' => XML_STRING, 'default' => ''],
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'event_name' => ['type' => XML_STRING, 'default' => ''],
+											'opdata' => ['type' => XML_STRING, 'default' => ''],
+											'url_name' => ['type' => XML_STRING, 'default' => ''],
+											'url' => ['type' => XML_STRING, 'default' => ''],
+											'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+											'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+											'description' => ['type' => XML_STRING, 'default' => ''],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+											'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' => ['type' => XML_ARRAY, 'rules' => [
+													'name' => ['type' => XML_STRING | XML_REQUIRED],
+													'expression' => ['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' => ['type' => XML_STRING, 'default' => '']
+												]]
+											]],
+											'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' => ['type' => XML_ARRAY, 'rules' => [
+													'tag' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING, 'default' => '']
+												]]
+											]]
+										]]
+									]]
+								]]
+							]],
+							'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+								'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+									'expression' => ['type' => XML_STRING | XML_REQUIRED],
+									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'recovery_expression' => ['type' => XML_STRING, 'default' => ''],
+									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' => ['type' => XML_STRING, 'default' => ''],
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'event_name' => ['type' => XML_STRING, 'default' => ''],
+									'opdata' => ['type' => XML_STRING, 'default' => ''],
+									'url_name' => ['type' => XML_STRING, 'default' => ''],
+									'url' => ['type' => XML_STRING, 'default' => ''],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'description' => ['type' => XML_STRING, 'default' => ''],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]]
+								]]
+							]],
+							'graph_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
+								'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'width' => ['type' => XML_STRING, 'default' => '900'],
+									'height' => ['type' => XML_STRING, 'default' => '200'],
+									'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
+									'yaxismax' => ['type' => XML_STRING, 'default' => '100'],
+									'show_work_period' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_triggers' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
+									'show_legend' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_3d' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'percent_left' => ['type' => XML_STRING, 'default' => '0'],
+									'percent_right' => ['type' => XML_STRING, 'default' => '0'],
+									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
+									'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'ex_rules' => [$this, 'getYMinItemExtendedRules']],
+									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
+									'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'ex_rules' => [$this, 'getYMaxItemExtendedRules']],
+									'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'ex_validate' => [$this, 'validateGraphItems'], 'rules' => [
+										'graph_item' => ['type' => XML_ARRAY, 'rules' => [
+											'sortorder' => ['type' => XML_STRING, 'default' => '0'],
+											'drawtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
+											'color' => ['type' => XML_STRING, 'default' => '009600'],
+											'yaxisside' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE],
+											'calc_fnc' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
+											'item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'host' => ['type' => XML_STRING | XML_REQUIRED],
+												'key' => ['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]]
+									]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
+								]]
+							]],
+							'host_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+								'host_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+									'host' => ['type' => XML_STRING | XML_REQUIRED],
+									'name' => ['type' => XML_STRING, 'default' => ''],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'inventory_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE],
+									'group_links' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
+										'group_link' => ['type' => XML_ARRAY, 'rules' => [
+											'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'name' => ['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]]
+									]],
+									'group_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
+										'group_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+										'template' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'macros' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+										'macro' => ['type' => XML_ARRAY, 'rules' => [
+											'macro' => ['type' => XML_STRING | XML_REQUIRED],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'description' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING, 'default' => '']
+										]]
+									]],
+									'custom_interfaces' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
+									'interfaces' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'custom_interfaces', 'in' => [CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
+											'interface' => ['type' => XML_ARRAY, 'rules' => [
+												'default' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+												'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
+												'useip' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+												'ip' => ['type' => XML_STRING, 'default' => '127.0.0.1'],
+												'dns' => ['type' => XML_STRING, 'default' => ''],
+												'port' => ['type' => XML_STRING, 'default' => '10050'],
+												'details' => ['type' => XML_MULTIPLE, 'rules' => [
+													['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
+														'version' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
+														'bulk' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+														'community' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'max_repetitions' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'contextname' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'securityname' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'securitylevel' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'authprotocol' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'authpassphrase' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'privprotocol' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]],
+														'privpassphrase' => ['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+														]]
+													]],
+													['else' => true, 'type' => XML_IGNORE_TAG]
+												]]
+											]]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]]
+								]]
+							]],
+							'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'master_item' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+									'key' => ['type' => XML_STRING | XML_REQUIRED]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'timeout' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'url' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'query_fields' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+									'query_field' => ['type' => XML_ARRAY, 'rules' => [
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
+										'value' => ['type' => XML_STRING, 'default' => '']
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+									'parameter' => ['type' => XML_ARRAY, 'rules' => [
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
+										'value' => ['type' => XML_STRING, 'default' => '']
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'status_codes' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'follow_redirects' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'post_type' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'posts' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'http_proxy' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'headers' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+									'header' => ['type' => XML_ARRAY, 'rules' => [
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
+										'value' => ['type' => XML_STRING | XML_REQUIRED]
+									]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'retrieve_mode' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'request_method' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ssl_cert_file' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ssl_key_file' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'ssl_key_password' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'verify_peer' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'verify_host' => ['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'lld_macro_paths' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
+								'lld_macro_path' => ['type' => XML_ARRAY, 'rules' => [
+									'lld_macro' => ['type' => XML_STRING | XML_REQUIRED],
+									'path' => ['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+								'step' => ['type' => XML_ARRAY, 'rules' => [
+									'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
+									'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
+											'parameter' => ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'error_handler' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'error_handler_params' => ['type' => XML_MULTIPLE, 'rules' => [
+										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										['else' => true, 'type' => XML_IGNORE_TAG]
+									]]
+								]]
+							]],
+							'overrides' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
+								'override' => ['type' => XML_ARRAY, 'rules' => [
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'step' => ['type' => XML_STRING | XML_REQUIRED],
+									'stop' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
+									'filter' => ['type' => XML_ARRAY, 'rules' => [
+										'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
+										'formula' => ['type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+											['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										'conditions' => ['type' => XML_MULTIPLE, 'rules' => [
+											['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+												'condition' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+													'macro' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING, 'default' => ''],
+													'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+													'formulaid' => ['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]],
+											['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+												'condition' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+													'macro' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING, 'default' => ''],
+													'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+													'formulaid' => ['type' => XML_IGNORE_TAG]
+												]]
+											]]
+										]]
+									]],
+									'operations' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
+										'operation' => ['type' => XML_ARRAY, 'rules' => [
+											'operationobject' => ['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE],
+											'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
+											'value' => ['type' => XML_STRING, 'default' => ''],
+											'discover' => ['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+											'status' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'delay' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'history' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'trends' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'severity' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'tags' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+													'tag' => ['type' => XML_ARRAY, 'rules' => [
+														'tag' => ['type' => XML_STRING | XML_REQUIRED],
+														'value' => ['type' => XML_STRING, 'default' => '']
+													]]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'templates' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+													'template' => ['type' => XML_ARRAY, 'rules' => [
+														'name' => ['type' => XML_STRING | XML_REQUIRED]
+													]]
+												]],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'inventory_mode' => ['type' => XML_MULTIPLE, 'rules' => [
+												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
+												['else' => true, 'type' => XML_IGNORE_TAG]
+											]]
+										]]
+									]]
+								]]
+							]]
+						]]
+					]],
 					'httptests' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
 						'httptest' => ['type' => XML_ARRAY, 'rules' => [
 							'uuid' => ['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
@@ -1776,823 +3298,6 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							'message' => ['type' => XML_STRING, 'default' => '']
 						]]
 					]]
-				]]
-			]]
-		]];
-	}
-
-	private function getDiscoveryRuleValidationRules(bool $is_template = false): array
-	{
-		return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
-			'discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
-				'uuid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'name' => ['type' => XML_STRING | XML_REQUIRED],
-				'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-				'snmp_oid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'key' => ['type' => XML_STRING | XML_REQUIRED],
-				'delay' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-				'allow_traps' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'allowed_hosts' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'params' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ipmi_sensor' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'authtype' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'username' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'password' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'publickey' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'privatekey' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'filter' => ['type' => XML_ARRAY, 'rules' => [
-					'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-					'formula' => ['type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					'conditions' => ['type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-							'condition' => ['type' => XML_ARRAY, 'rules' => [
-								'macro' => ['type' => XML_STRING | XML_REQUIRED],
-								'value' => ['type' => XML_STRING, 'default' => ''],
-								'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-								'formulaid' => ['type' => XML_STRING | XML_REQUIRED]
-							]]
-						]],
-						['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-							'condition' => ['type' => XML_ARRAY, 'rules' => [
-								'macro' => ['type' => XML_STRING | XML_REQUIRED],
-								'value' => ['type' => XML_STRING, 'default' => ''],
-								'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-								'formulaid' => ['type' => XML_IGNORE_TAG]
-							]]
-						]]
-					]]
-				]],
-				'lifetime_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
-				'lifetime' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'enabled_lifetime_type' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'enabled_lifetime' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'description' => ['type' => XML_STRING, 'default' => ''],
-				'interface_ref' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_INTERFACE], 'type' => XML_STRING],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'item_prototypes' => $this->getItemPrototypeValidationRules($is_template),
-				'trigger_prototypes' => $this->getTriggerPrototypeValidationRules($is_template),
-				'graph_prototypes' => $this->getGraphPrototypeValidationRules($is_template),
-				'host_prototypes' => $this->getHostPrototypeValidationRules($is_template),
-				'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'master_item' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-						'key' => ['type' => XML_STRING | XML_REQUIRED]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'timeout' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'url' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'query_fields' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-						'query_field' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING, 'default' => '']
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-						'parameter' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING, 'default' => '']
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'status_codes' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'follow_redirects' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'post_type' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'posts' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'http_proxy' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'headers' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-						'header' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'retrieve_mode' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'request_method' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ssl_cert_file' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ssl_key_file' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ssl_key_password' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'verify_peer' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'verify_host' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'lld_macro_paths' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
-					'lld_macro_path' => ['type' => XML_ARRAY, 'rules' => [
-						'lld_macro' => ['type' => XML_STRING | XML_REQUIRED],
-						'path' => ['type' => XML_STRING | XML_REQUIRED]
-					]]
-				]],
-				'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-					'step' => ['type' => XML_ARRAY, 'rules' => [
-						'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-						'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-								'parameter' => ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-							]],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]],
-						'error_handler' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-							['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]],
-						'error_handler_params' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]]
-					]]
-				]],
-				'overrides' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
-					'override' => ['type' => XML_ARRAY, 'rules' => [
-						'name' => ['type' => XML_STRING | XML_REQUIRED],
-						'step' => ['type' => XML_STRING | XML_REQUIRED],
-						'stop' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-						'filter' => ['type' => XML_ARRAY, 'rules' => [
-							'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-							'formula' => ['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'conditions' => ['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-									'condition' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-										'macro' => ['type' => XML_STRING | XML_REQUIRED],
-										'value' => ['type' => XML_STRING, 'default' => ''],
-										'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-										'formulaid' => ['type' => XML_STRING | XML_REQUIRED]
-									]]
-								]],
-								['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-									'condition' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-										'macro' => ['type' => XML_STRING | XML_REQUIRED],
-										'value' => ['type' => XML_STRING, 'default' => ''],
-										'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-										'formulaid' => ['type' => XML_IGNORE_TAG]
-									]]
-								]]
-							]]
-						]],
-						'operations' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
-							'operation' => ['type' => XML_ARRAY, 'rules' => [
-								'operationobject' => ['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE],
-								'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
-								'value' => ['type' => XML_STRING, 'default' => ''],
-								'discover' => ['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-								'status' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'delay' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'history' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'trends' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'severity' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'tags' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' => ['type' => XML_ARRAY, 'rules' => [
-											'tag' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'templates' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-										'template' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'inventory_mode' => ['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
-									['else' => true, 'type' => XML_IGNORE_TAG]
-								]]
-							]]
-						]]
-					]]
-				]]
-			]]
-		]];
-	}
-
-	private function getItemPrototypeValidationRules(bool $is_template = false): array
-	{
-		return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
-			'item_prototype' => ['type' => XML_ARRAY, 'rules' => [
-				'uuid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'name' => ['type' => XML_STRING | XML_REQUIRED],
-				'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-				'snmp_oid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'key' => ['type' => XML_STRING | XML_REQUIRED],
-				'delay' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'history' => ['type' => XML_STRING, 'default' => '31d'],
-				'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
-				'trends' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-				'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-				'allow_traps' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'allowed_hosts' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'units' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'params' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ipmi_sensor' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'authtype' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'username' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'password' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'publickey' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'privatekey' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'description' => ['type' => XML_STRING, 'default' => ''],
-				'valuemap' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::CHAR => CXmlConstantName::CHAR, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_ARRAY, 'rules' => [
-						'name' => ['type' => XML_STRING | XML_REQUIRED]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'logtimefmt' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::LOG => CXmlConstantName::LOG]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-					'step' => ['type' => XML_ARRAY, 'rules' => [
-						'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-						'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-								'parameter' => ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-							]],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]],
-						'error_handler' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-							['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]],
-						'error_handler_params' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]]
-					]]
-				]],
-				'interface_ref' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_MULTIPLE, 'rules' => [
-						['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_INTERFACE], 'type' => XML_STRING],
-						['else' => true, 'type' => XML_IGNORE_TAG]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'jmx_endpoint' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'master_item' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-						'key' => ['type' => XML_STRING | XML_REQUIRED]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'timeout' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'url' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'query_fields' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-						'query_field' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING, 'default' => '']
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'parameters' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-						'parameter' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING, 'default' => '']
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'status_codes' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'follow_redirects' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'post_type' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'posts' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'http_proxy' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'headers' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-						'header' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'retrieve_mode' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'request_method' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'output_format' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::OUTPUT_FORMAT_RAW, 'in' => [CXmlConstantValue::OUTPUT_FORMAT_RAW => CXmlConstantName::RAW, CXmlConstantValue::OUTPUT_FORMAT_JSON => CXmlConstantName::JSON]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ssl_cert_file' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ssl_key_file' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'ssl_key_password' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'verify_peer' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'verify_host' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-					'tag' => ['type' => XML_ARRAY, 'rules' => [
-						'tag' => ['type' => XML_STRING | XML_REQUIRED],
-						'value' => ['type' => XML_STRING, 'default' => '']
-					]]
-				]],
-				'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
-					'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
-						'uuid' => ['type' => XML_MULTIPLE, 'rules' => [
-							['if' => static fn(): bool => $is_template, 'type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-							['else' => true, 'type' => XML_IGNORE_TAG]
-						]],
-						'expression' => ['type' => XML_STRING | XML_REQUIRED],
-						'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-						'recovery_expression' => ['type' => XML_STRING, 'default' => ''],
-						'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-						'correlation_tag' => ['type' => XML_STRING, 'default' => ''],
-						'name' => ['type' => XML_STRING | XML_REQUIRED],
-						'event_name' => ['type' => XML_STRING, 'default' => ''],
-						'opdata' => ['type' => XML_STRING, 'default' => ''],
-						'url_name' => ['type' => XML_STRING, 'default' => ''],
-						'url' => ['type' => XML_STRING, 'default' => ''],
-						'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-						'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-						'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-						'description' => ['type' => XML_STRING, 'default' => ''],
-						'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-						'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-						'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-							'dependency' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING | XML_REQUIRED],
-								'expression' => ['type' => XML_STRING | XML_REQUIRED],
-								'recovery_expression' => ['type' => XML_STRING, 'default' => '']
-							]]
-						]],
-						'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-							'tag' => ['type' => XML_ARRAY, 'rules' => [
-								'tag' => ['type' => XML_STRING | XML_REQUIRED],
-								'value' => ['type' => XML_STRING, 'default' => '']
-							]]
-						]]
-					]]
-				]]
-			]]
-		]];
-	}
-
-	private function getTriggerPrototypeValidationRules(bool $is_template = false): array
-	{
-		return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
-			'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
-				'uuid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'expression' => ['type' => XML_STRING | XML_REQUIRED],
-				'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-				'recovery_expression' => ['type' => XML_STRING, 'default' => ''],
-				'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-				'correlation_tag' => ['type' => XML_STRING, 'default' => ''],
-				'name' => ['type' => XML_STRING | XML_REQUIRED],
-				'event_name' => ['type' => XML_STRING, 'default' => ''],
-				'opdata' => ['type' => XML_STRING, 'default' => ''],
-				'url_name' => ['type' => XML_STRING, 'default' => ''],
-				'url' => ['type' => XML_STRING, 'default' => ''],
-				'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-				'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-				'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-				'description' => ['type' => XML_STRING, 'default' => ''],
-				'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-				'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-				'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-					'dependency' => ['type' => XML_ARRAY, 'rules' => [
-						'name' => ['type' => XML_STRING | XML_REQUIRED],
-						'expression' => ['type' => XML_STRING | XML_REQUIRED],
-						'recovery_expression' => ['type' => XML_STRING, 'default' => '']
-					]]
-				]],
-				'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-					'tag' => ['type' => XML_ARRAY, 'rules' => [
-						'tag' => ['type' => XML_STRING | XML_REQUIRED],
-						'value' => ['type' => XML_STRING, 'default' => '']
-					]]
-				]]
-			]]
-		]];
-	}
-
-	private function getGraphPrototypeValidationRules(bool $is_template = false): array
-	{
-		return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
-			'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
-				'uuid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'name' => ['type' => XML_STRING | XML_REQUIRED],
-				'width' => ['type' => XML_STRING, 'default' => '900'],
-				'height' => ['type' => XML_STRING, 'default' => '200'],
-				'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
-				'yaxismax' => ['type' => XML_STRING, 'default' => '100'],
-				'show_work_period' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-				'show_triggers' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-				'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
-				'show_legend' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-				'show_3d' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-				'percent_left' => ['type' => XML_STRING, 'default' => '0'],
-				'percent_right' => ['type' => XML_STRING, 'default' => '0'],
-				// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
-				'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-				'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'ex_rules' => [$this, 'getYMinItemExtendedRules']],
-				// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
-				'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-				'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'ex_rules' => [$this, 'getYMaxItemExtendedRules']],
-				'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'ex_validate' => [$this, 'validateGraphItems'], 'rules' => [
-					'graph_item' => ['type' => XML_ARRAY, 'rules' => [
-						'sortorder' => ['type' => XML_STRING, 'default' => '0'],
-						'drawtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
-						'color' => ['type' => XML_STRING, 'default' => '009600'],
-						'yaxisside' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE],
-						'calc_fnc' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
-						'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
-						'item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'host' => ['type' => XML_STRING | XML_REQUIRED],
-							'key' => ['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]]
-				]],
-				'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
-			]]
-		]];
-	}
-
-	private function getHostPrototypeValidationRules(bool $is_template = false): array
-	{
-		return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
-			'host_prototype' => ['type' => XML_ARRAY, 'rules' => [
-				'uuid' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => static fn(): bool => $is_template, 'type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-					['else' => true, 'type' => XML_IGNORE_TAG]
-				]],
-				'host' => ['type' => XML_STRING | XML_REQUIRED],
-				'name' => ['type' => XML_STRING, 'default' => ''],
-				'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-				'discover' => ['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-				'inventory_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE],
-				'group_links' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
-					'group_link' => ['type' => XML_ARRAY, 'rules' => [
-						'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]]
-				]],
-				'group_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
-					'group_prototype' => ['type' => XML_ARRAY, 'rules' => [
-						'name' => ['type' => XML_STRING | XML_REQUIRED]
-					]]
-				]],
-				'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-					'template' => ['type' => XML_ARRAY, 'rules' => [
-						'name' => ['type' => XML_STRING | XML_REQUIRED]
-					]]
-				]],
-				'macros' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
-					'macro' => ['type' => XML_ARRAY, 'rules' => [
-						'macro' => ['type' => XML_STRING | XML_REQUIRED],
-						'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
-						'value' => ['type' => XML_STRING, 'default' => ''],
-						'description' => ['type' => XML_STRING, 'default' => '']
-					]]
-				]],
-				'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-					'tag' => ['type' => XML_ARRAY, 'rules' => [
-						'tag' => ['type' => XML_STRING | XML_REQUIRED],
-						'value' => ['type' => XML_STRING, 'default' => '']
-					]]
-				]],
-				'custom_interfaces' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-				'interfaces' => ['type' => XML_MULTIPLE, 'rules' => [
-					['if' => ['tag' => 'custom_interfaces', 'in' => [CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
-						'interface' => ['type' => XML_ARRAY, 'rules' => [
-							'default' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
-							'useip' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'ip' => ['type' => XML_STRING, 'default' => '127.0.0.1'],
-							'dns' => ['type' => XML_STRING, 'default' => ''],
-							'port' => ['type' => XML_STRING, 'default' => '10050'],
-							'details' => ['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
-									'version' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-									'bulk' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'community' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'max_repetitions' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'contextname' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'securityname' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'securitylevel' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'authprotocol' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
-											['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-											['else' => true, 'type' => XML_IGNORE_TAG]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'authpassphrase' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
-											['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
-											['else' => true, 'type' => XML_IGNORE_TAG]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'privprotocol' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
-											['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-											['else' => true, 'type' => XML_IGNORE_TAG]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'privpassphrase' => ['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
-											['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
-											['else' => true, 'type' => XML_IGNORE_TAG]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG]
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]]
-						]]
-					]],
-					['else' => true, 'type' => XML_IGNORE_TAG]
 				]]
 			]]
 		]];
