@@ -161,7 +161,6 @@ class ZColorPicker extends HTMLElement {
 	#color_field_name;
 	#palette_field_name;
 	#value;
-	#input_id;
 	#has_default;
 	#has_palette;
 	#disabled;
@@ -187,7 +186,6 @@ class ZColorPicker extends HTMLElement {
 			this.#color_field_name = this.hasAttribute('color-field-name') ? this.getAttribute('color-field-name') : '';
 			this.#palette_field_name = this.hasAttribute('palette-field-name') ? this.getAttribute('palette-field-name') : '';
 			this.#value = this.hasAttribute('value') ? this.getAttribute('value').toUpperCase() : '';
-			this.#input_id = this.hasAttribute('input-id') ? this.getAttribute('input-id') : '';
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('palette-field-name');
 			this.#disabled = this.hasAttribute('disabled');
@@ -219,7 +217,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'value', 'input-id', 'has-default', 'disabled', 'show-clear'];
+		return ['color-field-name', 'palette-field-name', 'value', 'has-default', 'disabled', 'show-clear'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -243,10 +241,6 @@ class ZColorPicker extends HTMLElement {
 
 			case 'value':
 				this.#value = new_value?.toUpperCase();
-				break;
-
-			case 'input-id':
-				this.#input_id = new_value;
 				break;
 
 			case 'has-default':
@@ -274,7 +268,6 @@ class ZColorPicker extends HTMLElement {
 
 		this.#hidden_input.name = name;
 		this.#hidden_input.value = this.#value;
-		this.#hidden_input.id = this.#input_id !== null ? this.#input_id : id;
 
 		this.#box.id = `lbl_${id}`;
 		this.#box.title = this.#getTitle(this.#value);
@@ -917,14 +910,6 @@ class ZColorPicker extends HTMLElement {
 
 	set value(value) {
 		this.setAttribute('value', value);
-	}
-
-	get inputId() {
-		return this.hasAttribute('input-id') ? this.getAttribute('input-id') : '';
-	}
-
-	set inputId(input_id) {
-		this.setAttribute('input-id', input_id);
 	}
 
 	get hasDefault() {

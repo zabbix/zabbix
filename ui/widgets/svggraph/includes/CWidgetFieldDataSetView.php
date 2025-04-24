@@ -517,9 +517,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(
-				(new CColorPicker($this->field->getName().'['.$ds_num.'][color][]'))
-					->setValue($color)
-					->setInputId('items_'.$ds_num.'_'.$row_num.'_color')
+				(new CColorPicker($this->field->getName().'['.$ds_num.'][color][]'))->setValue($color)
 			))->addClass('table-col-color'),
 			(new CCol(new CSpan($row_num.':')))->addClass('table-col-no'),
 			(new CCol([
