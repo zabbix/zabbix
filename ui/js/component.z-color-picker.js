@@ -189,7 +189,7 @@ class ZColorPicker extends HTMLElement {
 			this.#value = this.hasAttribute('value') ? this.getAttribute('value').toUpperCase() : '';
 			this.#input_id = this.hasAttribute('input-id') ? this.getAttribute('input-id') : '';
 			this.#has_default = this.hasAttribute('has-default');
-			this.#has_palette = this.hasAttribute('has-palette');
+			this.#has_palette = this.hasAttribute('palette-field-name');
 			this.#disabled = this.hasAttribute('disabled');
 			this.#show_clear = this.hasAttribute('show-clear');
 
@@ -219,8 +219,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'value', 'input-id', 'has-default', 'has-palette', 'disabled',
-			'show-clear'];
+		return ['color-field-name', 'palette-field-name', 'value', 'input-id', 'has-default', 'disabled', 'show-clear'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -239,6 +238,7 @@ class ZColorPicker extends HTMLElement {
 
 			case 'palette-field-name':
 				this.#palette_field_name = new_value;
+				this.#has_palette = new_value !== null;
 				break;
 
 			case 'value':
@@ -251,10 +251,6 @@ class ZColorPicker extends HTMLElement {
 
 			case 'has-default':
 				this.#has_default = new_value !== null;
-				break;
-
-			case 'has-palette':
-				this.#has_palette = new_value !== null;
 				break;
 
 			case 'disabled':
@@ -941,19 +937,6 @@ class ZColorPicker extends HTMLElement {
 		}
 		else {
 			this.removeAttribute('has-default');
-		}
-	}
-
-	get hasPalette() {
-		return this.hasAttribute('has-palette');
-	}
-
-	set hasPalette(has_palette) {
-		if (has_palette) {
-			this.setAttribute('has-palette', '');
-		}
-		else {
-			this.removeAttribute('has-palette');
 		}
 	}
 

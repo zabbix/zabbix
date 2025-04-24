@@ -48,7 +48,6 @@ class CWidgetFieldColorView extends CWidgetFieldView {
 		return (new CColorPicker())
 			->setColorFieldName($this->field->getName())
 			->setValue($this->field->getValue())
-			->setHasDefault($this->field->hasAllowInherited())
-			->setHasPalette($this->field->hasAllowPalette());
+			->setHasDefault($this->field->hasAllowInherited());
 	}
 }

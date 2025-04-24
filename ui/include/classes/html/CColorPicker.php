@@ -72,17 +72,6 @@ class CColorPicker extends CTag {
 		return $this;
 	}
 
-	public function setHasPalette(bool $has_palette = true): self {
-		if ($has_palette) {
-			$this->setAttribute('has-palette', '');
-		}
-		else {
-			$this->removeAttribute('has-palette');
-		}
-
-		return $this;
-	}
-
 	public function setDisabled(bool $disabled = true): self {
 		if ($disabled) {
 			$this->setAttribute('disabled', '');

@@ -24,7 +24,6 @@ class CWidgetFieldColor extends CWidgetField {
 	public const DEFAULT_VALUE = '';
 
 	private bool $allow_inherited = false;
-	private bool $allow_palette = false;
 
 	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
@@ -43,19 +42,6 @@ class CWidgetFieldColor extends CWidgetField {
 	 */
 	public function allowInherited(bool $allow_inherited = true): self {
 		$this->allow_inherited = $allow_inherited;
-
-		return $this;
-	}
-
-	public function hasAllowPalette(): bool {
-		return $this->allow_palette;
-	}
-
-	/**
-	 * Tell the Color picker whether to allow palette feature or not.
-	 */
-	public function allowPalette(bool $allow_palette = true): self {
-		$this->allow_palette = $allow_palette;
 
 		return $this;
 	}
