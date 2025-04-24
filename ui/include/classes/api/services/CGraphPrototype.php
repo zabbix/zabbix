@@ -518,4 +518,34 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 	}
+
+	/**
+	 * Inherit template graphs from given rules to hosts.
+	 *
+	 * @param array $ruleids
+	 * @param array $hostids
+	 */
+	public function linkTemplateObjects(array $ruleids, array $hostids): void {
+		$output = ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid', 'show_work_period',
+			'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type',
+			'ymax_type', 'ymin_itemid', 'ymax_itemid', 'discover'
+		];
+
+		$options = [
+			'discoveryids' => $ruleids,
+			'output' => $output,
+			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+			],
+			'preservekeys' => true,
+			'nopermissions' => true
+		];
+
+		$graphs = $this->get($options);
+
+		if ($graphs) {
+			$this->inherit($graphs, $hostids);
+		}
+	}
 }

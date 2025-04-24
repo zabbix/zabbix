@@ -715,6 +715,104 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	}
 
 	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public static function linkTemplateObjects(array $templateids, array $hostids): void {
+		$db_items = DB::select('items', [
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
+				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
+			),
+			'filter' => [
+				'hostid' => $templateids,
+				'flags' => ZBX_FLAG_DISCOVERY_RULE
+			],
+			'preservekeys' => true
+		]);
+
+		if (!$db_items) {
+			return;
+		}
+
+		self::prepareItemsForApi($db_items);
+		self::addInternalFields($db_items);
+
+		$items = [];
+
+		foreach ($db_items as $db_item) {
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
+
+			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
+				$item += ['parameters' => []];
+			}
+
+			$items[] = $item + [
+				'preprocessing' => [],
+				'lld_macro_paths' => [],
+				'filter' => [],
+				'overrides' => []
+			];
+		}
+
+		self::addAffectedObjects($items, $db_items);
+
+		$items = array_values($db_items);
+
+		foreach ($items as &$item) {
+			if (array_key_exists('parameters', $item)) {
+				$item['parameters'] = array_values($item['parameters']);
+			}
+
+			$item['preprocessing'] = array_values($item['preprocessing']);
+			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
+			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
+
+			foreach ($item['filter']['conditions'] as &$condition) {
+				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+			}
+			unset($condition);
+
+			foreach ($item['overrides'] as &$override) {
+				foreach ($override['filter']['conditions'] as &$condition) {
+					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+						unset($condition['formulaid']);
+					}
+				}
+				unset($condition);
+
+				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
+
+				foreach ($override['operations'] as &$operation) {
+					$operation['optag'] = array_values($operation['optag']);
+					$operation['optemplate'] = array_values($operation['optemplate']);
+				}
+				unset($operation);
+
+				$override['operations'] = array_values($override['operations']);
+			}
+			unset($override);
+
+			$item['overrides'] = array_values($item['overrides']);
+		}
+		unset($item);
+
+		self::inherit($items, [], $hostids);
+
+		$ruleids = array_keys($db_items);
+
+		CItemPrototype::linkTemplateObjects($ruleids, $hostids);
+		API::TriggerPrototype()->linkTemplateObjects($ruleids, $hostids);
+		API::GraphPrototype()->linkTemplateObjects($ruleids, $hostids);
+		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
+		CDiscoveryRulePrototype::linkTemplateObjects($ruleids, $hostids);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
@@ -911,7 +1009,11 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$upd_item += [
 				'preprocessing' => [],
 				'lld_macro_paths' => [],
-				'filter' => [],
+				'filter' => [
+					'evaltype' => DB::getDefault('items', 'evaltype'),
+					'formula' => DB::getDefault('items', 'formula'),
+					'conditions' => []
+				],
 				'overrides' => [],
 				'parameters' => []
 			];
@@ -1045,104 +1147,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	}
 
 	/**
-	 * @param array $templateids
-	 * @param array $hostids
-	 */
-	public static function linkTemplateObjects(array $templateids, array $hostids): void {
-		$db_items = DB::select('items', [
-			'output' => array_merge(
-				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
-					'enabled_lifetime', 'description', 'status'
-				],
-				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
-			),
-			'filter' => [
-				'hostid' => $templateids,
-				'flags' => ZBX_FLAG_DISCOVERY_RULE
-			],
-			'preservekeys' => true
-		]);
-
-		if (!$db_items) {
-			return;
-		}
-
-		self::prepareItemsForApi($db_items);
-		self::addInternalFields($db_items);
-
-		$items = [];
-
-		foreach ($db_items as $db_item) {
-			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
-
-			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
-				$item += ['parameters' => []];
-			}
-
-			$items[] = $item + [
-				'preprocessing' => [],
-				'lld_macro_paths' => [],
-				'filter' => [],
-				'overrides' => []
-			];
-		}
-
-		self::addAffectedObjects($items, $db_items);
-
-		$ruleids = array_keys($db_items);
-
-		$items = array_values($db_items);
-
-		foreach ($items as &$item) {
-			if (array_key_exists('parameters', $item)) {
-				$item['parameters'] = array_values($item['parameters']);
-			}
-
-			$item['preprocessing'] = array_values($item['preprocessing']);
-			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
-			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
-
-			foreach ($item['filter']['conditions'] as &$condition) {
-				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					unset($condition['formulaid']);
-				}
-			}
-			unset($condition);
-
-			foreach ($item['overrides'] as &$override) {
-				foreach ($override['filter']['conditions'] as &$condition) {
-					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-						unset($condition['formulaid']);
-					}
-				}
-				unset($condition);
-
-				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
-
-				foreach ($override['operations'] as &$operation) {
-					$operation['optag'] = array_values($operation['optag']);
-					$operation['optemplate'] = array_values($operation['optemplate']);
-				}
-				unset($operation);
-
-				$override['operations'] = array_values($override['operations']);
-			}
-			unset($override);
-
-			$item['overrides'] = array_values($item['overrides']);
-		}
-		unset($item);
-
-		self::inherit($items, [], $hostids);
-
-		CItemPrototype::linkTemplateObjects($templateids, $hostids);
-		API::TriggerPrototype()->syncTemplates(['templateids' => $templateids, 'hostids' => $hostids]);
-		API::GraphPrototype()->syncTemplates(['templateids' => $templateids, 'hostids' => $hostids]);
-		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
-		CDiscoveryRulePrototype::linkTemplateObjects($templateids, $hostids);
-	}
-
-	/**
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
@@ -1176,14 +1180,14 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$db_items[$row['itemid']] = $row;
 		}
 
+		$ruleids = array_keys($db_items);
+
 		if ($items) {
 			self::updateForce($items, $db_items);
 
-			$itemids = array_keys($db_items);
-
-			CItemPrototype::unlinkTemplateObjects($itemids);
-			API::HostPrototype()->unlinkTemplateObjects($itemids);
-			CDiscoveryRulePrototype::unlinkTemplateObjects($itemids);
+			CItemPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
+			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
 		}
 	}
 
@@ -1192,13 +1196,12 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDiscoveredItems($db_items);
 
 		$del_itemids = array_keys($db_items);
 
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
-		self::deleteAffectedLLdRulePrototypes($del_itemids);
+		self::deleteAffectedDiscoveryRulePrototypes($del_itemids);
 
 		self::deleteAffectedOverrides($del_itemids);
 
@@ -1229,17 +1232,23 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	}
 
 	/**
-	 * Add the (nested) discovered rules of the given items to the given item array.
-	 *
-	 * @param array $db_items
+	 * @param array      $templateids
+	 * @param array|null $hostids
 	 */
-	private static function addDiscoveredItems(array &$db_items): void {
-		$db_items += DBfetchArrayAssoc(DBselect(
-			'SELECT id.itemid,i.name'.
-			' FROM item_discovery id,items i'.
-			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', array_keys($db_items)).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_CREATED])
+	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
+		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
+
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT ii.itemid,ii.name'.
+			' FROM items i,items ii'.
+			' WHERE i.itemid=ii.templateid'.
+				' AND '.dbConditionId('i.hostid', $templateids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
+				$hostids_condition
 		), 'itemid');
+
+		if ($db_items) {
+			self::deleteForce($db_items);
+		}
 	}
 }

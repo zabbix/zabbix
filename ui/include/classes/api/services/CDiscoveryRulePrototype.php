@@ -372,7 +372,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::addHostStatus($items, $db_hosts, $db_templates);
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE);
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['ruleid', 'key_']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
 			'host_status' =>			['type' => API_ANY],
 			'flags' =>					['type' => API_ANY],
 			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
@@ -727,6 +727,106 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	}
 
 	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public static function linkTemplateObjects(array $ruleids, array $hostids): void {
+		$fields = array_merge(
+			['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+				'enabled_lifetime', 'description', 'status'
+			],
+			array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters']),
+			['hostid', 'templateid', 'flags']
+		);
+
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT i.'.implode(',i.', $fields).',h.status AS host_status,id.lldruleid AS ruleid'.
+			' FROM items i,hosts h,item_discovery id'.
+			' WHERE i.hostid=h.hostid'.
+				' AND i.itemid=id.itemid'.
+				' AND '.dbConditionId('id.lldruleid', $ruleids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+		), 'itemid');
+
+		if (!$db_items) {
+			return;
+		}
+
+		self::prepareItemsForApi($db_items);
+
+		$items = [];
+
+		foreach ($db_items as $db_item) {
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type', 'ruleid']));
+
+			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
+				$item += ['parameters' => []];
+			}
+
+			$items[] = $item + [
+				'preprocessing' => [],
+				'lld_macro_paths' => [],
+				'filter' => [],
+				'overrides' => []
+			];
+		}
+
+		self::addAffectedObjects($items, $db_items);
+
+		$items = array_values($db_items);
+
+		foreach ($items as &$item) {
+			if (array_key_exists('parameters', $item)) {
+				$item['parameters'] = array_values($item['parameters']);
+			}
+
+			$item['preprocessing'] = array_values($item['preprocessing']);
+			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
+			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
+
+			foreach ($item['filter']['conditions'] as &$condition) {
+				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+			}
+			unset($condition);
+
+			foreach ($item['overrides'] as &$override) {
+				foreach ($override['filter']['conditions'] as &$condition) {
+					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+						unset($condition['formulaid']);
+					}
+				}
+				unset($condition);
+
+				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
+
+				foreach ($override['operations'] as &$operation) {
+					$operation['optag'] = array_values($operation['optag']);
+					$operation['optemplate'] = array_values($operation['optemplate']);
+				}
+				unset($operation);
+
+				$override['operations'] = array_values($override['operations']);
+			}
+			unset($override);
+
+			$item['overrides'] = array_values($item['overrides']);
+		}
+		unset($item);
+
+		self::inherit($items, [], $hostids);
+
+		$ruleids = array_keys($db_items);
+
+		CItemPrototype::linkTemplateObjects($ruleids, $hostids);
+		API::TriggerPrototype()->linkTemplateObjects($ruleids, $hostids);
+		API::GraphPrototype()->linkTemplateObjects($ruleids, $hostids);
+		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
+		CDiscoveryRulePrototype::linkTemplateObjects($ruleids, $hostids);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
@@ -904,7 +1004,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$options = [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
-				'enabled_lifetime_type', 'enabled_lifetime','value_type', 'units', 'history', 'trends', 'valuemapid',
+				'enabled_lifetime_type', 'enabled_lifetime', 'value_type', 'units', 'history', 'trends',
 				'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
@@ -1002,7 +1102,11 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			$upd_item += [
 				'preprocessing' => [],
 				'lld_macro_paths' => [],
-				'filter' => [],
+				'filter' => [
+					'evaltype' => DB::getDefault('items', 'evaltype'),
+					'formula' => DB::getDefault('items', 'formula'),
+					'conditions' => []
+				],
 				'overrides' => [],
 				'parameters' => []
 			];
@@ -1066,7 +1170,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		$upd_db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
 				'enabled_lifetime_type', 'enabled_lifetime', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+				'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'filter' => [
 				'templateid' => array_keys($db_items),
@@ -1143,113 +1247,22 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	}
 
 	/**
-	 * @param array $templateids
-	 * @param array $hostids
-	 */
-	public static function linkTemplateObjects(array $templateids, array $hostids): void {
-		$db_items = DB::select('items', [
-			'output' => array_merge(
-				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
-					'enabled_lifetime', 'description', 'status', 'discover'
-				],
-				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
-			),
-			'filter' => [
-				'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
-				'hostid' => $templateids
-			],
-			'preservekeys' => true
-		]);
-
-		if (!$db_items) {
-			return;
-		}
-
-		self::prepareItemsForApi($db_items);
-		static::addInternalFields($db_items);
-
-		$items = [];
-
-		foreach ($db_items as $db_item) {
-			$item = array_intersect_key($db_item, array_flip(['itemid', 'type', 'ruleid']));
-
-			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
-				$item += ['parameters' => []];
-			}
-
-			$items[] = $item + [
-				'preprocessing' => [],
-				'lld_macro_paths' => [],
-				'filter' => [],
-				'overrides' => []
-			];
-		}
-
-		self::addAffectedObjects($items, $db_items);
-
-		$items = array_values($db_items);
-
-		foreach ($items as &$item) {
-			if (array_key_exists('parameters', $item)) {
-				$item['parameters'] = array_values($item['parameters']);
-			}
-
-			$item['preprocessing'] = array_values($item['preprocessing']);
-			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
-			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
-
-			foreach ($item['filter']['conditions'] as &$condition) {
-				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					unset($condition['formulaid']);
-				}
-			}
-			unset($condition);
-
-			foreach ($item['overrides'] as &$override) {
-				foreach ($override['filter']['conditions'] as &$condition) {
-					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-						unset($condition['formulaid']);
-					}
-				}
-				unset($condition);
-
-				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
-
-				foreach ($override['operations'] as &$operation) {
-					$operation['optag'] = array_values($operation['optag']);
-					$operation['optemplate'] = array_values($operation['optemplate']);
-				}
-				unset($operation);
-
-				$override['operations'] = array_values($override['operations']);
-			}
-			unset($override);
-
-			$item['overrides'] = array_values($item['overrides']);
-		}
-		unset($item);
-
-		static::inherit($items, [], $hostids);
-	}
-
-	/**
 	 * @param array $ruleids
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,i.flags,'.
+			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.hostid,i.flags,'.
 				'h.status AS host_status'.
 			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
 				' AND '.dbConditionId('id.lldruleid', $ruleids).
-				' AND '.dbConditionId('i.templateid', [0], true)
+				' AND '.dbConditionId('i.templateid', [0], true).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
 		);
 
 		$items = [];
 		$db_items = [];
-		$i = 0;
-		$tpl_itemids = [];
 		$internal_fields = array_flip(['type', 'key_', 'hostid', 'flags']);
 
 		while ($row = DBfetch($result)) {
@@ -1263,33 +1276,18 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 				$item += ['uuid' => generateUuidV4()];
 			}
 
-			if ($row['valuemapid'] != 0) {
-				$item += ['valuemapid' => 0];
-				$row['update_discovered_items'] = true;
-
-				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row, $internal_fields);
-				}
-			}
-
-			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
-				unset($row['type']);
-			}
-
-			$items[$i++] = $item;
+			$items[] = $item + array_intersect_key($row, $internal_fields);
 			$db_items[$row['itemid']] = $row;
 		}
+
+		$ruleids = array_keys($db_items);
 
 		if ($items) {
 			self::updateForce($items, $db_items);
 
-			if ($tpl_itemids) {
-				$items = array_intersect_key($items, $tpl_itemids);
-				$db_items = array_intersect_key($db_items, array_flip($tpl_itemids));
-
-				self::inherit($items, $db_items);
-			}
+			CItemPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
+			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
 		}
 	}
 
@@ -1312,7 +1310,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
-		self::deleteAffectedLldRulePrototypes($del_itemids);
+		self::deleteAffectedDiscoveryRulePrototypes($del_itemids);
 
 		self::deleteAffectedOverrides($del_itemids);
 
@@ -1342,7 +1340,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', array_keys($db_items)).
+				' AND '.dbConditionId('id.parent_itemid', array_keys($db_items)).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
 		), 'itemid');
 	}
@@ -1357,7 +1355,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', $del_itemids).
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_CREATED])
 		), 'itemid');
 

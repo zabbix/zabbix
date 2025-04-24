@@ -149,7 +149,7 @@ class CHostPrototype extends CHostBase {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
-				$sql_parts['where'][] = '1=0';
+				$sqlParts['where'][] = '1=0';
 			}
 			else {
 				$sqlParts['from'][] = 'host_hgset hh';
@@ -1828,6 +1828,9 @@ class CHostPrototype extends CHostBase {
 		$db_host_prototypes = $this->get([
 			'output' => ['hostid', 'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
 			'discoveryids' => $ruleids,
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+			],
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
@@ -1888,7 +1891,8 @@ class CHostPrototype extends CHostBase {
 			' WHERE hd.hostid=h.hostid'.
 				' AND hd.lldruleid=i.itemid'.
 				' AND i.hostid=hh.hostid'.
-				' AND '.dbConditionId('hd.lldruleid', $ruleids)
+				' AND '.dbConditionId('hd.lldruleid', $ruleids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
 		);
 
 		$hosts = [];

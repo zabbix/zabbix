@@ -2166,7 +2166,8 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', $del_itemids)
+				' AND '.dbConditionId('id.lldruleid', $del_itemids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
 		), 'itemid');
 
 		if ($db_items) {
@@ -2211,43 +2212,19 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	/**
 	 * Delete discovery prototypes which belong to the given LLD rules or discovery prototypes.
 	 *
-	 * @param array $del_itemids
+	 * @param array $ruleids
 	 */
-	public static function deleteAffectedLLdRulePrototypes(array $del_itemids): void {
+	protected static function deleteAffectedDiscoveryRulePrototypes(array $ruleids): void {
 		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', $del_itemids).
-				' AND '.dbConditionInt('i.flags', [
-					ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
-					ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED
-				])
+				' AND '.dbConditionId('id.lldruleid', $ruleids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
 		), 'itemid');
 
 		if ($db_items) {
 			CDiscoveryRulePrototype::deleteForce($db_items);
-		}
-	}
-
-	/**
-	 * @param array      $templateids
-	 * @param array|null $hostids
-	 */
-	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
-		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
-
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT ii.itemid,ii.name'.
-			' FROM items i,items ii'.
-			' WHERE i.itemid=ii.templateid'.
-				' AND '.dbConditionId('i.hostid', $templateids).
-				' AND '.dbConditionInt('i.flags', [static::FLAGS]).
-				$hostids_condition
-		), 'itemid');
-
-		if ($db_items) {
-			static::deleteForce($db_items);
 		}
 	}
 }

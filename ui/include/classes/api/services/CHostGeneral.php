@@ -789,10 +789,8 @@ abstract class CHostGeneral extends CHostBase {
 	 */
 	private static function linkTemplatesObjects(array $templateids, array $hostids): void {
 		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
-		$link_request = [
-			'templateids' => $templateids,
-			'hostids' => $hostids
-		];
+		$templateids = zbx_toArray($templateids);
+		$hostids = zbx_toArray($hostids);
 
 		foreach ($templateids as $templateid) {
 			// Fist link web items, so that later regular items can use web item as their master item.
@@ -800,11 +798,11 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		CItem::linkTemplateObjects($templateids, $hostids);
-		API::Trigger()->syncTemplates($link_request);
-		API::Graph()->syncTemplates($link_request);
+		API::Trigger()->linkTemplateObjects($templateids, $hostids);
+		API::Graph()->linkTemplateObjects($templateids, $hostids);
 		CDiscoveryRule::linkTemplateObjects($templateids, $hostids);
 
-		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
+		CTriggerGeneral::syncTemplateDependencies($templateids, $hostids);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

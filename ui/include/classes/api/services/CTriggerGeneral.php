@@ -2331,38 +2331,6 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Adds triggers and trigger prototypes from template to hosts.
-	 *
-	 * @param array $data
-	 */
-	public function syncTemplates(array $data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url_name', 'url',
-			'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-			'event_name'
-		];
-		if ($this instanceof CTriggerPrototype) {
-			$output[] = 'discover';
-		}
-
-		$triggers = $this->get([
-			'output' => $output,
-			'selectTags' => ['tag', 'value'],
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		$this->inherit($triggers, $data['hostids']);
-	}
-
-	/**
 	 * Check whether circular linkage occurs as a result of the given changes in trigger dependencies.
 	 *
 	 * @param array $ins_dependencies[<triggerid_up>][<triggerid>]

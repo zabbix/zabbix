@@ -613,4 +613,37 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return $result;
 	}
 
+	/**
+	 * Inherit trigger prototypes from given rules to hosts.
+	 *
+	 * @param array $ruleids
+	 * @param array $hostids
+	 */
+	public function linkTemplateObjects(array $ruleids, array $hostids) {
+		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url_name', 'url',
+			'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name', 'discover'
+		];
+
+		$options = [
+			'discoveryids' => $ruleids,
+			'output' => $output,
+			'selectTags' => ['tag', 'value'],
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+			],
+			'preservekeys' => true,
+			'nopermissions' => true
+		];
+
+		$triggers = $this->get($options);
+
+		if ($triggers) {
+			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$this->inherit($triggers, $hostids);
+		}
+	}
 }

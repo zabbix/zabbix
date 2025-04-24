@@ -1461,10 +1461,16 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
-							'parent_discovery_rule' => 	['type' => XML_ARRAY, 'rules' => [
-								'key' => 					['type' => XML_STRING | XML_REQUIRED]
+							'discover' =>				['type' => XML_MULTIPLE, 'rules' => [
+								['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'discover' => 				['type' => XML_STRING],
+							'parent_discovery_rule' => 	['type' => XML_MULTIPLE, 'rules' => [
+															['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_ARRAY, 'rules' => [
+																'key' => ['type' => XML_STRING | XML_REQUIRED]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
@@ -2679,10 +2685,16 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
-							'parent_discovery_rule' => 	['type' => XML_ARRAY, 'rules' => [
-								'key' => 					['type' => XML_STRING | XML_REQUIRED]
+							'discover' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'discover' => 				['type' => XML_STRING],
+							'parent_discovery_rule' =>	['type' => XML_MULTIPLE, 'rules' => [
+															['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_ARRAY, 'rules' => [
+																'key' => ['type' => XML_STRING | XML_REQUIRED]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]

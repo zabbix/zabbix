@@ -814,17 +814,19 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $templateids
+	 * Inherit item prototypes from given rules to hosts.
+	 *
+	 * @param array $ruleids
 	 * @param array $hostids
 	 */
-	public static function linkTemplateObjects(array $templateids, array $hostids): void {
+	public static function linkTemplateObjects(array $ruleids, array $hostids): void {
 		$db_items = DB::select('items', [
+			'discoveryids' => $ruleids,
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
 			'filter' => [
-				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				'hostid' => $templateids
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 			],
 			'preservekeys' => true
 		]);
@@ -1289,6 +1291,7 @@ class CItemPrototype extends CItemGeneral {
 			' WHERE id.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
 				' AND '.dbConditionId('id.lldruleid', $ruleids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
 				' AND '.dbConditionId('i.templateid', [0], true)
 		);
 

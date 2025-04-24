@@ -61,6 +61,7 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
+			'discoveryids'				=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
 			'editable'					=> false,
@@ -188,6 +189,20 @@ class CGraph extends CGraphGeneral {
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
+			}
+		}
+
+		if ($options['discoveryids'] !== null) {
+			zbx_value2array($options['discoveryids']);
+
+			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
+			$sqlParts['from']['item_discovery'] = 'item_discovery id';
+			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
+			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
+
+			if ($options['groupCount']) {
+				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -519,6 +534,34 @@ class CGraph extends CGraphGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $graph['name'], $hosts[0]['host']));
 				}
 			}
+		}
+	}
+
+	/**
+	 * Inherit template graphs from to hosts.
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public function linkTemplateObjects(array $templateids, array $hostids): void {
+		$output = ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid', 'show_work_period',
+			'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type',
+			'ymax_type', 'ymin_itemid', 'ymax_itemid'
+		];
+
+		$graphs = $this->get([
+			'output' => $output,
+			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
+			'filter' => [
+				'hostid' => $templateids,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+			],
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		if ($graphs) {
+			$this->inherit($graphs, $hostids);
 		}
 	}
 }

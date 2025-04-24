@@ -1148,9 +1148,11 @@ abstract class CGraphGeneral extends CApiService {
 			' WHERE ht.hostid=h2.hostid'.
 				' AND '.dbConditionId('ht.templateid', array_keys($templateids)).
 				' AND '.dbConditionInt('h2.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
+
 		if ($hostids !== null) {
 			$sql .= ' AND '.dbConditionId('ht.hostid', $hostids);
 		}
+
 		$db_host_templates = DBselect($sql);
 
 		while ($db_host_template = DBfetch($db_host_templates)) {
@@ -1404,33 +1406,5 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$this->inherit(array_merge($ins_graphs + $upd_graphs));
-	}
-
-	/**
-	 * Inherit template graphs from template to host.
-	 *
-	 * @param array $data
-	 */
-	public function syncTemplates(array $data): void {
-		$output = ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid', 'show_work_period',
-			'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type',
-			'ymax_type', 'ymin_itemid', 'ymax_itemid'
-		];
-
-		if ($this instanceof CGraphPrototype) {
-			$output[] = 'discover';
-		}
-
-		$graphs = $this->get([
-			'output' => $output,
-			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		if ($graphs) {
-			$this->inherit($graphs, $data['hostids']);
-		}
 	}
 }
