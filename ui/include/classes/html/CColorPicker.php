@@ -49,12 +49,6 @@ class CColorPicker extends CTag {
 		return $this;
 	}
 
-	public function setInputId(string $input_id): self {
-		$this->setAttribute('input-id', $input_id);
-
-		return $this;
-	}
-
 	public function setHasDefault(bool $has_default = true): self {
 		if ($has_default) {
 			$this->setAttribute('has-default', '');

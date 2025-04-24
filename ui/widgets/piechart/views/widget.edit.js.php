@@ -646,7 +646,6 @@ window.widget_pie_chart_form = new class {
 		for (const row of dataset.querySelectorAll('.single-item-table-row')) {
 			const prefix = `items_${dataset_index}_${row.rowIndex}`;
 
-			row.querySelector('.table-col-color .<?= ZBX_STYLE_COLOR_PICKER ?>').inputId = `${prefix}_color`;
 			row.querySelector('.table-col-no span').textContent = `${row.rowIndex}:`;
 			row.querySelector('.table-col-name a').id = `${prefix}_name`;
 			row.querySelector('.table-col-type z-select').id = `${prefix}_type`

@@ -37,7 +37,6 @@ jQuery(function ($) {
 			color_picker.colorFieldName = opt.makeName('color', opt.getId($override));
 			color_picker.paletteFieldName = opt.makeName('color_palette', opt.getId($override));
 			color_picker.value = value;
-			color_picker.inputId = field_name.replace(/\]/g, '_').replace(/\[/g, '_');
 
 			return $('<div>')
 				.append(color_picker)
