@@ -593,6 +593,8 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			unset($row);
 		}
 
+		$this->addRelatedDiscoveryData($options, $result);
+
 		return $result;
 	}
 

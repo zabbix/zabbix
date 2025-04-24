@@ -1834,22 +1834,7 @@ class CItem extends CItemGeneral {
 
 		$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
 	}
-	private function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] === null) {
-			return;
-		}
 
-		$discovery_data = API::getApiService()->select('item_discovery', [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemdiscoveryid', 'itemid']),
-			'filter' => ['itemid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
-
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid']);
-
-		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
-	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);

@@ -86,7 +86,8 @@ class CHostGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
 			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRulePrototypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
@@ -1249,7 +1250,30 @@ class CHostGroup extends CApiService {
 			$result = $relation_map->mapMany($result, $group_discoveries, 'groupDiscoveries');
 		}
 
+		$this->addRelatedDiscoveryData($options, $result);
+
 		return $result;
+	}
+
+	private function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		$output = $options['selectDiscoveryData'] === API_OUTPUT_EXTEND
+			? self::GROUP_DISCOVERY_FIELDS
+			: $options['selectDiscoveryData'];
+
+		$discovery_data = API::getApiService()->select('group_discovery', [
+			'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
+			'filter' => ['groupid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($discovery_data, 'groupid', 'groupdiscoveryid');
+
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['groupid', 'groupdiscoveryid'], $output);
+
+		$result = $relation_map->mapMany($result, $discovery_data, 'discoveryData');
 	}
 
 	/**

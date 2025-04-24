@@ -2149,6 +2149,23 @@ abstract class CItemGeneral extends CApiService {
 		return $result;
 	}
 
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		$discovery_data = API::getApiService()->select('item_discovery', [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemdiscoveryid', 'itemid']),
+			'filter' => ['itemid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
+
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid']);
+
+		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
+	}
+
 	/**
 	 * Check that dependent items of given items are valid.
 	 *
