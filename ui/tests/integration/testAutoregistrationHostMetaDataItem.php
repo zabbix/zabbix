@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for autoregistration
  *
  * @backup ids,hosts,items,actions,operations,optag,host_tag
- * @backup auditlog,changelog,config,ha_node
+ * @backup auditlog,changelog,settings,ha_node
  */
 class testAutoregistrationHostMetaDataItem extends CIntegrationTest {
 
