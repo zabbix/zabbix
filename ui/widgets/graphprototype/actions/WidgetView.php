@@ -114,7 +114,9 @@ class WidgetView extends CControllerWidgetIterator {
 				'hostids' => [$parent_lld['hostid']],
 				'selectDiscoveryData' => ['parent_graphid'],
 				'selectHosts' => ['name'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_CREATED]
+				],
 				'expandName' => true
 			]);
 
@@ -247,8 +249,10 @@ class WidgetView extends CControllerWidgetIterator {
 			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name_resolved'],
 				'hostids' => [$parent_lld['hostid']],
-				'selectDiscoveryData' => ['itemid', 'parent_itemid'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
+				'selectDiscoveryData' => ['parent_itemid'],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_CREATED]
+				]
 			]);
 
 			// Collect items based on the item prototype.

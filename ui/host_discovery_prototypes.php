@@ -310,7 +310,7 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 		uncheckTableRows($db_parent_discovery['itemid']);
 	}
 
-	show_messages($result, _('d'), _('Cannot delete discovery prototype'));
+	show_messages($result, _('Discovery prototype deleted'), _('Cannot delete discovery prototype'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }

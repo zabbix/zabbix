@@ -100,7 +100,7 @@ foreach ($data['triggers'] as $trigger) {
 			$dep_trigger_description =
 				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
-			if ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($dep_trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$dep_trigger_prototype_url = (new CUrl('zabbix.php'))
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'trigger.prototype.edit')

@@ -50,7 +50,7 @@ class CUpdateDiscoveredValidator extends CValidator implements CPartialValidator
 	public function validate($object) {
 		$allowedFields = array_flip($this->allowed);
 
-		if ($object['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($object['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 			// ignore the "flags" field
 			unset($object['flags']);
 

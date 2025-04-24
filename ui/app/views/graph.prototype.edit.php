@@ -32,7 +32,7 @@ $graph_form = (new CForm())
 	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
-$discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
+$discovered_graph = array_key_exists('flags', $data) && $data['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 $readonly = $is_templated || $discovered_graph || $data['discovered_prototype'];
 
 // Preview tab.

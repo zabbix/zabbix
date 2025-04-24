@@ -191,7 +191,7 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			$data['templates'][$db_graph['hosts'][0]['hostid']] = [];
 			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']
 					? $db_graph['discoveryRule']['itemid']
 					: $db_graph['discoveryRulePrototype']['itemid'];
@@ -285,7 +285,7 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 			->setArgument('context', 'template')
 			->setArgument('uncheck', '1');
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
@@ -326,7 +326,7 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 				->setArgument('context', 'template')
 				->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url
 					->setArgument('popup', 'graph.prototype.edit')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);

@@ -206,16 +206,14 @@ foreach ($data['discoveries'] as $discovery) {
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-			? [
-				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $discovery['itemid'])
-						->setArgument('context', $data['context'])
-				),
-				CViewHelper::showNum($discovery['hostPrototypes'])
-			]
-			: '',
+		[
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
+			),
+			CViewHelper::showNum($discovery['hostPrototypes'])
+		],
 		[
 			new CLink(_('Discovery prototypes'),
 				(new CUrl('host_discovery_prototypes.php'))
