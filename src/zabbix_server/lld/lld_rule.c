@@ -416,7 +416,7 @@ int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_
 			{
 				new_num++;
 			}
-			else
+			else if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE))
 				update_num++;
 
 		}
