@@ -638,25 +638,23 @@ out:
 int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
-#define MEMALLOC_ALIGN8(x)	(((x) + 7) & (~7u))
-	zbx_uint64_t	base = 0;
+	void	*base = (void *)sizeof(zbx_shmem_info_t);
 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	base += sizeof(zbx_shmem_info_t);
-	base = MEMALLOC_ALIGN8(base);
-	base += ZBX_SHMEM_BUCKET_COUNT * 8;
-	base += strlen(descr) + 1;
-	base += strlen(param) + 1;
-	base = MEMALLOC_ALIGN8(base);
-	size += base;
+	base = ALIGNPTR(base);
+	base = (void *)((void **)base + ZBX_SHMEM_BUCKET_COUNT);
+	base = (void *)((char *)base + strlen(descr) + 1);
+	base = (void *)((char *)base + strlen(param) + 1);
+	base = ALIGN8(base);
+
+	size += (size_t )base;
 
 	size += 8;
 	size += 2 * SHMEM_SIZE_FIELD;
 
 	return zbx_shmem_create(info, size, descr, param, allow_oom, error);
-#undef MEMALLOC_ALIGN8
 }
 
 void	zbx_shmem_destroy(zbx_shmem_info_t *info)
