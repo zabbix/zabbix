@@ -127,6 +127,7 @@ zbx_hashset_t	*zbx_get_audit_hashset(void);
 
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, const char *name, int audit_action,
 		int resource_type);
+void	zbx_audit_entry_clean(zbx_audit_entry_t *entry);
 
 #define ZBX_AUDIT_RESOURCE_MEDIATYPE			3
 #define ZBX_AUDIT_RESOURCE_HOST				4
