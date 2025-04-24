@@ -8178,6 +8178,10 @@ msgstr "Ошибка в запросе поиска в таблицу \"%1$s\"."
 msgid "Error message"
 msgstr "Сообщение об ошибке"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -12162,6 +12166,10 @@ msgstr "Элемент данных"
 msgid "Item added"
 msgstr "Элемент данных добавлен"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Элемент данных содержит пользовательский макрос со скрытыми значениями. Значения таких макросов необходимо ввести вручную."
@@ -13851,6 +13859,10 @@ msgstr "Метод не найден."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "Методы"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"

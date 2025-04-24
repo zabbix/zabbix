@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-14 19:55+0000\n"
+"PO-Revision-Date: 2025-04-17 20:44+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -5390,11 +5390,11 @@ msgstr "Créer et modifier des cartes"
 
 #: include/classes/helpers/CRoleHelper.php:550
 msgid "Create and edit own media"
-msgstr ""
+msgstr "Créer et éditer ses propres médias"
 
 #: include/classes/helpers/CRoleHelper.php:554
 msgid "Create and edit user media"
-msgstr ""
+msgstr "Créer et modifier des médias utilisateur"
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -8064,6 +8064,10 @@ msgstr "Erreur dans la requête de recherche dans la table \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Message d'erreur"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -12032,6 +12036,10 @@ msgstr "Élément"
 msgid "Item added"
 msgstr "Élément ajouté"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "L'élément contient des macros définies par l'utilisateur avec des valeurs secrètes. Les valeurs de ces macros doivent être saisies manuellement."
@@ -13703,6 +13711,10 @@ msgstr "Méthode pas trouvée."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "Méthodes"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
