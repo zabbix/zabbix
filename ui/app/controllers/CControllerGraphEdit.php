@@ -106,7 +106,6 @@ class CControllerGraphEdit extends CController {
 				'selectHosts' => ['hostid'],
 				'graphids' => $data['graphid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
-				'selectGraphDiscovery' 	=> ['parent_graphid'],
 				'selectDiscoveryData' => ['parent_graphid']
 			];
 

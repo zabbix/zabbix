@@ -206,10 +206,8 @@ JAVASCRIPT;
 			$data['limited'] = true;
 		}
 
-		// discovery rule
-		$flag = ZBX_FLAG_DISCOVERY_RULE;
-		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $item['flags']),
+			$item['flags'], CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 

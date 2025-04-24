@@ -433,39 +433,39 @@ function getItemParentTemplates(array $items, $flag) {
 
 	do {
 		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
-			$db_items = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids)
-			]);
-		}
-		elseif ($flag & ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
-			$db_items = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids)
-			]);
-
-			if (!$db_items) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$db_items = API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids),
+					'selectDiscoveryRule' => ['itemid'],
+					'selectDiscoveryRulePrototype' => ['itemid'],
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_items = API::DiscoveryRule()->get([
 					'output' => ['itemid', 'hostid', 'templateid'],
 					'itemids' => array_keys($parent_itemids)
 				]);
 			}
 		}
-		elseif ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$db_items = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids),
-				'selectDiscoveryRule' => ['itemid'],
-				'selectDiscoveryRulePrototype' => ['itemid']
-			]);
-		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids),
-				'webitems' => true
-			]);
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$db_items = API::ItemPrototype()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids),
+					'selectDiscoveryRule' => ['itemid'],
+					'selectDiscoveryRulePrototype' => ['itemid']
+				]);
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$db_items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids),
+					'webitems' => true
+				]);
+			}
 		}
 
 		$all_parent_itemids += $parent_itemids;
@@ -612,36 +612,42 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-				$url = (new CUrl('host_discovery.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', 'template');
-				$name = new CLink($template['name'], $url);
+			if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
+				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$url = (new CUrl('host_discovery_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+						->setArgument('context', 'template');
+				}
+				else {
+					$url = (new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+						->setArgument('context', 'template');
+				}
 			}
-			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$item_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'popup')
-					->setArgument('popup', 'item.prototype.edit')
-					->setArgument('context', 'template')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->getUrl();
-
-				$name = new CLink($template['name'], $item_url);
-			}
-			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$item_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'popup')
-					->setArgument('popup', 'item.edit')
-					->setArgument('context', 'template')
-					->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->getUrl();
-
-				$name = new CLink($template['name'], $item_url);
+				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'item.prototype.edit')
+						->setArgument('context', 'template')
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid']);
+				}
+				// ZBX_FLAG_DISCOVERY_NORMAL
+				else {
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'item.edit')
+						->setArgument('context', 'template')
+						->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
+				}
 			}
+
+			$name = new CLink($template['name'], $url);
 		}
 		else {
 			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
