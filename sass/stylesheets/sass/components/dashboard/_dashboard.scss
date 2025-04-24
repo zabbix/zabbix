@@ -852,13 +852,6 @@
 			}
 		}
 
-		&.is-editing:not(.is-editing-self):not(.dashboard-grid-widget-focus) {
-			.dashboard-grid-widget-header,
-			.dashboard-grid-widget-contents {
-				opacity: .75;
-			}
-		}
-
 		@if $ui-transitions {
 			&:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
 				transition-property: height, top;
@@ -948,13 +941,6 @@
 			.dashboard-grid-iterator-mask {
 				border: 1px solid darken($ui-border-color, 8%);
 				border-top: 0;
-			}
-		}
-
-		&.is-editing:not(.is-editing-self):not(.dashboard-grid-iterator-focus) {
-			.dashboard-grid-iterator-header,
-			.dashboard-grid-iterator-contents {
-				opacity: .75;
 			}
 		}
 
