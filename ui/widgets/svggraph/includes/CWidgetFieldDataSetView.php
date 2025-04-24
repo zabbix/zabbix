@@ -219,10 +219,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				]))->addClass('js-items-multiselect');
 			}
 
-			$dataset_head[] = (new CColorPicker())
-				->setColorFieldName($field_name.'['.$row_num.'][color]')
-				->setPaletteFieldName($field_name.'['.$row_num.'][color_palette]')
-				->setValue(array_key_exists('color', $value) ? $value['color'] : $value['color_palette']);
+			$dataset_head[] = (new CColorPicker($field_name.'['.$row_num.'][color]',
+				$field_name.'['.$row_num.'][color_palette]')
+			)->setValue(array_key_exists('color', $value) ? $value['color'] : $value['color_palette']);
 
 			if ($host_pattern_field !== null) {
 				$dataset_head[] = $host_pattern_field;
@@ -518,8 +517,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(
-				(new CColorPicker())
-					->setColorFieldName($this->field->getName().'['.$ds_num.'][color][]')
+				(new CColorPicker($this->field->getName().'['.$ds_num.'][color][]'))
 					->setValue($color)
 					->setInputId('items_'.$ds_num.'_'.$row_num.'_color')
 			))->addClass('table-col-color'),

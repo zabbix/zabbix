@@ -32,8 +32,7 @@ $form_list = (new CFormList())
 		->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
-		(new CColorPicker())
-			->setColorFieldName('problem_unack_color')
+		(new CColorPicker('problem_unack_color'))
 			->setValue($data['problem_unack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -45,8 +44,7 @@ $form_list = (new CFormList())
 			->setUncheckedValue('0')
 	])
 	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
-		(new CColorPicker())
-			->setColorFieldName('problem_ack_color')
+		(new CColorPicker('problem_ack_color'))
 			->setValue($data['problem_ack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -58,8 +56,7 @@ $form_list = (new CFormList())
 			->setUncheckedValue('0')
 	])
 	->addRow((new CLabel(_('Unacknowledged RESOLVED events'), 'ok_unack_color'))->setAsteriskMark(), [
-		(new CColorPicker())
-			->setColorFieldName('ok_unack_color')
+		(new CColorPicker('ok_unack_color'))
 			->setValue($data['ok_unack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -71,8 +68,7 @@ $form_list = (new CFormList())
 			->setUncheckedValue('0')
 	])
 	->addRow((new CLabel(_('Acknowledged RESOLVED events'), 'ok_ack_color'))->setAsteriskMark(), [
-		(new CColorPicker())
-			->setColorFieldName('ok_ack_color')
+		(new CColorPicker('ok_ack_color'))
 			->setValue($data['ok_ack_color'])
 			->setDisabled($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED)
 			->addClass('js-event-color-picker')
@@ -102,9 +98,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CColorPicker())
-			->setColorFieldName('severity_color_0')
-			->setValue($data['severity_color_0'])
+		(new CColorPicker('severity_color_0'))->setValue($data['severity_color_0'])
 	])
 	->addRow((new CLabel(_('Information'), 'severity_name_1'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_1', $data['severity_name_1'], false,
@@ -113,9 +107,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CColorPicker())
-			->setColorFieldName('severity_color_1')
-			->setValue($data['severity_color_1'])
+		(new CColorPicker('severity_color_1'))->setValue($data['severity_color_1'])
 	])
 	->addRow((new CLabel(_('Warning'), 'severity_name_2'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_2', $data['severity_name_2'], false,
@@ -124,9 +116,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CColorPicker())
-			->setColorFieldName('severity_color_2')
-			->setValue($data['severity_color_2'])
+		(new CColorPicker('severity_color_2'))->setValue($data['severity_color_2'])
 	])
 	->addRow((new CLabel(_('Average'), 'severity_name_3'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_3', $data['severity_name_3'], false,
@@ -135,9 +125,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CColorPicker())
-			->setColorFieldName('severity_color_3')
-			->setValue($data['severity_color_3'])
+		(new CColorPicker('severity_color_3'))->setValue($data['severity_color_3'])
 	])
 	->addRow((new CLabel(_('High'), 'severity_name_4'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_4', $data['severity_name_4'], false,
@@ -146,9 +134,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CColorPicker())
-			->setColorFieldName('severity_color_4')
-			->setValue($data['severity_color_4'])
+		(new CColorPicker('severity_color_4'))->setValue($data['severity_color_4'])
 	])
 	->addRow((new CLabel(_('Disaster'), 'severity_name_5'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_5', $data['severity_name_5'], false,
@@ -157,9 +143,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CColorPicker())
-			->setColorFieldName('severity_color_5')
-			->setValue($data['severity_color_5'])
+		(new CColorPicker('severity_color_5'))->setValue($data['severity_color_5'])
 	])
 	->addRow(null)
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));

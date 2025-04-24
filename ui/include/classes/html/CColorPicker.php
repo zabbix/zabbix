@@ -33,20 +33,14 @@ class CColorPicker extends CTag {
 
 	public const PALETTE_PREFIX = 'PALETTE_';
 
-	public function __construct() {
+	public function __construct(string $color_field_name, ?string $palette_field_name = null) {
 		parent::__construct('z-color-picker', true);
-	}
 
-	public function setColorFieldName(string $name): self {
-		$this->setAttribute('color-field-name', $name);
+		$this->setAttribute('color-field-name', $color_field_name);
 
-		return $this;
-	}
-
-	public function setPaletteFieldName(string $name): self {
-		$this->setAttribute('palette-field-name', $name);
-
-		return $this;
+		if ($palette_field_name !== null) {
+			$this->setAttribute('palette-field-name', $palette_field_name);
+		}
 	}
 
 	public function setValue(string $value): self {
