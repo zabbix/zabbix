@@ -1356,7 +1356,7 @@ This template has been tested on:
 |Azure SQL instance: Storage free space is low|<p>The free storage space has been less than `{$AZURE.SQL.INST.SPACE.WARN}`% for 5m.</p>|`min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}`|Warning|**Manual close**: Yes|
 |Azure SQL instance: Instance state has changed|<p>Azure SQL managed instance state has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.state)=1`|Warning||
 |Azure SQL instance: Instance collation has changed|<p>Azure SQL managed instance collation has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.collation)=1`|Average||
-|Azure SQL instance: Instance provisioning state has changed|<p>Azure SQL managed instance provisioning state has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.provision)=1`|Warning||
+|Azure SQL instance: Instance provisioning state has changed|<p>Azure SQL managed instance provisioning state has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.provision)<>0`|Warning||
 
 ## Feedback
 
