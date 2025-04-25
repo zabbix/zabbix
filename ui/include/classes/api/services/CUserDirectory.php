@@ -119,7 +119,7 @@ class CUserDirectory extends CApiService {
 				}
 			}
 			unset($value);
-			
+
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
 				'from' => ['userdirectory_saml'],
@@ -151,7 +151,7 @@ class CUserDirectory extends CApiService {
 				}
 				unset($db_userdirectory);
 			}
-			
+
 			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
 			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type'],
 				$request_output
@@ -427,7 +427,7 @@ class CUserDirectory extends CApiService {
 					}
 				}
 				unset($value);
-				
+
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
 					array_flip($saml_output) + array_flip(['userdirectoryid'])
 				);
@@ -568,7 +568,7 @@ class CUserDirectory extends CApiService {
 					}
 				}
 				unset($value);
-				
+
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
 					array_intersect_key($userdirectory, array_flip($saml_output)), $db_userdirectory
 				);
