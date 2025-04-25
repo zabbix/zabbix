@@ -62,6 +62,8 @@ class CWidgetEditDialogue extends EventTarget {
 	#last_type = null;
 	#last_type_reference = null;
 
+	#is_ready = false;
+
 	constructor({dashboard}) {
 		super();
 
@@ -101,7 +103,7 @@ class CWidgetEditDialogue extends EventTarget {
 	}
 
 	promiseTrySubmit() {
-		if (this.#overlay === null) {
+		if (!this.#is_ready) {
 			return Promise.resolve(false);
 		}
 
@@ -162,6 +164,8 @@ class CWidgetEditDialogue extends EventTarget {
 	}
 
 	#onReady() {
+		this.#is_ready = true;
+
 		const {type, name, view_mode, fields} = this.#getProperties();
 
 		this.#type = type;
