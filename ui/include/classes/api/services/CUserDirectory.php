@@ -119,7 +119,7 @@ class CUserDirectory extends CApiService {
 				}
 			}
 			unset($value);
-		
+			
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
 				'from' => ['userdirectory_saml'],
@@ -154,13 +154,9 @@ class CUserDirectory extends CApiService {
 				unset($db_userdirectory);
 			}
 			
-			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, [
-				'userdirectoryid', 
-				'idp_type', 
-				'idp_certificate', 
-				'sp_certificate', 
-				'sp_private_key'
-			], $request_output);
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type', 'idp_certificate', 'sp_certificate', 'sp_private_key'],
+				$request_output
+			);
 
 			if (!$options['preservekeys']) {
 				$db_userdirectories = array_values($db_userdirectories);
