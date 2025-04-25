@@ -77,12 +77,19 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
  *                                                                            *
  * Purpose: executes remote command and waits for result                      *
  *                                                                            *
+ * Parameters:  script                 - [IN]                                 *
+ *              host                   - [IN]                                 *
+ *              config_trapper_timeout - [IN]                                 *
+ *              info                   - [OUT]                                *
+ *              error                  - [OUT]                                *
+ *              max_error_len          - [IN]                                 *
+ *                                                                            *
  * Return value:  SUCCEED - remote command was executed successfully          *
  *                FAIL    - error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host, char **info,
-		int config_trapper_timeout, char *error, size_t max_error_len)
+static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host,
+		int config_trapper_timeout, char **info, char *error, size_t max_error_len)
 {
 	zbx_uint64_t	taskid;
 	zbx_db_result_t	result = NULL;
@@ -622,7 +629,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 					sizeof(error), debug);
 		}
 		else
-			ret = execute_remote_script(&script, &host, result, config_trapper_timeout, error,
+			ret = execute_remote_script(&script, &host, config_trapper_timeout, result, error,
 					sizeof(error));
 
 		if (SUCCEED == ret)
