@@ -8068,6 +8068,10 @@ msgstr "שגיאה בבקשת החיפוש בטבלה „%1$s“."
 msgid "Error message"
 msgstr "הודעת שגיאה"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -12037,6 +12041,10 @@ msgstr "פריט"
 msgid "Item added"
 msgstr "נוסף פריט"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "הפריט מכיל תסריטי מאקרו שנערכו על ידי המשתמש עם ערכים סודיים. את הערכים של תסריטי המאקרו האלה יש למלא ידנית."
@@ -13711,6 +13719,10 @@ msgstr "השיטה לא נמצאה."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "שיטות"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"

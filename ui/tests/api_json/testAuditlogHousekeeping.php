@@ -53,7 +53,7 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'housekeeping.hk_events_autoreg' => ['update', '2d', '1d'],
 			'housekeeping.hk_services' => ['update', '300d', '365d'],
 			'housekeeping.hk_audit' => ['update', '200d', '31d'],
-			'housekeeping.hk_sessions' => ['update', '200d', '365d'],
+			'housekeeping.hk_sessions' => ['update', '200d', '31d'],
 			'housekeeping.hk_history_global' => ['update', '1', '0'],
 			'housekeeping.hk_history' => ['update', '69d', '31d'],
 			'housekeeping.hk_trends_global' => ['update', '1', '0'],
