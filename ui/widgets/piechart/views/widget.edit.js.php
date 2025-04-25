@@ -188,8 +188,8 @@ window.widget_pie_chart_form = new class {
 	#displayingOptionsTabInit() {
 		const merge_color = document.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="merge_color"]');
 
-		if (merge_color.value === '') {
-			merge_color.value = '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>';
+		if (merge_color.color === '') {
+			merge_color.color = '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>';
 		}
 	}
 
@@ -243,9 +243,9 @@ window.widget_pie_chart_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 
@@ -565,13 +565,13 @@ window.widget_pie_chart_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 
-		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').value = colorPalette.getNextColor(used_colors);
+		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').color = colorPalette.getNextColor(used_colors);
 	}
 
 	#removeSingleItem(element) {

@@ -45,8 +45,7 @@ class ZColorPicker extends HTMLElement {
 	static ZBX_STYLE_PALETTE_ICON =			'color-picker-palette-icon';
 	static ZBX_STYLE_PALETTE_ICON_PART =	'color-picker-palette-icon-part';
 	static ZBX_STYLE_PALETTE_ROW =			'color-picker-palette-row';
-
-	static PALETTE_PREFIX = 'PALETTE_';
+	static ZBX_STYLE_PALETTE_INPUT =		'color-picker-palette-input';
 
 	static SOLID_COLORS = [
 		['FF0000', 'FF0080', 'BF00FF', '4000FF', '0040FF', '0080FF', '00BFFF', '00FFFF', '00FFBF', '00FF00', '80FF00', 'BFFF00', 'FFFF00', 'FFBF00', 'FF8000', 'FF4000', 'CC6600', '666699'],
@@ -134,8 +133,8 @@ class ZColorPicker extends HTMLElement {
 
 	static #palette_row_template = `
 		<li class="${ZColorPicker.ZBX_STYLE_PALETTE_ROW}">
-			<input type="radio" class="${ZBX_STYLE_CHECKBOX_RADIO}" id="${ZColorPicker.PALETTE_PREFIX}#{value}" name="${ZColorPicker.PALETTE_PREFIX}" value="${ZColorPicker.PALETTE_PREFIX}#{value}"/>
-			<label for="${ZColorPicker.PALETTE_PREFIX}#{value}">
+			<input type="radio" class="${ZBX_STYLE_CHECKBOX_RADIO}" id="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}-#{value}" name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}" value="#{value}"/>
+			<label for="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}-#{value}">
 				<span></span>
 				<div></div>
 			</label>
@@ -160,7 +159,8 @@ class ZColorPicker extends HTMLElement {
 	 */
 	#color_field_name;
 	#palette_field_name;
-	#value;
+	#color;
+	#palette;
 	#has_default;
 	#has_palette;
 	#disabled;
@@ -184,8 +184,10 @@ class ZColorPicker extends HTMLElement {
 			this.classList.add(ZColorPicker.ZBX_STYLE_CLASS);
 
 			this.#color_field_name = this.hasAttribute('color-field-name') ? this.getAttribute('color-field-name') : '';
-			this.#palette_field_name = this.hasAttribute('palette-field-name') ? this.getAttribute('palette-field-name') : '';
-			this.#value = this.hasAttribute('value') ? this.getAttribute('value').toUpperCase() : '';
+			this.#palette_field_name = this.hasAttribute('palette-field-name')
+				? this.getAttribute('palette-field-name') : '';
+			this.#color = this.hasAttribute('color') ? this.getAttribute('color').toUpperCase() : null;
+			this.#palette = this.hasAttribute('palette') ? Number(this.getAttribute('palette')) : null;
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('palette-field-name');
 			this.#disabled = this.hasAttribute('disabled');
@@ -217,7 +219,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'value', 'has-default', 'disabled', 'show-clear'];
+		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'show-clear'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -239,8 +241,12 @@ class ZColorPicker extends HTMLElement {
 				this.#has_palette = new_value !== null;
 				break;
 
-			case 'value':
-				this.#value = new_value?.toUpperCase();
+			case 'color':
+				this.#color = new_value !== null ? new_value.toUpperCase() : null;
+				break;
+
+			case 'palette':
+				this.#palette = new_value !== null ? Number(new_value) : null;
 				break;
 
 			case 'has-default':
@@ -263,33 +269,32 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	#refresh() {
-		const name = this.#isValidPalette(this.#value) ? this.#palette_field_name : this.#color_field_name;
-		const id = name.replaceAll('[', '_').replaceAll(']', '');
+		const name = this.#palette !== null ? this.#palette_field_name : this.#color_field_name;
+		const value = this.#palette !== null ? this.#palette : this.#color;
 
 		this.#hidden_input.name = name;
-		this.#hidden_input.value = this.#value;
+		this.#hidden_input.value = value;
 
-		this.#box.id = `lbl_${id}`;
-		this.#box.title = this.#getTitle(this.#value);
-		this.#box.classList.toggle(ZColorPicker.ZBX_STYLE_IS_PALETTE, this.#isValidPalette(this.#value));
+		this.#box.id = `lbl_${name.replaceAll('[', '_').replaceAll(']', '')}`;
+		this.#box.title = this.#getTitle();
+		this.#box.classList.toggle(ZColorPicker.ZBX_STYLE_IS_PALETTE, this.#palette !== null);
 
-		if (isColorHex(`#${this.#value}`)) {
-			this.#box.style.background = `#${this.#value}`;
+		if (isColorHex(`#${this.#color}`)) {
+			this.#box.style.background = `#${this.#color}`;
 		}
-		else if (this.#value === '') {
+		else if (this.#color === '') {
 			this.#box.style.background = '';
 		}
 
-		if (this.#isValidPalette(this.#value)) {
+		if (this.#palette !== null) {
 			const icon_parts = this.#box.querySelectorAll(`.${ZColorPicker.ZBX_STYLE_PALETTE_ICON_PART}`);
-			const number = ZColorPicker.#getPaletteRowNumber(this.#value);
 
-			icon_parts[0].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][0]}`);
-			icon_parts[1].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][8]}`);
-			icon_parts[2].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[number][17]}`);
+			icon_parts[0].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][0]}`);
+			icon_parts[1].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][8]}`);
+			icon_parts[2].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][17]}`);
 		}
 
-		this.#updateEmptyState(this.#box, this.#value);
+		this.#updateEmptyState(this.#box);
 
 		if (this.#disabled) {
 			this.#hidden_input.setAttribute('disabled', '');
@@ -407,8 +412,8 @@ class ZColorPicker extends HTMLElement {
 					case KEY_ARROW_LEFT:
 					case KEY_ARROW_RIGHT:
 					case KEY_ARROW_UP:
-						if (e.target.name === ZColorPicker.PALETTE_PREFIX) {
-							this.#dialog.querySelectorAll(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)
+						if (e.target.name === ZColorPicker.ZBX_STYLE_PALETTE_INPUT) {
+							this.#dialog.querySelectorAll(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]`)
 								.forEach(input => input.setAttribute('tabindex', '-1'));
 
 							e.target.setAttribute('tabindex', '0');
@@ -419,11 +424,11 @@ class ZColorPicker extends HTMLElement {
 			},
 
 			inputChange: e => {
-				const value = e.target.value;
+				this.#color = e.target.value;
 
-				this.#updatePreview(value);
-				this.#updateHighlight(value);
-				this.#updateApplyButton(value);
+				this.#updatePreview();
+				this.#updateHighlight();
+				this.#updateApplyButton();
 			},
 
 			documentClick: e => {
@@ -522,9 +527,9 @@ class ZColorPicker extends HTMLElement {
 
 		this.#is_dialog_open = true;
 
-		this.#updatePreview(this.#value);
-		this.#updateHighlight(this.#value);
-		this.#updateApplyButton(this.#value);
+		this.#updatePreview();
+		this.#updateHighlight();
+		this.#updateApplyButton();
 
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TABS}`)
 			.style.display = this.#has_palette ? '' : 'none';
@@ -534,24 +539,24 @@ class ZColorPicker extends HTMLElement {
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_CLEAR}`)
 			.style.display = !this.#has_default && this.#show_clear ? '' : 'none';
 
-		this.#dialog.querySelectorAll(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)
+		this.#dialog.querySelectorAll(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]`)
 			.forEach(input => {
 				input.checked = false;
 				input.setAttribute('tabindex', '-1');
 			});
 
-		if (ZColorPicker.#isValidSolid(this.#value)) {
+		if (isColorHex(`#${this.#color}`) || this.#color === '') {
 			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
 
 			if (tab !== null) {
 				this.#selectTab(tab);
 			}
 
-			this.#input.value = this.#value;
+			this.#input.value = this.#color;
 
 			this.#input.focus();
 		}
-		else if (this.#isValidPalette(this.#value)) {
+		else if (this.#palette !== null) {
 			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_PALETTE}`);
 
 			if (tab !== null) {
@@ -560,8 +565,9 @@ class ZColorPicker extends HTMLElement {
 
 			this.#input.value = '';
 
-			const row_number = ZColorPicker.#getPaletteRowNumber(this.#value);
-			const input = this.#dialog.querySelector(`input[value="${ZColorPicker.PALETTE_PREFIX}${row_number}"]`);
+			const input = this.#dialog.querySelector(
+				`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"][value="${this.#palette}"]`
+			);
 
 			if (input !== null) {
 				input.checked = true;
@@ -569,8 +575,9 @@ class ZColorPicker extends HTMLElement {
 			}
 		}
 
-		if (this.#dialog.querySelector(`input[name="${ZColorPicker.PALETTE_PREFIX}"]:checked`) === null) {
-			this.#dialog.querySelector(`input[name="${ZColorPicker.PALETTE_PREFIX}"]`)?.setAttribute('tabindex', '0');
+		if (this.#dialog.querySelector(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]:checked`) === null) {
+			this.#dialog.querySelector(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]`)
+				?.setAttribute('tabindex', '0');
 		}
 
 		this.#positionDialog();
@@ -667,12 +674,11 @@ class ZColorPicker extends HTMLElement {
 	 * Update element (box or preview) emptiness states.
 	 *
 	 * @param {Element} element
-	 * @param {string} value
 	 */
-	#updateEmptyState(element, value) {
+	#updateEmptyState(element) {
 		element.classList.remove(ZColorPicker.ZBX_STYLE_DEFAULT_COLOR, ZColorPicker.ZBX_STYLE_NO_COLOR);
 
-		if (value === '') {
+		if (this.#palette === null && this.#color === '') {
 			element.classList.add(this.#has_default
 				? ZColorPicker.ZBX_STYLE_DEFAULT_COLOR
 				: ZColorPicker.ZBX_STYLE_NO_COLOR
@@ -682,19 +688,17 @@ class ZColorPicker extends HTMLElement {
 
 	/**
 	 * Update color preview inside dialog.
-	 *
-	 * @param {string} value
 	 */
-	#updatePreview(value) {
+	#updatePreview() {
 		let changed = true;
 
-		if (isColorHex(`#${value}`)) {
-			this.#preview.style.background = `#${value}`;
-		}
-		else if (value === '') {
+		if (this.#palette !== null) {
 			this.#preview.style.background = '';
 		}
-		else if (this.#isValidPalette(value)) {
+		else if (isColorHex(`#${this.#color}`)) {
+			this.#preview.style.background = `#${this.#color}`;
+		}
+		else if (this.#color === '') {
 			this.#preview.style.background = '';
 		}
 		else {
@@ -702,24 +706,20 @@ class ZColorPicker extends HTMLElement {
 		}
 
 		if (changed) {
-			this.#preview.title = this.#getTitle(value, false);
+			this.#preview.title = this.#getTitle(false);
 
-			this.#updateEmptyState(this.#preview, value);
+			this.#updateEmptyState(this.#preview);
 		}
 	}
 
 	/**
 	 * Update color highlighting - mark selected color if it matches one of given colors.
-	 *
-	 * @param {string} value
 	 */
-	#updateHighlight(value) {
-		value = value.toUpperCase();
-
+	#updateHighlight() {
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR_SELECTED}`)
 			?.classList.remove(ZColorPicker.ZBX_STYLE_COLOR_SELECTED);
 
-		const color = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR}[data-color="${value}"]`);
+		const color = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_COLOR}[data-color="${this.#color}"]`);
 
 		if (color !== null) {
 			color.classList.add(ZColorPicker.ZBX_STYLE_COLOR_SELECTED);
@@ -727,12 +727,10 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	/**
-	 * Update "Apply" button - enable or disable it based on value.
-	 *
-	 * @param {string} value
+	 * Update "Apply" button - enable or disable it based on color value.
 	 */
-	#updateApplyButton(value) {
-		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`).disabled = !isColorHex(`#${value}`);
+	#updateApplyButton() {
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`).disabled = !isColorHex(`#${this.#color}`);
 	}
 
 	/**
@@ -767,11 +765,11 @@ class ZColorPicker extends HTMLElement {
 	 * @param {string} color
 	 */
 	#selectColor(color) {
-		if (!ZColorPicker.#isValidSolid(color)) {
+		if (!isColorHex(`#${color}`) && color !== '') {
 			return;
 		}
 
-		this.value = color;
+		this.color = color;
 
 		this.#closeDialog();
 
@@ -801,13 +799,7 @@ class ZColorPicker extends HTMLElement {
 	 * @param {Element} palette
 	 */
 	#selectPalette(palette) {
-		const value = palette.querySelector('input')?.value;
-
-		if (!this.#isValidPalette(value)) {
-			return;
-		}
-
-		this.value = value;
+		this.palette = palette.querySelector('input')?.value;
 
 		this.#closeDialog();
 
@@ -819,73 +811,23 @@ class ZColorPicker extends HTMLElement {
 	/**
 	 * Determine displayable title of box and preview.
 	 *
-	 * @param {string} value
 	 * @param {boolean} is_palette_allowed
 	 *
 	 * @returns {string}
 	 */
-	#getTitle(value, is_palette_allowed = true) {
-		value = value.toUpperCase();
-
-		if (isColorHex(`#${value}`)) {
-			return `#${value}`;
+	#getTitle(is_palette_allowed = true) {
+		if (is_palette_allowed && this.#palette !== null) {
+			return t('Palette %1$d').replace('%1$d', (this.#palette + 1).toString());
 		}
-		else if (value === '') {
+		else if (isColorHex(`#${this.#color}`)) {
+			return `#${this.#color}`;
+		}
+		else if (this.#color === '') {
 			return this.#has_default ? t('Use default') : t('No color');
-		}
-		else if (is_palette_allowed && this.#isValidPalette(value)) {
-			const number = ZColorPicker.#getPaletteRowNumber(value);
-
-			return t('Palette %1$d').replace('%1$d', (number + 1).toString());
 		}
 		else {
 			return '';
 		}
-	}
-
-	/**
-	 * Check if provided value is valid solid color.
-	 *
-	 * @param {string} value
-	 *
-	 * @returns {boolean}
-	 */
-	static #isValidSolid(value) {
-		return isColorHex(`#${value}`) || value === '';
-	}
-
-	/**
-	 * Check if provided value is valid palette code.
-	 *
-	 * @param {string} value
-	 *
-	 * @returns {boolean}
-	 */
-	#isValidPalette(value) {
-		if (!this.#has_palette) {
-			return false;
-		}
-
-		const number = ZColorPicker.#getPaletteRowNumber(value);
-
-		return number >= 0 && number < ZColorPicker.PALETTE_COLORS.length;
-	}
-
-	/**
-	 * Get row number of selected palette.
-	 *
-	 * @param {string} value
-	 *
-	 * @returns {number}
-	 */
-	static #getPaletteRowNumber(value) {
-		const regex = new RegExp(`^${ZColorPicker.PALETTE_PREFIX}(\\d+)$`, 'i');
-
-		if (value.match(regex) === null) {
-			return -1;
-		}
-
-		return Number(value.match(regex)[1]);
 	}
 
 	get colorFieldName() {
@@ -904,12 +846,22 @@ class ZColorPicker extends HTMLElement {
 		this.setAttribute('palette-field-name', name);
 	}
 
-	get value() {
-		return this.hasAttribute('value') ? this.getAttribute('value') : '';
+	get color() {
+		return this.hasAttribute('color') ? this.getAttribute('color') : '';
 	}
 
-	set value(value) {
-		this.setAttribute('value', value);
+	set color(color) {
+		this.setAttribute('color', color);
+		this.removeAttribute('palette');
+	}
+
+	get palette() {
+		return this.hasAttribute('palette') ? this.getAttribute('palette') : '';
+	}
+
+	set palette(palette) {
+		this.setAttribute('palette', palette);
+		this.removeAttribute('color');
 	}
 
 	get hasDefault() {

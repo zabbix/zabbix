@@ -17,8 +17,7 @@
 namespace Widgets\PieChart\Includes;
 
 use API,
-	CApiInputValidator,
-	CColorPicker;
+	CApiInputValidator;
 
 use Zabbix\Widgets\CWidgetField;
 
@@ -43,7 +42,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 	];
 
 	// First palette from predefined palettes.
-	private const DEFAULT_PALETTE = CColorPicker::PALETTE_PREFIX.'0';
+	private const DEFAULT_PALETTE = 0;
 
 	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
@@ -57,7 +56,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'itemids'				=> ['type' => API_IDS],
 				'references'			=> ['type' => API_STRINGS_UTF8],
 				'color'					=> ['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
-				'color_palette'			=> ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'color_palette'			=> ['type' => API_INT32, 'flags' => API_NOT_EMPTY],
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'dataset_aggregation'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])],
 				'type'					=> ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [self::ITEM_TYPE_NORMAL, self::ITEM_TYPE_TOTAL])],
@@ -273,7 +272,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				}
 				elseif (array_key_exists('color_palette', $value)) {
 					$widget_fields[] = [
-						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 						'name' => $this->name.'.'.$index.'.color_palette',
 						'value' => $value['color_palette']
 					];

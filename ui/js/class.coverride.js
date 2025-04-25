@@ -36,7 +36,13 @@ jQuery(function ($) {
 
 			color_picker.colorFieldName = opt.makeName('color', opt.getId($override));
 			color_picker.paletteFieldName = opt.makeName('color_palette', opt.getId($override));
-			color_picker.value = value;
+
+			if (option === 'color') {
+				color_picker.color = value;
+			}
+			else if (option === 'color_palette') {
+				color_picker.palette = value;
+			}
 
 			return $('<div>')
 				.append(color_picker)
