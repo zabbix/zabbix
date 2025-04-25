@@ -8064,6 +8064,10 @@ msgstr "Error a la sol·licitud de cerca de la taula \"%1$s\"."
 msgid "Error message"
 msgstr "Missatge d'error"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -12031,6 +12035,10 @@ msgstr "Element"
 msgid "Item added"
 msgstr "Element afegit"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "L'element conté macros definides per l'usuari amb valors secrets. Els valors d'aquestes macros s'han d'introduir manualment."
@@ -13702,6 +13710,10 @@ msgstr "No s'ha trobat pas el mètode."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "Mètodes"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"

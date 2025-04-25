@@ -7953,6 +7953,10 @@ msgstr "테이블 \"%1$s\"의 검색 리퀘스트를 실패하였습니다."
 msgid "Error message"
 msgstr "에러 메세지"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -11903,6 +11907,10 @@ msgstr "아이템"
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "항목에 비밀 값이 있는 사용자 정의 매크로가 포함되어 있습니다. 이러한 매크로의 값은 수동으로 입력해야 합니다."
@@ -13556,6 +13564,10 @@ msgstr "메소드를 찾을 수 없습니다."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "방법"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
