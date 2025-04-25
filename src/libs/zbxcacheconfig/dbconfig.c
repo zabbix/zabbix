@@ -554,6 +554,7 @@ int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 		case ITEM_TYPE_DEPENDENT:
 		case ITEM_TYPE_HTTPTEST:
 		case ITEM_TYPE_SNMPTRAP:
+		case ITEM_TYPE_NESTED_LLD:
 			return FAIL;
 	}
 
