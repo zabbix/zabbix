@@ -1,11 +1,16 @@
 Changes for 7.4.0rc1
 
 New features:
+..F.I..PS. [ZBXNEXT-9910] changed default user session storage period from 365d to 31d (aluchko, askolmeisters)
+A.F.....S. [ZBXNEXT-7527] added support of host prototypes on discovered hosts (wczerneha, wiper)
+A.F.I..... [ZBXNEXT-875] implemented map element stacking order control (Ivo)
 .......PS. [ZBXNEXT-5968] increased configuration max cache sizes for HistoryCacheSize, HistoryIndexCacheSize, TrendCacheSize (rtrizna)
 .......PS. [ZBXNEXT-9877] added zabbix[preprocessing] internal item (asestakovs)
 .........T [ZBXNEXT-9646] added Juniper MX by NETCONF template (egordymov)
 
 Bug fixes:
+........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
+..F....... [ZBX-26277] fixed disabled media types being shown in black color (aluchko)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 ..F....... [ZBX-26293] fixed permission issue opening trigger configuration form from context menu (gcalenko)
 ...G....S. [ZBX-24850] fixed rejected incoming connection from link-local addresses on Windows (mprihodko)
@@ -116,6 +121,18 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.6
+
+7.2.6rc1 was released as 7.2.6 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.6rc1
@@ -534,6 +551,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.12
+
+7.0.12rc1 was released as 7.0.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.12rc1
@@ -4012,6 +4041,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.41rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.40
+
+6.0.40rc1 was released as 6.0.40 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40rc1

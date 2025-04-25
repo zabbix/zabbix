@@ -1,0 +1,47 @@
+{
+	"manifest_version": 2.0,
+	"id": "itemcard",
+	"type": "widget",
+	"name": "Item card",
+	"namespace": "ItemCard",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays the most relevant information about an item.",
+	"url": "web_interface/frontend_sections/dashboards/widgets/item_card",
+	"widget": {
+		"size": {
+			"width": 14,
+			"height": 5
+		},
+		"js_class": "CWidgetItemCard",
+		"in": {
+			"itemid": {
+				"type": "_itemid",
+				"required": true
+			},
+			"sparkline": {
+				"type": "_timeperiod"
+			}
+		}
+	},
+	"actions": {
+		"widget.itemcard.view": {
+			"class": "WidgetView"
+		},
+		"widget.itemcard.value.check": {
+			"class": "ValueCheck",
+			"layout": "layout.json"
+		},
+		"widget.itemcard.binary_value.get": {
+			"class": "BinaryValueGet",
+			"layout": "layout.json"
+		},
+		"widget.itemcard.image_value.get": {
+			"class": "ImageValueGet",
+			"layout": "layout.image"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js", "class.widget-field.item-sections.js"]
+	}
+}

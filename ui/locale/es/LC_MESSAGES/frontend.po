@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-06 14:51+0000\n"
+"PO-Revision-Date: 2025-04-11 20:44+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2551,8 +2551,8 @@ msgstr "No se puede copiar el prototipo del gráfico \"%1$s\", porque la métric
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] "No se pudo copiar el monitor"
-msgstr[1] "No se pudo copiar los monitores"
+msgstr[0] "No se pudo copiar la métrica"
+msgstr[1] "No se pudieron copiar las métricas"
 
 #: include/classes/api/services/CDiscoveryRule.php:3643
 #, c-format
@@ -4908,7 +4908,7 @@ msgstr "Configuración de prototipos de ítem"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr "Configuración de monitores"
+msgstr "Configuración de métricas"
 
 #: app/controllers/CControllerMacrosEdit.php:64
 msgid "Configuration of macros"
@@ -8065,6 +8065,10 @@ msgstr "Error en la solicitud de búsqueda de la tabla \"%1$s\"."
 msgid "Error message"
 msgstr "Mensaje de error"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -9092,7 +9096,7 @@ msgstr[1] "Gráficos eliminados"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "Edición de gráficos"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -9143,7 +9147,7 @@ msgstr[1] "Prototipos de gráfico eliminados"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "Edición de prototipos de gráficos"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12032,6 +12036,10 @@ msgstr "Monitor"
 msgid "Item added"
 msgstr "Monitor añadido"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "La métrica contiene macros definidas por el usuario con valores secretos. Los valores de estas macros deben ingresarse manualmente."
@@ -12235,7 +12243,7 @@ msgstr "La métrica con ID \"%1$s\" no está disponible."
 #: widgets/dataover/partials/table.top.php:31
 #: widgets/plaintext/includes/WidgetForm.php:45
 msgid "Items"
-msgstr "Monitores"
+msgstr "Métricas"
 
 #: include/views/monitoring.history.php:140
 msgid "Items list"
@@ -13704,6 +13712,10 @@ msgstr "Método no encontrado."
 msgid "Methods"
 msgstr "Métodos"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14388,11 +14400,11 @@ msgstr "Nuevo tiempo de inactividad excluido"
 
 #: app/views/graph.edit.php:130
 msgid "New graph"
-msgstr ""
+msgstr "Nuevo gráfico"
 
 #: app/views/graph.prototype.edit.php:131
 msgid "New graph prototype"
-msgstr ""
+msgstr "Nuevo prototipo de gráfico"
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -14688,7 +14700,7 @@ msgstr "Ninguna métrica seleccionada."
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
-msgstr "Sin monitores definidos."
+msgstr "Sin métricas definidas."
 
 #: app/partials/hostmacros.inherited.list.html.php:28
 #: app/partials/hostmacros.list.html.php:28
@@ -15530,7 +15542,7 @@ msgstr "Solo se puede configurar un grupo desactivado para usuarios dados de baj
 
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Sólo cuentan los monitores asignados a equipos habilitados"
+msgstr "Sólo cuentan las métricas asignadas a equipos habilitados"
 
 #: include/classes/api/services/CDRule.php:648
 msgid "Only one check can be unique."
@@ -15565,7 +15577,7 @@ msgstr "Solo los superadministradores pueden definir el propietario del informe.
 
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de monitores habilitados"
+msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de métricas habilitadas"
 
 #: jsLoader.php:439
 msgid "Open URL"
@@ -19674,7 +19686,7 @@ msgstr "Estadísticas y disponibilidad de búfer de memoria del proxy. Modo (mod
 
 #: include/classes/data/CItemData.php:2870
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "Estadísticas de valores recibidos por el gestor de preprocesamiento."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -26696,7 +26708,7 @@ msgstr "el valor debe estar entre \"%1$s\" y \"%2$s\""
 #: app/controllers/CControllerGraphUpdate.php:228
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
-msgstr ""
+msgstr "El valor debe estar entre \"%1$s\" y \"%2$s\", y no tener más de \"%3$s\" dígitos después del punto decimal"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
