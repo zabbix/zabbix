@@ -113,7 +113,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
-			$saml_output = $this->setWriteOnlyFields($saml_output);
+			$saml_output = $this->prepareSamlCertificateWritingFields($saml_output);
 
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
@@ -416,7 +416,7 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 				$saml_output = self::SAML_OUTPUT_FIELDS;
-				$saml_output = $this->setWriteOnlyFields($saml_output);
+				$saml_output = $this->prepareSamlCertificateWritingFields($saml_output);
 
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
 					array_flip($saml_output) + array_flip(['userdirectoryid'])
@@ -552,7 +552,7 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 				$saml_output = self::SAML_OUTPUT_FIELDS;
-				$saml_output = $this->setWriteOnlyFields($saml_output);
+				$saml_output = $this->prepareSamlCertificateWritingFields($saml_output);
 
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
 					array_intersect_key($userdirectory, array_flip($saml_output)), $db_userdirectory
@@ -1658,7 +1658,7 @@ class CUserDirectory extends CApiService {
 		]];
 	}
 
-	private function setWriteOnlyFields(array $saml_output): array
+	private function prepareSamlCertificateWritingFields(array $saml_output): array
 	{
 		foreach ($saml_output as $key => $value) {
 			if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
