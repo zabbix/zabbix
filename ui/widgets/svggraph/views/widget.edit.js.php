@@ -308,9 +308,9 @@ window.widget_svggraph_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 
@@ -621,13 +621,13 @@ window.widget_svggraph_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 
-		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').value = colorPalette.getNextColor(used_colors);
+		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').color = colorPalette.getNextColor(used_colors);
 	}
 
 	_removeSingleItem(element) {

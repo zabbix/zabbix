@@ -17,8 +17,7 @@
 namespace Widgets\SvgGraph\Includes;
 
 use API,
-	CApiInputValidator,
-	CColorPicker;
+	CApiInputValidator;
 
 use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectOverrideHost;
@@ -41,7 +40,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 	];
 
 	// First palette from predefined palettes.
-	private const DEFAULT_PALETTE = CColorPicker::PALETTE_PREFIX.'0';
+	private const DEFAULT_PALETTE = 0;
 
 	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
@@ -55,7 +54,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'itemids'				=> ['type' => API_IDS],
 				'references'			=> ['type' => API_STRINGS_UTF8],
 				'color'					=> ['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
-				'color_palette'			=> ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'color_palette'			=> ['type' => API_INT32, 'flags' => API_NOT_EMPTY],
 				'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 				'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
 				'width'					=> ['type' => API_INT32, 'in' => '0:10'],
@@ -297,7 +296,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				}
 				elseif (array_key_exists('color_palette', $value)) {
 					$widget_fields[] = [
-						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 						'name' => $this->name.'.'.$index.'.color_palette',
 						'value' => $value['color_palette']
 					];

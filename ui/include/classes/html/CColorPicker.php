@@ -31,8 +31,6 @@ class CColorPicker extends CTag {
 		['D7F9E2', 'ACF1C7', '77E4A8', '75DBA7', '40CE85', '17C571', '15B769', '0A9F59', '099554', '09814C', '087847', '0A7044', '09623B', '095837', '084F31', '074B2F', '053320', '031C11']
 	];
 
-	public const PALETTE_PREFIX = 'PALETTE_';
-
 	public function __construct(string $color_field_name, ?string $palette_field_name = null) {
 		parent::__construct('z-color-picker', true);
 
@@ -43,8 +41,22 @@ class CColorPicker extends CTag {
 		}
 	}
 
-	public function setValue(string $value): self {
-		$this->setAttribute('value', $value);
+	public function setColor(?string $color = null): self {
+		if ($color !== null) {
+			$this
+				->setAttribute('color', $color)
+				->removeAttribute('palette');
+		}
+
+		return $this;
+	}
+
+	public function setPalette(?string $palette = null): self {
+		if ($palette !== null) {
+			$this
+				->setAttribute('palette', $palette)
+				->removeAttribute('color');
+		}
 
 		return $this;
 	}
@@ -131,16 +143,12 @@ class CColorPicker extends CTag {
 	/**
 	 * Get array of palette colors.
 	 *
-	 * @param string $palette_code  Valid palette code.
-	 * @param int    $count         How many colors from palette are requested.
+	 * @param int $row_number  Palette row number.
+	 * @param int $count       How many colors from palette are requested.
 	 *
 	 * @return array  Color hex codes in format ['#FF0000', '#FF7F7F'].
 	 */
-	public static function getPaletteColors(string $palette_code, int $count): array {
-		$row_number = preg_match('/^'.self::PALETTE_PREFIX.'(\\d+)$/i', $palette_code, $matches)
-			? (int) $matches[1]
-			: -1;
-
+	public static function getPaletteColors(int $row_number, int $count): array {
 		$result = [];
 		$row_count = count(self::PALETTE_COLORS);
 		$col_count = count(self::PALETTE_COLORS[0]);

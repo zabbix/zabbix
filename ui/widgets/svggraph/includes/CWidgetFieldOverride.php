@@ -35,7 +35,7 @@ class CWidgetFieldOverride extends CWidgetField {
 				'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 				'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 				'color'				=> ['type' => API_COLOR],
-				'color_palette'		=> ['type' => API_STRING_UTF8],
+				'color_palette'		=> ['type' => API_INT32],
 				'type'				=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 				'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 				'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
@@ -111,7 +111,7 @@ class CWidgetFieldOverride extends CWidgetField {
 			foreach ($this->getOverrideOptions() as $option) {
 				if (array_key_exists($option, $value)) {
 					$widget_fields[] = [
-						'type' => ($option === 'color' || $option === 'color_palette' || $option === 'timeshift')
+						'type' => ($option === 'color' || $option === 'timeshift')
 							? ZBX_WIDGET_FIELD_TYPE_STR
 							: ZBX_WIDGET_FIELD_TYPE_INT32,
 						'name' => $this->name.'.'.$index.'.'.$option,
