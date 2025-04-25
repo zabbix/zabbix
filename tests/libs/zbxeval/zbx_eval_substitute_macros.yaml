@@ -1,8 +1,8 @@
 ---
 test case: 'macro replacment ZBX_EVAL_TOKEN_VAR_MACRO'
 in:
-  rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
-  expression: '{MACRO} + min(1,"xyz")'
+  rules: [ZBX_EVAL_PARSE_MACRO]
+  expression: '{MACRO}'
   macro: '{MACRO}'
   macro_data: 'macro_data'
 out:
@@ -78,7 +78,16 @@ out:
 test case: 'usermacro in ctx ZBX_EVAL_TOKEN_ARG_QUERY'
 in:
   rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
-  expression: 'last(/host/smt)'
+  expression: 'kurtosis(avg_foreach(/*/some.zabbix.key[{$QUERY}]?[group="{HOSTGROUPLLD}"],1d))'
+  macro: '{$QUERY}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'ZBX_EVAL_TOKEN_ARG_QUERY without macro'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'kurtosis(avg_foreach(/*/some.zabbix.key[{$QUERY}]?[group="{HOSTGROUPLLD}"],1d))'
   macro: '{$QUERY}'
   macro_data: 'macro_data'
 out:

@@ -394,3 +394,29 @@ int	compare_ctx(zbx_eval_context_t *ctx1, zbx_eval_context_t *ctx2)
 	}
 	return SUCCEED;
 }
+
+int	query_macro_resolver(zbx_token_type_t type, char **value, char **error, va_list args)
+{
+	const char	*macro = va_arg(args, const char *);
+	const char	*macro_data = va_arg(args, const char *);
+
+	ZBX_UNUSED(error);
+
+	switch(type)
+	{
+		case ZBX_EVAL_TOKEN_VAR_STR:
+		case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			if (0 == strcmp(*value, macro))
+			{
+				zbx_free(*value);
+				*value = zbx_strdup(NULL, macro_data);
+			}
+			else
+				return FAIL;
+			break;
+		default:
+			return FAIL;
+			break;
+	}
+	return SUCCEED;
+}

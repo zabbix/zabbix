@@ -20,7 +20,8 @@ SERVER_tests = \
 	zbx_eval_format_function_error \
 	zbx_get_serialized_expression_functionids \
 	zbx_eval_deserialize_dyn\
-	zbx_eval_substitute_macros
+	zbx_eval_substitute_macros\
+	zbx_eval_query_subtitute_user_macros
 
 endif
 
@@ -295,5 +296,19 @@ zbx_eval_substitute_macros_LDADD += @SERVER_LIBS@
 zbx_eval_substitute_macros_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_substitute_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_query_subtitute_user_macros
+
+zbx_eval_query_subtitute_user_macros_SOURCES = \
+	zbx_eval_query_subtitute_user_macros.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_query_subtitute_user_macros_LDADD = $(EVAL_LIBS)
+
+zbx_eval_query_subtitute_user_macros_LDADD += @SERVER_LIBS@
+
+zbx_eval_query_subtitute_user_macros_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_query_subtitute_user_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

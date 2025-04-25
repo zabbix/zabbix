@@ -22,10 +22,10 @@
 #include "mock_eval.h"
 #include "zbxdbwrap.h"
 
-int	my_macro_resolver(zbx_token_type_t token_type, char **value, char **error, va_list args)
+static int	my_macro_resolver(zbx_token_type_t token_type, char **value, char **error, va_list args)
 {
 	const char	*macro = va_arg(args, const char *);
-	const char	*macro_data = va_arg(args, const char *);
+	char		*macro_data = va_arg(args, char *);
 	int		ret = SUCCEED;
 
 	ZBX_UNUSED(error);
@@ -39,9 +39,12 @@ int	my_macro_resolver(zbx_token_type_t token_type, char **value, char **error, v
 			if (0 == strcmp(*value, macro))
 			{
 				zbx_free(*value);
-				*value = zbx_mock_get_parameter_string("in.macro_data");
+				*value = zbx_strdup(NULL, macro_data);
 			}
 			break;
+		case ZBX_EVAL_PARSE_ITEM_QUERY:
+			ret = zbx_eval_query_subtitute_user_macros(*value, strlen(*value), value, error,
+					query_macro_resolver, macro, macro_data);
 		default:
 			return ret;
 			break;
@@ -50,7 +53,7 @@ int	my_macro_resolver(zbx_token_type_t token_type, char **value, char **error, v
 	return ret;
 }
 
-void	set_variant_error(zbx_eval_context_t ctx, const char *variant_data)
+static void	set_variant_error(zbx_eval_context_t ctx, const char *variant_data)
 {
 	for (int i = 0; i < ctx.stack.values_num; i++)
 	{
@@ -59,7 +62,7 @@ void	set_variant_error(zbx_eval_context_t ctx, const char *variant_data)
 	}
 }
 
-void 	set_variant_ui64(zbx_eval_context_t ctx, zbx_uint64_t variant_data)
+static void 	set_variant_ui64(zbx_eval_context_t ctx, zbx_uint64_t variant_data)
 {
 	for (int i = 0; i < ctx.stack.values_num; i++)
 	{
@@ -70,12 +73,13 @@ void 	set_variant_ui64(zbx_eval_context_t ctx, zbx_uint64_t variant_data)
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			returned_ret, result, ret,
+	int			returned_ret, ret,
 				exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	zbx_eval_context_t	ctx;
-	char			*error = NULL, *value = NULL;
-	const char		*macro_data, *variant_data, *macro = zbx_mock_get_parameter_string("in.macro");
-	zbx_uint64_t		hostid, rules = mock_eval_read_rules("in.rules");
+	char			*error = NULL,
+				*macro_data = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.macro_data"));
+	const char		*macro = zbx_mock_get_parameter_string("in.macro");
+	zbx_uint64_t		rules = mock_eval_read_rules("in.rules");
 
 	ZBX_UNUSED(state);
 
@@ -98,6 +102,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("returned value:", exp_result, ret);
 
-	zbx_free(error);
 	zbx_eval_clear(&ctx);
+	zbx_free(error);
+	zbx_free(macro_data);
 }

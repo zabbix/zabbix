@@ -186,6 +186,8 @@ tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_replace_functionid
 tests/libs/zbxeval/zbx_eval_serialize
+tests/libs/zbxeval/zbx_eval_substitute_macros
+tests/libs/zbxeval/zbx_eval_query_subtitute_user_macros
 tests/libs/zbxeval/zbx_get_serialized_expression_functionids
 tests/libs/zbxexpr/calculate_item_nextcheck
 tests/libs/zbxexpr/calculate_item_nextcheck_unreachable
