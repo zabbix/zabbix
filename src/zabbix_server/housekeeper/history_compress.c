@@ -75,9 +75,25 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 
 	/* get hypertable's 'segmentby' attribute name */
 
-	result = zbx_db_select("select attname from timescaledb_information.compression_settings"
-			" where hypertable_schema='%s' and hypertable_name='%s'"
-			" and segmentby_column_index is not null", zbx_db_get_schema_esc(), table_name);
+	if (1 == ZBX_DB_TSDB_GE_V2_18)
+	{
+		result = zbx_db_select(
+				"select segmentby"
+				" from timescaledb_information.hypertable_compression_settings"
+				" where hypertable::text='%s'"
+					" and segmentby is not null",
+				table_name);
+	}
+	else
+	{
+		result = zbx_db_select(
+				"select attname"
+				" from timescaledb_information.compression_settings"
+				" where hypertable_schema='%s'"
+					" and hypertable_name='%s'"
+					" and segmentby_column_index is not null",
+				zbx_db_get_schema_esc(), table_name);
+	}
 
 	for (i = 0; NULL != (row = zbx_db_fetch(result)); i++)
 	{
@@ -87,8 +103,24 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 
 	if (1 != i)
 	{
-		zbx_db_execute("alter table %s set (timescaledb.compress,timescaledb.compress_segmentby='%s',"
-				"timescaledb.compress_orderby='%s')", table_name, segmentby, orderby);
+		if (1 == ZBX_DB_TSDB_GE_V2_18)
+		{
+			zbx_db_execute(
+					"alter table %s set("
+						"timescaledb.enable_columnstore=true,"
+						"timescaledb.segmentby='%s',"
+						"timescaledb.orderby='%s')",
+					table_name, segmentby, orderby);
+		}
+		else
+		{
+			zbx_db_execute(
+					"alter table %s set("
+						"timescaledb.compress,"
+						"timescaledb.compress_segmentby='%s',"
+						"timescaledb.compress_orderby='%s')",
+					table_name, segmentby, orderby);
+		}
 	}
 
 	zbx_db_free_result(result);
