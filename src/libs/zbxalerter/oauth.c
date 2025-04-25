@@ -145,7 +145,9 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): out:[%s]", __func__, ZBX_NULL2STR(out));
+	tmp = zbx_str_printable_dyn(ZBX_NULL2STR(out));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): out:[%s]", __func__, tmp);
+	zbx_free(tmp);
 
 	if (SUCCEED != zbx_json_open(out, &jp))
 	{
