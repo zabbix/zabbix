@@ -572,6 +572,7 @@ class ZColorPicker extends HTMLElement {
 			if (input !== null) {
 				input.checked = true;
 				input.setAttribute('tabindex', '0');
+				input.focus();
 			}
 		}
 
