@@ -39,7 +39,7 @@ void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *n
 			"insert into item_template_cache (link_hostid,itemid) "
 				"select " ZBX_FS_UI64 ", itemid from items where flags!=1 and ", hostid);
 
-	if (FAIL == zbx_db_prepare_multiple_query(insert_hostid_itself_query, "itemid", &new_itemids, &sql,
+	if (FAIL == zbx_db_prepare_multiple_query(insert_hostid_itself_query, "itemid", new_itemids, &sql,
 		&sql_alloc, &sql_offset))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
