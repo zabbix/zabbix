@@ -101,7 +101,7 @@ class CControllerAuthenticationEdit extends CController {
 	}
 
 	protected function doAction() {
-		global $ALLOW_HTTP_AUTH, $SSO;
+		global $ALLOW_HTTP_AUTH;
 
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
@@ -182,14 +182,11 @@ class CControllerAuthenticationEdit extends CController {
 				'sp_private_key' => ''
 			];
 
-			if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database') {
-				// if has input then field is under editing
-				$config_fields += [
-					'idp_certificate_status' => !$this->hasInput('idp_certificate'),
-					'sp_certificate_status' => !$this->hasInput('sp_certificate'),
-					'sp_private_key_status' => !$this->hasInput('sp_private_key')
-				];
-			}
+			$config_fields += [
+				'idp_certificate_hash' => $this->hasInput('idp_certificate') ? '' : '1',
+				'sp_certificate_hash' => $this->hasInput('sp_certificate') ? '' : '1',
+				'sp_private_key_hash' => $this->hasInput('sp_private_key') ? '' : '1',
+			];
 
 			if ($ALLOW_HTTP_AUTH) {
 				$config_fields += [
@@ -235,19 +232,6 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_servers'] = [];
 			foreach ($userdirectories as $userdirectory) {
 				if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-					if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database') {
-						$userdirectory['idp_certificate_status'] = $userdirectory['idp_certificate'] !== '';
-						$userdirectory['sp_certificate_status'] = $userdirectory['sp_certificate'] !== '';
-						$userdirectory['sp_private_key_status'] = $userdirectory['sp_private_key'] !== '';
-
-						// for ui we don't need the value
-						unset(
-							$userdirectory['idp_certificate'],
-							$userdirectory['sp_certificate'],
-							$userdirectory['sp_private_key']
-						);
-					}
-
 					$saml_configuration = $userdirectory;
 				}
 				else {

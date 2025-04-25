@@ -37,8 +37,8 @@ class CUserDirectory extends CApiService {
 	public const SAML_OUTPUT_FIELDS = [
 		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
 		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status', 'idp_certificate',
-		'sp_certificate', 'sp_private_key'
+		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status',
+		'idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'
 	];
 
 	public const OUTPUT_FIELDS = [
@@ -55,7 +55,7 @@ class CUserDirectory extends CApiService {
 		// SAML output fields.
 		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
 		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-		'encrypt_assertions', 'scim_status', 'idp_certificate', 'sp_certificate', 'sp_private_key'
+		'encrypt_assertions', 'scim_status', 'idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'
 	];
 
 	public const MEDIA_OUTPUT_FIELDS = [
@@ -70,7 +70,6 @@ class CUserDirectory extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options) {
-		global $SSO;
 		$this->validateGet($options);
 
 		if (!$options['countOutput']) {
@@ -114,6 +113,13 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
+			foreach ($saml_output as $key => $value) {
+				if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
+					$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
+				}
+			}
+			unset($value);
+		
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
 				'from' => ['userdirectory_saml'],
@@ -122,21 +128,39 @@ class CUserDirectory extends CApiService {
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
-				if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database')) {
-					$row['idp_certificate'] = $this->hashSamlCertificateValue($row['idp_certificate']);
-					$row['sp_certificate'] = $this->hashSamlCertificateValue($row['sp_certificate']);
-					$row['sp_private_key'] = $this->hashSamlCertificateValue($row['sp_private_key']);
-				}
-
 				$db_userdirectories[$row['userdirectoryid']] += $row;
 			}
 		}
 
 		if ($db_userdirectories) {
 			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
-			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type'],
-				$request_output
-			);
+
+			if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
+				foreach ($db_userdirectories as $key => $db_userdirectory) {
+					foreach (['idp_certificate', 'sp_certificate', 'sp_private_key'] as $field) {
+						if (!array_key_exists($field, $db_userdirectory)) {
+							continue;
+						}
+						
+						if ($db_userdirectory[$field] !== '') {
+							$db_userdirectories[$key][$field.'_hash'] = md5($db_userdirectory[$field]);
+						}
+						else {
+							$db_userdirectories[$key][$field.'_hash'] = '';
+						}
+					}
+					unset($field);
+				}
+				unset($db_userdirectory);
+			}
+			
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, [
+				'userdirectoryid', 
+				'idp_type', 
+				'idp_certificate', 
+				'sp_certificate', 
+				'sp_private_key'
+			], $request_output);
 
 			if (!$options['preservekeys']) {
 				$db_userdirectories = array_values($db_userdirectories);
@@ -401,8 +425,17 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$saml_output = self::SAML_OUTPUT_FIELDS;
+				
+				foreach ($saml_output as $key => $value) {
+					if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
+						$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
+					}
+				}
+				unset($value);
+			
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
-					array_flip(self::SAML_OUTPUT_FIELDS) + array_flip(['userdirectoryid'])
+					array_flip($saml_output) + array_flip(['userdirectoryid'])
 				);
 			}
 		}
@@ -497,7 +530,6 @@ class CUserDirectory extends CApiService {
 	 * @return array
 	 */
 	public function update(array $userdirectories): array {
-		global $SSO;
 		$this->validateUpdate($userdirectories, $db_userdirectories);
 
 		self::addFieldDefaultsByType($userdirectories, $db_userdirectories);
@@ -535,27 +567,20 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$saml_output = self::SAML_OUTPUT_FIELDS;
+
+				foreach ($saml_output as $key => $value) {
+					if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
+						$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
+					}
+				}
+				unset($value);
+				
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
-					array_intersect_key($userdirectory, array_flip(self::SAML_OUTPUT_FIELDS)), $db_userdirectory
+					array_intersect_key($userdirectory, array_flip($saml_output)), $db_userdirectory
 				);
 
 				if ($upd_userdirectory_saml) {
-					if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database')) {
-						// if db value and new value are different then remove field from update
-						if (array_key_exists('idp_certificate', $upd_userdirectory_saml)
-								&& $db_userdirectory['idp_certificate'] === $this->hashSamlCertificateValue($upd_userdirectory_saml['idp_certificate'])) {
-							unset($upd_userdirectory_saml['idp_certificate']);
-						}
-						if (array_key_exists('sp_certificate', $upd_userdirectory_saml)
-								&& $db_userdirectory['sp_certificate'] == $this->hashSamlCertificateValue($upd_userdirectory_saml['sp_certificate'])) {
-							unset($upd_userdirectory_saml['sp_certificate']);
-						}
-						if (array_key_exists('sp_private_key', $upd_userdirectory_saml)
-								&& $db_userdirectory['sp_private_key'] == $this->hashSamlCertificateValue($upd_userdirectory_saml['sp_private_key'])) {
-							unset($upd_userdirectory_saml['sp_private_key']);
-						}
-					}
-
 					if (count($upd_userdirectory_saml) > 0) {
 						$upd_userdirectories_saml[] = [
 							'values' => $upd_userdirectory_saml,
