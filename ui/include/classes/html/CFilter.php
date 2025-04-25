@@ -334,12 +334,14 @@ class CFilter extends CDiv {
 	}
 
 	/**
-	 * Disable initial check of time selector parameters.
+	 * Disable initial check of time selector parameters. All controls will be initially enabled.
+	 *
+	 * Required to invoke jQuery.publish('timeselector.update-ui') to update controls according to the time selected.
 	 *
 	 * @return CFilter
 	 */
-	public function disableInitialCheck(): CFilter {
-		$this->setAttribute('data-disable-initial-check', 1);
+	public function setManualSetup(): CFilter {
+		$this->setAttribute('data-manual-setup', 1);
 
 		return $this;
 	}

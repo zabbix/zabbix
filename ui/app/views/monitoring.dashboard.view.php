@@ -235,7 +235,7 @@ $html_page = (new CHtmlPage())
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 			->preventHistoryUpdates()
-			->disableInitialCheck()
+			->setManualSetup()
 			->setHidden()
 	);
 

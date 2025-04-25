@@ -405,6 +405,8 @@
 			const filter = document.querySelector('.filter-space');
 
 			filter.style.display = '';
+
+			$.publish('timeselector.update-ui');
 		}
 
 		#toggleTimeSelector(enable) {
@@ -423,7 +425,21 @@
 
 			filter
 				.querySelectorAll('.js-btn-time-left, .<?= ZBX_STYLE_BTN_TIME_ZOOMOUT ?>, .js-btn-time-right')
-				.forEach(button => button.disabled = !enable);
+				.forEach(button => {
+					if (enable) {
+						button.disabled = button.dataset.cached_disabled === '1';
+					}
+					else {
+						if (button.disabled) {
+							button.dataset.cached_disabled = '1';
+						}
+						else {
+							delete button.dataset.cached_disabled;
+						}
+
+						button.disabled = true;
+					}
+				});
 		}
 
 		#enableNavigationWarning() {

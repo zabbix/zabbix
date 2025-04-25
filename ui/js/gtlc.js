@@ -43,10 +43,15 @@ jQuery(function($) {
 	endpoint.setArgument('action', 'timeselector.update');
 	endpoint.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
 
-	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
-		' timeselector.rangeoffset',
-		timeSelectorEventHandler
-	);
+	$.subscribe(`
+		timeselector.rangechange
+		timeselector.decrement
+		timeselector.increment
+		timeselector.zoomout
+		timeselector.rangeoffset
+	`, timeSelectorEventHandler);
+
+	$.subscribe('timeselector.update-ui', checkDisableTimeSelectorUI);
 
 	element.from.keydown(submitChangeHandler);
 	element.to.keydown(submitChangeHandler);
@@ -581,7 +586,7 @@ jQuery(function($) {
 			});
 	}
 
-	if (!$container.data('disable-initial-check')) {
+	if (!$container.data('manual-setup')) {
 		checkDisableTimeSelectorUI();
 	}
 });
