@@ -58,6 +58,7 @@ window.item_edit_form = new class {
 		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
+		this.last_key_value = '';
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -692,7 +693,7 @@ window.item_edit_form = new class {
 	#updateValueTypeHintVisibility(preprocessing_active) {
 		const key = this.field.key.value;
 		const value_type = this.field.value_type.value;
-		const inferred_type = this.#getInferredValueType(key);
+		const inferred_type = this.#getInferredValueType(key, true);
 
 		this.label.value_type_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
 			preprocessing_active || inferred_type === null || value_type == inferred_type
@@ -731,13 +732,19 @@ window.item_edit_form = new class {
 		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 	}
 
-	#getInferredValueType(key) {
+	#getInferredValueType(key, is_hint = false) {
 		const type = this.field.type.value;
 		const search = key.split('[')[0].trim().toLowerCase();
 
 		if (!(type in this.value_type_keys) || search === '') {
 			return null;
 		}
+
+		if (search === this.last_key_value && !is_hint) {
+			return null;
+		}
+
+		this.last_key_value = search;
 
 		if (search in this.value_type_keys[type]) {
 			return this.value_type_keys[type][search];
