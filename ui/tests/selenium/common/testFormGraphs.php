@@ -1171,7 +1171,6 @@ class testFormGraphs extends CWebTest {
 		else {
 			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
 		}
-
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		if ($data['case'] === 'Clone' || $data['case'] === 'Delete') {
@@ -1187,6 +1186,10 @@ class testFormGraphs extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		}
 		else {
+			// After clicking the clone button the overlay dialog is reloaded again.
+			if ($data['case'] === 'Clone') {
+				$dialog->waitUntilReady();
+			}
 			$dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 

@@ -64,7 +64,7 @@ typedef struct
 	time_t				last_used;
 
 	/* alternate query instance (for the case when 'entity' query is TOTAL) */
-	char				*query_instance;
+	zbx_vector_str_t		query_instance;
 }
 zbx_vmware_perf_counter_t;
 

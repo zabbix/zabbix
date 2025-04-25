@@ -8178,6 +8178,10 @@ msgstr "Ошибка в запросе поиска в таблицу \"%1$s\"."
 msgid "Error message"
 msgstr "Сообщение об ошибке"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -9209,6 +9213,10 @@ msgstr[0] "График удален"
 msgstr[1] "Графики удалены"
 msgstr[2] "Графики удалены"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9256,6 +9264,10 @@ msgid_plural "Graph prototypes deleted"
 msgstr[0] "Прототип графиков удалён"
 msgstr[1] "Прототипы графиков удалены"
 msgstr[2] "Прототипы графиков удалены"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12154,6 +12166,10 @@ msgstr "Элемент данных"
 msgid "Item added"
 msgstr "Элемент данных добавлен"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Элемент данных содержит пользовательский макрос со скрытыми значениями. Значения таких макросов необходимо ввести вручную."
@@ -13844,6 +13860,10 @@ msgstr "Метод не найден."
 msgid "Methods"
 msgstr "Методы"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14531,6 +14551,14 @@ msgstr "Значение тега нового события"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
 msgstr "Новое исключение времени простоя"
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -19821,6 +19849,10 @@ msgstr "Статистика и доступность кэша записи в 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Статистика и доступность буфера памяти прокси. Режим (режимы: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -26858,6 +26890,14 @@ msgstr[2] "значение должно быть одно из %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

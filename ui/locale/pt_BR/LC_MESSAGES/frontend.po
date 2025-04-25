@@ -8068,6 +8068,10 @@ msgstr "Erro na requisição de pesquisa pela tabela \"%1$s\"."
 msgid "Error message"
 msgstr "Mensagem de erro"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -9093,6 +9097,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gráfico removido"
 msgstr[1] "Gráficos removidos"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9139,6 +9147,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Protótipo de gráfico excluído"
 msgstr[1] "Protótipos de gráficos excluídos"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12028,6 +12040,10 @@ msgstr "Item"
 msgid "Item added"
 msgstr "Item incluído"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "O item contém macros definidas pelo usuário com valores secretos. Os valores dessas macros devem ser inseridos manualmente."
@@ -13700,6 +13716,10 @@ msgstr "Método não encontrado."
 msgid "Methods"
 msgstr "Métodos"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14381,6 +14401,14 @@ msgstr "Novo valor para a etiqueta de eventos"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
 msgstr "Novo tempo de inatividade excluído"
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -19659,6 +19687,10 @@ msgstr "Estatísticas e disponibilidade do cache de gravação do Zabbix. Cache 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estatísticas e disponibilidade de buffer de memória proxy. Modo (modos: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -26673,6 +26705,14 @@ msgstr[1] "o valor deve ser um de %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "o valor deve estar entre \"%1$s\" e \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

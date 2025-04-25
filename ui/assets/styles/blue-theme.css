@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4842,6 +4842,141 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 .dashboard-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
+div.dashboard-widget-itemcard .item-card {
+  min-width: 300px; }
+  div.dashboard-widget-itemcard .item-card .sections-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 53px;
+    padding: 0 10px;
+    border-bottom: 1px solid #ebeef0; }
+    div.dashboard-widget-itemcard .item-card .sections-header .section-item {
+      display: grid;
+      grid-template-columns: 1fr max-content; }
+      div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name {
+        display: flex;
+        gap: 4px;
+        min-width: 0;
+        line-height: 18px; }
+        div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action {
+          height: 17px; }
+        div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .btn-icon {
+          align-self: center;
+          min-width: 16px;
+          height: 16px; }
+      div.dashboard-widget-itemcard .item-card .sections-header .section-item .problem-icon-link {
+        margin-left: 5px; }
+    div.dashboard-widget-itemcard .item-card .sections-header .section-path {
+      display: flex;
+      gap: 5px;
+      height: 17px;
+      line-height: 17px; }
+      div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element {
+        flex: 1 1 0;
+        max-width: fit-content; }
+  div.dashboard-widget-itemcard .item-card .sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-auto-rows: minmax(54px, auto);
+    margin-left: -1px;
+    overflow: hidden; }
+    div.dashboard-widget-itemcard .item-card .sections .section {
+      display: grid;
+      position: relative;
+      grid-template-columns: auto 1fr;
+      grid-row: span var(--span, 1);
+      column-gap: 10px;
+      align-items: center;
+      padding: 0 10px;
+      margin-right: -1px;
+      border-right: 1px solid #ebeef0;
+      border-bottom: 1px solid #ebeef0;
+      border-left: 1px solid #ebeef0;
+      line-height: 18px; }
+      div.dashboard-widget-itemcard .item-card .sections .section .section-body {
+        text-align: right; }
+      div.dashboard-widget-itemcard .item-card .sections .section.section-description {
+        grid-template-columns: 1fr;
+        word-break: break-word;
+        --line-clamp: 2; }
+      div.dashboard-widget-itemcard .item-card .sections .section.section-error {
+        grid-template-columns: 1fr;
+        word-break: break-word;
+        --line-clamp: 2; }
+      div.dashboard-widget-itemcard .item-card .sections .section.section-metrics, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data {
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 10px; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column {
+          display: flex;
+          justify-content: center; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
+          display: flex;
+          flex-direction: column;
+          gap: 5px; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header:not(a) {
+            color: #768d99; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+            display: block;
+            position: relative;
+            height: 17px;
+            line-height: 17px;
+            box-sizing: border-box; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value .btn-icon {
+            height: 14px;
+            margin-top: 2px; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value z-sparkline {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 17px; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
+          align-items: flex-end;
+          text-align: right; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+            width: 100%; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
+            overflow: hidden; }
+            div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link) {
+              width: 100px;
+              height: 53px;
+              background: transparent var(--thumbnail) no-repeat center;
+              background-size: cover;
+              border-color: transparent;
+              text-indent: -9999px; }
+              div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link):not(.is-loading), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link):not(.is-loading) {
+                border: 1px solid #dfe4e7;
+                border-radius: 3px; }
+      div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers {
+        max-height: 36px;
+        overflow: hidden; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger {
+          display: inline-block;
+          max-width: 100%; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger:not(:first-of-type) {
+            margin-left: 4px; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name {
+            max-width: 100%; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name,
+          div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .delimiter {
+            display: inline-block;
+            vertical-align: top; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .link-alt {
+          margin-left: 5px; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers.has-ellipsis .trigger-name {
+          max-width: 75px; }
+      div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter {
+        grid-template-columns: 1fr 2fr; }
+      div.dashboard-widget-itemcard .item-card .sections .section.section-tags {
+        grid-template-columns: 1fr; }
+        div.dashboard-widget-itemcard .item-card .sections .section.section-tags .tags {
+          max-height: 38px;
+          overflow: hidden; }
+          div.dashboard-widget-itemcard .item-card .sections .section.section-tags .tags .btn-icon {
+            height: 14px;
+            margin-top: 2px; }
+
 form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
   max-width: 250px; }
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
@@ -4906,9 +5041,9 @@ div.dashboard-widget-map .sysmap-widget-container {
   display: flex; }
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
-    div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
+    div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection {
       fill: #e0f7ff; }
-      div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+      div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection.selected {
         fill: #c9e3fc;
         stroke: #ced7db;
         stroke-width: 1px; }

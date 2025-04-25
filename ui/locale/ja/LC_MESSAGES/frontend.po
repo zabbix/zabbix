@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-06 03:49+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2025-04-12 12:23+0000\n"
+"Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -321,11 +321,11 @@ msgstr "(ホストディスカバリによって作成)"
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(レガシー) 単一の値を同期的に取得し、オプションで他の値と組み合わせて取得する。"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(レガシー) JSONでサブツリーを取得する。"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -1359,7 +1359,7 @@ msgstr "代わりに、手動でインストールすることができます:"
 #: include/views/monitoring.sysmap.edit.php:269
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Always"
-msgstr ""
+msgstr "いつも"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1818,7 +1818,7 @@ msgstr "自動"
 #: include/views/monitoring.sysmap.edit.php:270
 #: include/views/monitoring.sysmap.edit.php:277
 msgid "Auto hide"
-msgstr ""
+msgstr "自動で非表示にする。"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1944,7 +1944,7 @@ msgstr "背景のイメージ"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background scale"
-msgstr ""
+msgstr "背景縮尺"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2079,11 +2079,11 @@ msgstr "境界幅"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "接続の暗号化設定を変更する場合は、\"tls_connect\" フィールドと \"tls_accept\" フィールドの両方を指定する必要があります。"
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "接続の暗号化用の 事前共有鍵を変更する場合は、「tls_psk_identity」フィールドと「tls_psk」フィールドの両方を指定する必要があります。"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2685,7 +2685,7 @@ msgstr "デフォルトのユーザーディレクトリを削除できません
 #: include/classes/api/services/CDRule.php:772
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "検出ルール \"%2$s\" 中の検出チェック \"%1$s\" を削除できません: %3$s。"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2696,7 +2696,7 @@ msgstr[0] "ディスカバリルールを削除できません"
 #: include/classes/api/services/CDRule.php:979
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "検出ルール \"%1$s\" を削除できません。: %2$s"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2721,7 +2721,7 @@ msgstr[0] "ホストを削除できません"
 #: include/classes/api/services/CHost.php:1631
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "ホスト \"%1$s\" を削除できません。: %2$s"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2737,7 +2737,7 @@ msgstr[0] "ホストグループを削除できません"
 #: include/classes/api/services/CHostGroup.php:767
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "ホスト グループ \"%1$s\" を削除できません。: %2$s"
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2869,7 +2869,7 @@ msgstr[0] "テンプレートを削除できません"
 #: include/classes/api/services/CTemplate.php:805
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "テンプレート \"%1$s\" を削除できません。: %2$s"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2907,7 +2907,7 @@ msgstr[0] "トリガーを削除できません"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "トリガー \"%1$s\" を削除できません。: %2$s"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -2932,12 +2932,12 @@ msgstr[0] "ユーザーグループを削除できません"
 #: include/classes/api/services/CUserGroup.php:1330
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "ユーザー グループ \"%1$s\" は LDAP ユーザー ディレクトリ \"%2$s\" によって使用されているため、削除できません。"
 
 #: include/classes/api/services/CUserGroup.php:1325
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "ユーザー グループ \"%1$s\" は SAML ユーザー ディレクトリによって使用されているため、削除できません。"
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3222,7 +3222,7 @@ msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロ�
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
-msgstr ""
+msgstr "マップ \"%3$s\" のリンクで使用されている \"%2$s\" のアイテム \"%1$s\" が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -3373,7 +3373,7 @@ msgstr "同じアイテムキーのアイテムがすでにあるので、テン
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ LLD ルールを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
@@ -3408,17 +3408,17 @@ msgstr "同じキーを持つLLDルールが既に存在するため、テンプ
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをホスト \"%3$s\" に継承できません。同じキーを持つアイテム プロトタイプが既にテンプレート \"%4$s\" から継承されているためです。"
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをホスト \"%3$s\" に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをテンプレート \"%3$s\" に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -7952,6 +7952,10 @@ msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 msgid "Error message"
 msgstr "エラーメッセージ"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -8971,6 +8975,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "グラフを削除しました"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9016,6 +9024,10 @@ msgstr "グラフのプロトタイプを追加しました"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "グラフのプロトタイプを削除しました"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11894,6 +11906,10 @@ msgstr "アイテム"
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "アイテムは秘密な値を持つユーザー定義マクロを含んでいます。これらのマクロの値は手動で入力する必要があります。"
@@ -13548,6 +13564,10 @@ msgstr "メソッドが見つかりません。"
 msgid "Methods"
 msgstr "認証方法"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14223,6 +14243,14 @@ msgstr "新しいイベントタグの値"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
 msgstr "新規除外するダウンタイム"
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -19488,6 +19516,10 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -26480,6 +26512,14 @@ msgstr[0] "値は%1$sにしてください"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "値は\"%1$s\"から\"%2$s\"までにしてください"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

@@ -609,6 +609,8 @@ class CPage {
 	 * @param string $password  Password on login screen
 	 * @param int $scenario  	Scenario TEST_BAD means that passed credentials are invalid, TEST_GOOD - user successfully logged in
 	 * @param string $url		Direct link to certain Zabbix page
+	 *
+	 * @return $this
 	 */
 	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php') {
 		if (self::$cookie === null) {
@@ -631,6 +633,8 @@ class CPage {
 		elseif ($scenario === TEST_BAD && $sign_out) {
 			throw new \Exception('"Sign out" button is found on the page. Probably user is logged in, but shouldn\'t.');
 		}
+
+		return $this;
 	}
 
 	/**

@@ -8179,6 +8179,10 @@ msgstr "Chyba vo vyhľadávacej požiadavke nad tabuľkou \"%1$s\"."
 msgid "Error message"
 msgstr "Chybová správa"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -9210,6 +9214,10 @@ msgstr[0] "Graf odstránený"
 msgstr[1] "Grafy zmazané"
 msgstr[2] "Grafy zmazané"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9257,6 +9265,10 @@ msgid_plural "Graph prototypes deleted"
 msgstr[0] "Prototyp grafu bol odstránený"
 msgstr[1] "Prototypy grafov boly zmazané"
 msgstr[2] "Prototypy grafov boli zmazané"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12155,6 +12167,10 @@ msgstr "Položka"
 msgid "Item added"
 msgstr "Položka pridaná"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Položka obsahuje užívateľom definované makrá typu \"Tajný text\". Hodnoty týchto makier by sa mali zadávať manuálne."
@@ -13845,6 +13861,10 @@ msgstr "Metóda nenájdená."
 msgid "Methods"
 msgstr "Metódy"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14532,6 +14552,14 @@ msgstr "Nová hodnota event tagu"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
 msgstr "Nové vylúčené prestoje"
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -19822,6 +19850,10 @@ msgstr "Štatistiky a dostupnosť vyrovnávacej pamäte Zabbix. Cache - jedna z 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Štatistiky a dostupnosť vyrovnávacej pamäte proxy. Režim (režimy: pfree, free, total, used, pussed)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -26859,6 +26891,14 @@ msgstr[2] "hodnoty musia byť %1$s "
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "hodnota musí byť medzi \"%1$s\" a \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-20 20:32+0000\n"
+"PO-Revision-Date: 2025-04-17 20:44+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -5390,11 +5390,11 @@ msgstr "Créer et modifier des cartes"
 
 #: include/classes/helpers/CRoleHelper.php:550
 msgid "Create and edit own media"
-msgstr ""
+msgstr "Créer et éditer ses propres médias"
 
 #: include/classes/helpers/CRoleHelper.php:554
 msgid "Create and edit user media"
-msgstr ""
+msgstr "Créer et modifier des médias utilisateur"
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -8065,6 +8065,10 @@ msgstr "Erreur dans la requête de recherche dans la table \"%1$s\"."
 msgid "Error message"
 msgstr "Message d'erreur"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -9090,6 +9094,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Graphique supprimé"
 msgstr[1] "Graphiques supprimés"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9136,6 +9144,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Prototype de graphique supprimé"
 msgstr[1] "Prototypes de graphique supprimés"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12024,6 +12036,10 @@ msgstr "Élément"
 msgid "Item added"
 msgstr "Élément ajouté"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "L'élément contient des macros définies par l'utilisateur avec des valeurs secrètes. Les valeurs de ces macros doivent être saisies manuellement."
@@ -13696,6 +13712,10 @@ msgstr "Méthode pas trouvée."
 msgid "Methods"
 msgstr "Méthodes"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14378,6 +14398,14 @@ msgstr "Nouvelle valeur de tag d'événement"
 msgid "New excluded downtime"
 msgstr "Nouveau temps d'arrêt exclu"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr "Nouveau graphique"
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr "Nouveau prototype de graphique"
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nouvel hôte"
@@ -14402,7 +14430,7 @@ msgstr "Nouvelle période de maintenance"
 
 #: app/views/popup.media.edit.php:144
 msgid "New media"
-msgstr ""
+msgstr "Nouveau média"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -19656,6 +19684,10 @@ msgstr "Statistiques et disponibilité du cache en écriture Zabbix. Cache - une
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Statistiques et disponibilité de la mémoire tampon du proxy. Mode (modes : pfree, free, total, used, pused)."
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Statistiques des valeurs reçues par le gestionnaire de prétraitement."
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -21025,7 +21057,7 @@ msgstr "Top des hôtes"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "Top des éléments"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -25803,11 +25835,11 @@ msgstr "aucune autorisation pour créer et modifier des cartes"
 
 #: include/classes/api/services/CUser.php:502
 msgid "no permissions to create and edit own media"
-msgstr ""
+msgstr "aucune autorisation pour créer et éditer ses propres médias"
 
 #: include/classes/api/services/CUser.php:508
 msgid "no permissions to create and edit user media"
-msgstr ""
+msgstr "aucune autorisation pour créer et modifier les médias utilisateur"
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
@@ -26669,6 +26701,14 @@ msgstr[1] "la valeur doit être l'une des %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "la valeur doit être comprise entre \"%1$s\" et \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr "la valeur doit être comprise entre « %1$s » et « %2$s », et ne pas comporter plus de « %3$s » chiffres après la virgule"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

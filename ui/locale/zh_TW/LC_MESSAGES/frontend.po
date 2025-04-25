@@ -7964,6 +7964,10 @@ msgstr "資料表搜尋請求 \"%1$s\"的錯誤."
 msgid "Error message"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -8984,6 +8988,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "圖形已删除"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9029,6 +9037,10 @@ msgstr ""
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] ""
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11910,6 +11922,10 @@ msgstr "項目"
 msgid "Item added"
 msgstr "項目已新增"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
@@ -13568,6 +13584,10 @@ msgstr "未發現方法."
 msgid "Methods"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr ""
@@ -14243,6 +14263,14 @@ msgstr ""
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
+msgstr ""
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
 msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
@@ -19510,6 +19538,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -26503,6 +26535,14 @@ msgstr[0] ""
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
+msgstr ""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
