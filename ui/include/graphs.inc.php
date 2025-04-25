@@ -35,28 +35,28 @@ function graphType($type = null) {
 
 function graph_item_drawtypes() {
 	return [
-		GRAPH_ITEM_DRAWTYPE_LINE,
-		GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
-		GRAPH_ITEM_DRAWTYPE_BOLD_LINE,
-		GRAPH_ITEM_DRAWTYPE_DOT,
-		GRAPH_ITEM_DRAWTYPE_DASHED_LINE,
-		GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE
+		DRAWTYPE_LINE,
+		DRAWTYPE_FILLED_REGION,
+		DRAWTYPE_BOLD_LINE,
+		DRAWTYPE_DOT,
+		DRAWTYPE_DASHED_LINE,
+		DRAWTYPE_GRADIENT_LINE
 	];
 }
 
 function graph_item_drawtype2str($drawtype) {
 	switch ($drawtype) {
-		case GRAPH_ITEM_DRAWTYPE_LINE:
+		case DRAWTYPE_LINE:
 			return _('Line');
-		case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+		case DRAWTYPE_FILLED_REGION:
 			return _('Filled region');
-		case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
+		case DRAWTYPE_BOLD_LINE:
 			return _('Bold line');
-		case GRAPH_ITEM_DRAWTYPE_DOT:
+		case DRAWTYPE_DOT:
 			return _('Dot');
-		case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
+		case DRAWTYPE_DASHED_LINE:
 			return _('Dashed line');
-		case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
+		case DRAWTYPE_GRADIENT_LINE:
 			return _('Gradient line');
 		default:
 			return _('Unknown');
@@ -276,7 +276,10 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'graph.list')
+			->setArgument('context', 'template')
+			->setArgument('uncheck', '1');
 
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
@@ -314,18 +317,21 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 		$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$url = (new CUrl('graphs.php'))
-				->setArgument('form', 'update')
-				->setArgument('context', 'template');
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('context', 'template')
+				->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+				$url
+					->setArgument('popup', 'graph.prototype.edit')
+					->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
 			}
 
-			$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
-
 			if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$url->setArgument('hostid', $template['hostid']);
+				$url
+					->setArgument('popup', 'graph.edit')
+					->setArgument('hostid', $template['hostid']);
 			}
 
 			$name = new CLink($template['name'], $url);
@@ -1536,4 +1542,200 @@ function expandShortGraphItem($short_item) {
 	}
 
 	return $item;
+}
+
+/**
+ * @param bool  $readonly              Indicator whether form is readonly.
+ * @param array $graph_item_drawtypes  List of draw style values.
+ *
+ * @return CTag
+ */
+function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTag {
+	return (new CTemplateTag('tmpl-item-row-' . GRAPH_TYPE_NORMAL))
+		->addItem([
+			(new CRow([
+				(new CCol([
+					$readonly ? null : (new CDiv)->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CInput('hidden', 'items[#{number}][gitemid]', '#{gitemid}'))
+						->setId('items_#{number}_gitemid'),
+					(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))
+						->setId('items_#{number}_itemid'),
+					(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))
+						->setId('items_#{number}_sortorder'),
+					(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))
+						->setId('items_#{number}_flags'),
+					(new CInput('hidden', 'items[#{number}][type]', GRAPH_ITEM_SIMPLE))
+						->setId('items_#{number}_type'),
+					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
+						->setId('items_#{number}_calc_fnc'),
+					(new CInput('hidden', 'items[#{number}][drawtype]', '#{drawtype}'))
+						->setId('items_#{number}_drawtype'),
+					(new CInput('hidden', 'items[#{number}][yaxisside]', '#{yaxisside}'))
+						->setId('items_#{number}_yaxisside')
+				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
+				getItemTemplateNameColumn($readonly),
+				new CCol(
+					(new CSelect('items[#{number}][calc_fnc]'))
+						->setValue('#{calc_fnc}')
+						->addOptions(CSelect::createOptionsFromArray([
+							CALC_FNC_ALL => _('all'),
+							CALC_FNC_MIN => _('min'),
+							CALC_FNC_AVG => _('avg'),
+							CALC_FNC_MAX => _('max')
+						]))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CSelect('items[#{number}][drawtype]'))
+						->setValue('#{drawtype}')
+						->addOptions(CSelect::createOptionsFromArray($graph_item_drawtypes))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CSelect('items[#{number}][yaxisside]'))
+						->setValue('#{yaxisside}')
+						->addOptions(CSelect::createOptionsFromArray([
+							GRAPH_YAXIS_SIDE_LEFT => _('Left'),
+							GRAPH_YAXIS_SIDE_RIGHT => _('Right')
+						]))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+				),
+				$readonly ? null : getItemTemplateRemoveColumn()
+			]))
+				->addClass('graph-item')
+				->setId('items_#{number}')
+		]);
+}
+
+function getItemTemplateStacked(bool $readonly): CTag {
+	return (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_STACKED))
+		->addItem([
+			(new CRow([
+				(new CCol([
+					$readonly ? null : (new CDiv)->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CInput('hidden', 'items[#{number}][gitemid]', '#{gitemid}'))
+						->setId('items_#{number}_gitemid'),
+					(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))
+						->setId('items_#{number}_itemid'),
+					(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))
+						->setId('items_#{number}_sortorder'),
+					(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))
+						->setId('items_#{number}_flags'),
+					(new CInput('hidden', 'items[#{number}][type]', GRAPH_TYPE_STACKED))
+						->setId('items_#{number}_type'),
+					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
+						->setId('items_#{number}_calc_fnc'),
+					(new CInput('hidden', 'items[#{number}][drawtype]', '#{drawtype}'))
+						->setId('items_#{number}_drawtype'),
+					(new CInput('hidden', 'items[#{number}][yaxisside]', '#{yaxisside}'))
+						->setId('items_#{number}_yaxisside')
+				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
+				getItemTemplateNameColumn($readonly),
+				new CCol(
+					(new CSelect('items[#{number}][calc_fnc]'))
+						->setValue('#{calc_fnc}')
+						->addOptions(CSelect::createOptionsFromArray([
+							CALC_FNC_MIN => _('min'),
+							CALC_FNC_AVG => _('avg'),
+							CALC_FNC_MAX => _('max')
+						]))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CSelect('items[#{number}][yaxisside]'))
+						->setValue('#{yaxisside}')
+						->addOptions(CSelect::createOptionsFromArray([
+							GRAPH_YAXIS_SIDE_LEFT => _('Left'),
+							GRAPH_YAXIS_SIDE_RIGHT => _('Right')
+						]))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+				),
+				$readonly ? null : getItemTemplateRemoveColumn()
+			]))
+				->addClass('graph-item')
+				->setId('items_#{number}')
+		]);
+}
+
+function getItemTemplatePieAndExploded(bool $readonly): CTag {
+	return (new CTemplateTag('tmpl-item-row-'.GRAPH_TYPE_PIE))
+		->addItem([
+			(new CRow([
+				(new CCol([
+					$readonly ? null : (new CDiv)->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CInput('hidden', 'items[#{number}][gitemid]', '#{gitemid}'))
+						->setId('items_#{number}_gitemid'),
+					(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))
+						->setId('items_#{number}_itemid'),
+					(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))
+						->setId('items_#{number}_sortorder'),
+					(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))
+						->setId('items_#{number}_flags'),
+					(new CInput('hidden', 'items[#{number}][type]', '#{type}'))
+						->setId('items_#{number}_type'),
+					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
+						->setId('items_#{number}_calc_fnc'),
+					(new CInput('hidden', 'items[#{number}][drawtype]', DRAWTYPE_LINE))
+						->setId('items_#{number}_drawtype'),
+					(new CInput('hidden', 'items[#{number}][yaxisside]', GRAPH_YAXIS_SIDE_LEFT))
+						->setId('items_#{number}_yaxisside')
+				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
+				getItemTemplateNameColumn($readonly),
+				new CCol(
+					(new CSelect('items[#{number}][type]'))
+						->setValue('#{type}')
+						->addOptions(CSelect::createOptionsFromArray([
+							GRAPH_ITEM_SIMPLE =>_('Simple'),
+							GRAPH_ITEM_SUM =>_('Graph sum')
+						]))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CSelect('items[#{number}][calc_fnc]'))
+						->setValue('#{calc_fnc}')
+						->addOptions(CSelect::createOptionsFromArray([
+							CALC_FNC_MIN => _('min'),
+							CALC_FNC_AVG => _('avg'),
+							CALC_FNC_MAX => _('max'),
+							CALC_FNC_LST => _('last')
+						]))
+						->setReadonly($readonly)
+				),
+				new CCol(
+					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+				),
+				$readonly ? null : getItemTemplateRemoveColumn()
+			]))
+				->addClass('graph-item')
+				->setId('items_#{number}')
+		]);
+}
+
+function getItemTemplateNameColumn(bool $readonly): CTag {
+	return new CCol($readonly
+		? (new CSpan('#{name}'))->setId('items_#{number}_name')
+		: (new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDBREAK)
+			->addClass('js-item-name')
+			->setId('items_#{number}_name')
+	);
+}
+
+function getItemTemplateRemoveColumn(): Ctag {
+	return (new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('js-remove')
+			->setAttribute('data-remove', '#{number}')
+			->setId('items_#{number}_remove')
+	))->addClass(ZBX_STYLE_NOWRAP);
 }

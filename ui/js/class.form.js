@@ -326,7 +326,7 @@ class CForm {
 
 		return validator.validateChanges(this.getAllValues(), fields)
 			.then((result) => {
-				this.setErrors(validator.getErrors(), false);
+				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
 
 				return result;
@@ -379,7 +379,7 @@ class CForm {
 		}
 
 		if (focus_error_field) {
-			this.focusErrorField();
+			this.focusErrorField(Object.keys(field_errors));
 		}
 	}
 
@@ -454,9 +454,9 @@ class CForm {
 		});
 	}
 
-	focusErrorField() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrors()) {
+	focusErrorField(field_names) {
+		for (const [key, field] of Object.entries(this.#fields)) {
+			if (field_names.includes(key) && field.hasErrors()) {
 				$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
 				field.focusErrorField();
 				break;

@@ -4409,7 +4409,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @return array
 	 */
 	protected function fillWidgetConfigurationFrom($data, $update = false) {
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady(30)->one();
 		$form = $dialog->asForm();
 		$form->fill($data['fields']);
 
@@ -4500,9 +4500,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$this->query('button:Apply')->one()->click();
 		CDashboardElement::find()->one()->waitUntilReady();
 
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',)->one()]
+		);
+
 		$skip_selectors = [
 			'class:clock',
-			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
 			'xpath://footer',
 			// Cover Geomap widget, because it's screenshots are not stable.

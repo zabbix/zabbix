@@ -1254,6 +1254,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 			$dialog->getFooter()->query('button:Update')->one()->click();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
+			$dialog->ensureNotPresent();
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

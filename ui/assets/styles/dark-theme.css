@@ -566,8 +566,10 @@ svg a {
   border-radius: 50%;
   background: #59db8f; }
 
-.list-table thead th .text-vertical:lang(ja), .list-table thead th .text-vertical:lang(ko), .list-table thead th .text-vertical:lang(zh) {
-  transform: unset; }
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color, .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color, .map-link-hintbox-row .map-link-hintbox-row-color-box {
+  width: 10px;
+  height: 10px;
+  margin-right: 10px; }
 
 .ui-resizable-border-n {
   border-top: 1px solid #768d99;
@@ -1193,6 +1195,9 @@ footer {
       line-height: inherit; }
     .form-grid table td.sortable-item.wordbreak, .form-grid table td.sortable-item.wordwrap {
       line-height: 1.4em; }
+    .form-grid table .dynamic-row-control > td {
+      padding-bottom: 0;
+      line-height: 1.4; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #737373; }
@@ -2432,14 +2437,14 @@ div[data-field-type="set"].has-error {
     color: #737373;
     white-space: nowrap;
     vertical-align: bottom; }
-    .list-table thead th .text-vertical {
+    .list-table thead th z-vertical {
+      display: inline-block;
+      position: relative;
       max-height: 150px;
       min-width: 22px;
       overflow: hidden;
       text-overflow: ellipsis;
-      writing-mode: vertical-lr;
-      line-height: 22px;
-      transform: rotate(180deg); }
+      line-height: 22px; }
     .list-table thead th .arrow-up {
       margin-left: 3px;
       border-bottom-color: #737373; }
@@ -3289,12 +3294,6 @@ output {
   align-items: center;
   white-space: pre;
   line-height: 18px; }
-  .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity .navigation-tree-node-info-problems-hint-severity-color {
-    margin-right: 10px; }
-
-.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color {
-  width: 10px;
-  height: 10px; }
 
 .radio-list-control {
   display: inline-block;
@@ -3825,10 +3824,6 @@ section {
   display: flex;
   align-items: center;
   white-space: pre; }
-  .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color {
-    width: 10px;
-    height: 10px;
-    margin-right: 10px; }
 
 .svg-honeycomb .svg-honeycomb-container {
   --color: #eeeeee;
@@ -4202,19 +4197,19 @@ z-select {
       background-color: #383838;
       border-color: #4f4f4f;
       box-shadow: none; }
-    .z-select .focusable.red, .z-select .focusable.red.link-action:not(:hover):not(:focus), .z-select .focusable.red.link-alt:not(:hover):not(:focus),
-    z-select .focusable.red,
-    z-select .focusable.red.btn-icon:not([disabled]),
-    z-select .focusable.red.btn-link:not([disabled]),
-    z-select .focusable.red.link-action:not(:hover):not(:focus),
-    z-select .focusable.red.link-alt:not(:hover):not(:focus) {
+    .z-select .focusable.color-negative, .z-select .focusable.color-negative.link-action:not(:hover):not(:focus), .z-select .focusable.color-negative.link-alt:not(:hover):not(:focus),
+    z-select .focusable.color-negative,
+    z-select .focusable.color-negative.btn-icon:not([disabled]),
+    z-select .focusable.color-negative.btn-link:not([disabled]),
+    z-select .focusable.color-negative.link-action:not(:hover):not(:focus),
+    z-select .focusable.color-negative.link-alt:not(:hover):not(:focus) {
       color: #e45959; }
-      .z-select .focusable.red::after, .z-select .focusable.red.link-action:not(:focus):not(:hover)::after, .z-select .focusable.red.link-alt:not(:focus):not(:hover)::after,
-      z-select .focusable.red::after,
-      z-select .focusable.red.btn-icon:not([disabled])::after,
-      z-select .focusable.red.btn-link:not([disabled])::after,
-      z-select .focusable.red.link-action:not(:focus):not(:hover)::after,
-      z-select .focusable.red.link-alt:not(:focus):not(:hover)::after {
+      .z-select .focusable.color-negative::after, .z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after,
+      z-select .focusable.color-negative::after,
+      z-select .focusable.color-negative.btn-icon:not([disabled])::after,
+      z-select .focusable.color-negative.btn-link:not([disabled])::after,
+      z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after,
+      z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after {
         color: #f2f2f2; }
   .z-select .list,
   z-select .list {
@@ -4245,12 +4240,12 @@ z-select {
       .z-select .list li.hover,
       z-select .list li.hover {
         background-color: #454545; }
-      .z-select .list li.red, .z-select .list li.red.link-action:not(:hover):not(:focus), .z-select .list li.red.link-alt:not(:hover):not(:focus),
-      z-select .list li.red,
-      z-select .list li.red.btn-icon:not([disabled]),
-      z-select .list li.red.btn-link:not([disabled]),
-      z-select .list li.red.link-action:not(:hover):not(:focus),
-      z-select .list li.red.link-alt:not(:hover):not(:focus) {
+      .z-select .list li.color-negative, .z-select .list li.color-negative.link-action:not(:hover):not(:focus), .z-select .list li.color-negative.link-alt:not(:hover):not(:focus),
+      z-select .list li.color-negative,
+      z-select .list li.color-negative.btn-icon:not([disabled]),
+      z-select .list li.color-negative.btn-link:not([disabled]),
+      z-select .list li.color-negative.link-action:not(:hover):not(:focus),
+      z-select .list li.color-negative.link-alt:not(:hover):not(:focus) {
         color: #e45959; }
       .z-select .list li[disabled],
       z-select .list li[disabled] {
@@ -4857,9 +4852,9 @@ div.dashboard-widget-map .sysmap-widget-container {
   display: flex; }
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
-    div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
+    div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection {
       fill: #3a3a3a; }
-      div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+      div.dashboard-widget-map .sysmap-widget-container svg .map-elements ellipse.selection.selected {
         fill: #4a4a4a;
         stroke: #383838;
         stroke-width: 1px; }
@@ -5969,11 +5964,6 @@ form.is-loading {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
     display: inline-block; }
-  .table-forms .dynamic-row > td {
-    padding-top: 0; }
-  .table-forms .dynamic-row-control > td {
-    padding-top: 0;
-    padding-bottom: 0; }
   .table-forms .btn-icon:not(:first-child),
   .table-forms .icon:not(:first-child) {
     margin-left: 5px; }
@@ -6456,9 +6446,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .qr-code {
   height: 190px;
   width: 190px;
-  margin: 20px auto;
-  color: #f2f2f2;
-  background-color: #2b2b2b; }
+  margin: 20px auto; }
 
 .qr-code img {
   image-rendering: pixelated; }
@@ -7448,6 +7436,13 @@ svg {
     padding: 0;
     border: 0; }
 
+.map-link-hintbox-row {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+  line-height: 18px;
+  min-height: 18px; }
+
 .lld-overrides-operations-table,
 .confirmation-msg {
   white-space: normal;
@@ -7880,26 +7875,30 @@ svg {
   float: left;
   line-height: 24px; }
 
-#itemsTable .table-col-handle {
+#graph-tab #items-table .table-col-handle {
   width: 12px; }
-#itemsTable .table-col-no {
+#graph-tab #items-table .table-col-no {
   width: 20px; }
-#itemsTable .table-col-name-normal {
+#graph-tab #items-table .table-col-name-normal {
   width: 285px; }
-#itemsTable .table-col-name {
+#graph-tab #items-table .table-col-name {
   width: 365px; }
-#itemsTable .table-col-type {
+#graph-tab #items-table .table-col-type {
   width: 85px; }
-#itemsTable .table-col-function {
+#graph-tab #items-table .table-col-function {
   width: 85px; }
-#itemsTable .table-col-draw-style {
+#graph-tab #items-table .table-col-draw-style {
   width: 85px; }
-#itemsTable .table-col-y-axis-side {
+#graph-tab #items-table .table-col-y-axis-side {
   width: 85px; }
-#itemsTable .table-col-color {
+#graph-tab #items-table .table-col-color {
   width: 55px; }
-#itemsTable .table-col-action {
+#graph-tab #items-table .table-col-action {
   width: 55px; }
+#graph-tab .yaxis-select {
+  margin-right: 3px; }
+#graph-tab .graph-items {
+  max-width: 750px; }
 
 .z-select.z-select-host-interface .description:not(:empty),
 z-select.z-select-host-interface .description:not(:empty) {

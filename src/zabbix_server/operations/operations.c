@@ -1013,7 +1013,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
-	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
+	zbx_db_delete_hosts(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
 	hostname_esc = zbx_db_dyn_escape_string(hostname);
 	zbx_db_execute("delete from autoreg_host where host='%s'", hostname_esc);
 

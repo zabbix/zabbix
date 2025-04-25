@@ -518,7 +518,8 @@ foreach ($data['hosts'] as $host) {
 		],
 		[
 			new CLink(_('Graphs'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')

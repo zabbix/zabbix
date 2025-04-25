@@ -133,7 +133,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$graph_count = CViewHelper::showNum($host['graphs']);
 	$graphs_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
+		? [new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'graph.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')
@@ -321,7 +322,8 @@ if ($data['admin']) {
 			: _('Triggers');
 
 		$graphs_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
+			? [new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'graph.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 				->setArgument('context', 'template')

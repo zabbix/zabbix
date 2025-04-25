@@ -61,7 +61,8 @@ void	vmware_shmem_perf_counter_free(zbx_vmware_perf_counter_t *counter)
 {
 	vmware_vector_str_uint64_pair_shared_clean(&counter->values);
 	zbx_vector_str_uint64_pair_destroy(&counter->values);
-	vmware_shared_strfree(counter->query_instance);
+	zbx_vector_str_clear_ext(&counter->query_instance, vmware_shared_strfree);
+	zbx_vector_str_destroy(&counter->query_instance);
 	__vm_shmem_free_func(counter);
 }
 
@@ -86,8 +87,8 @@ void	vmware_perf_counters_add_new(zbx_vector_vmware_perf_counter_ptr_t *counters
 	counter->counterid = counterid;
 	counter->state = state;
 	counter->last_used = 0;
-	counter->query_instance = NULL;
 
+	VMWARE_VECTOR_CREATE(&counter->query_instance, str);
 	VMWARE_VECTOR_CREATE(&counter->values, str_uint64_pair);
 
 	zbx_vector_vmware_perf_counter_ptr_append(counters, counter);

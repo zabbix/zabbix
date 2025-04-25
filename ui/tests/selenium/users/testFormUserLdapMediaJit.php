@@ -54,7 +54,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 */
 	public function prepareJitMedia() {
 		$mediatypeids = CDBHelper::getAll('SELECT mediatypeid FROM media_type WHERE name IN (\'iTop\', \'SMS\','.
-				' \'MS Teams Workflow\', \'Slack\', \'OTRS\', \'Opsgenie\', \'Brevis.one\', \'Github\', \'Discord\','.
+				' \'MS Teams Workflow\', \'Slack\', \'TOPdesk\', \'Opsgenie\', \'Brevis.one\', \'GitHub\', \'Discord\','.
 				' \'iLert\', \'SIGNL4\', \'SysAid\', \'Jira\', \'Line\', \'Email\', \'PagerDuty\', \'Pushover\','.
 				' \'Telegram\', \'Redmine\', \'Zammad\', \'VictorOps\', \'ServiceNow\')'
 		);
@@ -71,55 +71,55 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$provisioned_media = [
 			[
 				'name' => self::MEDIA_MAPPING_REMOVE,
-				'mediatypeid' => 42, // MS Teams Workflow.
+				'mediatypeid' => 85, // MS Teams Workflow.
 				'attribute' => 'uid',
 				'severity' => 63 // All severity options selected.
 			],
 			[
 				'name' => 'Media mapping with severity: none',
-				'mediatypeid' => 21, // OTRS.
+				'mediatypeid' => 98, // TOPdesk.
 				'attribute' => 'uid',
 				'severity' => 0 // None.
 			],
 			[
 				'name' => 'Enabled media type Opsgenie',
-				'mediatypeid' => 6, // Opsgenie.
+				'mediatypeid' => 86, // Opsgenie.
 				'attribute' => 'uid'
 			],
 			[
 				'name' => 'Enabled media that is disabled in Media types',
-				'mediatypeid' => 17, // Zendesk.
+				'mediatypeid' => 101, // Zendesk.
 				'attribute' => 'uid'
 			],
 			[
 				'name' => 'Disabled media that is enabled in Media types',
-				'mediatypeid' => 19, // Zammad.
+				'mediatypeid' => 100, // Zammad.
 				'attribute' => 'uid',
 				'active' => 1
 			],
 			[
 				'name' => self::MEDIA_MAPPING_EDIT_TYPE_1,
-				'mediatypeid' => 28, // VictorOps.
+				'mediatypeid' => 99, // VictorOps.
 				'attribute' => 'uid'
 			],
 			[
 				'name' => self::MEDIA_MAPPING_EDIT_TYPE_2,
-				'mediatypeid' => 18, // ServiceNow.
+				'mediatypeid' => 92, // ServiceNow.
 				'attribute' => 'uid'
 			],
 			[
 				'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
-				'mediatypeid' => 27, // Rocket.Chat.
+				'mediatypeid' => 91, // Rocket.Chat.
 				'attribute' => 'uid'
 			],
 			[
 				'name' => self::MEDIA_MAPPING_EDIT_TYPE_4,
-				'mediatypeid' => 39, // OTRS CE.
+				'mediatypeid' => 87, // OTRS CE.
 				'attribute' => 'uid'
 			],
 			[
 				'name' => self::MEDIA_MAPPING_EDIT_TYPE_5,
-				'mediatypeid' => 41, // OTRS CE.
+				'mediatypeid' => 82, // MantisBT.
 				'attribute' => 'uid'
 			]
 		];
@@ -160,7 +160,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 	public function testFormUserLdapMediaJit_CheckProvisionedMediaLayout() {
 		// Media types to appear after the provisioning.
-		$media_types = ['MantisBT', 'MS Teams Workflow', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow',
+		$media_types = ['MantisBT', 'MS Teams Workflow', 'Opsgenie', 'TOPdesk', 'OTRS CE', 'Rocket.Chat', 'ServiceNow',
 				'VictorOps', 'Zammad', 'Zendesk'
 		];
 
@@ -343,7 +343,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 						],
 						'Enabled' => true
 					],
-					'media' => 'OTRS',
+					'media' => 'TOPdesk',
 					'check_configuration' => [
 						'Use if severity' => [
 							'Not classified',
@@ -449,6 +449,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['message']);
 			$dialog->close();
 		}
+		$dialog->ensureNotPresent();
 
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
@@ -566,11 +567,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'Github'
+								'Media type' => 'GitHub'
 							],
 							'expected' => [
 								'fields' => [
-									'Type' => 'Github',
+									'Type' => 'GitHub',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
 									'Use if severity' => [
@@ -932,7 +933,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		foreach ($data['media_types'] as $media_type) {
 			if (array_key_exists('Attribute', $media_type['update'])) {
-				$this->assertFalse($user_media_table->findRow('Type', '	MantisBT', true)->isPresent());
+				$this->assertFalse($user_media_table->findRow('Type', 'MantisBT', true)->isPresent());
 				$this->assertEquals(self::$provisioned_media_count - 1, $user_media_table->getRows()->count());
 			}
 			else {

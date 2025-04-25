@@ -194,7 +194,8 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 			->setArgument('context', 'host')
 	);
 	$graphsLink = new CLink(_('Graphs'),
-		(new CUrl('graphs.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'graph.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')

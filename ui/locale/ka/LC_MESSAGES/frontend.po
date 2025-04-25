@@ -1352,6 +1352,14 @@ msgstr ""
 msgid "Alternatively, you can install it manually:"
 msgstr "ალტერნატიულად, თქვენ შეგიძლიათ ის ხელით დააყენოთ:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
@@ -1803,6 +1811,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "ავტო"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr ""
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "ავტო-შესვლა"
@@ -1924,6 +1940,10 @@ msgstr "ფონის ფერი"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "ფონური გამოსახულება"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -3196,6 +3216,11 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1597
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
 msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1872
@@ -5242,6 +5267,14 @@ msgstr "რემონტის შექმნა და ჩასწორე
 msgid "Create and edit maps"
 msgstr "რუკების შექმნა და ჩასწორება"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "ფონის შექმნა"
@@ -5848,6 +5881,11 @@ msgstr "მონაცემთა ბაზის TLS დაშიფვრა
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "მონაცემთა ბაზის TLS გასაღების ფაილი"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr ""
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -8921,6 +8959,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "გრაფიკი წაიშალა"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -8966,6 +9008,10 @@ msgstr "გრაფიკის პროტოტიპი დაემატ�
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "გრაფიკის პროტოტიპი წაიშალა"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11081,6 +11127,10 @@ msgstr "ზრდის ბიჯი"
 #: include/actions.inc.php:2008 include/html.inc.php:971
 msgid "Indefinitely"
 msgstr "უსასრულოდ"
+
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr ""
 
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
@@ -14170,6 +14220,14 @@ msgstr "ახალი მოვლენის ჭდის მნიშვნ
 msgid "New excluded downtime"
 msgstr ""
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "ახალი ჰოსტი"
@@ -14191,6 +14249,10 @@ msgstr "ახალი ელემენტის პროტოტიპი"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "ახალი რემონტის პერიოდი"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -16596,6 +16658,10 @@ msgstr "Prometheus-დან JSON-ში"
 msgid "Properties"
 msgstr "თვისებები"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "პროტოკოლი"
@@ -18928,6 +18994,12 @@ msgstr "თავსართის ჩვენება"
 msgid "Show hosts in maintenance"
 msgstr "რემონტში მყოფი ჰოსტების ჩვენება"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "ჭდეების ჩვენება"
@@ -18945,6 +19017,14 @@ msgstr "ახსნის ჩვენება"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "ხაზების ჩვენება"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19402,12 +19482,20 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "სტატიკური"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -24162,6 +24250,18 @@ msgstr ""
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24216,6 +24316,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
 msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:149
@@ -24736,6 +24840,10 @@ msgstr "არსებობს"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - ეილერის რიცხვი მნიშვნელობის ხარისხში"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
@@ -24860,6 +24968,10 @@ msgstr "ჰოსტების ჯგუფი"
 msgid "host group with the same UUID already exists"
 msgstr "ჰოსტის ჯგუფი იგივე UUID-ით უკვე არსებობს"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -24877,6 +24989,10 @@ msgstr ""
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "ჰოსტის პროტოტიპი იგივე UUID-ით უკვე არსებობს"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -24936,6 +25052,10 @@ msgstr "არასწორი ელემენტების რაოდ�
 #: include/classes/parsers/CExpressionParser.php:140
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
+msgstr ""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
 msgstr ""
 
 #: include/classes/api/services/CAction.php:2851
@@ -25496,6 +25616,14 @@ msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
 msgstr ""
 
 #: include/classes/api/services/CEvent.php:1566
@@ -26357,6 +26485,14 @@ msgstr[0] "მნიშვნელობა %1$s უნდა იყოს"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "მნიშვნელობა \"%1$s\"-სა და \"%2$s\"-ს შორის უნდა იყოს"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
