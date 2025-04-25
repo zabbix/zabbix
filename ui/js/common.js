@@ -333,7 +333,6 @@ function PopUp(action, parameters, {
 			content: jQuery('<div>', {'height': '68px', 'width': '105px', class: 'is-loading'}),
 			class: `modal-popup ${dialogue_class}`,
 			buttons: [],
-			element: trigger_element,
 			prevent_navigation
 		}, {
 			type: 'popup',
@@ -341,7 +340,8 @@ function PopUp(action, parameters, {
 			is_modal,
 			is_draggable,
 			position,
-			position_fix
+			position_fix,
+			trigger_element
 		});
 	}
 	else {

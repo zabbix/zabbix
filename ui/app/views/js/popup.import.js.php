@@ -134,7 +134,7 @@ window.popup_import = new class {
 			]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			element: (compare_overlay || this.overlay).$btn_submit
+			trigger_element: (compare_overlay || this.overlay).$btn_submit
 		});
 	}
 
@@ -162,7 +162,7 @@ window.popup_import = new class {
 				}, {
 					dialogueid: 'popup_import_compare',
 					position: response.no_changes ? Overlay.prototype.POSITION_CENTER : undefined,
-					element: this.overlay.$btn_submit
+					trigger_element: this.overlay.$btn_submit
 				});
 			})
 			.catch((exception) => {
@@ -268,7 +268,7 @@ window.popup_import = new class {
 				]
 			}, {
 				position: Overlay.prototype.POSITION_CENTER,
-				element: obj
+				trigger_element: obj
 			});
 		}
 	}

@@ -423,7 +423,7 @@ function submitPopup(overlay) {
 			]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			element: overlay.$btn_submit
+			trigger_element: overlay.$btn_submit
 		});
 
 		overlay.unsetLoading();

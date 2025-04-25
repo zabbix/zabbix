@@ -891,7 +891,7 @@ class CWidgetNavTree extends CWidget {
 					script_inline: response.script_inline
 				}, {
 					dialogueid: 'navtreeitem',
-					element: trigger_element
+					trigger_element
 				});
 			}
 		});

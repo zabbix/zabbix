@@ -284,7 +284,7 @@ window.webscenario_step_edit_popup = new class {
 			}]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			element: jQuery(trigger_element)
+			trigger_element: jQuery(trigger_element)
 		});
 	}
 

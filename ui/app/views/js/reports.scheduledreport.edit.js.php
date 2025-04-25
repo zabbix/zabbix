@@ -86,7 +86,7 @@
 			]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			element: update_btn
+			trigger_element: update_btn
 		});
 	}
 

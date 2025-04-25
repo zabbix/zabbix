@@ -101,7 +101,7 @@ window.mediatype_test_edit_popup = new class {
 			]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			element: trigger_element
+			trigger_element
 		});
 	}
 

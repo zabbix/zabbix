@@ -53,7 +53,7 @@ $(document).ready(function() {
 			]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			element: opener
+			trigger_element: opener
 		});
 	});
 });

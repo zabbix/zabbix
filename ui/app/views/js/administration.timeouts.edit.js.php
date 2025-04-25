@@ -90,7 +90,7 @@
 				]
 			}, {
 				position: Overlay.prototype.POSITION_CENTER,
-				element: reset_button
+				trigger_element: reset_button
 			});
 		}
 	};

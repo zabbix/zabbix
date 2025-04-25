@@ -143,7 +143,7 @@
 				}
 			]
 		}, {
-			element: obj.$button
+			trigger_element: obj.$button
 		});
 
 		if (obj.options.label_before.length) {

@@ -338,7 +338,7 @@ class Script {
 				]
 			}, {
 				position: Overlay.prototype.POSITION_CENTER,
-				element: trigger_element
+				trigger_element
 			});
 		});
 	}

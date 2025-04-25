@@ -73,7 +73,7 @@
 				]
 			}, {
 				position: Overlay.prototype.POSITION_CENTER,
-				element: this
+				trigger_element: this
 			});
 		});
 	});

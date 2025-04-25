@@ -19,12 +19,13 @@
  * This class is for internal use only.
  * @see overlayDialogue
  *
- * @param {string}      type          Dialogue type (currently supported: "popup").
- * @param {string|null} dialogueid    Dialogue ID.
- * @param {boolean}     is_modal      Whether to prevent interaction with background objects.
- * @param {boolean}     is_draggable  Whether to allow dragging the form around.
- * @param {string}      position      Positioning strategy (Overlay.prototype.POSITION_*).
- * @param {Object|null} position_fix  Specific position, if not null (same as returned by "this.getPositionFix").
+ * @param {string}      type             Dialogue type (currently supported: "popup").
+ * @param {string|null} dialogueid       Dialogue ID.
+ * @param {*}           trigger_element  Focusable element to focus back when overlay is closed.
+ * @param {boolean}     is_modal         Whether to prevent interaction with background objects.
+ * @param {boolean}     is_draggable     Whether to allow dragging the form around.
+ * @param {string}      position         Positioning strategy (Overlay.prototype.POSITION_*).
+ * @param {Object|null} position_fix     Specific position, if not null (same as returned by "this.getPositionFix").
  */
 function Overlay({
 	type,
@@ -32,7 +33,8 @@ function Overlay({
 	is_modal = true,
 	is_draggable = false,
 	position = this.POSITION_CENTER_TOP,
-	position_fix = null
+	position_fix = null,
+	trigger_element = null
 } = {}) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
@@ -40,6 +42,7 @@ function Overlay({
 	this._is_draggable = is_draggable;
 	this._position = position;
 	this._position_fix = position_fix;
+	this.element = trigger_element;
 
 	this.headerid = `overlay-dialogue-header-title-${this.dialogueid}`;
 
@@ -704,7 +707,7 @@ Overlay.prototype.unsetProperty = function(key) {
  */
 Overlay.prototype.setProperties = function(properties) {
 	const names_ordered = ['class', 'title', 'doc_url', 'buttons', 'footer', 'content', 'controls', 'debug',
-		'prevent_navigation', 'trigger_element', 'data', 'script_inline'
+		'prevent_navigation', 'data', 'script_inline'
 	];
 
 	for (const name of names_ordered) {
@@ -774,10 +777,6 @@ Overlay.prototype.setProperties = function(properties) {
 				this.$dialogue[0].dataset.preventNavigation = value;
 				this.unsetProperty(name);
 				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
-				break;
-
-			case 'trigger_element':
-				this.trigger_element = value;
 				break;
 
 			case 'data':

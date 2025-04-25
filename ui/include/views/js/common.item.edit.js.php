@@ -286,7 +286,7 @@
 					]
 				}, {
 					position: Overlay.prototype.POSITION_CENTER,
-					element: e.target
+					trigger_element: e.target
 				});
 			}
 		});

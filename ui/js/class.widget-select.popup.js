@@ -85,7 +85,7 @@ class CWidgetSelectPopup {
 				action: () => {}
 			}]
 		}, {
-			element: document.activeElement
+			trigger_element: document.activeElement
 		});
 	}
 
