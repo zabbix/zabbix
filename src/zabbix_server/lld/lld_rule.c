@@ -1788,7 +1788,7 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 		}
 	}
 
-	if (0 != update_num)
+	if (0 != update_num || 0 != (data_flags & LLD_OVERRIDE_SYNC_UPDATE))
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_num)
