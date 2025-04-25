@@ -7955,6 +7955,10 @@ msgstr "查找表请求出现 \"%1$s\"的错误."
 msgid "Error message"
 msgstr "错误信息"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -11905,6 +11909,10 @@ msgstr "监控项"
 msgid "Item added"
 msgstr "监控项已添加"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "监控项包含具有秘密值的用户定义的宏。这些宏的值应手动输入。"
@@ -13558,6 +13566,10 @@ msgstr "未发现方法."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "方法"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -19508,6 +19520,10 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfree、free、total、used、pused）。"
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251

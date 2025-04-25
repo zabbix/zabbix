@@ -1699,7 +1699,8 @@ class CConfigurationExportBuilder {
 				'icon_maintenance' => $element['iconid_maintenance'],
 				'urls' => $this->formatMapElementUrls($element['urls']),
 				'evaltype' => $element['evaltype'],
-				'tags' => $this->formatTags($element['tags'])
+				'tags' => $this->formatTags($element['tags']),
+				'zindex' => $element['zindex']
 			];
 		}
 

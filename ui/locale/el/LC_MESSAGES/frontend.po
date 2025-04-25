@@ -8077,6 +8077,10 @@ msgstr "Σφάλμα στό αίτημα αναζήτησης για πίνακ�
 msgid "Error message"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -12051,6 +12055,10 @@ msgstr "Συλλέκτης"
 msgid "Item added"
 msgstr "Συλλέκτης προστέθηκε"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
@@ -13726,6 +13734,10 @@ msgstr "Μέθοδος δεν βρέθηκε."
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
+msgstr ""
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
 msgstr ""
 
 #: include/httptest.inc.php:392
@@ -19699,6 +19711,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237

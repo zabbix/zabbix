@@ -81,7 +81,24 @@ class CControllerTriggerPrototypeEdit extends CController {
 			return false;
 		}
 
-		$trigger_id = $this->hasInput('triggerid') ? $this->getInput('triggerid') : null;
+		if ($this->hasInput('hostid')) {
+			if ($this->getInput('context') === 'host') {
+				$exists = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $this->getInput('hostid')
+				]);
+			}
+			else {
+				$exists = (bool) API::Template()->get([
+					'output' => [],
+					'templateids' => $this->getInput('hostid')
+				]);
+			}
+
+			if (!$exists) {
+				return false;
+			}
+		}
 
 		if ($this->hasInput('triggerid')) {
 			$trigger_prototypes = API::TriggerPrototype()->get([
@@ -102,27 +119,6 @@ class CControllerTriggerPrototypeEdit extends CController {
 			}
 
 			$this->trigger_prototype = reset($trigger_prototypes);
-
-			if ($this->getInput('context') === 'host') {
-				$host = API::Host()->get([
-					'output' => [],
-					'triggerids' => $trigger_id ? [$trigger_id] : null
-				]);
-
-				if (!$host) {
-					return false;
-				}
-			}
-			else {
-				$template = API::Template()->get([
-					'output' => ['templateid'],
-					'triggerids' => $trigger_id ? [$trigger_id] : null
-				]);
-
-				if (!$template) {
-					return false;
-				}
-			}
 		}
 		else {
 			$this->trigger_prototype = null;
