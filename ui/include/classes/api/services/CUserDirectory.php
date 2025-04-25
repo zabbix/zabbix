@@ -133,15 +133,13 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories) {
-			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
-
 			if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
 				foreach ($db_userdirectories as $key => $db_userdirectory) {
 					foreach (['idp_certificate', 'sp_certificate', 'sp_private_key'] as $field) {
 						if (!array_key_exists($field, $db_userdirectory)) {
 							continue;
 						}
-						
+
 						if ($db_userdirectory[$field] !== '') {
 							$db_userdirectories[$key][$field.'_hash'] = md5($db_userdirectory[$field]);
 						}
@@ -154,7 +152,8 @@ class CUserDirectory extends CApiService {
 				unset($db_userdirectory);
 			}
 			
-			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type', 'idp_certificate', 'sp_certificate', 'sp_private_key'],
+			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type'],
 				$request_output
 			);
 
@@ -422,14 +421,13 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 				$saml_output = self::SAML_OUTPUT_FIELDS;
-				
 				foreach ($saml_output as $key => $value) {
 					if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
 						$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
 					}
 				}
 				unset($value);
-			
+				
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
 					array_flip($saml_output) + array_flip(['userdirectoryid'])
 				);
@@ -564,7 +562,6 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 				$saml_output = self::SAML_OUTPUT_FIELDS;
-
 				foreach ($saml_output as $key => $value) {
 					if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
 						$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
@@ -577,12 +574,10 @@ class CUserDirectory extends CApiService {
 				);
 
 				if ($upd_userdirectory_saml) {
-					if (count($upd_userdirectory_saml) > 0) {
-						$upd_userdirectories_saml[] = [
-							'values' => $upd_userdirectory_saml,
-							'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
-						];
-					}
+					$upd_userdirectories_saml[] = [
+						'values' => $upd_userdirectory_saml,
+						'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+					];
 				}
 			}
 		}
@@ -1505,7 +1500,6 @@ class CUserDirectory extends CApiService {
 	}
 
 	private static function getValidationRules(bool $is_update = false): array {
-		global $SSO;
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
 		$specific_fields = $is_update
@@ -1521,24 +1515,6 @@ class CUserDirectory extends CApiService {
 				'userdirectory_mediaid' =>	['type' => API_ANY]
 			]]
 			: ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => self::getProvisionMediaValidationFields()];
-
-		$saml_certificates = [];
-		if (array_key_exists('CERT_STORAGE', $SSO) && $SSO['CERT_STORAGE'] === 'database') {
-			$saml_certificates = [
-				'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_CERTIFICATE, 'length' => 10000],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_CERTIFICATE, 'length' => 10000],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_PRIVATE_KEY, 'length' => 10000],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-			];
-		}
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => $specific_fields + [
 			'idp_type' =>			['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
@@ -1681,8 +1657,20 @@ class CUserDirectory extends CApiService {
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])]] + $provision_media_rule,
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-			]]
-		] + $saml_certificates ];
+			]],
+			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_CERTIFICATE, 'length' => 10000],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_CERTIFICATE, 'length' => 10000],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SAML_PRIVATE_KEY, 'length' => 10000],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+		]];
 	}
 
 	private function hashSamlCertificateValue($value): string {
