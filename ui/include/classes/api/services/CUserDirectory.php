@@ -113,12 +113,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
-			foreach ($saml_output as $key => $value) {
-				if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
-					$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
-				}
-			}
-			unset($value);
+			$saml_output = $this->setWriteOnlyFields($saml_output);
 
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
@@ -421,12 +416,7 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 				$saml_output = self::SAML_OUTPUT_FIELDS;
-				foreach ($saml_output as $key => $value) {
-					if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
-						$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
-					}
-				}
-				unset($value);
+				$saml_output = $this->setWriteOnlyFields($saml_output);
 
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
 					array_flip($saml_output) + array_flip(['userdirectoryid'])
@@ -562,12 +552,7 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 				$saml_output = self::SAML_OUTPUT_FIELDS;
-				foreach ($saml_output as $key => $value) {
-					if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
-						$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
-					}
-				}
-				unset($value);
+				$saml_output = $this->setWriteOnlyFields($saml_output);
 
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
 					array_intersect_key($userdirectory, array_flip($saml_output)), $db_userdirectory
@@ -1671,5 +1656,17 @@ class CUserDirectory extends CApiService {
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 		]];
+	}
+	
+	private function setWriteOnlyFields(array $saml_output): array
+	{
+		foreach ($saml_output as $key => $value) {
+			if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
+				$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
+			}
+		}
+		unset($value);
+		
+		return $saml_output;
 	}
 }
