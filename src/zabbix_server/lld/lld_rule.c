@@ -1652,7 +1652,7 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 			{
 				new_num++;
 			}
-			else
+			else if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE))
 				update_num++;
 
 			data_flags |= lld_override_data_get_sync_flags((zbx_lld_override_data_t *)row->data,
