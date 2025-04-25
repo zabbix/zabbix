@@ -296,21 +296,16 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateGet(array &$options): void {
+		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryRule' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff($discovery_fields, ['lldruleid', 'discover'])), 'default' => null],
 			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-	}
-
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$this->addRelatedDiscoveryData($options, $result);
-
-		return $result;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -354,6 +349,32 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$this->addRelatedDiscoveryRule($options, $result);
+		$this->addRelatedDiscoveryData($options, $result);
+
+		return $result;
+	}
+
+	private function addRelatedDiscoveryRule(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
+
+		$lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => $relation_map->getRelatedIds(),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 	}
 
 	/**
