@@ -709,23 +709,11 @@ class CConfigurationExportBuilder {
 				unset($data['filter']);
 			}
 
-			if (isset($discoveryRule['uuid'])) {
-				$data['uuid'] = $discoveryRule['uuid'];
-			}
+			$data += array_intersect_key($discoveryRule, array_flip([
+				'uuid', 'interface_ref', 'parent_discovery_rule', 'discover'
+			]));
 
-			if (isset($discoveryRule['interface_ref'])) {
-				$data['interface_ref'] = $discoveryRule['interface_ref'];
-			}
-
-			if (isset($discoveryRule['parent_discovery_rule'])) {
-				$data['parent_discovery_rule'] = $discoveryRule['parent_discovery_rule'];
-			}
-
-			if (isset($discoveryRule['discover'])) {
-				$data['discover'] = $discoveryRule['discover'];
-			}
-
-			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
+			$data['master_item'] = $discoveryRule['type'] == ITEM_TYPE_DEPENDENT
 				? ['key' => $discoveryRule['master_item']['key_']]
 				: [];
 
