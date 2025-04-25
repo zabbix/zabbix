@@ -191,7 +191,7 @@ class testUserMacro extends CAPITest {
 						'description' => 'Config',
 						'required' => ZBX_WIZARD_FIELD_REQUIRED,
 						'regex' => '/^[a-zA-Z0-9_]+$/',
-						'options' => ''
+						'options' => []
 					]
 				],
 				'expected_error' => null
@@ -273,7 +273,12 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_LIST,
 						'label' => 'Config',
-						'options' => '[{"checked":"option1", "unchecked":"option2"}]'
+						'options' => [
+							[
+								'checked' => 'option1',
+								'unchecked' => 'option2'
+							]
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/options/1": unexpected parameter "checked".'
@@ -362,7 +367,7 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.'
+				'expected_error' => 'Invalid parameter "/1/config/options": maximum number of array elements is 1.'
 			],
 			[
 				'hostmacro' => [
@@ -436,6 +441,9 @@ class testUserMacro extends CAPITest {
 					}
 					else {
 						$hostmacro['config'] += DB::getDefaults('hostmacro_config');
+						$hostmacro['config']['options'] = $hostmacro['config']['options']
+							? json_encode($hostmacro['config']['options'])
+							: '';
 
 						foreach (array_keys($hostmacro['config']) as $config_key) {
 							$this->assertEquals($dbRow[$config_key], $hostmacro['config'][$config_key]);
@@ -818,7 +826,7 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/options": value must be empty.',
+				'expected_error' => 'Invalid parameter "/1/config/options": should be empty.',
 				'expect_db_rows' => []
 			],
 			[
@@ -947,7 +955,7 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/options": value must be empty.',
+				'expected_error' => 'Invalid parameter "/1/config/options": should be empty.',
 				'expect_db_rows' => []
 			],
 			[
@@ -1167,11 +1175,29 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10004',
 						'config' => [
 							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
-							'options' => [['checked' => 1]]
+							'options' => [['checked' => '1']]
 						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/options/1": the parameter "unchecked" is missing.',
+				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10004',
+						'config' => [
+							'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+							'options' => [
+								[
+									'checked' => 1,
+									'unchecked' => 0
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/options/1/checked": a character string is expected.',
 				'expect_db_rows' => []
 			],
 			[
@@ -1193,7 +1219,7 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.',
+				'expected_error' => 'Invalid parameter "/1/config/options": maximum number of array elements is 1.',
 				'expect_db_rows' => []
 			],
 			[
@@ -1328,7 +1354,7 @@ class testUserMacro extends CAPITest {
 					[
 						'hostmacroid' => '10005',
 						'config' => [
-							'options' => [['checked' => 1]]
+							'options' => [['checked' => '1']]
 						]
 					]
 				],
@@ -1353,7 +1379,7 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/options": only one option is allowed.',
+				'expected_error' => 'Invalid parameter "/1/config/options": maximum number of array elements is 1.',
 				'expect_db_rows' => []
 			],
 			[
