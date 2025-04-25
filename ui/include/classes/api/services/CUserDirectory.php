@@ -153,7 +153,7 @@ class CUserDirectory extends CApiService {
 			}
 
 			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
-			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type'],
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type', 'idp_certificate', 'sp_certificate', 'sp_private_key'],
 				$request_output
 			);
 
