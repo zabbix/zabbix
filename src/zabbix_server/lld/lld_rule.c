@@ -784,9 +784,8 @@ int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *i
 			{
 				new_num++;
 			}
-			else
+			else if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE))
 				update_num++;
-
 		}
 	}
 
