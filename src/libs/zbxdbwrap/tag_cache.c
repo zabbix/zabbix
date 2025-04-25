@@ -23,7 +23,6 @@ void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *n
 	char		*sql = NULL;
 	char		insert_hostid_itself_query[MAX_STRING_LEN];
 	size_t		sql_alloc = 256, sql_offset = 0;
-	zbx_db_insert_t	db_insert_item_template_cache_host_itself;
 
 	/* 1 = ZBX_FLAG_DISCOVERY_RULE */
 	zbx_db_execute_multiple_query(
@@ -40,7 +39,7 @@ void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *n
 			"insert into item_template_cache (link_hostid,itemid) "
 				"select " ZBX_FS_UI64 ", itemid from items where flags!=1 and ", hostid);
 
-	if (FAIL == zbx_db_prepare_multiple_query(insert_hostid_itself_query, "itemid", &new_itemids->values, &sql,
+	if (FAIL == zbx_db_prepare_multiple_query(insert_hostid_itself_query, "itemid", &new_itemids, &sql,
 		&sql_alloc, &sql_offset))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
