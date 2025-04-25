@@ -220,8 +220,7 @@ class C70ImportConverterTest extends CImportConverterTest {
 	 * @param array $expected
 	 */
 	public function testConvert(array $source, array $expected): void {
-		$result = $this->createConverter()->convert($this->createSource($source));
-		$this->assertConvert($this->createExpectedResult($expected), $result);
+		$this->assertConvert($this->createExpectedResult($expected), $this->createSource($source));
 	}
 
 	protected function createSource(array $data = []): array {
