@@ -1657,7 +1657,7 @@ class CUserDirectory extends CApiService {
 			]],
 		]];
 	}
-	
+
 	private function setWriteOnlyFields(array $saml_output): array
 	{
 		foreach ($saml_output as $key => $value) {
@@ -1666,7 +1666,7 @@ class CUserDirectory extends CApiService {
 			}
 		}
 		unset($value);
-		
+
 		return $saml_output;
 	}
 }
