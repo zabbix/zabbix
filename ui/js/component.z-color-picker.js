@@ -458,6 +458,8 @@ class ZColorPicker extends HTMLElement {
 
 			documentKeydown: e => {
 				if (e.which === KEY_ESCAPE) {
+					e.stopPropagation();
+
 					this.#closeDialog();
 
 					this.#box.focus();
@@ -588,7 +590,7 @@ class ZColorPicker extends HTMLElement {
 
 		this.#input.addEventListener('input', this.#events.inputChange);
 
-		document.addEventListener('keydown', this.#events.documentKeydown);
+		document.addEventListener('keydown', this.#events.documentKeydown, {capture: true});
 
 		addEventListener('resize', this.#events.windowResize);
 		addEventListener('scroll', this.#events.windowScroll, {capture: true});
@@ -612,7 +614,7 @@ class ZColorPicker extends HTMLElement {
 
 		this.#input.removeEventListener('input', this.#events.inputChange);
 
-		document.removeEventListener('keydown', this.#events.documentKeydown);
+		document.removeEventListener('keydown', this.#events.documentKeydown, {capture: true});
 
 		removeEventListener('resize', this.#events.windowResize);
 		removeEventListener('scroll', this.#events.windowScroll, {capture: true});
