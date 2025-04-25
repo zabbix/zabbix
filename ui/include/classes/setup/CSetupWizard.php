@@ -611,8 +611,8 @@ class CSetupWizard extends CForm {
 						: CVaultCyberArk::API_ENDPOINT_DEFAULT
 					)
 				))
-                    ->setId('vault-api-endpoint')
-                    ->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+					->setId('vault-api-endpoint')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_url_row',
 				!in_array($db_creds_storage, [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK])
 					? ZBX_STYLE_DISPLAY_NONE
@@ -637,7 +637,7 @@ class CSetupWizard extends CForm {
 					? $this->getConfig('DB_VAULT_DB_PATH')
 					: ''
 				))
-                    ->setId('vault-secret-path')
+					->setId('vault-secret-path')
 					->setAttribute('placeholder', CVaultHashiCorp::DB_PATH_PLACEHOLDER)
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'vault_db_path_row',
@@ -669,7 +669,7 @@ class CSetupWizard extends CForm {
 					? $this->getConfig('DB_VAULT_DB_PATH')
 					: ''
 				))
-                    ->setId('valet-secret-query-string')
+					->setId('valet-secret-query-string')
 					->setAttribute('placeholder', CVaultCyberArk::DB_PATH_PLACEHOLDER)
 					->setAttribute('maxlength', 2048)
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
@@ -724,14 +724,14 @@ class CSetupWizard extends CForm {
 				'db_verify_host',
 				ZBX_STYLE_DISPLAY_NONE
 			)
-            ->addRow(
-                (new CLabel(_('Database TLS CA file'), 'tls-ca-file'))->setAsteriskMark(),
-                (new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))
-                    ->setId('tls-ca-file')
-                    ->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-                'db_cafile_row',
-                ZBX_STYLE_DISPLAY_NONE
-            )
+			->addRow(
+				(new CLabel(_('Database TLS CA file'), 'tls-ca-file'))->setAsteriskMark(),
+				(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))
+					->setId('tls-ca-file')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'db_cafile_row',
+				ZBX_STYLE_DISPLAY_NONE
+			)
 			->addRow(_('Database TLS key file'),
 				(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'db_keyfile_row',
