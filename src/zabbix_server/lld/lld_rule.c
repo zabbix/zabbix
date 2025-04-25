@@ -1816,13 +1816,6 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 		}
 	}
 
-	if (0 != delids_override.values_num)
-	{
-		zbx_vector_uint64_sort(&delids_override, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_db_execute_multiple_query("delete from item_condition where", "item_conditionid", &delids_override);
-		delete_num = delids_override.values_num;
-	}
-
 	if (0 != delids_condition.values_num)
 	{
 		zbx_vector_uint64_sort(&delids_condition, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1852,6 +1845,12 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 				&delids_optemplate);
 	}
 
+	if (0 != delids_override.values_num)
+	{
+		zbx_vector_uint64_sort(&delids_override, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_db_execute_multiple_query("delete from lld_override where", "lld_overrideid", &delids_override);
+		delete_num = delids_override.values_num;
+	}
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&delids_optemplate);
@@ -2337,6 +2336,9 @@ static void	lld_rule_update_overrides(zbx_vector_lld_item_full_ptr_t *items, cha
 			const zbx_sync_row_t	*src_row;
 
 			dst_row = item->overrides.rows.values[j];
+
+			if (0 != (dst_row->flags & ZBX_SYNC_ROW_DELETE))
+				continue;
 
 			if (NULL == (src_row = zbx_sync_rowset_search_by_id(&item->prototype->overrides,
 					dst_row->parent_rowid)))
