@@ -185,6 +185,7 @@ class CControllerHostWizardGet extends CController {
 		}
 
 		$data = [
+			'arg_server_host' => self::getArgServerHost(),
 			/*
 			 * All host data (or empty of no host). Interface IP and DNS merged into one field "address". Only one
 			 * interface remains (could be non-main interface) so it will pre-fill the fields if needed.
@@ -206,5 +207,28 @@ class CControllerHostWizardGet extends CController {
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
+	}
+
+	protected static function getArgServerHost(): string {
+		$result = [];
+
+		/** @var CConfigFile $config */
+		$config = ZBase::getInstance()->Component()->get('config')->config;
+		if ($config['ZBX_SERVER'] && $config['ZBX_SERVER_PORT']) {
+			$result[] = $config['ZBX_SERVER'].':'.$config['ZBX_SERVER_PORT'];
+		}
+		else {
+			$hanodes = API::HaNode()->get([
+				'output' => ['address', 'port'],
+				'filter' => ['status' =>ZBX_NODE_STATUS_ACTIVE]
+			]);
+
+
+			foreach ($hanodes as $hanode) {
+				$result[] = $hanode['address'].':'.$hanode['port'];
+			}
+		}
+
+		return implode(',', $result);
 	}
 }
