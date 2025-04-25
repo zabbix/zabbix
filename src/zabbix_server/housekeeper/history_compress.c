@@ -77,6 +77,7 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 
 	if (1 == ZBX_DB_TSDB_GE_V2_18)
 	{
+		/* timescaledb_information.hypertable_compression_settings is available since TimescaleDB 2.18.0 */
 		result = zbx_db_select(
 				"select segmentby"
 				" from timescaledb_information.hypertable_compression_settings"
@@ -86,6 +87,7 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 	}
 	else
 	{
+		/* timescaledb_information.compression_settings is deprecated since TimescaleDB 2.18.0 */
 		result = zbx_db_select(
 				"select attname"
 				" from timescaledb_information.compression_settings"
@@ -105,6 +107,8 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 	{
 		if (1 == ZBX_DB_TSDB_GE_V2_18)
 		{
+			/* Available since TimescaleDB 2.18.0:                                         */
+			/* timescaledb.enable_columnstore, timescaledb.segmentby, timescaledb.orderby. */
 			zbx_db_execute(
 					"alter table %s set("
 						"timescaledb.enable_columnstore=true,"
@@ -114,6 +118,8 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 		}
 		else
 		{
+			/* Deprecated since TimescaleDB 2.18.0:                                                */
+			/* timescaledb.compress, timescaledb.compress_segmentby, timescaledb.compress_orderby. */
 			zbx_db_execute(
 					"alter table %s set("
 						"timescaledb.compress,"
