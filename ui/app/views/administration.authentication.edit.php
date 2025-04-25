@@ -321,7 +321,7 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 					(new CTextArea('idp_certificate', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setRows(3)
-						->setAttribute('placeholder', 'PEM-encoded IdP certificate')
+						->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
 						->addClass('saml-enabled'),
 					(new CDiv([
 						(new CButton('idp_certificate_input_button', _('Choose file')))
@@ -353,7 +353,7 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 					(new CTextArea('sp_private_key', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setRows(3)
-						->setAttribute('placeholder', 'PEM-encoded SP private key')
+						->setAttribute('placeholder', _('PEM-encoded SP private key'))
 						->addClass('saml-enabled'),
 					(new CDiv([
 						(new CButton('sp_private_key_input_button', _('Choose file')))
@@ -385,7 +385,7 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 					(new CTextArea('sp_certificate', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setRows(3)
-						->setAttribute('placeholder', 'PEM-encoded SP certificate')
+						->setAttribute('placeholder', _('PEM-encoded SP certificate'))
 						->addClass('saml-enabled'),
 					(new CDiv([
 						(new CButton('sp_certificate_input_button', _('Choose file')))

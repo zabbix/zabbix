@@ -4392,7 +4392,7 @@ class CApiInputValidator {
 			$is_certificate = @openssl_x509_read($data);
 
 			if (!$is_certificate) {
-				$error = _s('Provided %1$s is not a valid %2$s.', $path, 'certificate');
+				$error = _s('Provided %1$s is not a valid %2$s', $path, 'certificate');
 
 				return false;
 			}
@@ -4419,7 +4419,7 @@ class CApiInputValidator {
 			$is_private_key = openssl_pkey_get_private($data);
 
 			if (!$is_private_key) {
-				$error = _s('Provided %1$s is not a valid %2$s.', $path, 'key');
+				$error = _s('Provided %1$s is not a valid %2$s', $path, 'key');
 
 				return false;
 			}

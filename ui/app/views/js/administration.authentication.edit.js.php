@@ -342,7 +342,7 @@
 				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
 						&& idp_certificate_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('You are about to erase existing IdP certificate.')
+						_('You are about to erase existing IdP certificate')
 					) ?>);
 				}
 			}
@@ -353,7 +353,7 @@
 				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
 						&& sp_certificate_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('You are about to erase existing SP certificate.')
+						_('You are about to erase existing SP certificate')
 					) ?>);
 				}
 			}
@@ -363,7 +363,7 @@
 				if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
 						&& sp_private_key_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('You are about to erase existing SP private key.')
+						_('You are about to erase existing SP private key')
 					) ?>);
 				}
 			}
