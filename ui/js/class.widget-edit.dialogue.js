@@ -51,7 +51,7 @@ class CWidgetEditDialogue extends EventTarget {
 
 	#position_fix;
 
-	#overlay;
+	#overlay = null;
 
 	#abort_controller = new AbortController();
 
@@ -101,6 +101,10 @@ class CWidgetEditDialogue extends EventTarget {
 	}
 
 	promiseTrySubmit() {
+		if (this.#overlay === null) {
+			return Promise.resolve(false);
+		}
+
 		this.#overlay.setLoading();
 
 		return this.#promiseSubmitReadiness()
