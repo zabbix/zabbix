@@ -3180,7 +3180,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 				$buttons = [
 					'xpath://button[contains(@class, "btn-time-left")]' => true,
-					'xpath://button[contains(@class, "btn-time-right")]' => true,
+					'xpath://button[contains(@class, "btn-time-right")]' => false,
 					'button:Zoom out' => true,
 					'button:Apply' => true,
 					'id:from_calendar' => true,
