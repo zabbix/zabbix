@@ -917,6 +917,9 @@ static zbx_uint64_t	lld_operation_get_col_sync_flags(zbx_sync_row_t *row, int in
 {
 	int	col = index + LLD_OVERRIDE_OPERATION_COL_OFFSET;
 
+	if (0 == (row->flags & (UINT64_C(1) << col)))
+		return 0;
+
 	if (NULL == row->cols_orig[col])
 	{
 		/* return insert flag */
