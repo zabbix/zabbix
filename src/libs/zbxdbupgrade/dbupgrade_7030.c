@@ -549,11 +549,12 @@ static int	DBpatch_7030041(void)
 
 static int	DBpatch_7030042(void)
 {
+	/* 1 - ZBX_FLAG_DISCOVERY_RULE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			" insert into item_template_cache"
 				" (with recursive cte as"
 					" ("
-						"select i0.templateid, i0.itemid from items i0"
+						"select i0.templateid, i0.itemid from items i0 where flags != 1"
 						" union all"
 						" select i1.templateid, c.itemid from cte c join items i1 on"
 							" c.templateid=i1.itemid"
@@ -565,10 +566,11 @@ static int	DBpatch_7030042(void)
 		return FAIL;
 	}
 
+	/* 1 - ZBX_FLAG_DISCOVERY_RULE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"insert into item_template_cache"
 				" (select i.itemid,h.hostid from items i,hosts h"
-				" where i.hostid=h.hostid)"))
+				" where i.hostid=h.hostid and i.flags != 1)"))
 	{
 		return FAIL;
 	}

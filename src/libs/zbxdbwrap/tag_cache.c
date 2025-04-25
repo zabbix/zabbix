@@ -22,9 +22,10 @@ void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *n
 {
 	zbx_db_insert_t	db_insert_item_template_cache_host_itself;
 
+	/* 1 = ZBX_FLAG_DISCOVERY_RULE */
 	zbx_db_execute_multiple_query(
 			"insert into item_template_cache with recursive cte as ("
-				" select i0.templateid, i0.itemid, i0.hostid from items i0"
+				" select i0.templateid, i0.itemid, i0.hostid from items i0 where flags != 1"
 					" union all"
 				" select i1.templateid, c.itemid, c.hostid from cte c"
 				" join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL)"
