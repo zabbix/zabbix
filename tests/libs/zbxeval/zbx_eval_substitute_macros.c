@@ -22,7 +22,7 @@
 #include "mock_eval.h"
 #include "zbxdbwrap.h"
 
-static int	my_macro_resolver(zbx_token_type_t token_type, char **value, char **error, va_list args)
+static int	macro_resolver(zbx_token_type_t token_type, char **value, char **error, va_list args)
 {
 	const char	*macro = va_arg(args, const char *);
 	char		*macro_data = va_arg(args, char *);
@@ -45,6 +45,7 @@ static int	my_macro_resolver(zbx_token_type_t token_type, char **value, char **e
 		case ZBX_EVAL_PARSE_ITEM_QUERY:
 			ret = zbx_eval_query_subtitute_user_macros(*value, strlen(*value), value, error,
 					query_macro_resolver, macro, macro_data);
+			break;
 		default:
 			return ret;
 			break;
@@ -98,7 +99,7 @@ void	zbx_mock_test_entry(void **state)
 			set_variant_ui64(ctx, zbx_mock_get_parameter_uint64("in.variant_data"));
 	}
 
-	ret = zbx_eval_substitute_macros(&ctx, &error, my_macro_resolver, macro, macro_data);
+	ret = zbx_eval_substitute_macros(&ctx, &error, macro_resolver, macro, macro_data);
 
 	zbx_mock_assert_int_eq("returned value:", exp_result, ret);
 

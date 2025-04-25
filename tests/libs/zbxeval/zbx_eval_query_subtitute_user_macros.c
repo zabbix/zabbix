@@ -46,16 +46,16 @@ void	zbx_mock_test_entry(void **state)
 
 	if (NULL != out)
 	{
-		const char	*exp_out = zbx_strdup(NULL ,zbx_mock_get_parameter_string("out.string"));
+		char	*exp_out = zbx_strdup(NULL ,zbx_mock_get_parameter_string("out.string"));
 
 		zbx_mock_assert_str_eq("return out:", exp_out, out);
 		zbx_free(exp_out);
 	}
 
-	if (FAIL == zbx_mock_parameter_exists("in.error"))
-		zbx_free(error);
-	else
+	if (SUCCEED == zbx_mock_parameter_exists("in.error"))
 		zbx_free(error_val);
+	else
+		zbx_free(error);
 
 	zbx_free(out);
 }
