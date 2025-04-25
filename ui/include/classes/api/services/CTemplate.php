@@ -379,7 +379,9 @@ class CTemplate extends CHostGeneral {
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'config' => 		['type' => API_OBJECT, 'fields' => self::getMacroConfigValidationRules()]
+				'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+				]]
 			]],
 			'wizard_ready' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_NOT_READY, ZBX_WIZARD_READY])],
 			'readme' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'readme')]
@@ -389,7 +391,7 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkMacroConfigOptions($templates);
+		self::checkMacroConfig($templates);
 		self::checkVendorFields($templates);
 		self::addUuid($templates);
 		self::checkUuidDuplicates($templates);
@@ -455,151 +457,87 @@ class CTemplate extends CHostGeneral {
 		}
 	}
 
-	private static function getMacroConfigValidationRules(): array {
-		return [
-			'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+	private static function checkMacroConfig(array &$templates, ?array &$db_templates = null): void {
+		$api_input_macro_config_rules = ['type' => API_OBJECT, 'fields' => [
+			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
 			'label' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
+				['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
 			]],
 			'description' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'description')]
+				['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'description')]
 			]],
 			'required' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
-										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'required')]
+				['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
+				['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'required')]
 			]],
 			'regex' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
+				['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_REGEX, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
 			]],
 			'options' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_JSON, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'options')]
+				['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_LIST], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value', 'text']], 'fields' => [
+					'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+					'text' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]],
+				['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_CHECKBOX], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 1, 'fields' => [
+					'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+					'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+				]],
+				['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
-		];
-	}
-
-	private static function checkMacroConfig(array $templates, array $db_templates): void {
-		$api_input_macro_config_rules = [
-			'config' =>	['type' => API_OBJECT, 'fields' => self::getMacroConfigValidationRules()]
-		];
-
-		foreach ($templates as $t => $template) {
-			if (array_key_exists('macros', $template) && $template['macros']) {
-				$m = 0;
-
-				foreach ($template['macros'] as $macro) {
-					if (array_key_exists('config', $macro)) {
-						$path = '/'.($t + 1).'/macros/'.($m + 1);
-
-						if (array_key_exists('hostmacroid', $macro)) {
-							$hostmacroid = $macro['hostmacroid'];
-							$db_type = $db_templates[$template['templateid']]['macros'][$hostmacroid]['config']['type'];
-
-							if (!array_key_exists('type', $macro['config'])) {
-								$macro['config']['type'] = $db_type;
-							}
-
-							if ($db_type != $macro['config']['type']) {
-								if ($db_type == ZBX_WIZARD_FIELD_NOCONF) {
-									$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
-										API_REQUIRED;
-								}
-
-								if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-										|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-									$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
-										API_REQUIRED;
-								}
-							}
-						}
-						else {
-							$api_input_macro_config_rules['config']['fields']['label']['rules'][0]['flags'] |=
-								API_REQUIRED;
-							$api_input_macro_config_rules['config']['fields']['options']['rules'][0]['flags'] |=
-								API_REQUIRED;
-						}
-
-						$macro['config'] = array_intersect_key($macro['config'],
-							$api_input_macro_config_rules['config']['fields']
-						);
-
-						if (!CApiInputValidator::validate($api_input_macro_config_rules['config'],
-								$macro['config'], $path, $error)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-						}
-					}
-
-					$m++;
-				}
-			}
-		}
-	}
-
-	private static function checkMacroConfigOptions(array &$templates, ?array $db_templates = null): void {
-		$api_input_list_rules = [
-			'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['value', 'text']], 'fields' => [
-				'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'text' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-			]
-		];
-
-		$api_input_checkbox_rules = [
-			'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-				'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-			]
-		];
+		]];
 
 		foreach ($templates as $t => &$template) {
 			if (array_key_exists('macros', $template) && $template['macros']) {
-				$m = 0;
+				$db_template = $db_templates && array_key_exists($template['templateid'], $db_templates)
+					? $db_templates[$template['templateid']]
+					: null;
 
-				foreach ($template['macros'] as &$macro) {
-					if (array_key_exists('config', $macro)) {
-						if (array_key_exists('hostmacroid', $macro)) {
-							$hostmacroid = $macro['hostmacroid'];
-							$db_type = $db_templates[$template['templateid']]['macros'][$hostmacroid]['config']['type'];
-
-							if (!array_key_exists('type', $macro['config'])) {
-								$macro['config']['type'] = $db_type;
-							}
-						}
-
-						if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-								|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-							$options = json_decode($macro['config']['options'], true);
-							$path = '/'.($t + 1).'/macros/'.($m + 1).'/config/options';
-
-							if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
-								if (!CApiInputValidator::validate($api_input_list_rules, $options, $path, $error)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-								}
-							}
-							else {
-								if (!CApiInputValidator::validate($api_input_checkbox_rules, $options, $path, $error)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-								}
-
-								if (count($options) > 1) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										$path, _('only one option is allowed')
-									));
-								}
-							}
-
-							$macro['config']['options'] = json_encode($options);
-						}
+				foreach (array_values($template['macros']) as $m => $macro) {
+					if (!array_key_exists('config', $macro)) {
+						continue;
 					}
 
-					$m++;
+					$db_macros = $db_template ? $db_template['macros'] : null;
+					$path = '/'.($t + 1).'/macros/'.($m + 1).'/config';
+
+					if ($db_macros !== null
+							&& array_key_exists('hostmacroid', $macro)
+							&& array_key_exists($macro['hostmacroid'], $db_macros)) {
+						$db_macro = $db_macros[$macro['hostmacroid']];
+						$macro['config'] += ['type' => $db_macro['config']['type']];
+						self::addRequiredFieldsByMacroConfigType($macro['config'], $db_macro['config']);
+					}
+
+					if (!CApiInputValidator::validate($api_input_macro_config_rules, $macro['config'], $path, $error)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+
+					if (array_key_exists('options', $macro['config'])) {
+						$path_options = $path . '/options';
+						$encoded = json_encode($macro['config']['options'], JSON_THROW_ON_ERROR);
+
+						if (mb_strlen($encoded) > DB::getFieldLength('hostmacro_config', 'options')) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path_options,
+								_('value is too long')
+							));
+						}
+					}
 				}
-				unset($macro);
 			}
 		}
 		unset($template);
+	}
+
+	private static function addRequiredFieldsByMacroConfigType(array &$macro_config, array $db_macro_config): void {
+		if ($macro_config['type'] == ZBX_WIZARD_FIELD_TEXT) {
+			$macro_config += array_intersect_key($db_macro_config, array_flip(['label']));
+		}
+		if (in_array($macro_config['type'], [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])) {
+			$macro_config += array_intersect_key($db_macro_config, array_flip(['label','options']));
+		}
 	}
 
 	/**
@@ -676,7 +614,6 @@ class CTemplate extends CHostGeneral {
 		$this->addAffectedObjects($templates, $db_templates);
 
 		self::checkMacroConfig($templates, $db_templates);
-		self::checkMacroConfigOptions($templates, $db_templates);
 		self::checkVendorFields($templates, $db_templates);
 		self::checkUuidDuplicates($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
@@ -744,6 +681,258 @@ class CTemplate extends CHostGeneral {
 		$this->updateTemplates($templates, $db_templates);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
+	}
+
+	/**
+	 * @param array      $templates
+	 * @param array|null $db_templates
+	 * @param array|null $upd_hostids
+	 */
+	protected function updateMacros(array &$templates, ?array &$db_templates = null, ?array &$upd_hostids = null): void {
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+		$del_hostmacroids = [];
+
+		foreach ($templates as &$template) {
+			if (!array_key_exists('macros', $template)) {
+				continue;
+			}
+
+			$db_macros = ($db_templates !== null) ? $db_templates[$template['templateid']]['macros'] : [];
+
+			foreach ($template['macros'] as &$macro) {
+				if (array_key_exists('hostmacroid', $macro) && $db_macros) {
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $macro, $db_macros[$macro['hostmacroid']]);
+
+					if ($upd_hostmacro) {
+						$upd_hostmacros[] = [
+							'values' => $upd_hostmacro,
+							'where' => ['hostmacroid' => $macro['hostmacroid']]
+						];
+					}
+
+					unset($db_macros[$macro['hostmacroid']]);
+				}
+				else {
+					$ins_hostmacros[] = ['hostid' => $template['templateid']] + $macro;
+				}
+			}
+			unset($macro);
+
+			if ($db_macros) {
+				$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_macros));
+			}
+		}
+		unset($template);
+
+		if ($del_hostmacroids) {
+			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
+		}
+
+		if ($upd_hostmacros) {
+			DB::update('hostmacro', $upd_hostmacros);
+		}
+
+		if ($ins_hostmacros) {
+			$hostmacroids = DB::insert('hostmacro', $ins_hostmacros);
+		}
+
+		foreach ($templates as &$template) {
+			if (!array_key_exists('macros', $template)) {
+				continue;
+			}
+
+			foreach ($template['macros'] as &$macro) {
+				if (!array_key_exists('hostmacroid', $macro)) {
+					$macro['hostmacroid'] = array_shift($hostmacroids);
+				}
+			}
+			unset($macro);
+		}
+		unset($template);
+
+		self::addFieldDefaultsByMacroConfigType($templates, $db_templates);
+		$this->updateMacroConfigs($templates, $db_templates);
+		self::prepareMacroConfigOptionsForAuditlog($templates, $db_templates);
+	}
+
+	/**
+	 * @param array      $templates
+	 * @param array|null $db_templates
+	 */
+	protected function updateMacroConfigs(array $templates, ?array $db_templates = null): void {
+		$ins_hostmacro_configs = [];
+		$upd_hostmacro_configs = [];
+		$del_hostmacro_configs = [];
+
+		self::prepareMacroConfigOptionsForDb($templates, $db_templates);
+
+		foreach ($templates as &$template) {
+			if (!array_key_exists('macros', $template)) {
+				continue;
+			}
+
+			$db_macros = ($db_templates !== null) ? $db_templates[$template['templateid']]['macros'] : [];
+
+			foreach ($template['macros'] as &$macro) {
+				if (!array_key_exists('config', $macro)) {
+					continue;
+				}
+
+				if ($db_macros && array_key_exists($macro['hostmacroid'], $db_macros)) {
+					if (array_key_exists('type', $macro['config'])
+							&& $macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+						$del_hostmacro_configs[] = $macro['hostmacroid'];
+					}
+					else {
+						$db_macro_config = $db_macros[$macro['hostmacroid']]['config'];
+						$upd_hostmacro_config = DB::getUpdatedValues('hostmacro_config', $macro['config'],
+							$db_macro_config
+						);
+
+						if ($upd_hostmacro_config) {
+							if ($db_macro_config['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+								$ins_hostmacro_configs[] = ['hostmacroid' => $macro['hostmacroid']]
+									+ $upd_hostmacro_config;
+							}
+							else {
+								$upd_hostmacro_configs[] = [
+									'values' => $upd_hostmacro_config,
+									'where' => ['hostmacroid' => $macro['hostmacroid']]
+								];
+							}
+						}
+					}
+				}
+				else {
+					$ins_hostmacro_configs[] = ['hostmacroid' => $macro['hostmacroid']] + $macro['config'];
+				}
+			}
+			unset($macro);
+		}
+		unset($template);
+
+		if ($del_hostmacro_configs) {
+			DB::delete('hostmacro_config', ['hostmacroid' => $del_hostmacro_configs]);
+		}
+
+		if ($upd_hostmacro_configs) {
+			DB::update('hostmacro_config', $upd_hostmacro_configs);
+		}
+
+		if ($ins_hostmacro_configs) {
+			DB::insert('hostmacro_config', $ins_hostmacro_configs, false);
+		}
+	}
+
+	private static function addFieldDefaultsByMacroConfigType(array &$templates, ?array &$db_templates = null): void {
+		if ($db_templates === null) {
+			return;
+		}
+
+		$field_defaults = DB::getDefaults('hostmacro_config');
+		$field_defaults['options'] = [];
+
+		foreach ($templates as &$template) {
+			if (!array_key_exists('macros', $template)) {
+				continue;
+			}
+
+			$db_macros = $db_templates[$template['templateid']]['macros'];
+
+			foreach ($template['macros'] as &$macro) {
+				if (array_key_exists($macro['hostmacroid'], $db_macros)
+					&& array_key_exists('config', $macro)
+					&& array_key_exists('type', $macro['config'])
+					&& $macro['config']['type'] != $db_macros[$macro['hostmacroid']]['config']['type']
+				) {
+					$field_names = [];
+
+					if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+						$field_names = ['label', 'description', 'required', 'regex', 'options'];
+					}
+					elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_TEXT) {
+						$field_names = ['options'];
+					}
+					elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
+						$field_names = ['regex'];
+					}
+					elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+						$field_names = ['required', 'regex'];
+					}
+
+					$macro['config'] += array_intersect_key($field_defaults, array_flip($field_names));
+				}
+			}
+			unset($macro);
+		}
+		unset($template);
+	}
+
+	private static function prepareMacroConfigOptionsForDb(array &$templates, ?array &$db_templates = null): void {
+		foreach ($templates as &$template) {
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as &$macro) {
+					if (array_key_exists('config', $macro) && array_key_exists('options', $macro['config'])) {
+						$macro['config']['options'] = $macro['config']['options']
+							? json_encode($macro['config']['options'], JSON_THROW_ON_ERROR)
+							: '';
+					}
+				}
+				unset($macro);
+			}
+		}
+		unset($template);
+
+		if ($db_templates !== null) {
+			foreach ($db_templates as &$db_template) {
+				if (array_key_exists('macros', $db_template)) {
+					foreach ($db_template['macros'] as &$db_macro) {
+						if (array_key_exists('config', $db_macro) && array_key_exists('options', $db_macro['config'])) {
+							$db_macro['config']['options'] = $db_macro['config']['options']
+								? json_encode($db_macro['config']['options'], JSON_THROW_ON_ERROR)
+								: '';
+						}
+					}
+					unset($db_macro);
+				}
+			}
+			unset($db_template);
+		}
+	}
+
+	private static function prepareMacroConfigOptionsForAuditlog(array &$templates, ?array &$db_templates = null): void {
+		foreach ($templates as &$template) {
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as &$macro) {
+					if (array_key_exists('config', $macro) && array_key_exists('options', $macro['config'])) {
+						foreach ($macro['config']['options'] as $index => &$option) {
+							$option['index'] = $index;
+						}
+						unset($option);
+					}
+				}
+				unset($macro);
+			}
+		}
+		unset($template);
+
+		if ($db_templates) {
+			foreach ($db_templates as &$db_template) {
+				if (array_key_exists('macros', $db_template)) {
+					foreach ($db_template['macros'] as &$db_macro) {
+						if (array_key_exists('config', $db_macro) && array_key_exists('options', $db_macro['config'])) {
+							foreach ($db_macro['config']['options'] as $index => &$db_option) {
+								$db_option['index'] = $index;
+							}
+							unset($db_option);
+						}
+					}
+					unset($db_macro);
+				}
+			}
+			unset($db_template);
+		}
 	}
 
 	/**

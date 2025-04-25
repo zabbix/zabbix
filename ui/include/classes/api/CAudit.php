@@ -556,6 +556,7 @@ class CAudit {
 		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
 		'template.groups' => 'hostgroupid',
 		'template.macros' => 'hostmacroid',
+		'template.macros.config.options' => 'index',
 		'template.tags' => 'hosttagid',
 		'template.templates' => 'hosttemplateid',
 		'template.templates_clear' => 'hosttemplateid',

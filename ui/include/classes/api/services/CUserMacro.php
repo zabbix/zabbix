@@ -458,7 +458,9 @@ class CUserMacro extends CApiService {
 									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
+			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
@@ -494,20 +496,13 @@ class CUserMacro extends CApiService {
 	 */
 	private function createReal(array &$hostmacros): void {
 		$hostmacroids = DB::insert('hostmacro', $hostmacros);
-		$add_hostmacros_configs = [];
 
 		foreach ($hostmacros as $index => &$hostmacro) {
 			$hostmacro['hostmacroid'] = $hostmacroids[$index];
-
-			if (array_key_exists('config', $hostmacro) && $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
-				$add_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
-			}
 		}
 		unset($hostmacro);
 
-		if ($add_hostmacros_configs) {
-			DB::insert('hostmacro_config', $add_hostmacros_configs, false);
-		}
+		$this->updateRealHostmacroConfig($hostmacros);
 	}
 
 	/**
@@ -523,7 +518,9 @@ class CUserMacro extends CApiService {
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 			'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])],
-			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
+			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
@@ -693,8 +690,15 @@ class CUserMacro extends CApiService {
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
 				]],
 				'options' =>			['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'options')],
-					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'options')]
+					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_LIST], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value', 'text']], 'fields' => [
+						'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'text' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+					]],
+					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_CHECKBOX], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 1, 'fields' => [
+						'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]],
+					['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 				]]
 			]
 		];
@@ -727,57 +731,35 @@ class CUserMacro extends CApiService {
 
 			$path .= '/config';
 
-			if ($db_hostmacros !== null && array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)
-					&& (!array_key_exists('type', $hostmacro['config'])
-						|| $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF)) {
+			if ($db_hostmacros !== null && array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)) {
 				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
-				$hostmacro['config'] += $db_hostmacro['config'];
+				$hostmacro['config'] += ['type' => $db_hostmacro['config']['type']];
+				self::addRequiredFieldsByMacroConfigType($hostmacro['config'], $db_hostmacro['config']);
 			}
 
 			if (!CApiInputValidator::validate($api_macro_config_rules, $hostmacro['config'], $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
-			self::checkMacroConfigOptions($hostmacro, $path);
-		}
-	}
+			if (array_key_exists('options', $hostmacro['config'])) {
+				$path_options = $path . '/options';
+				$encoded = json_encode($hostmacro['config']['options'], JSON_THROW_ON_ERROR);
 
-	private static function checkMacroConfigOptions(array $hostmacro, string $path): void {
-		$api_input_list_rules = [
-			'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['value', 'text']], 'fields' => [
-				'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'text' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-			]
-		];
-
-		$api_input_checkbox_rules = [
-			'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-				'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-			]
-		];
-
-		if ($hostmacro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-				|| $hostmacro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-			$options = json_decode($hostmacro['config']['options'], true);
-			$path .= '/options';
-
-			if ($hostmacro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
-				if (!CApiInputValidator::validate($api_input_list_rules, $options, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-			else {
-				if (!CApiInputValidator::validate($api_input_checkbox_rules, $options, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-
-				if (count($options) > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path, _('only one option is allowed')
+				if (mb_strlen($encoded) > DB::getFieldLength('hostmacro_config', 'options')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path_options,
+						_('value is too long')
 					));
 				}
 			}
+		}
+	}
+
+	private static function addRequiredFieldsByMacroConfigType(array &$macro_config, array $db_macro_config): void {
+		if ($macro_config['type'] == ZBX_WIZARD_FIELD_TEXT) {
+			$macro_config += array_intersect_key($db_macro_config, array_flip(['label']));
+		}
+		if (in_array($macro_config['type'], [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])) {
+			$macro_config += array_intersect_key($db_macro_config, array_flip(['label','options']));
 		}
 	}
 
@@ -832,55 +814,61 @@ class CUserMacro extends CApiService {
 	/**
 	 * Updates hostmacros_config records in the database.
 	 *
-	 * @param array $hostmacros
-	 * @param array $db_hostmacros
+	 * @param array      $hostmacros
+	 * @param array|null $db_hostmacros
 	 */
-	private function updateRealHostmacroConfig(array $hostmacros, array $db_hostmacros): void {
-		$add_hostmacros_configs = [];
+	private function updateRealHostmacroConfig(array $hostmacros, ?array $db_hostmacros = null): void {
+		$ins_hostmacros_configs = [];
 		$upd_hostmacros_configs = [];
 		$del_hostmacros_configids = [];
 
-		$db_hostmacro_configs = DB::select('hostmacro_config', [
-			'output' => ['hostmacroid'],
-			'hostmacroids' => array_column($hostmacros, 'hostmacroid'),
-			'preservekeys' => true
-		]);
+		self::addFieldDefaultsByMacroConfigType($hostmacros, $db_hostmacros);
+		self::prepareMacroConfigOptionsForDb($hostmacros, $db_hostmacros);
 
 		foreach ($hostmacros as $hostmacro) {
 			if (!array_key_exists('config', $hostmacro)) {
 				continue;
 			}
 
-			if (array_key_exists('type', $hostmacro['config'])
-					&& $hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
-				$del_hostmacros_configids[] = $hostmacro['hostmacroid'];
-				continue;
-			}
+			if ($db_hostmacros !== null) {
+				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
+				$db_hostmacro_config = array_key_exists('config', $db_hostmacro) ? $db_hostmacro['config'] : [];
 
-			if (!array_key_exists($hostmacro['hostmacroid'], $db_hostmacro_configs)) {
-				if (array_key_exists('type', $hostmacro['config'])
-						&& $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
-					$add_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
+				if ($db_hostmacro_config
+						&& $db_hostmacro_config['type'] != ZBX_WIZARD_FIELD_NOCONF
+						&& array_key_exists('type', $hostmacro['config'])
+						&& $hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+					$del_hostmacros_configids[] = $hostmacro['hostmacroid'];
+					continue;
 				}
 
-				continue;
+				if ($db_hostmacro_config
+						&& $db_hostmacro_config['type'] == ZBX_WIZARD_FIELD_NOCONF
+						&& array_key_exists('type', $hostmacro['config'])
+						&& $hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+					$ins_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
+					continue;
+				}
+
+				$upd_hostmacro_config = DB::getUpdatedValues('hostmacro_config', $hostmacro['config'],
+					$db_hostmacro_config);
+
+				if ($upd_hostmacro_config) {
+					$upd_hostmacros_configs[] = [
+						'values' => $upd_hostmacro_config,
+						'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
+					];
+				}
 			}
-
-			$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
-			$db_hostmacro_config = array_key_exists('config', $db_hostmacro) ? $db_hostmacro['config'] : [];
-			$upd_hostmacro_config = DB::getUpdatedValues('hostmacro_config', $hostmacro['config'],
-				$db_hostmacro_config);
-
-			if ($upd_hostmacro_config) {
-				$upd_hostmacros_configs[] = [
-					'values' => $upd_hostmacro_config,
-					'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
-				];
+			else {
+				if ($hostmacro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+					$ins_hostmacros_configs[] = ['hostmacroid' => $hostmacro['hostmacroid']] + $hostmacro['config'];
+				}
 			}
 		}
 
-		if ($add_hostmacros_configs) {
-			DB::insert('hostmacro_config', $add_hostmacros_configs, false);
+		if ($ins_hostmacros_configs) {
+			DB::insert('hostmacro_config', $ins_hostmacros_configs, false);
 		}
 
 		if ($upd_hostmacros_configs) {
@@ -889,6 +877,63 @@ class CUserMacro extends CApiService {
 
 		if ($del_hostmacros_configids) {
 			DB::delete('hostmacro_config', ['hostmacroid' => $del_hostmacros_configids]);
+		}
+	}
+
+	private static function addFieldDefaultsByMacroConfigType(array &$hostmacros, ?array &$db_hostmacros = null): void {
+		if ($db_hostmacros === null) {
+			return;
+		}
+
+		$field_defaults = DB::getDefaults('hostmacro_config');
+		$field_defaults['options'] = [];
+
+		foreach ($hostmacros as &$macro) {
+			if (array_key_exists($macro['hostmacroid'], $db_hostmacros)
+				&& array_key_exists('config', $macro)
+				&& array_key_exists('type', $macro['config'])
+				&& $macro['config']['type'] != $db_hostmacros[$macro['hostmacroid']]['config']['type']
+			) {
+				$field_names = [];
+
+				if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+					$field_names = ['label', 'description', 'required', 'regex', 'options'];
+				}
+				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_TEXT) {
+					$field_names = ['options'];
+				}
+				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
+					$field_names = ['regex'];
+				}
+				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+					$field_names = ['required', 'regex'];
+				}
+
+				$macro['config'] += array_intersect_key($field_defaults, array_flip($field_names));
+			}
+		}
+		unset($macro);
+	}
+
+	private static function prepareMacroConfigOptionsForDb(array &$hostmacros, ?array &$db_hostmacros = null): void {
+		foreach ($hostmacros as &$macro) {
+			if (array_key_exists('config', $macro) && array_key_exists('options', $macro['config'])) {
+				$macro['config']['options'] = $macro['config']['options']
+					? json_encode($macro['config']['options'], JSON_THROW_ON_ERROR)
+					: '';
+			}
+		}
+		unset($macro);
+
+		if ($db_hostmacros !== null) {
+			foreach ($db_hostmacros as &$db_macro) {
+				if (array_key_exists('config', $db_macro) && array_key_exists('options', $db_macro['config'])) {
+					$db_macro['config']['options'] = $db_macro['config']['options']
+						? json_encode($db_macro['config']['options'], JSON_THROW_ON_ERROR)
+						: '';
+				}
+			}
+			unset($db_macro);
 		}
 	}
 
@@ -1016,6 +1061,9 @@ class CUserMacro extends CApiService {
 
 				continue;
 			}
+
+			// Do not inherit config part of macro.
+			unset($hostmacro['config']);
 
 			if ($db_hostmacros) {
 				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
@@ -1256,6 +1304,10 @@ class CUserMacro extends CApiService {
 			$result[$hostmacroid]['config'] = array_key_exists($hostmacroid, $resource)
 				? $resource[$hostmacroid]
 				: DB::getDefaults('hostmacro_config');
+
+			$result[$hostmacroid]['config']['options'] = $result[$hostmacroid]['config']['options'] !== ''
+				? json_decode($result[$hostmacroid]['config']['options'], true)
+				: [];
 		}
 	}
 

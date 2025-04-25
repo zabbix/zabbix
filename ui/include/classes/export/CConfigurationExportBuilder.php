@@ -1293,11 +1293,6 @@ class CConfigurationExportBuilder {
 		$macros = order_macros($macros, 'macro');
 
 		foreach ($macros as $macro) {
-			if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-					|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-				$macro['config']['options'] = json_decode($macro['config']['options'], true);
-			}
-
 			$result[] = [
 				'macro' => $macro['macro'],
 				'type' => $macro['type'],

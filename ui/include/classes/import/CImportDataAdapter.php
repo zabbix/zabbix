@@ -82,14 +82,6 @@ class CImportDataAdapter {
 					$template += array_fill_keys(['vendor_name', 'vendor_version'], '');
 				}
 
-				foreach ($template['macros'] as &$macro) {
-					if ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-							|| $macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-						$macro['config']['options'] = json_encode($macro['config']['options']);
-					}
-				}
-				unset($macro);
-
 				$templates[] = CArrayHelper::getByKeys($template, [
 					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
 					'valuemaps', 'vendor_name', 'vendor_version', 'wizard_ready', 'readme'
