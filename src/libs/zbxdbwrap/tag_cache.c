@@ -20,26 +20,37 @@
 
 void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids)
 {
+	char		*sql = NULL;
+	char		insert_hostid_itself_query[MAX_STRING_LEN];
+	size_t		sql_alloc = 256, sql_offset = 0;
 	zbx_db_insert_t	db_insert_item_template_cache_host_itself;
 
 	/* 1 = ZBX_FLAG_DISCOVERY_RULE */
 	zbx_db_execute_multiple_query(
 			"insert into item_template_cache with recursive cte as ("
-				" select i0.templateid, i0.itemid, i0.hostid from items i0 where flags != 1"
+				" select i0.templateid, i0.itemid, i0.hostid from items i0 where i0.flags!=1"
 					" union all"
 				" select i1.templateid, c.itemid, c.hostid from cte c"
 				" join items i1 on c.templateid=i1.itemid where i1.templateid is not NULL)"
 			" select cte.itemid,ii.hostid from cte,items ii"
-				" where cte.templateid= ii.itemid and ", "cte.itemid", new_itemids);
+				" where cte.templateid=ii.itemid and ", "cte.itemid", new_itemids);
 
-	zbx_db_insert_prepare(&db_insert_item_template_cache_host_itself, "item_template_cache",
-			"itemid", "link_hostid",  (char *)NULL);
+	/* 1 = ZBX_FLAG_DISCOVERY_RULE */
+	zbx_snprintf(insert_hostid_itself_query, MAX_STRING_LEN,
+			"insert into item_template_cache (link_hostid,itemid) "
+				"select " ZBX_FS_UI64 ", itemid from items where flags!=1 and ", hostid);
 
-	for (int i = 0; i < new_itemids->values_num; i++)
-		zbx_db_insert_add_values(&db_insert_item_template_cache_host_itself, new_itemids->values[i], hostid);
+	if (FAIL == zbx_db_prepare_multiple_query(insert_hostid_itself_query, "itemid", &new_itemids->values, &sql,
+		&sql_alloc, &sql_offset))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
 
-	zbx_db_insert_execute(&db_insert_item_template_cache_host_itself);
-	zbx_db_insert_clean(&db_insert_item_template_cache_host_itself);
+	if (FAIL == zbx_db_flush_overflowed_sql(sql, sql_offset))
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	zbx_free(sql);
 }
 
 int	zbx_db_delete_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
