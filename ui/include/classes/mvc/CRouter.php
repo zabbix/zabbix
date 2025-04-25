@@ -141,6 +141,7 @@ class CRouter {
 		'host.wizard.create'						=> [CControllerHostWizardCreate::class,								'layout.json',			null],
 		'host.wizard.edit'							=> [CControllerHostWizardEdit::class,								'layout.json',			'host.wizard.edit'],
 		'host.wizard.get'							=> [CControllerHostWizardGet::class,								'layout.json',			null],
+		'host.wizard.update'						=> [CControllerHostWizardUpdate::class,								'layout.json',			null],
 		'hostgroup.create'							=> [CControllerHostGroupCreate::class,								'layout.json',			null],
 		'hostgroup.delete'							=> [CControllerHostGroupDelete::class,								'layout.json',			null],
 		'hostgroup.disable'							=> [CControllerHostGroupDisable::class,								'layout.json',			null],
