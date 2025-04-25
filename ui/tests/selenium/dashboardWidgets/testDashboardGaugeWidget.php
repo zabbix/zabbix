@@ -1327,8 +1327,6 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->save();
 		$widget = $dashboard->waitUntilReady()->getWidget($header);
-		// Without scroll down on Jenkins error - requested image region is invalid.
-		$this->page->scrollDown();
 
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();

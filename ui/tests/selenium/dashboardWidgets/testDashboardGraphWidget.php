@@ -281,6 +281,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
+		$dashboard->getWidget('Graph');
 		$form = $overlay->asForm();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 

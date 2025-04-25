@@ -783,7 +783,9 @@ class testDashboardURLWidget extends testWidgets {
 		// Check that already created widget became invalid and returns error regarding invalid parameter.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget = $dashboard->getWidget(self::$default_widget)->getContent();
-		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
+		$this->assertEquals("Widget is not fully configured\nPlease update configuration",
+				$widget->query('class:no-data-message')->one()->getText()
+		);
 		$broken_form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		// Check that the widget URL field is empty.

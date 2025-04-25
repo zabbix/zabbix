@@ -2442,6 +2442,11 @@ class testDocumentationLinks extends CWebTest {
 		if (array_key_exists('actions', $data)) {
 			foreach ($data['actions'] as $action) {
 				call_user_func_array([$this, $action['callback']], [CTestArrayHelper::get($action, 'element', null)]);
+
+				// $dialog->isValid() can be false if a widget is added.
+				if ($action['element'] === 'id:dashboard-add-widget') {
+					COverlayDialogElement::get('Add widget')->waitUntilReady();
+				}
 			}
 		}
 
