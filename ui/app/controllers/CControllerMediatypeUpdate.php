@@ -58,7 +58,7 @@ class CControllerMediatypeUpdate extends CController {
 			'client_secret' =>			'db media_type_oauth.client_secret',
 			'authorization_url' =>		'db media_type_oauth.authorization_url',
 			'token_url' =>				'db media_type_oauth.token_url',
-			'tokens_status' =>			'int32|in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
+			'tokens_status' =>			'int32|in '.implode(',', range(0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID)),
 			'access_token' =>			'db media_type_oauth.access_token',
 			'access_expires_in' =>		'int32',
 			'refresh_token' =>			'db media_type_oauth.refresh_token'
