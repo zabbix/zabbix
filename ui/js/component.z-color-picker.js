@@ -342,8 +342,8 @@ class ZColorPicker extends HTMLElement {
 			},
 
 			dialogKeydown: e => {
-				switch (e.which) {
-					case KEY_ENTER:
+				switch (e.key) {
+					case 'Enter':
 						const selected_tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SELECTED}`);
 
 						if (selected_tab.classList.contains(ZColorPicker.ZBX_STYLE_TAB_SOLID)) {
@@ -372,7 +372,7 @@ class ZColorPicker extends HTMLElement {
 
 						break;
 
-					case KEY_TAB:
+					case 'Tab':
 						const focusables = Array.from(
 							this.#dialog.querySelectorAll(`
 								input:not([tabindex^="-"]):not([disabled]),
@@ -407,11 +407,11 @@ class ZColorPicker extends HTMLElement {
 			},
 
 			dialogKeyup: e => {
-				switch (e.which) {
-					case KEY_ARROW_DOWN:
-					case KEY_ARROW_LEFT:
-					case KEY_ARROW_RIGHT:
-					case KEY_ARROW_UP:
+				switch (e.key) {
+					case 'ArrowDown':
+					case 'ArrowLeft':
+					case 'ArrowRight':
+					case 'ArrowUp':
 						if (e.target.name === ZColorPicker.ZBX_STYLE_PALETTE_INPUT) {
 							this.#dialog.querySelectorAll(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]`)
 								.forEach(input => input.setAttribute('tabindex', '-1'));
@@ -457,7 +457,7 @@ class ZColorPicker extends HTMLElement {
 			},
 
 			documentKeydown: e => {
-				if (e.which === KEY_ESCAPE) {
+				if (e.key === 'Escape') {
 					e.stopPropagation();
 
 					this.#closeDialog();
