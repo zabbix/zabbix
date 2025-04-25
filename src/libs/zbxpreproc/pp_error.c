@@ -311,15 +311,8 @@ int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, 
 
 			if (NULL != um_handle)
 			{
-				char	*error_resolve = NULL;
-
-				if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache,
-						&error_handler_params, &hostid, 1, ZBX_MACRO_ENV_NONSECURE,
-						&error_resolve))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error_resolve);
-					zbx_free(error_resolve);
-				}
+				zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache,
+						&error_handler_params, &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 			}
 
 			if (ZBX_PREPROC_FAIL_SET_VALUE == step->error_handler)

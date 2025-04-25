@@ -8068,6 +8068,10 @@ msgstr "Erro na requisição de pesquisa pela tabela \"%1$s\"."
 msgid "Error message"
 msgstr "Mensagem de erro"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -12036,6 +12040,10 @@ msgstr "Item"
 msgid "Item added"
 msgstr "Item incluído"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "O item contém macros definidas pelo usuário com valores secretos. Os valores dessas macros devem ser inseridos manualmente."
@@ -13707,6 +13715,10 @@ msgstr "Método não encontrado."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "Métodos"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"

@@ -434,6 +434,27 @@ static int	DBpatch_7030030(void)
 
 static int	DBpatch_7030031(void)
 {
+	const zbx_db_field_t	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_7030032(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'itemcard','widgets/itemcard',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030033(void)
+{
 	const zbx_db_table_t	table =
 			{"lld_macro_export", "lld_macro_exportid", 0,
 				{
@@ -449,12 +470,12 @@ static int	DBpatch_7030031(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030032(void)
+static int	DBpatch_7030034(void)
 {
 	return DBcreate_index("lld_macro_export", "lld_macro_export_1", "itemid", 0);
 }
 
-static int	DBpatch_7030033(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -462,33 +483,33 @@ static int	DBpatch_7030033(void)
 	return DBadd_foreign_key("lld_macro_export", 1, &field);
 }
 
-static int	DBpatch_7030034(void)
+static int	DBpatch_7030036(void)
 {
 	const zbx_db_field_t	field = {"lldruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("item_discovery", &field);
 }
 
-static int	DBpatch_7030035(void)
+static int	DBpatch_7030037(void)
 {
 	return DBcreate_index("item_discovery", "item_discovery_3", "lldruleid", 0);
 }
 
-static int	DBpatch_7030036(void)
+static int	DBpatch_7030038(void)
 {
 	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("item_discovery", 3, &field);
 }
 
-static int	DBpatch_7030037(void)
+static int	DBpatch_7030039(void)
 {
 	const zbx_db_field_t	field = {"parent_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("item_discovery", &field);
 }
 
-static int	DBpatch_7030038(void)
+static int	DBpatch_7030040(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update item_discovery id"
 					" set lldruleid=parent_itemid,parent_itemid=NULL"
@@ -504,7 +525,7 @@ static int	DBpatch_7030038(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030039(void)
+static int	DBpatch_7030041(void)
 {
 	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
@@ -558,5 +579,7 @@ DBPATCH_ADD(7030036, 0, 1)
 DBPATCH_ADD(7030037, 0, 1)
 DBPATCH_ADD(7030038, 0, 1)
 DBPATCH_ADD(7030039, 0, 1)
+DBPATCH_ADD(7030040, 0, 1)
+DBPATCH_ADD(7030041, 0, 1)
 
 DBPATCH_END()

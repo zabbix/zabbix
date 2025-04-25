@@ -44,7 +44,7 @@ class CWidgetFieldHostSections {
 			.dynamicRows({
 				template: `#${this.#field_name}-row-tmpl`,
 				allow_empty: true,
-				rows: this.#field_value.map((type) => ({['section']: type})),
+				rows: this.#field_value.map(type => ({section: type})),
 				sortable: true,
 				sortable_options: {
 					target: 'tbody',

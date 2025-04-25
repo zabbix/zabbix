@@ -1275,7 +1275,8 @@ class CImportDataAdapterTest extends TestCase {
 								'recovery_expression' => ''
 							]
 						],
-						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '0'
 					],
 					[
 						'elementtype' => '0',
@@ -1310,7 +1311,8 @@ class CImportDataAdapterTest extends TestCase {
 								'host' => 'export-host'
 							]
 						],
-						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '1'
 					],
 					[
 						'elementtype' => '3',
@@ -1345,7 +1347,8 @@ class CImportDataAdapterTest extends TestCase {
 								'name' => 'Zabbix servers'
 							]
 						],
-						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '2'
 					]
 				],
 				'links' => [
