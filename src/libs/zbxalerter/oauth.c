@@ -157,6 +157,8 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 
 	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
+		int	expected_ret = FAIL;
+
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error", &tmp, &tmp_alloc, NULL))
 		{
 			SET_ERROR("%s", "error field not found in OAuth server response");
@@ -164,7 +166,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 		}
 
 		if (0 != strcmp("invalid_grant", tmp))
-			ret = NETWORK_ERROR;	/* you may try again */
+			expected_ret = NETWORK_ERROR;	/* you may try again */
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "error_description", &tmp, &tmp_alloc, NULL))
 		{
@@ -174,7 +176,19 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 
 		SET_ERROR("%s", tmp);
 
-		data->tokens_status = (data->tokens_status & ~ZBX_OAUTH_TOKEN_ACCESS_VALID) & ZBX_OAUTH_TOKEN_VALID;
+		if (NETWORK_ERROR == expected_ret)
+		{
+			/* remove access token valid bit */
+			data->tokens_status = (data->tokens_status & ~ZBX_OAUTH_TOKEN_ACCESS_VALID) &
+					ZBX_OAUTH_TOKEN_VALID;
+		}
+		else /* invalid_grant */
+		{
+			/* user should renew everything */
+			data->tokens_status = 0;
+		}
+
+		ret = expected_ret;
 	}
 	else
 	{
