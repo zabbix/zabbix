@@ -461,8 +461,6 @@ class ZColorPicker extends HTMLElement {
 					e.stopPropagation();
 
 					this.#closeDialog();
-
-					this.#box.focus();
 				}
 			},
 
@@ -624,6 +622,11 @@ class ZColorPicker extends HTMLElement {
 		this.#is_dialog_open = false;
 
 		this.#mutation_observer.disconnect();
+
+		if (document.activeElement === document.body) {
+			// Focus only if other focusable element in document was not clicked.
+			this.#box.focus();
+		}
 	}
 
 	#positionDialog() {
@@ -776,8 +779,6 @@ class ZColorPicker extends HTMLElement {
 		this.#closeDialog();
 
 		this.dispatchEvent(new Event('change', {bubbles: true}));
-
-		this.#box.focus();
 	}
 
 	/**
@@ -806,8 +807,6 @@ class ZColorPicker extends HTMLElement {
 		this.#closeDialog();
 
 		this.dispatchEvent(new Event('change', {bubbles: true}));
-
-		this.#box.focus();
 	}
 
 	/**
