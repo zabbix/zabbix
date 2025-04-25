@@ -183,6 +183,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			]
 		]]);
 
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
+
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
@@ -347,6 +350,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * Checks the resulting tags on host to make sure the autoregistration did not happen.
 	 *
 	 * @required-components agent,agent2,server
+	 *
+	 * @backup actions,hosts,host_tag,autoreg_host
+	 *
 	 * @configurationDataProvider agentConfigurationProvider_secondTimeWrongPSK
 	 */
 	public function testAutoregistration_secondTimeWrongPSK()

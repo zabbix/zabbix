@@ -7964,6 +7964,10 @@ msgstr "資料表搜尋請求 \"%1$s\"的錯誤."
 msgid "Error message"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -11918,6 +11922,10 @@ msgstr "項目"
 msgid "Item added"
 msgstr "項目已新增"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
@@ -13574,6 +13582,10 @@ msgstr "未發現方法."
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
+msgstr ""
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
 msgstr ""
 
 #: include/httptest.inc.php:392
