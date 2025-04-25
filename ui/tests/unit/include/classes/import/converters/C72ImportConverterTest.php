@@ -36,10 +36,10 @@ class C72ImportConverterTest extends CImportConverterTest {
 							],
 							'links' => [
 								[
-									'drawtype' => 3,
+									'drawtype' => CXmlConstantValue::DOTTED_LINE,
 									'linktriggers' => [
 										[
-											'drawtype' => 2
+											'drawtype' => CXmlConstantValue::BOLD_LINE
 										]
 									]
 								]
