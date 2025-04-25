@@ -78,7 +78,6 @@ if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'databas
 	];
 }
 else {
-	CUserDirectory::resetSamlCertificates($userdirectoryid);
 	$certs = [
 		'SP_KEY' => 'conf/certs/sp.key',
 		'SP_CERT' => 'conf/certs/sp.crt',
