@@ -172,6 +172,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	int		maxattempts, object, source, ret;
 
 	zbx_media_auth_t	mailauth = {0};
+	zbx_oauth_data_t	data = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -206,8 +207,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		}
 		case SMTP_AUTHENTICATION_OAUTH:
 		{
-			zbx_oauth_data_t	data = {0};
-
 			if (SUCCEED != (ret = zbx_oauth_fetch_from_db(mediatypeid, mediatype_name, &data, &error)))
 				goto out;
 
@@ -236,8 +235,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 			mailauth.oauthbearer = zbx_strdup(NULL, data.access_token);
 			mailauth.username = zbx_strdup(mailauth.username, smtp_email);
-
-			zbx_oauth_clean(&data);
 			ZBX_FALLTHROUGH;
 		}
 		default:
@@ -267,6 +264,7 @@ out:
 	zbx_free(mailauth.username);
 	zbx_free(mailauth.password);
 	zbx_free(mailauth.oauthbearer);
+	zbx_oauth_clean(&data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 #undef EXPIRE_OFFSET
