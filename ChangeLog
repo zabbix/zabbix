@@ -1,8 +1,13 @@
 Changes for 7.0.13rc1
 
 New features:
+.........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
+........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
+.........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
+........S. [ZBX-26235] fixed Zabbix server crash caused by audit when autoregistration deletes host tags (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.12
