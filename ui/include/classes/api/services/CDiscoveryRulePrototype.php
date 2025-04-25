@@ -1004,8 +1004,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$options = [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
-				'enabled_lifetime_type', 'enabled_lifetime', 'value_type', 'units', 'history', 'trends',
-				'logtimefmt', 'description', 'status', 'discover'
+				'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
@@ -1169,8 +1168,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
 		$upd_db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
-				'enabled_lifetime_type', 'enabled_lifetime', 'value_type', 'units', 'history', 'trends',
-				'logtimefmt', 'description', 'status', 'discover'
+				'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'filter' => [
 				'templateid' => array_keys($db_items),
