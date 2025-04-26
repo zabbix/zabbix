@@ -47,11 +47,11 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		];
 
 		$options += [
-			'discoveryids'					=> null,
 			'groupids'						=> null,
 			'templateids'					=> null,
 			'hostids'						=> null,
 			'itemids'						=> null,
+			'discoveryids'					=> null,
 			'interfaceids'					=> null,
 			'inherited'						=> null,
 			'templated'						=> null,
@@ -105,18 +105,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			}
 		}
 
-		if ($options['discoveryids'] !== null) {
-			zbx_value2array($options['discoveryids']);
-
-			$sql_parts['from']['item_discovery'] = 'item_discovery id';
-			$sql_parts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
-			$sql_parts['where']['idi'] = 'i.itemid=id.itemid';
-
-			if ($options['groupCount']) {
-				$sql_parts['group']['id'] = 'id.lldruleid';
-			}
-		}
-
 		if ($options['templateids'] !== null) {
 			zbx_value2array($options['templateids']);
 
@@ -143,6 +131,18 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			zbx_value2array($options['itemids']);
 
 			$sql_parts['where']['itemid'] = dbConditionId('i.itemid', $options['itemids']);
+		}
+
+		if ($options['discoveryids'] !== null) {
+			zbx_value2array($options['discoveryids']);
+
+			$sql_parts['from'][] = 'item_discovery id';
+			$sql_parts['where'][] = 'i.itemid=id.itemid';
+			$sql_parts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
+
+			if ($options['groupCount']) {
+				$sql_parts['group']['id'] = 'id.lldruleid';
+			}
 		}
 
 		if ($options['interfaceids'] !== null) {
@@ -462,7 +462,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	/**
 	 * @param array $items
 	 */
-	public static function createForce(array &$items): void {
+	private static function createForce(array &$items): void {
 		self::addValueType($items);
 
 		self::prepareItemsForDb($items);
@@ -625,7 +625,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	 * @param array $items
 	 * @param array $db_items
 	 */
-	public static function updateForce(array &$items, array &$db_items): void {
+	private static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
 		CArrayHelper::sort($items, ['itemid']);
 
@@ -674,7 +674,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::updateLldMacroPaths($items, $db_items, $upd_itemids);
 		self::updateItemFilters($items, $db_items, $upd_itemids);
 		self::updateOverrides($items, $db_items, $upd_itemids);
-		self::updateDiscoveredItems($items, $db_items);
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
@@ -683,47 +682,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_LLD_RULE_PROTOTYPE, $items, $db_items);
-	}
-
-	/**
-	 * @param array $items
-	 * @param array $db_items
-	 */
-	private static function updateDiscoveredItems(array $item_prototypes, array $db_item_prototypes): void {
-		foreach ($item_prototypes as $i => $item_prototype) {
-			if (!in_array($item_prototype['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-					|| !array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
-				unset($item_prototypes[$i]);
-				continue;
-			}
-		}
-
-		if (!$item_prototypes) {
-			return;
-		}
-
-		$result = DBselect(
-			'SELECT id.itemid,i.name,i.valuemapid'.
-			' FROM item_discovery id,items i'.
-			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', array_column($item_prototypes, 'itemid'))
-		);
-
-		$items = [];
-		$db_items = [];
-
-		while ($row = DBfetch($result)) {
-			$items[] = [
-				'itemid' => $row['itemid'],
-				'valuemapid' => 0
-			];
-
-			$db_items[$row['itemid']] = $row;
-		}
-
-		if ($items) {
-			CDiscoveryRule::updateForce($items, $db_items);
-		}
 	}
 
 	/**
@@ -1187,10 +1145,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
 
-				if (array_key_exists('update_discovered_items', $db_item)) {
-					$upd_db_item['update_discovered_items'] = true;
-				}
-
 				$upd_item = [
 					'itemid' => $upd_db_item['itemid'],
 					'type' => $item['type']
@@ -1245,47 +1199,42 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	}
 
 	/**
-	 * @param array $ruleids
+	 * @param array $itemids
+	 *
+	 * @return array
 	 */
-	public static function unlinkTemplateObjects(array $ruleids): void {
-		$result = DBselect(
-			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.hostid,i.flags,'.
-				'h.status AS host_status'.
-			' FROM item_discovery id,items i,hosts h'.
-			' WHERE id.itemid=i.itemid'.
-				' AND i.hostid=h.hostid'.
-				' AND '.dbConditionId('id.lldruleid', $ruleids).
-				' AND '.dbConditionId('i.templateid', [0], true).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
-		);
+	public function delete(array $itemids): array {
+		$this->validateDelete($itemids, $db_items);
 
-		$items = [];
-		$db_items = [];
-		$internal_fields = array_flip(['type', 'key_', 'hostid', 'flags']);
+		self::deleteForce($db_items);
 
-		while ($row = DBfetch($result)) {
-			$item = [
-				'itemid' => $row['itemid'],
-				'templateid' => 0,
-				'host_status' => $row['host_status']
-			];
+		return ['ruleids' => $itemids];
+	}
 
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$item += ['uuid' => generateUuidV4()];
-			}
+	private function validateDelete(array $itemids, ?array &$db_items = null): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
-			$items[] = $item + array_intersect_key($row, $internal_fields);
-			$db_items[$row['itemid']] = $row;
+		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys($db_items);
+		$db_items = $this->get([
+			'output' => ['itemid', 'name', 'templateid'],
+			'itemids' => $itemids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		if ($items) {
-			self::updateForce($items, $db_items);
+		if (count($db_items) != count($itemids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-			CItemPrototype::unlinkTemplateObjects($ruleids);
-			API::HostPrototype()->unlinkTemplateObjects($ruleids);
-			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
+		foreach ($itemids as $i => $itemid) {
+			if ($db_items[$itemid]['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('cannot delete inherited LLD rule prototype')
+				));
+			}
 		}
 	}
 
@@ -1359,6 +1308,51 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		if ($db_items) {
 			CDiscoveryRule::deleteForce($db_items);
+		}
+	}
+
+	/**
+	 * @param array $ruleids
+	 */
+	public static function unlinkTemplateObjects(array $ruleids): void {
+		$result = DBselect(
+			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.hostid,i.flags,'.
+				'h.status AS host_status'.
+			' FROM item_discovery id,items i,hosts h'.
+			' WHERE id.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('id.lldruleid', $ruleids).
+				' AND '.dbConditionId('i.templateid', [0], true).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+		);
+
+		$items = [];
+		$db_items = [];
+		$internal_fields = array_flip(['type', 'key_', 'hostid', 'flags']);
+
+		while ($row = DBfetch($result)) {
+			$item = [
+				'itemid' => $row['itemid'],
+				'templateid' => 0,
+				'host_status' => $row['host_status']
+			];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$item += ['uuid' => generateUuidV4()];
+			}
+
+			$items[] = $item + array_intersect_key($row, $internal_fields);
+			$db_items[$row['itemid']] = $row;
+		}
+
+		$ruleids = array_keys($db_items);
+
+		if ($items) {
+			self::updateForce($items, $db_items);
+
+			CItemPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
+			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
 		}
 	}
 }

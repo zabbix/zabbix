@@ -149,7 +149,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
 			}
-			elseif ($db_item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			elseif (in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_RULE_CREATED])) {
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesDiscovered();
 			}
 			else {

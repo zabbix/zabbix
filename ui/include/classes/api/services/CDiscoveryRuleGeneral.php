@@ -22,20 +22,20 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	protected const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
-		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
-		ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
-	];
-
-	/**
-	 * @inheritDoc
-	 */
 	public const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON,
 		ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
 		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON,
 		ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_SNMP_GET_VALUE
+	];
+
+	/**
+	 * @inheritDoc
+	 */
+	protected const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+		ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
 	];
 
 	/**
@@ -225,18 +225,19 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			}
 			else {
 				$items = API::DiscoveryRulePrototype()->get([
-					'discoveryids' => $itemids,
-					'nopermissions' => true,
 					'countOutput' => true,
-					'groupCount' => true
+					'groupCount' => true,
+					'discoveryids' => $itemids,
+					'nopermissions' => true
 				]);
 
-				$items = zbx_toHash($items, 'lldruleid');
+				$items = array_column($items, null, 'lldruleid');
 
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['discoveryRulePrototypes'] =
+				foreach ($result as $itemid => &$item) {
+					$item['discoveryRulePrototypes'] =
 						array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
 				}
+				unset($item);
 			}
 		}
 
@@ -408,7 +409,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 					$item_prototype_objectids = [];
 					$trigger_prototype_objectids = [];
 					$host_prototype_objectids = [];
-					$lldrule_prototype_objectids = [];
+					$lld_rule_prototype_objectids = [];
 
 					foreach ($operations as $operation) {
 						switch ($operation['operationobject']) {
@@ -425,18 +426,18 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 								break;
 
 							case OPERATION_OBJECT_LLD_RULE_PROTOTYPE:
-								$lldrule_prototype_objectids[$operation['lld_override_operationid']] = true;
+								$lld_rule_prototype_objectids[$operation['lld_override_operationid']] = true;
 								break;
 						}
 					}
 
 					if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids
-							|| $lldrule_prototype_objectids) {
+							|| $lld_rule_prototype_objectids) {
 						$opstatus = DB::select('lld_override_opstatus', [
 							'output' => ['lld_override_operationid', 'status'],
 							'filter' => ['lld_override_operationid' => array_keys(
 								$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids +
-								$lldrule_prototype_objectids
+								$lld_rule_prototype_objectids
 							)]
 						]);
 					}
@@ -452,11 +453,11 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 						]);
 					}
 
-					if ($item_prototype_objectids || $lldrule_prototype_objectids) {
+					if ($item_prototype_objectids || $lld_rule_prototype_objectids) {
 						$opperiod = DB::select('lld_override_opperiod', [
 							'output' => ['lld_override_operationid', 'delay'],
 							'filter' => ['lld_override_operationid' => array_keys(
-								$item_prototype_objectids + $lldrule_prototype_objectids
+								$item_prototype_objectids + $lld_rule_prototype_objectids
 							)]
 						]);
 					}
@@ -492,7 +493,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 						$lld_override_operationid = $operation['lld_override_operationid'];
 
 						if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids
-								|| $lldrule_prototype_objectids) {
+								|| $lld_rule_prototype_objectids) {
 							foreach ($opstatus as $row) {
 								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opstatus']['status'] = $row['status'];
@@ -518,7 +519,9 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 									$operation['optrends']['trends'] = $row['trends'];
 								}
 							}
+						}
 
+						if ($item_prototype_objectids || $lld_rule_prototype_objectids) {
 							foreach ($opperiod as $row) {
 								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opperiod']['delay'] = $row['delay'];
@@ -552,14 +555,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 							foreach ($opinventory as $row) {
 								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
-								}
-							}
-						}
-
-						if ($lldrule_prototype_objectids) {
-							foreach ($opperiod as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['opperiod']['delay'] = $row['delay'];
 								}
 							}
 						}
@@ -2033,18 +2028,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		}
 	}
 
-
-	/**
-	 * @param array $items
-	 */
-	abstract public static function createForce(array &$items): void;
-
-	/**
-	 * @param array $items
-	 * @param array $db_items
-	 */
-	abstract public static function updateForce(array &$items, array &$db_items): void;
-
 	/**
 	 * @param array $item
 	 *
@@ -2106,57 +2089,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $itemids
-	 *
-	 * @return array
-	 */
-	public function delete(array $itemids): array {
-		$this->validateDelete($itemids, $db_items);
-
-		static::deleteForce($db_items);
-
-		return ['ruleids' => $itemids];
-	}
-
-	/**
-	 * @param array      $itemids
-	 * @param array|null $db_items
-	 *
-	 * @throws APIException
-	 */
-	protected function validateDelete(array $itemids, ?array &$db_items = null): void {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'templateid'],
-			'itemids' => $itemids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if (count($db_items) != count($itemids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		foreach ($itemids as $i => $itemid) {
-			if ($db_items[$itemid]['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
-					_('cannot delete inherited LLD rule')
-				));
-			}
-		}
-	}
-
-	/**
-	 * @param array $db_items
-	 */
-	abstract static function deleteForce(array $db_items): void;
-
-	/**
 	 * Delete item prototypes which belong to the given LLD rules.
 	 *
 	 * @param array $del_itemids
@@ -2196,22 +2128,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	}
 
 	/**
-	 * Delete overrides which belong to the given LLD rules.
-	 *
-	 * @param array $del_itemids
-	 */
-	protected static function deleteAffectedOverrides(array $del_itemids): void {
-		$del_overrideids = array_keys(DB::select('lld_override', [
-			'filter' => ['itemid' => $del_itemids],
-			'preservekeys' => true
-		]));
-
-		if ($del_overrideids) {
-			self::deleteOverrides($del_overrideids);
-		}
-	}
-
-	/**
 	 * Delete discovery prototypes which belong to the given LLD rules or discovery prototypes.
 	 *
 	 * @param array $ruleids
@@ -2229,6 +2145,22 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 
 		if ($db_items) {
 			CDiscoveryRulePrototype::deleteForce($db_items);
+		}
+	}
+
+	/**
+	 * Delete overrides which belong to the given LLD rules.
+	 *
+	 * @param array $del_itemids
+	 */
+	protected static function deleteAffectedOverrides(array $del_itemids): void {
+		$del_overrideids = array_keys(DB::select('lld_override', [
+			'filter' => ['itemid' => $del_itemids],
+			'preservekeys' => true
+		]));
+
+		if ($del_overrideids) {
+			self::deleteOverrides($del_overrideids);
 		}
 	}
 }

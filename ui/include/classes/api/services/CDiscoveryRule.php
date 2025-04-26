@@ -365,16 +365,38 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			return;
 		}
 
-		$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
+		foreach ($result as &$lld_rule) {
+			$lld_rule['discoveryRule'] = [];
+		}
+		unset($lld_rule);
 
-		$lld_rules = API::DiscoveryRule()->get([
-			'output' => $options['selectDiscoveryRule'],
-			'itemids' => $relation_map->getRelatedIds(),
+		$resource = DBselect(
+			'SELECT id.itemid,id2.lldruleid'.
+			' FROM item_discovery id'.
+			' JOIN item_discovery id2 ON id.parent_itemid=id2.itemid'.
+			' WHERE '.dbConditionId('id.itemid', array_keys($result))
+		);
+
+		$itemids = [];
+
+		while ($row = DBfetch($resource)) {
+			$itemids[$row['lldruleid']][] = $row['itemid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $this->outputExtend($options['selectDiscoveryRule'], ['itemid']),
+			'itemids' => array_keys($itemids),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
-		$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
+		foreach ($parent_lld_rules as $parent_lld_rule) {
+			foreach ($itemids[$parent_lld_rule['itemid']] as $itemid) {
+				$result[$itemid]['discoveryRule'] = $this->outputIsRequested('itemid', $options['selectDiscoveryRule'])
+					? array_diff_key($parent_lld_rule, ['itemid' => true])
+					: $parent_lld_rule;
+			}
+		}
 	}
 
 	/**
@@ -448,8 +470,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkNestedTypeHosts($items);
-
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
 		self::addUuid($items);
@@ -459,46 +479,16 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::checkLifetimeFields($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
+		self::checkNestedItems($items);
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
 	}
 
-	private static function checkNestedTypeHosts(array $items, ?array $db_items = null): void {
-		$hostids = [];
-
-		foreach ($items as $i => $item) {
-			if ($item['host_status'] != HOST_STATUS_TEMPLATE && $item['type'] == ITEM_TYPE_NESTED
-					&& ($db_items === null || $item['type'] != $db_items[$item['itemid']]['type'])) {
-				$hostids[$i] = $item['hostid'];
-			}
-		}
-
-		if (!$hostids) {
-			return;
-		}
-
-		$result = DBselect(
-			'SELECT h.hostid'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionId('h.hostid', array_unique($hostids)).
-				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_CREATED], true).
-			' LIMIT 1'
-		);
-
-		while ($row = DBfetch($result)) {
-			$i = array_search($row['hostid'], $hostids);
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-				'/'.($i + 1).'/type', _('cannot have a nested LLD rule on a non-discovered host')
-			));
-		}
-	}
-
 	/**
 	 * @param array $items
 	 */
-	public static function createForce(array &$items): void {
+	private static function createForce(array &$items): void {
 		self::addValueType($items);
 
 		self::prepareItemsForDb($items);
@@ -573,9 +563,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		$count = $this->get([
 			'countOutput' => true,
 			'itemids' => array_column($items, 'itemid'),
-			'filter' => [
-				'flags' => [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED]
-			],
 			'editable' => true
 		]);
 
@@ -610,15 +597,15 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-			$item += ['lifetime_type' => $db_item['lifetime_type']];
+				$item += ['lifetime_type' => $db_item['lifetime_type']];
 
-			$item += $item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY
-				? ['enabled_lifetime_type' => DB::getDefault('items', 'enabled_lifetime_type')]
-				: ['enabled_lifetime_type' => $db_item['enabled_lifetime_type']];
+				$item += $item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY
+					? ['enabled_lifetime_type' => DB::getDefault('items', 'enabled_lifetime_type')]
+					: ['enabled_lifetime_type' => $db_item['enabled_lifetime_type']];
 
-			$api_input_rules = $db_item['templateid'] == 0
-				? self::getValidationRules()
-				: self::getInheritedValidationRules();
+				$api_input_rules = $db_item['templateid'] == 0
+					? self::getValidationRules()
+					: self::getInheritedValidationRules();
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
@@ -628,8 +615,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		unset($item);
 
 		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_']);
-
-		self::checkNestedTypeHosts($items, $db_items);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
@@ -646,6 +631,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::checkLifetimeFields($items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
+		self::checkNestedItems($items, $db_items);
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
@@ -672,11 +658,43 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		]];
 	}
 
+	private static function checkNestedItems(array $items, ?array $db_items = null): void {
+		$item_indexes = [];
+
+		foreach ($items as $i => $item) {
+			if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+					&& $item['type'] == ITEM_TYPE_NESTED
+					&& ($db_items === null || $item['type'] != $db_items[$item['itemid']]['type'])) {
+				$item_indexes[$item['hostid']][] = $i;
+			}
+		}
+
+		if (!$item_indexes) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT h.hostid'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionId('h.hostid', array_keys($item_indexes)).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_CREATED], true).
+			' LIMIT 1'
+		);
+
+		while ($row = DBfetch($result)) {
+			$i = reset($item_indexes[$row['hostid']]);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+				'/'.($i + 1).'/type', _('cannot have a nested LLD rule on a non-discovered host')
+			));
+		}
+	}
+
 	/**
 	 * @param array $items
 	 * @param array $db_items
 	 */
-	public static function updateForce(array &$items, array &$db_items): void {
+	private static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
 		CArrayHelper::sort($items, ['itemid']);
 
@@ -1168,47 +1186,42 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	}
 
 	/**
-	 * @param array      $templateids
-	 * @param array|null $hostids
+	 * @param array $itemids
+	 *
+	 * @return array
 	 */
-	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
-		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
+	public function delete(array $itemids): array {
+		$this->validateDelete($itemids, $db_items);
 
-		$result = DBselect(
-			'SELECT ii.itemid,ii.name,ii.templateid,ii.uuid,h.status AS host_status'.
-			' FROM items i,items ii,hosts h'.
-			' WHERE i.itemid=ii.templateid'.
-				' AND ii.hostid=h.hostid'.
-				' AND '.dbConditionId('i.hostid', $templateids).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED]).
-				$hostids_condition
-		);
+		self::deleteForce($db_items);
 
-		$items = [];
-		$db_items = [];
+		return ['ruleids' => $itemids];
+	}
 
-		while ($row = DBfetch($result)) {
-			$item = [
-				'itemid' => $row['itemid'],
-				'templateid' => 0
-			];
+	private function validateDelete(array $itemids, ?array &$db_items = null): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$item += ['uuid' => generateUuidV4()];
-			}
-
-			$items[] = $item;
-			$db_items[$row['itemid']] = $row;
+		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys($db_items);
+		$db_items = $this->get([
+			'output' => ['itemid', 'name', 'templateid'],
+			'itemids' => $itemids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		if ($items) {
-			self::updateForce($items, $db_items);
+		if (count($db_items) != count($itemids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-			CItemPrototype::unlinkTemplateObjects($ruleids);
-			API::HostPrototype()->unlinkTemplateObjects($ruleids);
-			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
+		foreach ($itemids as $i => $itemid) {
+			if ($db_items[$itemid]['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('cannot delete inherited LLD rule')
+				));
+			}
 		}
 	}
 
@@ -1250,6 +1263,51 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		DB::insertBatch('housekeeper', $ins_housekeeper);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_LLD_RULE, $db_items);
+	}
+
+	/**
+	 * @param array      $templateids
+	 * @param array|null $hostids
+	 */
+	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
+		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
+
+		$result = DBselect(
+			'SELECT ii.itemid,ii.name,ii.templateid,ii.uuid,h.status AS host_status'.
+			' FROM items i,items ii,hosts h'.
+			' WHERE i.itemid=ii.templateid'.
+				' AND ii.hostid=h.hostid'.
+				' AND '.dbConditionId('i.hostid', $templateids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
+				$hostids_condition
+		);
+
+		$items = [];
+		$db_items = [];
+
+		while ($row = DBfetch($result)) {
+			$item = [
+				'itemid' => $row['itemid'],
+				'templateid' => 0
+			];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$item += ['uuid' => generateUuidV4()];
+			}
+
+			$items[] = $item;
+			$db_items[$row['itemid']] = $row;
+		}
+
+		if ($items) {
+			self::updateForce($items, $db_items);
+
+			$ruleids = array_keys($db_items);
+
+			CItemPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
+			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
+		}
 	}
 
 	/**

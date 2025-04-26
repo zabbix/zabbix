@@ -1267,21 +1267,21 @@ class CHostPrototype extends CHostBase {
 	private static function checkDiscoveryRules(array $hosts, ?array &$db_lld_rules = null): void {
 		$ruleids = array_unique(array_column($hosts, 'ruleid'));
 
-		$count = intval(API::DiscoveryRule()->get([
+		$count = (int) API::DiscoveryRule()->get([
 			'countOutput' => true,
 			'itemids' => $ruleids,
 			'filter' => [
 				'flags' => [ZBX_FLAG_DISCOVERY_RULE]
 			],
 			'editable' => true
-		])) + intval(API::DiscoveryRulePrototype()->get([
+		]) + (int) API::DiscoveryRulePrototype()->get([
 			'countOutput' => true,
 			'itemids' => $ruleids,
 			'filter' => [
 				'flags' => [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE]
 			],
 			'editable' => true
-		]));
+		]);
 
 		if ($count != count($ruleids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
