@@ -108,7 +108,7 @@ zabbix_export:
             - uuid: 68ee9193a98c40778ee57ab2256082ec
               expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.availability.state)=1'
               name: 'Azure backup jobs: Azure vault is degraded'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in a degraded state.'
               tags:
@@ -117,7 +117,7 @@ zabbix_export:
             - uuid: 40b756bf271d46da94d3a9de2b892d88
               expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.availability.state)=3'
               name: 'Azure backup jobs: Azure vault is in unknown state'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
               tags:
@@ -126,7 +126,7 @@ zabbix_export:
             - uuid: cecb9bb0945f4f21bb2ad3df02307641
               expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.availability.state)=2'
               name: 'Azure backup jobs: Azure vault is unavailable'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
               tags:
@@ -157,7 +157,7 @@ zabbix_export:
             - uuid: d70f2e4edb38492ea019abbfc1cbb82a
               expression: 'length(last(/Azure Backup Jobs by HTTP/azure.vault.data.errors))>0'
               name: 'Azure backup jobs: There are errors in requests to API'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Error: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
               tags:
@@ -332,7 +332,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.backup
           delay: '0'
-          description: 'The number of backup jobs over the period.'
+          description: 'The number of backup jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -347,7 +347,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.backup.config
           delay: '0'
-          description: 'The number of configuring backup jobs over the period.'
+          description: 'The number of configuring backup jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -359,20 +359,22 @@ zabbix_export:
               value: backup
           triggers:
             - uuid: 881f3faf12da40458266c62f047c3c1e
-              expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.config) > 0'
+              expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.config)>0'
+              recovery_mode: NONE
               name: 'Azure backup jobs: Configuring backup job has appeared'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'New configuring backup job has appeared.'
+              manual_close: 'YES'
               tags:
                 - tag: scope
-                  value: availability
+                  value: notice
         - uuid: 7b6e5f9eb7e74524bf4fa856225ad107
           name: 'Jobs: Deleting backup data'
           type: DEPENDENT
           key: azure.vault.jobs.backup.delete
           delay: '0'
-          description: 'The number of deleting backup data jobs over the period.'
+          description: 'The number of deleting backup data jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -384,20 +386,22 @@ zabbix_export:
               value: backup
           triggers:
             - uuid: 7d4a36701e3c4384991858c34017b04f
-              expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.delete) > 0'
+              expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.delete)>0'
+              recovery_mode: NONE
               name: 'Azure backup jobs: Deleting backup data job has appeared'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'New deleting backup data job has appeared.'
+              manual_close: 'YES'
               tags:
                 - tag: scope
-                  value: availability
+                  value: notice
         - uuid: 7a8af0d3852546e9aa49a3754af4e1f3
           name: 'Jobs: Cancelled'
           type: DEPENDENT
           key: azure.vault.jobs.cancelled
           delay: '0'
-          description: 'The number of cancelled jobs over the period.'
+          description: 'The number of cancelled jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -412,7 +416,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.completed
           delay: '0'
-          description: 'The number of completed jobs over the period.'
+          description: 'The number of completed jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -427,7 +431,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.failed
           delay: '0'
-          description: 'The number of failed jobs over the period.'
+          description: 'The number of failed jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -442,7 +446,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.in_progress
           delay: '0'
-          description: 'The number of jobs that are in progress, over the period.'
+          description: 'The number of jobs that are in progress, over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -457,7 +461,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.restore
           delay: '0'
-          description: 'The number of restore jobs over the period.'
+          description: 'The number of restore jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -469,20 +473,22 @@ zabbix_export:
               value: backup
           triggers:
             - uuid: 04f76f2f21a043169ac1fa11d42f72f3
-              expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.restore) > 0'
+              expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.restore)>0'
+              recovery_mode: NONE
               name: 'Azure backup jobs: Restore job has appeared'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'New restore job has appeared.'
+              manual_close: 'YES'
               tags:
                 - tag: scope
-                  value: availability
+                  value: notice
         - uuid: 3024516bc255403b8aaa765b4d376835
           name: 'Jobs: Total'
           type: DEPENDENT
           key: azure.vault.jobs.total
           delay: '0'
-          description: 'The number of jobs over the period.'
+          description: 'The number of jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -497,7 +503,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.with_warning
           delay: '0'
-          description: 'The number of jobs that are completed with warnings, over the period.'
+          description: 'The number of jobs that are completed with warnings, over the {$AZURE.VAULT.PERIOD} day(s) period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -511,7 +517,7 @@ zabbix_export:
         - uuid: e37ff9885d014939b9ea182ce2087e05
           name: 'Azure backup job discovery'
           type: DEPENDENT
-          key: job.discovery
+          key: azure.vault.job.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -543,7 +549,7 @@ zabbix_export:
             - uuid: 9a46651633ad45d69a2a931259d381ac
               name: 'Job status [{#JOB.FRIENDLY.NAME}, {#JOB.NAME}]'
               type: DEPENDENT
-              key: 'job.status[{#JOB.NAME}]'
+              key: 'azure.vault.job.status[{#JOB.NAME}]'
               delay: '0'
               description: |
                 Job status.
@@ -588,38 +594,60 @@ zabbix_export:
                   value: '{#JOB.FRIENDLY.NAME}'
               trigger_prototypes:
                 - uuid: a3a8cb87e41546b0a6550375578cc651
-                  expression: 'last(/Azure Backup Jobs by HTTP/job.status[{#JOB.NAME}]) = 6'
+                  expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=6'
                   name: 'Azure backup jobs: Job cancelled [{#JOB.NAME}]'
-                  event_name: 'Azure backup jobs: Job type {#JOB.OPERATION} in {HOST.NAME} for {#JOB.FRIENDLY.NAME} with ID {#JOB.NAME} cancelled.'
+                  event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has cancelled.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Job have received "Cancelled" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
-                      value: availability
+                      value: notice
                 - uuid: 475a62e73f9c4a2abef6320c6909e7fa
-                  expression: 'last(/Azure Backup Jobs by HTTP/job.status[{#JOB.NAME}]) = 4'
+                  expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=4'
                   name: 'Azure backup jobs: Job completed with warnings [{#JOB.NAME}]'
-                  event_name: 'Azure backup jobs: Job type {#JOB.OPERATION} in {HOST.NAME} for {#JOB.FRIENDLY.NAME} with ID {#JOB.NAME} completed with warnings.'
+                  event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has completed with warnings.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Job have received "Completed with warnings" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
-                      value: availability
+                      value: notice
+                - uuid: b7e43dbcd4914f228bb0687f585951ea
+                  expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=7'
+                  name: 'Azure backup jobs: Job expired [{#JOB.NAME}]'
+                  event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has  expired.'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Job have received "Expired" status.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: notice
                 - uuid: f340de23cd004f1b94239dbcf7ec136e
-                  expression: 'last(/Azure Backup Jobs by HTTP/job.status[{#JOB.NAME}]) = 5'
+                  expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=5'
                   name: 'Azure backup jobs: Job failed [{#JOB.NAME}]'
-                  event_name: 'Azure backup jobs: Job type {#JOB.OPERATION} in {HOST.NAME} for {#JOB.FRIENDLY.NAME} with ID {#JOB.NAME} failed.'
+                  event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has failed.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Job have received "Failed" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
-                      value: availability
+                      value: notice
+                - uuid: 860b6d8bbefd4daba537e517dfb94007
+                  expression: 'last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=0'
+                  name: 'Azure backup jobs: Job status unknown [{#JOB.NAME}]'
+                  event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] is in unknown status.'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Job have received "Unknown" status.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: notice
           master_item:
             key: azure.vault.data.get
           lld_macro_paths:
@@ -761,17 +789,17 @@ zabbix_export:
                       value: 'Job status [*]'
                     - type: STRING
                       name: reference
-                      value: FECCB
+                      value: EBACA
                 - type: item
                   name: 'Selected job'
                   'y': '11'
-                  width: '72'
+                  width: '22'
                   height: '1'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
                       name: description
-                      value: '{{ITEM.NAME}.regsub("(Job status \[)(.*)(, )(.*)(\])","Resource: \2, Job ID: \4")}'
+                      value: 'Selected job status:'
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -783,7 +811,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: itemid._reference
-                      value: ECADB._itemid
+                      value: EBACA._itemid
                     - type: INTEGER
                       name: show.0
                       value: '2'
@@ -865,7 +893,7 @@ zabbix_export:
                       value: 'Job status [*]'
                     - type: STRING
                       name: reference
-                      value: ECADB
+                      value: AFAEA
                     - type: STRING
                       name: secondary_label
                       value: '{{ITEM.NAME}.regsub("(Job status \[)(.*)(,.*\])","\2")}'
@@ -923,6 +951,41 @@ zabbix_export:
                     - type: STRING
                       name: thresholds.7.threshold
                       value: '7'
+                - type: item
+                  name: 'Selected job'
+                  x: '22'
+                  'y': '11'
+                  width: '50'
+                  height: '1'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: '{{ITEM.NAME}.regsub("(Job status \[)(.*)(, )(.*)(\])","Resource: \2, Job ID: \4")}'
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '60'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: STRING
+                      name: itemid._reference
+                      value: AFAEA._itemid
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '60'
                 - type: item
                   name: 'Failed jobs'
                   x: '29'

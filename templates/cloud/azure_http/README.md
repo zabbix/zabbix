@@ -1427,16 +1427,16 @@ This template has been tested on:
 |Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.vault.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Availability state|<p>The availability status of the resource.</p><p>0 - Available - no events detected that affect the health of the resource.</p><p>1 - Degraded  - your resource detected a loss in performance, although it's still available for use.</p><p>2 - Unavailable - the service detected an ongoing platform or non-platform event that affects the health of the resource.</p><p>3 - Unknown - Resource Health hasn't received information about the resource for more than 10 minutes.</p>|Dependent item|azure.vault.availability.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.availabilityState`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Replace: `Available -> 0`</p></li><li><p>Replace: `Degraded -> 1`</p></li><li><p>Replace: `Unavailable -> 2`</p></li><li><p>Replace: `Unknown -> 3`</p></li><li><p>In range: `0 -> 3`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Availability status detailed|<p>The summary description of the availability status.</p>|Dependent item|azure.vault.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Jobs: Total|<p>The number of jobs over the period.</p>|Dependent item|azure.vault.jobs.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs.length()`</p></li></ul>|
-|Jobs: Completed|<p>The number of completed jobs over the period.</p>|Dependent item|azure.vault.jobs.completed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "Completed")].length()`</p></li></ul>|
-|Jobs: In progress|<p>The number of jobs that are in progress, over the period.</p>|Dependent item|azure.vault.jobs.in_progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "InProgress")].length()`</p></li></ul>|
-|Jobs: Failed|<p>The number of failed jobs over the period.</p>|Dependent item|azure.vault.jobs.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "Failed")].length()`</p></li></ul>|
-|Jobs: Completed with warnings|<p>The number of jobs that are completed with warnings, over the period.</p>|Dependent item|azure.vault.jobs.with_warning<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|Jobs: Cancelled|<p>The number of cancelled jobs over the period.</p>|Dependent item|azure.vault.jobs.cancelled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "Cancelled")].length()`</p></li></ul>|
-|Jobs: Backup|<p>The number of backup jobs over the period.</p>|Dependent item|azure.vault.jobs.backup<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.operation == "Backup")].length()`</p></li></ul>|
-|Jobs: Restore|<p>The number of restore jobs over the period.</p>|Dependent item|azure.vault.jobs.restore<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.operation == "Restore")].length()`</p></li></ul>|
-|Jobs: Deleting backup data|<p>The number of deleting backup data jobs over the period.</p>|Dependent item|azure.vault.jobs.backup.delete<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|Jobs: Configuring backup|<p>The number of configuring backup jobs over the period.</p>|Dependent item|azure.vault.jobs.backup.config<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Jobs: Total|<p>The number of jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs.length()`</p></li></ul>|
+|Jobs: Completed|<p>The number of completed jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.completed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "Completed")].length()`</p></li></ul>|
+|Jobs: In progress|<p>The number of jobs that are in progress, over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.in_progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "InProgress")].length()`</p></li></ul>|
+|Jobs: Failed|<p>The number of failed jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "Failed")].length()`</p></li></ul>|
+|Jobs: Completed with warnings|<p>The number of jobs that are completed with warnings, over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.with_warning<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Jobs: Cancelled|<p>The number of cancelled jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.cancelled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.status == "Cancelled")].length()`</p></li></ul>|
+|Jobs: Backup|<p>The number of backup jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.backup<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.operation == "Backup")].length()`</p></li></ul>|
+|Jobs: Restore|<p>The number of restore jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.restore<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.properties.operation == "Restore")].length()`</p></li></ul>|
+|Jobs: Deleting backup data|<p>The number of deleting backup data jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.backup.delete<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Jobs: Configuring backup|<p>The number of configuring backup jobs over the {$AZURE.VAULT.PERIOD} day(s) period.</p>|Dependent item|azure.vault.jobs.backup.config<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
@@ -1446,29 +1446,31 @@ This template has been tested on:
 |Azure backup jobs: Azure vault is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.availability.state)=2`|High||
 |Azure backup jobs: Azure vault is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.availability.state)=1`|Average||
 |Azure backup jobs: Azure vault is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.availability.state)=3`|Warning||
-|Azure backup jobs: Restore job has appeared|<p>New restore job has appeared.</p>|`change(/Azure Backup Jobs by HTTP/azure.vault.jobs.restore) > 0`|Average||
-|Azure backup jobs: Deleting backup data job has appeared|<p>New deleting backup data job has appeared.</p>|`change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.delete) > 0`|Warning||
-|Azure backup jobs: Configuring backup job has appeared|<p>New configuring backup job has appeared.</p>|`change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.config) > 0`|Info||
+|Azure backup jobs: Restore job has appeared|<p>New restore job has appeared.</p>|`change(/Azure Backup Jobs by HTTP/azure.vault.jobs.restore)>0`|Average|**Manual close**: Yes|
+|Azure backup jobs: Deleting backup data job has appeared|<p>New deleting backup data job has appeared.</p>|`change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.delete)>0`|Warning|**Manual close**: Yes|
+|Azure backup jobs: Configuring backup job has appeared|<p>New configuring backup job has appeared.</p>|`change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.config)>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Azure backup job discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Azure backup job discovery|<p>List of backup jobs in the vault.</p>|Dependent item|job.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure backup job discovery|<p>List of backup jobs in the vault.</p>|Dependent item|azure.vault.job.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Azure backup job discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Job status [{#JOB.FRIENDLY.NAME}, {#JOB.NAME}]|<p>Job status.</p><p>Possible values:</p><p>0 - Unknown</p><p>1 - In progress</p><p>2 - Queued</p><p>3 - Completed</p><p>4 - Completed with warnings</p><p>5 - Failed</p><p>6 - Cancelled</p><p>7 - Expired</p>|Dependent item|job.status[{#JOB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.name == '{#JOB.NAME}')].properties.status.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Job status [{#JOB.FRIENDLY.NAME}, {#JOB.NAME}]|<p>Job status.</p><p>Possible values:</p><p>0 - Unknown</p><p>1 - In progress</p><p>2 - Queued</p><p>3 - Completed</p><p>4 - Completed with warnings</p><p>5 - Failed</p><p>6 - Cancelled</p><p>7 - Expired</p>|Dependent item|azure.vault.job.status[{#JOB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.name == '{#JOB.NAME}')].properties.status.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Azure backup job discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure backup jobs: Job failed [{#JOB.NAME}]|<p>Job have received "Failed" status.</p>|`last(/Azure Backup Jobs by HTTP/job.status[{#JOB.NAME}]) = 5`|High|**Manual close**: Yes|
-|Azure backup jobs: Job cancelled [{#JOB.NAME}]|<p>Job have received "Cancelled" status.</p>|`last(/Azure Backup Jobs by HTTP/job.status[{#JOB.NAME}]) = 6`|Average|**Manual close**: Yes|
-|Azure backup jobs: Job completed with warnings [{#JOB.NAME}]|<p>Job have received "Completed with warnings" status.</p>|`last(/Azure Backup Jobs by HTTP/job.status[{#JOB.NAME}]) = 4`|Warning|**Manual close**: Yes|
+|Azure backup jobs: Job failed [{#JOB.NAME}]|<p>Job have received "Failed" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=5`|High|**Manual close**: Yes|
+|Azure backup jobs: Job cancelled [{#JOB.NAME}]|<p>Job have received "Cancelled" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=6`|Average|**Manual close**: Yes|
+|Azure backup jobs: Job completed with warnings [{#JOB.NAME}]|<p>Job have received "Completed with warnings" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=4`|Warning|**Manual close**: Yes|
+|Azure backup jobs: Job expired [{#JOB.NAME}]|<p>Job have received "Expired" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=7`|Average|**Manual close**: Yes|
+|Azure backup jobs: Job status unknown [{#JOB.NAME}]|<p>Job have received "Unknown" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=0`|Average|**Manual close**: Yes|
 
 ## Feedback
 
