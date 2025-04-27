@@ -20,18 +20,131 @@
 
 ?>
 
+/*
+host: 'aaa',
+	_csrf_token: '',
+	groups: [
+	'23',
+	//{new: 'test12321'}
+],
+	templates: ['10668'],
+	tls_psk: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+	tls_psk_identity: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+	interfaces: {
+	"1": {
+		"address": "125",
+			"port": "10050",
+			'type': 1
+	},
+	"2": {
+		"address": "125",
+			"port": "10050",
+			'type': 2,
+			// the details should not differ from master branch
+			"details": {
+			"version": "3",
+				"community": "",
+				"max_repetitions": "10",
+				"contextname": "context-name",
+				"securityname": "sec-name",
+				"securitylevel": "2",
+				"authprotocol": "0",
+				"authpassphrase": "auth-passphr",
+				"privprotocol": "0",
+				"privpassphrase": "priv-passpht",
+				"bulk": "1"
+		}
+	},
+	"3": {
+		"address": "192.168.27.5",
+			"port": "10050",
+			'type': 3
+	},
+	"4": {
+		"address": "192.168.27.6",
+			"port": "10050",
+			'type': 4
+	}
+},
+ipmi_authtype: 0,
+	ipmi_password: "psswd",
+	ipmi_privilege: "4",
+	ipmi_username: "username"
+macros: {
+	0: {
+		"macro" : "",
+		"discovery_state": "3",
+		"value": "",
+		"type": "0",
+		"description": ""
+	}
+}
+*/
+
 window.host_wizard_edit = new class {
 
 	STEP_WELCOME = 0;
 	STEP_SELECT_TEMPLATE = 1;
 	STEP_CREATE_HOST = 2;
 	STEP_INSTALL_AGENT = 3;
+	STEP_ADD_HOST_INTERFACE = 4;
+	STEP_CONFIGURE_HOST_MACROS = 5;
+
+	TEMPLATE_DATA_COLLECTION_ANY = -1;
+	TEMPLATE_DATA_COLLECTION_AGENT_BASED = 0;
+	TEMPLATE_DATA_COLLECTION_AGENTLESS = 1;
+
+	TEMPLATE_AGENT_MODE_ANY = -1;
+	TEMPLATE_AGENT_MODE_ACTIVE = 0;
+	TEMPLATE_AGENT_MODE_PASSIVE = 0;
+
+	TEMPLATE_SHOW_ANY = -1;
+	TEMPLATE_SHOW_LINKED = 0;
+	TEMPLATE_SHOW_NOT_LINKED = 1;
+
+	INTERFACE_TYPE_AGENT = 1;
+	INTERFACE_TYPE_SNMP = 2;
+	INTERFACE_TYPE_IPMI = 3;
+	INTERFACE_TYPE_JMX = 4;
+
+	SNMP_V1 = 1;
+	SNMP_V2C = 2;
+	SNMP_V3 = 3;
+
+	SNMP_BULK_ENABLED = 1;
+
+	INTERFACE_SECONDARY = 0;
+	INTERFACE_PRIMARY = 1;
+	INTERFACE_USE_IP = 1;
+
+	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV = 0
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV = 1;
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV = 2;
+	ITEM_SNMPV3_AUTHPROTOCOL_MD5 = 0;
+	ITEM_SNMPV3_PRIVPROTOCOL_DES = 0;
+
+	DEFAULT_PORTS = {
+		[this.INTERFACE_TYPE_AGENT]: 10050,
+		[this.INTERFACE_TYPE_SNMP]: 161,
+		[this.INTERFACE_TYPE_IPMI]: 623,
+		[this.INTERFACE_TYPE_JMX]: 12345
+	}
+
+	DISCOVERY_STATE_MANUAL = 0x3;
+
+	MACRO_TYPE_TEXT = 'TEXT';
+	MACRO_TYPE_SECRET = 'SECRET_TEXT';
+	MACRO_TYPE_VAULT = 'VAULT';
 
 	/**
 	 * @type {Map<number, object>}
 	 */
 	#templates;
 	#linked_templates;
+
+	#template;
+	#template_uuid;
+	#host;
 
 	#current_step;
 	#first_step;
@@ -53,53 +166,85 @@ window.host_wizard_edit = new class {
 	 */
 	#next_button;
 
-	#template_step_welcome;
-	#template_step_select_template;
-	#template_step_create_host;
-	#template_step_install_agent;
+	#view_templates;
 
-	#template_templates_section;
-	#template_card;
-	#template_tag;
-	#template_tag_more;
-
-	#form_data;
-
-	#form_default_data = {
+	#form_data = {
+		do_not_show_welcome: 0,
 		template_search_query: '',
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
+		monitoring_os: 'linux',
+		monitoring_os_distribution: -1,
+
+		groups: [],
+		templates: [],
 		tls_psk: '',
 		tls_psk_identity: '',
-		monitoring_os: -1,
-		monitoring_os_distribution: -1
-	};
+		ipmi_authtype: 0,
+		ipmi_password: 'psswd',
+		ipmi_privilege: 4,
+		ipmi_username: 'username',
+		interfaces: {
+			[this.INTERFACE_TYPE_AGENT]: {
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_AGENT],
+				type: this.INTERFACE_TYPE_AGENT
+			},
+			[this.INTERFACE_TYPE_SNMP]: {
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_SNMP],
+				type: this.INTERFACE_TYPE_SNMP,
+				// the details should not differ from master branch
+				details: {
+					version: this.SNMP_V3,
+					community: '',
+					max_repetitions: 10,
+					contextname: 'context-name',
+					securityname: 'sec-name',
+					securitylevel: 2,
+					authprotocol: 0,
+					authpassphrase: 'auth-passphr',
+					privprotocol: 0,
+					privpassphrase: 'priv-passpht',
+					bulk: 1
+				}
+			},
+			[this.INTERFACE_TYPE_IPMI]: {
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_IPMI],
+				type: this.INTERFACE_TYPE_IPMI
+			},
+			[this.INTERFACE_TYPE_JMX]: {
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_JMX],
+				type: this.INTERFACE_TYPE_JMX
+			}
+		},
+
+		macros: {}
+	}
 
 	#sections_expanded = new Map();
 
 	init({templates, linked_templates, wizard_hide_welcome}) {
-		this.#initViewTemplates();
+		this.#template = this.example_template.zabbix_export.templates[0]; console.log(this.#template); // TODO debug
 
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
 		this.#first_step = wizard_hide_welcome ? this.STEP_SELECT_TEMPLATE : this.STEP_WELCOME;
-		this.#last_step = this.STEP_INSTALL_AGENT;
+		this.#last_step = this.STEP_CONFIGURE_HOST_MACROS;
+
+		this.#initViewTemplates();
 
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 
-		this.#form_data = this.#initReactiveData(this.#form_default_data, (property, value) => {
-			this.#updateForm(property, value);
-		});
+		this.#form_data = this.#initReactiveData(this.#form_data, this.#onFormDataChange.bind(this));
 
-		this.#dialogue.addEventListener('input', ({target}) => {
-			if (target.name in this.#form_data) {
-				this.#form_data[target.name] = target.value;
-			}
-		});
+		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 
 		this.#dialogue.addEventListener('click', ({target}) => {
 			if (target.classList.contains('js-generate-pre-shared-key')) {
@@ -108,52 +253,71 @@ window.host_wizard_edit = new class {
 		});
 
 		this.#back_button = this.#dialogue.querySelector('.js-back');
-		this.#back_button.addEventListener('click', () => this.#gotoBackStep());
+		this.#back_button.addEventListener('click', () => {
+			this.#gotoStep(Math.max(this.#first_step, this.#current_step - 1));
+		});
 
 		this.#next_button = this.#dialogue.querySelector('.js-next');
-		this.#next_button.addEventListener('click', () => this.#gotoNextStep());
+		this.#next_button.addEventListener('click', () => {
+			this.#gotoStep(Math.min(this.#last_step, this.#current_step + 1));
+		});
 
-		this.#gotoStep(this.STEP_SELECT_TEMPLATE);
+		this.#gotoStep(this.STEP_CONFIGURE_HOST_MACROS);
 		//this.#gotoStep(this.#first_step);
 	}
 
 	#initViewTemplates() {
-		this.#template_step_welcome = new Template(
-			document.getElementById('host-wizard-step-welcome').innerHTML
-		);
-		this.#template_step_select_template = new Template(
-			document.getElementById('host-wizard-step-select-template').innerHTML
-		);
-		this.#template_step_create_host = new Template(
-			document.getElementById('host-wizard-step-create-host').innerHTML
-		);
-		this.#template_step_install_agent = new Template(
-			document.getElementById('host-wizard-step-install-agent').innerHTML
-		);
+		const tmpl = (id) => (new Template(document.getElementById(id).innerHTML));
 
-		this.#template_templates_section = new Template(
-			document.getElementById('host-wizard-templates-section').innerHTML
-		);
-		this.#template_card = new Template(
-			document.getElementById('host-wizard-template-card').innerHTML
-		);
-		this.#template_tag = new Template(
-			document.getElementById('host-wizard-template-tag').innerHTML
-		);
-		this.#template_tag_more = new Template(
-			document.getElementById('host-wizard-template-tag-more').innerHTML
-		);
-	}
+		this.#view_templates = {
+			step_welcome: tmpl('host-wizard-step-welcome'),
+			step_select_template: tmpl('host-wizard-step-select-template'),
+			step_create_host: tmpl('host-wizard-step-create-host'),
+			step_install_agent: tmpl('host-wizard-step-install-agent'),
+			step_add_host_interface: tmpl('host-wizard-step-add-host-interface'),
+			step_configure_host_macros: tmpl('host-wizard-step-configure-host-macros'),
 
-	#gotoBackStep() {
-		this.#gotoStep(Math.max(this.#first_step, this.#current_step - 1));
-	}
+			templates_section: tmpl('host-wizard-templates-section'),
+			card: tmpl('host-wizard-template-card'),
 
-	#gotoNextStep() {
-		this.#gotoStep(Math.min(this.#last_step, this.#current_step + 1));
+			macro_field_checkbox: tmpl('host-wizard-macro-field-checkbox'),
+			macro_field_select: tmpl('host-wizard-macro-field-select'),
+			macro_field_radio: tmpl('host-wizard-macro-field-radio'),
+			macro_field_text: tmpl('host-wizard-macro-field-text'),
+			macro_field_secret: tmpl('host-wizard-macro-field-secret'),
+			macro_field_vault: tmpl('host-wizard-macro-field-vault'),
+
+			progress: new Template(`
+				<div class="progress"></div>
+			`),
+			progress_step: new Template(`
+				<div class="progress-step #{class}">#{label}</div>
+			`),
+			tag: new Template(`
+				<span class="${ZBX_STYLE_TAG}">#{tag}: #{value}</span>
+			`),
+			tag_more: new Template(`
+				<button type="button" class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_MORE}"></button>
+			`),
+			description: new Template(`
+				<div class="${ZBX_STYLE_FORM_DESCRIPTION} ${ZBX_STYLE_MARKDOWN}">#{description}</div>
+			`),
+			radio_item: new Template(`
+				<li>
+					<input type="radio" id="#{id}" name="#{name}" value="#{value}">
+					<label for="#{id}">#{label}</label>
+				</li>
+			`)
+		}
 	}
 
 	#gotoStep(step) {
+		this.#overlay.setLoading();
+
+		if (this.#current_step === this.STEP_WELCOME && this.#form_data.do_not_show_welcome) {
+			this.#disableWelcomeStep();
+		}
+
 		this.#current_step = step;
 
 		switch (this.#current_step) {
@@ -167,31 +331,57 @@ window.host_wizard_edit = new class {
 				this.#renderCreateHost();
 				break;
 			case this.STEP_INSTALL_AGENT:
-				this.#renderInstallAgent()
+				this.#renderInstallAgent();
+				break;
+			case this.STEP_ADD_HOST_INTERFACE:
+				this.#renderAddHostInterface();
+				break;
+			case this.STEP_CONFIGURE_HOST_MACROS:
+				this.#renderConfigureHostMacros();
+				break;
 		}
 
-		this.#back_button.toggleAttribute('disabled', this.#current_step === this.#first_step);
-		this.#next_button.toggleAttribute('disabled', this.#current_step === this.#last_step);
-
 		this.#updateForm();
+		this.#updateFields();
+		this.#updateProgress();
 
-		this.#overlay.unsetLoading();
+		setTimeout(() => {
+			this.#overlay.unsetLoading();
+
+			this.#back_button.toggleAttribute('disabled', this.#current_step === this.#first_step);
+			this.#next_button.toggleAttribute('disabled', this.#current_step === this.#last_step);
+		});
+	}
+
+	#onFormDataChange(path, new_value, old_value) {
+		console.log('Data changed', {path, new_value, old_value}, this.#form_data);
+
+		this.#updateField(this.#pathToInputName(path), new_value);
+		this.#updateForm();
+	}
+
+	#onInputChange({target}) {
+		const value = target.type === 'checkbox'
+			? (target.checked ? target.value : target.getAttribute('unchecked-value'))
+			: target.value;
+
+		this.#setValueByName(this.#form_data, target.name, value);
 	}
 
 	#renderWelcome() {
-		const step = this.#template_step_welcome.evaluateToElement();
+		const step = this.#view_templates.step_welcome.evaluateToElement();
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
 	#renderSelectTemplate() {
-		const step = this.#template_step_select_template.evaluateToElement();
+		const step = this.#view_templates.step_select_template.evaluateToElement();
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
 	#renderCreateHost() {
-		const step = this.#template_step_create_host.evaluateToElement();
+		const step = this.#view_templates.step_create_host.evaluateToElement();
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 
@@ -199,35 +389,104 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderInstallAgent() {
-		const step = this.#template_step_install_agent.evaluateToElement();
+		const step = this.#view_templates.step_install_agent.evaluateToElement();
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
-	#updateForm(property, value) {
-		if (property !== undefined) {
-			this.#updateField(property, value);
-		}
-		else {
-			for (const [property, value] of Object.entries(this.#form_data)) {
-				this.#updateField(property, value);
+	#renderAddHostInterface() {
+		const step = this.#view_templates.step_add_host_interface.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+	}
+
+	#renderConfigureHostMacros() {
+		const step = this.#view_templates.step_configure_host_macros.evaluateToElement();
+		const macros_list = step.querySelector('.js-host-macro-list');
+
+		this.#template.macros.forEach((macro, row_index) => {
+			const {field, description} = this.#makeMacroField(macro, row_index);
+
+			if (field !== null) {
+				macros_list.appendChild(field);
+
+				if (description !== null) {
+					description.classList.add(ZBX_STYLE_GRID_COLUMN_LAST);
+					macros_list.appendChild(description);
+				}
 			}
+		});
+
+		if (this.#template_uuid !== this.#template.uuid) {
+			this.#template_uuid = this.#template.uuid;
+
+			this.#template.macros.forEach((macro, row_index) => {
+				this.#form_data.macros[row_index] = {
+					type: macro.type,
+					macro: macro.macro,
+					value: macro.value,
+					description: macro.description,
+					discovery_state: this.DISCOVERY_STATE_MANUAL
+				}
+			});
 		}
 
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+
+		jQuery(".macro-input-group", step).macroValue();
+		jQuery('.input-secret', step).inputSecret();
+	}
+
+	#updateProgress() {
+		let progress = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER} .progress`);
+
+		if (this.#current_step === this.STEP_WELCOME) {
+			if (progress !== null) {
+				progress.remove();
+			}
+
+			return;
+		}
+
+		if (progress === null) {
+			progress = this.#view_templates.progress.evaluateToElement();
+		}
+		else {
+			progress.innerHTML = '';
+		}
+
+		progress.appendChild(this.#view_templates.progress_step.evaluateToElement({
+			label: t('Select a template'),
+			class: 'progress-step-complete'
+		}));
+
+		progress.appendChild(this.#view_templates.progress_step.evaluateToElement({
+			label: t('Create or select a host'),
+			class: 'progress-step-current'
+		}));
+
+		progress.appendChild(this.#view_templates.progress_step.evaluateToElement({
+			label: t('A few more steps'),
+			class: 'progress-step-disabled'
+		}));
+
+		this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`).appendChild(progress);
+	}
+
+	#updateForm() {
 		switch (this.#current_step) {
 			case this.STEP_WELCOME:
-				this.#renderWelcome();
 				break;
 			case this.STEP_SELECT_TEMPLATE:
 				const step_body = document.querySelector('.js-templates');
 
 				step_body.innerHTML = '';
-				for (const section of this.#getCardListSections()) {
+
+				for (const section of this.#makeCardListSections()) {
 					step_body.appendChild(section);
 				}
 				break;
 			case this.STEP_CREATE_HOST:
-				this.#renderCreateHost();
 				break;
 			case this.STEP_INSTALL_AGENT:
 				const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
@@ -236,11 +495,20 @@ window.host_wizard_edit = new class {
 					windows_distribution_select.style.display = this.#form_data.monitoring_os === 'windows' ? '' : 'none';
 				}
 				break;
+			case this.STEP_CONFIGURE_HOST_MACROS:
+
+				break;
 		}
 	}
 
-	#updateField(property, value) {
-		const field = this.#dialogue.querySelector(`[name="${property}"]`);
+	#updateFields() {
+		for (const {name, value} of this.#getInputsData(this.#form_data)) {
+			this.#updateField(name, value);
+		}
+	}
+
+	#updateField(name, value) {
+		const field = this.#dialogue.querySelector(`[name="${name}"]`);
 
 		if (field === null) {
 			return;
@@ -248,29 +516,16 @@ window.host_wizard_edit = new class {
 
 		switch (field.type) {
 			case 'checkbox':
-				field.checked = Boolean(value);
+				field.checked = field.value == value;
 				break;
 			case 'radio':
-				for (const radio of this.#dialogue.querySelectorAll(`[name="${property}"]`)) {
+				for (const radio of this.#dialogue.querySelectorAll(`[name="${name}"]`)) {
 					radio.checked = radio.value == value;
 				}
 				break;
 			default:
 				field.value = value;
 		}
-	}
-
-	#initReactiveData(initial_data, on_change_callback) {
-		return new Proxy(initial_data, {
-			set(target, property, value) {
-				if (target[property] !== value) {
-					target[property] = value;
-					on_change_callback(property, value);
-				}
-
-				return true;
-			}
-		});
 	}
 
 	#generatePSK() {
@@ -280,7 +535,7 @@ window.host_wizard_edit = new class {
 		return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 	}
 
-	#getCardListSections() {
+	#makeCardListSections() {
 		let template_classes = Array.from(this.#templates)
 			.filter(([templateid, template]) => {
 				if (this.#form_data.data_collection != ZBX_TEMPLATE_DATA_COLLECTION_ANY
@@ -319,7 +574,7 @@ window.host_wizard_edit = new class {
 		const sections = [];
 
 		for (const [title, templateids] of template_classes) {
-			const section = this.#template_templates_section.evaluateToElement({
+			const section = this.#view_templates.templates_section.evaluateToElement({
 				title: title.charAt(0).toUpperCase() + title.slice(1),
 				count: templateids.length
 			});
@@ -349,7 +604,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeCard(template) {
-		const card = this.#template_card.evaluateToElement({
+		const card = this.#view_templates.card.evaluateToElement({
 			title: template.name
 		});
 
@@ -372,7 +627,7 @@ window.host_wizard_edit = new class {
 		let all_fits = true;
 
 		for (let i = 0; i < template.tags.length; i++) {
-			const tag_element = this.#template_tag.evaluateToElement(template.tags[i]);
+			const tag_element = this.#view_templates.tag.evaluateToElement(template.tags[i]);
 
 			temp_tag_list.appendChild(tag_element);
 
@@ -384,7 +639,7 @@ window.host_wizard_edit = new class {
 		}
 
 		if (!all_fits) {
-			temp_tag_list.appendChild(this.#template_tag_more.evaluateToElement());
+			temp_tag_list.appendChild(this.#view_templates.tag_more.evaluateToElement());
 
 			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
 				const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
@@ -394,254 +649,343 @@ window.host_wizard_edit = new class {
 		}
 
 		tags_list.innerHTML = temp_tag_list.innerHTML;
+		temp_tag_list.remove();
 
 		card.querySelector('.js-template-info-collapse').style.display = 'none';
 
 		return card;
 	}
 
+	#makeMacroField(macro, row_index) {
+		const field_view = (() => {
+			switch (macro.config.type) {
+				case 'checkbox':
+					return this.#makeMacroFieldCheckbox(macro, row_index);
+				case 'list':
+					return this.#makeMacroFieldList(macro, row_index);
+				case 'text':
+					return this.#makeMacroFieldText(macro, row_index);
+				default:
+					return null;
+			}
+		})();
 
+		const description_view = macro.config.description
+			? this.#view_templates.description.evaluateToElement({
+				description: macro.config.description
+			})
+			: null;
 
+		return {field: field_view, description: description_view};
+	}
 
+	#makeMacroFieldCheckbox(macro, row_index) {
+		console.log('#makeMacroFieldCheckbox', row_index, macro)
 
+		const field = this.#view_templates.macro_field_checkbox.evaluateToElement({
+			index: row_index,
+			label: macro.config.label,
+			macro: macro.macro,
+			value: macro.config.options[0].checked,
+			unchecked_value: macro.config.options[0].unchecked
+		});
 
+		return field;
+	}
 
+	#makeMacroFieldList(macro_entry, row_index) {
+		console.log('#makeMacroFieldList', macro_entry);
 
+		const { label, options } = macro_entry.config;
+		const { macro, value } = macro_entry;
 
+		if (options.length > 5) {
+			const field_select = this.#view_templates.macro_field_select.evaluateToElement({
+				index: row_index,
+				label,
+				macro,
+				value
+			});
+			const select = field_select.querySelector('z-select');
 
+			select.setAttribute('data-options', JSON.stringify(
+				options.map(option => ({label: option.text, value: option.value}))
+			));
 
-
-
-
-
-
-
-
-
-
-
-	showMultistepForm(wizard_hide_welcome) {
-		if (!wizard_hide_welcome) {
-			this.showStep('welcomeStep');
+			return field_select;
 		}
 		else {
-			this.showStep('selectTemplates');
+			const field_radio = this.#view_templates.macro_field_radio.evaluateToElement({label, macro, value});
+			const radio_list = field_radio.querySelector('.radio-list-control');
+
+			radio_list.innerHTML = '';
+
+			options.forEach((option, index) => {
+				const radio = this.#view_templates.radio_item.evaluateToElement({
+					id: `macros_${row_index}_value_${index}`,
+					name: `macros[${row_index}][value]`,
+					label: option.text,
+					value: option.value
+				});
+
+				radio_list.appendChild(radio);
+			});
+
+			return field_radio;
 		}
 	}
 
-	showStep(step) {
-		switch (step) {
-			case 'welcomeStep':
-				this.showStepWelcome();
-				break;
-			case 'selectTemplates':
-				this.showStepSelectTemplates();
-				break;
+	#makeMacroFieldText(macro, row_index) {
+		console.log('#makeMacroFieldText', row_index, macro);
+
+		switch (macro.type) {
+			case this.MACRO_TYPE_SECRET:
+				return this.#view_templates.macro_field_secret.evaluateToElement({
+					index: row_index,
+					label: macro.config.label,
+					macro: macro.macro
+				});
+			case this.MACRO_TYPE_SECRET:
+				return this.#view_templates.macro_field_vault.evaluateToElement({
+					index: row_index,
+					label: macro.config.label,
+					macro: macro.macro
+				});
+			default:
+				return this.#view_templates.macro_field_text.evaluateToElement({
+					index: row_index,
+					label: macro.config.label,
+					macro: macro.macro
+				});
 		}
 	}
 
-	showStepWelcome() {
-
+	#disableWelcomeStep() {
+		// TODO call profile update
+		console.log('Update profile: disable welcome step')
 	}
 
-	showStepSelectTemplates() {
 
+
+
+
+
+
+
+
+
+
+	#initReactiveData(target_object, on_change_callback) {
+		const createProxy = (obj, path = []) => {
+			return new Proxy(obj, {
+				get(target, property, receiver) {
+					const value = Reflect.get(target, property, receiver);
+					if (typeof value === 'object' && value !== null) {
+						return createProxy(value, [...path, property]);
+					}
+					return value;
+				},
+				set(target, property, value, receiver) {
+					const old_value = target[property];
+					const result = Reflect.set(target, property, value, receiver);
+
+					if (old_value !== value) {
+						on_change_callback([...path, property].join('.'), value, old_value);
+					}
+
+					return result;
+				}
+			});
+		};
+
+		return createProxy(target_object);
 	}
 
-/*
+	#getInputsData(data, parent_key = '') {
+		return Object.entries(data).reduce((fields, [key, value]) => {
+			const full_key = parent_key ? `${parent_key}[${key}]` : key;
 
-	init({templates, linked_templates, old_template_count, wizard_hide_welcome}) {
-		this.overlay = overlays_stack.getById('host.wizard.edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.templates = templates;
-		this.linked_templates = linked_templates;
-		this.old_template_count = old_template_count;
-		this.wizard_hide_welcome = wizard_hide_welcome;
+			if (Array.isArray(value)) {
+				return fields.concat(
+					value.flatMap((item, index) =>
+						(item && typeof item === 'object')
+							? this.#getInputsData(item, `${full_key}[${index}]`)
+							: { name: `${full_key}[${index}]`, value: item }
+					)
+				);
+			}
 
-		const return_url = new URL('zabbix.php', location.href);
-		return_url.searchParams.set('action', 'host.list');
-		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+			if (value !== null && typeof value === 'object') {
+				return fields.concat(this.#getInputsData(value, full_key));
+			}
 
+			return fields.concat({ name: full_key, value });
+		}, []);
+	}
 
-		this.initial_form_fields = getFormFields(this.form);
-		this.initEvents(); // TODO VM: do we need it?
-		this.initPopupListeners(); // TODO VM: do we need it?
-	},
+	#setValueByName(data, name, new_value) {
+		const path = this.#parseInputName(name);
+		let current = data;
 
-	initEvents() {
-	},
+		for (let i = 0; i < path.length - 1; i++) {
+			if (current[path[i]] === undefined) {
+				current[path[i]] = typeof path[i+1] === 'number' ? [] : {};
+			}
+			current = current[path[i]];
+		}
+		current[path[path.length - 1]] = new_value;
+	}
 
-	initPopupListeners() {
-		const subscriptions = [];
+	#parseInputName(name) {
+		const parts = [];
 
-		for (const action of ['template.edit', 'proxy.edit', 'item.edit']) {
-			subscriptions.push(
-				ZABBIX.EventHub.subscribe({
-					require: {
-						context: CPopupManager.EVENT_CONTEXT,
-						event: CPopupManagerEvent.EVENT_OPEN,
-						action
+		name.replace(/\[([^\]]*)\]/g, '.$1').split('.').forEach(part => {
+			if (part !== '') {
+				parts.push(isNaN(part) ? part : Number(part));
+			}
+		});
+
+		return parts;
+	}
+
+	#pathToInputName(path) {
+		const [first, ...rest] = path.split('.');
+
+		return first + rest.map(p => `[${p}]`).join('');
+	};
+}
+
+window.host_wizard_edit.example_template = {
+	"zabbix_export": {
+		"version": "7.4",
+		"templates": [
+			{
+				"uuid": "2513e7cddfdf45bfa0abb00d3dd4bc39",
+				"template": "my template",
+				"name": "my template",
+				"groups": [
+					{
+						"name": "My group"
+					}
+				],
+				"wizard_ready": true,
+				"macros": [
+					{
+						"macro": "{$USERNAME}",
+						"value": "root",
+						"description": "MYSQL user",
+						"config": {
+							"type": "text",
+							"label": "Username",
+							"description": "On your [DBMS](http://www.zabbix.com) create MySQL user that will be used for monitoring. Enter specified MySQL user name here.",
+							"required": true,
+							"regex": "/^[A-Za-z0-9_]+$/"
+						}
 					},
-					callback: ({event}) => {
-						if (!this.isConfirmed()) {
-							event.preventDefault();
+					{
+						"macro": "{$PASSWORD}",
+						"type": "SECRET_TEXT",
+						"description": "MYSQL password",
+						"config": {
+							"type": "text",
+							"label": "Password",
+							"description": "On your [DBMS](http://www.zabbix.com) create MySQL user that will be used for monitoring. Enter specified MySQL password here.",
+							"required": true
+						}
+					},
+					{
+						"macro": "{$OPTIONS}",
+						"value": "mariadb",
+						"description": "MYSQL user",
+						"config": {
+							"type": "list",
+							"label": "Connection",
+							"description": "On your [DBMS](http://www.zabbix.com) connection.",
+							"required": true,
+							"options": [
+								{
+									"value": "",
+									"text": "Default Configuration"
+								},
+								{
+									"value": "mariadb",
+									"text": "MariaDB"
+								},
+								{
+									"value": "mysql",
+									"text": "MySQL"
+								}
+							]
+						}
+					},
+					{
+						"macro": "{$PORT}",
+						"value": "port",
+						"description": "MYSQL user",
+						"config": {
+							"type": "list",
+							"label": "Port",
+							"description": "On your [DBMS](http://www.zabbix.com) connection.",
+							"required": true,
+							"options": [
+								{
+									"value": "",
+									"text": "Default port"
+								},
+								{
+									"value": "3306",
+									"text": "MariaDB - 3306"
+								},
+								{
+									"value": "3307",
+									"text": "MariaDB - 3307"
+								},
+								{
+									"value": "3308",
+									"text": "MariaDB - 3308"
+								},
+								{
+									"value": "port",
+									"text": "MariaDB - 3309"
+								},
+								{
+									"value": "3316",
+									"text": "MariaDB - 3316"
+								},
+								{
+									"value": "3326",
+									"text": "MariaDB - 3326"
+								},
+								{
+									"value": "3336",
+									"text": "MariaDB - 3336"
+								},
+								{
+									"value": "3346",
+									"text": "MariaDB - 3346"
+								},
+							]
+						}
+					},
+					{
+						"macro": "{$ENABLE}",
+						"value": "1",
+						"description": "Enable MYSQL",
+						"config": {
+							"type": "checkbox",
+							"label": "Enable",
+							"description": "Enable [DBMS](http://www.zabbix.com).",
+							"options": [
+								{
+									"checked": "1",
+									"unchecked": "0"
+								}
+							]
 						}
 					}
-				})
-			);
-		}
-
-		subscriptions.push(
-			ZABBIX.EventHub.subscribe({
-				require: {
-					context: CPopupManager.EVENT_CONTEXT,
-					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
-					action: this.overlay.dialogueid
-				},
-				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
-			})
-		);
-	},
-
-/
-	preprocessFormFields(fields, is_clone) {
-		this.trimFields(fields);
-		fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
-
-		if (this.form.querySelector('#change_psk')) {
-			delete fields.tls_psk_identity;
-			delete fields.tls_psk;
-		}
-
-		if ('tags' in fields) {
-			for (const key in fields.tags) {
-				const tag = fields.tags[key];
-
-				if (tag.automatic == <?= ZBX_TAG_AUTOMATIC ?> && !is_clone) {
-					delete fields.tags[key];
-				}
-				else {
-					delete tag.automatic;
-				}
+				],
+				"readme": "The **template** you selected (Apache by HTTP) requires additional configuration.\n\n1. Enable the ``Stackdriver Monitoring API`` for the GCP project you wish to monitor.\n\n   How to: [Enable the Monitoring API](http://www.zabbix.com)\n2. Create a service account in **Google Cloud** console for the project you have to monitor.\n\n   How to: [Create service accounts](http://www.zabbix.com)\n3. Create and download the service account key in JSON format.\n\n   How to: [Create and delete service account keys](http://www.zabbix.com)\n4. If you want to monitor **Cloud SQL services** - don't forget to activate the **Cloud SQL Admin API**.\n\n   How to: [Use the Cloud SQL Admin API](http://www.zabbix.com)\n5. Copy the **project_id**, **private_key_id**, **private_key**, **client_email** from the JSON key file and add them to their corresponding macros **{$GCP.PROJECT.ID}**, **{$GCP.PRIVATE.KEY.ID}**, **{$GCP.PRIVATE.KEY}**, **{$GCP.CLIENT.EMAIL}** on the template/host."
 			}
-		}
-
-		return fields;
-	},
-
-	trimFields(fields) {
-		const fields_to_trim = ['host', 'visiblename', 'description', 'ipmi_username', 'ipmi_password',
-			'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk'];
-		for (const field of fields_to_trim) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
-			}
-		}
-
-		if ('interfaces' in fields) {
-			for (const key in fields.interfaces) {
-				const host_interface = fields.interfaces[key];
-				host_interface.ip = host_interface.ip.trim();
-				host_interface.dns = host_interface.dns.trim();
-				host_interface.port = host_interface.port.trim();
-
-				if ('details' in host_interface) {
-					const details = host_interface.details;
-					details.authpassphrase = details.authpassphrase.trim();
-					details.community = details.community.trim();
-					details.contextname = details.contextname.trim();
-					details.privpassphrase = details.privpassphrase.trim();
-					details.securityname = details.securityname.trim();
-				}
-			}
-		}
-
-		if ('macros' in fields) {
-			for (const key in fields.macros) {
-				const macro = fields.macros[key];
-				macro.macro = macro.macro.trim();
-
-				if ('value' in macro) {
-					macro.value = macro.value.trim();
-				}
-				if ('description' in macro) {
-					macro.description = macro.description.trim();
-				}
-			}
-		}
-
-		if ('host_inventory' in fields) {
-			for (const key in fields.host_inventory) {
-				fields.host_inventory[key] = fields.host_inventory[key].trim();
-			}
-		}
-
-		if ('tags' in fields) {
-			for (const key in fields.tags) {
-				const tag = fields.tags[key];
-				tag.tag = tag.tag.trim();
-				tag.value = tag.value.trim();
-			}
-		}
-	},
-
-	isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
-			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
-	},
-
-	submit() {
-		this.removePopupMessages();
-
-		const fields = this.preprocessFormFields(getFormFields(this.form), false);
-		const curl = new Curl(this.form.getAttribute('action'));
-
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
-	},
-
-	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-	},
-
-	ajaxExceptionHandler: (exception) => {
-		const form = host_edit_popup.form;
-
-		let title, messages;
-
-		if (typeof exception === 'object' && 'error' in exception) {
-			title = exception.error.title;
-			messages = exception.error.messages;
-		}
-		else {
-			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-		}
-
-		const message_box = makeMessageBox('bad', messages, title)[0];
-
-		form.parentNode.insertBefore(message_box, form);
+		]
 	}
-	*/
 }

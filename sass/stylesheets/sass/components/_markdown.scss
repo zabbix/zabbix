@@ -11,8 +11,28 @@
 		line-height: 18px;
 	}
 
+	h4 {
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 18px;
+	}
+
 	p {
-		margin-top: 16px;
 		margin-bottom: 0;
+
+		&:not(:first-child) {
+			margin-top: 16px;
+		}
+	}
+
+	pre {
+		padding: 5px;
+		background: $form-dark-bg-color;
+		border: 1px solid $form-border-color;
+		border-radius: 2px;
+	}
+
+	a {
+		@extend .link-external;
 	}
 }

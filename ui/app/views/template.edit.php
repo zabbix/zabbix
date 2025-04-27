@@ -199,7 +199,7 @@ if (!$data['readonly']) {
 						->disableSpellcheck()
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}][value]', '', false)
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -228,7 +228,7 @@ if (!$data['readonly']) {
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}][value]', '', false)
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CButton('macros[#{rowNum}][remove]', _('Remove')))

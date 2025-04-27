@@ -429,7 +429,7 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 				)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}][value]', '', false)
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
@@ -460,7 +460,7 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 				)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}][value]', '', false)
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CButton('macros[#{rowNum}][remove]', _('Remove')))

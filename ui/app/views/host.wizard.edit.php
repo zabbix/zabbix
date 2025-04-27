@@ -24,27 +24,15 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_WIZARD),
 	'body' => (new CDiv())
 		->addItem(
-			(new CDiv([
-				(new CDiv([_('Select a template'), BR(), 'Apache by HTTP']))
-					->addClass('progress-step progress-step-complete'),
-				(new CDiv(_('Create or select a host')))
-					->addClass('progress-step progress-step-complete'),
-				(new CDiv(_('Install Zabbix agent')))
-					->addClass('progress-step'),
-				(new CDiv(_('Add host interface')))
-					->addClass('progress-step'),
-				(new CDiv(_('Configure host')))
-					->addClass('progress-step progress-step-disabled'),
-			]))->addClass('progress')
-		)
-		->addItem(
 			(new CDiv())->addClass('step-form-body')
 		)
 		->addItem([
 			stepWelcome(),
 			stepSelectTemplate($data['old_template_count']),
-			stepSelectCreateHost(),
-			stepSelectInstallAgent()
+			stepCreateHost(),
+			stepInstallAgent(),
+			stepAddHostInterface(),
+			stepConfigureHostMacros()
 		])
 			->addClass('step-form')
 			->toString(),
@@ -91,7 +79,7 @@ function stepWelcome(): CTemplateTag {
 						new CTag('p', true, _('You can always access Host Wizard from Data Collection > Hosts.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_MARKDOWN)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
@@ -99,7 +87,7 @@ function stepWelcome(): CTemplateTag {
 			(new CSection())
 				->addItem(
 					(new CFormField([
-						(new CCheckBox('do-not-show-welcome'))->setLabel(_('Do not show welcome screen'))
+						(new CCheckBox('do_not_show_welcome'))->setLabel(_('Do not show welcome screen'))
 					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
@@ -126,7 +114,7 @@ function stepSelectTemplate($old_template_count): array {
 							new CTag('p', true, _('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.')),
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-							->addClass(ZBX_STYLE_MARKDOWN)
+							->addClass(ZBX_STYLE_FORMATED_TEXT)
 					)
 					->addItem(
 						(new CFormField([
@@ -139,7 +127,7 @@ function stepSelectTemplate($old_template_count): array {
 						(new CDiv([
 							new CFormField([
 								new CLabel(_('Data collection')),
-								(new CRadioButtonList('data_collection', ZBX_TEMPLATE_DATA_COLLECTION_ANY))
+								(new CRadioButtonList('data_collection'))
 									->addValue(_('All'), ZBX_TEMPLATE_DATA_COLLECTION_ANY)
 									->addValue(_('Agent-based'), ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED)
 									->addValue(_('Agentless'), ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS)
@@ -147,7 +135,7 @@ function stepSelectTemplate($old_template_count): array {
 							]),
 							new CFormField([
 								new CLabel(_('Agent mode')),
-								(new CRadioButtonList('agent_mode', ZBX_TEMPLATE_AGENT_MODE_ANY))
+								(new CRadioButtonList('agent_mode'))
 									->addValue(_('All'), ZBX_TEMPLATE_AGENT_MODE_ANY)
 									->addValue(_('Active'), ZBX_TEMPLATE_AGENT_MODE_ACTIVE)
 									->addValue(_('Passive'), ZBX_TEMPLATE_AGENT_MODE_PASSIVE)
@@ -155,7 +143,7 @@ function stepSelectTemplate($old_template_count): array {
 							]),
 							new CFormField([
 								new CLabel(_('Show templates')),
-								(new CRadioButtonList('show_templates', ZBX_TEMPLATE_SHOW_ANY))
+								(new CRadioButtonList('show_templates'))
 									->addValue(_('All'), ZBX_TEMPLATE_SHOW_ANY)
 									->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
 									->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
@@ -174,7 +162,7 @@ function stepSelectTemplate($old_template_count): array {
 							new CTag('h2', true, _('Templates'))
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-							->addClass(ZBX_STYLE_MARKDOWN)
+							->addClass(ZBX_STYLE_FORMATED_TEXT)
 					)
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
@@ -227,17 +215,11 @@ function stepSelectTemplate($old_template_count): array {
 					]))->addClass('template-info-toggles')
 				)
 				->addClass(CRadioCardList::ZBX_STYLE_CLASS_CARD)
-		),
-		new CTemplateTag('host-wizard-template-tag',
-			(new CSpan('#{tag}: #{value}'))->addClass(ZBX_STYLE_TAG)
-		),
-		new CTemplateTag('host-wizard-template-tag-more',
-			new CButtonIcon(ZBX_ICON_MORE)
 		)
 	];
 }
 
-function stepSelectCreateHost(): CTemplateTag {
+function stepCreateHost(): CTemplateTag {
 	return new CTemplateTag('host-wizard-step-create-host',
 		(new CDiv([
 			(new CSection())
@@ -248,7 +230,7 @@ function stepSelectCreateHost(): CTemplateTag {
 						new CTag('p', true, _('Hosts are organized into host groups for easier management and access control.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_MARKDOWN)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
@@ -307,7 +289,7 @@ function stepSelectCreateHost(): CTemplateTag {
 	);
 }
 
-function stepSelectInstallAgent(): CTemplateTag {
+function stepInstallAgent(): CTemplateTag {
 	return new CTemplateTag('host-wizard-step-install-agent',
 		(new CDiv([
 			(new CSection())
@@ -318,132 +300,384 @@ function stepSelectInstallAgent(): CTemplateTag {
 						new CTag('p', true, _('Skip OS selection if you already have Zabbix agent installed.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_MARKDOWN)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
 
 			(new CSection())
 				->addItem(
-					(new CDiv([
-						(new CTag('h6', true, [new CSpan('1.'), _('Configure encryption')]))
-							->addClass('list-item'),
-						new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
-					]))
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_MARKDOWN)
-				)
-				->addItem(
-					(new CFormField([
-						new CLabel(_('Pre-shared key identity')),
-						new CTextBox('tls_psk_identity'),
-						(new CDiv(
-							_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
-						))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addItem(
-					(new CFormField([
-						new CLabel(_('Pre-shared key')),
-						(new CDiv([
-							(new CTextArea('tls_psk'))
-								->setRows(3),
-							(new CSimpleButton(_('Generate new')))
-								->addClass(ZBX_STYLE_BTN_GREY)
-								->addClass('js-generate-pre-shared-key'),
-						]))->addClass('pre-shared-key-field'),
+					(new CList([
+						(new CListItem())
+							->addItem(
+								(new CTag('h6', true, [_('Configure encryption')]))
+									->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+							)
+							->addItem(
+								(new CDiv(
+									new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
+								))->addClass(ZBX_STYLE_FORMATED_TEXT)
+							)
+							->addItem(
+								new CFormField([
+									new CLabel(_('Pre-shared key identity')),
+									new CTextBox('tls_psk_identity'),
+									(new CDiv(
+										_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+									))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+								])
+							)
+							->addItem(
+								new CFormField([
+									new CLabel(_('Pre-shared key')),
+									(new CDiv([
+										(new CTextArea('tls_psk'))
+											->setRows(3),
+										(new CSimpleButton(_('Generate new')))
+											->addClass(ZBX_STYLE_BTN_GREY)
+											->addClass('js-generate-pre-shared-key'),
+									]))->addClass('pre-shared-key-field'),
 
-						(new CDiv(
-							_('Generate a secret pre-shared key hexadecimal string.')
-						))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addItem(
-					(new CDiv([
-						(new CTag('h6', true, [new CSpan('2.'), _('Select the OS of your monitoring target')]))
-							->addClass('list-item'),
+									(new CDiv(
+										_('Generate a secret pre-shared key hexadecimal string.')
+									))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+								])
+							)
+							->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
+
+						(new CListItem())
+							->addItem(
+								(new CTag('h6', true, [_('Select the OS of your monitoring target')]))
+									->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+							)
+							->addItem(
+								new CFormField(
+									(new CRadioCardList('monitoring_os', 'linux'))
+										->addValue(['label' => _('Linux'), 'value' => 'linux'])
+										->addValue(['label' => _('Windows'), 'value' => 'windows'])
+										->addValue(['label' => _('Other'), 'value' => 'other'])
+										->addClass(ZBX_STYLE_GRID_COLUMNS)
+								)
+							)
+							->addItem(
+								(new CFormField([
+									new CLabel(_('Select the OS distribution'), 'windows-new'),
+									(new CRadioCardList('monitoring_os_distribution'))
+										->addValue(['label' => _('Windows 10/Server 2016 or later'), 'value' => 'windows-new'])
+										->addValue(['label' => _('Older version'), 'value' => 'windows-old'])
+										->addClass(ZBX_STYLE_GRID_COLUMNS)
+								]))->addClass('js-windows-distribution-select')
+							)
+							->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
+
+						(new CListItem())
+							->addItem(
+								(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
+									->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+							)
+							->addItem(
+								(new CDiv([
+									new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
+									new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
+									new CTag('p', true, new CLink(_('Open installation instructions'), '#'))
+								]))->addClass(ZBX_STYLE_FORMATED_TEXT)
+							)
+							->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 					]))
+						->addClass(ZBX_STYLE_ORDERED_LIST)
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_MARKDOWN)
-				)
-				->addItem(
-					(new CFormField(
-						(new CRadioCardList('monitoring_os', 'linux'))
-							->addValue(['label' => _('Linux'), 'value' => 'linux'])
-							->addValue(['label' => _('Windows'), 'value' => 'windows'])
-							->addValue(['label' => _('Other'), 'value' => 'other'])
-							->addClass(ZBX_STYLE_GRID_COLUMNS)
-					))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addItem(
-					(new CFormField([
-						new CLabel(_('Select the OS distribution'), 'windows-new'),
-						(new CRadioCardList('monitoring_os_distribution'))
-							->addValue(['label' => _('Windows 10/Server 2016 or later'), 'value' => 'windows-new'])
-							->addValue(['label' => _('Older version'), 'value' => 'windows-old'])
-							->addClass(ZBX_STYLE_GRID_COLUMNS)
-					]))
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass('js-windows-distribution-select')
-				)
-				->addItem(
-					(new CDiv([
-						(new CTag('h6', true, [new CSpan('3.'), _('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
-							->addClass('list-item'),
-						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
-						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.'))
-					]))
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_MARKDOWN)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
 	);
 }
 
-
-
-
-
-
-
-/*
-$data['form_name'] = 'host-wizard-form';
-
-$form = (new CForm())
-	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host')))->removeId())
-	->setId($data['form_name'])
-	->setName($data['form_name'])
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', $data['form_action'])
-		->getUrl()
-	)
-	->addVar('hostid', $data['hostid'])
-	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)); // TODO VM: do we need this?
-
-
-
-
-$output = [
-	'header' => _('Host Wizard'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_WIZARD),
-	'body' => $form->toString(),
-	'script_inline' => getPagePostJs().
-		$this->readJsFile('host.wizard.edit.js.php').
-		'host_wizard_edit.init('.json_encode([
-			'templates' => $data['templates'],
-			'linked_templates' => $data['linked_templates'],
-			'old_template_count' => $data['old_template_count'],
-			'wizard_hide_welcome' => $data['wizard_hide_welcome']
-		]).');',
-	'dialogue_class' => 'modal-popup-large'
-];
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
+function stepAddHostInterface(): CTemplateTag {
+	return new CTemplateTag('host-wizard-step-add-host-interface',
+		(new CDiv([
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CTag('h1', true, _('Add host interface')),
+						new CTag('p', true, _('The template you selected (Apache by HTTP) requires the <Agent interface / Intelligent Platform Management Interface (IPMI) / Java Management Extensions (JMX) interface / Simple Network Management Protocol (SNMP) interface> to be added to the host (PostgreSQL).')),
+						new CTag('p', true, _('SNote: <IPMI/JMX/SNMP> must be configured and enabled on your monitoring target.'))
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CFormField([
+							new CLabel(_('Agent address')),
+							new CTextBox('address')
+						]),
+						new CFormField([
+							new CLabel(_('Agent port')),
+							new CTextBox('port', '10050')
+						]),
+						(new CDiv(
+							_('Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target.')
+						))
+							->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMNS)
+						->addClass(ZBX_STYLE_FORM_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addItem(
+					(new CDiv([
+						new CTag('h4', true, _('Enable IPMI checks on Zabbix server')),
+						new CTag('p', true, _('In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value.')),
+						new CTag('p', true, [
+							_('For more details, see'),
+							' ',
+							new CLink(_('IPMI checks'), '#')
+						])
+					]))
+						->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+						->addClass(ZBX_STYLE_MARKDOWN)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CFormField([
+							new CLabel(_('IPMI address')),
+							new CTextBox('address')
+						]),
+						new CFormField([
+							new CLabel(_('IPMI port')),
+							new CTextBox('port', '10050')
+						]),
+						(new CDiv(
+							_('Enter the IP/DNS address and port of your IPMI-enabled monitoring target.')
+						))
+							->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMNS)
+						->addClass(ZBX_STYLE_FORM_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addItem(
+					(new CDiv([
+						new CFormField([
+							new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+							(new CSelect('ipmi_authtype'))
+								->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+								->setWidthAuto()
+						]),
+						new CFormField([
+							new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+							(new CSelect('ipmi_privilege'))
+								->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+								->setWidthAuto()
+						]),
+						new CFormField([
+							new CLabel(_('Username'), 'ipmi_username'),
+							new CTextBox('ipmi_username')
+						]),
+						new CFormField([
+							new CLabel(_('Password'), 'ipmi_password'),
+							new CTextBox('ipmi_password')
+						]),
+					]))
+						->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CFormField([
+							new CLabel(_('JMX address')),
+							new CTextBox('address')
+						]),
+						new CFormField([
+							new CLabel(_('JMX port')),
+							new CTextBox('port', '1089')
+						]),
+						(new CDiv(
+							_('Enter the IP/DNS address and port of your JMX-enabled monitoring target.')
+						))
+							->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMNS)
+						->addClass(ZBX_STYLE_FORM_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addItem(
+					(new CDiv([
+						new CTag('h4', true, _('Enable remote JMX monitoring')),
+						new CTag('p', true, [
+							_('1. Install Java Gateway on the same machine running Zabbix server by following the instructions in'),
+							' ',
+							new CLink(_('Zabbix documentation'), '#')
+						]),
+						new CTag('p', true, _('2. Configure your Java application to support remote JMX monitoring. For example:')),
+						new CTag('pre', true, "JAVA_OPTS=\"-Dcom.sun.management.jmxremote \\\n-Dcom.sun.management.jmxremote.local.only=false \\\n-Dcom.sun.management.jmxremote.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.rmi.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.authenticate=false \\\n-Dcom.sun.management.jmxremote.ssl=false \\\n-Djava.rmi.server.hostname=<JMX address>\""),
+						new CTag('p', true, [_('For more details, see'), ' ', new CLink(_('JMX monitoring'), '#')])
+					]))
+						->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+						->addClass(ZBX_STYLE_MARKDOWN)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CFormField([
+							new CLabel(_('SNMP address')),
+							new CTextBox('address')
+						]),
+						new CFormField([
+							new CLabel(_('SNMP port')),
+							new CTextBox('port', '444')
+						]),
+						(new CDiv(
+							_('Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target.')
+						))
+							->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMNS)
+						->addClass(ZBX_STYLE_FORM_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addItem(
+					(new CDiv([
+						new CFormField([
+							new CLabel(_('SNMP version'), 'label_ipmi_authtype'),
+							(new CSelect('ipmi_authtype'))
+								->addOptions(CSelect::createOptionsFromArray([
+									SNMP_V1 => _('SNMPv1'),
+									SNMP_V2C => _('SNMPv2'),
+									SNMP_V3 => _('SNMPv3')
+								]))
+								->setValue(SNMP_V2C)
+								->setWidthAuto()
+						]),
+						new CFormField([
+							new CLabel(_('Context name'), 'label_ipmi_privilege'),
+							new CTextBox('contextname', '', false, DB::getFieldLength('interface_snmp', 'contextname'))
+						]),
+						new CFormField([
+							new CLabel(_('Security name'), 'ipmi_username'),
+							new CTextBox('ipmi_username')
+						]),
+						new CFormField([
+							new CLabel(_('Security level'), 'ipmi_password'),
+							(new CSelect('securitylevel'))
+								->addOptions(CSelect::createOptionsFromArray([
+									ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+									ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+									ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+								]))
+								->setValue(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+								->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_securitylevel')
+								->setWidthAuto()
+						]),
+						new CFormField([
+							(new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))
+								->setLabel(_('Use combined requests'))
+						])
+					]))
+						->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		]))->addClass('step-form-body')
+	);
 }
 
-echo json_encode($output);
-*/
+function stepConfigureHostMacros(): array {
+	return [
+		new CTemplateTag('host-wizard-step-configure-host-macros',
+			(new CDiv([
+				(new CSection())
+					->addItem(
+						(new CDiv([
+							new CTag('h1', true, _('Configure host')),
+							new CTag('p', true, _('To complete the setup, configure the following variables (host macros).')),
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_FORMATED_TEXT)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				(new CSection())
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+					->addClass('js-host-macro-list'),
+			]))->addClass('step-form-body')
+		),
+		new CTemplateTag('host-wizard-macro-field-checkbox',
+			(new CFormField([
+				(new CCheckBox('macros[#{index}][value]', '#{value}'))
+					->setLabel('#{label}')
+					->setUncheckedValue('#{unchecked_value}'),
+				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+			]))
+				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				->addClass('field-checkbox')
+		),
+		new CTemplateTag('host-wizard-macro-field-select',
+			(new CFormField([
+				new CLabel('#{label}'),
+				(new CSelect('macros[#{index}][value]'))->setWidthAuto(),
+				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+			]))
+				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				->addClass('field-list')
+		),
+		new CTemplateTag('host-wizard-macro-field-radio',
+			(new CFormField([
+				new CLabel('#{label}'),
+				(new CRadioButtonList('macros[#{index}][value]'))->setModern(),
+				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+			]))
+				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				->addClass('field-radio')
+		),
+		new CTemplateTag('host-wizard-macro-field-text',
+			(new CFormField([
+				new CLabel('#{label}'),
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{index}][value]', null, false),
+				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+			]))
+				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				->addClass('field-text')
+		),
+		new CTemplateTag('host-wizard-macro-field-secret',
+			(new CFormField([
+				new CLabel('#{label}'),
+				new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{index}][value]', null, false),
+				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+			]))
+				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				->addClass('field-text')
+		),
+		new CTemplateTag('host-wizard-macro-field-vault',
+			(new CFormField([
+				new CLabel('#{label}'),
+				new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{index}][value]', null, false),
+				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+			]))
+				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				->addClass('field-text')
+		)
+	];
+}

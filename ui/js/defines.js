@@ -32,7 +32,16 @@ const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
+
+const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
+const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
+
 const ZBX_STYLE_FORM_GRID = 'form-grid';
+const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
+
+const ZBX_STYLE_MARKDOWN = 'markdown';
+const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
 

@@ -5,6 +5,7 @@
 		padding: 0;
 
 		.overlay-dialogue-header {
+			flex-wrap: wrap;
 			margin: 0;
 			padding: 56px 56px 16px 56px;
 
@@ -20,6 +21,11 @@
 			.btn-overlay-close {
 				margin-right: 0;
 			}
+
+			.progress {
+				flex: 0 0 100%;
+				margin-top: 16px;
+			}
 		}
 
 		.overlay-dialogue-body {
@@ -27,7 +33,7 @@
 			padding: 0 56px 32px 56px;
 			width: initial;
 			min-height: 384px;
-			max-height: calc(100vh - 300px);
+			max-height: calc(100vh - 340px);
 		}
 
 		.overlay-dialogue-footer {
@@ -72,11 +78,40 @@
 		}
 
 		&.grid-columns {
-			gap: 16px 48px;
+			gap: 8px 48px;
 
 			.section-head,
 			.section-body {
 				display: contents;
+
+				.formated-text:not(:first-of-type) {
+					margin-top: 8px;
+				}
+			}
+		}
+	}
+
+	.formated-text {
+		@extend .markdown;
+	}
+
+	.ordered-list {
+		--counter-width: 2ch;
+
+		.ordered-list-item {
+			.formated-text,
+			.form-field {
+				&:not(:first-child) {
+					margin-top: 8px;
+				}
+			}
+
+			.formated-text + .form-field {
+				margin-top: 16px;
+			}
+
+			&:not(:first-child) {
+				margin-top: 24px;
 			}
 		}
 	}
@@ -92,6 +127,7 @@
 		.progress-step {
 			position: relative;
 			padding-bottom: 8px;
+			color: $font-alt-color;
 
 			&::after {
 				content: '';
@@ -100,20 +136,21 @@
 				right: 0;
 				bottom: 0;
 				height: 0;
-				border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, $progress-default-color);
+				border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, #{$progress-default-color});
 				border-radius: 2px;
 			}
 
 			&.progress-step-complete {
-				--pregress-step-color: $progress-complete-color;
+				--pregress-step-color: #{$progress-complete-color};
 			}
 
 			&.progress-step-current {
-				--pregress-step-color: $progress-current-color;
+				--pregress-step-color: #{$progress-current-color};
+				color: $font-color;
 			}
 
 			&.progress-step-error {
-				--pregress-step-color: $progress-error-color;
+				--pregress-step-color: #{$progress-error-color};
 			}
 
 			&.progress-step-disabled {
@@ -133,31 +170,76 @@
 				}
 			}
 		}
+
+		&.form-columns {
+			gap: 8px 16px;
+
+			> .form-fields-hint {
+				margin-top: -4px;
+			}
+		}
+	}
+
+	.fields-group {
+		display: grid;
+		gap: 8px 16px;
+		padding: 8px;
+		background: $form-darker-bg-color;
+		border-radius: 2px;
 	}
 
 	.form-field {
 		display: grid;
+		gap: 4px;
 
 		> label {
-			margin-bottom: 4px;
 			line-height: 16px;
 		}
 
 		input,
-		textarea {
+		textarea,
+		z-select > button {
 			border-radius: 2px;
+		}
+
+		input[type="checkbox"] + label {
+			cursor: pointer;
 		}
 
 		.multiselect {
 			width: 100%;
 		}
 
-		.form-fields-hint {
-			margin-top: 4px;
-			font-size: 11px;
-			line-height: 16px;
-			white-space: initial;
-			color: $form-field-hint-color;
+		&.field-checkbox {
+			gap: 0;
+
+			label {
+				line-height: 24px;
+			}
+		}
+	}
+
+	.form-fields-hint {
+		font-size: 11px;
+		line-height: 16px;
+		white-space: initial;
+		color: $form-field-hint-color;
+	}
+
+	.form-description {
+		position: relative;
+		padding-top: 16px;
+		padding-left: 24px;
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: 16px;
+			bottom: 0;
+			left: 0;
+			width: 0;
+			border-left: 4px solid $form-description-border-color;
+			border-radius: 2px;
 		}
 	}
 
