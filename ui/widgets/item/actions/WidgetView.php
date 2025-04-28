@@ -333,8 +333,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$elements['units'] = $formatted_value['units'];
 
 		if ($is_numeric_data && !$formatted_value['is_mapped']) {
-			$numeric_formatting = getNumericFormatting();
-			$decimal_pos = strrpos($elements['value'], $numeric_formatting['decimal_point']);
+			$decimal_pos = strrpos($elements['value'], '.');
 
 			if ($decimal_pos !== false) {
 				$elements['decimals'] = substr($elements['value'], $decimal_pos);

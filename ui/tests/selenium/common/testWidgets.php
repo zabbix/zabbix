@@ -123,6 +123,7 @@ class testWidgets extends CWebTest {
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
+		$items_dialog->query('button:Select')->waitUntilClickable();
 		$table->waitUntilReloaded();
 		$items_dialog->waitUntilReady();
 		$items_dialog->query('button:Select')->waitUntilClickable();
