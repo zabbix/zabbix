@@ -1396,13 +1396,25 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_ADD, new_optagids, &host_tags);
 
 	if (0 != del_optagids->values_num)
+	{
+		/* If we need to delete tags, and there are no new tags, then add_discovered_host() was not run */
+		/* so audit entry was not created for the host. That is why we need to manually create it here. */
+
+		if (0 == new_optagids->values_num)
+		{
+			zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event), ZBX_AUDIT_ACTION_UPDATE,
+					hostid, hostname);
+		}
+
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_DEL, del_optagids, &host_tags);
+	}
 
 	discovered_host_tags_save(hostid, &host_tags, event);
 
 	zbx_vector_db_tag_ptr_clear_ext(&host_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host_tags);
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
