@@ -2521,18 +2521,35 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid,
+						dc_item->itemid)))
+				{
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
+				}
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid,
+						dc_item->itemid)))
+				{
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
+				}
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid,
+						dc_item->itemid)))
+				{
 					replace_to = zbx_strdup(replace_to, interface.addr);
+				}
+			}
+			else if (0 == strcmp(m, MVAR_HOST_PORT))
+			{
+				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid,
+						dc_item->itemid)))
+				{
+					replace_to = zbx_strdup(replace_to, interface.port_orig);
+				}
 			}
 			else if (0 == strcmp(m, MVAR_ITEM_ID))
 			{
