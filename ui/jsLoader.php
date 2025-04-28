@@ -54,7 +54,6 @@ $available_js = [
 	'flickerfreescreen.js' => '',
 	'multilineinput.js' => '',
 	'multiselect.js' => '',
-	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
@@ -473,11 +472,6 @@ $translate_strings = [
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
-	'colorpicker.js' => [
-		'D' => _x('D', 'Default color option'),
-		'S_CLOSE' => _('Close'),
-		'Use default' => _('Use default')
-	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
@@ -531,7 +525,6 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'main.js',
-		'colorpicker.js',
 		'common.js',
 		'component.z-bar-gauge.js',
 		'component.z-color-picker.js',
