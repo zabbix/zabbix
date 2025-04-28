@@ -34,6 +34,7 @@
 				width: 14px;
 				height: 14px;
 				opacity: 0;
+				cursor: pointer;
 			}
 
 			&:has(input[type="radio"]:checked)::after {

@@ -197,7 +197,7 @@ function stepSelectTemplate($old_template_count): array {
 					(new CLabel([
 						'#{title}',
 						(new CSpan(
-							new CInput('radio', 'template', '#{templateid)')
+							(new CInput('radio', null, '#{templateid}'))->setAttribute('name', 'template_selected')
 						))->addClass(CRadioCardList::ZBX_STYLE_CLASS_SELECTOR)
 					]))->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
 				)
@@ -454,7 +454,8 @@ function stepAddHostInterface(): CTemplateTag {
 						->addClass(ZBX_STYLE_MARKDOWN)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+				->addClass('js-host-interface-'.INTERFACE_TYPE_AGENT),
 			(new CSection())
 				->addItem(
 					(new CDiv([
@@ -504,7 +505,8 @@ function stepAddHostInterface(): CTemplateTag {
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+				->addClass('js-host-interface-'.INTERFACE_TYPE_IPMI),
 			(new CSection())
 				->addItem(
 					(new CDiv([
@@ -543,7 +545,8 @@ function stepAddHostInterface(): CTemplateTag {
 						->addClass(ZBX_STYLE_MARKDOWN)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+				->addClass('js-host-interface-'.INTERFACE_TYPE_JMX),
 			(new CSection())
 				->addItem(
 					(new CDiv([
@@ -609,6 +612,7 @@ function stepAddHostInterface(): CTemplateTag {
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+				->addClass('js-host-interface-'.INTERFACE_TYPE_SNMP)
 		]))->addClass('step-form-body')
 	);
 }

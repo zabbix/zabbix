@@ -3262,7 +3262,8 @@ output {
         margin-right: 0;
         width: 14px;
         height: 14px;
-        opacity: 0; }
+        opacity: 0;
+        cursor: pointer; }
       .radio-card-list .radio-card-label .radio-card-selector:has(input[type="radio"]:checked)::after {
         content: '';
         position: absolute;

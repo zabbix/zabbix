@@ -178,6 +178,7 @@ window.host_wizard_edit = new class {
 	#data = {
 		do_not_show_welcome: 0,
 		template_search_query: '',
+		template_selected: null,
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
@@ -347,6 +348,11 @@ window.host_wizard_edit = new class {
 
 		this.#current_step = step;
 
+		let back_button = this.#current_step !== 0;
+		let next_button = true;
+		let create_button = false;
+		let finish_button = false;
+
 		switch (this.#steps_queue[step]) {
 			case this.STEP_WELCOME:
 				this.#renderWelcome();
@@ -371,9 +377,16 @@ window.host_wizard_edit = new class {
 				break;
 			case this.STEP_CONFIGURATION_FINISH:
 				this.#renderConfigurationFinish();
+
+				next_button = false;
+				create_button = false;
 				break;
 			case this.STEP_COMPLETE:
 				this.#renderComplete();
+
+				back_button = false;
+				next_button = false;
+				finish_button = false;
 				break;
 		}
 
@@ -384,8 +397,10 @@ window.host_wizard_edit = new class {
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
 
-			this.#back_button.toggleAttribute('disabled', this.#current_step === 0);
-			this.#next_button.toggleAttribute('disabled', this.#current_step === this.#steps_queue.length - 1);
+			this.#back_button.toggleAttribute('disabled', !back_button);
+			this.#next_button.toggleAttribute('disabled', !next_button);
+			this.#create_button.toggleAttribute('disabled', !create_button);
+			this.#finish_button.toggleAttribute('disabled', !finish_button);
 		});
 	}
 
@@ -419,6 +434,10 @@ window.host_wizard_edit = new class {
 
 	#renderAddHostInterface() {
 		const step = this.#view_templates.step_add_host_interface.evaluateToElement();
+
+		for (const [interface_type, required] in this.#data.interface_required) {
+			step.querySelector(`js-host-interface-${interface_type}`).style.display = required ? '' : 'none';
+		}
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
@@ -546,7 +565,7 @@ window.host_wizard_edit = new class {
 			},
 			{
 				label: t('Add host interface'),
-				visible: Object.values(this.#data.interface_required).some(required => required),
+				visible: this.#host && Object.values(this.#data.interface_required).some(required => required),
 				steps: [this.STEP_ADD_HOST_INTERFACE]
 			},
 			{
@@ -584,17 +603,21 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`).appendChild(progress);
 	}
 
-	#updateForm() {
+	#updateForm(path, new_value, old_value) {
 		switch (this.#current_step) {
 			case this.STEP_WELCOME:
 				break;
 			case this.STEP_SELECT_TEMPLATE:
-				const step_body = document.querySelector('.js-templates');
+				if (!path
+						|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
+				) {
+					const step_body = document.querySelector('.js-templates');
 
-				step_body.innerHTML = '';
+					step_body.innerHTML = '';
 
-				for (const section of this.#makeCardListSections()) {
-					step_body.appendChild(section);
+					for (const section of this.#makeCardListSections()) {
+						step_body.appendChild(section);
+					}
 				}
 				break;
 			case this.STEP_CREATE_HOST:
@@ -700,9 +723,9 @@ window.host_wizard_edit = new class {
 			const card_list = section.querySelector('.templates-card-list');
 
 			for (const templateid of templateids) {
-				const card = this.#makeCard(this.#templates.get(templateid));
-
-				card_list.appendChild(card)
+				card_list.appendChild(
+					this.#makeCard(this.#templates.get(templateid), templateid === this.#data.template_selected)
+				);
 			}
 
 			section.addEventListener('expand', () => this.#sections_expanded.set(title, true));
@@ -714,8 +737,9 @@ window.host_wizard_edit = new class {
 		return sections;
 	}
 
-	#makeCard(template) {
+	#makeCard(template, checked) {
 		const card = this.#view_templates.card.evaluateToElement({
+			...template,
 			title: template.name
 		});
 
@@ -763,6 +787,7 @@ window.host_wizard_edit = new class {
 		temp_tag_list.remove();
 
 		card.querySelector('.js-template-info-collapse').style.display = 'none';
+		card.querySelector('input[type=radio').checked = checked;
 
 		return card;
 	}
@@ -880,7 +905,7 @@ window.host_wizard_edit = new class {
 		console.log('Data changed', {path, new_value, old_value}, this.#data);
 
 		this.#updateField(this.#pathToInputName(path), new_value);
-		this.#updateForm();
+		this.#updateForm(path, new_value, old_value);
 	}
 
 	#onInputChange({target}) {
