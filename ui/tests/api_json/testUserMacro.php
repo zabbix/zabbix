@@ -139,8 +139,8 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG0}',
-					'value' => 'invalid',
+					'macro' => '{$CONFIG1}',
+					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => []
 				],
@@ -159,7 +159,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG0}',
+					'macro' => '{$CONFIG2}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
@@ -181,7 +181,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG}',
+					'macro' => '{$CONFIG3}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
@@ -193,7 +193,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG2}',
+					'macro' => '{$CONFIG4}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
@@ -234,7 +234,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG3}',
+					'macro' => '{$CONFIG5}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
@@ -331,7 +331,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG4}',
+					'macro' => '{$CONFIG6}',
 					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
