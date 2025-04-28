@@ -393,8 +393,8 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		foreach ($parent_lld_rules as $parent_lld_rule) {
 			foreach ($itemids[$parent_lld_rule['itemid']] as $itemid) {
 				$result[$itemid]['discoveryRule'] = $this->outputIsRequested('itemid', $options['selectDiscoveryRule'])
-					? array_diff_key($parent_lld_rule, ['itemid' => true])
-					: $parent_lld_rule;
+					? $parent_lld_rule
+					: array_diff_key($parent_lld_rule, ['itemid' => true]);
 			}
 		}
 	}
