@@ -94,6 +94,16 @@ else {
 	$certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
 }
 
+foreach ($certs as $key => $cert) {
+	if ($cert === '' || $key === 'SP_KEY') {
+		continue;
+	}
+
+	$cert_value = Utils::getStringBetween($cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
+	$certs[$key] = Utils::formatCert($cert_value !== '' ? $cert_value : $cert);
+}
+unset($cert);
+
 $settings = [
 	'sp' => [
 		'entityId' => $saml_settings['sp_entityid'],
