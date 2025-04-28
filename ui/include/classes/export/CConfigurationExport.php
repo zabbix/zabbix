@@ -865,7 +865,7 @@ class CConfigurationExport {
 			}
 		}
 
-		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
+		$this->prepareDiscoveryRules($discovery_rules);
 
 		// Discovery rules may use web items as master items.
 		foreach ($discovery_rules as $discovery_rule) {
@@ -894,7 +894,7 @@ class CConfigurationExport {
 	 *
 	 * @return array
 	 */
-	protected function prepareDiscoveryRules(array $items, bool $is_lld_rule_prototype = false) {
+	protected function prepareDiscoveryRules(array &$items, bool $is_lld_rule_prototype = false): void {
 		$templateids = [];
 
 		foreach ($items as &$item) {
@@ -1069,8 +1069,8 @@ class CConfigurationExport {
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'discoveryids' => array_column($items, 'itemid'),
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRulePrototype' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		];
@@ -1090,8 +1090,8 @@ class CConfigurationExport {
 		// gather trigger prototypes
 		$options = [
 			'output' => $this->dataFields['trigger_prototype'],
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRulePrototype' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectHosts' => ['status'],
 			'selectItems' => ['itemid', 'flags', 'type'],
@@ -1118,8 +1118,8 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRulePrototype' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -1156,41 +1156,38 @@ class CConfigurationExport {
 			$items[$parent_lld['itemid']]['hostPrototypes'][] = $host_prototype;
 		}
 
-		if (!$is_lld_rule_prototype) {
-			$this->gatherDiscoveryPrototypes($items, $items);
-		}
-
-		return $items;
+		$this->gatherDiscoveryRulePrototypes($items, $is_lld_rule_prototype);
 	}
 
-	private function gatherDiscoveryPrototypes(array $lld_rules, array &$items,
-			bool $is_lld_rule_prototype = false): void {
-		$discovery_prototypes = API::DiscoveryRulePrototype()->get([
-			'discoveryids' => array_keys($lld_rules),
-			'output' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => ['itemid', 'key_'],
-			'selectDiscoveryRulePrototype' => ['itemid', 'key_'],
+	private function gatherDiscoveryRulePrototypes(array &$items, bool $is_lld_rule_prototype = false): void {
+		$options = [
+			'output' => CDiscoveryRulePrototype::OUTPUT_FIELDS,
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'discoveryids' => array_keys($items),
 			'preservekeys' => true
-		]);
+		];
 
-		if ($discovery_prototypes) {
-			$this->gatherDiscoveryPrototypes($discovery_prototypes, $items, true);
+		$options += $is_lld_rule_prototype
+			? ['selectDiscoveryRulePrototype' => ['itemid', 'key_']]
+			: ['selectDiscoveryRule' => ['itemid', 'key_']];
+
+		$lld_rule_prototypes = API::DiscoveryRulePrototype()->get($options);
+
+		foreach ($lld_rule_prototypes as &$lld_rule_prototype) {
+			$lld_rule_prototype = [
+				'parent_discovery_rule' => $is_lld_rule_prototype
+					? ['key' => $lld_rule_prototype['discoveryRulePrototype']['key_']]
+					: ['key' => $lld_rule_prototype['discoveryRule']['key_']]
+			] + $lld_rule_prototype;
 		}
+		unset($lld_rule_prototype);
 
-		if ($is_lld_rule_prototype) {
-			$lld_rules = $this->prepareDiscoveryRules($lld_rules, true);
-
-			foreach ($lld_rules as &$lld_rule) {
-				$parent_lld = $lld_rule['discoveryRule'] ?: $lld_rule['discoveryRulePrototype'];
-
-				$lld_rule['parent_discovery_rule'] = ['key' => $parent_lld['key_']];
-				$items[$lld_rule['itemid']] = $lld_rule;
-			}
-			unset($lld_rule);
+		if ($lld_rule_prototypes) {
+			$this->prepareDiscoveryRules($lld_rule_prototypes, true);
+			$items += $lld_rule_prototypes;
 		}
 	}
 

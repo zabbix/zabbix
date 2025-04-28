@@ -28,7 +28,8 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		'privatekey', 'flags', 'interfaceid', 'description', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
 		'enabled_lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
 		'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file',
-		'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'state', 'error', 'parameters'
+		'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'state', 'error', 'parameters',
+		'uuid'
 	];
 
 	/**
@@ -296,10 +297,8 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateGet(array &$options): void {
-		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
-
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryRule' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff($discovery_fields, ['lldruleid', 'discover'])), 'default' => null],
+			'selectDiscoveryRule' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CDiscoveryRule::OUTPUT_FIELDS, ['lldruleid', 'discover'])), 'default' => null],
 			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
 		]];
 

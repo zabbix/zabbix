@@ -32,6 +32,9 @@ class CItem extends CItemGeneral {
 		'allow_traps', 'state', 'error', 'parameters', 'lastclock', 'lastns', 'lastvalue', 'prevvalue', 'name_resolved'
 	];
 
+	public const ITEM_DISCOVERY_OUTPUT_FIELDS = ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_itemid', 'key_', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
+
 	/**
 	 * @inheritDoc
 	 */
@@ -463,8 +466,8 @@ class CItem extends CItemGeneral {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_itemid', 'key_', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::ITEM_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1833,6 +1836,10 @@ class CItem extends CItemGeneral {
 			return;
 		}
 
+		if ($options['selectItemDiscovery'] === 'extend') {
+			$options['selectItemDiscovery'] = self::ITEM_DISCOVERY_OUTPUT_FIELDS;
+		}
+
 		$item_discoveries = API::getApiService()->select('item_discovery', [
 			'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemdiscoveryid', 'itemid']),
 			'filter' => ['itemid' => array_keys($result)],
@@ -1846,7 +1853,6 @@ class CItem extends CItemGeneral {
 
 		$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
 	}
-
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);

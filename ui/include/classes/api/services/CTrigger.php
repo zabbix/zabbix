@@ -36,6 +36,9 @@ class CTrigger extends CTriggerGeneral {
 		'url_name', 'flags'
 	];
 
+	public const TRIGGER_DISCOVERY_OUTPUT_FIELDS = ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
+
 	/**
 	 * Get Triggers data.
 	 *
@@ -549,8 +552,8 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	protected function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::TRIGGER_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -908,16 +911,30 @@ class CTrigger extends CTriggerGeneral {
 			return;
 		}
 
-		$trigger_discovery = API::getApiService()->select('trigger_discovery', [
-			'output' => $this->outputExtend($options['selectTriggerDiscovery'], ['triggerid']),
-			'filter' => ['triggerid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($trigger_discovery, 'triggerid', 'triggerid');
+		foreach ($result as &$trigger) {
+			$trigger['triggerDiscovery'] = [];
+		}
+		unset($trigger);
 
-		$trigger_discovery = $this->unsetExtraFields($trigger_discovery, ['triggerid']);
+		$sql_select = ['triggerid'];
+		foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
+			if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
+				$sql_select[] = $field;
+			}
+		}
 
-		$result = $relation_map->mapOne($result, $trigger_discovery, 'triggerDiscovery');
+		$trigger_discoveries = DBselect(
+			'SELECT '.implode(',', $sql_select).
+			' FROM trigger_discovery'.
+			' WHERE '.dbConditionInt('triggerid', array_keys($result)
+		));
+
+		while ($trigger_discovery = DBfetch($trigger_discoveries)) {
+			$triggerid = $trigger_discovery['triggerid'];
+			unset($trigger_discovery['triggerid']);
+
+			$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
+		}
 	}
 
 	private function addRelatedDiscoveryData(array $options, array &$result): void {
@@ -925,16 +942,30 @@ class CTrigger extends CTriggerGeneral {
 			return;
 		}
 
-		$discovery_data = API::getApiService()->select('trigger_discovery', [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['triggerid']),
-			'filter' => ['triggerid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($discovery_data, 'triggerid', 'triggerid');
+		foreach ($result as &$trigger) {
+			$trigger['discoveryData'] = [];
+		}
+		unset($trigger);
 
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['triggerid']);
+		$sql_select = ['triggerid'];
+		foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
+			if ($this->outputIsRequested($field, $options['selectDiscoveryData'])) {
+				$sql_select[] = $field;
+			}
+		}
 
-		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
+		$trigger_discoveries = DBselect(
+			'SELECT '.implode(',', $sql_select).
+			' FROM trigger_discovery'.
+			' WHERE '.dbConditionInt('triggerid', array_keys($result))
+		);
+
+		while ($discovery_data = DBfetch($trigger_discoveries)) {
+			$triggerid = $discovery_data['triggerid'];
+			unset($discovery_data['triggerid']);
+
+			$result[$triggerid]['discoveryData'] = $discovery_data;
+		}
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {

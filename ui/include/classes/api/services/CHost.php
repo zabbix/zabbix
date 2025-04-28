@@ -27,6 +27,9 @@ class CHost extends CHostGeneral {
 		'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode', 'active_available'
 	];
 
+	public const HOST_DISCOVERY_OUTPUT_FIELDS = ['host', 'hostid', 'parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['host', 'parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
+
 	/**
 	 * Get host data.
 	 *
@@ -1981,6 +1984,10 @@ class CHost extends CHostGeneral {
 			return;
 		}
 
+		if ($options['selectHostDiscovery'] === 'extend') {
+			$options['selectHostDiscovery'] = self::HOST_DISCOVERY_OUTPUT_FIELDS;
+		}
+
 		$host_discoveries = API::getApiService()->select('host_discovery', [
 			'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
 			'filter' => ['hostid' => array_keys($result)],
@@ -2007,7 +2014,7 @@ class CHost extends CHostGeneral {
 		]);
 		$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
 
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid']);
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid', 'lastcheck']);
 
 		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 	}
@@ -2029,8 +2036,8 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
-			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['host', 'hostid', 'parent_hostid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['host', 'parent_hostid', 'lastcheck', 'status', 'ts_delete', 'ts_disable', 'disable_source']), 'default' => null]
+			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::HOST_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {

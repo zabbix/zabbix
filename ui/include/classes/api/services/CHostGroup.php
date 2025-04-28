@@ -88,7 +88,7 @@ class CHostGroup extends CApiService {
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
-			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CDiscoveryRule::OUTPUT_FIELDS, ['uuid'])), 'default' => null],
 			'selectDiscoveryRulePrototypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],

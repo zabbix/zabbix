@@ -2168,7 +2168,7 @@ abstract class CItemGeneral extends CApiService {
 		]);
 		$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
 
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid']);
+		$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid', 'lastcheck']);
 
 		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 	}

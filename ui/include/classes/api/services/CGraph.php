@@ -23,6 +23,9 @@ class CGraph extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
 
+	public const GRAPH_DISCOVERY_OUTPUT_FIELDS = ['graphid', 'parent_graphid', 'status', 'ts_delete'];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_graphid', 'status', 'ts_delete'];
+
 	public function __construct() {
 		parent::__construct();
 
@@ -326,8 +329,8 @@ class CGraph extends CGraphGeneral {
 	 */
 	protected function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', ['graphid', 'parent_graphid', 'lastcheck', 'status', 'ts_delete']), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['parent_graphid', 'lastcheck', 'status', 'ts_delete']), 'default' => null]
+			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::GRAPH_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -440,6 +443,10 @@ class CGraph extends CGraphGeneral {
 			return;
 		}
 
+		if ($options['selectGraphDiscovery'] === 'extend') {
+			$options['selectGraphDiscovery'] = self::GRAPH_DISCOVERY_OUTPUT_FIELDS;
+		}
+
 		$graph_discoveries = API::getApiService()->select('graph_discovery', [
 			'output' => $this->outputExtend($options['selectGraphDiscovery'], ['graphid']),
 			'filter' => ['graphid' => array_keys($result)],
@@ -466,7 +473,7 @@ class CGraph extends CGraphGeneral {
 		]);
 		$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
 
-		$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid']);
+		$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid', 'lastcheck']);
 
 		$result = $relation_map->mapOne($result, $graph_discoveries, 'discoveryData');
 	}
