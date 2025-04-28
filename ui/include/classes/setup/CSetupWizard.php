@@ -610,8 +610,7 @@ class CSetupWizard extends CForm {
 						? CVaultHashiCorp::API_ENDPOINT_DEFAULT
 						: CVaultCyberArk::API_ENDPOINT_DEFAULT
 					)
-				))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_url_row',
 				!in_array($db_creds_storage, [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK])
 					? ZBX_STYLE_DISPLAY_NONE
