@@ -628,7 +628,7 @@ class CUserDirectory extends CApiService {
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/idp_type', _('cannot be changed'))
 				);
 			}
-			elseif (array_key_exists('idp_certificate', $userdirectory) 
+			elseif (array_key_exists('idp_certificate', $userdirectory)
 					&& self::checkSamlCertificate($userdirectory['idp_certificate'], $error) === false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -1686,15 +1686,15 @@ class CUserDirectory extends CApiService {
 		if (mb_strlen($value) > 10000) {
 			$error = _s('Incorrect value for %1$s.', 'certificate').' '.
 				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
-			
-			return false;	
+
+			return false;
 		}
 		elseif ($value !== '') {
 			$is_certificate = @openssl_x509_read($value);
 
 			if (!$is_certificate) {
 				$error = _s('Provided %1$s is not a valid %2$s', $value, 'certificate');
-				
+
 				return false;
 			}
 		}
@@ -1706,7 +1706,7 @@ class CUserDirectory extends CApiService {
 		if (mb_strlen($value) > 10000) {
 			$error = _s('Incorrect value for %1$s.', 'SP private key').' '.
 				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
-				
+
 			return false;
 		}
 		elseif ($value !== '') {
@@ -1714,7 +1714,7 @@ class CUserDirectory extends CApiService {
 
 			if (!$is_private_key) {
 				$error = _s('Provided %1$s is not a valid %2$s', $value, 'key');
-				
+
 				return false;
 			}
 		}
