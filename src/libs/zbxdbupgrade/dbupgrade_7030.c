@@ -441,6 +441,20 @@ static int	DBpatch_7030031(void)
 
 static int	DBpatch_7030032(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'itemcard','widgets/itemcard',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030033(void)
+{
 	const zbx_db_table_t	table =
 			{"media_type_oauth", "mediatypeid", 0,
 				{
@@ -463,7 +477,7 @@ static int	DBpatch_7030032(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030033(void)
+static int	DBpatch_7030034(void)
 {
 	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0,
 						ZBX_FK_CASCADE_DELETE};
@@ -511,5 +525,6 @@ DBPATCH_ADD(7030030, 0, 1)
 DBPATCH_ADD(7030031, 0, 1)
 DBPATCH_ADD(7030032, 0, 1)
 DBPATCH_ADD(7030033, 0, 1)
+DBPATCH_ADD(7030034, 0, 1)
 
 DBPATCH_END()
