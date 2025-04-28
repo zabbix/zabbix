@@ -46,7 +46,7 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.'][value]');
+	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']');
 
 	if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 		$macro_value->addRevertButton();

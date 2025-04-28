@@ -696,7 +696,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-text',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{index}][value]', null, false),
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{index}]', null, false),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -705,7 +705,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-secret',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{index}][value]', null, false),
+				new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{index}]', null, false),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -714,7 +714,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-vault',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{index}][value]', null, false),
+				new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{index}]', null, false),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)

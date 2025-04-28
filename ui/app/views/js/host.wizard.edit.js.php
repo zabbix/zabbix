@@ -78,6 +78,11 @@ window.host_wizard_edit = new class {
 	MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	MACRO_TYPE_VAULT = 'VAULT';
 
+	WIZARD_FIELD_NOCONF = 0;
+	WIZARD_FIELD_TEXT = 1;
+	WIZARD_FIELD_LIST = 2;
+	WIZARD_FIELD_CHECKBOX = 3;
+
 	#view_templates;
 
 	/** @type {Map<number, object>} */
@@ -180,7 +185,16 @@ window.host_wizard_edit = new class {
 		macros: {}
 	}
 
-	init({templates, linked_templates, wizard_hide_welcome}) {
+	async init({templates, linked_templates, wizard_hide_welcome}) {
+
+		await this.#loadWizardConfig({templateid: 10265});
+
+
+
+
+
+
+
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
@@ -227,38 +241,38 @@ window.host_wizard_edit = new class {
 	}
 
 	#onBeforeNextStep() {
-		switch (this.#steps_queue[this.#current_step]) {
+		/*switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_CREATE_HOST:
-				const template_get_url = new URL('zabbix.php', location.href);
-
-				template_get_url.searchParams.set('action', 'host.wizard.get');
-				template_get_url.searchParams.set('templateid', this.#data.template_selected);
-
-				if (this.#data.hostid !== null) {
-					console.log(this.#data.hostid)
-					template_get_url.searchParams.set('hostid', this.#data.hostid.id);
-				}
-
-				return fetch(template_get_url.href)
-					.then(response => response.json())
-					.then(response => {
-						this.#data.agent_install_required = response.agent_install_required;
-
-						this.#data.interface_required = {
-							[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
-							[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
-							[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
-							[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required
-						};
-
-						this.#template = response.template;
-						this.#host = response.host;
-
-						console.log(response)
-					})
+				//return this.#loadWizardConfig({templateid: this.#data.template_selected, hostid: this.#data.hostid?.id});
+				return this.#loadWizardConfig({templateid: 10265});
 			default:
 				return Promise.resolve();
-		}
+		}*/
+	}
+
+	async #loadWizardConfig({templateid, hostid}) {
+		const url_params = objectToSearchParams({
+			action: 'host.wizard.get',
+			templateid,
+			...(hostid && {hostid})
+		})
+		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
+
+		return await fetch(get_url.href)
+			.then(response => response.json())
+			.then(response => {
+				this.#data.agent_install_required = response.agent_install_required;
+
+				this.#data.interface_required = {
+					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
+					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
+					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
+					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required
+				};
+
+				this.#template = response.template;
+				this.#host = response.host;
+			});
 	}
 
 	#initViewTemplates() {
@@ -443,40 +457,43 @@ window.host_wizard_edit = new class {
 	#renderReadme() {
 		const step = this.#view_templates.step_readme.evaluateToElement();
 
+		step.querySelector(`.${ZBX_STYLE_MARKDOWN}`).appendChild(this.#template.readme);
+
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
 	#renderConfigureHost() {
-		console.log('#renderConfigureHost')
 		const step = this.#view_templates.step_configure_host.evaluateToElement();
-		const macros_list = step.querySelector('.js-host-macro-list');
-		console.log('1', this.#template.macros)
-		this.#template.macros.forEach((macro, row_index) => {
-			const {field, description} = this.#makeMacroField(macro, row_index);
 
-			if (field !== null) {
-				macros_list.appendChild(field);
-
-				if (description !== null) {
-					description.classList.add(ZBX_STYLE_GRID_COLUMN_LAST);
-					macros_list.appendChild(description);
-				}
-			}
-		});
-		console.log('2', this.#template.macros)
 		if (this.#template.templateid !== this.#templateid) {
 			this.#templateid = this.#template.templateid;
-			console.log('3', this.#template.macros)
+
+			const macros_list = step.querySelector('.js-host-macro-list');
+
 			this.#template.macros.forEach((macro, row_index) => {
-				console.log(macro, row_index)
-				this.#data.macros[row_index] = {
+				const {field, description} = this.#makeMacroField(macro, row_index);
+
+				if (field !== null) {
+					macros_list.appendChild(field);
+
+					if (description !== null) {
+						description.classList.add(ZBX_STYLE_GRID_COLUMN_LAST);
+						macros_list.appendChild(description);
+					}
+				}
+			});
+
+			this.#data.macros = this.#template.macros.reduce((obj, macro, index) => {
+				obj[index] = {
 					type: macro.type,
 					macro: macro.macro,
 					value: macro.value,
 					description: macro.description,
 					discovery_state: this.DISCOVERY_STATE_MANUAL
-				}
-			});
+				};
+
+				return obj;
+			}, {});
 		}
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
@@ -500,7 +517,7 @@ window.host_wizard_edit = new class {
 	#updateStepsQueue() {
 		this.#steps_queue = [];
 
-		if (!this.#data.do_not_show_welcome) {
+		/*if (!this.#data.do_not_show_welcome) {
 			this.#steps_queue.push(this.STEP_WELCOME);
 		}
 
@@ -516,7 +533,9 @@ window.host_wizard_edit = new class {
 
 		if (this.#template?.readme) {
 			this.#steps_queue.push(this.STEP_README);
-		}
+		}*/
+
+		console.log(this.#template);
 
 		if (Object.keys(this.#template?.macros || {}).length) {
 			this.#steps_queue.push(this.STEP_CONFIGURE_HOST);
@@ -801,13 +820,13 @@ window.host_wizard_edit = new class {
 
 	#makeMacroField(macro, row_index) {
 		const field_view = (() => {
-			switch (macro.config.type) {
-				case 'checkbox':
-					return this.#makeMacroFieldCheckbox(macro, row_index);
-				case 'list':
-					return this.#makeMacroFieldList(macro, row_index);
-				case 'text':
+			switch (Number(macro.config.type)) {
+				case this.WIZARD_FIELD_TEXT:
 					return this.#makeMacroFieldText(macro, row_index);
+				case this.WIZARD_FIELD_LIST:
+					return this.#makeMacroFieldList(macro, row_index);
+				case this.WIZARD_FIELD_CHECKBOX:
+					return this.#makeMacroFieldCheckbox(macro, row_index);
 				default:
 					return null;
 			}
@@ -822,18 +841,29 @@ window.host_wizard_edit = new class {
 		return {field: field_view, description: description_view};
 	}
 
-	#makeMacroFieldCheckbox(macro, row_index) {
-		console.log('#makeMacroFieldCheckbox', row_index, macro)
+	#makeMacroFieldText(macro, row_index) {
+		console.log('#makeMacroFieldText', row_index, macro);
 
-		const field = this.#view_templates.macro_field_checkbox.evaluateToElement({
-			index: row_index,
-			label: macro.config.label,
-			macro: macro.macro,
-			value: macro.config.options[0].checked,
-			unchecked_value: macro.config.options[0].unchecked
-		});
-
-		return field;
+		switch (macro.type) {
+			case this.MACRO_TYPE_SECRET:
+				return this.#view_templates.macro_field_secret.evaluateToElement({
+					index: row_index,
+					label: macro.config.label,
+					macro: macro.macro
+				});
+			case this.MACRO_TYPE_VAULT:
+				return this.#view_templates.macro_field_vault.evaluateToElement({
+					index: row_index,
+					label: macro.config.label,
+					macro: macro.macro
+				});
+			default:
+				return this.#view_templates.macro_field_text.evaluateToElement({
+					index: row_index,
+					label: macro.config.label,
+					macro: macro.macro
+				});
+		}
 	}
 
 	#makeMacroFieldList(macro_entry, row_index) {
@@ -878,29 +908,18 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#makeMacroFieldText(macro, row_index) {
-		console.log('#makeMacroFieldText', row_index, macro);
+	#makeMacroFieldCheckbox(macro, row_index) {
+		console.log('#makeMacroFieldCheckbox', row_index, macro)
 
-		switch (macro.type) {
-			case this.MACRO_TYPE_SECRET:
-				return this.#view_templates.macro_field_secret.evaluateToElement({
-					index: row_index,
-					label: macro.config.label,
-					macro: macro.macro
-				});
-			case this.MACRO_TYPE_VAULT:
-				return this.#view_templates.macro_field_vault.evaluateToElement({
-					index: row_index,
-					label: macro.config.label,
-					macro: macro.macro
-				});
-			default:
-				return this.#view_templates.macro_field_text.evaluateToElement({
-					index: row_index,
-					label: macro.config.label,
-					macro: macro.macro
-				});
-		}
+		const field = this.#view_templates.macro_field_checkbox.evaluateToElement({
+			index: row_index,
+			label: macro.config.label,
+			macro: macro.macro,
+			value: macro.config.options[0].checked,
+			unchecked_value: macro.config.options[0].unchecked
+		});
+
+		return field;
 	}
 
 	#disableWelcomeStep() {

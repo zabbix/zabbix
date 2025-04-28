@@ -35,7 +35,7 @@ else {
 		]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.'][value]', null, false))
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
 			->setReadonly($data['readonly']
 				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
 			);

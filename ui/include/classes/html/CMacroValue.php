@@ -123,7 +123,7 @@ class CMacroValue extends CInput {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
 			$dropdown_btn_class = ZBX_ICON_TEXT;
 
-			$elements[] = (new CTextAreaFlexible($name, $value, ['add_post_js' => $this->add_post_js]))
+			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
@@ -133,7 +133,7 @@ class CMacroValue extends CInput {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_ICON_LOCK;
 
-			$elements[] = (new CTextAreaFlexible($name, $value, ['add_post_js' => $this->add_post_js]))
+			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
@@ -143,7 +143,7 @@ class CMacroValue extends CInput {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
 			$dropdown_btn_class = ZBX_ICON_EYE_OFF;
 
-			$elements[] = (new CInputSecret($name, $value, $this->add_post_js))
+			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
 				->setAttribute('disabled', $readonly ? 'disabled' : null)
 				->setAttribute('placeholder', _('value'));
