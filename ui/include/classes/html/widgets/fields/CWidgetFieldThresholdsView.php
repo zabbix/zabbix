@@ -54,21 +54,15 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 			$thresholds_table
 				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true})
-				.on("afteradd.dynamicRows", function(opt) {
-					const rows = this.querySelectorAll(".form_row");
-					const colors = jQuery("#widget-dialogue-form")[0]
-						.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.' input");
+				.on("afteradd.dynamicRows", function() {
+					const color_pickers = this.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.'");
 					const used_colors = [];
-					for (const color of colors) {
-						if (color.value !== "" && color.name.includes("thresholds")) {
-							used_colors.push(color.value);
+					for (const color_picker of color_pickers) {
+						if (color_picker.color !== "") {
+							used_colors.push(color_picker.color);
 						}
 					}
-					jQuery(".color-picker input", rows[rows.length - 1])
-						.val(colorPalette.getNextColor(used_colors))
-						.colorpicker({
-							appendTo: ".overlay-dialogue-body"
-						});
+					color_pickers[color_pickers.length - 1].color = colorPalette.getNextColor(used_colors);
 				});
 		';
 	}
@@ -81,7 +75,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 	public function getRowTemplate($row_num = '#{rowNum}', $color = '#{color}', $threshold = '#{threshold}'): CRow {
 		return (new CRow([
-			(new CColor($this->field->getName().'['.$row_num.'][color]', $color))->appendColorPickerJs(false),
+			(new CColorPicker($this->field->getName().'['.$row_num.'][color]'))->setColor($color),
 			(new CTextBox($this->field->getName().'['.$row_num.'][threshold]', $threshold, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),
