@@ -189,6 +189,7 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 								break;
 							}
 						}
+					}
 				}
 			}
 
