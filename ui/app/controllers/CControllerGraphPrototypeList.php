@@ -58,11 +58,11 @@ class CControllerGraphPrototypeList extends CController {
 			]);
 		}
 
-		$this->discovery_rule = reset($discovery_rule);
-
 		if (!$discovery_rule) {
 			return false;
 		}
+
+		$this->discovery_rule = reset($discovery_rule);
 
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)

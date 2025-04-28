@@ -565,25 +565,34 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-			$url = (new CUrl('host_discovery.php'))
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', 'template');
+		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setArgument('context', 'template');
+			}
+			else {
+				$url = (new CUrl('host_discovery.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
+					->setArgument('context', 'template');
+			}
 		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'item.prototype.list')
-				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-				->setArgument('context', 'template');
-		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'item.list')
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', 'template');
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
+					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setArgument('context', 'template');
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
+					->setArgument('context', 'template');
+			}
 		}
 
 		$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);

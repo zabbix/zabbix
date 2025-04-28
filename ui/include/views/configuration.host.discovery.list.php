@@ -243,6 +243,29 @@ foreach ($data['discoveries'] as $discovery) {
 		$data['allowed_ui_conf_templates']
 	);
 
+	if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($discovery['discoveryRule']) {
+			if ($discovery['is_discovery_rule_editable']) {
+				$description[] = (new CLink($discovery['discoveryRule']['name'],
+					(new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid',  $discovery['discoveryRule']['itemid'])
+						->setArgument('context', 'host')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$description[] = (new CSpan($discovery['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
+		$description[] = NAME_DELIMITER;
+	}
+
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
 			$description[] = $discovery['master_item']['name'];

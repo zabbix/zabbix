@@ -266,8 +266,14 @@ if (getRequest('parent_discoveryid')) {
 
 	$db_parent_discovery = reset($db_parent_discovery);
 
-	if (!$db_parent_discovery || $db_parent_discovery['hosts'][0]['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!$db_parent_discovery) {
 		access_deny();
+	}
+
+	if (hasRequest('add') || hasRequest('update')) {
+		if ($db_parent_discovery['hosts'][0]['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			access_deny();
+		}
 	}
 
 	$hosts = $db_parent_discovery['hosts'];
@@ -804,6 +810,7 @@ else {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
+		'selectDiscoveryRule' => ['itemid', 'name'],
 		'editable' => true,
 		'templated' => ($data['context'] === 'template'),
 		'sortfield' => $sort_field,
@@ -826,6 +833,31 @@ else {
 	}
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
+
+	$lld_parentids = [];
+
+	foreach ($data['discoveries'] as $discovery) {
+		if ($discovery['discoveryRule']) {
+			$lld_parentids[$discovery['discoveryRule']['itemid']] = true;
+		}
+	}
+
+	if ($lld_parentids) {
+		$editable_lld_parents = API::DiscoveryRule()->get([
+			'output' => [],
+			'itemids' => array_keys($lld_parentids),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($data['discoveries'] as &$discovery) {
+			if ($discovery['discoveryRule']) {
+				$discovery['is_discovery_rule_editable'] =
+					array_key_exists($discovery['discoveryRule']['itemid'], $editable_lld_parents);
+			}
+		}
+		unset($discovery);
+	}
 
 	// pager
 	if (hasRequest('page')) {

@@ -105,12 +105,10 @@ JAVASCRIPT;
 	/**
 	 * Add inherited from host and template tags to item tags.
 	 *
-	 * @param int   $item_tags['itemid']
-	 * @param int   $item_tags['hostid']
-	 * @param int   $item_tags['templateid']
-	 * @param array $item_tags['discoveryRule']
-	 * @param int   $item_tags['discoveryRule']['templateid']
-	 * @param int   $item_tags['discoveryRule']['itemid']
+	 * @param int   $item['itemid']
+	 * @param int   $item['hostid']
+	 * @param int   $item['templateid']
+	 * @param array $item['discoveryRule'] (for base objects) | ['parent_lld'] (for prototypes)
 	 * @param array $item_tags
 	 *
 	 * @return array of tags with inherited and additional property 'type' set for each tag.
