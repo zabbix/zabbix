@@ -87,6 +87,8 @@ int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name
 	data->access_expires_in = (time_t)atoi(row[6]);
 	data->tokens_status = (unsigned char)atoi(row[7]);
 
+	/* for audit it is necessary to keep the original value from DB to compare with, not the intermediate values
+	which may appear later in the sequence of unsuccessful attempts to update tokens */
 	data->old_tokens_status = data->tokens_status;
 
 	ret = SUCCEED;
@@ -119,7 +121,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 #define SET_ERROR(format, ...)											\
 	do													\
 	{													\
-		*error = zbx_dsprintf(NULL, "Access token retrieval failed: mediatype \"%s\": " format,	\
+		*error = zbx_dsprintf(NULL, "Access token retrieval failed: mediatype \"%s\": " format,		\
 				mediatype_name, __VA_ARGS__);							\
 	}													\
 	while (0)
@@ -137,7 +139,7 @@ int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name,
 	char	*posts = zbx_strdcatf(NULL, "grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s",
 			data->client_id, data->client_secret, data->refresh_token);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): posts [%s]", __func__, posts);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): posts:[%s]", __func__, posts);
 
 	if (SUCCEED != zbx_http_req(data->token_url, header, timeout, NULL, NULL, config_source_ip,
 			config_ssl_ca_location, NULL, NULL, &out, posts, &response_code, error))
@@ -261,7 +263,7 @@ void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetc
 	{
 		data->tokens_status |= ZBX_OAUTH_TOKEN_ACCESS_VALID;
 
-		if (NULL != data->old_refresh_token)
+		if (NULL != data->old_refresh_token)	 /* data->refresh_token has changed */
 		{
 			data->tokens_status |= ZBX_OAUTH_TOKEN_REFRESH_VALID;
 			zbx_db_execute("update media_type_oauth set"
