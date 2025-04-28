@@ -186,15 +186,6 @@ window.host_wizard_edit = new class {
 	}
 
 	async init({templates, linked_templates, wizard_hide_welcome}) {
-
-		await this.#loadWizardConfig({templateid: 10265});
-
-
-
-
-
-
-
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
@@ -238,41 +229,6 @@ window.host_wizard_edit = new class {
 
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
-	}
-
-	#onBeforeNextStep() {
-		/*switch (this.#steps_queue[this.#current_step]) {
-			case this.STEP_CREATE_HOST:
-				//return this.#loadWizardConfig({templateid: this.#data.template_selected, hostid: this.#data.hostid?.id});
-				return this.#loadWizardConfig({templateid: 10265});
-			default:
-				return Promise.resolve();
-		}*/
-	}
-
-	async #loadWizardConfig({templateid, hostid}) {
-		const url_params = objectToSearchParams({
-			action: 'host.wizard.get',
-			templateid,
-			...(hostid && {hostid})
-		})
-		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
-
-		return await fetch(get_url.href)
-			.then(response => response.json())
-			.then(response => {
-				this.#data.agent_install_required = response.agent_install_required;
-
-				this.#data.interface_required = {
-					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
-					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
-					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
-					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required
-				};
-
-				this.#template = response.template;
-				this.#host = response.host;
-			});
 	}
 
 	#initViewTemplates() {
@@ -457,43 +413,40 @@ window.host_wizard_edit = new class {
 	#renderReadme() {
 		const step = this.#view_templates.step_readme.evaluateToElement();
 
-		step.querySelector(`.${ZBX_STYLE_MARKDOWN}`).appendChild(this.#template.readme);
+		step.querySelector(`.${ZBX_STYLE_MARKDOWN}`).innerHTML = this.#template.readme;
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
 	#renderConfigureHost() {
 		const step = this.#view_templates.step_configure_host.evaluateToElement();
+		const macros_list = step.querySelector('.js-host-macro-list');
+
+		this.#template.macros.forEach((macro, row_index) => {
+			const {field, description} = this.#makeMacroField(macro, row_index);
+
+			if (field !== null) {
+				macros_list.appendChild(field);
+
+				if (description !== null) {
+					description.classList.add(ZBX_STYLE_GRID_COLUMN_LAST);
+					macros_list.appendChild(description);
+				}
+			}
+		});
 
 		if (this.#template.templateid !== this.#templateid) {
 			this.#templateid = this.#template.templateid;
 
-			const macros_list = step.querySelector('.js-host-macro-list');
-
-			this.#template.macros.forEach((macro, row_index) => {
-				const {field, description} = this.#makeMacroField(macro, row_index);
-
-				if (field !== null) {
-					macros_list.appendChild(field);
-
-					if (description !== null) {
-						description.classList.add(ZBX_STYLE_GRID_COLUMN_LAST);
-						macros_list.appendChild(description);
-					}
-				}
-			});
-
-			this.#data.macros = this.#template.macros.reduce((obj, macro, index) => {
-				obj[index] = {
+			this.#data.macros = Object.fromEntries(
+				this.#template.macros.map((macro, index) => [index, {
 					type: macro.type,
 					macro: macro.macro,
 					value: macro.value,
 					description: macro.description,
 					discovery_state: this.DISCOVERY_STATE_MANUAL
-				};
-
-				return obj;
-			}, {});
+				}])
+			);
 		}
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
@@ -514,10 +467,53 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
+	#onBeforeNextStep() {
+
+		console.log(this.#data.hostid)
+
+		switch (this.#steps_queue[this.#current_step]) {
+			case this.STEP_CREATE_HOST:
+				const host = this.#data.hostid;
+
+				return this.#loadWizardConfig({
+					templateid: this.#data.template_selected,
+					hostid: host && !host.isNew ? host.id : null
+				});
+
+			default:
+				return Promise.resolve();
+		}
+	}
+
+	#loadWizardConfig({templateid, hostid}) {
+		const url_params = objectToSearchParams({
+			action: 'host.wizard.get',
+			templateid,
+			...(hostid !== null && {hostid})
+		})
+		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
+
+		return fetch(get_url.href)
+			.then(response => response.json())
+			.then(response => {
+				this.#data.agent_install_required = response.agent_install_required;
+
+				this.#data.interface_required = {
+					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
+					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
+					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
+					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required
+				};
+
+				this.#template = response.template;
+				this.#host = response.host;
+			});
+	}
+
 	#updateStepsQueue() {
 		this.#steps_queue = [];
 
-		/*if (!this.#data.do_not_show_welcome) {
+		if (!this.#data.do_not_show_welcome) {
 			this.#steps_queue.push(this.STEP_WELCOME);
 		}
 
@@ -533,7 +529,7 @@ window.host_wizard_edit = new class {
 
 		if (this.#template?.readme) {
 			this.#steps_queue.push(this.STEP_README);
-		}*/
+		}
 
 		console.log(this.#template);
 
@@ -573,7 +569,7 @@ window.host_wizard_edit = new class {
 			},
 			{
 				label: t('Create or select a host'),
-				info: this.#host?.name,
+				info: this.#data.hostid?.name,
 				visible: true,
 				steps: [this.STEP_CREATE_HOST]
 			},
@@ -626,12 +622,12 @@ window.host_wizard_edit = new class {
 		switch (this.#current_step) {
 			case this.STEP_WELCOME:
 				break;
+
 			case this.STEP_SELECT_TEMPLATE:
 				if (!path
-						|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
+					|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
 				) {
 					const step_body = document.querySelector('.js-templates');
-
 					step_body.innerHTML = '';
 
 					for (const section of this.#makeCardListSections()) {
@@ -643,11 +639,13 @@ window.host_wizard_edit = new class {
 					this.#next_button.toggleAttribute('disabled', new_value === null);
 				}
 				break;
+
 			case this.STEP_CREATE_HOST:
 				if (path === 'hostid') {
 					this.#next_button.toggleAttribute('disabled', new_value === null);
 				}
 				break;
+
 			case this.STEP_INSTALL_AGENT:
 				const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
 
@@ -655,8 +653,8 @@ window.host_wizard_edit = new class {
 					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
 				}
 				break;
-			case this.STEP_CONFIGURE_HOST:
 
+			case this.STEP_CONFIGURE_HOST:
 				break;
 		}
 	}
@@ -708,12 +706,14 @@ window.host_wizard_edit = new class {
 					return false;
 				}
 
+				const query = this.#data.template_search_query.toLowerCase();
+
 				if (this.#data.template_search_query.trim() !== '') {
-					return template.name.toLowerCase().includes(this.#data.template_search_query)
-						|| template.description.toLowerCase().includes(this.#data.template_search_query)
+					return template.name.toLowerCase().includes(query)
+						|| template.description.toLowerCase().includes(query)
 						|| template.tags.some(({tag, value}) => {
-							return tag.toLowerCase().includes(this.#data.template_search_query)
-								|| value.toLowerCase().includes(this.#data.template_search_query);
+							return tag.toLowerCase().includes(query)
+								|| value.toLowerCase().includes(query);
 						});
 				}
 
@@ -911,15 +911,13 @@ window.host_wizard_edit = new class {
 	#makeMacroFieldCheckbox(macro, row_index) {
 		console.log('#makeMacroFieldCheckbox', row_index, macro)
 
-		const field = this.#view_templates.macro_field_checkbox.evaluateToElement({
+		return this.#view_templates.macro_field_checkbox.evaluateToElement({
 			index: row_index,
 			label: macro.config.label,
 			macro: macro.macro,
 			value: macro.config.options[0].checked,
 			unchecked_value: macro.config.options[0].unchecked
 		});
-
-		return field;
 	}
 
 	#disableWelcomeStep() {
