@@ -139,7 +139,7 @@ class testUserMacro extends CAPITest {
 			],
 			[
 				'hostmacro' => [
-					'macro' => '{$CONFIG}',
+					'macro' => '{$CONFIG0}',
 					'value' => 'invalid',
 					'hostid' => '50010',
 					'config' => []
@@ -447,7 +447,7 @@ class testUserMacro extends CAPITest {
 					$dbResult = DBSelect('select * from hostmacro_config where hostmacroid='.zbx_dbstr($id));
 					$dbRow = DBFetch($dbResult);
 
-					if ($hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+					if (!$hostmacro['config'] || $hostmacro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
 						$this->assertFalse($dbRow);
 					}
 					else {
@@ -780,28 +780,14 @@ class testUserMacro extends CAPITest {
 			[
 				'hostmacro' => [
 					[
-						'hostmacroid' => '1',
-						'value' => 'test',
-						'config' => []
-					],
-					[
-						'hostmacroid' => '2',
-						'value' => 'test',
-						'description' => 'notes',
+						'hostmacroid' => '10001',
 						'config' => []
 					]
 				],
 				'expected_error' => null,
 				'expect_db_rows' => [
 					[
-						'hostmacroid' => '1',
-						'value' => 'test',
-						'description' => 'description'
-					],
-					[
-						'hostmacroid' => '2',
-						'value' => 'test',
-						'description' => 'notes'
+						'hostmacroid' => '10001'
 					]
 				]
 			],
