@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-10 00:12+0000\n"
+"PO-Revision-Date: 2025-04-12 12:23+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -2079,7 +2079,7 @@ msgstr "境界幅"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr "接続の暗号化設定を変更する場合は、「tls_connect」フィールドと「tls_accept」フィールドの両方を指定する必要があります。"
+msgstr "接続の暗号化設定を変更する場合は、\"tls_connect\" フィールドと \"tls_accept\" フィールドの両方を指定する必要があります。"
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
@@ -2156,23 +2156,23 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr "スワップインの待機の為に費やされたCPU時間、「url」- VMwareサービスURL、「uuid」- VMware仮想マシンのグローバル一意識別子、「instance」- CPUインスタンス"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1939
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "周期中のCPU使用率（パーセンテージ）は電源管理またはHTに依存します。「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバル一意識別子です。"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1925
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "周期中の CPU 使用率 (パーセンテージ)、「url」 - VMware サービスの URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2289
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "周期中のCPU使用率（パーセンテージ）、「url」- VMwareサービスURL、「uuid」- VMware仮想マシンのグローバル一意識別子"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2205
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr "周期中のVMware リソース プールの CPU 使用率 (ヘルツ単位)、「url」 - VMware サービス URL、「rpid」 - VMware リソース プール ID"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU utilization percentage. Returns float"
@@ -7952,6 +7952,10 @@ msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 msgid "Error message"
 msgstr "エラーメッセージ"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -11902,6 +11906,10 @@ msgstr "アイテム"
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "アイテムは秘密な値を持つユーザー定義マクロを含んでいます。これらのマクロの値は手動で入力する必要があります。"
@@ -13555,6 +13563,10 @@ msgstr "メソッドが見つかりません。"
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "認証方法"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"

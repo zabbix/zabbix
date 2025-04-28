@@ -8076,6 +8076,10 @@ msgstr "Feil i søkeforespørsel for tabell \"%1$s\"."
 msgid "Error message"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -12049,6 +12053,10 @@ msgstr "artikkel"
 msgid "Item added"
 msgstr "Element lagt til"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
@@ -13723,6 +13731,10 @@ msgstr "Metode ikke funnet."
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
+msgstr ""
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
 msgstr ""
 
 #: include/httptest.inc.php:392

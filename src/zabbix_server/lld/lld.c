@@ -164,8 +164,11 @@ static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, 
 	}
 	else
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
-				&condition->regexp, ZBX_MACRO_TYPE_LLD_FILTER, NULL, 0);
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+
+		zbx_substitute_macros(&condition->regexp, NULL, 0, zbx_macro_field_params_resolv, um_handle, item);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	return SUCCEED;

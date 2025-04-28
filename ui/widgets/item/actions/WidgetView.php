@@ -399,55 +399,58 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		if (array_key_exists(Widget::SHOW_VALUE, $show)) {
+		if (array_key_exists(Widget::SHOW_VALUE, $show)
+				|| (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $elements['change_indicator'] !== null)) {
 			$item_value_cell = [
 				'is_numeric' => $elements['is_numeric']
 			];
 
-			if ($config['units_show'] == 1 && $elements['units'] !== '') {
-				$item_value_cell['parts']['units'] = [
-					'text' => $elements['units'],
-					'font_size' => $config['units_size'],
-					'bold' => $config['units_bold'] == 1,
-					'color' => $config['units_color']
-				];
-				$item_value_cell['units_pos'] = $config['units_pos'];
-			}
+			if (array_key_exists(Widget::SHOW_VALUE, $show)) {
+				if ($config['units_show'] == 1 && $elements['units'] !== '') {
+					$item_value_cell['parts']['units'] = [
+						'text' => $elements['units'],
+						'font_size' => $config['units_size'],
+						'bold' => $config['units_bold'] == 1,
+						'color' => $config['units_color']
+					];
+					$item_value_cell['units_pos'] = $config['units_pos'];
+				}
 
-			$item_value_cell['parts']['value'] = [
-				'text' => $elements['value'],
-				'font_size' => $config['value_size'],
-				'bold' => $config['value_bold'] == 1,
-				'color' => $config['value_color']
-			];
-
-			if ($elements['decimals'] !== null) {
-				$item_value_cell['parts']['decimals'] = [
-					'text' => $elements['decimals'],
-					'font_size' => $config['decimal_size'],
+				$item_value_cell['parts']['value'] = [
+					'text' => $elements['value'],
+					'font_size' => $config['value_size'],
 					'bold' => $config['value_bold'] == 1,
 					'color' => $config['value_color']
+				];
+
+				if ($elements['decimals'] !== null) {
+					$item_value_cell['parts']['decimals'] = [
+						'text' => $elements['decimals'],
+						'font_size' => $config['decimal_size'],
+						'bold' => $config['value_bold'] == 1,
+						'color' => $config['value_color']
+					];
+				}
+			}
+
+			if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $elements['change_indicator'] !== null) {
+				$colors = [
+					Widget::CHANGE_INDICATOR_UP => $config['up_color'],
+					Widget::CHANGE_INDICATOR_DOWN => $config['down_color'],
+					Widget::CHANGE_INDICATOR_UP_DOWN => $config['updown_color']
+				];
+
+				$item_value_cell['parts']['change_indicator'] = [
+					'type' => $elements['change_indicator'],
+					'font_size' => $elements['decimals'] !== null
+						? max($config['value_size'], $config['decimal_size'])
+						: $config['value_size'],
+					'color' => $colors[$elements['change_indicator']]
 				];
 			}
 
 			$cells[$config['value_v_pos']][$config['value_h_pos']] = [
 				'item_value' => $item_value_cell
-			];
-		}
-
-		if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $elements['change_indicator'] !== null) {
-			$colors = [
-				Widget::CHANGE_INDICATOR_UP => $config['up_color'],
-				Widget::CHANGE_INDICATOR_DOWN => $config['down_color'],
-				Widget::CHANGE_INDICATOR_UP_DOWN => $config['updown_color']
-			];
-
-			$cells[$config['value_v_pos']][$config['value_h_pos']]['item_value']['parts']['change_indicator'] = [
-				'type' => $elements['change_indicator'],
-				'font_size' => $elements['decimals'] !== null
-					? max($config['value_size'], $config['decimal_size'])
-					: $config['value_size'],
-				'color' => $colors[$elements['change_indicator']]
 			];
 		}
 
