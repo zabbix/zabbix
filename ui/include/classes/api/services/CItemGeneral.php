@@ -26,6 +26,10 @@ abstract class CItemGeneral extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_itemid', 'key_', 'status', 'ts_delete', 'ts_disable',
+		'disable_source'
+	];
+
 	public const INTERFACE_TYPES_BY_PRIORITY = [
 		INTERFACE_TYPE_AGENT,
 		INTERFACE_TYPE_SNMP,
@@ -2161,16 +2165,25 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		$discovery_data = API::getApiService()->select('item_discovery', [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemdiscoveryid', 'itemid']),
-			'filter' => ['itemid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($discovery_data, 'itemid', 'itemdiscoveryid');
+		foreach ($result as &$item) {
+			$item['discoveryData'] = [];
+		}
+		unset($item);
 
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['itemid', 'itemdiscoveryid', 'lastcheck']);
+		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
+			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
+		}
 
-		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
+		$_options = [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemid']),
+			'filter' => ['itemid' => array_keys($result)]
+		];
+		$resource = DBselect(DB::makeSql('item_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['itemid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['itemid']));
+		}
 	}
 
 	/**

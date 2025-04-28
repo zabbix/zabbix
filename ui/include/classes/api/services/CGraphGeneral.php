@@ -26,6 +26,8 @@ abstract class CGraphGeneral extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_graphid', 'status', 'ts_delete'];
+
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
 	const ERROR_MISSING_GRAPH_NAME = 'missingGraphName';
 	const ERROR_MISSING_GRAPH_ITEMS = 'missingGraphItems';
@@ -501,6 +503,32 @@ abstract class CGraphGeneral extends CApiService {
 			: [];
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
+	}
+
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$graph) {
+			$graph['discoveryData'] = [];
+		}
+		unset($graph);
+
+		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
+			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
+		}
+
+		$_options = [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
+			'graphids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('graph_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['graphid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['graphid']));
+		}
 	}
 
 	/**

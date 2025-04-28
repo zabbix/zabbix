@@ -96,6 +96,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		self::validateGet($options);
+
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
@@ -418,6 +420,16 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return $result;
 	}
 
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
 	/**
 	 * Create new trigger prototypes.
 	 *
@@ -609,6 +621,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
 			}
 		}
+
+		$this->addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}

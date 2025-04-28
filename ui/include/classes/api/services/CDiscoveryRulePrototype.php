@@ -88,6 +88,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			'limitSelects'					=> null
 		];
 
+		self::validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
@@ -282,6 +284,16 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		return $result;
 	}
 
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
 
@@ -336,6 +348,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			]);
 			$result = $relation_map->mapOne($result, $discovery_prototypes, 'discoveryRulePrototype');
 		}
+
+		$this->addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}

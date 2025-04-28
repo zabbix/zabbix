@@ -19,6 +19,10 @@
  */
 abstract class CTriggerGeneral extends CApiService {
 
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_triggerid', 'status', 'ts_delete', 'ts_disable',
+		'disable_source'
+	];
+
 	private static function isTrigger(): bool {
 		return static::class === 'CTrigger';
 	}
@@ -884,6 +888,32 @@ abstract class CTriggerGeneral extends CApiService {
 			: [];
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
+	}
+
+	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['discoveryData'] = [];
+		}
+		unset($trigger);
+
+		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
+			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
+		}
+
+		$_options = [
+			'output' => $this->outputExtend($options['selectDiscoveryData'], ['triggerid']),
+			'triggerids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('trigger_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['triggerid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['triggerid']));
+		}
 	}
 
 	/**

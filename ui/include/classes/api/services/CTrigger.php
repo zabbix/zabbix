@@ -36,9 +36,6 @@ class CTrigger extends CTriggerGeneral {
 		'url_name', 'flags'
 	];
 
-	public const TRIGGER_DISCOVERY_OUTPUT_FIELDS = ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
-	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
-
 	/**
 	 * Get Triggers data.
 	 *
@@ -129,7 +126,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$options = zbx_array_merge($defOptions, $options);
 
-		$this->validateGet($options);
+		self::validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -543,16 +540,9 @@ class CTrigger extends CTriggerGeneral {
 		return $result;
 	}
 
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array &$options): void {
+	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::TRIGGER_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
+			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
@@ -916,55 +906,19 @@ class CTrigger extends CTriggerGeneral {
 		}
 		unset($trigger);
 
-		$sql_select = ['triggerid'];
-		foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
-			if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
-				$sql_select[] = $field;
-			}
+		if ($options['selectTriggerDiscovery'] === API_OUTPUT_EXTEND) {
+			$options['selectTriggerDiscovery'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
 		}
 
-		$trigger_discoveries = DBselect(
-			'SELECT '.implode(',', $sql_select).
-			' FROM trigger_discovery'.
-			' WHERE '.dbConditionInt('triggerid', array_keys($result)
-		));
+		$_options = [
+			'output' => $this->outputExtend($options['selectTriggerDiscovery'], ['triggerid']),
+			'triggerids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('trigger_discovery', $_options));
 
-		while ($trigger_discovery = DBfetch($trigger_discoveries)) {
-			$triggerid = $trigger_discovery['triggerid'];
-			unset($trigger_discovery['triggerid']);
-
-			$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
-		}
-	}
-
-	private function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] === null) {
-			return;
-		}
-
-		foreach ($result as &$trigger) {
-			$trigger['discoveryData'] = [];
-		}
-		unset($trigger);
-
-		$sql_select = ['triggerid'];
-		foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
-			if ($this->outputIsRequested($field, $options['selectDiscoveryData'])) {
-				$sql_select[] = $field;
-			}
-		}
-
-		$trigger_discoveries = DBselect(
-			'SELECT '.implode(',', $sql_select).
-			' FROM trigger_discovery'.
-			' WHERE '.dbConditionInt('triggerid', array_keys($result))
-		);
-
-		while ($discovery_data = DBfetch($trigger_discoveries)) {
-			$triggerid = $discovery_data['triggerid'];
-			unset($discovery_data['triggerid']);
-
-			$result[$triggerid]['discoveryData'] = $discovery_data;
+		while ($trigger_discovery = DBfetch($resource)) {
+			$result[$trigger_discovery['triggerid']]['triggerDiscovery'] =
+				array_diff_key($trigger_discovery, array_flip(['triggerid']));
 		}
 	}
 

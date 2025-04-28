@@ -27,9 +27,6 @@ class CHost extends CHostGeneral {
 		'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode', 'active_available'
 	];
 
-	public const HOST_DISCOVERY_OUTPUT_FIELDS = ['host', 'hostid', 'parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
-	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['host', 'parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
-
 	/**
 	 * Get host data.
 	 *
@@ -170,7 +167,7 @@ class CHost extends CHostGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		$this->validateGet($options);
+		self::validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1984,49 +1981,28 @@ class CHost extends CHostGeneral {
 			return;
 		}
 
-		if ($options['selectHostDiscovery'] === 'extend') {
-			$options['selectHostDiscovery'] = self::HOST_DISCOVERY_OUTPUT_FIELDS;
+		foreach ($result as &$host) {
+			$host['hostDiscovery'] = [];
+		}
+		unset($host);
+
+		if ($options['selectHostDiscovery'] === API_OUTPUT_EXTEND) {
+			$options['selectHostDiscovery'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
 		}
 
-		$host_discoveries = API::getApiService()->select('host_discovery', [
+		$_options = [
 			'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
-			'filter' => ['hostid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($host_discoveries, 'hostid', 'hostid');
+			'hostids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('host_discovery', $_options));
 
-		$host_discoveries = $this->unsetExtraFields($host_discoveries, ['hostid'],
-			$options['selectHostDiscovery']
-		);
-
-		$result = $relation_map->mapOne($result, $host_discoveries, 'hostDiscovery');
-	}
-
-	private function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] === null) {
-			return;
+		while ($host_discovery = DBfetch($resource)) {
+			$result[$host_discovery['hostid']]['hostDiscovery'] =
+				array_diff_key($host_discovery, array_flip(['hostid']));
 		}
-
-		$discovery_data = API::getApiService()->select('host_discovery', [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
-			'filter' => ['hostid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($discovery_data, 'hostid', 'hostid');
-
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['hostid', 'lastcheck']);
-
-		$result = $relation_map->mapOne($result, $discovery_data, 'discoveryData');
 	}
 
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array &$options) {
+	private static function validateGet(array &$options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			'selectInheritedTags' =>	['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -2036,7 +2012,7 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
-			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::HOST_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
+			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
