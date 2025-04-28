@@ -116,6 +116,13 @@ class CControllerHostWizardGet extends CController {
 		]);
 		$template = $templates[0];
 
+		$parsedown = (new Parsedown())
+			->setMarkupEscaped(true);
+
+		if ($template['readme'] !== '') {
+			$template['readme'] = $parsedown->text($template['readme']);
+		}
+
 		$agent_interface_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET
 		];
