@@ -20,67 +20,6 @@
 
 ?>
 
-/*
-host: 'aaa',
-	_csrf_token: '',
-	groups: [
-	'23',
-	//{new: 'test12321'}
-],
-	templates: ['10668'],
-	tls_psk: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-	tls_psk_identity: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-	interfaces: {
-	"1": {
-		"address": "125",
-			"port": "10050",
-			'type': 1
-	},
-	"2": {
-		"address": "125",
-			"port": "10050",
-			'type': 2,
-			// the details should not differ from master branch
-			"details": {
-			"version": "3",
-				"community": "",
-				"max_repetitions": "10",
-				"contextname": "context-name",
-				"securityname": "sec-name",
-				"securitylevel": "2",
-				"authprotocol": "0",
-				"authpassphrase": "auth-passphr",
-				"privprotocol": "0",
-				"privpassphrase": "priv-passpht",
-				"bulk": "1"
-		}
-	},
-	"3": {
-		"address": "192.168.27.5",
-			"port": "10050",
-			'type': 3
-	},
-	"4": {
-		"address": "192.168.27.6",
-			"port": "10050",
-			'type': 4
-	}
-},
-ipmi_authtype: 0,
-	ipmi_password: "psswd",
-	ipmi_privilege: "4",
-	ipmi_username: "username"
-macros: {
-	0: {
-		"macro" : "",
-		"discovery_state": "3",
-		"value": "",
-		"type": "0",
-		"description": ""
-	}
-}
-*/
-
 window.host_wizard_edit = new class {
 
 	STEP_WELCOME = 0;
@@ -145,7 +84,7 @@ window.host_wizard_edit = new class {
 	#templates;
 	#linked_templates;
 
-	#template_uuid;
+	#templateid;
 	#template;
 	#host;
 
@@ -242,8 +181,6 @@ window.host_wizard_edit = new class {
 	}
 
 	init({templates, linked_templates, wizard_hide_welcome}) {
-		this.#template = this.example_template.zabbix_export.templates[0]; console.log(this.#template); // TODO debug
-
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
@@ -273,7 +210,10 @@ window.host_wizard_edit = new class {
 
 		this.#next_button = this.#dialogue.querySelector('.js-next');
 		this.#next_button.addEventListener('click', () => {
-			this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
+			this.#onBeforeNextStep().then(() => {
+				this.#updateStepsQueue();
+				this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
+			});
 		});
 
 		this.#create_button = this.#dialogue.querySelector('.js-create');
@@ -284,6 +224,41 @@ window.host_wizard_edit = new class {
 
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
+	}
+
+	#onBeforeNextStep() {
+		switch (this.#steps_queue[this.#current_step]) {
+			case this.STEP_CREATE_HOST:
+				const template_get_url = new URL('zabbix.php', location.href);
+
+				template_get_url.searchParams.set('action', 'host.wizard.get');
+				template_get_url.searchParams.set('templateid', this.#data.template_selected);
+
+				if (this.#data.hostid !== null) {
+					console.log(this.#data.hostid)
+					template_get_url.searchParams.set('hostid', this.#data.hostid.id);
+				}
+
+				return fetch(template_get_url.href)
+					.then(response => response.json())
+					.then(response => {
+						this.#data.agent_install_required = response.agent_install_required;
+
+						this.#data.interface_required = {
+							[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
+							[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
+							[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
+							[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required
+						};
+
+						this.#template = response.template;
+						this.#host = response.host;
+
+						console.log(response)
+					})
+			default:
+				return Promise.resolve();
+		}
 	}
 
 	#initViewTemplates() {
@@ -429,17 +404,23 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 
-		jQuery("#hostid", step).multiSelect().on('change', (_, {options, values}) => {
-			console.log(options.name, values.selected)
+		const hostid_ms = jQuery("#hostid", step).multiSelect().on('change', (_, {options, values}) => {
 			this.#setValueByName(this.#data, options.name,
-				Object.keys(values.selected).length ? values.selected : null
+				Object.keys(values.selected).length ? Object.values(values.selected)[0] : null
 			);
 		});
 
-		jQuery("#groups_", step).multiSelect().on('change', (_, {options, values}) => {
-			console.log(options.name, values.selected)
+		if (this.#data.hostid !== null) {
+			hostid_ms.multiSelect('addData', [this.#data.hostid]);
+		}
+
+		const groups_ms = jQuery("#groups_", step).multiSelect().on('change', (_, {options, values}) => {
 			this.#setValueByName(this.#data, options.name, Object.values(values.selected));
 		});
+
+		if (this.#data.groups.length) {
+			groups_ms.multiSelect('addData', this.#data.groups)
+		}
 	}
 
 	#renderInstallAgent() {
@@ -451,8 +432,9 @@ window.host_wizard_edit = new class {
 	#renderAddHostInterface() {
 		const step = this.#view_templates.step_add_host_interface.evaluateToElement();
 
-		for (const [interface_type, required] in this.#data.interface_required) {
-			step.querySelector(`js-host-interface-${interface_type}`).style.display = required ? '' : 'none';
+		for (const [interface_type, required] of Object.entries(this.#data.interface_required)) {
+			console.log(required, step.querySelector(`.js-host-interface-${interface_type}`))
+			step.querySelector(`.js-host-interface-${interface_type}`).style.display = required ? '' : 'none';
 		}
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
@@ -465,9 +447,10 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderConfigureHost() {
+		console.log('#renderConfigureHost')
 		const step = this.#view_templates.step_configure_host.evaluateToElement();
 		const macros_list = step.querySelector('.js-host-macro-list');
-
+		console.log('1', this.#template.macros)
 		this.#template.macros.forEach((macro, row_index) => {
 			const {field, description} = this.#makeMacroField(macro, row_index);
 
@@ -480,11 +463,12 @@ window.host_wizard_edit = new class {
 				}
 			}
 		});
-
-		if (this.#template_uuid !== this.#template.uuid) {
-			this.#template_uuid = this.#template.uuid;
-
+		console.log('2', this.#template.macros)
+		if (this.#template.templateid !== this.#templateid) {
+			this.#templateid = this.#template.templateid;
+			console.log('3', this.#template.macros)
 			this.#template.macros.forEach((macro, row_index) => {
+				console.log(macro, row_index)
 				this.#data.macros[row_index] = {
 					type: macro.type,
 					macro: macro.macro,
@@ -534,7 +518,7 @@ window.host_wizard_edit = new class {
 			this.#steps_queue.push(this.STEP_README);
 		}
 
-		if (!Object.keys(this.#template?.macros || {}).length) {
+		if (Object.keys(this.#template?.macros || {}).length) {
 			this.#steps_queue.push(this.STEP_CONFIGURE_HOST);
 		}
 
@@ -1022,140 +1006,5 @@ window.host_wizard_edit = new class {
 		const [first, ...rest] = path.split('.');
 
 		return first + rest.map(p => `[${p}]`).join('');
-	}
-}
-
-window.host_wizard_edit.example_template = {
-	"zabbix_export": {
-		"version": "7.4",
-		"templates": [
-			{
-				"uuid": "2513e7cddfdf45bfa0abb00d3dd4bc39",
-				"template": "my template",
-				"name": "my template",
-				"groups": [
-					{
-						"name": "My group"
-					}
-				],
-				"wizard_ready": true,
-				"macros": [
-					{
-						"macro": "{$USERNAME}",
-						"value": "root",
-						"description": "MYSQL user",
-						"config": {
-							"type": "text",
-							"label": "Username",
-							"description": "On your [DBMS](http://www.zabbix.com) create MySQL user that will be used for monitoring. Enter specified MySQL user name here.",
-							"required": true,
-							"regex": "/^[A-Za-z0-9_]+$/"
-						}
-					},
-					{
-						"macro": "{$PASSWORD}",
-						"type": "SECRET_TEXT",
-						"description": "MYSQL password",
-						"config": {
-							"type": "text",
-							"label": "Password",
-							"description": "On your [DBMS](http://www.zabbix.com) create MySQL user that will be used for monitoring. Enter specified MySQL password here.",
-							"required": true
-						}
-					},
-					{
-						"macro": "{$OPTIONS}",
-						"value": "mariadb",
-						"description": "MYSQL user",
-						"config": {
-							"type": "list",
-							"label": "Connection",
-							"description": "On your [DBMS](http://www.zabbix.com) connection.",
-							"required": true,
-							"options": [
-								{
-									"value": "",
-									"text": "Default Configuration"
-								},
-								{
-									"value": "mariadb",
-									"text": "MariaDB"
-								},
-								{
-									"value": "mysql",
-									"text": "MySQL"
-								}
-							]
-						}
-					},
-					{
-						"macro": "{$PORT}",
-						"value": "port",
-						"description": "MYSQL user",
-						"config": {
-							"type": "list",
-							"label": "Port",
-							"description": "On your [DBMS](http://www.zabbix.com) connection.",
-							"required": true,
-							"options": [
-								{
-									"value": "",
-									"text": "Default port"
-								},
-								{
-									"value": "3306",
-									"text": "MariaDB - 3306"
-								},
-								{
-									"value": "3307",
-									"text": "MariaDB - 3307"
-								},
-								{
-									"value": "3308",
-									"text": "MariaDB - 3308"
-								},
-								{
-									"value": "port",
-									"text": "MariaDB - 3309"
-								},
-								{
-									"value": "3316",
-									"text": "MariaDB - 3316"
-								},
-								{
-									"value": "3326",
-									"text": "MariaDB - 3326"
-								},
-								{
-									"value": "3336",
-									"text": "MariaDB - 3336"
-								},
-								{
-									"value": "3346",
-									"text": "MariaDB - 3346"
-								},
-							]
-						}
-					},
-					{
-						"macro": "{$ENABLE}",
-						"value": "1",
-						"description": "Enable MYSQL",
-						"config": {
-							"type": "checkbox",
-							"label": "Enable",
-							"description": "Enable [DBMS](http://www.zabbix.com).",
-							"options": [
-								{
-									"checked": "1",
-									"unchecked": "0"
-								}
-							]
-						}
-					}
-				],
-				"readme": "The **template** you selected (Apache by HTTP) requires additional configuration.\n\n1. Enable the ``Stackdriver Monitoring API`` for the GCP project you wish to monitor.\n\n   How to: [Enable the Monitoring API](http://www.zabbix.com)\n2. Create a service account in **Google Cloud** console for the project you have to monitor.\n\n   How to: [Create service accounts](http://www.zabbix.com)\n3. Create and download the service account key in JSON format.\n\n   How to: [Create and delete service account keys](http://www.zabbix.com)\n4. If you want to monitor **Cloud SQL services** - don't forget to activate the **Cloud SQL Admin API**.\n\n   How to: [Use the Cloud SQL Admin API](http://www.zabbix.com)\n5. Copy the **project_id**, **private_key_id**, **private_key**, **client_email** from the JSON key file and add them to their corresponding macros **{$GCP.PROJECT.ID}**, **{$GCP.PRIVATE.KEY.ID}**, **{$GCP.PRIVATE.KEY}**, **{$GCP.CLIENT.EMAIL}** on the template/host."
-			}
-		]
 	}
 }
