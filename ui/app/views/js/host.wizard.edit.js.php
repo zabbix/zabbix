@@ -215,14 +215,27 @@ window.host_wizard_edit = new class {
 
 		this.#next_button = this.#dialogue.querySelector('.js-next');
 		this.#next_button.addEventListener('click', () => {
-			this.#onBeforeNextStep().then(() => {
-				this.#updateStepsQueue();
-				this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
-			});
+			this.#onBeforeNextStep()
+				.then(() => {
+					this.#updateStepsQueue();
+					this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
+				})
+				.catch(() => {
+					this.#gotoStep(this.#current_step);
+				});
 		});
 
 		this.#create_button = this.#dialogue.querySelector('.js-create');
 		this.#create_button.style.display = 'none';
+		this.#create_button.addEventListener('click', () => {
+			this.#onBeforeNextStep()
+				.then(() => {
+					this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
+				})
+				.catch(() => {
+					this.#gotoStep(this.#current_step);
+				});
+		});
 
 		this.#finish_button = this.#dialogue.querySelector('.js-finish');
 		this.#finish_button.style.display = 'none';
@@ -473,22 +486,23 @@ window.host_wizard_edit = new class {
 
 		switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_CREATE_HOST:
-				const host = this.#data.hostid;
+				return this.#loadWizardConfig();
 
-				return this.#loadWizardConfig({
-					templateid: this.#data.template_selected,
-					hostid: host && !host.isNew ? host.id : null
-				});
+			case this.STEP_CONFIGURATION_FINISH:
+				return this.#saveHost();
 
 			default:
 				return Promise.resolve();
 		}
 	}
 
-	#loadWizardConfig({templateid, hostid}) {
+	#loadWizardConfig() {
+		const host = this.#data.hostid;
+		const hostid = host && !host.isNew ? host.id : null;
+
 		const url_params = objectToSearchParams({
 			action: 'host.wizard.get',
-			templateid,
+			templateid: this.#data.template_selected,
 			...(hostid !== null && {hostid})
 		})
 		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
@@ -508,6 +522,55 @@ window.host_wizard_edit = new class {
 				this.#template = response.template;
 				this.#host = response.host;
 			});
+	}
+
+	#saveHost() {
+
+		console.log('#saveHost', this.#data);
+
+		const submit_url = new URL('zabbix.php', location.href);
+		submit_url.searchParams.set('action', 'host.wizard.create');
+
+		fetch(submit_url.href, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(this.#data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				console.log('Save response', response);
+
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				overlayDialogueDestroy(this.#overlay.dialogueid);
+
+				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			})
+			.catch(exception => {
+				this.#ajaxExceptionHandler(exception);
+			})
+			.finally(() => {
+				this.#overlay.unsetLoading();
+			});
+	}
+
+	#ajaxExceptionHandler(exception) {
+		const step_form = this.#dialogue.querySelector('.step-form');
+		console.log(exception)
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		} else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		step_form.parentNode.insertBefore(message_box, step_form);
 	}
 
 	#updateStepsQueue() {
