@@ -273,12 +273,6 @@ class CApiInputValidator {
 
 			case API_SELEMENTID:
 				return self::validateSelementId($rule, $data, $path, $error);
-
-			case API_SAML_CERTIFICATE:
-				return self::validateSamlCertificate($rule, $data, $path, $error);
-
-			case API_SAML_PRIVATE_KEY:
-				return self::validateSamlPrivateKey($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -363,8 +357,6 @@ class CApiInputValidator {
 			case API_PROMETHEUS_LABEL:
 			case API_NUMBER:
 			case API_SELEMENTID:
-			case API_SAML_CERTIFICATE:
-			case API_SAML_PRIVATE_KEY:
 				return true;
 
 			case API_OBJECT:
@@ -4372,59 +4364,5 @@ class CApiInputValidator {
 		return is_string($data)
 			? self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error)
 			: self::validateId([], $data, $path, $error);
-	}
-
-	private static function validateSamlCertificate($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Incorrect value for %1$s.', $path).' '.
-				_s('%1$d characters exceeds maximum length of %2$d characters', strlen($data), 10000);
-
-			return false;
-		}
-
-		if ($data !== '') {
-			$is_certificate = @openssl_x509_read($data);
-
-			if (!$is_certificate) {
-				$error = _s('Provided %1$s is not a valid %2$s', $path, 'certificate');
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private static function validateSamlPrivateKey($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Incorrect value for %1$s.', $path).' '.
-				_s('%1$d characters exceeds maximum length of %2$d characters', strlen($data), 10000);
-
-			return false;
-		}
-
-		if ($data !== '') {
-			$is_private_key = openssl_pkey_get_private($data);
-
-			if (!$is_private_key) {
-				$error = _s('Provided %1$s is not a valid %2$s', $path, 'key');
-
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
