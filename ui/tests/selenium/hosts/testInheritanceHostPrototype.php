@@ -230,7 +230,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 						' WHERE flags=2 AND hostid IN ('.
 							'SELECT hostid'.
 							' FROM host_discovery'.
-							' WHERE lldruleid IN ('.
+							' WHERE parent_itemid IN ('.
 								'SELECT itemid'.
 								' FROM items'.
 								' WHERE hostid in ('.
