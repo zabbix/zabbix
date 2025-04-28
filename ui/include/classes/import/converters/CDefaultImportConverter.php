@@ -76,6 +76,9 @@ class CDefaultImportConverter extends CConverter {
 				if (array_key_exists($tag, $data)) {
 					$data[$tag] = $this->addDefaultValue($data[$tag], $tag_rules);
 				}
+//				elseif ($tag_rules['type'] & XML_ARRAY) {
+//					$data[$tag] = $this->addDefaultValue([], $tag_rules);
+//				}
 				elseif (array_key_exists('ex_default', $tag_rules)) {
 					$data[$tag] = (string) call_user_func($tag_rules['ex_default'], $data);
 				}
