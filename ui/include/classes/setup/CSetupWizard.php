@@ -604,14 +604,13 @@ class CSetupWizard extends CForm {
 			)
 			// Vault common.
 			->addRow(
-				(new CLabel(_('Vault API endpoint'), 'vault-api-endpoint'))->setAsteriskMark(),
+				(new CLabel(_('Vault API endpoint'), 'vault_url'))->setAsteriskMark(),
 				(new CTextBox('vault_url',
 					$this->getConfig('DB_VAULT_URL', $db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP
 						? CVaultHashiCorp::API_ENDPOINT_DEFAULT
 						: CVaultCyberArk::API_ENDPOINT_DEFAULT
 					)
 				))
-					->setId('vault-api-endpoint')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_url_row',
 				!in_array($db_creds_storage, [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK])
@@ -632,12 +631,11 @@ class CSetupWizard extends CForm {
 				$db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK ? ZBX_STYLE_DISPLAY_NONE : null
 			)
 			->addRow(
-				(new CLabel(_('Vault secret path'), 'vault-secret-path'))->setAsteriskMark(),
+				(new CLabel(_('Vault secret path'), 'vault_db_path'))->setAsteriskMark(),
 				(new CTextBox('vault_db_path', $db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP
 					? $this->getConfig('DB_VAULT_DB_PATH')
 					: ''
 				))
-					->setId('vault-secret-path')
 					->setAttribute('placeholder', CVaultHashiCorp::DB_PATH_PLACEHOLDER)
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'vault_db_path_row',
@@ -664,12 +662,11 @@ class CSetupWizard extends CForm {
 				$db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK ? ZBX_STYLE_DISPLAY_NONE : null
 			)
 			->addRow(
-				(new CLabel(_('Vault secret query string'), 'valet-secret-query-string'))->setAsteriskMark(),
+				(new CLabel(_('Vault secret query string'), 'vault_query_string'))->setAsteriskMark(),
 				(new CTextBox('vault_query_string', $db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK
 					? $this->getConfig('DB_VAULT_DB_PATH')
 					: ''
 				))
-					->setId('valet-secret-query-string')
 					->setAttribute('placeholder', CVaultCyberArk::DB_PATH_PLACEHOLDER)
 					->setAttribute('maxlength', 2048)
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
@@ -725,9 +722,8 @@ class CSetupWizard extends CForm {
 				ZBX_STYLE_DISPLAY_NONE
 			)
 			->addRow(
-				(new CLabel(_('Database TLS CA file'), 'tls-ca-file'))->setAsteriskMark(),
+				(new CLabel(_('Database TLS CA file'), 'ca_file'))->setAsteriskMark(),
 				(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))
-					->setId('tls-ca-file')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'db_cafile_row',
 				ZBX_STYLE_DISPLAY_NONE
