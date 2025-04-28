@@ -299,108 +299,180 @@ function stepCreateHost(): CTemplateTag {
 	);
 }
 
-function stepInstallAgent(): CTemplateTag {
-	return new CTemplateTag('host-wizard-step-install-agent',
-		(new CDiv([
-			(new CSection())
+function stepInstallAgent(): array {
+	return [
+		new CTemplateTag('host-wizard-step-install-agent',
+			(new CDiv([
+				(new CSection())
+					->addItem(
+						(new CDiv([
+							new CTag('h1', true, _('Install Zabbix agent')),
+							new CTag('p', true, _('The template you selected (Apache by HTTP, this is just an example) requires Zabbix agent to be installed and running on your monitoring target.')),
+							new CTag('p', true, _('Skip OS selection if you already have Zabbix agent installed.'))
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_FORMATED_TEXT)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+				(new CSection())
+					->addItem(
+						(new CList([
+							(new CListItem())
+								->addItem(
+									(new CTag('h6', true, [_('Configure encryption')]))
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+								)
+								->addItem(
+									(new CDiv(
+										new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
+									))->addClass(ZBX_STYLE_FORMATED_TEXT)
+								)
+								->addItem(
+									new CFormField([
+										new CLabel(_('Pre-shared key identity')),
+										new CTextBox('tls_psk_identity'),
+										(new CDiv(
+											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+									])
+								)
+								->addItem(
+									new CFormField([
+										new CLabel(_('Pre-shared key')),
+										(new CDiv([
+											(new CTextArea('tls_psk'))
+												->setRows(3),
+											(new CSimpleButton(_('Generate new')))
+												->addClass(ZBX_STYLE_BTN_GREY)
+												->addClass('js-generate-pre-shared-key'),
+										]))->addClass('pre-shared-key-field'),
+
+										(new CDiv(
+											_('Generate a secret pre-shared key hexadecimal string.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+									])
+								)
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
+
+							(new CListItem())
+								->addItem(
+									(new CTag('h6', true, [_('Select the OS of your monitoring target')]))
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+								)
+								->addItem(
+									new CFormField(
+										(new CRadioCardList('monitoring_os', 'linux'))
+											->addValue(['label' => _('Linux'), 'value' => 'linux'])
+											->addValue(['label' => _('Windows'), 'value' => 'windows'])
+											->addValue(['label' => _('Other'), 'value' => 'other'])
+											->addClass(ZBX_STYLE_GRID_COLUMNS)
+									)
+								)
+								->addItem(
+									(new CFormField([
+										new CLabel(_('Select the OS distribution'), 'windows-new'),
+										(new CRadioCardList('monitoring_os_distribution'))
+											->addValue(['label' => _('Windows 10/Server 2016 or later'), 'value' => 'windows-new'])
+											->addValue(['label' => _('Older version'), 'value' => 'windows-old'])
+											->addClass(ZBX_STYLE_GRID_COLUMNS)
+									]))->addClass('js-windows-distribution-select')
+								)
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
+
+							(new CListItem())
+								->addItem(
+									(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+								)
+								->addItem(
+									(new CDiv([
+										new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
+										new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
+										new CTag('p', true, new CLink(_('Open installation instructions'), '#'))
+									]))->addClass(ZBX_STYLE_FORMATED_TEXT)
+								)
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+						]))
+							->addClass(ZBX_STYLE_ORDERED_LIST)
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+			]))->addClass('step-form-body')
+		),
+
+		new CTemplateTag('host-wizard-step-install-agent-os-linux',
+			(new CListItem())
+				->addItem(
+					(new CTag('h6', true, [_('Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:')]))
+						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+				)
 				->addItem(
 					(new CDiv([
-						new CTag('h1', true, _('Install Zabbix agent')),
-						new CTag('p', true, _('The template you selected (Apache by HTTP, this is just an example) requires Zabbix agent to be installed and running on your monitoring target.')),
-						new CTag('p', true, _('Skip OS selection if you already have Zabbix agent installed.'))
+						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/#{version}/install-zabbix.sh | bash -s -- --agent2 --server-host #{serverHost} --hostname #{hostname} --psk-identity string --psk XXXXXXXX"),
 					]))
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_FORMATED_TEXT)
+						->addClass(ZBX_STYLE_MARKDOWN)
 				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
+		),
 
-			(new CSection())
+		new CTemplateTag('host-wizard-step-install-agent-os-windows-new',
+			(new CListItem())
 				->addItem(
-					(new CList([
-						(new CListItem())
-							->addItem(
-								(new CTag('h6', true, [_('Configure encryption')]))
-									->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-							)
-							->addItem(
-								(new CDiv(
-									new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
-								))->addClass(ZBX_STYLE_FORMATED_TEXT)
-							)
-							->addItem(
-								new CFormField([
-									new CLabel(_('Pre-shared key identity')),
-									new CTextBox('tls_psk_identity'),
-									(new CDiv(
-										_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
-									))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-								])
-							)
-							->addItem(
-								new CFormField([
-									new CLabel(_('Pre-shared key')),
-									(new CDiv([
-										(new CTextArea('tls_psk'))
-											->setRows(3),
-										(new CSimpleButton(_('Generate new')))
-											->addClass(ZBX_STYLE_BTN_GREY)
-											->addClass('js-generate-pre-shared-key'),
-									]))->addClass('pre-shared-key-field'),
-
-									(new CDiv(
-										_('Generate a secret pre-shared key hexadecimal string.')
-									))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-								])
-							)
-							->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-
-						(new CListItem())
-							->addItem(
-								(new CTag('h6', true, [_('Select the OS of your monitoring target')]))
-									->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-							)
-							->addItem(
-								new CFormField(
-									(new CRadioCardList('monitoring_os', 'linux'))
-										->addValue(['label' => _('Linux'), 'value' => 'linux'])
-										->addValue(['label' => _('Windows'), 'value' => 'windows'])
-										->addValue(['label' => _('Other'), 'value' => 'other'])
-										->addClass(ZBX_STYLE_GRID_COLUMNS)
-								)
-							)
-							->addItem(
-								(new CFormField([
-									new CLabel(_('Select the OS distribution'), 'windows-new'),
-									(new CRadioCardList('monitoring_os_distribution'))
-										->addValue(['label' => _('Windows 10/Server 2016 or later'), 'value' => 'windows-new'])
-										->addValue(['label' => _('Older version'), 'value' => 'windows-old'])
-										->addClass(ZBX_STYLE_GRID_COLUMNS)
-								]))->addClass('js-windows-distribution-select')
-							)
-							->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-
-						(new CListItem())
-							->addItem(
-								(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
-									->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-							)
-							->addItem(
-								(new CDiv([
-									new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
-									new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
-									new CTag('p', true, new CLink(_('Open installation instructions'), '#'))
-								]))->addClass(ZBX_STYLE_FORMATED_TEXT)
-							)
-							->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
-					]))
-						->addClass(ZBX_STYLE_ORDERED_LIST)
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					(new CTag('h6', true, [_('Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:')]))
+						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-		]))->addClass('step-form-body')
-	);
+				->addItem(
+					(new CDiv([
+						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/#{version}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
+					]))
+						->addClass(ZBX_STYLE_MARKDOWN)
+				)
+				->addItem(new CTag('p', true))
+				->addItem(
+					(new CDiv([
+						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 -serverHost #{serverHost} -hostname '#{hostname}' -pskIdentity 'qeqweqweqweqwe' -psk AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+					]))
+						->addClass(ZBX_STYLE_MARKDOWN)
+				)
+				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+		),
+
+		new CTemplateTag('host-wizard-step-install-agent-os-windows-old',
+			(new CListItem())
+				->addItem(
+					(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
+						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+				)
+				->addItem(
+					(new CDiv([
+						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
+						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
+						new CTag('p', true, new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MSI)))
+					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
+		),
+
+		new CTemplateTag('host-wizard-step-install-agent-os-other',
+			(new CListItem())
+				->addItem(
+					(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
+						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+				)
+				->addItem(
+					(new CDiv([
+						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
+						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
+						new CTag('p', true, [new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)), ' (', _s('Mac OS'), ')']),
+						new CTag('p', true, [new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)), ' (', _s('Other OS'), ')'])
+					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+		),
+	];
 }
 
 function stepAddHostInterface(): CTemplateTag {

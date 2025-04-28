@@ -97,6 +97,9 @@ class CDocHelper {
 	const DATA_COLLECTION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const INVENTORY_HOST_LIST =									'web_interface/frontend_sections/inventory/hosts';
 	const INVENTORY_HOST_OVERVIEW =								'web_interface/frontend_sections/inventory/overview';
+	const INSTALLATION_PACKAGES_MAC =							'installation/install_from_packages/mac_pkg';
+	const INSTALLATION_PACKAGES_MSI =							'installation/install_from_packages/win_msi';
+	const INSTALLATION_PACKAGES_OTHER =							'installation/install_from_packages'; // TODO VM: update link
 	const ITEM_TYPES_DB_MONITOR =								'config/items/itemtypes/odbc_checks';
 	const ITEM_TYPES_IPMI_AGENT =								'config/items/itemtypes/ipmi';
 	const ITEM_TYPES_JMX_AGENT =								'config/items/itemtypes/jmx_monitoring';
