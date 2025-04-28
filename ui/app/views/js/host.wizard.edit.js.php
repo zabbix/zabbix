@@ -348,19 +348,24 @@ window.host_wizard_edit = new class {
 
 		this.#current_step = step;
 
-		let back_button = this.#current_step !== 0;
-		let next_button = true;
-		let create_button = false;
-		let finish_button = false;
+		let show_back_button = true;
+		let show_next_button = true;
+		let show_create_button = false;
+		let show_finish_button = false;
+
+		let allow_back_button = this.#current_step > 0;
+		let allow_next_button = true;
 
 		switch (this.#steps_queue[step]) {
 			case this.STEP_WELCOME:
 				this.#renderWelcome();
 				break;
 			case this.STEP_SELECT_TEMPLATE:
+				allow_next_button = this.#data.template_selected !== null;
 				this.#renderSelectTemplate();
 				break;
 			case this.STEP_CREATE_HOST:
+				allow_next_button = this.#data.hostid !== null;
 				this.#renderCreateHost();
 				break;
 			case this.STEP_INSTALL_AGENT:
@@ -378,15 +383,15 @@ window.host_wizard_edit = new class {
 			case this.STEP_CONFIGURATION_FINISH:
 				this.#renderConfigurationFinish();
 
-				next_button = false;
-				create_button = false;
+				show_next_button = false;
+				show_create_button = true;
 				break;
 			case this.STEP_COMPLETE:
 				this.#renderComplete();
 
-				back_button = false;
-				next_button = false;
-				finish_button = false;
+				show_back_button = false;
+				show_next_button = false;
+				show_finish_button = true;
 				break;
 		}
 
@@ -397,10 +402,13 @@ window.host_wizard_edit = new class {
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
 
-			this.#back_button.toggleAttribute('disabled', !back_button);
-			this.#next_button.toggleAttribute('disabled', !next_button);
-			this.#create_button.toggleAttribute('disabled', !create_button);
-			this.#finish_button.toggleAttribute('disabled', !finish_button);
+			this.#back_button.style.display = show_back_button ? '' : 'none';
+			this.#next_button.style.display = show_next_button ? '' : 'none';
+			this.#create_button.style.display = show_create_button ? '' : 'none';
+			this.#finish_button.style.display = show_finish_button ? '' : 'none';
+
+			this.#back_button.toggleAttribute('disabled', !allow_back_button);
+			this.#next_button.toggleAttribute('disabled', !allow_next_button);
 		});
 	}
 
@@ -421,8 +429,16 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 
-		jQuery("#hostid, #groups_", step).multiSelect().on('change', (_, {options, values}) => {
-			this.#setValueByName(this.#data, options.name, values.selected);
+		jQuery("#hostid", step).multiSelect().on('change', (_, {options, values}) => {
+			console.log(options.name, values.selected)
+			this.#setValueByName(this.#data, options.name,
+				Object.keys(values.selected).length ? values.selected : null
+			);
+		});
+
+		jQuery("#groups_", step).multiSelect().on('change', (_, {options, values}) => {
+			console.log(options.name, values.selected)
+			this.#setValueByName(this.#data, options.name, Object.values(values.selected));
 		});
 	}
 
@@ -619,8 +635,15 @@ window.host_wizard_edit = new class {
 						step_body.appendChild(section);
 					}
 				}
+
+				if (path === 'template_selected') {
+					this.#next_button.toggleAttribute('disabled', new_value === null);
+				}
 				break;
 			case this.STEP_CREATE_HOST:
+				if (path === 'hostid') {
+					this.#next_button.toggleAttribute('disabled', new_value === null);
+				}
 				break;
 			case this.STEP_INSTALL_AGENT:
 				const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');

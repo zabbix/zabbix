@@ -253,7 +253,7 @@ function stepCreateHost(): CTemplateTag {
 							'name' => 'hostid',
 							'object_name' => 'hosts',
 							'add_new' => true,
-							'selectedLimit' => 1,
+							'multiple' => false,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
