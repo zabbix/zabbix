@@ -61,7 +61,8 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 			'output' => ['ipmi_authtype','ipmi_privilege', 'ipmi_username', 'ipmi_password'],
 			'selectHostGroups' => ['groupid'],
 			'selectInterfaces' => ['interfaceid', 'type', 'main', 'ip', 'dns', 'port', 'useip', 'details'],
-			'selectMacros' => ['macro', 'value', 'description', 'type'],
+			'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
+			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
 			'selectParentTemplates' => ['templateid'],
 			'hostids' => $this->getInput('hostid')
 		]);
@@ -83,7 +84,7 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 					$this->getInput('templates', []), array_column($db_host['parentTemplates'], 'templateid')
 				))]),
 				'interfaces' => array_merge($db_host['interfaces'], $this->processHostInterfaces($interfaces)),
-				'macros' => $this->processUserMacros($this->getInput('macros', [])),
+				'macros' => $this->prepareMacros($this->getInput('macros', []), $db_host['macros']),
 				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE)
 			];
 
@@ -112,7 +113,7 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 				throw new Exception();
 			}
 
-			$result = DBend(true);
+			$result = DBend();
 		}
 		catch (Exception) {
 			$result = false;
@@ -166,7 +167,8 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 						&& $interface['useip'] == $host_interface['useip'];
 
 					if ($same) {
-						if (in_array($interface['type'], [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_JMX])) {
+						if (in_array($interface['type'], [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_JMX,
+								INTERFACE_TYPE_IPMI])) {
 							unset($interfaces[$key]);
 
 							break;
@@ -187,28 +189,32 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 								break;
 							}
 						}
-						if ($interface['type'] == INTERFACE_TYPE_IPMI) {
-							$fields = ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'];
-							$identical_ipmi_fields = 0;
-
-							foreach ($fields as $field) {
-								if ($this->getInput($field) == $host[$field]) {
-									$identical_ipmi_fields++;
-								}
-							}
-
-							if ($identical_ipmi_fields === count($fields)) {
-								unset($interfaces[$key]);
-							}
-						}
-					}
 				}
 			}
 
-			$interface['isNew'] = true;
+			$interface += [
+				'isNew' => true,
+				'main' => in_array($interface['type'], array_column($host['interfaces'], 'type'))
+					? INTERFACE_SECONDARY
+					: INTERFACE_PRIMARY
+			];
 		}
 		unset($interface);
 
 		return $interfaces;
+	}
+
+	private function prepareMacros(array $macros, array $host_macros): array {
+		$result = [];
+
+		foreach ($host_macros as $host_macro) {
+			$result[$host_macro['macro']] = $host_macro;
+		}
+
+		foreach ($macros as $macro) {
+			$result[$macro['macro']] = $macro;
+		}
+
+		return array_values($result);
 	}
 }
