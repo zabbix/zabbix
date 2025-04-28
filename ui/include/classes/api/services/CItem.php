@@ -1737,11 +1737,10 @@ class CItem extends CItemGeneral {
 
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$resource = DBselect(
-				'SELECT i.itemid,idd.lldruleid'.
-				' FROM items i,item_discovery id,item_discovery idd'.
-				' WHERE i.itemid=id.itemid'.
-					' AND id.parent_itemid=idd.itemid'.
-					' AND '.dbConditionId('i.itemid', array_keys($result))
+				'SELECT id.itemid,id2.lldruleid'.
+				' FROM item_discovery id,item_discovery id2'.
+				' WHERE id.parent_itemid=id2.itemid'.
+					' AND '.dbConditionId('id.itemid', array_keys($result))
 			);
 
 			$relation_map = new CRelationMap();

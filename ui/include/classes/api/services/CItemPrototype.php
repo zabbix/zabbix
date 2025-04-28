@@ -819,29 +819,20 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $ruleids
 	 * @param array $hostids
 	 */
-	public static function linkTemplateObjects(array $ruleids, array $hostids): void {
-		$fields = array_merge(
-			['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
+	public function linkTemplateObjects(array $ruleids, array $hostids): void {
+		$db_items = $this->get([
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
-			],
-			array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters']),
-			['hostid', 'templateid', 'flags']
-		);
-
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.'.implode(',i.', $fields).',h.status AS host_status,id.lldruleid AS ruleid'.
-			' FROM items i,hosts h,item_discovery id'.
-			' WHERE i.hostid=h.hostid'.
-				' AND i.itemid=id.itemid'.
-				' AND '.dbConditionId('id.lldruleid', $ruleids).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
-		), 'itemid');
+			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
+			'discoveryids' => $ruleids,
+			'preservekeys' => true
+		]);
 
 		if (!$db_items) {
 			return;
 		}
 
-		self::prepareItemsForApi($db_items);
+		self::addInternalFields($db_items);
 
 		$items = [];
 

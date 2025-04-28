@@ -777,7 +777,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$ruleids = array_keys($db_items);
 
-		CItemPrototype::linkTemplateObjects($ruleids, $hostids);
+		API::ItemPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::TriggerPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::GraphPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);

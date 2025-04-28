@@ -618,7 +618,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
 		$items = $this->extendObjectsByKey($items, $db_items, 'itemid',
-			['hostid', 'flags', 'lifetime', 'enabled_lifetime']
+			['hostid', 'flags', 'lifetime', 'enabled_lifetime', 'lifetime_type', 'enabled_lifetime_type']
 		);
 
 		self::validateUniqueness($items);
@@ -765,7 +765,8 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
 			),
 			'filter' => [
-				'hostid' => $templateids
+				'hostid' => $templateids,
+				'flags' => [ZBX_FLAG_DISCOVERY_RULE]
 			],
 			'preservekeys' => true
 		]);
@@ -842,7 +843,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 
 		$ruleids = array_keys($db_items);
 
-		CItemPrototype::linkTemplateObjects($ruleids, $hostids);
+		API::ItemPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::TriggerPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::GraphPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
