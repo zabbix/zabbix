@@ -85,8 +85,8 @@ class CDefaultImportConverter extends CConverter {
 				elseif (array_key_exists('default', $tag_rules)) {
 					$data[$tag] = (string) $tag_rules['default'];
 				}
-				else {
-					$data[$tag] = (($tag_rules['type'] & XML_STRING) ? '' : []);
+				elseif ($tag_rules['type'] & XML_INDEXED_ARRAY) {
+					$data[$tag] = [];
 				}
 			}
 		}
