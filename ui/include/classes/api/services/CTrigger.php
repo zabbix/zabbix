@@ -1138,8 +1138,7 @@ class CTrigger extends CTriggerGeneral {
 			'output' => $output,
 			'selectTags' => ['tag', 'value'],
 			'filter' => [
-				'hostid' => $templateids,
-				'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				'hostid' => $templateids
 			],
 			'preservekeys' => true,
 			'nopermissions' => true

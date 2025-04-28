@@ -766,8 +766,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
 			),
 			'filter' => [
-				'hostid' => $templateids,
-				'flags' => ZBX_FLAG_DISCOVERY_RULE
+				'hostid' => $templateids
 			],
 			'preservekeys' => true
 		]);

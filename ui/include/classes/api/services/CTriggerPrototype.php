@@ -625,18 +625,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'event_name', 'discover'
 		];
 
-		$options = [
+		$triggers = $this->get([
 			'discoveryids' => $ruleids,
 			'output' => $output,
 			'selectTags' => ['tag', 'value'],
-			'filter' => [
-				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
-			],
 			'preservekeys' => true,
 			'nopermissions' => true
-		];
-
-		$triggers = $this->get($options);
+		]);
 
 		if ($triggers) {
 			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,

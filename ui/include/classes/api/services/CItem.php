@@ -1733,7 +1733,19 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
+			$resource = DBselect(
+				'SELECT i.itemid,idd.lldruleid'.
+				' FROM items i,item_discovery id,item_discovery idd'.
+				' WHERE i.itemid=id.itemid'.
+					' AND id.parent_itemid=idd.itemid'.
+					' AND '.dbConditionId('i.itemid', array_keys($result))
+			);
+
+			$relation_map = new CRelationMap();
+
+			while ($row = DBfetch($resource)) {
+				$relation_map->addRelation($row['itemid'], $row['lldruleid']);
+			}
 
 			$lld_rules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],

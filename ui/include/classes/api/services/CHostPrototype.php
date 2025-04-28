@@ -1828,9 +1828,6 @@ class CHostPrototype extends CHostBase {
 		$db_host_prototypes = $this->get([
 			'output' => ['hostid', 'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
 			'discoveryids' => $ruleids,
-			'filter' => [
-				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
-			],
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);

@@ -531,18 +531,13 @@ class CGraphPrototype extends CGraphGeneral {
 			'ymax_type', 'ymin_itemid', 'ymax_itemid', 'discover'
 		];
 
-		$options = [
+		$graphs = $this->get([
 			'discoveryids' => $ruleids,
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-			'filter' => [
-				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
-			],
 			'preservekeys' => true,
 			'nopermissions' => true
-		];
-
-		$graphs = $this->get($options);
+		]);
 
 		if ($graphs) {
 			$this->inherit($graphs, $hostids);
