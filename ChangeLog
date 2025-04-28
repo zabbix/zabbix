@@ -1,6 +1,8 @@
 Changes for 7.4.0rc1
 
 New features:
+.........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
+..F.I..... [ZBXNEXT-9087] implemented Item card widget (dfofanovs)
 ..F.I..PS. [ZBXNEXT-9910] changed default user session storage period from 365d to 31d (aluchko, askolmeisters)
 A.F.....S. [ZBXNEXT-7527] added support of host prototypes on discovered hosts (wczerneha, wiper)
 A.F.I..... [ZBXNEXT-875] implemented map element stacking order control (Ivo)
@@ -9,6 +11,9 @@ A.F.I..... [ZBXNEXT-875] implemented map element stacking order control (Ivo)
 .........T [ZBXNEXT-9646] added Juniper MX by NETCONF template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
+.........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
+........S. [ZBX-26235] fixed Zabbix server crash caused by audit when autoregistration deletes host tags (arimdjonoks)
 ........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
 ..F....... [ZBX-26277] fixed disabled media types being shown in black color (aluchko)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
@@ -126,8 +131,13 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.7rc1
 
 New features:
+.........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
+........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
+.........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
+........S. [ZBX-26235] fixed Zabbix server crash caused by audit when autoregistration deletes host tags (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.6
@@ -556,8 +566,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.13rc1
 
 New features:
+.........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
+........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
+.........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
+........S. [ZBX-26235] fixed Zabbix server crash caused by audit when autoregistration deletes host tags (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.12
