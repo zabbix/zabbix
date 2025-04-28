@@ -52,6 +52,7 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark(),
 		(new CFormField([
 			(new CTextBox('redirection_url', $data['redirection_url']))
+				->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'redirection_url'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -73,6 +74,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('client_id', $data['client_id']))
 				->disableAutocomplete()
+				->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_id'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('oauth-clientid-field')
@@ -82,6 +84,7 @@ if (array_key_exists('client_secret', $data)) {
 	$client_secrect = [
 		(new CTextBox('client_secret', $data['client_secret']))
 			->disableAutocomplete()
+			->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_secret'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	];
@@ -93,6 +96,7 @@ else {
 			->setName('client_secret_button'),
 		(new CTextBox('client_secret', ''))
 			->disableAutocomplete()
+			->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_secret'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
@@ -135,7 +139,9 @@ if ($data['advanced_form']) {
 			->setAsteriskMark()
 			->setId('oauth-auth-endpoint-label'),
 		(new CFormField([
-			(new CTextBox('authorization_url', $data['authorization_url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('authorization_url', $data['authorization_url']))
+				->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'authorization_url'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		]))->setId('oauth-auth-endpoint-field')
 	])
 	->addItem([
@@ -186,8 +192,9 @@ if ($data['advanced_form']) {
 			->setId('oauth-token-endpoint-label'),
 		(new CFormField(
 			(new CTextBox('token_url', $data['token_url']))
-				->setAriaRequired()
+				->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'token_url'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
 		))->setId('oauth-token-endpoint-field')
 	])
 	->addItem([
