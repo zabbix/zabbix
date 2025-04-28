@@ -729,6 +729,10 @@ class CUserMacro extends CApiService {
 				);
 			}
 
+			if (!$hostmacro['config']) {
+				continue;
+			}
+
 			$path .= '/config';
 
 			if ($db_hostmacros !== null && array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)) {
@@ -826,7 +830,7 @@ class CUserMacro extends CApiService {
 		self::prepareMacroConfigOptionsForDb($hostmacros, $db_hostmacros);
 
 		foreach ($hostmacros as $hostmacro) {
-			if (!array_key_exists('config', $hostmacro)) {
+			if (!array_key_exists('config', $hostmacro) || !$hostmacro['config']) {
 				continue;
 			}
 

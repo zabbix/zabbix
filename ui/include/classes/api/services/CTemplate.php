@@ -496,7 +496,7 @@ class CTemplate extends CHostGeneral {
 					: null;
 
 				foreach (array_values($template['macros']) as $m => $macro) {
-					if (!array_key_exists('config', $macro)) {
+					if (!array_key_exists('config', $macro) || !$macro['config']) {
 						continue;
 					}
 
@@ -775,7 +775,7 @@ class CTemplate extends CHostGeneral {
 			$db_macros = ($db_templates !== null) ? $db_templates[$template['templateid']]['macros'] : [];
 
 			foreach ($template['macros'] as &$macro) {
-				if (!array_key_exists('config', $macro)) {
+				if (!array_key_exists('config', $macro) || !$macro['config']) {
 					continue;
 				}
 
@@ -805,7 +805,9 @@ class CTemplate extends CHostGeneral {
 					}
 				}
 				else {
-					$ins_hostmacro_configs[] = ['hostmacroid' => $macro['hostmacroid']] + $macro['config'];
+					if ($macro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+						$ins_hostmacro_configs[] = ['hostmacroid' => $macro['hostmacroid']] + $macro['config'];
+					}
 				}
 			}
 			unset($macro);

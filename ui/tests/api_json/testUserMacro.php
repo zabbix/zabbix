@@ -144,6 +144,17 @@ class testUserMacro extends CAPITest {
 					'hostid' => '50010',
 					'config' => []
 				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'label' => 'Config'
+					]
+				],
 				'expected_error' => 'Invalid parameter "/1/config": the parameter "type" is missing.'
 			],
 			[
@@ -750,6 +761,34 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '2',
 						'value' => 'test',
 						'description' => 'notes'
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '1',
+						'value' => 'test',
+						'description' => 'description'
+					],
+					[
+						'hostmacroid' => '2',
+						'value' => 'test',
+						'description' => 'notes'
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '1',
+						'value' => 'test',
+						'config' => []
+					],
+					[
+						'hostmacroid' => '2',
+						'value' => 'test',
+						'description' => 'notes',
+						'config' => []
 					]
 				],
 				'expected_error' => null,
