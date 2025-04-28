@@ -88,7 +88,10 @@ window.host_wizard_edit = new class {
 	STEP_CREATE_HOST = 2;
 	STEP_INSTALL_AGENT = 3;
 	STEP_ADD_HOST_INTERFACE = 4;
-	STEP_CONFIGURE_HOST_MACROS = 5;
+	STEP_README = 5;
+	STEP_CONFIGURE_HOST = 6;
+	STEP_CONFIGURATION_FINISH = 7;
+	STEP_COMPLETE = 8;
 
 	TEMPLATE_DATA_COLLECTION_ANY = -1;
 	TEMPLATE_DATA_COLLECTION_AGENT_BASED = 0;
@@ -136,39 +139,43 @@ window.host_wizard_edit = new class {
 	MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	MACRO_TYPE_VAULT = 'VAULT';
 
-	/**
-	 * @type {Map<number, object>}
-	 */
+	#view_templates;
+
+	/** @type {Map<number, object>} */
 	#templates;
 	#linked_templates;
 
-	#template;
 	#template_uuid;
+	#template;
 	#host;
 
-	#current_step;
-	#first_step;
-	#last_step;
+	/** @type {number} */
+	#current_step = 0;
 
-	/**
-	 * @type {Overlay}
-	 */
+	/** @type {Array} */
+	#steps_queue;
+
+	/** @type {Overlay} */
 	#overlay;
+
+	/** @type {HTMLDivElement} */
 	#dialogue;
 
-	/**
-	 * @type {HTMLButtonElement}
-	 */
+	/** @type {HTMLButtonElement} */
 	#back_button;
 
-	/**
-	 * @type {HTMLButtonElement}
-	 */
+	/** @type {HTMLButtonElement} */
 	#next_button;
 
-	#view_templates;
+	/** @type {HTMLButtonElement} */
+	#create_button;
 
-	#form_data = {
+	/** @type {HTMLButtonElement} */
+	#finish_button;
+
+	#sections_expanded = new Map();
+
+	#data = {
 		do_not_show_welcome: 0,
 		template_search_query: '',
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
@@ -176,7 +183,15 @@ window.host_wizard_edit = new class {
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
 		monitoring_os: 'linux',
 		monitoring_os_distribution: -1,
+		agent_install_required: false,
+		interface_required: {
+			[this.INTERFACE_TYPE_AGENT]: false,
+			[this.INTERFACE_TYPE_SNMP]: false,
+			[this.INTERFACE_TYPE_IPMI]: false,
+			[this.INTERFACE_TYPE_JMX]: false
+		},
 
+		hostid: null,
 		groups: [],
 		templates: [],
 		tls_psk: '',
@@ -225,8 +240,6 @@ window.host_wizard_edit = new class {
 		macros: {}
 	}
 
-	#sections_expanded = new Map();
-
 	init({templates, linked_templates, wizard_hide_welcome}) {
 		this.#template = this.example_template.zabbix_export.templates[0]; console.log(this.#template); // TODO debug
 
@@ -234,36 +247,42 @@ window.host_wizard_edit = new class {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
-		this.#first_step = wizard_hide_welcome ? this.STEP_SELECT_TEMPLATE : this.STEP_WELCOME;
-		this.#last_step = this.STEP_CONFIGURE_HOST_MACROS;
+
+		this.#data.do_not_show_welcome = wizard_hide_welcome;
 
 		this.#initViewTemplates();
 
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 
-		this.#form_data = this.#initReactiveData(this.#form_data, this.#onFormDataChange.bind(this));
+		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
 
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 
 		this.#dialogue.addEventListener('click', ({target}) => {
 			if (target.classList.contains('js-generate-pre-shared-key')) {
-				this.#form_data.tls_psk = this.#generatePSK();
+				this.#data.tls_psk = this.#generatePSK();
 			}
 		});
 
 		this.#back_button = this.#dialogue.querySelector('.js-back');
 		this.#back_button.addEventListener('click', () => {
-			this.#gotoStep(Math.max(this.#first_step, this.#current_step - 1));
+			this.#gotoStep(Math.max(this.#current_step - 1, 0));
 		});
 
 		this.#next_button = this.#dialogue.querySelector('.js-next');
 		this.#next_button.addEventListener('click', () => {
-			this.#gotoStep(Math.min(this.#last_step, this.#current_step + 1));
+			this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
 		});
 
-		this.#gotoStep(this.STEP_CONFIGURE_HOST_MACROS);
-		//this.#gotoStep(this.#first_step);
+		this.#create_button = this.#dialogue.querySelector('.js-create');
+		this.#create_button.style.display = 'none';
+
+		this.#finish_button = this.#dialogue.querySelector('.js-finish');
+		this.#finish_button.style.display = 'none';
+
+		this.#updateStepsQueue();
+		this.#gotoStep(this.#current_step);
 	}
 
 	#initViewTemplates() {
@@ -275,7 +294,10 @@ window.host_wizard_edit = new class {
 			step_create_host: tmpl('host-wizard-step-create-host'),
 			step_install_agent: tmpl('host-wizard-step-install-agent'),
 			step_add_host_interface: tmpl('host-wizard-step-add-host-interface'),
-			step_configure_host_macros: tmpl('host-wizard-step-configure-host-macros'),
+			step_readme: tmpl('host-wizard-step-readme'),
+			step_configure_host: tmpl('host-wizard-step-configure-host'),
+			step_configuration_finish: tmpl('host-wizard-step-configuration-finish'),
+			step_complete: tmpl('host-wizard-step-complete'),
 
 			templates_section: tmpl('host-wizard-templates-section'),
 			card: tmpl('host-wizard-template-card'),
@@ -291,7 +313,10 @@ window.host_wizard_edit = new class {
 				<div class="progress"></div>
 			`),
 			progress_step: new Template(`
-				<div class="progress-step #{class}">#{label}</div>
+				<div class="progress-step">#{label}</div>
+			`),
+			progress_step_info: new Template(`
+				<div class="progress-info">#{info}</div>
 			`),
 			tag: new Template(`
 				<span class="${ZBX_STYLE_TAG}">#{tag}: #{value}</span>
@@ -312,15 +337,17 @@ window.host_wizard_edit = new class {
 	}
 
 	#gotoStep(step) {
+		console.log('GoTo to step:', step, this.#steps_queue[step])
+
 		this.#overlay.setLoading();
 
-		if (this.#current_step === this.STEP_WELCOME && this.#form_data.do_not_show_welcome) {
+		if (this.#current_step === this.STEP_WELCOME && this.#data.do_not_show_welcome) {
 			this.#disableWelcomeStep();
 		}
 
 		this.#current_step = step;
 
-		switch (this.#current_step) {
+		switch (this.#steps_queue[step]) {
 			case this.STEP_WELCOME:
 				this.#renderWelcome();
 				break;
@@ -336,8 +363,17 @@ window.host_wizard_edit = new class {
 			case this.STEP_ADD_HOST_INTERFACE:
 				this.#renderAddHostInterface();
 				break;
-			case this.STEP_CONFIGURE_HOST_MACROS:
-				this.#renderConfigureHostMacros();
+			case this.STEP_README:
+				this.#renderReadme();
+				break;
+			case this.STEP_CONFIGURE_HOST:
+				this.#renderConfigureHost();
+				break;
+			case this.STEP_CONFIGURATION_FINISH:
+				this.#renderConfigurationFinish();
+				break;
+			case this.STEP_COMPLETE:
+				this.#renderComplete();
 				break;
 		}
 
@@ -348,24 +384,9 @@ window.host_wizard_edit = new class {
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
 
-			this.#back_button.toggleAttribute('disabled', this.#current_step === this.#first_step);
-			this.#next_button.toggleAttribute('disabled', this.#current_step === this.#last_step);
+			this.#back_button.toggleAttribute('disabled', this.#current_step === 0);
+			this.#next_button.toggleAttribute('disabled', this.#current_step === this.#steps_queue.length - 1);
 		});
-	}
-
-	#onFormDataChange(path, new_value, old_value) {
-		console.log('Data changed', {path, new_value, old_value}, this.#form_data);
-
-		this.#updateField(this.#pathToInputName(path), new_value);
-		this.#updateForm();
-	}
-
-	#onInputChange({target}) {
-		const value = target.type === 'checkbox'
-			? (target.checked ? target.value : target.getAttribute('unchecked-value'))
-			: target.value;
-
-		this.#setValueByName(this.#form_data, target.name, value);
 	}
 
 	#renderWelcome() {
@@ -385,7 +406,9 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 
-		jQuery("#hostid, #groups_", step).multiSelect();
+		jQuery("#hostid, #groups_", step).multiSelect().on('change', (_, {options, values}) => {
+			this.#setValueByName(this.#data, options.name, values.selected);
+		});
 	}
 
 	#renderInstallAgent() {
@@ -400,8 +423,14 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
-	#renderConfigureHostMacros() {
-		const step = this.#view_templates.step_configure_host_macros.evaluateToElement();
+	#renderReadme() {
+		const step = this.#view_templates.step_readme.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+	}
+
+	#renderConfigureHost() {
+		const step = this.#view_templates.step_configure_host.evaluateToElement();
 		const macros_list = step.querySelector('.js-host-macro-list');
 
 		this.#template.macros.forEach((macro, row_index) => {
@@ -421,7 +450,7 @@ window.host_wizard_edit = new class {
 			this.#template_uuid = this.#template.uuid;
 
 			this.#template.macros.forEach((macro, row_index) => {
-				this.#form_data.macros[row_index] = {
+				this.#data.macros[row_index] = {
 					type: macro.type,
 					macro: macro.macro,
 					value: macro.value,
@@ -437,10 +466,52 @@ window.host_wizard_edit = new class {
 		jQuery('.input-secret', step).inputSecret();
 	}
 
+	#renderConfigurationFinish() {
+		const step = this.#view_templates.step_configuration_finish.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+	}
+
+	#renderComplete() {
+		const step = this.#view_templates.step_complete.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+	}
+
+	#updateStepsQueue() {
+		this.#steps_queue = [];
+
+		if (!this.#data.do_not_show_welcome) {
+			this.#steps_queue.push(this.STEP_WELCOME);
+		}
+
+		this.#steps_queue.push(this.STEP_SELECT_TEMPLATE, this.STEP_CREATE_HOST);
+
+		if (this.#data.agent_install_required) {
+			this.#steps_queue.push(this.STEP_INSTALL_AGENT);
+		}
+
+		if (Object.values(this.#data.interface_required).some(required => required)) {
+			this.#steps_queue.push(this.STEP_ADD_HOST_INTERFACE);
+		}
+
+		if (this.#template?.readme) {
+			this.#steps_queue.push(this.STEP_README);
+		}
+
+		if (!Object.keys(this.#template?.macros || {}).length) {
+			this.#steps_queue.push(this.STEP_CONFIGURE_HOST);
+		}
+
+		this.#steps_queue.push(this.STEP_CONFIGURATION_FINISH, this.STEP_COMPLETE);
+
+		console.log('Steps queue:', this.#steps_queue)
+	}
+
 	#updateProgress() {
 		let progress = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER} .progress`);
 
-		if (this.#current_step === this.STEP_WELCOME) {
+		if (this.#steps_queue[this.#current_step] === this.STEP_WELCOME) {
 			if (progress !== null) {
 				progress.remove();
 			}
@@ -455,20 +526,60 @@ window.host_wizard_edit = new class {
 			progress.innerHTML = '';
 		}
 
-		progress.appendChild(this.#view_templates.progress_step.evaluateToElement({
-			label: t('Select a template'),
-			class: 'progress-step-complete'
-		}));
+		const progress_labels = [
+			{
+				label: t('Select a template'),
+				info: this.#template?.name,
+				visible: true,
+				steps: [this.STEP_SELECT_TEMPLATE]
+			},
+			{
+				label: t('Create or select a host'),
+				info: this.#host?.name,
+				visible: true,
+				steps: [this.STEP_CREATE_HOST]
+			},
+			{
+				label: t('Install Zabbix agent'),
+				visible: this.#data.agent_install_required,
+				steps: [this.STEP_INSTALL_AGENT]
+			},
+			{
+				label: t('Add host interface'),
+				visible: Object.values(this.#data.interface_required).some(required => required),
+				steps: [this.STEP_ADD_HOST_INTERFACE]
+			},
+			{
+				label: t('Configure host'),
+				visible: this.#host,
+				steps: [this.STEP_README, this.STEP_CONFIGURE_HOST, this.STEP_CONFIGURATION_FINISH]
+			},
+			{
+				label: t('A few more steps'),
+				visible: !this.#host,
+				steps: []
+			}
+		];
 
-		progress.appendChild(this.#view_templates.progress_step.evaluateToElement({
-			label: t('Create or select a host'),
-			class: 'progress-step-current'
-		}));
+		for (const {label, info, steps} of progress_labels.filter(({visible}) => visible)) {
+			const progress_step = progress.appendChild(
+				this.#view_templates.progress_step.evaluateToElement({label: label + (info ? ':' : '')})
+			);
 
-		progress.appendChild(this.#view_templates.progress_step.evaluateToElement({
-			label: t('A few more steps'),
-			class: 'progress-step-disabled'
-		}));
+			if (info !== undefined) {
+				progress_step.appendChild(
+					this.#view_templates.progress_step_info.evaluateToElement({info})
+				);
+			}
+
+			progress_step.classList.toggle('progress-step-complete',
+				steps.length && Math.max(...steps) < this.#steps_queue[this.#current_step]
+			);
+			progress_step.classList.toggle('progress-step-current',
+				steps.includes(this.#steps_queue[this.#current_step])
+			);
+			progress_step.classList.toggle('progress-step-disabled', !steps.length);
+		}
 
 		this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`).appendChild(progress);
 	}
@@ -492,17 +603,17 @@ window.host_wizard_edit = new class {
 				const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
 
 				if (windows_distribution_select !== null) {
-					windows_distribution_select.style.display = this.#form_data.monitoring_os === 'windows' ? '' : 'none';
+					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
 				}
 				break;
-			case this.STEP_CONFIGURE_HOST_MACROS:
+			case this.STEP_CONFIGURE_HOST:
 
 				break;
 		}
 	}
 
 	#updateFields() {
-		for (const {name, value} of this.#getInputsData(this.#form_data)) {
+		for (const {name, value} of this.#getInputsData(this.#data)) {
 			this.#updateField(name, value);
 		}
 	}
@@ -538,22 +649,22 @@ window.host_wizard_edit = new class {
 	#makeCardListSections() {
 		let template_classes = Array.from(this.#templates)
 			.filter(([templateid, template]) => {
-				if (this.#form_data.data_collection != ZBX_TEMPLATE_DATA_COLLECTION_ANY
-						&& !template.data_collection.includes(Number(this.#form_data.data_collection))) {
+				if (this.#data.data_collection != ZBX_TEMPLATE_DATA_COLLECTION_ANY
+						&& !template.data_collection.includes(Number(this.#data.data_collection))) {
 					return false;
 				}
 
-				if (this.#form_data.agent_mode != ZBX_TEMPLATE_AGENT_MODE_ANY
-						&& !template.agent_mode.includes(Number(this.#form_data.agent_mode))) {
+				if (this.#data.agent_mode != ZBX_TEMPLATE_AGENT_MODE_ANY
+						&& !template.agent_mode.includes(Number(this.#data.agent_mode))) {
 					return false;
 				}
 
-				if (this.#form_data.template_search_query.trim() !== '') {
-					return template.name.toLowerCase().includes(this.#form_data.template_search_query)
-						|| template.description.toLowerCase().includes(this.#form_data.template_search_query)
+				if (this.#data.template_search_query.trim() !== '') {
+					return template.name.toLowerCase().includes(this.#data.template_search_query)
+						|| template.description.toLowerCase().includes(this.#data.template_search_query)
 						|| template.tags.some(({tag, value}) => {
-							return tag.toLowerCase().includes(this.#form_data.template_search_query)
-								|| value.toLowerCase().includes(this.#form_data.template_search_query);
+							return tag.toLowerCase().includes(this.#data.template_search_query)
+								|| value.toLowerCase().includes(this.#data.template_search_query);
 						});
 				}
 
@@ -745,7 +856,7 @@ window.host_wizard_edit = new class {
 					label: macro.config.label,
 					macro: macro.macro
 				});
-			case this.MACRO_TYPE_SECRET:
+			case this.MACRO_TYPE_VAULT:
 				return this.#view_templates.macro_field_vault.evaluateToElement({
 					index: row_index,
 					label: macro.config.label,
@@ -765,15 +876,26 @@ window.host_wizard_edit = new class {
 		console.log('Update profile: disable welcome step')
 	}
 
+	#onFormDataChange(path, new_value, old_value) {
+		console.log('Data changed', {path, new_value, old_value}, this.#data);
 
+		this.#updateField(this.#pathToInputName(path), new_value);
+		this.#updateForm();
+	}
 
+	#onInputChange({target}) {
+		if (!target.name) {
+			return;
+		}
 
+		const value = target.type === 'checkbox'
+			? (target.checked ? target.value : target.getAttribute('unchecked-value'))
+			: target.value;
 
+		console.log(`Input "${target.name}" changed: `, value);
 
-
-
-
-
+		this.#setValueByName(this.#data, target.name, value);
+	}
 
 	#initReactiveData(target_object, on_change_callback) {
 		const createProxy = (obj, path = []) => {
@@ -852,7 +974,7 @@ window.host_wizard_edit = new class {
 		const [first, ...rest] = path.split('.');
 
 		return first + rest.map(p => `[${p}]`).join('');
-	};
+	}
 }
 
 window.host_wizard_edit.example_template = {

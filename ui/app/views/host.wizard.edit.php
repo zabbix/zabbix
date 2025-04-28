@@ -32,7 +32,10 @@ $output = [
 			stepCreateHost(),
 			stepInstallAgent(),
 			stepAddHostInterface(),
-			stepConfigureHostMacros()
+			stepReadme(),
+			stepConfigureHost(),
+			stepConfigurationFinish(),
+			stepComplete()
 		])
 			->addClass('step-form')
 			->toString(),
@@ -49,6 +52,14 @@ $output = [
 		[
 			'title' => _('Next'),
 			'class' => 'js-next',
+		],
+		[
+			'title' => _('Create'),
+			'class' => 'js-create',
+		],
+		[
+			'title' => _('Finish'),
+			'class' => 'js-finish',
 		]
 	],
 	'script_inline' => $this->readJsFile('host.wizard.edit.js.php')
@@ -90,7 +101,6 @@ function stepWelcome(): CTemplateTag {
 						(new CCheckBox('do_not_show_welcome'))->setLabel(_('Do not show welcome screen'))
 					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
@@ -603,9 +613,36 @@ function stepAddHostInterface(): CTemplateTag {
 	);
 }
 
-function stepConfigureHostMacros(): array {
+function stepReadme(): CTemplateTag {
+	return new CTemplateTag('host-wizard-step-readme',
+		(new CDiv([
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CTag('h1', true, _('Configure host')),
+						new CTag('p', true, _('The template you selected (Apache by HTTP) requires additional configuration.'))
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+			(new CSection())
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_MARKDOWN)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		]))->addClass('step-form-body')
+	);
+}
+
+function stepConfigureHost(): array {
 	return [
-		new CTemplateTag('host-wizard-step-configure-host-macros',
+		new CTemplateTag('host-wizard-step-configure-host',
 			(new CDiv([
 				(new CSection())
 					->addItem(
@@ -680,4 +717,40 @@ function stepConfigureHostMacros(): array {
 				->addClass('field-text')
 		)
 	];
+}
+
+function stepConfigurationFinish(): CTemplateTag {
+	return new CTemplateTag('host-wizard-step-configuration-finish',
+		(new CDiv([
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CTag('h1', true, _('Configure host')),
+						new CTag('p', true, _('Click Create to complete the setup.'))
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		]))->addClass('step-form-body')
+	);
+}
+
+function stepComplete(): CTemplateTag {
+	return new CTemplateTag('host-wizard-step-complete',
+		(new CDiv([
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CTag('h1', true, _('Configuration complete')),
+						new CTag('p', true, _s('Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s).', '#{host_name}'))
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		]))->addClass('step-form-body')
+	);
 }
