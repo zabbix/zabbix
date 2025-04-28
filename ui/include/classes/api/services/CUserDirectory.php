@@ -1688,7 +1688,7 @@ class CUserDirectory extends CApiService {
 
 			return false;
 		}
-	
+
 		if (mb_strlen($value) > 10000) {
 			$error = _s('Incorrect value for %1$s.', 'certificate').' '.
 				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
@@ -1714,7 +1714,7 @@ class CUserDirectory extends CApiService {
 
 			return false;
 		}
-		
+
 		if (mb_strlen($value) > 10000) {
 			$error = _s('Incorrect value for %1$s.', 'SP private key').' '.
 				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
