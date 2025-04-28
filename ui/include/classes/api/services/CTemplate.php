@@ -57,6 +57,7 @@ class CTemplate extends CHostGeneral {
 			// filter
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
+			'inheritedTags'				=> false,
 			'filter'					=> null,
 			'search'					=> '',
 			'searchByAny'				=> null,
@@ -77,6 +78,7 @@ class CTemplate extends CHostGeneral {
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
 			'selectTags'				=> null,
+			'selectInheritedTags'		=> null,
 			'selectValueMaps'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -224,8 +226,8 @@ class CTemplate extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-				'host_tag', 'hostid'
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
+				$options['inheritedTags'], 'host_tag', 'h', 'hostid'
 			);
 		}
 
@@ -299,11 +301,15 @@ class CTemplate extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'inheritedTags' =>				['type' => API_BOOLEAN],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectInheritedTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])]
 		]];
+
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -322,19 +328,26 @@ class CTemplate extends CHostGeneral {
 		$ins_templates = [];
 
 		foreach ($templates as $template) {
-			unset($template['groups'], $template['templates'], $template['tags'], $template['macros']);
-
 			$ins_templates[] = $template + ['status' => HOST_STATUS_TEMPLATE];
 		}
 
 		$templateids = DB::insert('hosts', $ins_templates);
 
+		$ins_host_template_cache = [];
+
 		foreach ($templates as $index => &$template) {
 			$template['templateid'] = $templateids[$index];
+
+			$ins_host_template_cache[] = [
+				'hostid' => $template['templateid'],
+				'link_hostid' => $template['templateid']
+			];
 		}
 		unset($template);
 
 		$this->checkTemplatesLinks($templates);
+
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 
 		$this->updateGroups($templates);
 		$this->updateHgSets($templates);
@@ -706,6 +719,8 @@ class CTemplate extends CHostGeneral {
 		DB::delete('hosts_groups', ['hostid' => $templateids]);
 
 		// Finally delete the template.
+		DB::delete('host_template_cache', ['link_hostid' => $templateids]);
+		DB::delete('host_template_cache', ['hostid' => $templateids]);
 		DB::delete('host_tag', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);
 

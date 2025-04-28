@@ -87,6 +87,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectTags'					=> null,
+			'selectInheritedTags'			=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -96,6 +97,14 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {

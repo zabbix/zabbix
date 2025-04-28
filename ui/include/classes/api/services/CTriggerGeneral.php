@@ -819,6 +819,8 @@ abstract class CTriggerGeneral extends CApiService {
 			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
+		self::addRelatedInheritedTags($options, $result);
+
 		return $result;
 	}
 
@@ -884,6 +886,34 @@ abstract class CTriggerGeneral extends CApiService {
 			: [];
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
+	}
+
+	private static function addRelatedInheritedTags(array $options, array &$result): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['inheritedTags'] = [];
+		}
+		unset($row);
+
+		$resource = DBselect(
+			'SELECT DISTINCT t.triggerid,ht.tag,ht.value'.
+			' FROM item_template_cache itc'.
+			' JOIN functions f ON itc.itemid=f.itemid'.
+			' JOIN triggers t ON f.triggerid=t.triggerid'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			' WHERE '.dbConditionId('t.triggerid', array_keys($result))
+		);
+
+		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
+			? ['tag', 'value']
+			: $options['selectInheritedTags'];
+
+		while ($row = DBfetch($resource)) {
+			$result[$row['triggerid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		}
 	}
 
 	/**

@@ -283,8 +283,8 @@ class CProblem extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'p',
-				'problem_tag', 'eventid'
+			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], false,
+				'problem_tag', 'p', 'eventid'
 			);
 		}
 

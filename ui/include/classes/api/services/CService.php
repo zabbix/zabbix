@@ -582,14 +582,14 @@ class CService extends CApiService {
 		}
 
 		if ($options['tags']) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 's',
-				'service_tag', 'serviceid'
+			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], false,
+				'service_tag', 's', 'serviceid'
 			);
 		}
 
 		if ($options['problem_tags']) {
 			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['problem_tags'], $options['evaltype'],
-				's', 'service_problem_tag', 'serviceid'
+				false, 'service_problem_tag', 's', 'serviceid'
 			);
 		}
 		elseif ($options['without_problem_tags']) {

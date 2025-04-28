@@ -95,6 +95,7 @@ class CTrigger extends CTriggerGeneral {
 			'min_severity'					=> null,
 			'evaltype'						=> TAG_EVAL_TYPE_AND_OR,
 			'tags'							=> null,
+			'inheritedTags'					=> false,
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
@@ -115,6 +116,7 @@ class CTrigger extends CTriggerGeneral {
 			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
+			'selectInheritedTags'			=> null,
 			'selectTriggerDiscovery'		=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
@@ -125,6 +127,15 @@ class CTrigger extends CTriggerGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'inheritedTags' =>			['type' => API_BOOLEAN],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -442,8 +453,12 @@ class CTrigger extends CTriggerGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 't',
-				'trigger_tag', 'triggerid'
+			if ($options['inheritedTags']) {
+				$sqlParts['from']['functions'] = 'functions f';
+			}
+
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
+				$options['inheritedTags'], 'trigger_tag', 't', 'triggerid'
 			);
 		}
 

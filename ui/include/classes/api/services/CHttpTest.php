@@ -50,38 +50,49 @@ class CHttpTest extends CApiService {
 		];
 
 		$defOptions = [
-			'httptestids'    => null,
-			'hostids'        => null,
-			'groupids'       => null,
-			'templateids'    => null,
-			'editable'       => false,
-			'inherited'      => null,
-			'templated'      => null,
-			'monitored'      => null,
-			'nopermissions'  => null,
-			'evaltype'		=> TAG_EVAL_TYPE_AND_OR,
-			'tags'			=> null,
+			'httptestids'			=> null,
+			'hostids'				=> null,
+			'groupids'				=> null,
+			'templateids'			=> null,
+			'editable'				=> false,
+			'inherited'				=> null,
+			'templated'				=> null,
+			'monitored'				=> null,
+			'nopermissions'			=> null,
+			'evaltype'				=> TAG_EVAL_TYPE_AND_OR,
+			'tags'					=> null,
+			'inhertitedTags'		=> false,
 			// filter
-			'filter'         => null,
-			'search'         => null,
-			'searchByAny'    => null,
-			'startSearch'    => false,
-			'excludeSearch'  => false,
+			'filter'				=> null,
+			'search'				=> null,
+			'searchByAny'			=> null,
+			'startSearch'			=> false,
+			'excludeSearch'			=> false,
 			// output
-			'output'         => API_OUTPUT_EXTEND,
-			'expandName'     => null,
-			'expandStepName' => null,
-			'selectHosts'    => null,
-			'selectSteps'    => null,
-			'selectTags'	 => null,
-			'countOutput'    => false,
-			'groupCount'     => false,
-			'preservekeys'   => false,
-			'sortfield'      => '',
-			'sortorder'      => '',
-			'limit'          => null
+			'output'				=> API_OUTPUT_EXTEND,
+			'expandName'			=> null,
+			'expandStepName'		=> null,
+			'selectHosts'			=> null,
+			'selectSteps'			=> null,
+			'selectTags'			=> null,
+			'selectInheritedTags'	=> null,
+			'countOutput'			=> false,
+			'groupCount'			=> false,
+			'preservekeys'			=> false,
+			'sortfield'				=> '',
+			'sortorder'				=> '',
+			'limit'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'inheritedTags' =>			['type' => API_BOOLEAN],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -132,8 +143,8 @@ class CHttpTest extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'ht',
-				'httptest_tag', 'httptestid'
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
+				$options['inheritedTags'], 'httptest_tag', 'ht', 'httptestid'
 			);
 		}
 
@@ -685,6 +696,7 @@ class CHttpTest extends CApiService {
 		self::deleteAffectedSteps($del_httptestids);
 
 		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
+		DB::delete('httptest_template_cache', ['httptestid' => $del_httptestids]);
 		DB::delete('httptest_tag', ['httptestid' => $del_httptestids]);
 		DB::update('httptest', [
 			'values' => ['templateid' => 0],
@@ -1097,7 +1109,35 @@ class CHttpTest extends CApiService {
 			}
 		}
 
+		self::addRelatedInheritedTags($options, $result);
+
 		return $result;
+	}
+
+	private static function addRelatedInheritedTags(array $options, array &$result): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['inheritedTags'] = [];
+		}
+		unset($row);
+
+		$resource = DBselect(
+			'SELECT DISTINCT htc.httptestid,ht.tag,ht.value'.
+			' FROM httptest_template_cache htc'.
+			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+			' WHERE '.dbConditionId('htc.httptestid', array_keys($result))
+		);
+
+		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
+			? ['tag', 'value']
+			: $options['selectInheritedTags'];
+
+		while ($row = DBfetch($resource)) {
+			$result[$row['httptestid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		}
 	}
 
 	/**

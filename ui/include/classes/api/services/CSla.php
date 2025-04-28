@@ -329,7 +329,7 @@ class CSla extends CApiService {
 
 		if ($options['service_tags']) {
 			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['service_tags'], $options['evaltype'],
-				'sla', 'sla_service_tag', 'slaid'
+				false, 'sla_service_tag', 'sla', 'slaid'
 			);
 		}
 

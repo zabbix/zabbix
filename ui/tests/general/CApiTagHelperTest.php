@@ -25,7 +25,7 @@ require_once __DIR__.'/../../include/classes/api/services/CItem.php';
 class CApiTagHelperTest extends CTest {
 
 	public static function provider(): array {
-		$sql_args = [2 => 'e', 'event_tag', 'eventid'];
+		$sql_args = [2 => false, 'event_tag', 'e', 'eventid'];
 
 		return [
 			[

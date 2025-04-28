@@ -486,18 +486,9 @@ class CHost extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			if ($options['inheritedTags']) {
-				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
-				);
-			}
-			else {
-				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid'
-				);
-			}
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
+				$options['inheritedTags'], 'host_tag', 'h', 'hostid'
+			);
 		}
 
 		// limit
@@ -716,8 +707,9 @@ class CHost extends CHostGeneral {
 		$hosts_rtdata = [];
 		$hosts_interfaces = [];
 		$hosts_inventory = [];
+		$ins_host_template_cache = [];
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $host) {
 			$hosts_rtdata[] = ['hostid' => $host['hostid']];
 
 			if (array_key_exists('interfaces', $host)) {
@@ -739,8 +731,12 @@ class CHost extends CHostGeneral {
 			if (array_key_exists('inventory_mode', $host_inventory)) {
 				$hosts_inventory[] = ['hostid' => $host['hostid']] + $host_inventory;
 			}
+
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
 		}
-		unset($host);
 
 		if ($hosts_interfaces) {
 			API::HostInterface()->create($hosts_interfaces);
@@ -753,6 +749,7 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::insertBatch('host_rtdata', $hosts_rtdata, false);
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
@@ -1759,6 +1756,7 @@ class CHost extends CHostGeneral {
 
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);
+		DB::delete('host_template_cache', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
@@ -1937,40 +1935,6 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
-			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
-
-			$templates = API::Template()->get([
-				'output' => [],
-				'selectTags' => ['tag', 'value'],
-				'templateids' => $templateids,
-				'preservekeys' => true,
-				'nopermissions' => true
-			]);
-
-			// Set "inheritedTags" for each host.
-			foreach ($result as &$host) {
-				$tags = [];
-
-				// Get IDs and template tag values from previously stored variables.
-				foreach ($hosts_templates[$host['hostid']] as $templateid) {
-					foreach ($templates[$templateid]['tags'] as $tag) {
-						foreach ($tags as $_tag) {
-							// Skip tags with same name and value.
-							if ($_tag['tag'] === $tag['tag'] && $_tag['value'] === $tag['value']) {
-								continue 2;
-							}
-						}
-						$tags[] = $tag;
-					}
-				}
-
-				$host['inheritedTags'] = $this->unsetExtraFields($tags, ['tag', 'value'],
-					$options['selectInheritedTags']
-				);
-			}
-		}
-
 		return $result;
 	}
 
@@ -1999,11 +1963,11 @@ class CHost extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'inheritedTags' =>				['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' =>		['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			'inheritedTags' =>				['type' => API_BOOLEAN],
 			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
 			'withProblemsSuppressed' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
+			'selectInheritedTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
 			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])]

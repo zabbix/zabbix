@@ -101,6 +101,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectDiscoveryRule'			=> null,
 			'selectPreprocessing'			=> null,
 			'selectTags'					=> null,
+			'selectInheritedTags'			=> null,
 			'selectValueMap'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
@@ -319,8 +320,10 @@ class CItemPrototype extends CItemGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])]
 		]];
+
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -434,6 +437,8 @@ class CItemPrototype extends CItemGeneral {
 		self::prepareItemsForApi($items);
 
 		$ins_items_discovery = [];
+		$ins_item_template_cache = [];
+		$inherited_itemids = [];
 		$host_statuses = [];
 		$flags = [];
 
@@ -447,6 +452,15 @@ class CItemPrototype extends CItemGeneral {
 				];
 			}
 
+			$ins_item_template_cache[] = [
+				'itemid' => $item['itemid'],
+				'link_hostid' => $item['hostid']
+			];
+
+			if (array_key_exists('templateid', $item) && $item['templateid'] != 0) {
+				$inherited_itemids[$item['templateid']][$item['itemid']] = true;
+			}
+
 			$host_statuses[] = $item['host_status'];
 			$flags[] = $item['flags'];
 			unset($item['host_status'], $item['flags']);
@@ -455,6 +469,12 @@ class CItemPrototype extends CItemGeneral {
 
 		if ($ins_items_discovery) {
 			DB::insertBatch('item_discovery', $ins_items_discovery);
+		}
+
+		DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
+
+		if ($inherited_itemids) {
+			self::createItemTemplateCache($inherited_itemids);
 		}
 
 		self::updateParameters($items);
@@ -668,6 +688,9 @@ class CItemPrototype extends CItemGeneral {
 
 		$upd_items = [];
 		$upd_itemids = [];
+		$ins_item_template_cache = [];
+		$upd_item_template_cache = [];
+		$del_item_template_cache = [];
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
@@ -675,6 +698,14 @@ class CItemPrototype extends CItemGeneral {
 		self::prepareItemsForDb($items);
 
 		foreach ($items as $i => &$item) {
+			if (array_key_exists('update_template_cache', $item)) {
+				$upd_item_template_cache[$item['itemid']] = [
+					'hostid' => $item['hostid'],
+					'templateid' => $item['templateid']
+				];
+				unset($item['update_template_cache']);
+			}
+
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
 			if ($upd_item) {
@@ -692,6 +723,15 @@ class CItemPrototype extends CItemGeneral {
 					$item = array_intersect_key($item, $internal_fields + $upd_item + $nested_object_fields);
 				}
 
+				if (array_key_exists('templateid', $upd_item)) {
+					if ($upd_item['templateid'] != 0) {
+						$ins_item_template_cache[$item['templateid']][$item['itemid']] = true;
+					}
+					else {
+						$del_item_template_cache[$db_items[$item['itemid']]['templateid']][$item['itemid']] = true;
+					}
+				}
+
 				$upd_itemids[$i] = $item['itemid'];
 			}
 			else {
@@ -702,6 +742,18 @@ class CItemPrototype extends CItemGeneral {
 
 		if ($upd_items) {
 			DB::update('items', $upd_items);
+		}
+
+		if ($del_item_template_cache) {
+			self::deleteItemTemplateCache($del_item_template_cache);
+		}
+
+		if ($ins_item_template_cache) {
+			self::createItemTemplateCache($ins_item_template_cache);
+		}
+
+		if ($upd_item_template_cache) {
+			self::updateItemTemplateCache($upd_item_template_cache);
 		}
 
 		self::updateTags($items, $db_items, $upd_itemids);
@@ -1052,7 +1104,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$upd_items[] = array_intersect_key($upd_db_item,
 				array_flip(['itemid', 'hostid', 'templateid', 'host_status', 'ruleid'])
-			) + $item;
+			) + $item + ['update_template_cache' => true];
 		}
 
 		return $upd_items;
@@ -1132,7 +1184,7 @@ class CItemPrototype extends CItemGeneral {
 		$result = DBselect(DB::makeSql('items', $options));
 
 		while ($row = DBfetch($result)) {
-			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
+			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];// + ['update_template_cache' => true];
 		}
 
 		$upd_items = [];
@@ -1182,7 +1234,7 @@ class CItemPrototype extends CItemGeneral {
 				'templateid' => $item['itemid'],
 				'host_status' => $upd_db_item['host_status'],
 				'ruleid' => $upd_db_item['ruleid']
-			] + $item;
+			] + $item + ['update_template_cache' => true];
 
 			$upd_item += [
 				'headers' => [],
@@ -1495,7 +1547,35 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
+		self::addRelatedInheritedTags($options, $result);
+
 		return $result;
+	}
+
+	private static function addRelatedInheritedTags(array $options, array &$result): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['inheritedTags'] = [];
+		}
+		unset($row);
+
+		$resource = DBselect(
+			'SELECT DISTINCT itc.itemid,ht.tag,ht.value'.
+			' FROM item_template_cache itc'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			' WHERE '.dbConditionId('itc.itemid', array_keys($result))
+		);
+
+		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
+			? ['tag', 'value']
+			: $options['selectInheritedTags'];
+
+		while ($row = DBfetch($resource)) {
+			$result[$row['itemid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		}
 	}
 
 	/**
@@ -1527,6 +1607,7 @@ class CItemPrototype extends CItemGeneral {
 		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
+		DB::delete('item_template_cache', ['itemid' => $del_itemids]);
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],

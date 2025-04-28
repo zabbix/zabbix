@@ -68,6 +68,7 @@ class CHostPrototype extends CHostBase {
 			'selectTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hostmacro_fields), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -540,10 +541,19 @@ class CHostPrototype extends CHostBase {
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $hosts);
 
+		$ins_host_template_cache = [];
+
 		foreach ($hosts as &$host) {
 			$host['host_status'] = array_shift($host_statuses);
+
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
 		}
 		unset($host);
+
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 	}
 
 	/**
@@ -2522,6 +2532,7 @@ class CHostPrototype extends CHostBase {
 
 		DB::delete('interface', ['hostid' => $hostids]);
 		DB::delete('hosts_templates', ['hostid' => $hostids]);
+		DB::delete('host_template_cache', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hostmacro', ['hostid' => $hostids]);
 		DB::delete('host_inventory', ['hostid' => $hostids]);

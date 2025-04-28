@@ -1446,6 +1446,129 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 	}
 
+	protected static function deleteItemTemplateCache(array $tpl_itemids): void {
+		$resource = DBselect(
+			'SELECT itc.itemid,itc.link_hostid'.
+			' FROM item_template_cache itc'.
+			' WHERE '.dbConditionId('itc.itemid', array_keys($tpl_itemids))
+		);
+
+		$del_item_template_cache = [];
+
+		while ($row = DBfetch($resource)) {
+			foreach ($tpl_itemids[$row['itemid']] as $itemid => $foo) {
+				$del_item_template_cache[$itemid][] = $row['link_hostid'];
+			}
+		}
+
+		$sql_where = [];
+
+		foreach ($del_item_template_cache as $itemid => $link_hostids) {
+			$sql_where[] = dbConditionId('itc.itemid', [$itemid]).
+				' AND '.dbConditionId('itc.link_hostid', $link_hostids);
+		}
+
+		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+
+		DBexecute(
+			'DELETE FROM item_template_cache itc'.
+			' WHERE '.$sql_where
+		);
+	}
+
+	protected static function createItemTemplateCache(array $tpl_itemids): void {
+		$resource = DBselect(
+			'SELECT itc.itemid,itc.link_hostid'.
+			' FROM item_template_cache itc'.
+			' WHERE '.dbConditionId('itc.itemid', array_keys($tpl_itemids))
+		);
+
+		$ins_item_template_cache = [];
+
+		while ($row = DBfetch($resource)) {
+			foreach ($tpl_itemids[$row['itemid']] as $itemid => $foo) {
+				$ins_item_template_cache[] = [
+					'itemid' => $itemid,
+					'link_hostid' => $row['link_hostid']
+				];
+			}
+		}
+
+		DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
+	}
+
+	protected static function updateItemTemplateCache(array $items): void {
+		$link_hostids = [];
+
+		$resource = DBselect(
+			'SELECT itc.itemid,itc.link_hostid'.
+			' FROM item_template_cache itc'.
+			' WHERE '.dbConditionId('itc.itemid', array_keys($items))
+		);
+
+		while ($row = DBfetch($resource)) {
+			if ($row['link_hostid'] != $items[$row['itemid']]['hostid']) {
+				$link_hostids[$row['itemid']][$row['link_hostid']] = true;
+			}
+		}
+
+		$tpl_itemids = [];
+
+		foreach ($items as $itemid => $item) {
+			$tpl_itemids[$item['templateid']][$itemid] = true;
+		}
+
+		$tpl_link_hostids = [];
+
+		$resource = DBselect(
+			'SELECT itc.itemid,itc.link_hostid'.
+			' FROM item_template_cache itc'.
+			' WHERE '.dbConditionId('itc.itemid', array_keys($tpl_itemids))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$tpl_link_hostids[$row['itemid']][$row['link_hostid']] = true;
+		}
+
+		$ins_item_template_cache = [];
+		$del_item_template_cache = [];
+
+		foreach ($tpl_itemids as $templateid => $itemids) {
+			foreach ($itemids as $itemid => $foo) {
+				foreach (array_diff_key($link_hostids[$itemid], $tpl_link_hostids[$templateid]) as $hostid => $foo) {
+					$del_item_template_cache[$itemid][] = $hostid;
+				}
+
+				foreach (array_diff_key($tpl_link_hostids[$templateid], $link_hostids[$itemid]) as $hostid => $foo) {
+					$ins_item_template_cache[] = [
+						'itemid' => $itemid,
+						'link_hostid' => $hostid
+					];
+				}
+			}
+		}
+
+		if ($del_item_template_cache) {
+			$sql_where = [];
+
+			foreach ($del_item_template_cache as $itemid => $link_hostids) {
+				$sql_where[] = dbConditionId('itc.itemid', [$itemid]).
+					' AND '.dbConditionId('itc.link_hostid', $link_hostids);
+			}
+
+			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+
+			DBexecute(
+				'DELETE FROM item_template_cache itc'.
+				' WHERE '.$sql_where
+			);
+		}
+
+		if ($ins_item_template_cache) {
+			DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
+		}
+	}
+
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items

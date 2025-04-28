@@ -107,10 +107,28 @@ class CHttpTestManager {
 	public function create(array $httptests) {
 		$httptestids = DB::insert('httptest', $httptests);
 
+		$ins_httptest_template_cache = [];
+		$inherited_httptestids = [];
+
 		foreach ($httptests as &$httptest) {
 			$httptest['httptestid'] = array_shift($httptestids);
+
+			$ins_httptest_template_cache[] = [
+				'httptestid' => $httptest['httptestid'],
+				'link_hostid' => $httptest['hostid']
+			];
+
+			if (array_key_exists('templateid', $httptest) && $httptest['templateid'] != 0) {
+				$inherited_httptestids[$httptest['templateid']][$httptest['httptestid']] = true;
+			}
 		}
 		unset($httptest);
+
+		DB::insertBatch('httptest_template_cache', $ins_httptest_template_cache, false);
+
+		if ($inherited_httptestids) {
+			self::createHttptestTemplateCache($inherited_httptestids);
+		}
 
 		self::createItems($httptests);
 		self::updateFields($httptests);
@@ -118,6 +136,129 @@ class CHttpTestManager {
 		self::updateTags($httptests);
 
 		return $httptests;
+	}
+
+	private static function deleteHttptestTemplateCache(array $tpl_httptestids): void {
+		$resource = DBselect(
+			'SELECT htc.httptestid,htc.link_hostid'.
+			' FROM httptest_template_cache htc'.
+			' WHERE '.dbConditionId('htc.httptestid', array_keys($tpl_httptestids))
+		);
+
+		$del_httptest_template_cache = [];
+
+		while ($row = DBfetch($resource)) {
+			foreach ($tpl_httptestids[$row['httptestid']] as $httptestid => $foo) {
+				$del_httptest_template_cache[$httptestid][] = $row['link_hostid'];
+			}
+		}
+
+		$sql_where = [];
+
+		foreach ($del_httptest_template_cache as $httptestid => $link_hostids) {
+			$sql_where[] = dbConditionId('htc.httptestid', [$httptestid]).
+				' AND '.dbConditionId('htc.link_hostid', $link_hostids);
+		}
+
+		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+
+		DBexecute(
+			'DELETE FROM httptest_template_cache htc'.
+			' WHERE '.$sql_where
+		);
+	}
+
+	private static function createHttptestTemplateCache(array $tpl_httptestids): void {
+		$resource = DBselect(
+			'SELECT htc.httptestid,htc.link_hostid'.
+			' FROM httptest_template_cache htc'.
+			' WHERE '.dbConditionId('htc.httptestid', array_keys($tpl_httptestids))
+		);
+
+		$ins_httptest_template_cache = [];
+
+		while ($row = DBfetch($resource)) {
+			foreach ($tpl_httptestids[$row['httptestid']] as $httptestid => $foo) {
+				$ins_httptest_template_cache[] = [
+					'httptestid' => $httptestid,
+					'link_hostid' => $row['link_hostid']
+				];
+			}
+		}
+
+		DB::insertBatch('httptest_template_cache', $ins_httptest_template_cache, false);
+	}
+
+	protected static function updateHttptestTemplateCache(array $httptests): void {
+		$link_hostids = [];
+
+		$resource = DBselect(
+			'SELECT htc.httptestid,htc.link_hostid'.
+			' FROM httptest_template_cache htc'.
+			' WHERE '.dbConditionId('htc.httptestid', array_keys($httptests))
+		);
+
+		while ($row = DBfetch($resource)) {
+			if ($row['link_hostid'] != $httptests[$row['httptestid']]['hostid']) {
+				$link_hostids[$row['httptestid']][$row['link_hostid']] = true;
+			}
+		}
+
+		$tpl_httptestids = [];
+
+		foreach ($httptests as $httptestid => $httptest) {
+			$tpl_httptestids[$httptest['templateid']][$httptestid] = true;
+		}
+
+		$tpl_link_hostids = [];
+
+		$resource = DBselect(
+			'SELECT htc.httptestid,htc.link_hostid'.
+			' FROM httptest_template_cache htc'.
+			' WHERE '.dbConditionId('htc.httptestid', array_keys($tpl_httptestids))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$tpl_link_hostids[$row['httptestid']][$row['link_hostid']] = true;
+		}
+
+		$ins_httptest_template_cache = [];
+		$del_httptest_template_cache = [];
+
+		foreach ($tpl_httptestids as $templateid => $httptestids) {
+			foreach ($httptestids as $httptestid => $foo) {
+				foreach (array_diff_key($link_hostids[$httptestid], $tpl_link_hostids[$templateid]) as $hostid => $foo) {
+					$del_httptest_template_cache[$httptestid][] = $hostid;
+				}
+
+				foreach (array_diff_key($tpl_link_hostids[$templateid], $link_hostids[$httptestid]) as $hostid => $foo) {
+					$ins_httptest_template_cache[] = [
+						'httptestid' => $httptestid,
+						'link_hostid' => $hostid
+					];
+				}
+			}
+		}
+
+		if ($del_httptest_template_cache) {
+			$sql_where = [];
+
+			foreach ($del_httptest_template_cache as $httptestid => $link_hostids) {
+				$sql_where[] = dbConditionId('htc.httptestid', [$httptestid]).
+					' AND '.dbConditionId('htc.link_hostid', $link_hostids);
+			}
+
+			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+
+			DBexecute(
+				'DELETE FROM httptest_template_cache htc'.
+				' WHERE '.$sql_where
+			);
+		}
+
+		if ($ins_httptest_template_cache) {
+			DB::insertBatch('httptest_template_cache', $ins_httptest_template_cache, false);
+		}
 	}
 
 	/**
@@ -140,20 +281,53 @@ class CHttpTestManager {
 		self::addAffectedObjects($httptests, $db_httptests);
 
 		$upd_httptests = [];
+		$ins_httptest_template_cache = [];
+		$upd_httptest_template_cache = [];
+		$del_httptest_template_cache = [];
 
 		foreach ($httptests as $httptest) {
-			$upd_httptest = DB::getUpdatedValues('httptest', $httptest, $db_httptests[$httptest['httptestid']]);
+			if (array_key_exists('update_template_cache', $httptest)) {
+				$upd_httptest_template_cache[$httptest['httptestid']] = [
+					'hostid' => $httptest['hostid'],
+					'templateid' => $httptest['templateid']
+				];
+				unset($httptest['update_template_cache']);
+			}
+
+			$db_httptest = $db_httptests[$httptest['httptestid']];
+			$upd_httptest = DB::getUpdatedValues('httptest', $httptest, $db_httptest);
 
 			if ($upd_httptest) {
 				$upd_httptests[] = [
 					'values' => $upd_httptest,
 					'where' => ['httptestid' => $httptest['httptestid']]
 				];
+
+				if (array_key_exists('templateid', $upd_httptest)) {
+					if ($upd_httptest['templateid'] != 0) {
+						$ins_httptest_template_cache[$httptest['templateid']][$httptest['httptestid']] = true;
+					}
+					else {
+						$del_httptest_template_cache[$db_httptest['templateid']][$httptest['httptestid']] = true;
+					}
+				}
 			}
 		}
 
 		if ($upd_httptests) {
 			DB::update('httptest', $upd_httptests);
+		}
+
+		if ($del_httptest_template_cache) {
+			self::deleteHttptestTemplateCache($del_httptest_template_cache);
+		}
+
+		if ($ins_httptest_template_cache) {
+			self::createHttptestTemplateCache($ins_httptest_template_cache);
+		}
+
+		if ($upd_httptest_template_cache) {
+			self::updateHttptestTemplateCache($upd_httptest_template_cache);
 		}
 
 		self::updateItems($httptests, $db_httptests);
@@ -1490,6 +1664,7 @@ class CHttpTestManager {
 				$newHttpTest['templateid'] = $httpTestId;
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
+					$newHttpTest['update_template_cache'] = true;
 
 					foreach (['headers', 'variables'] as $field_name) {
 						if (array_key_exists($field_name, $newHttpTest)) {

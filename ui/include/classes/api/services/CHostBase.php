@@ -1340,7 +1340,7 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Update table "hosts_templates".
+	 * Update tables "hosts_templates" and "host_template_cache".
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -1351,6 +1351,9 @@ abstract class CHostBase extends CApiService {
 
 		$ins_hosts_templates = [];
 		$del_hosttemplateids = [];
+
+		$ins_host_template_cache = [];
+		$del_host_template_cache = [];
 
 		foreach ($hosts as $i => &$host) {
 			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
@@ -1373,6 +1376,7 @@ abstract class CHostBase extends CApiService {
 							'hostid' => $host[$id_field_name],
 							'templateid' => $template['templateid']
 						];
+						$ins_host_template_cache[$host[$id_field_name]][] = $template['templateid'];
 						$changed = true;
 					}
 				}
@@ -1389,6 +1393,7 @@ abstract class CHostBase extends CApiService {
 				foreach ($db_templates as $del_template) {
 					$changed = true;
 					$del_hosttemplateids[] = $del_template['hosttemplateid'];
+					$del_host_template_cache[$host[$id_field_name]][] = $del_template['templateid'];
 
 					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
 						$index = $templates_clear_indexes[$del_template['templateid']];
@@ -1400,6 +1405,7 @@ abstract class CHostBase extends CApiService {
 				foreach ($host['templates_clear'] as &$template) {
 					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
 					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
+					$del_host_template_cache[$host[$id_field_name]][] = $template['templateid'];
 				}
 				unset($template);
 			}
@@ -1436,6 +1442,92 @@ abstract class CHostBase extends CApiService {
 			unset($template);
 		}
 		unset($host);
+
+		if ($del_host_template_cache) {
+			self::deleteHostTemplateCache($del_host_template_cache, $this instanceof CTemplate);
+		}
+
+		if ($ins_host_template_cache) {
+			self::insertHostTemplateCache($ins_host_template_cache, $this instanceof CTemplate);
+		}
+	}
+
+	private static function deleteHostTemplateCache(array $hosts_templates, bool $is_template): void {
+		$ancestors = self::getDbAncestors($hosts_templates);
+		$descendants = $is_template ? self::getDbDescendants($hosts_templates) : [];
+		$sql_where = [];
+
+		foreach (CHostTemplateCacheHelper::getLinksToDelete($hosts_templates, $ancestors, $descendants)
+				as $hostid => $link_hostids) {
+			$sql_where[] = dbConditionId('htc.hostid', [$hostid]).
+				' AND '.dbConditionId('htc.link_hostid', $link_hostids);
+		}
+
+		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+
+		DBexecute(
+			'DELETE FROM host_template_cache htc'.
+			' WHERE '.$sql_where
+		);
+	}
+
+	private static function insertHostTemplateCache(array $hosts_templates, bool $is_template): void {
+		$ancestors = self::getDbAncestors($hosts_templates);
+		$descendants = $is_template ? self::getDbDescendants($hosts_templates) : [];
+		$ins_host_template_cache = [];
+
+		foreach (CHostTemplateCacheHelper::getLinksToCreate($hosts_templates, $ancestors, $descendants)
+				as $hostid => $link_hostids) {
+			foreach ($link_hostids as $link_hostid) {
+				$ins_host_template_cache[] = [
+					'hostid' => $hostid,
+					'link_hostid' => $link_hostid
+				];
+			}
+		}
+
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+	}
+
+	private static function getDbAncestors(array $hosts_templates): array {
+		$result = [];
+		$hostids = [];
+
+		foreach ($hosts_templates as $values) {
+			foreach ($values as $value) {
+				$hostids[$value] = true;
+			}
+		}
+
+		$resource = DBselect(
+			'SELECT htc.hostid,htc.link_hostid'.
+			' FROM host_template_cache htc'.
+			' WHERE htc.hostid!=htc.link_hostid'.
+				' AND '.dbConditionId('htc.hostid', array_keys($hostids))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$result[$row['hostid']][] = $row['link_hostid'];
+		}
+
+		return $result;
+	}
+
+	private static function getDbDescendants(array $hosts_templates): array {
+		$result = [];
+
+		$resource = DBselect(
+			'SELECT htc.hostid,htc.link_hostid'.
+			' FROM host_template_cache htc'.
+			' WHERE htc.hostid!=htc.link_hostid'.
+				' AND '.dbConditionId('htc.link_hostid', array_keys($hosts_templates))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$result[$row['link_hostid']][] = $row['hostid'];
+		}
+
+		return $result;
 	}
 
 	/**
@@ -1875,6 +1967,35 @@ abstract class CHostBase extends CApiService {
 			);
 		}
 
+		self::addRelatedInheritedTags($options, $result);
+
 		return $result;
+	}
+
+	private static function addRelatedInheritedTags(array $options, array &$result): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['inheritedTags'] = [];
+		}
+		unset($row);
+
+		$resource = DBselect(
+			'SELECT DISTINCT htc.hostid,ht.tag,ht.value'.
+			' FROM host_template_cache htc'.
+			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+			' WHERE htc.hostid!=htc.link_hostid'.
+				' AND '.dbConditionId('htc.hostid', array_keys($result))
+		);
+
+		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
+			? ['tag', 'value']
+			: $options['selectInheritedTags'];
+
+		while ($row = DBfetch($resource)) {
+			$result[$row['hostid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		}
 	}
 }
