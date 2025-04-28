@@ -709,8 +709,8 @@ class CUserMacro extends CApiService {
 			$all_hostids += array_flip(array_column($db_hostmacros, 'hostid'));
 		}
 
-		$templateids = API::Template()->get([
-			'output' => ['templateid'],
+		$templates = API::Template()->get([
+			'output' => [],
 			'templateids' => array_keys($all_hostids),
 			'preservekeys' => true
 		]);
@@ -723,7 +723,7 @@ class CUserMacro extends CApiService {
 
 			$path = '/'.($index + 1);
 
-			if (!array_key_exists($hostmacro['hostid'], $templateids)) {
+			if (!array_key_exists($hostmacro['hostid'], $templates)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
 					_s('unexpected parameter "%1$s"', 'config'))
 				);
@@ -851,7 +851,8 @@ class CUserMacro extends CApiService {
 				}
 
 				$upd_hostmacro_config = DB::getUpdatedValues('hostmacro_config', $hostmacro['config'],
-					$db_hostmacro_config);
+					$db_hostmacro_config
+				);
 
 				if ($upd_hostmacro_config) {
 					$upd_hostmacros_configs[] = [
@@ -1285,10 +1286,14 @@ class CUserMacro extends CApiService {
 		}
 
 		$templates = API::Template()->get([
-			'output' => ['templateid'],
+			'output' => [],
 			'templateids' => array_keys(array_flip(array_column($result, 'hostid'))),
 			'preservekeys' => true
 		]);
+
+		if (!$templates) {
+			return;
+		}
 
 		$resource = DB::select('hostmacro_config', [
 			'output' => ['type', 'label', 'description', 'required', 'regex', 'options'],
