@@ -76,7 +76,6 @@ window.widget_tophosts_form = new class {
 				).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'edit':
@@ -97,7 +96,6 @@ window.widget_tophosts_form = new class {
 					).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'remove':
@@ -167,10 +165,5 @@ window.widget_tophosts_form = new class {
 		input.setAttribute('name', name);
 		input.setAttribute('value', value);
 		this.#form.appendChild(input);
-	}
-
-	// Need to remove function after sub-popups auto close.
-	#removeColorpicker() {
-		$('#color_picker').hide();
 	}
 };
