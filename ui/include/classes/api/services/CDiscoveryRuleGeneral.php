@@ -1124,7 +1124,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	 */
 	protected static function checkLifetimeFields(array $items): void {
 		foreach ($items as $i => $item) {
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED && $item['lifetime_type'] != ZBX_LLD_DELETE_AFTER
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED || $item['lifetime_type'] != ZBX_LLD_DELETE_AFTER
 					|| $item['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER || $item['lifetime'][0] === '{'
 					|| $item['enabled_lifetime'][0] === '{') {
 				continue;
