@@ -63,37 +63,49 @@
 								.change();
 
 							// unacknowledged problem events
-							$('#problem_unack_color')
-								.val("<?= CSettingsSchema::getDefault('problem_unack_color') ?>")
-								.prop('disabled', !custom_color_enabled)
-								.change();
+							const problem_unack_color = document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="problem_unack_color"]'
+							);
+
+							problem_unack_color.color = '<?= CSettingsSchema::getDefault("problem_unack_color") ?>';
+							problem_unack_color.disabled = !custom_color_enabled;
+
 							$('#problem_unack_style').prop('checked',
 								<?= json_encode((bool) CSettingsSchema::getDefault('problem_unack_style')) ?>
 							);
 
 							// acknowledged problem events
-							$('#problem_ack_color')
-								.val("<?= CSettingsSchema::getDefault('problem_ack_color') ?>")
-								.prop('disabled', !custom_color_enabled)
-								.change();
+							const problem_ack_color = document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="problem_ack_color"]'
+							);
+
+							problem_ack_color.color = '<?= CSettingsSchema::getDefault("problem_ack_color") ?>';
+							problem_ack_color.disabled = !custom_color_enabled;
+
 							$('#problem_ack_style').prop('checked',
 								<?= json_encode((bool) CSettingsSchema::getDefault('problem_ack_style')) ?>
 							);
 
 							// unacknowledged resolved events
-							$('#ok_unack_color')
-								.val("<?= CSettingsSchema::getDefault('ok_unack_color') ?>")
-								.prop('disabled', !custom_color_enabled)
-								.change();
+							const ok_unack_color = document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="ok_unack_color"]'
+							);
+
+							ok_unack_color.color = '<?= CSettingsSchema::getDefault("ok_unack_color") ?>';
+							ok_unack_color.disabled = !custom_color_enabled;
+
 							$('#ok_unack_style').prop('checked',
 								<?= json_encode((bool) CSettingsSchema::getDefault('ok_unack_style')) ?>
 							);
 
 							// acknowledged resolved events
-							$('#ok_ack_color')
-								.val("<?= CSettingsSchema::getDefault('ok_ack_color') ?>")
-								.prop('disabled', !custom_color_enabled)
-								.change();
+							const ok_ack_color = document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="ok_ack_color"]'
+							);
+
+							ok_ack_color.color = '<?= CSettingsSchema::getDefault("ok_ack_color") ?>';
+							ok_ack_color.disabled = !custom_color_enabled;
+
 							$('#ok_ack_style').prop('checked',
 								<?= json_encode((bool) CSettingsSchema::getDefault('ok_ack_style')) ?>
 							);
@@ -107,24 +119,30 @@
 							$('#severity_name_3').val("<?= CSettingsSchema::getDefault('severity_name_3') ?>");
 							$('#severity_name_4').val("<?= CSettingsSchema::getDefault('severity_name_4') ?>");
 							$('#severity_name_5').val("<?= CSettingsSchema::getDefault('severity_name_5') ?>");
-							$('#severity_color_0')
-								.val("<?= CSettingsSchema::getDefault('severity_color_0') ?>")
-								.change();
-							$('#severity_color_1')
-								.val("<?= CSettingsSchema::getDefault('severity_color_1') ?>")
-								.change();
-							$('#severity_color_2')
-								.val("<?= CSettingsSchema::getDefault('severity_color_2') ?>")
-								.change();
-							$('#severity_color_3')
-								.val("<?= CSettingsSchema::getDefault('severity_color_3') ?>")
-								.change();
-							$('#severity_color_4')
-								.val("<?= CSettingsSchema::getDefault('severity_color_4') ?>")
-								.change();
-							$('#severity_color_5')
-								.val("<?= CSettingsSchema::getDefault('severity_color_5') ?>")
-								.change();
+
+							document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_0"]'
+							).color = '<?= CSettingsSchema::getDefault("severity_color_0") ?>';
+
+							document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_1"]'
+							).color = '<?= CSettingsSchema::getDefault("severity_color_1") ?>';
+
+							document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_2"]'
+							).color = '<?= CSettingsSchema::getDefault("severity_color_2") ?>';
+
+							document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_3"]'
+							).color = '<?= CSettingsSchema::getDefault("severity_color_3") ?>';
+
+							document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_4"]'
+							).color = '<?= CSettingsSchema::getDefault("severity_color_4") ?>';
+
+							document.querySelector(
+								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_5"]'
+							).color = '<?= CSettingsSchema::getDefault("severity_color_5") ?>';
 						}
 					}
 				]
