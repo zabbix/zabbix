@@ -198,6 +198,7 @@ class CControllerHostList extends CController {
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
+			'inheritedTags' => true,
 			'groupids' => $filter_groupids,
 			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'proxyids' => $proxyids,
@@ -251,6 +252,7 @@ class CControllerHostList extends CController {
 			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
 			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
@@ -390,6 +392,8 @@ class CControllerHostList extends CController {
 		if (!$filter['tags']) {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
+
+		$hosts = mergeRegularAndInheritedTags($hosts, true);
 
 		$data = [
 			'action' => $this->getAction(),

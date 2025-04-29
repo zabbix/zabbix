@@ -733,9 +733,11 @@ else {
 	$options = [
 		'output' => ['httptestid', $sortField],
 		'selectTags' => ['tag', 'value'],
+		'selectInheritedTags' => ['tag', 'value'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids ? $filter_groupids : null,
 		'tags' => $data['filter']['tags'],
+		'inheritedTags' => true,
 		'evaltype' => $data['filter']['evaltype'],
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
@@ -747,6 +749,8 @@ else {
 	}
 
 	$httpTests = API::HttpTest()->get($options);
+
+	$httpTests = mergeRegularAndInheritedTags($httpTests, true);
 
 	$dbHttpTests = DBselect(
 		'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.

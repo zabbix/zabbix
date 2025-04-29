@@ -548,9 +548,11 @@ class CControllerItemList extends CControllerItem {
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectItemDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'sortfield' => $input['sort'],
 			'evaltype' => $input['filter_evaltype'],
 			'tags' => $input['filter_tags'],
+			'inheritedTags' => true,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
@@ -652,6 +654,8 @@ class CControllerItemList extends CControllerItem {
 		}
 
 		$items = API::Item()->get($options);
+
+		$items = mergeRegularAndInheritedTags($items, true);
 
 		return expandItemNamesWithMasterItems($items, 'items');
 	}

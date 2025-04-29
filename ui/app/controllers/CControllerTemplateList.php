@@ -113,6 +113,7 @@ class CControllerTemplateList extends CController {
 			'output' => ['templateid', $sort_field],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
+			'inheritedTags' => true,
 			'search' => array_filter([
 				'name' => $filter['name'],
 				'vendor_name' => $filter['vendor_name'],
@@ -139,6 +140,7 @@ class CControllerTemplateList extends CController {
 			'selectDashboards' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -184,6 +186,8 @@ class CControllerTemplateList extends CController {
 		if (!$filter['tags']) {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
+
+		$templates = mergeRegularAndInheritedTags($templates, true);
 
 		$data = [
 			'action' => $this->getAction(),

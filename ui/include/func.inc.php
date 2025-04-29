@@ -2644,3 +2644,51 @@ function zbx_mb_check_encoding(string $string, string $encoding): bool {
 
 	return $decoded_string === $string;
 }
+
+function mergeRegularAndInheritedTags(array $objects, bool $mark_inherited = false): array {
+	foreach ($objects as &$object) {
+		if ($mark_inherited) {
+			foreach ($object['tags'] as &$tag) {
+				$tag['is_inherited'] = false;
+			}
+			unset($tag);
+
+			foreach ($object['inheritedTags'] as &$tag) {
+				$tag['is_inherited'] = true;
+			}
+			unset($tag);
+
+			$object['tags'] = array_merge($object['tags'], $object['inheritedTags']);
+		}
+		else {
+			// Merge regular tags with inherited ones, removing duplicate tags and values.
+
+			if (!$object['inheritedTags']) {
+				$tags = $object['tags'];
+			}
+			elseif (!$object['tags']) {
+				$tags = $object['inheritedTags'];
+			}
+			else {
+				$tags = $object['tags'];
+
+				foreach ($object['inheritedTags'] as $inherited_tag) {
+					foreach ($tags as $tag) {
+						if ($tag['tag'] === $inherited_tag['tag'] && $tag['value'] === $inherited_tag['value']) {
+							continue 2;
+						}
+					}
+
+					$tags[] = $inherited_tag;
+				}
+			}
+
+			$object['tags'] = $tags;
+		}
+
+		unset($object['inheritedTags']);
+	}
+	unset($object);
+
+	return $objects;
+}

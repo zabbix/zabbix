@@ -126,11 +126,13 @@ class CControllerTriggerPrototypeList extends CController {
 			'selectHosts' => ['hostid', 'host'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'triggerids' => array_column($data['triggers'], 'triggerid')
 		]);
 
 		order_result($data['triggers'], $sort_field, $sort_order);
 
+		$data['triggers'] = mergeRegularAndInheritedTags($data['triggers'], true);
 		$data['tags'] = makeTags($data['triggers'], true, 'triggerid');
 
 		$dep_trigger_ids = [];

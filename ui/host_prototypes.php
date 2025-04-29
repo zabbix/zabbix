@@ -596,6 +596,7 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
 		'selectTags' => ['tag', 'value'],
+		'selectInheritedTags' => ['tag', 'value'],
 		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $limit
@@ -656,6 +657,7 @@ else {
 		]);
 	}
 
+	$data['hostPrototypes'] = mergeRegularAndInheritedTags($data['hostPrototypes'], true);
 	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
