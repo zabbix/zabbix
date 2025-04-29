@@ -18,6 +18,8 @@
  */
 class CWidgetEditDialogue extends EventTarget {
 
+	static INPUT_THROTTLE_MS = 500;
+
 	static EVENT_LOAD = 'load';
 	static EVENT_READY = 'ready';
 
@@ -57,12 +59,13 @@ class CWidgetEditDialogue extends EventTarget {
 
 	#input_throttle_timeout = null;
 
-	#messages;
+	#messages = [];
 
 	#last_type = null;
 	#last_type_reference = null;
 
 	#is_ready = false;
+	#is_validated = false;
 
 	constructor({dashboard}) {
 		super();
@@ -239,10 +242,12 @@ class CWidgetEditDialogue extends EventTarget {
 			clearTimeout(this.#input_throttle_timeout);
 		}
 
-		this.#input_throttle_timeout = setTimeout(() => this.#update(), CDashboard.WIDGET_EDIT_INPUT_THROTTLE_MS);
+		this.#input_throttle_timeout = setTimeout(() => this.#validate(), CWidgetEditDialogue.INPUT_THROTTLE_MS);
 	}
 
 	#onValidatorResult(result) {
+		this.#is_validated = true;
+
 		this.#messages = [];
 
 		if ('error' in result) {
@@ -287,7 +292,7 @@ class CWidgetEditDialogue extends EventTarget {
 
 	#promiseSubmitReadiness() {
 		return new Promise(resolve => {
-			this.#update();
+			this.#validate();
 
 			if (this.#validator.inProgress()) {
 				this.#validator.onResult({
@@ -317,19 +322,23 @@ class CWidgetEditDialogue extends EventTarget {
 		}
 	}
 
-	#update() {
+	#validate() {
 		const {type, name, view_mode, fields} = this.#getProperties();
 
-		if (type !== this.#type || name !== this.#name || view_mode !== this.#view_mode
-				|| JSON.stringify(fields) !== JSON.stringify(this.#fields)) {
+		const is_modified = type !== this.#type || name !== this.#name || view_mode !== this.#view_mode
+			|| JSON.stringify(fields) !== JSON.stringify(this.#fields);
+
+		if (is_modified) {
 			this.#type = type;
 			this.#name = name;
 			this.#view_mode = view_mode;
 			this.#fields = fields;
 
-			this.#validator.check({type, name, fields});
-
 			this.#is_unsaved = true;
+		}
+
+		if (is_modified || (!this.#is_validated && !this.#validator.inProgress())) {
+			this.#validator.check({type, name, fields});
 		}
 	}
 

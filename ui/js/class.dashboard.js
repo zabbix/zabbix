@@ -41,8 +41,6 @@ class CDashboard {
 	static EVENT_REFERRED_UPDATE = 'dashboard-referred-update';
 	static EVENT_FEEDBACK = 'dashboard-feedback';
 
-	static WIDGET_EDIT_INPUT_THROTTLE_MS = 500;
-
 	#broadcast_options;
 
 	#broadcast_cache = new Map();

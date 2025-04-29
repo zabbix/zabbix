@@ -46,12 +46,17 @@ class CWidgetFieldThresholds extends CWidgetField {
 			})
 			.on('tableupdate.dynamicRows', () => this.dispatchUpdateEvent());
 
-		const observer = new MutationObserver(() => this.dispatchUpdateEvent());
+		const observer = new MutationObserver(records => {
+			if (records.some(record => record.type === 'attributes' &&record.target.value !== record.oldValue)) {
+				this.dispatchUpdateEvent();
+			}
+		});
 
 		observer.observe(thresholds_table, {
 			subtree: true,
 			attributes: true,
-			attributeFilter: ['value']
+			attributeFilter: ['value'],
+			attributeOldValue: true
 		});
 
 		thresholds_table.addEventListener('input', () => this.dispatchUpdateEvent());
