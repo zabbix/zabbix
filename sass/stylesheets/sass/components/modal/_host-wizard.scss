@@ -2,7 +2,11 @@
 	--modal-max-width: 1120px;
 
 	&.overlay-dialogue.modal {
+		display: grid;
+		grid-template-rows: max-content 1fr max-content;
 		padding: 0;
+		min-height: unquote("min(calc(100vh - 100px), 580px)");
+		max-height: calc(100vh - 100px);
 
 		.overlay-dialogue-header {
 			flex-wrap: wrap;
@@ -32,8 +36,10 @@
 			margin: 0;
 			padding: 0 56px 32px 56px;
 			width: initial;
-			min-height: 384px;
-			max-height: calc(100vh - 340px);
+
+			form {
+				padding: 0;
+			}
 		}
 
 		.overlay-dialogue-footer {

@@ -5655,7 +5655,11 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
 .modal-popup-host-wizard {
   --modal-max-width: 1120px; }
   .modal-popup-host-wizard.overlay-dialogue.modal {
-    padding: 0; }
+    display: grid;
+    grid-template-rows: max-content 1fr max-content;
+    padding: 0;
+    min-height: min(calc(100vh - 100px), 580px);
+    max-height: calc(100vh - 100px); }
     .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-header {
       flex-wrap: wrap;
       margin: 0;
@@ -5673,9 +5677,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-body {
       margin: 0;
       padding: 0 56px 32px 56px;
-      width: initial;
-      min-height: 384px;
-      max-height: calc(100vh - 340px); }
+      width: initial; }
+      .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-body form {
+        padding: 0; }
     .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer {
       display: flex;
       align-items: baseline;
