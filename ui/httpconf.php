@@ -455,6 +455,11 @@ if (isset($_REQUEST['form'])) {
 		'hostids' => $data['hostid'],
 		'templated_hosts' => true
 	]);
+
+	if (!$host) {
+		access_deny();
+	}
+
 	$data['host'] = reset($host);
 
 	if (hasRequest('httptestid')) {
