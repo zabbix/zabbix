@@ -127,7 +127,7 @@ window.host_wizard_edit = new class {
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
 		monitoring_os: 'linux',
-		monitoring_os_distribution: -1,
+		monitoring_os_distribution: 'windows-new',
 		agent_install_required: false,
 		interface_required: {
 			[this.INTERFACE_TYPE_AGENT]: false,
@@ -260,6 +260,11 @@ window.host_wizard_edit = new class {
 
 			templates_section: tmpl('host-wizard-templates-section'),
 			card: tmpl('host-wizard-template-card'),
+
+			install_agent_readme_linux: tmpl('host-wizard-step-install-agent-os-linux'),
+			install_agent_readme_windows_new: tmpl('host-wizard-step-install-agent-os-windows-new'),
+			install_agent_readme_windows_old: tmpl('host-wizard-step-install-agent-os-windows-old'),
+			install_agent_readme_other: tmpl('host-wizard-step-install-agent-os-other'),
 
 			macro_field_checkbox: tmpl('host-wizard-macro-field-checkbox'),
 			macro_field_select: tmpl('host-wizard-macro-field-select'),
@@ -715,6 +720,21 @@ window.host_wizard_edit = new class {
 				if (windows_distribution_select !== null) {
 					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
 				}
+
+				const readme_template = (() => {
+					switch (this.#data.monitoring_os) {
+						case 'linux':
+							return this.#view_templates.install_agent_readme_linux;
+						case 'windows':
+							return this.#data.monitoring_os_distribution === 'windows-new'
+								? this.#view_templates.install_agent_readme_windows_new
+								: this.#view_templates.install_agent_readme_windows_old;
+						default:
+							return this.#view_templates.install_agent_readme_other;
+					}
+				})();
+
+				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({});
 				break;
 
 			case this.STEP_CONFIGURE_HOST:

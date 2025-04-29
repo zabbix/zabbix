@@ -382,18 +382,8 @@ function stepInstallAgent(): array {
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
 
 							(new CListItem())
-								->addItem(
-									(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
-										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-								)
-								->addItem(
-									(new CDiv([
-										new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
-										new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
-										new CTag('p', true, new CLink(_('Open installation instructions'), '#'))
-									]))->addClass(ZBX_STYLE_FORMATED_TEXT)
-								)
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addclass('js-install-agent-readme')
 						]))
 							->addClass(ZBX_STYLE_ORDERED_LIST)
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -412,10 +402,8 @@ function stepInstallAgent(): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/#{version}/install-zabbix.sh | bash -s -- --agent2 --server-host #{serverHost} --hostname #{hostname} --psk-identity string --psk XXXXXXXX"),
-					]))
-						->addClass(ZBX_STYLE_MARKDOWN)
+					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
-				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
 		),
 
 		new CTemplateTag('host-wizard-step-install-agent-os-windows-new',
@@ -427,17 +415,9 @@ function stepInstallAgent(): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/#{version}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
-					]))
-						->addClass(ZBX_STYLE_MARKDOWN)
-				)
-				->addItem(new CTag('p', true))
-				->addItem(
-					(new CDiv([
 						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 -serverHost #{serverHost} -hostname '#{hostname}' -pskIdentity 'qeqweqweqweqwe' -psk AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-					]))
-						->addClass(ZBX_STYLE_MARKDOWN)
+					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
-				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 		),
 
 		new CTemplateTag('host-wizard-step-install-agent-os-windows-old',
@@ -453,7 +433,6 @@ function stepInstallAgent(): array {
 						new CTag('p', true, new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MSI)))
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
-				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
 		),
 
 		new CTemplateTag('host-wizard-step-install-agent-os-other',
@@ -470,7 +449,6 @@ function stepInstallAgent(): array {
 						new CTag('p', true, [new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)), ' (', _s('Other OS'), ')'])
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
-				->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 		),
 	];
 }
