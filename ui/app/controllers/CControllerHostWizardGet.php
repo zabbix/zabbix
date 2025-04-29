@@ -75,7 +75,7 @@ class CControllerHostWizardGet extends CController {
 	}
 
 	protected function doAction(): void {
-		$host = [];
+		$host = null;
 
 		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([

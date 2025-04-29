@@ -40,6 +40,8 @@ const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
 const ZBX_STYLE_FORM_GRID = 'form-grid';
 const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
 
+const ZBX_STYLE_FIELD_LABEL_ASTERISK = 'form-label-asterisk';
+
 const ZBX_STYLE_MARKDOWN = 'markdown';
 const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 

@@ -89,9 +89,11 @@ window.host_wizard_edit = new class {
 	#templates;
 	#linked_templates;
 
-	#templateid;
-	#template;
-	#host;
+	#source_hostid = null;
+	#host = null;
+
+	#selected_templateid = null;
+	#template = null;
 
 	/** @type {number} */
 	#current_step = 0;
@@ -312,18 +314,15 @@ window.host_wizard_edit = new class {
 		let show_finish_button = false;
 
 		let allow_back_button = this.#current_step > 0;
-		let allow_next_button = true;
 
 		switch (this.#steps_queue[step]) {
 			case this.STEP_WELCOME:
 				this.#renderWelcome();
 				break;
 			case this.STEP_SELECT_TEMPLATE:
-				allow_next_button = this.#data.template_selected !== null;
 				this.#renderSelectTemplate();
 				break;
 			case this.STEP_CREATE_HOST:
-				allow_next_button = this.#data.hostid !== null;
 				this.#renderCreateHost();
 				break;
 			case this.STEP_INSTALL_AGENT:
@@ -353,9 +352,13 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
+		this.#next_button.removeAttribute('disabled');
+
 		this.#updateForm();
 		this.#updateFields();
 		this.#updateProgress();
+
+		const allow_next_button = !this.#next_button.hasAttribute('disabled');
 
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
@@ -378,6 +381,8 @@ window.host_wizard_edit = new class {
 
 	#renderSelectTemplate() {
 		const step = this.#view_templates.step_select_template.evaluateToElement();
+
+		step.querySelector('.js-show-templates').style.display = this.#host !== null ? '' : 'none';
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
@@ -447,8 +452,8 @@ window.host_wizard_edit = new class {
 			}
 		});
 
-		if (this.#template.templateid !== this.#templateid) {
-			this.#templateid = this.#template.templateid;
+		if (this.#template.templateid !== this.#selected_templateid) {
+			this.#selected_templateid = this.#template.templateid;
 
 			this.#data.macros = Object.fromEntries(
 				this.#template.macros.map((macro, index) => [index, {
@@ -484,6 +489,9 @@ window.host_wizard_edit = new class {
 			case this.STEP_WELCOME:
 				return this.#disableWelcomeStep();
 
+			case this.STEP_SELECT_TEMPLATE:
+				return this.#source_hostid !== null ? this.#loadWizardConfig() : Promise.resolve();
+
 			case this.STEP_CREATE_HOST:
 				return this.#loadWizardConfig();
 
@@ -496,8 +504,11 @@ window.host_wizard_edit = new class {
 	}
 
 	#loadWizardConfig() {
-		const host = this.#data.hostid;
-		const hostid = host && !host.isNew ? host.id : null;
+		const hostid = this.#source_hostid !== null
+			? this.#source_hostid
+			: this.#data.host && !this.#data.host.isNew
+				? this.#data.host.id
+				: null;
 
 		const url_params = objectToSearchParams({
 			action: 'host.wizard.get',
@@ -568,7 +579,14 @@ window.host_wizard_edit = new class {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		step_form.parentNode.insertBefore(message_box, step_form);
+		const message_element = this.#dialogue.querySelector('.msg-bad');
+
+		if (message_element === null) {
+			step_form.parentNode.insertBefore(message_box, step_form);
+		}
+		else {
+			message_element.replaceWith(message_element);
+		}
 	}
 
 	#updateStepsQueue() {
@@ -578,7 +596,11 @@ window.host_wizard_edit = new class {
 			this.#steps_queue.push(this.STEP_WELCOME);
 		}
 
-		this.#steps_queue.push(this.STEP_SELECT_TEMPLATE, this.STEP_CREATE_HOST);
+		this.#steps_queue.push(this.STEP_SELECT_TEMPLATE);
+
+		if (this.#source_hostid === null) {
+			this.#steps_queue.push(this.STEP_CREATE_HOST);
+		}
 
 		if (this.#data.agent_install_required) {
 			this.#steps_queue.push(this.STEP_INSTALL_AGENT);
@@ -620,13 +642,13 @@ window.host_wizard_edit = new class {
 		const progress_labels = [
 			{
 				label: t('Select a template'),
-				info: this.#template?.name,
+				info: this.#template?.name || this.#templates?.get(this.#data.template_selected)?.name,
 				visible: true,
 				steps: [this.STEP_SELECT_TEMPLATE]
 			},
 			{
 				label: t('Create or select a host'),
-				info: this.#data.hostid?.name,
+				info: this.#data.host?.name,
 				visible: true,
 				steps: [this.STEP_CREATE_HOST]
 			},
@@ -637,17 +659,17 @@ window.host_wizard_edit = new class {
 			},
 			{
 				label: t('Add host interface'),
-				visible: this.#host && Object.values(this.#data.interface_required).some(required => required),
+				visible: this.#data.host !== null && Object.values(this.#data.interface_required).some(value => value),
 				steps: [this.STEP_ADD_HOST_INTERFACE]
 			},
 			{
 				label: t('Configure host'),
-				visible: this.#host,
+				visible: this.#data.host !== null,
 				steps: [this.STEP_README, this.STEP_CONFIGURE_HOST, this.STEP_CONFIGURATION_FINISH]
 			},
 			{
 				label: t('A few more steps'),
-				visible: !this.#host,
+				visible: this.#data.host === null,
 				steps: []
 			}
 		];
@@ -692,38 +714,60 @@ window.host_wizard_edit = new class {
 					}
 				}
 
-				if (path === 'template_selected') {
-					this.#next_button.toggleAttribute('disabled', new_value === null);
+				if (!path || path === 'template_selected') {
+					if (this.#data.template_selected !== null) {
+						this.#updateProgress();
+					}
+
+					this.#next_button.toggleAttribute('disabled', this.#data.template_selected === null);
+
 				}
 				break;
 
 			case this.STEP_CREATE_HOST:
-				if (path === 'hostid') {
-					this.#next_button.toggleAttribute('disabled', new_value === null);
+				const is_host_new = this.#data.host?.isNew || false;
+
+				if (!path || path === 'host' || path === 'groups') {
+					this.#dialogue.querySelector('.js-host-groups-label')
+						.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, is_host_new)
+
+					this.#next_button.toggleAttribute('disabled',
+						this.#data.host === null || (is_host_new && !this.#data.groups.length)
+					);
 				}
+
 				break;
 
 			case this.STEP_INSTALL_AGENT:
-				const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
-
-				if (windows_distribution_select !== null) {
-					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
+				if (!path || path === 'tls_psk_identity' || path === 'tls_psk') {
+					this.#next_button.toggleAttribute('disabled',
+						this.#data.tls_psk_identity.trim() === '' || this.#data.tls_psk.trim() === ''
+					);
 				}
 
-				const readme_template = (() => {
-					switch (this.#data.monitoring_os) {
-						case 'linux':
-							return this.#view_templates.install_agent_readme_linux;
-						case 'windows':
-							return this.#data.monitoring_os_distribution === 'windows-new'
-								? this.#view_templates.install_agent_readme_windows_new
-								: this.#view_templates.install_agent_readme_windows_old;
-						default:
-							return this.#view_templates.install_agent_readme_other;
-					}
-				})();
+				if (!path && this.#data.tls_psk.trim() === '') {
+					this.#data.tls_psk = this.#generatePSK();
+				}
 
-				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({});
+				if (!path || path === 'monitoring_os' || path === 'monitoring_os_distribution') {
+					const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
+					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
+
+					const readme_template = (() => {
+						switch (this.#data.monitoring_os) {
+							case 'linux':
+								return this.#view_templates.install_agent_readme_linux;
+							case 'windows':
+								return this.#data.monitoring_os_distribution === 'windows-new'
+									? this.#view_templates.install_agent_readme_windows_new
+									: this.#view_templates.install_agent_readme_windows_old;
+							default:
+								return this.#view_templates.install_agent_readme_other;
+						}
+					})();
+
+					this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({});
+				}
 				break;
 
 			case this.STEP_CONFIGURE_HOST:
@@ -767,7 +811,7 @@ window.host_wizard_edit = new class {
 
 	#makeCardListSections() {
 		let template_classes = Array.from(this.#templates)
-			.filter(([templateid, template]) => {
+			.filter(([_, template]) => {
 				if (this.#data.data_collection != ZBX_TEMPLATE_DATA_COLLECTION_ANY
 						&& !template.data_collection.includes(Number(this.#data.data_collection))) {
 					return false;
@@ -792,13 +836,20 @@ window.host_wizard_edit = new class {
 				return true;
 			})
 			.reduce((map, [templateid, {tags}]) => {
-				for (const {tag, value} of tags) {
+				let found = false;
+
+				for (const { tag, value } of tags) {
 					if (tag === 'class') {
 						map.set(value, [...(map.get(value) || []), templateid]);
+						found = true;
 					}
 				}
 
-				return map
+				if (!found) {
+					map.set('other', [...(map.get('other') || []), templateid]);
+				}
+
+				return map;
 			}, new Map());
 
 		template_classes = new Map([...template_classes.entries()].sort((a, b) => a[0].localeCompare(b[0])));

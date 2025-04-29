@@ -157,14 +157,14 @@ function stepSelectTemplate($old_template_count): array {
 									->addValue(_('Passive'), ZBX_TEMPLATE_AGENT_MODE_PASSIVE)
 									->setModern()
 							]),
-							new CFormField([
+							(new CFormField([
 								new CLabel(_('Show templates')),
 								(new CRadioButtonList('show_templates'))
 									->addValue(_('All'), ZBX_TEMPLATE_SHOW_ANY)
 									->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
 									->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
 									->setModern()
-							])
+							]))->addClass('js-show-templates'),
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
 							->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
@@ -278,7 +278,7 @@ function stepCreateHost($form): CTemplateTag {
 				)
 				->addItem(
 					(new CFormField([
-						new CLabel(_('Host groups')),
+						(new CLabel(_('Host groups')))->addClass('js-host-groups-label'),
 						new CMultiSelect([
 							'name' => 'groups[]',
 							'object_name' => 'hostGroup',
