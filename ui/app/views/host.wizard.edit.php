@@ -22,7 +22,10 @@
 $output = [
 	'header' => '',
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_WIZARD),
-	'body' => (new CDiv())
+	'body' => (new CForm())
+		->setId('host-wizard-form')
+		->setName('host_wizard_form')
+		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addItem(
 			(new CDiv())->addClass('step-form-body')
 		)
@@ -66,7 +69,8 @@ $output = [
 		.'host_wizard_edit.init('.json_encode([
 			'templates' => $data['templates'],
 			'linked_templates' => $data['linked_templates'],
-			'wizard_hide_welcome' => $data['wizard_hide_welcome']
+			'wizard_hide_welcome' => $data['wizard_hide_welcome'],
+			'csrf_token' => CCsrfTokenHelper::get('host-wizard')
 		]).');',
 	'dialogue_class' => 'modal-popup-host-wizard'
 ];
@@ -77,7 +81,6 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
-
 
 function stepWelcome(): CTemplateTag {
 	return new CTemplateTag('host-wizard-step-welcome',

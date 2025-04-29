@@ -119,6 +119,8 @@ window.host_wizard_edit = new class {
 
 	#sections_expanded = new Map();
 
+	#csrf_token;
+
 	#data = {
 		do_not_show_welcome: 0,
 		template_search_query: '',
@@ -185,13 +187,13 @@ window.host_wizard_edit = new class {
 		macros: {}
 	}
 
-	async init({templates, linked_templates, wizard_hide_welcome}) {
+	async init({templates, linked_templates, wizard_hide_welcome, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
-
 		this.#data.do_not_show_welcome = wizard_hide_welcome;
+		this.#csrf_token = csrf_token;
 
 		this.#initViewTemplates();
 
@@ -302,10 +304,6 @@ window.host_wizard_edit = new class {
 
 	#gotoStep(step) {
 		this.#overlay.setLoading();
-
-		if (this.#current_step === this.STEP_WELCOME && this.#data.do_not_show_welcome) {
-			this.#disableWelcomeStep();
-		}
 
 		this.#current_step = step;
 
@@ -484,6 +482,9 @@ window.host_wizard_edit = new class {
 
 	#onBeforeNextStep() {
 		switch (this.#steps_queue[this.#current_step]) {
+			case this.STEP_WELCOME:
+				return this.#disableWelcomeStep();
+
 			case this.STEP_CREATE_HOST:
 				return this.#loadWizardConfig();
 
@@ -530,7 +531,7 @@ window.host_wizard_edit = new class {
 		fetch(submit_url.href, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(this.#data)
+			body: urlEncodeData({...this.#data, [CSRF_TOKEN_NAME]: this.#csrf_token})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -984,6 +985,10 @@ window.host_wizard_edit = new class {
 
 	#disableWelcomeStep() {
 		// TODO call profile update
+
+		this.#current_step--;
+
+		return Promise.resolve();
 	}
 
 	#onFormDataChange(path, new_value, old_value) {
