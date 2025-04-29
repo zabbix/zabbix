@@ -1914,42 +1914,14 @@ int	lld_override_data_compare(const void *v1, const void *v2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: merge LLD override data from source to destination row            *
- *                                                                            *
- * Parameters: dst_row - [IN/OUT] destination row                             *
- *             src_row - [IN] source row                                      *
- *                                                                            *
- ******************************************************************************/
-static void	lld_rule_override_merge(zbx_sync_row_t *dst_row, const zbx_sync_row_t *src_row)
-{
-	zbx_lld_override_data_t        *dst, *src;
-
-	if (NULL == dst_row->data)
-	{
-		dst = lld_override_data_create(0);
-		dst_row->data = dst;
-	}
-	else
-		dst = (zbx_lld_override_data_t *)dst_row->data;
-
-	src = (zbx_lld_override_data_t *)src_row->data;
-
-	zbx_sync_rowset_merge(&dst->conditions, &src->conditions);
-	zbx_sync_rowset_merge(&dst->operations, &src->operations);
-	zbx_sync_rowset_merge(&dst->optags, &src->optags);
-	zbx_sync_rowset_merge(&dst->optemplates, &src->optemplates);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: set IDs for new LLD rule override conditions and operations       *
  *                                                                            *
  * Parameters: items - [IN/OUT] vector of LLD items                           *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
+static void	lld_rule_overrides_set_base_ids(zbx_vector_lld_item_full_ptr_t *items)
 {
-	int	new_conditions_num = 0, new_operations_num = 0, new_optags_num = 0, new_optemplates_num = 0;
+	int	new_conditions_num = 0, new_operations_num = 0;
 
 	/* calculate the number of new conditions and operations */
 	for (int i = 0; i < items->values_num; i++)
@@ -1980,41 +1952,19 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 					new_operations_num++;
 			}
-
-			for (int k = 0; k < data->optags.rows.values_num; k++)
-			{
-				zbx_sync_row_t         *row = data->optags.rows.values[k];
-
-				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
-					new_optags_num++;
-			}
-
-			for (int k = 0; k < data->optemplates.rows.values_num; k++)
-			{
-				zbx_sync_row_t         *row = data->optemplates.rows.values[k];
-
-				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
-					new_optemplates_num++;
-			}
 		}
 	}
 
-	/* reserve and assign IDs for new conditions, operations, optags and optemplates */
-	if (0 != new_conditions_num || 0 != new_operations_num || 0 != new_optags_num || 0 != new_optemplates_num)
+	/* reserve and assign IDs for new conditions, operations */
+	if (0 != new_conditions_num || 0 != new_operations_num)
 	{
-		zbx_uint64_t	new_conditionid, new_operationid, new_optagid, new_optemplateid;
+		zbx_uint64_t	new_conditionid, new_operationid;
 
 		if (0 != new_conditions_num)
 			new_conditionid = zbx_db_get_maxid_num("lld_override_condition", new_conditions_num);
 
 		if (0 != new_operations_num)
 			new_operationid = zbx_db_get_maxid_num("lld_override_operation", new_operations_num);
-
-		if (0 != new_optags_num)
-			new_optagid = zbx_db_get_maxid_num("lld_override_optag", new_optags_num);
-
-		if (0 != new_optemplates_num)
-			new_optemplateid = zbx_db_get_maxid_num("lld_override_optemplate", new_optemplates_num);
 
 		for (int i = 0; i < items->values_num; i++)
 		{
@@ -2044,6 +1994,77 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 					if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 						row->rowid = new_operationid++;
 				}
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set IDs for new LLD rule override operation tags and templates    *
+ *                                                                            *
+ * Parameters: items - [IN/OUT] vector of LLD items                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_rule_overrides_set_dep_ids(zbx_vector_lld_item_full_ptr_t *items)
+{
+	int	new_optags_num = 0, new_optemplates_num = 0;
+
+	/* calculate the number of new conditions and operations */
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t	*item = items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (int j = 0; j < item->overrides.rows.values_num; j++)
+		{
+			zbx_lld_override_data_t	*data;
+
+			data = (zbx_lld_override_data_t *)item->overrides.rows.values[j]->data;
+
+			for (int k = 0; k < data->optags.rows.values_num; k++)
+			{
+				zbx_sync_row_t         *row = data->optags.rows.values[k];
+
+				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+					new_optags_num++;
+			}
+
+			for (int k = 0; k < data->optemplates.rows.values_num; k++)
+			{
+				zbx_sync_row_t         *row = data->optemplates.rows.values[k];
+
+				if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+					new_optemplates_num++;
+			}
+		}
+	}
+
+	/* reserve and assign IDs for new optags and optemplates */
+	if (0 != new_optags_num || 0 != new_optemplates_num)
+	{
+		zbx_uint64_t	new_optagid, new_optemplateid;
+
+		if (0 != new_optags_num)
+			new_optagid = zbx_db_get_maxid_num("lld_override_optag", new_optags_num);
+
+		if (0 != new_optemplates_num)
+			new_optemplateid = zbx_db_get_maxid_num("lld_override_optemplate", new_optemplates_num);
+
+		for (int i = 0; i < items->values_num; i++)
+		{
+			zbx_lld_item_full_t	*item = items->values[i];
+
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+				continue;
+
+			for (int j = 0; j < item->overrides.rows.values_num; j++)
+			{
+				zbx_lld_override_data_t	*data;
+
+				data = (zbx_lld_override_data_t *)item->overrides.rows.values[j]->data;
 
 				for (int k = 0; k < data->optags.rows.values_num; k++)
 				{
@@ -2063,6 +2084,134 @@ static void	lld_rule_overrides_set_ids(zbx_vector_lld_item_full_ptr_t *items)
 			}
 		}
 	}
+}
+
+/* helper structure to remap prototype operation IDs to actual LLD rule operation IDs */
+typedef struct
+{
+	zbx_uint64_t	src_opid;
+	char		dst_opid[MAX_ID_LEN];
+}
+zbx_lld_operation_map_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remap prototype operation ID to actual LLD rule operation ID      *
+ *                                                                            *
+ * Parameters: operations     - [IN] hashset with operation ID mappings       *
+ *             operationid_db - [IN] source operation ID to remap             *
+ *             info           - [OUT] error message                           *
+ *                                                                            *
+ * Return value: remapped operation ID or NULL if remapping failed            *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*lld_override_remap_operationid(const zbx_hashset_t *operations, const char *operationid_db,
+		char **info)
+{
+	zbx_uint64_t		operationid;
+	zbx_lld_operation_map_t	*opmap;
+
+	if (SUCCEED != zbx_is_uint64(operationid_db, &operationid))
+	{
+		*info = zbx_strdcatf(*info, "Invalid LLD override operation id \"%s\".\n", operationid_db);
+		return NULL;
+	}
+
+	if (NULL == (opmap = (zbx_lld_operation_map_t *)zbx_hashset_search(operations, &operationid)))
+	{
+		*info = zbx_strdcat(*info, "Cannot update LLD override operation id.\n");
+		return NULL;
+	}
+
+	return opmap->dst_opid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: merge LLD base override data from source to destination row       *
+ *                                                                            *
+ * Parameters: dst_row - [IN/OUT] destination row                             *
+ *             src_row - [IN] source row                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_rule_override_merge_base(zbx_sync_row_t *dst_row, const zbx_sync_row_t *src_row)
+{
+	zbx_lld_override_data_t	*dst, *src;
+
+	if (NULL == dst_row->data)
+	{
+		dst = lld_override_data_create(0);
+		dst_row->data = dst;
+	}
+	else
+		dst = (zbx_lld_override_data_t *)dst_row->data;
+
+	src = (zbx_lld_override_data_t *)src_row->data;
+
+	zbx_sync_rowset_merge(&dst->conditions, &src->conditions);
+	zbx_sync_rowset_merge(&dst->operations, &src->operations);
+}
+
+static void	lld_rule_override_merge_rowset(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src,
+		int col, const zbx_hashset_t *opmap, char **info)
+{
+	zbx_sync_rowset_t	rowset;
+
+	/* before merging make temporary rowset and replace prototype operation IDs with real operation IDs */
+
+	zbx_sync_rowset_init(&rowset, dst->cols_num);
+	zbx_sync_rowset_copy(&rowset, src);
+
+	for (int i = 0; i < rowset.rows.values_num; i++)
+	{
+		zbx_sync_row_t	*row = rowset.rows.values[i];
+		const char	*depid;
+
+		if (0 == (row->flags & (ZBX_SYNC_ROW_INSERT | ZBX_SYNC_ROW_UPDATE)))
+			continue;
+
+		if (NULL == (depid = lld_override_remap_operationid(opmap, row->cols[col], info)))
+			return;
+
+		row->cols[col] = zbx_strdup(row->cols[col], depid);
+	}
+
+	zbx_sync_rowset_merge(dst, &rowset);
+	zbx_sync_rowset_clear(&rowset);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: merge dependent LLD override data from source to destination row  *
+ *                                                                            *
+ * Parameters: dst_row - [IN/OUT] destination row                             *
+ *             src_row - [IN] source row                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_rule_override_merge_deps(zbx_sync_row_t *dst_row, const zbx_sync_row_t *src_row, char **info)
+{
+	zbx_lld_override_data_t		*dst = (zbx_lld_override_data_t *)dst_row->data;
+	const zbx_lld_override_data_t	*src = (const zbx_lld_override_data_t *)src_row->data;
+	zbx_hashset_t			opmap;
+
+	zbx_hashset_create(&opmap, (size_t)dst->operations.rows.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < dst->operations.rows.values_num; i++)
+	{
+		zbx_sync_row_t		*row = dst->operations.rows.values[i];
+		zbx_lld_operation_map_t	map_local ;
+
+		map_local.src_opid = row->parent_rowid;
+		zbx_snprintf(map_local.dst_opid, sizeof(map_local.dst_opid), ZBX_FS_UI64, row->rowid);
+		zbx_hashset_insert(&opmap, &map_local, sizeof(map_local));
+	}
+
+	lld_rule_override_merge_rowset(&dst->optags, &src->optags, LLD_OVERRIDE_OPTAG_COL_OPID, &opmap, info);
+	lld_rule_override_merge_rowset(&dst->optemplates, &src->optemplates, LLD_OVERRIDE_OPTEMPLATE_COL_OPID, &opmap,
+			info);
+
+	zbx_hashset_destroy(&opmap);
 }
 
 /******************************************************************************
@@ -2188,184 +2337,15 @@ out:
 	return ret;
 }
 
-/* helper structure to remap prototype operation IDs to actual LLD rule operation IDs */
 typedef struct
 {
-	zbx_uint64_t	src_opid;
-	char		dst_opid[MAX_ID_LEN];
+	zbx_sync_row_t		*dst;
+	const zbx_sync_row_t	*src;
 }
-zbx_lld_operation_map_t;
+zbx_sync_row_pair_t;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: remap prototype operation ID to actual LLD rule operation ID      *
- *                                                                            *
- * Parameters: operations     - [IN] hashset with operation ID mappings       *
- *             operationid_db - [IN] source operation ID to remap             *
- *             info           - [OUT] error message                           *
- *                                                                            *
- * Return value: remapped operation ID or NULL if remapping failed            *
- *                                                                            *
- ******************************************************************************/
-static const char	*lld_override_remap_operationid(zbx_hashset_t *operations, const char *operationid_db,
-		char **info)
-{
-	zbx_uint64_t		operationid;
-	zbx_lld_operation_map_t	*opmap;
-
-	if (SUCCEED != zbx_is_uint64(operationid_db, &operationid))
-	{
-		*info = zbx_strdcatf(*info, "Invalid LLD override operation id \"%s\".\n", operationid_db);
-		return NULL;
-	}
-
-	if (NULL == (opmap = (zbx_lld_operation_map_t *)zbx_hashset_search(operations, &operationid)))
-	{
-		*info = zbx_strdcat(*info, "Cannot update LLD override operation id.\n");
-		return NULL;
-	}
-
-	return opmap->dst_opid;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: update operation IDs in LLD override operation tags and templates *
- *                                                                            *
- * Parameters: dst_row - [IN/OUT] destination override row                    *
- *             info    - [OUT] error message                                  *
- *                                                                            *
- * Return value: SUCCEED - operation IDs were updated successfully            *
- *               FAIL    - operation ID update failed                         *
- *                                                                            *
- * Comments: When LLD overrides are copied from prototypes to actual LLD      *
- *           rules, the operation IDs in related tables (tags, templates)     *
- *           still reference the prototype operation IDs. This function       *
- *           creates a mapping between prototype operation IDs and actual     *
- *           LLD rule operation IDs, then updates all references to use       *
- *           the correct IDs in the destination LLD rule.                     *
- *                                                                            *
- ******************************************************************************/
-static int	lld_override_update_operationids(zbx_sync_row_t *dst_row, char **info)
-{
-	zbx_lld_override_data_t	*dst = (zbx_lld_override_data_t *)dst_row->data;
-	zbx_hashset_t		operations;
-	int			ret = FAIL;
-
-	zbx_hashset_create(&operations, (size_t)dst->operations.rows.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	for (int i = 0; i < dst->operations.rows.values_num; i++)
-	{
-		zbx_sync_row_t		*row = dst->operations.rows.values[i];
-		zbx_lld_operation_map_t	map_local ;
-
-		map_local.src_opid = row->parent_rowid;
-		zbx_snprintf(map_local.dst_opid, sizeof(map_local.dst_opid), ZBX_FS_UI64, row->rowid);
-		zbx_hashset_insert(&operations, &map_local, sizeof(map_local));
-	}
-
-	for (int i = 0; i < dst->optags.rows.values_num; i++)
-	{
-		zbx_sync_row_t	*row = dst->optags.rows.values[i];
-		const char	*operationid_new;
-
-		if (0 == (row->flags & (ZBX_SYNC_ROW_INSERT | ZBX_SYNC_ROW_UPDATE)))
-			continue;
-
-		if (NULL == (operationid_new = lld_override_remap_operationid(&operations,
-				row->cols[LLD_OVERRIDE_OPTAG_COL_OPID], info)))
-		{
-			goto out;
-		}
-
-		if (NULL == row->cols_orig[LLD_OVERRIDE_OPTAG_COL_OPID] ||
-				0 != strcmp(row->cols_orig[LLD_OVERRIDE_OPTAG_COL_OPID], operationid_new))
-		{
-			zbx_free(row->cols[LLD_OVERRIDE_OPTAG_COL_OPID]);
-			row->cols[LLD_OVERRIDE_OPTAG_COL_OPID] = zbx_strdup(NULL, operationid_new);
-		}
-		else
-			zbx_sync_row_rollback_col(row, LLD_OVERRIDE_OPTAG_COL_OPID);
-	}
-
-	for (int i = 0; i < dst->optemplates.rows.values_num; i++)
-	{
-		zbx_sync_row_t	*row = dst->optemplates.rows.values[i];
-		const char	*operationid_new;
-
-		if (0 == (row->flags & (ZBX_SYNC_ROW_INSERT | ZBX_SYNC_ROW_UPDATE)))
-			continue;
-
-		if (NULL == (operationid_new = lld_override_remap_operationid(&operations,
-				row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_OPID], info)))
-		{
-			goto out;
-		}
-
-		if (NULL == row->cols_orig[LLD_OVERRIDE_OPTEMPLATE_COL_OPID] ||
-				0 != strcmp(row->cols_orig[LLD_OVERRIDE_OPTEMPLATE_COL_OPID], operationid_new))
-		{
-			zbx_free(row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_OPID]);
-			row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_OPID] = zbx_strdup(NULL, operationid_new);
-		}
-		else
-			zbx_sync_row_rollback_col(row, LLD_OVERRIDE_OPTEMPLATE_COL_OPID);
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_hashset_destroy(&operations);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: update LLD rule override formulas and operation IDs               *
- *                                                                            *
- * Parameters: items           - [IN/OUT] vector of LLD items to update       *
- *             info            - [OUT] error message if update fails          *
- *                                                                            *
- * Comments: Replaces prototype references with actual LLD rule data in       *
- *           overrides.                                                       *
- *                                                                            *
- ******************************************************************************/
-static void	lld_rule_update_overrides(zbx_vector_lld_item_full_ptr_t *items, char **info)
-{
-	for (int i = 0; i < items->values_num; i++)
-	{
-		zbx_lld_item_full_t	*item = items->values[i];
-
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-			continue;
-
-		for (int j = 0; j < item->overrides.rows.values_num; j++)
-		{
-			zbx_sync_row_t		*dst_row;
-			const zbx_sync_row_t	*src_row;
-
-			dst_row = item->overrides.rows.values[j];
-
-			if (0 != (dst_row->flags & ZBX_SYNC_ROW_DELETE))
-				continue;
-
-			if (NULL == (src_row = zbx_sync_rowset_search_by_id(&item->prototype->overrides,
-					dst_row->parent_rowid)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			if (FAIL == lld_override_update_formula(dst_row, src_row, info) ||
-				FAIL == lld_override_update_operationids(dst_row, info))
-			{
-				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-			}
-
-		}
-	}
-}
+ZBX_VECTOR_DECL(sync_row_pair, zbx_sync_row_pair_t)
+ZBX_VECTOR_IMPL(sync_row_pair, zbx_sync_row_pair_t)
 
 /******************************************************************************
  *                                                                            *
@@ -2378,7 +2358,11 @@ static void	lld_rule_update_overrides(zbx_vector_lld_item_full_ptr_t *items, cha
  ******************************************************************************/
 void	lld_rule_overrides_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
+	zbx_vector_sync_row_pair_t	overrides;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_sync_row_pair_create(&overrides);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -2394,21 +2378,34 @@ void	lld_rule_overrides_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 
 		for (int j = 0; j < item->prototype->overrides.rows.values_num; j++)
 		{
-			zbx_sync_row_t	*dst, *src;
+			zbx_sync_row_pair_t	pair;
 
-			src = item->prototype->overrides.rows.values[j];
+			pair.src = item->prototype->overrides.rows.values[j];
 
-			if (NULL == (dst = zbx_sync_rowset_search_by_parent(&item->overrides, src->rowid)))
+			if (NULL == (pair.dst = zbx_sync_rowset_search_by_parent(&item->overrides, pair.src->rowid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
-			lld_rule_override_merge(dst, src);
+
+			zbx_vector_sync_row_pair_append(&overrides, pair);
 		}
 	}
 
-	lld_rule_overrides_set_ids(items);
-	lld_rule_update_overrides(items, info);
+	for (int i = 0; i < overrides.values_num; i++)
+		lld_rule_override_merge_base(overrides.values[i].dst, overrides.values[i].src);
+
+	lld_rule_overrides_set_base_ids(items);
+
+	for (int i = 0; i < overrides.values_num; i++)
+	{
+		lld_override_update_formula(overrides.values[i].dst, overrides.values[i].src, info);
+		lld_rule_override_merge_deps(overrides.values[i].dst, overrides.values[i].src, info);
+	}
+
+	lld_rule_overrides_set_dep_ids(items);
+
+	zbx_vector_sync_row_pair_destroy(&overrides);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
