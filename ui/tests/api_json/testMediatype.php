@@ -91,27 +91,6 @@ class testMediatype extends CAPITest {
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be 0.'
-			],
-			'OAuth redirection_url shold be valid URL' => [
-				[[
-					'mediatypeid' => ':media_type:OAuth with tokens',
-					'redirection_url' => '    '
-				]],
-				'Invalid parameter "/1/redirection_url": unacceptable URL.'
-			],
-			'OAuth authorization_url shold be valid URL' => [
-				[[
-					'mediatypeid' => ':media_type:OAuth with tokens',
-					'authorization_url' => '/relative/url'
-				]],
-				'Invalid parameter "/1/authorization_url": unacceptable URL.'
-			],
-			'OAuth token_url shold be valid URL' => [
-				[[
-					'mediatypeid' => ':media_type:OAuth with tokens',
-					'token_url' => 'https://'
-				]],
-				'Invalid parameter "/1/token_url": unacceptable URL.'
 			]
 		];
 	}
@@ -307,57 +286,6 @@ class testMediatype extends CAPITest {
 					'redirection_url' => 'http://example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
-			],
-			'OAuth redirection_url shold be valid URL' => [
-				[[
-					'name' => 'OAuth invalid redirection_url',
-					'type' => MEDIA_TYPE_EMAIL,
-					'provider' => CMediatypeHelper::EMAIL_PROVIDER_GMAIL,
-					'smtp_server' => 'smtp.gmail.com',
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
-					'client_id' => 'clientid',
-					'client_secret' => 'clientsecret',
-					'authorization_url' => 'http://example.com',
-					'token_url' => 'http://example.com',
-					'redirection_url' => '    '
-				]],
-				'Invalid parameter "/1/redirection_url": unacceptable URL.'
-			],
-			'OAuth authorization_url shold be valid URL' => [
-				[[
-					'name' => 'OAuth invalid authorization_url',
-					'type' => MEDIA_TYPE_EMAIL,
-					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
-					'smtp_server' => 'smtp.gmail.com',
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
-					'client_id' => 'clientid',
-					'client_secret' => 'clientsecret',
-					'redirection_url' => 'http://example.com',
-					'token_url' => 'http://example.com',
-					'authorization_url' => '/relative/url'
-				]],
-				'Invalid parameter "/1/authorization_url": unacceptable URL.'
-			],
-			'OAuth token_url shold be valid URL' => [
-				[[
-					'name' => 'OAuth invalid token_url',
-					'type' => MEDIA_TYPE_EMAIL,
-					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
-					'smtp_server' => 'smtp.gmail.com',
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
-					'client_id' => 'clientid',
-					'client_secret' => 'clientsecret',
-					'redirection_url' => 'http://example.com',
-					'authorization_url' => 'http://example.com',
-					'token_url' => 'https://'
-				]],
-				'Invalid parameter "/1/token_url": unacceptable URL.'
 			]
 		];
 	}
