@@ -15,6 +15,7 @@
 
 
 class CRadioCardList extends CList {
+
 	public const ZBX_STYLE_CLASS = 'radio-card-list';
 	public const ZBX_STYLE_CLASS_CARD = 'radio-card';
 	public const ZBX_STYLE_CLASS_LABEL = 'radio-card-label';
@@ -94,6 +95,7 @@ class CRadioCardList extends CList {
 
 	public function toString($destroy = true) {
 		foreach ($this->values as $key => $value) {
+			$value += ['id' => null, 'disabled' => null, 'on_change' => null];
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
 			}
