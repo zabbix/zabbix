@@ -902,6 +902,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			'Subject' => 'New subject',
 			'Message' => 'New message'
 		])->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$templates_list->invalidate();
 		$templates_list->findRow('Message type', 'Discovery')->query('button:Remove')->one()->click();
 		// Cancel all previously made modifications.
