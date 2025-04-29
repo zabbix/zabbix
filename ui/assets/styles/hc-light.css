@@ -4616,8 +4616,6 @@ form.dashboard-widget-item .fields-group.fields-group-value .units-show {
     width: 100%; }
 form.dashboard-widget-item .fields-group.fields-group-change-indicator {
   grid-template-columns: repeat(3, max-content 96px); }
-  form.dashboard-widget-item .fields-group.fields-group-change-indicator .input-color-picker {
-    display: block; }
 
 div.dashboard-widget-item .dashboard-grid-widget-body a {
   position: relative;

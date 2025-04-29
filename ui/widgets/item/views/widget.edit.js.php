@@ -48,19 +48,6 @@ window.widget_item_form = new class {
 				});
 		});
 
-		const colorpickers = this.#form
-			.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input:not([name="sparkline[color]"])');
-
-		for (const colorpicker of colorpickers) {
-			$(colorpicker).colorpicker({
-				appendTo: ".overlay-dialogue-body",
-				use_default: !colorpicker.name.includes('thresholds'),
-				onUpdate: ['up_color', 'down_color', 'updown_color'].includes(colorpicker.name)
-					? (color) => this.setIndicatorColor(colorpicker.name, color)
-					: null
-			});
-		}
-
 		const show = [this._show_description, this._show_value, this._show_time, this._show_change_indicator,
 			this._show_sparkline
 		];
@@ -72,6 +59,11 @@ window.widget_item_form = new class {
 		document.getElementById('units_show').addEventListener('change', () => this.updateForm());
 		document.getElementById('aggregate_function').addEventListener('change', () => this.updateForm());
 		document.getElementById('history').addEventListener('change', () => this.updateForm());
+
+		for (const change_indicator of ['up_color', 'down_color', 'updown_color']) {
+			this.#form.querySelector(`.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="${change_indicator}"]`)
+				?.addEventListener('change', e => this.setIndicatorColor(change_indicator, e.target.color));
+		}
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -105,7 +97,8 @@ window.widget_item_form = new class {
 			}
 		}
 
-		for (const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
+		for (const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold,' +
+				'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="units_color"]')) {
 			element.disabled = !this._show_value.checked || !document.getElementById('units_show').checked;
 		}
 
