@@ -544,6 +544,7 @@ zbx_dc_kv_t;
 typedef struct
 {
 	const char	*path;
+	const char	*last_error;
 	zbx_hashset_t	kvs;
 }
 zbx_dc_kvs_path_t;

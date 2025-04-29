@@ -622,20 +622,20 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$content_menu->addItem($graph_prototypes);
 
 		// host prototypes
-		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$host_prototypes = new CSpan([
-				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
-						->setArgument('context', $context)
-				),
-				CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
-			]);
-			if ($current_element === 'hosts') {
-				$host_prototypes->addClass(ZBX_STYLE_SELECTED);
-			}
-			$content_menu->addItem($host_prototypes);
+		$host_prototypes = new CSpan([
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
+			CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
+		]);
+
+		if ($current_element === 'hosts') {
+			$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
+
+		$content_menu->addItem($host_prototypes);
 
 		// Discovery prototypes
 		$item_prototypes = new CSpan([
