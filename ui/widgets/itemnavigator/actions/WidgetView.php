@@ -103,9 +103,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => $this->fields_values['hostids'] ?: null,
 				'evaltype' => $this->fields_values['host_tags_evaltype'],
 				'tags' => $this->fields_values['host_tags'] ?: null,
+				'inheritedTags' => true,
 				'with_items' => true,
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $host_tags_to_keep ? ['tag', 'value'] : null,
+				'selectInheritedTags' => $host_tags_to_keep ? ['tag', 'value'] : null,
 				'preservekeys' => true,
 				'sortfield' => 'hostid'
 			]);
@@ -117,6 +119,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'with_items' => true,
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $host_tags_to_keep ? ['tag', 'value'] : null,
+				'selectInheritedTags' => $host_tags_to_keep ? ['tag', 'value'] : null,
 				'preservekeys' => true
 			]);
 		}
@@ -132,6 +135,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true,
 			'evaltype' => $this->fields_values['item_tags_evaltype'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
+			'inheritedTags' => true,
 			'filter' => [
 				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL ? null : $this->fields_values['state']
 			],
@@ -143,6 +147,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: $this->fields_values['items']
 			],
 			'selectTags' => $item_tags_to_keep ? ['tag', 'value'] : null,
+			'selectInheritedTags' => $item_tags_to_keep ? ['tag', 'value'] : null,
 			'preservekeys' => true,
 			'sortfield' => 'name',
 			'sortorder' => ZBX_SORT_UP
@@ -152,6 +157,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$selected_items_cnt = 0;
 		$items = [];
 		$hosts = [];
+
+		if ($host_tags_to_keep) {
+			$db_hosts = mergeRegularAndInheritedTags($db_hosts);
+		}
 
 		foreach ($db_hosts as $hostid => $host) {
 			if ($selected_items_cnt == $limit_extended) {
@@ -224,6 +233,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$item_problems[$trigger_item['itemid']][$problem['severity']][$problem['eventid']] = true;
 					}
 				}
+			}
+
+			if ($item_tags_to_keep) {
+				$items = mergeRegularAndInheritedTags($items);
 			}
 
 			foreach ($items as $key => &$item) {

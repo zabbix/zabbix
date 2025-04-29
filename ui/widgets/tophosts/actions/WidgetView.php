@@ -90,6 +90,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids,
 			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
 			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
+			'inheritedTags' => true,
 			'filter' => ['maintenance_status' => $maintenance_status],
 			'monitored_hosts' => true,
 			'preservekeys' => true

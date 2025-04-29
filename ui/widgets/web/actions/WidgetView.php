@@ -115,8 +115,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			// Fetch links between HTTP tests and host groups.
 			$where_tags = (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags'])
-				? CApiTagHelper::addWhereCondition($this->fields_values['tags'], $this->fields_values['evaltype'], 'ht',
-					'httptest_tag', 'httptestid'
+				? CApiTagHelper::addWhereCondition($this->fields_values['tags'], $this->fields_values['evaltype'], true,
+					'httptest_tag', 'ht', 'httptestid'
 				)
 				: '';
 

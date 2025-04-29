@@ -93,6 +93,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'filter' => $filter,
 				'evaltype' => $evaltype,
 				'tags' => $tags,
+				'inheritedTags' => true,
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -113,6 +114,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids,
 			'evaltype' => $this->fields_values['evaltype_item'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
+			'inheritedTags' => true,
 			'selectValueMap' => ['mappings'],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
