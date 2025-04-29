@@ -1471,7 +1471,7 @@ static void	lld_override_data_save_opstr(zbx_uint64_t itemid, zbx_uint64_t overr
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set %s='%s'"
 				" where lld_override_operationid=" ZBX_FS_UI64 ";\n",
-				table_name, field_name, value_esc, overrideid);
+				table_name, field_name, value_esc, row->rowid);
 
 		zbx_free(value_esc);
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
