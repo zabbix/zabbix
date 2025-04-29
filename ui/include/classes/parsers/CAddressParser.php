@@ -35,6 +35,12 @@ class CAddressParser extends CParser {
 	private $type = null;
 
 	/**
+	 * Supported options:
+	 *   'usermacros' => true  Enabled support of user macros;
+	 *   'lldmacros' => true   Enabled support of LLD macros;
+	 *   'macros' => true      Enabled support of all macros;
+	 *   'macros' => []        Allows array with list of macros. Empty array or false means no macros supported.
+	 *
 	 * @param array $options
 	 */
 	public function __construct(array $options) {
