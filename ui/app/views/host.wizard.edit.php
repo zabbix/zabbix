@@ -46,7 +46,8 @@ $output = [
 		[
 			'title' => _('Cancel'),
 			'class' => ZBX_STYLE_BTN_LINK.' dialogue-cancel js-cancel',
-			'cancel' => true
+			'cancel' => true,
+			'action' => ''
 		],
 		[
 			'title' => _('Back'),
