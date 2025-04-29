@@ -169,14 +169,14 @@ foreach ($data['groups'] as $group) {
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		$max = 0;
 
-		foreach ($group['groupDiscoveries'] as $group_discovery) {
-			if ($group_discovery['ts_delete'] == 0) {
+		foreach ($group['discoveryData'] as $discovery_data) {
+			if ($discovery_data['ts_delete'] == 0) {
 				$max = 0;
 				break;
 			}
 
-			if ($group_discovery['status'] == ZBX_LLD_STATUS_LOST) {
-				$max = max($max, (int) $group_discovery['ts_delete']);
+			if ($discovery_data['status'] == ZBX_LLD_STATUS_LOST) {
+				$max = max($max, (int) $discovery_data['ts_delete']);
 			}
 		}
 

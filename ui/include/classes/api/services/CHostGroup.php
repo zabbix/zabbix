@@ -1234,23 +1234,6 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		// adding group discovery
-		if ($options['selectGroupDiscoveries'] !== null) {
-			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
-				? self::DISCOVERY_DATA_OUTPUT_FIELDS
-				: $options['selectGroupDiscoveries'];
-
-			$group_discoveries = API::getApiService()->select('group_discovery', [
-				'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
-				'filter' => ['groupid' => $groupids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($group_discoveries, 'groupid', 'groupdiscoveryid');
-
-			$group_discoveries = $this->unsetExtraFields($group_discoveries, ['groupid', 'groupdiscoveryid'], $output);
-
-			$result = $relation_map->mapMany($result, $group_discoveries, 'groupDiscoveries');
-		}
 		$this->addRelatedGroupDiscoveries($options, $result);
 		$this->addRelatedDiscoveryData($options, $result);
 
