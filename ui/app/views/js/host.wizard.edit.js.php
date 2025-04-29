@@ -301,8 +301,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#gotoStep(step) {
-		console.log('GoTo to step:', step, this.#steps_queue[step])
-
 		this.#overlay.setLoading();
 
 		if (this.#current_step === this.STEP_WELCOME && this.#data.do_not_show_welcome) {
@@ -421,7 +419,6 @@ window.host_wizard_edit = new class {
 		const step = this.#view_templates.step_add_host_interface.evaluateToElement();
 
 		for (const [interface_type, required] of Object.entries(this.#data.interface_required)) {
-			console.log(required, step.querySelector(`.js-host-interface-${interface_type}`))
 			step.querySelector(`.js-host-interface-${interface_type}`).style.display = required ? '' : 'none';
 		}
 
@@ -486,9 +483,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#onBeforeNextStep() {
-
-		console.log(this.#data.hostid)
-
 		switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_CREATE_HOST:
 				return this.#loadWizardConfig();
@@ -530,9 +524,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#saveHost() {
-
-		console.log('#saveHost', this.#data);
-
 		const submit_url = new URL('zabbix.php', location.href);
 		submit_url.searchParams.set('action', 'host.wizard.create');
 
@@ -543,8 +534,6 @@ window.host_wizard_edit = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				console.log('Save response', response);
-
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -563,7 +552,7 @@ window.host_wizard_edit = new class {
 
 	#ajaxExceptionHandler(exception) {
 		const step_form = this.#dialogue.querySelector('.step-form');
-		console.log(exception)
+
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -599,15 +588,11 @@ window.host_wizard_edit = new class {
 			this.#steps_queue.push(this.STEP_README);
 		}
 
-		console.log(this.#template);
-
 		if (Object.keys(this.#template?.macros || {}).length) {
 			this.#steps_queue.push(this.STEP_CONFIGURE_HOST);
 		}
 
 		this.#steps_queue.push(this.STEP_CONFIGURATION_FINISH, this.STEP_COMPLETE);
-
-		console.log('Steps queue:', this.#steps_queue)
 	}
 
 	#updateProgress() {
@@ -925,8 +910,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeMacroFieldText(macro, row_index) {
-		console.log('#makeMacroFieldText', row_index, macro);
-
 		switch (macro.type) {
 			case this.MACRO_TYPE_SECRET:
 				return this.#view_templates.macro_field_secret.evaluateToElement({
@@ -950,8 +933,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeMacroFieldList(macro_entry, row_index) {
-		console.log('#makeMacroFieldList', macro_entry);
-
 		const { label, options } = macro_entry.config;
 		const { macro, value } = macro_entry;
 
@@ -992,8 +973,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeMacroFieldCheckbox(macro, row_index) {
-		console.log('#makeMacroFieldCheckbox', row_index, macro)
-
 		return this.#view_templates.macro_field_checkbox.evaluateToElement({
 			index: row_index,
 			label: macro.config.label,
@@ -1005,12 +984,9 @@ window.host_wizard_edit = new class {
 
 	#disableWelcomeStep() {
 		// TODO call profile update
-		console.log('Update profile: disable welcome step')
 	}
 
 	#onFormDataChange(path, new_value, old_value) {
-		console.log('Data changed', {path, new_value, old_value}, this.#data);
-
 		this.#updateField(this.#pathToInputName(path), new_value);
 		this.#updateForm(path, new_value, old_value);
 	}
@@ -1023,8 +999,6 @@ window.host_wizard_edit = new class {
 		const value = target.type === 'checkbox'
 			? (target.checked ? target.value : target.getAttribute('unchecked-value'))
 			: target.value;
-
-		console.log(`Input "${target.name}" changed: `, value);
 
 		this.#setValueByName(this.#data, target.name, value);
 	}
