@@ -123,6 +123,13 @@ class CControllerHostWizardGet extends CController {
 			$template['readme'] = $parsedown->text($template['readme']);
 		}
 
+		foreach ($template['macros'] as $m => $tmpl_macro) {
+			// Skip macros that do no have config set up.
+			if ($tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+				unset($template['macros'][$m]);
+			}
+		}
+
 		$agent_interface_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET
 		];
@@ -161,28 +168,6 @@ class CControllerHostWizardGet extends CController {
 			if (in_array($item['type'], $jmx_interface_types)) {
 				$jmx_interface_required = true;
 			}
-		}
-
-		/*
-		 * If host exists and macro name matches template name, value is taken from host instead of template. Skips
-		 * macros that have no config and converts JSON string for list and checkbox config types to array.
-		 */
-		if ($host && $host['macros']) {
-			foreach ($template['macros'] as $m => &$tmpl_macro) {
-				// Skip macros that do no have config set up.
-				if ($tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
-					unset($template['macros'][$m]);
-					continue;
-				}
-
-				// Use host macro value if macro name matches.
-				foreach ($host['macros'] as $host_macro) {
-					if ($tmpl_macro['macro'] === $host_macro['macro']) {
-						$tmpl_macro['value'] = $host_macro['value'];
-					}
-				}
-			}
-			unset($tmpl_macro);
 		}
 
 		$data = [
