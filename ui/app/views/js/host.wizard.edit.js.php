@@ -984,9 +984,11 @@ window.host_wizard_edit = new class {
 	}
 
 	#disableWelcomeStep() {
-		// TODO call profile update
+		if (this.#data.do_not_show_welcome === 1) {
+			// TODO call profile update
 
-		this.#current_step--;
+			this.#current_step--;
+		}
 
 		return Promise.resolve();
 	}
