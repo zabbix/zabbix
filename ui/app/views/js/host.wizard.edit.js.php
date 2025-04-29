@@ -768,6 +768,10 @@ window.host_wizard_edit = new class {
 				const is_host_new = this.#data.host?.isNew || false;
 
 				if (!path || path === 'host' || path === 'groups') {
+					if (this.#data.host !== null) {
+						this.#updateProgress();
+					}
+
 					this.#dialogue.querySelector('.js-host-groups-label')
 						.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, is_host_new)
 
