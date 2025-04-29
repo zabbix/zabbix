@@ -544,6 +544,10 @@ window.host_wizard_edit = new class {
 			body: JSON.stringify({
 				...this.#data,
 				host: this.#data.host.id,
+				groups: this.#data.groups.map(ms_group => (ms_group.isNew
+					? {name: ms_group.id}
+					: {groupid: ms_group.id}
+				)),
 				[CSRF_TOKEN_NAME]: this.#csrf_token
 			})
 		})
