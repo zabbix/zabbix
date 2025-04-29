@@ -19,20 +19,22 @@
  * @var array $data
  */
 
+$form = (new CForm())
+	->setId('host-wizard-form')
+	->setName('host_wizard_form')
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+
 $output = [
 	'header' => '',
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_WIZARD),
-	'body' => (new CForm())
-		->setId('host-wizard-form')
-		->setName('host_wizard_form')
-		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	'body' => $form
 		->addItem(
 			(new CDiv())->addClass('step-form-body')
 		)
 		->addItem([
 			stepWelcome(),
 			stepSelectTemplate($data['old_template_count']),
-			stepCreateHost(),
+			stepCreateHost($form),
 			stepInstallAgent(),
 			stepAddHostInterface(),
 			stepReadme(),
@@ -233,7 +235,7 @@ function stepSelectTemplate($old_template_count): array {
 	];
 }
 
-function stepCreateHost(): CTemplateTag {
+function stepCreateHost($form): CTemplateTag {
 	return new CTemplateTag('host-wizard-step-create-host',
 		(new CDiv([
 			(new CSection())
@@ -254,7 +256,7 @@ function stepCreateHost(): CTemplateTag {
 					(new CFormField([
 						new CLabel(_('Host name')),
 						new CMultiSelect([
-							'name' => 'hostid',
+							'name' => 'host',
 							'object_name' => 'hosts',
 							'add_new' => true,
 							'multiple' => false,
@@ -262,8 +264,8 @@ function stepCreateHost(): CTemplateTag {
 								'parameters' => [
 									'srctbl' => 'hosts',
 									'srcfld1' => 'hostid',
-									'dstfrm' => '', //$form->getName(),
-									'dstfld1' => 'hostid',
+									'dstfrm' => $form->getName(),
+									'dstfld1' => 'host',
 									'editable' => true
 								]
 							],
@@ -285,7 +287,7 @@ function stepCreateHost(): CTemplateTag {
 								'parameters' => [
 									'srctbl' => 'host_groups',
 									'srcfld1' => 'groupid',
-									'dstfrm' => '', //$form->getName(),
+									'dstfrm' => $form->getName(),
 									'dstfld1' => 'groups_',
 									'editable' => true
 								]

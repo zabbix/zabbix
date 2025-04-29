@@ -137,8 +137,7 @@ window.host_wizard_edit = new class {
 			[this.INTERFACE_TYPE_IPMI]: false,
 			[this.INTERFACE_TYPE_JMX]: false
 		},
-
-		hostid: null,
+		host: null,
 		groups: [],
 		templates: [],
 		tls_psk: '',
@@ -388,14 +387,14 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 
-		const hostid_ms = jQuery("#hostid", step).multiSelect().on('change', (_, {options, values}) => {
+		const host_ms = jQuery("#host", step).multiSelect().on('change', (_, {options, values}) => {
 			this.#setValueByName(this.#data, options.name,
 				Object.keys(values.selected).length ? Object.values(values.selected)[0] : null
 			);
 		});
 
-		if (this.#data.hostid !== null) {
-			hostid_ms.multiSelect('addData', [this.#data.hostid]);
+		if (this.#data.host !== null) {
+			host_ms.multiSelect('addData', [this.#data.host]);
 		}
 
 		const groups_ms = jQuery("#groups_", step).multiSelect().on('change', (_, {options, values}) => {
@@ -525,13 +524,17 @@ window.host_wizard_edit = new class {
 	}
 
 	#saveHost() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'host.wizard.create');
+		const submit_url = new URL('zabbix.php', location.href);
+		submit_url.searchParams.set('action', 'host.wizard.create');
 
-		fetch(curl.getUrl(), {
+		fetch(submit_url.href, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({...this.#data, [CSRF_TOKEN_NAME]: this.#csrf_token})
+			body: JSON.stringify({
+				...this.#data,
+				host: this.#data.host.id,
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			})
 		})
 			.then((response) => response.json())
 			.then((response) => {
