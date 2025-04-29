@@ -505,7 +505,7 @@ abstract class CGraphGeneral extends CApiService {
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
@@ -515,12 +515,8 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
-			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
+			'output' => array_merge(['graphid'], $options['selectDiscoveryData']),
 			'graphids' => array_keys($result)
 		];
 		$resource = DBselect(DB::makeSql('graph_discovery', $_options));

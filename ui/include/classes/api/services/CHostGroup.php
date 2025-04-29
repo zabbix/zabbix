@@ -88,8 +88,8 @@ class CHostGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CDiscoveryRule::OUTPUT_FIELDS, ['uuid'])), 'default' => null],
 			'selectDiscoveryRulePrototypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
@@ -1234,13 +1234,13 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		$this->addRelatedGroupDiscoveries($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedGroupDiscoveries($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
-	private function addRelatedGroupDiscoveries(array $options, array &$result): void {
+	private static function addRelatedGroupDiscoveries(array $options, array &$result): void {
 		if ($options['selectGroupDiscoveries'] === null) {
 			return;
 		}
@@ -1250,12 +1250,8 @@ class CHostGroup extends CApiService {
 		}
 		unset($group);
 
-		if ($options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND) {
-			$options['selectGroupDiscoveries'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectGroupDiscoveries'], ['groupid']),
+			'output' => array_merge(['groupid'], $options['selectGroupDiscoveries']),
 			'filter' => ['groupid' => array_keys($result)]
 		];
 		$resource = DBselect(DB::makeSql('group_discovery', $_options));
@@ -1266,7 +1262,7 @@ class CHostGroup extends CApiService {
 		}
 	}
 
-	private function addRelatedDiscoveryData(array $options, array &$result): void {
+	private static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
@@ -1276,12 +1272,8 @@ class CHostGroup extends CApiService {
 		}
 		unset($group);
 
-		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
-			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['groupid']),
+			'output' => array_merge(['groupid'], $options['selectDiscoveryData']),
 			'filter' => ['groupid' => array_keys($result)]
 		];
 		$resource = DBselect(DB::makeSql('group_discovery', $_options));

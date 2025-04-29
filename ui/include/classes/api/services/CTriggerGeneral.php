@@ -890,7 +890,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
@@ -900,12 +900,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		unset($trigger);
 
-		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
-			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['triggerid']),
+			'output' => array_merge(['triggerid'], $options['selectDiscoveryData']),
 			'triggerids' => array_keys($result)
 		];
 		$resource = DBselect(DB::makeSql('trigger_discovery', $_options));

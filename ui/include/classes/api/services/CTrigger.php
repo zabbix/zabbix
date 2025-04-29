@@ -542,8 +542,8 @@ class CTrigger extends CTriggerGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -890,13 +890,13 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		$this->addRelatedTriggerDiscovery($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedTriggerDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
-	private function addRelatedTriggerDiscovery(array $options, array &$result): void {
+	private static function addRelatedTriggerDiscovery(array $options, array &$result): void {
 		if ($options['selectTriggerDiscovery'] === null) {
 			return;
 		}
@@ -906,12 +906,8 @@ class CTrigger extends CTriggerGeneral {
 		}
 		unset($trigger);
 
-		if ($options['selectTriggerDiscovery'] === API_OUTPUT_EXTEND) {
-			$options['selectTriggerDiscovery'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectTriggerDiscovery'], ['triggerid']),
+			'output' => array_merge(['triggerid'], $options['selectTriggerDiscovery']),
 			'triggerids' => array_keys($result)
 		];
 		$resource = DBselect(DB::makeSql('trigger_discovery', $_options));

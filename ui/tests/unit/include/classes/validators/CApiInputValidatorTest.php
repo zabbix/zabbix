@@ -4275,6 +4275,24 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/output/3": value (name) already exists.'
 			],
 			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				'extend',
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				['name'],
+				'/output',
+				['name']
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				'name',
+				'/output',
+				'Invalid parameter "/output": value must be "extend".'
+			],
+			[
 				['type' => API_PSK],
 				'0123456789abcdef0123456789abcdef',
 				'/psk',

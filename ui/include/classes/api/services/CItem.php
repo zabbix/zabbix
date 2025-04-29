@@ -457,8 +457,8 @@ class CItem extends CItemGeneral {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1750,8 +1750,8 @@ class CItem extends CItemGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		$this->addRelatedItemDiscovery($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedItemDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		$requested_output = array_filter([
 			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
@@ -1821,7 +1821,7 @@ class CItem extends CItemGeneral {
 		return $result;
 	}
 
-	private function addRelatedItemDiscovery(array $options, array &$result): void {
+	private static function addRelatedItemDiscovery(array $options, array &$result): void {
 		if ($options['selectItemDiscovery'] === null) {
 			return;
 		}
@@ -1831,12 +1831,8 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		if ($options['selectItemDiscovery'] === API_OUTPUT_EXTEND) {
-			$options['selectItemDiscovery'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemid']),
+			'output' => array_merge(['itemid'], $options['selectItemDiscovery']),
 			'filter' => ['itemid' => array_keys($result)]
 		];
 		$resource = DBselect(DB::makeSql('item_discovery', $_options));

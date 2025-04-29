@@ -1882,7 +1882,7 @@ abstract class CHostBase extends CApiService {
 		return $result;
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
@@ -1892,12 +1892,8 @@ abstract class CHostBase extends CApiService {
 		}
 		unset($host);
 
-		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
-			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['hostid']),
+			'output' => array_merge(['hostid'], $options['selectDiscoveryData']),
 			'hostids' => array_keys($result)
 		];
 		$resource = DBselect(DB::makeSql('host_discovery', $_options));

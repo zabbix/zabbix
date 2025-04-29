@@ -2160,7 +2160,7 @@ abstract class CItemGeneral extends CApiService {
 		return $result;
 	}
 
-	protected function addRelatedDiscoveryData(array $options, array &$result): void {
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
@@ -2170,12 +2170,8 @@ abstract class CItemGeneral extends CApiService {
 		}
 		unset($item);
 
-		if ($options['selectDiscoveryData'] === API_OUTPUT_EXTEND) {
-			$options['selectDiscoveryData'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['itemid']),
+			'output' => array_merge(['itemid'], $options['selectDiscoveryData']),
 			'filter' => ['itemid' => array_keys($result)]
 		];
 		$resource = DBselect(DB::makeSql('item_discovery', $_options));

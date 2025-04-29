@@ -319,8 +319,8 @@ class CGraph extends CGraphGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -422,13 +422,13 @@ class CGraph extends CGraphGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		$this->addRelatedGraphDiscovery($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedGraphDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
-	private function addRelatedGraphDiscovery(array $options, array &$result): void {
+	private static function addRelatedGraphDiscovery(array $options, array &$result): void {
 		if ($options['selectGraphDiscovery'] === null) {
 			return;
 		}
@@ -438,12 +438,8 @@ class CGraph extends CGraphGeneral {
 		}
 		unset($graph);
 
-		if ($options['selectGraphDiscovery'] === API_OUTPUT_EXTEND) {
-			$options['selectGraphDiscovery'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectGraphDiscovery'], ['graphid']),
+			'output' => array_merge(['graphid'], $options['selectGraphDiscovery']),
 			'graphids' => array_keys($result)
 		];
 		$resource = DBselect(DB::makeSql('graph_discovery', $_options));

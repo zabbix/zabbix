@@ -1893,8 +1893,8 @@ class CHost extends CHostGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		$this->addRelatedHostDiscovery($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedHostDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		if ($options['selectTags'] !== null) {
 			foreach ($result as &$row) {
@@ -1976,7 +1976,7 @@ class CHost extends CHostGeneral {
 		$result = $relation_map->mapMany($result, $groups, 'hostgroups');
 	}
 
-	private function addRelatedHostDiscovery(array $options, array &$result): void {
+	private static function addRelatedHostDiscovery(array $options, array &$result): void {
 		if ($options['selectHostDiscovery'] === null) {
 			return;
 		}
@@ -1986,12 +1986,8 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
-		if ($options['selectHostDiscovery'] === API_OUTPUT_EXTEND) {
-			$options['selectHostDiscovery'] = self::DISCOVERY_DATA_OUTPUT_FIELDS;
-		}
-
 		$_options = [
-			'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
+			'output' => array_merge(['hostid'], $options['selectHostDiscovery']),
 			'hostids' => array_keys($result)
 		];
 		$resource = DBselect(DB::makeSql('host_discovery', $_options));
@@ -2012,8 +2008,8 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
-			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
