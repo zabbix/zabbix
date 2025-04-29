@@ -525,13 +525,13 @@ window.host_wizard_edit = new class {
 	}
 
 	#saveHost() {
-		const submit_url = new URL('zabbix.php', location.href);
-		submit_url.searchParams.set('action', 'host.wizard.create');
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'host.wizard.create');
 
-		fetch(submit_url.href, {
+		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({...this.#data, [CSRF_TOKEN_NAME]: this.#csrf_token})
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({...this.#data, [CSRF_TOKEN_NAME]: this.#csrf_token})
 		})
 			.then((response) => response.json())
 			.then((response) => {

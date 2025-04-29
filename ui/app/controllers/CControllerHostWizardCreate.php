@@ -16,6 +16,10 @@
 
 class CControllerHostWizardCreate extends CControllerHostUpdateGeneral {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'host' =>				'required|db hosts.host|not_empty',
