@@ -19,7 +19,6 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 	protected function checkInput(): bool {
 		$fields = [
 			'hostid' =>				'required|db hosts.hostid',
-			'host' =>				'required|db hosts.host|not_empty',
 			'groups' =>				'array',
 			'templates' =>			'required|array_db hosts.hostid',
 			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
@@ -76,7 +75,6 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'hostid' => $this->getInput('hostid'),
-				'host' => $this->getInput('host'),
 				'groups' => $this->processHostGroups(array_unique(
 					array_merge($this->getInput('groups', []), array_column($db_host['hostgroups'], 'groupid'))
 				)),

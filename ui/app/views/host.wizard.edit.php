@@ -242,7 +242,7 @@ function stepCreateHost($form): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Create or select a host')),
-						new CTag('p', true, _('The template you selected (#{template_name}) must be linked to a host – an entity in Zabbix that represents your monitoring target.')),
+						new CTag('p', true, _s('The template you selected (%1$s) must be linked to a host – an entity in Zabbix that represents your monitoring target.', '#{template_name}')),
 						new CTag('p', true, _('Hosts are organized into host groups for easier management and access control.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -313,7 +313,7 @@ function stepInstallAgent(): array {
 					->addItem(
 						(new CDiv([
 							new CTag('h1', true, _('Install Zabbix agent')),
-							new CTag('p', true, _('The template you selected (Apache by HTTP, this is just an example) requires Zabbix agent to be installed and running on your monitoring target.')),
+							new CTag('p', true, _s('The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target.', '#{template_name}')),
 							new CTag('p', true, _('Skip OS selection if you already have Zabbix agent installed.'))
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -466,8 +466,8 @@ function stepAddHostInterface(): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Add host interface')),
-						new CTag('p', true, _('The template you selected (Apache by HTTP) requires the <Agent interface / Intelligent Platform Management Interface (IPMI) / Java Management Extensions (JMX) interface / Simple Network Management Protocol (SNMP) interface> to be added to the host (PostgreSQL).')),
-						new CTag('p', true, _('SNote: <IPMI/JMX/SNMP> must be configured and enabled on your monitoring target.'))
+						new CTag('p', true, _s('The template you selected (%1$s) requires the %2$s to be added to the host (%3$s).', '#{template_name}', '#{interfaces_long}', '#{host_name}')),
+						new CTag('p', true, _s('Note: %1$s must be configured and enabled on your monitoring target.', '#{interfaces_short}'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)

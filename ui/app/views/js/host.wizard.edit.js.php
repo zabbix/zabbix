@@ -388,7 +388,9 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderCreateHost() {
-		const step = this.#view_templates.step_create_host.evaluateToElement();
+		const step = this.#view_templates.step_create_host.evaluateToElement({
+			template_name: this.#templates.get(this.#data.template_selected)?.name
+		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 
@@ -412,13 +414,47 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderInstallAgent() {
-		const step = this.#view_templates.step_install_agent.evaluateToElement();
+		const step = this.#view_templates.step_install_agent.evaluateToElement({
+			template_name: this.#templates.get(this.#data.template_selected)?.name
+		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
 	}
 
 	#renderAddHostInterface() {
-		const step = this.#view_templates.step_add_host_interface.evaluateToElement();
+		const interface_names_long = {
+			[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent interface')) ?>,
+			[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('Simple Network Management Protocol (SNMP) interface')) ?>,
+			[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('Intelligent Platform Management Interface (IPMI)')) ?>,
+			[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('Java Management Extensions (JMX) interface')) ?>
+		};
+
+		const interface_names_short = {
+			[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent')) ?>,
+			[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('SNMP')) ?>,
+			[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('IPMI')) ?>,
+			[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('JMX')) ?>
+		};
+
+		let interfaces_long = [];
+		let interfaces_short = [];
+
+		for (const [interface_type, required] of Object.entries(this.#data.interface_required)) {
+			if (required) {
+				interfaces_long.push(interface_names_long[interface_type]);
+				interfaces_short.push(interface_names_short[interface_type]);
+			}
+		}
+
+		interfaces_long = interfaces_long.join(' / ');
+		interfaces_short = interfaces_short.join('/');
+
+		const step = this.#view_templates.step_add_host_interface.evaluateToElement({
+			template_name: this.#templates.get(this.#data.template_selected)?.name,
+			host_name: this.#data.host.isNew ? this.#data.host.id : this.#data.host.name,
+			interfaces_long: interfaces_long,
+			interfaces_short: interfaces_short
+		});
 
 		for (const [interface_type, required] of Object.entries(this.#data.interface_required)) {
 			step.querySelector(`.js-host-interface-${interface_type}`).style.display = required ? '' : 'none';
@@ -545,8 +581,8 @@ window.host_wizard_edit = new class {
 				...this.#data,
 				host: this.#data.host.id,
 				groups: this.#data.groups.map(ms_group => (ms_group.isNew
-					? {name: ms_group.id}
-					: {groupid: ms_group.id}
+					? {new: ms_group.id}
+					: ms_group.id
 				)),
 				[CSRF_TOKEN_NAME]: this.#csrf_token
 			})
@@ -646,7 +682,7 @@ window.host_wizard_edit = new class {
 		const progress_labels = [
 			{
 				label: t('Select a template'),
-				info: this.#template?.name || this.#templates?.get(this.#data.template_selected)?.name,
+				info: this.#templates.get(this.#data.template_selected)?.name,
 				visible: true,
 				steps: [this.STEP_SELECT_TEMPLATE]
 			},
