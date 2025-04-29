@@ -583,7 +583,10 @@ window.host_wizard_edit = new class {
 				groups: this.#data.groups.map(ms_group => (ms_group.isNew
 					? {new: ms_group.id}
 					: ms_group.id
-				)),
+				))
+				interfaces: Object.fromEntries(
+					Object.entries(this.#data.interfaces).filter(([type]) => this.#data.interface_required[type])
+				),
 				[CSRF_TOKEN_NAME]: this.#csrf_token
 			})
 		})
