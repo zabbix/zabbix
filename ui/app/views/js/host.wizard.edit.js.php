@@ -495,7 +495,7 @@ window.host_wizard_edit = new class {
 				this.#template.macros.map((macro, index) => [index, {
 					type: macro.type,
 					macro: macro.macro,
-					value: macro.value,
+					value: macro.value, // TODO get from host if exists
 					description: macro.description,
 					discovery_state: this.DISCOVERY_STATE_MANUAL
 				}])
@@ -650,11 +650,11 @@ window.host_wizard_edit = new class {
 			this.#steps_queue.push(this.STEP_ADD_HOST_INTERFACE);
 		}
 
-		if (this.#template?.readme) {
+		if (this.#template?.readme !== '') {
 			this.#steps_queue.push(this.STEP_README);
 		}
 
-		if (Object.keys(this.#template?.macros || {}).length) {
+		if (this.#template?.macros.length) {
 			this.#steps_queue.push(this.STEP_CONFIGURE_HOST);
 		}
 
@@ -896,7 +896,12 @@ window.host_wizard_edit = new class {
 				return map;
 			}, new Map());
 
-		template_classes = new Map([...template_classes.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+		template_classes = new Map([...template_classes.entries()].sort((a, b) => {
+			if (a[0] === 'other') return 1;
+			if (b[0] === 'other') return -1;
+
+			return a[0].localeCompare(b[0]);
+		}));
 
 		const sections = [];
 
