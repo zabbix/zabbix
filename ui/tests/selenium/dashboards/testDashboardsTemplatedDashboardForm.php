@@ -4622,6 +4622,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
+				COverlayDialogElement::ensureNotPresent();
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {
