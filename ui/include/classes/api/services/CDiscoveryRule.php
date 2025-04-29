@@ -611,7 +611,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
 		$items = $this->extendObjectsByKey($items, $db_items, 'itemid',
-			['hostid', 'flags', 'lifetime', 'enabled_lifetime', 'lifetime_type', 'enabled_lifetime_type']
+			['hostid', 'flags', 'lifetime', 'enabled_lifetime']
 		);
 
 		self::validateUniqueness($items);
