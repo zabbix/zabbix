@@ -48,10 +48,13 @@
 #define LLD_OVERRIDE_CONDITION_COL_OPERATOR		0
 
 /* lld_override_optag table columns */
-#define LLD_OVERRIDE_OPTAG_COL_OPID		2
+#define LLD_OVERRIDE_OPTAG_COL_OPID		0
+#define LLD_OVERRIDE_OPTAG_COL_TAG		1
+#define LLD_OVERRIDE_OPTAG_COL_VALUE		2
 
 /* lld_override_optemplate table columns */
-#define LLD_OVERRIDE_OPTEMPLATE_COL_OPID	1
+#define LLD_OVERRIDE_OPTEMPLATE_COL_OPID	0
+#define LLD_OVERRIDE_OPTEMPLATE_COL_TEMPLATE	1
 
 typedef enum
 {
@@ -1239,18 +1242,20 @@ static void	lld_override_data_save_optags(zbx_uint64_t itemid, zbx_uint64_t over
 		{
 			zbx_uint64_t	operationid;
 
-			ZBX_DBROW2UINT64(operationid, row->cols[2]);
-			zbx_db_insert_add_values(db_insert, row->rowid, operationid, row->cols[0], row->cols[1]);
+			ZBX_DBROW2UINT64(operationid, row->cols[LLD_OVERRIDE_OPTAG_COL_OPID]);
+			zbx_db_insert_add_values(db_insert, row->rowid, operationid,
+					row->cols[LLD_OVERRIDE_OPTAG_COL_TAG], row->cols[LLD_OVERRIDE_OPTAG_COL_VALUE]);
 
 			zbx_audit_discovery_rule_update_json_add_lld_override_optag(ZBX_AUDIT_LLD_CONTEXT,
-					itemid, overrideid, operationid, row->rowid, row->cols[0], row->cols[1]);
+					itemid, overrideid, operationid, row->rowid,
+					row->cols[LLD_OVERRIDE_OPTAG_COL_TAG], row->cols[LLD_OVERRIDE_OPTAG_COL_VALUE]);
 			continue;
 		}
 
 		if (0 == (row->flags & ZBX_SYNC_ROW_UPDATE))
 			continue;
 
-		const char	*fields[] = {"tag", "value", "lld_override_operationid"};
+		const char	*fields[] = {"lld_override_operationid", "tag", "value"};
 		char		delim = ' ';
 		zbx_uint64_t	operationid;
 
@@ -1317,8 +1322,8 @@ static void	lld_override_data_save_optemplates(zbx_uint64_t itemid, zbx_uint64_t
 		{
 			zbx_uint64_t	templateid, operationid;
 
-			ZBX_DBROW2UINT64(operationid, row->cols[1]);
-			ZBX_DBROW2UINT64(templateid, row->cols[0]);
+			ZBX_DBROW2UINT64(operationid, row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_OPID]);
+			ZBX_DBROW2UINT64(templateid, row->cols[LLD_OVERRIDE_OPTEMPLATE_COL_TEMPLATE]);
 			zbx_db_insert_add_values(db_insert, row->rowid, operationid, templateid);
 
 			continue;
@@ -1327,7 +1332,7 @@ static void	lld_override_data_save_optemplates(zbx_uint64_t itemid, zbx_uint64_t
 		if (0 == (row->flags & ZBX_SYNC_ROW_UPDATE))
 			continue;
 
-		const char	*fields[] = {"templateid", "lld_override_operationid"};
+		const char	*fields[] = {"lld_override_operationid", "templateid"};
 		char		delim = ' ';
 		zbx_uint64_t	operationid;
 
@@ -2624,7 +2629,7 @@ void	lld_rule_fetch_override_data(zbx_vector_lld_override_data_ptr_t *overrides)
 			continue;
 		}
 
-		zbx_sync_rowset_add_row(&overrides->values[index]->optags, row[0], row[3], row[4], row[2]);
+		zbx_sync_rowset_add_row(&overrides->values[index]->optags, row[0], row[2], row[3], row[4]);
 	}
 	zbx_db_free_result(result);
 
@@ -2656,7 +2661,7 @@ void	lld_rule_fetch_override_data(zbx_vector_lld_override_data_ptr_t *overrides)
 			continue;
 		}
 
-		zbx_sync_rowset_add_row(&overrides->values[index]->optemplates, row[0], row[3], row[2]);
+		zbx_sync_rowset_add_row(&overrides->values[index]->optemplates, row[0], row[2], row[3]);
 	}
 	zbx_db_free_result(result);
 
