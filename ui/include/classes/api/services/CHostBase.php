@@ -1840,44 +1840,9 @@ abstract class CHostBase extends CApiService {
 		];
 		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
 
-		if ($this instanceof CTemplate) {
-			$hostmacroids = [];
-		}
-
 		while ($db_macro = DBfetch($db_macros)) {
-			if ($this instanceof CTemplate) {
-				$hostmacroids[] = $db_macro['hostmacroid'];
-			}
-
 			$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
 				array_diff_key($db_macro, array_flip(['hostid']));
-		}
-
-		if ($this instanceof CTemplate) {
-			$options = [
-				'output' => ['hostmacroid', 'type', 'label', 'description', 'required', 'regex', 'options'],
-				'filter' => ['hostmacroid' => $hostmacroids]
-			];
-			$db_macro_configs = DBfetchArray(DBselect(DB::makeSql('hostmacro_config', $options)));
-
-			foreach ($db_hosts as &$db_host) {
-				foreach ($db_host['macros'] as &$db_macro) {
-					$db_macro['config'] = DB::getDefaults('hostmacro_config');
-
-					foreach ($db_macro_configs as $db_macro_config) {
-						if (bccomp($db_macro['hostmacroid'], $db_macro_config['hostmacroid']) == 0) {
-							unset($db_macro_config['hostmacroid']);
-							$db_macro['config'] = $db_macro_config;
-						}
-					}
-
-					$db_macro['config']['options'] = $db_macro['config']['options'] !== ''
-						? json_decode($db_macro['config']['options'], true)
-						: [];
-				}
-				unset($db_macro);
-			}
-			unset($db_host);
 		}
 	}
 

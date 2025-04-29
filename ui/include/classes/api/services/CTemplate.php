@@ -1421,6 +1421,42 @@ class CTemplate extends CHostGeneral {
 		$this->addUnchangedTemplates($templates, $db_templates, $del_objectids);
 	}
 
+	protected function addAffectedMacros(array $hosts, array &$db_hosts): void {
+		parent::addAffectedMacros($hosts, $db_hosts);
+
+		$hostmacroids = [];
+		foreach ($db_hosts as $hostid => ['macros' => $db_macros]) {
+			foreach ($db_macros as $db_macro) {
+				$hostmacroids[$db_macro['hostmacroid']] = $hostid;
+			}
+		}
+
+		$options = [
+			'output' => ['hostmacroid', 'type', 'label', 'description', 'required', 'regex', 'options'],
+			'filter' => ['hostmacroid' => array_keys($hostmacroids)]
+		];
+		$db_macro_configs = DBfetchArray(DBselect(DB::makeSql('hostmacro_config', $options)));
+
+		foreach ($db_hosts as &$db_host) {
+			foreach ($db_host['macros'] as &$db_macro) {
+				$db_macro['config'] = DB::getDefaults('hostmacro_config');
+
+				foreach ($db_macro_configs as $db_macro_config) {
+					if (bccomp($db_macro['hostmacroid'], $db_macro_config['hostmacroid']) == 0) {
+						unset($db_macro_config['hostmacroid']);
+						$db_macro['config'] = $db_macro_config;
+					}
+				}
+
+				$db_macro['config']['options'] = $db_macro['config']['options'] !== ''
+					? json_decode($db_macro['config']['options'], true)
+					: [];
+			}
+			unset($db_macro);
+		}
+		unset($db_host);
+	}
+
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
