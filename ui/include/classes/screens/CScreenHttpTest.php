@@ -52,6 +52,7 @@ class CScreenHttpTest extends CScreenBase {
 			'output' => ['httptestid', 'name', 'hostid'],
 			'selectHosts' => ['name', 'status'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'selectSteps' => API_OUTPUT_COUNT,
 			'evaltype' => array_key_exists('evaltype', $this->data) ? $this->data['evaltype'] : TAG_EVAL_TYPE_AND_OR,
 			'tags' => array_key_exists('tags', $this->data) ? $this->data['tags'] : [],
@@ -82,6 +83,7 @@ class CScreenHttpTest extends CScreenBase {
 		$httptests = resolveHttpTestMacros($httptests, true, false);
 		order_result($httptests, $sort_field, $sort_order);
 
+		$httptests = mergeRegularAndInheritedTags($httptests);
 		$tags = makeTags($httptests, true, 'httptestid', ZBX_TAG_COUNT_DEFAULT,
 			array_key_exists('tags', $this->data) ? $this->data['tags'] : []
 		);

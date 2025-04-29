@@ -257,30 +257,6 @@ abstract class CControllerHost extends CController {
 					? count($host_problems[$host['hostid']][$severity])
 					: 0;
 			}
-
-			// Merge host tags with template tags, and skip duplicate tags and values.
-			if (!$host['inheritedTags']) {
-				$tags = $host['tags'];
-			}
-			elseif (!$host['tags']) {
-				$tags = $host['inheritedTags'];
-			}
-			else {
-				$tags = $host['tags'];
-
-				foreach ($host['inheritedTags'] as $template_tag) {
-					foreach ($tags as $host_tag) {
-						// Skip tags with same name and value.
-						if ($host_tag['tag'] === $template_tag['tag']
-								&& $host_tag['value'] === $template_tag['value']) {
-							continue 2;
-						}
-					}
-					$tags[] = $template_tag;
-				}
-			}
-
-			$host['tags'] = $tags;
 		}
 		unset($host);
 
@@ -294,6 +270,7 @@ abstract class CControllerHost extends CController {
 			]);
 		}
 
+		$hosts = mergeRegularAndInheritedTags($hosts);
 		$tags = makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 
 		foreach ($hosts as &$host) {
