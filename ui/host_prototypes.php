@@ -608,10 +608,37 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
 		'selectTags' => ['tag', 'value'],
+		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectDiscoveryData' => ['parent_hostid'],
 		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $limit
 	]);
+
+	$lld_parentids = [];
+
+	foreach ($data['hostPrototypes'] as $host_prototype) {
+		if ($host_prototype['discoveryRule']) {
+			$lld_parentids[$host_prototype['discoveryRule']['itemid']] = true;
+		}
+	}
+
+	if ($lld_parentids) {
+		$editable_lld_parents = API::DiscoveryRule()->get([
+			'output' => [],
+			'itemids' => array_keys($lld_parentids),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($data['hostPrototypes'] as &$host_prototype) {
+			if ($host_prototype['discoveryRule']) {
+				$host_prototype['is_discovery_rule_editable'] =
+					array_key_exists($host_prototype['discoveryRule']['itemid'], $editable_lld_parents);
+			}
+		}
+		unset($host_prototype);
+	}
 
 	order_result($data['hostPrototypes'], $sortField, $sortOrder);
 

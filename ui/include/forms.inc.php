@@ -201,7 +201,8 @@ JAVASCRIPT;
 		$data['interfaceid'] = $item['interfaceid'];
 
 		// Check for a discovered prototype
-		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED && $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& ($item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE || $item['flags'] & ZBX_FLAG_DISCOVERY_RULE)) {
 			$data['readonly'] = true;
 			$data['limited'] = true;
 		}

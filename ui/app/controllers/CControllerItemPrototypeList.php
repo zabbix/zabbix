@@ -121,14 +121,41 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		$items = API::ItemPrototype()->get([
 			'output' => [
 				'delay', 'history', 'key_', 'name', 'status', 'trends', 'type', 'discover',
-				'itemid', 'templateid', 'value_type', 'master_itemid'
+				'itemid', 'templateid', 'value_type', 'master_itemid', 'flags'
 			],
 			'discoveryids' => [$this->getInput('parent_discoveryid')],
 			'selectTags' => ['tag', 'value'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_itemid'],
 			'editable' => true,
 			'sortfield' => $profile['sort'],
 			'limit' => $limit
 		]);
+
+		$lld_parentids = [];
+
+		foreach ($items as $item) {
+			if ($item['discoveryRule']) {
+				$lld_parentids[$item['discoveryRule']['itemid']] = true;
+			}
+		}
+
+		if ($lld_parentids) {
+			$editable_lld_parents = API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($items as &$item) {
+				if ($item['discoveryRule']) {
+					$item['is_discovery_rule_editable'] =
+						array_key_exists($item['discoveryRule']['itemid'], $editable_lld_parents);
+				}
+			}
+			unset($item);
+		}
 
 		$items = expandItemNamesWithMasterItems($items, 'itemprototypes');
 

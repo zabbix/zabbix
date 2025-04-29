@@ -89,10 +89,10 @@ foreach ($data['discoveries'] as $discovery) {
 		if ($discovery['discoveryRule']) {
 			if ($discovery['is_discovery_rule_editable']) {
 				$description[] = (new CLink($discovery['discoveryRule']['name'],
-					(new CUrl('host_prototypes.php'))
+					(new CUrl('host_discovery_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('parent_discoveryid', $discovery['discoveryRule']['itemid'])
-						->setArgument('hostid', $discovery['discoveryData']['parent_hostid'])
+						->setArgument('itemid', $discovery['discoveryData']['parent_itemid'])
 						->setArgument('context', 'host')
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)

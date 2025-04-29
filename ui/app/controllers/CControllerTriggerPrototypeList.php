@@ -140,13 +140,40 @@ class CControllerTriggerPrototypeList extends CController {
 
 		$data['triggers'] = API::TriggerPrototype()->get([
 			'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
-				'recovery_expression', 'opdata', 'discover'
+				'recovery_expression', 'opdata', 'discover', 'flags'
 			],
 			'selectHosts' => ['hostid', 'host'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectTags' => ['tag', 'value'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_triggerid'],
 			'triggerids' => array_column($data['triggers'], 'triggerid')
 		]);
+
+		$lld_parentids = [];
+
+		foreach ($data['triggers'] as $trigger) {
+			if ($trigger['discoveryRule']) {
+				$lld_parentids[$trigger['discoveryRule']['itemid']] = true;
+			}
+		}
+
+		if ($lld_parentids) {
+			$editable_lld_parents = API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as &$trigger) {
+				if ($trigger['discoveryRule']) {
+					$trigger['is_discovery_rule_editable'] =
+						array_key_exists($trigger['discoveryRule']['itemid'], $editable_lld_parents);
+				}
+			}
+			unset($trigger);
+		}
 
 		order_result($data['triggers'], $sort_field, $sort_order);
 

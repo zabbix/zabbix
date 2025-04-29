@@ -55,6 +55,32 @@ foreach ($data['items'] as $item) {
 		$data['allowed_ui_conf_templates']
 	)];
 
+	if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($item['discoveryRule']) {
+			if ($item['is_discovery_rule_editable']) {
+				$name[] = (new CLink($item['discoveryRule']['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'item.prototype.edit')
+						->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+						->setArgument('itemid', $item['discoveryData']['parent_itemid'])
+						->setArgument('context', 'host')
+						->getUrl()
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$name[] = (new CSpan($item['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
+		$name[] = NAME_DELIMITER;
+	}
+
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
 			$name[] = $item['master_item']['name'];

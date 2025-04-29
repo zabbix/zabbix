@@ -450,7 +450,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$options = $overrides ? ['selectOverrides' => ['step']] : [];
 
 			$db_item = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'templateid'],
+				'output' => ['itemid', 'templateid', 'flags'],
 				'itemids' => $itemid
 			] + $options)[0];
 		}
@@ -610,7 +610,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (hasRequest('update')) {
 				$item = getSanitizedItemFields($input + $db_item + [
-						'flags' => ZBX_FLAG_DISCOVERY_RULE,
 						'hosts' => $hosts
 					]);
 
@@ -760,7 +759,7 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
-	if ($host['status'] != HOST_STATUS_TEMPLATE && $host['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	if (getRequest('form') === 'add' && $host['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 		unset($data['types'][ITEM_TYPE_NESTED]);
 	}
 

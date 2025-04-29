@@ -76,6 +76,31 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
 		$data['allowed_ui_conf_templates']
 	);
+
+	if ($hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($hostPrototype['discoveryRule']) {
+			if ($hostPrototype['is_discovery_rule_editable']) {
+				$name[] = (new CLink($hostPrototype['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $hostPrototype['discoveryRule']['itemid'])
+						->setArgument('hostid', $hostPrototype['discoveryData']['parent_hostid'])
+						->setArgument('context', 'host')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$name[] = (new CSpan($hostPrototype['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
+		$name[] = NAME_DELIMITER;
+	}
+
 	$name[] = new CLink($hostPrototype['name'],
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')

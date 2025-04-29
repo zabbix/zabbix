@@ -127,17 +127,42 @@ class CControllerGraphPrototypeList extends CController {
 
 		// Get graphs after paging.
 		$options = [
-			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
+			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover', 'flags'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_graphid'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
 		];
 
 		$data['graphs'] = API::GraphPrototype()->get($options);
 
+		$lld_parentids = [];
+
 		foreach ($data['graphs'] as &$graph) {
 			$graph['graphtype'] = graphType($graph['graphtype']);
+
+			if ($graph['discoveryRule']) {
+				$lld_parentids[$graph['discoveryRule']['itemid']] = true;
+			}
 		}
 		unset($graph);
+
+		if ($lld_parentids) {
+			$editable_lld_parents = API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($data['graphs'] as &$graph) {
+				if ($graph['discoveryRule']) {
+					$graph['is_discovery_rule_editable'] =
+						array_key_exists($graph['discoveryRule']['itemid'], $editable_lld_parents);
+				}
+			}
+			unset($graph);
+		}
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 

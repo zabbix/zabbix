@@ -811,6 +811,7 @@ else {
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectDiscoveryData' => ['parent_itemid'],
 		'editable' => true,
 		'templated' => ($data['context'] === 'template'),
 		'sortfield' => $sort_field,

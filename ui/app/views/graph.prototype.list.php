@@ -96,18 +96,43 @@ foreach ($data['graphs'] as $graph) {
 		}
 	}
 
-	$name = [
-		makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			$data['allowed_ui_conf_templates']
-		),
-		new CLink($graph['name'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'popup')
-			->setArgument('popup', 'graph.prototype.edit')
-			->setArgument('context', $data['context'])
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('graphid', $graphid)
-		)
-	];
+	$name = [];
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		$data['allowed_ui_conf_templates']
+	);
+
+	if ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($graph['discoveryRule']) {
+			if ($graph['is_discovery_rule_editable']) {
+				$name[] = (new CLink($graph['discoveryRule']['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'graph.prototype.edit')
+						->setArgument('parent_discoveryid', $graph['discoveryRule']['itemid'])
+						->setArgument('graphid', $graph['discoveryData']['parent_graphid'])
+						->setArgument('context', 'host')
+						->getUrl()
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$name[] = (new CSpan($graph['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
+		$name[] = NAME_DELIMITER;
+	}
+
+	$name[] = new CLink($graph['name'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'graph.prototype.edit')
+		->setArgument('context', $data['context'])
+		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		->setArgument('graphid', $graphid));
 
 	$nodiscover = ($graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 
