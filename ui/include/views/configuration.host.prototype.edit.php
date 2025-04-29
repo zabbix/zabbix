@@ -586,7 +586,7 @@ $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_E
 
 if ($host_prototype['hostid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('update', _('Update')))->setEnabled(!$data['discovered_prototype']),
 		[
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(
