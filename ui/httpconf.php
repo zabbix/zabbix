@@ -135,6 +135,17 @@ elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])
 	access_deny();
 }
 
+// Validate hostid.
+if (hasRequest('hostid')) {
+	$host = API::Host()->get([
+		'hostids' => getRequest('hostid')
+	]);
+
+	if (!$host) {
+		access_deny();
+	}
+}
+
 // Validate backurl.
 if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
@@ -455,11 +466,6 @@ if (isset($_REQUEST['form'])) {
 		'hostids' => $data['hostid'],
 		'templated_hosts' => true
 	]);
-
-	if (!$host) {
-		access_deny();
-	}
-
 	$data['host'] = reset($host);
 
 	if (hasRequest('httptestid')) {
