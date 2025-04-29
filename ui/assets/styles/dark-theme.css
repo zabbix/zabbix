@@ -1804,6 +1804,7 @@ button {
   border: 1px solid #303030;
   border-bottom: 0;
   background-color: #2b2b2b;
+  z-index: 10;
   transition: opacity 0.3s ease-out; }
   .dashboard-grid-widget-header h4 {
     flex-grow: 1;

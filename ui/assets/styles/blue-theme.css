@@ -1799,6 +1799,7 @@ button {
   border: 1px solid #dfe4e7;
   border-bottom: 0;
   background-color: #ffffff;
+  z-index: 10;
   transition: opacity 0.3s ease-out; }
   .dashboard-grid-widget-header h4 {
     flex-grow: 1;

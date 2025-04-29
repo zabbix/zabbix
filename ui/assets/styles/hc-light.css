@@ -1770,7 +1770,8 @@ button {
   align-items: flex-start;
   border: 1px solid #9f9f9f;
   border-bottom: 0;
-  background-color: #ffffff; }
+  background-color: #ffffff;
+  z-index: 10; }
   .dashboard-grid-widget-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
