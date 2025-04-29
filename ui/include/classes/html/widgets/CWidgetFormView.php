@@ -184,7 +184,7 @@ class CWidgetFormView {
 		}
 
 		return '
-			new CWidgetForm('.json_encode($parameters, JSON_THROW_ON_ERROR).');
+			new CWidgetForm('.json_encode($parameters, JSON_THROW_ON_ERROR).').ready();
 		';
 	}
 

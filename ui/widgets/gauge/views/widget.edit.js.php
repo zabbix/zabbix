@@ -50,6 +50,7 @@ window.widget_form = new class extends CWidgetForm {
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {

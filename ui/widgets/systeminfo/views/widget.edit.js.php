@@ -25,6 +25,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._info_type.addEventListener('change', () => this.#updateForm());
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {

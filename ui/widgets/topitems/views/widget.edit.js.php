@@ -66,6 +66,8 @@ window.widget_form = new class extends CWidgetForm {
 		jQuery(document.getElementById('groupids_')).on('change', () => this.#updateForm());
 		jQuery(document.getElementById('hostids_')).on('change', () => this.#updateForm());
 		this.#form.addEventListener('form_fields.changed', () => this.#updateForm());
+
+		this.ready();
 	}
 
 	/**

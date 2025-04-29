@@ -24,6 +24,7 @@ window.widget_form = new class extends CWidgetForm {
 		}
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {

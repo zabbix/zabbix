@@ -33,6 +33,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._acknowledge_status.addEventListener('change', () => this.updateForm());
 
 		this.updateForm();
+		this.ready();
 	}
 
 	updateForm() {

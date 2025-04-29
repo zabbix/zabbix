@@ -85,6 +85,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#datasetTabInit();
 		this.#displayingOptionsTabInit();
 		this.#updateForm();
+		this.ready();
 	}
 
 	#datasetTabInit() {

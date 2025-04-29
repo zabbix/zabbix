@@ -83,7 +83,8 @@ window.widget_form = new class extends CWidgetForm {
 					this.#is_item_numeric = type !== null && this.#isItemValueTypeNumeric(type);
 					this.updateForm();
 				}
-			});
+			})
+			.finally(() => this.ready());
 	}
 
 	updateForm() {

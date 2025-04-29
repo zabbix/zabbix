@@ -77,6 +77,8 @@ window.widget_form = new class extends CWidgetForm {
 
 		this._updateForm();
 		this._updatePreview();
+
+		this.ready();
 	}
 
 	onGraphConfigChange() {

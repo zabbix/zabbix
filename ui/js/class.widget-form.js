@@ -87,8 +87,6 @@ class CWidgetForm {
 				this.#endScripting();
 			}
 		}, {signal});
-
-		this.fire(CWidgetForm.EVENT_READY);
 	}
 
 	/**
@@ -109,6 +107,15 @@ class CWidgetForm {
 	 */
 	getField(name) {
 		return this.getForm().fields[name];
+	}
+
+	/**
+	 * Mark form as ready for working with. The framework will not access form fields unless it's ready.
+	 *
+	 * It's mandatory to invoke this method by dialogue itself as soon as the form is ready.
+	 */
+	ready() {
+		this.fire(CWidgetForm.EVENT_READY);
 	}
 
 	/**

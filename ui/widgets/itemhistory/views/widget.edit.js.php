@@ -59,6 +59,8 @@ window.widget_form = new class extends CWidgetForm {
 			.on(CSortable.EVENT_SORT, () => this.registerUpdateEvent());
 
 		this.#list_columns.addEventListener('click', (e) => this.#processColumnsAction(e));
+
+		this.ready();
 	}
 
 	#processColumnsAction(e) {

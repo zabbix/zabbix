@@ -39,6 +39,7 @@ window.widget_form = new class extends CWidgetForm {
 		jQuery(this.#table).on('tableupdate.dynamicRows', () => this.#updateForm());
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {

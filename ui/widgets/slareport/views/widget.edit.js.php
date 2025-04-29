@@ -20,6 +20,8 @@ window.widget_form = new class extends CWidgetForm {
 	init({serviceid_field_id}) {
 		this._$service = jQuery(`#${serviceid_field_id}`);
 		this._$service.multiSelect('getSelectButton').addEventListener('click', () => this.selectService());
+
+		this.ready();
 	}
 
 	selectService() {
