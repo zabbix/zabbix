@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testWidgetCommunication.php';
+require_once __DIR__.'/../common/testWidgetCommunication.php';
 
 /**
  * @backup profiles

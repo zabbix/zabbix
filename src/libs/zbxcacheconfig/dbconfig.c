@@ -1852,16 +1852,21 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 				zbx_free(error);
 				continue;
 			}
-
 		}
 		else if (FAIL == zbx_vault_get_kvs(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
-					error);
+			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+						dc_kvs_path->path, error);
+			}
+			dc_strpool_replace(NULL != dc_kvs_path->last_error ? 1 : 0, &dc_kvs_path->last_error, error);
 			zbx_free(error);
 			continue;
 		}
+		else if (NULL != dc_kvs_path->last_error)
+			dc_strpool_release(dc_kvs_path->last_error);
 
 		zbx_hashset_iter_reset(&dc_kvs_path->kvs, &iter);
 		while (NULL != (dc_kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
@@ -9212,14 +9217,17 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 	UNLOCK_CACHE;
 
-	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
 	{
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 		return psk_len;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "host PSK and autoregistration PSK have the same identity \"%s\" but"
+	/* stricter API validation for PSK identities is expected to make this use-case impossible */
+	zabbix_log(LOG_LEVEL_CRIT, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
+	THIS_SHOULD_NEVER_HAPPEN;
+
 	return psk_len;
 }
 #endif
@@ -16042,6 +16050,14 @@ static const zbx_um_cache_t	*dc_um_get_cache(const zbx_dc_um_handle_t *um_handle
  * Comments: Closing the last opened handle within process will release locked*
  *           user macro cache in the configuration cache.                     *
  *                                                                            *
+ *           NOTE: closing of handles must be done in REVERSE ORDER of        *
+ *           opening them.                                                    *
+ *           Pay attention when multiple handles are opened at the same time  *
+ *           (e.g. in one function) using                                     *
+ *           zbx_dc_open_user_macros(),                                       *
+ *           zbx_dc_open_user_macros_secure() and                             *
+ *           zbx_dc_open_user_macros_masked().                                *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle)
 {
@@ -16185,16 +16201,15 @@ int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replac
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
  *             env         - [IN] security environment                        *
- *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
-		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error)
+void	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env)
 {
 	/* wrap the passed user macro and func macro cache into user macro handle structure */
 	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = env, .prev = NULL};
 
-	return zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, error);
+	(void)zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, NULL);
 }
 
 typedef struct

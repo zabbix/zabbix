@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0beta1');
+define('ZABBIX_VERSION',		'7.4.0rc1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7030013);
+define('ZABBIX_DB_VERSION',		7030032);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -504,6 +504,9 @@ define('ZBX_REPORT_CREATOR_TYPE_RECIPIENT',	1);
 define('ZBX_REPORT_EXCLUDE_USER_FALSE',	0);
 define('ZBX_REPORT_EXCLUDE_USER_TRUE',	1);
 
+define('SYSMAP_BACKGROUND_SCALE_NONE', 	0);
+define('SYSMAP_BACKGROUND_SCALE_COVER', 1);
+
 define('SYSMAP_LABEL_ADVANCED_OFF',	0);
 define('SYSMAP_LABEL_ADVANCED_ON',	1);
 
@@ -523,6 +526,14 @@ define('MAP_LABEL_LOC_BOTTOM',	0);
 define('MAP_LABEL_LOC_LEFT',	1);
 define('MAP_LABEL_LOC_RIGHT',	2);
 define('MAP_LABEL_LOC_TOP',		3);
+
+define('MAP_SHOW_LABEL_DEFAULT', 	-1);
+define('MAP_SHOW_LABEL_AUTO_HIDE',	0);
+define('MAP_SHOW_LABEL_ALWAYS', 	1);
+
+define('MAP_INDICATOR_TYPE_STATIC_LINK', 	0);
+define('MAP_INDICATOR_TYPE_TRIGGER', 		1);
+define('MAP_INDICATOR_TYPE_ITEM_VALUE', 	2);
 
 define('SYSMAP_ELEMENT_TYPE_HOST',		0);
 define('SYSMAP_ELEMENT_TYPE_MAP',		1);
@@ -551,6 +562,8 @@ define('SYSMAP_SHAPE_BORDER_TYPE_NONE',		0);
 define('SYSMAP_SHAPE_BORDER_TYPE_SOLID',	1);
 define('SYSMAP_SHAPE_BORDER_TYPE_DOTTED',	2);
 define('SYSMAP_SHAPE_BORDER_TYPE_DASHED',	3);
+
+define('SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT',	2);
 
 define('SYSMAP_SHAPE_LABEL_HALIGN_CENTER',	0);
 define('SYSMAP_SHAPE_LABEL_HALIGN_LEFT',	1);
@@ -780,18 +793,13 @@ define('ZBX_LLD_RULE_DELAY_DEFAULT',	'1h');
 define('GRAPH_DISCOVER',	0);
 define('GRAPH_NO_DISCOVER',	1);
 
-define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
-define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
-define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
-define('GRAPH_ITEM_DRAWTYPE_DOT',			3);
-define('GRAPH_ITEM_DRAWTYPE_DASHED_LINE',	4);
-define('GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE',	5);
-define('GRAPH_ITEM_DRAWTYPE_BOLD_DOT',		6);
-
-define('MAP_LINK_DRAWTYPE_LINE',			0);
-define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
-define('MAP_LINK_DRAWTYPE_DOT',				3);
-define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
+define('DRAWTYPE_LINE',				0);
+define('DRAWTYPE_FILLED_REGION',	1);
+define('DRAWTYPE_BOLD_LINE',		2);
+define('DRAWTYPE_DOT',				3);
+define('DRAWTYPE_DASHED_LINE',		4);
+define('DRAWTYPE_GRADIENT_LINE',	5);
+define('DRAWTYPE_BOLD_DOT',			6);
 
 define('ZBX_SLA_MAX_REPORTING_PERIODS',		100);
 define('ZBX_SLA_DEFAULT_REPORTING_PERIODS',	20);
@@ -1608,6 +1616,7 @@ define('API_PROMETHEUS_LABEL',		68);
 define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
 define('API_NUMBER',				71);
+define('API_SELEMENTID',			72);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1639,6 +1648,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
+define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
@@ -1937,6 +1947,7 @@ define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE', 'btn-dashboard-kioskmo
 define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW', 'btn-dashboard-kioskmode-toggle-slideshow');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
+define('ZBX_STYLE_BTN_GREY_ICON', 'btn-grey-icon');
 define('ZBX_STYLE_BTN_HOST_DASHBOARD_LIST', 'btn-host-dashboard-list');
 define('ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD', 'btn-host-dashboard-next-dashboard');
 define('ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD', 'btn-host-dashboard-previous-dashboard');
@@ -2188,7 +2199,6 @@ define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
-define('ZBX_STYLE_TEXT_VERTICAL', 'text-vertical');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');

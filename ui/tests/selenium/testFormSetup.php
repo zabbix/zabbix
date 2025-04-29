@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__ . '/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup sessions
@@ -110,8 +110,6 @@ class testFormSetup extends CWebTest {
 
 		global $DB;
 		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on row in table.
-		$this->query('tag:h1')->one()->hoverMouse();
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
 	}
 

@@ -13,10 +13,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource ScheduledReports
@@ -161,6 +161,10 @@ class testPageScheduledReport extends CWebTest {
 		foreach ($expired_report as $column => $value) {
 			$this->assertEquals($value, $row->getColumn($column)->getText());
 		}
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public static function getFilterData() {

@@ -16,10 +16,6 @@
 #include "expression.h"
 #include "datafunc.h"
 
-#ifdef HAVE_LIBXML2
-#	include "zbxxml.h"
-#endif
-
 #include "zbxdb.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"
@@ -584,7 +580,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	int				N_functionid, indexed_macro, ret, res = SUCCEED,
 					pos = 0, found, user_names_found = 0, raw_value;
 	size_t				data_alloc, data_len;
-	zbx_dc_interface_t		interface;
 	zbx_vector_uint64_t		hostids;
 	const zbx_vector_uint64_t	*phostids;
 	zbx_token_t			token, inner_token;
@@ -2495,9 +2490,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 		}
 		else if (0 == indexed_macro &&
-				0 != (macro_type & (ZBX_MACRO_TYPE_ITEM_KEY | ZBX_MACRO_TYPE_PARAMS_FIELD |
-						ZBX_MACRO_TYPE_LLD_FILTER | ZBX_MACRO_TYPE_ALLOWED_HOSTS |
-						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD | ZBX_MACRO_TYPE_QUERY_FILTER)))
+				0 != (macro_type & (ZBX_MACRO_TYPE_ITEM_KEY)))
 		{
 			zbx_uint64_t			c_hostid, c_itemid;
 			const char			*host, *name;
@@ -2520,8 +2513,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				c_interface = &dc_item->interface;
 			}
 
-			if ((ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)) &&
-					0 == (ZBX_MACRO_TYPE_QUERY_FILTER & macro_type))
+			if ((ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &c_hostid, 1, &replace_to);
 
@@ -2591,36 +2583,14 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == strcmp(m, MVAR_HOST_PORT))
 			{
-				if (0 == (macro_type & ZBX_MACRO_TYPE_ALLOWED_HOSTS))
+				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
-					{
-						zbx_dsprintf(replace_to, "%u", c_interface->port);
-					}
-					else
-					{
-						ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-								ZBX_DC_REQUEST_HOST_PORT);
-					}
+					zbx_dsprintf(replace_to, "%u", c_interface->port);
 				}
-			}
-			else if (0 != (macro_type & ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD))
-			{
-				if (0 == strcmp(m, MVAR_ITEM_ID))
+				else
 				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY))
-				{
-					replace_to = zbx_strdup(replace_to, dc_item->key);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
-				{
-					replace_to = zbx_strdup(replace_to, dc_item->key_orig);
-				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
-				{
-					ret = zbx_dc_get_host_inventory_by_itemid(m, dc_item->itemid, &replace_to);
+					ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
+							ZBX_DC_REQUEST_HOST_PORT);
 				}
 			}
 		}
@@ -2684,56 +2654,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 			}
 		}
-		else if (0 == indexed_macro && (0 != (macro_type & (ZBX_MACRO_TYPE_HTTP_RAW | ZBX_MACRO_TYPE_HTTP_JSON |
-				ZBX_MACRO_TYPE_HTTP_XML))))
-		{
-			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
-						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
-			{
-				zbx_dc_get_user_macro(um_handle, m, &dc_host->hostid, 1, &replace_to);
-				pos = token.loc.r;
-			}
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
-			{
-				replace_to = zbx_strdup(replace_to, dc_host->host);
-			}
-			else if (0 == strcmp(m, MVAR_HOST_NAME))
-			{
-				replace_to = zbx_strdup(replace_to, dc_host->name);
-			}
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
-			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-			}
-			else if	(0 == strcmp(m, MVAR_HOST_DNS))
-			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-			}
-			else if (0 == strcmp(m, MVAR_HOST_CONN))
-			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.addr);
-			}
-			else if (0 == strcmp(m, MVAR_HOST_PORT))
-			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.port_orig);
-			}
-			else if (0 == strcmp(m, MVAR_ITEM_ID))
-			{
-				replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
-			}
-			else if (0 == strcmp(m, MVAR_ITEM_KEY))
-			{
-				replace_to = zbx_strdup(replace_to, dc_item->key);
-			}
-			else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
-			{
-				replace_to = zbx_strdup(replace_to, dc_item->key_orig);
-			}
-		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_ALERT_EMAIL) &&
 				(ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type)))
 		{
@@ -2757,20 +2677,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				zbx_dc_get_user_macro(um_handle, m, NULL, 0, &replace_to);
 
 			pos = token.loc.r;
-		}
-
-		if (0 != (macro_type & ZBX_MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
-		{
-			zbx_json_escape(&replace_to);
-		}
-
-		if (0 != (macro_type & ZBX_MACRO_TYPE_QUERY_FILTER) && NULL != replace_to)
-		{
-			char	*esc;
-
-			esc = zbx_dyn_escape_string(replace_to, "\\");
-			zbx_free(replace_to);
-			replace_to = esc;
 		}
 
 		if ((ZBX_TOKEN_FUNC_MACRO == token.type || ZBX_TOKEN_USER_FUNC_MACRO == token.type) &&
@@ -2963,161 +2869,6 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
 	return ret;
 }
 
-#ifdef HAVE_LIBXML2
-/******************************************************************************
- *                                                                            *
- * Comments: auxiliary function for substitute_macros_xml().                  *
- *                                                                            *
- ******************************************************************************/
-static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, zbx_macro_resolver_f macro_resolver_cb,
-		const void *resolver_data, xmlNode *node)
-{
-	xmlChar	*value;
-	xmlAttr	*attr;
-	char	*value_tmp;
-
-	for (;NULL != node; node = node->next)
-	{
-		switch (node->type)
-		{
-			case XML_TEXT_NODE:
-				if (NULL == (value = xmlNodeGetContent(node)))
-					break;
-
-				value_tmp = zbx_strdup(NULL, (const char *)value);
-
-				if (NULL == macro_resolver_cb)
-				{
-					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item,
-							NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
-							ZBX_MACRO_TYPE_HTTP_XML, NULL, 0);
-				}
-				else
-					macro_resolver_cb(&value_tmp, resolver_data);
-
-				xmlNodeSetContent(node, NULL);
-				xmlNodeAddContent(node, (xmlChar *)value_tmp);
-
-				zbx_free(value_tmp);
-				xmlFree(value);
-				break;
-			case XML_CDATA_SECTION_NODE:
-				if (NULL == (value = xmlNodeGetContent(node)))
-					break;
-
-				value_tmp = zbx_strdup(NULL, (const char *)value);
-
-				if (NULL == macro_resolver_cb)
-				{
-					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item,
-							NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
-							ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
-				}
-				else
-					macro_resolver_cb(&value_tmp, resolver_data);
-
-				xmlNodeSetContent(node, NULL);
-				xmlNodeAddContent(node, (xmlChar *)value_tmp);
-
-				zbx_free(value_tmp);
-				xmlFree(value);
-				break;
-			case XML_ELEMENT_NODE:
-				for (attr = node->properties; NULL != attr; attr = attr->next)
-				{
-					if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
-						continue;
-
-					value_tmp = zbx_strdup(NULL, (const char *)value);
-
-					if (NULL == macro_resolver_cb)
-					{
-						substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host,
-								item, NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
-								ZBX_MACRO_TYPE_HTTP_XML, NULL, 0);
-					}
-					else
-						macro_resolver_cb(&value_tmp, resolver_data);
-
-					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
-
-					zbx_free(value_tmp);
-					xmlFree(value);
-				}
-				break;
-			default:
-				break;
-		}
-
-		substitute_macros_in_xml_elements(item, macro_resolver_cb, resolver_data, node->children);
-	}
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Substitutes simple or LLD macros in XML text nodes, attributes of *
- *          a node or in CDATA section, validates XML.                        *
- *                                                                            *
- * Parameters: data              - [IN/OUT] pointer to buffer that contains   *
- *                                          xml                               *
- *             item              - [IN] item for simple macro substitution    *
- *             macro_resolver_cb - [IN] macro resolver function, optional     *
- *             resolver_data    - [IN] user-defined data for macro resolver, *
- *                                      optional                              *
- *             error             - [OUT] reason for xml parsing failure       *
- *             maxerrlen         - [IN] size of error buffer                  *
- *                                                                            *
- * Return value: SUCCEED or FAIL if XML validation has failed.                *
- *                                                                            *
- ******************************************************************************/
-static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, char *error, int maxerrlen)
-{
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(item);
-	ZBX_UNUSED(macro_resolver_cb);
-	ZBX_UNUSED(resolver_data);
-	zbx_snprintf(error, maxerrlen, "Support for XML was not compiled in");
-	return FAIL;
-#else
-	xmlDoc		*doc;
-	xmlNode		*root_element;
-	xmlChar		*mem;
-	int		size, ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (FAIL == zbx_open_xml(*data, 0, maxerrlen, (void **)&doc, (void **)&root_element, &error))
-	{
-		if (NULL == doc)
-			goto exit;
-
-		if (NULL == root_element)
-			goto clean;
-	}
-
-	substitute_macros_in_xml_elements(item, macro_resolver_cb, resolver_data, root_element);
-	xmlDocDumpMemory(doc, &mem, &size);
-
-	if (FAIL == zbx_check_xml_memory((char *)mem, maxerrlen, &error))
-		goto clean;
-
-	zbx_free(*data);
-	*data = zbx_malloc(NULL, size + 1);
-	memcpy(*data, (const char *)mem, size + 1);
-	xmlFree(mem);
-	ret = SUCCEED;
-clean:
-	xmlFreeDoc(doc);
-exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-#endif
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute_simple_macros with masked secret macros                *
@@ -3132,12 +2883,6 @@ int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_even
 {
 	return substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
 			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
-}
-
-void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers)
-{
-	substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			item, allowed_peers, ZBX_MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
 }
 
 /******************************************************************************
@@ -3163,37 +2908,6 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 	return ret;
 
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: substitute_macros_xml with masked secret macros.                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, zbx_macro_resolver_f macro_resolver_cb,
-		const void *resolver_data, char *error, int maxerrlen)
-{
-	return substitute_macros_xml_impl(data, item, macro_resolver_cb, resolver_data, error, maxerrlen);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: substitute_macros_xml with unmasked secret macros.                *
- *                                                                            *
- ******************************************************************************/
-int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, char *error, int maxerrlen)
-{
-	int			ret;
-	zbx_dc_um_handle_t	*um_handle;
-
-	um_handle = zbx_dc_open_user_macros_secure();
-
-	ret = substitute_macros_xml_impl(data, item, macro_resolver_cb, resolver_data, error, maxerrlen);
-
-	zbx_dc_close_user_macros(um_handle);
-
-	return ret;
 }
 
 /******************************************************************************

@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "dbupgrade_common.h"
+#include "zbxtasks.h"
 
 /*
  * 7.4 development database patches
@@ -245,6 +246,213 @@ out:
 	return ret;
 }
 
+static int	DBpatch_7030014(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 2 - SYSMAP_ELEMENT_TYPE_TRIGGER */
+	if (ZBX_DB_OK > zbx_db_execute("delete from sysmaps_elements"
+			" where elementtype=2"
+				" and selementid not in ("
+					"select distinct selementid from sysmap_element_trigger"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030015(void)
+{
+	const zbx_db_table_t	table =
+			{"sysmap_link_threshold", "linkthresholdid", 0,
+				{
+					{"linkthresholdid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"linkid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"drawtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"threshold", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"pattern", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030016(void)
+{
+	const zbx_db_field_t	field = {"linkid", NULL, "sysmaps_links", "linkid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_link_threshold", 1, &field);
+}
+
+static int	DBpatch_7030017(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_link_threshold", "sysmap_link_threshold_1"))
+		return DBcreate_index("sysmap_link_threshold", "sysmap_link_threshold_1", "linkid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030018(void)
+{
+	const zbx_db_field_t	field = {"background_scale", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_7030019(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps set background_scale=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030020(void)
+{
+	const zbx_db_field_t	field = {"show_element_label", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_7030021(void)
+{
+	const zbx_db_field_t	field = {"show_link_label", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_7030022(void)
+{
+	const zbx_db_field_t	field = {"show_label", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_7030023(void)
+{
+	const zbx_db_field_t	field = {"show_label", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_links", &field);
+}
+
+static int	DBpatch_7030024(void)
+{
+	const zbx_db_field_t	field = {"indicator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_links", &field);
+}
+
+static int	DBpatch_7030025(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps_links sl set indicator_type = 1 "
+			"where exists (select null from sysmaps_link_triggers slt where slt.linkid = sl.linkid)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030026(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("sysmaps_links", &field);
+}
+
+static int	DBpatch_7030027(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("sysmaps_links", 4, &field);
+}
+
+static int	DBpatch_7030028(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmaps_links", "sysmaps_links_4"))
+		return DBcreate_index("sysmaps_links", "sysmaps_links_4", "itemid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030029(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.hosts.graphs.php.sort", "web.hosts.graph.list.sort",
+			"web.hosts.graphs.php.sortorder", "web.hosts.graph.list.sortorder",
+			"web.hosts.graphs.filter_hostids", "web.hosts.graph.list.filter_hostids",
+			"web.hosts.graphs.filter_groupids", "web.hosts.graph.list.filter_groupids",
+			"web.hosts.graphs.filter.active", "web.hosts.graph.list.filter.active",
+			"web.templates.graphs.php.sort", "web.templates.graph.list.sort",
+			"web.templates.graphs.php.sortorder", "web.templates.graph.list.sortorder",
+			"web.templates.graphs.filter_hostids", "web.templates.graph.list.filter_hostids",
+			"web.templates.graphs.filter_groupids", "web.templates.graph.list.filter_groupids",
+			"web.templates.graphs.filter.active", "web.templates.graph.list.filter.active",
+		};
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030030(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", (char *)NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_field_t	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_7030032(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'itemcard','widgets/itemcard',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -265,5 +473,24 @@ DBPATCH_ADD(7030010, 0, 1)
 DBPATCH_ADD(7030011, 0, 1)
 DBPATCH_ADD(7030012, 0, 1)
 DBPATCH_ADD(7030013, 0, 1)
+DBPATCH_ADD(7030014, 0, 1)
+DBPATCH_ADD(7030015, 0, 1)
+DBPATCH_ADD(7030016, 0, 1)
+DBPATCH_ADD(7030017, 0, 1)
+DBPATCH_ADD(7030018, 0, 1)
+DBPATCH_ADD(7030019, 0, 1)
+DBPATCH_ADD(7030020, 0, 1)
+DBPATCH_ADD(7030021, 0, 1)
+DBPATCH_ADD(7030022, 0, 1)
+DBPATCH_ADD(7030023, 0, 1)
+DBPATCH_ADD(7030024, 0, 1)
+DBPATCH_ADD(7030025, 0, 1)
+DBPATCH_ADD(7030026, 0, 1)
+DBPATCH_ADD(7030027, 0, 1)
+DBPATCH_ADD(7030028, 0, 1)
+DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
+DBPATCH_ADD(7030032, 0, 1)
 
 DBPATCH_END()

@@ -257,11 +257,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.edit')
 		->setArgument('triggerid', $triggerid)
-		->setArgument('hostid', $data['single_selected_hostid'])
+		->setArgument('hostid', array_column($trigger['hosts'], 'hostid')[0])
 		->setArgument('context', $data['context'])
 		->getUrl();
 
-	$description[] = (new CLink($trigger['description'], $trigger_url))->addClass(ZBX_STYLE_WORDBREAK);
+	$description[] = (new CLink($trigger['description'], $trigger_url))->addClass(ZBX_STYLE_WORDWRAP);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];

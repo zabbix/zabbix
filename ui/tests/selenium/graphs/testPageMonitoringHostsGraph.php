@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup profiles, hosts
@@ -871,7 +871,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			}
 		}
 
+		$table = $this->getTable();
 		$form->fill($data['filter'])->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check result amount and graph/item ids.

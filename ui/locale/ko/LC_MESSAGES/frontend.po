@@ -1353,6 +1353,14 @@ msgstr "집계된 데이터 세트의 범례 라벨로도 사용됩니다."
 msgid "Alternatively, you can install it manually:"
 msgstr "혹은, 수동으로 인스톨 하실 수 있습니다:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "스왑 공간으로 스왑 아웃되는 게스트 물리적 메모리의 양, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 가상 머신 전역 고유 식별자"
@@ -1804,6 +1812,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "자동"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr ""
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "자동 로그인 (1개월)"
@@ -1925,6 +1941,10 @@ msgstr "배경색"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "배경 이미지"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -3198,6 +3218,11 @@ msgstr "그래프 \"%3$s\"의 Y축의 최소값으로 이용되고 있는 \"%2$s
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -5254,6 +5279,14 @@ msgstr "유지 관리 생성 및 편집"
 msgid "Create and edit maps"
 msgstr "맵 생성 및 수정"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "배경 생성"
@@ -5860,6 +5893,11 @@ msgstr "데이터베이스 TLS 암호화"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "데이터베이스 TLS 키 파일"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr ""
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -7915,6 +7953,10 @@ msgstr "테이블 \"%1$s\"의 검색 리퀘스트를 실패하였습니다."
 msgid "Error message"
 msgstr "에러 메세지"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -8934,6 +8976,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "그래프를 삭제하였습니다"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -8979,6 +9025,10 @@ msgstr "그래프 프로토타입을 추가하였습니다"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "그래프 프로토타입을 삭제하였습니다"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11095,6 +11145,10 @@ msgstr "증가"
 msgid "Indefinitely"
 msgstr "무기한"
 
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
 msgstr "지표"
@@ -11852,6 +11906,10 @@ msgstr "아이템"
 #: items.php:667
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
+
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -13507,6 +13565,10 @@ msgstr "메소드를 찾을 수 없습니다."
 msgid "Methods"
 msgstr "방법"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "마이크로소프트 엣지"
@@ -14183,6 +14245,14 @@ msgstr "새로운 이벤트 태그의 값"
 msgid "New excluded downtime"
 msgstr "새로 제외된 가동 중지 시간"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "새 호스트"
@@ -14204,6 +14274,10 @@ msgstr "새 항목 프로토타입"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "신규 메인터넌스 기간"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -16609,6 +16683,10 @@ msgstr "프로메테우스에서 JSON으로"
 msgid "Properties"
 msgstr "속성"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "프로토콜"
@@ -18941,6 +19019,12 @@ msgstr "헤더 표시"
 msgid "Show hosts in maintenance"
 msgstr "메인터넌스중 호스트 보이기"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "라벨 표시"
@@ -18958,6 +19042,14 @@ msgstr "범례 보이기"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "표시할 행 수"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19415,6 +19507,10 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "고정"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Zabbix 쓰기 캐시의 통계 및 가용성. 캐시 - 값 중 하나(모드: all, float, uint, str, log, text, 지원되지 않음), 기록(모드: pfree, free, total, used, pused), 인덱스(모드: pfree, free, total, used , pused), 추세(모드: pfree, free, total, used, pused)."
@@ -19422,6 +19518,10 @@ msgstr "Zabbix 쓰기 캐시의 통계 및 가용성. 캐시 - 값 중 하나(�
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "프록시 메모리 버퍼의 통계 및 가용성. 모드(모드: pfree, free, total, Used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -24178,6 +24278,18 @@ msgstr "ascii() - 값의 가장 왼쪽 문자의 ASCII 코드를 반환합니다
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - 라디안으로 표현되는 각도 값의 아크사인"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24233,6 +24345,10 @@ msgstr "baselinewma() - 계절의 데이터 기간을 평균하여 기준선을 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - 값이 주어진 범위에 속하는지 확인합니다(1 - 범위 내, 0 - 그렇지 않은 경우)."
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -24753,6 +24869,10 @@ msgstr "존재함"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - 값의 거듭제곱에서의 오일러 수"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - 값에서 1을 뺀 값의 오일러 수"
@@ -24877,6 +24997,10 @@ msgstr "호스트 그룹"
 msgid "host group with the same UUID already exists"
 msgstr "동일한 UUID를 가진 호스트 그룹이 이미 존재함"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -24894,6 +25018,10 @@ msgstr "호스트 패턴"
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "동일한 UUID를 가진 호스트 프로토타입이 이미 존재함"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -24954,6 +25082,10 @@ msgstr "요소의 수가 올바르지 않습니다"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "\"%1$s\"부터 잘못된 표현"
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25514,6 +25646,14 @@ msgstr "증상 장애를 원인 장애로 변환할 권한이 없음"
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
 msgstr "지도를 만들고 편집할 수 있는 권한이 없음"
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
@@ -26374,6 +26514,14 @@ msgstr[0] ""
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "값은 \"%1$s\"에서 \"%2$s\" 사이여야 함"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

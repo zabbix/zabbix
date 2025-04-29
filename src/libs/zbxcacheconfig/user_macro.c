@@ -412,6 +412,8 @@ static void	dc_kvs_path_remove(zbx_dc_kvs_path_t *kvs_path)
 
 	zbx_hashset_destroy(&kvs_path->kvs);
 	dc_strpool_release(kvs_path->path);
+	if (NULL != kvs_path->last_error)
+		dc_strpool_release(kvs_path->last_error);
 
 	dbconfig_shmem_free_func(kvs_path);
 }
@@ -491,6 +493,7 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location,
 	{
 		kvs_path = (zbx_dc_kvs_path_t *)dbconfig_shmem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
 		kvs_path->path = dc_strpool_intern(path);
+		kvs_path->last_error = NULL;
 		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
 				dbconfig_shmem_malloc_func, dbconfig_shmem_realloc_func, dbconfig_shmem_free_func);
 
@@ -1024,9 +1027,8 @@ static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *
 		const char *macro, const zbx_um_macro_t **um_macro)
 {
 	char		*name = NULL, *context = NULL;
-	unsigned char	context_op;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, &context_op))
+	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, NULL))
 		return;
 
 	/* User macros should be expanded according to the following priority: */

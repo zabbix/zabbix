@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormMacros.php';
+require_once __DIR__.'/../common/testFormMacros.php';
 
 /**
  * @onBefore prepareDiscoveredHostMacrosData

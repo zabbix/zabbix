@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
+require_once __DIR__.'/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
@@ -25,7 +25,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 
 	public $source = 'graph';
 
-	protected $link = 'graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
+	protected $link = 'zabbix.php?action=graph.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
 	protected static $host_druleids;
 
@@ -142,8 +142,8 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 * @dataProvider getGraphPrototypesSortingData
 	 */
 	public function testPageGraphPrototypes_Sorting($data) {
-		$this->page->login()->open('graphs.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=graph.prototype.list&context=host&sort='.$data['sort'].
+				'&sortorder=ASC&parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 

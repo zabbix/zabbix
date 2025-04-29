@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * Test checks the objects created by LLD and then no more discovered or/and disabled.
@@ -363,7 +363,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			[
 				[
 					'object' => 'graph',
-					'url' => 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D='
 				]
 			]
 		];
