@@ -163,7 +163,7 @@ if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_
 		$oauth_status[] = makeErrorIcon(_('Refresh token is invalid or outdated.'));
 	}
 
-	// Add input elements after icon to prevent left maring because icon will be not first child.
+	// Add input elements after icon to prevent left margin because icon will be not first child.
 	$oauth_status = array_merge($oauth_status, [
 		(new CVar('redirection_url', $data['redirection_url']))->removeId(),
 		(new CVar('client_id', $data['client_id']))->removeId(),
