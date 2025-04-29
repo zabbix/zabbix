@@ -1239,8 +1239,7 @@ class CItem extends CItemGeneral {
 			$parent_indexes = array_flip(array_column($items, 'itemid'));
 			$upd_items = [];
 
-			foreach ($upd_db_items as &$upd_db_item) {
-			//	$upd_db_item['update_template_cache'] = true;
+			foreach ($upd_db_items as $upd_db_item) {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
 
@@ -1257,7 +1256,6 @@ class CItem extends CItemGeneral {
 
 				$upd_items[] = $upd_item;
 			}
-			unset($upd_db_item);
 
 			self::addAffectedObjects($upd_items, $upd_db_items);
 		}
@@ -1343,7 +1341,7 @@ class CItem extends CItemGeneral {
 		$result = DBselect(DB::makeSql('items', $options));
 
 		while ($row = DBfetch($result)) {
-			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];// + ['update_template_cache' => true];
+			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
 		}
 
 		$upd_items = [];

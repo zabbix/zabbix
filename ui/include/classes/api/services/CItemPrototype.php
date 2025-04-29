@@ -1184,7 +1184,7 @@ class CItemPrototype extends CItemGeneral {
 		$result = DBselect(DB::makeSql('items', $options));
 
 		while ($row = DBfetch($result)) {
-			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];// + ['update_template_cache' => true];
+			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
 		}
 
 		$upd_items = [];
