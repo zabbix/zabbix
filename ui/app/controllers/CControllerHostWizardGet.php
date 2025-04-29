@@ -175,12 +175,6 @@ class CControllerHostWizardGet extends CController {
 					continue;
 				}
 
-				// Converts list and checkbox config type options to array.
-				if ($tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_LIST
-						|| $tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
-					$tmpl_macro['config']['options'] = json_decode($tmpl_macro['config']['options'], true);
-				}
-
 				// Use host macro value if macro name matches.
 				foreach ($host['macros'] as $host_macro) {
 					if ($tmpl_macro['macro'] === $host_macro['macro']) {
