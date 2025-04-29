@@ -117,7 +117,7 @@ class CControllerHostWizardGet extends CController {
 		$template = $templates[0];
 
 		$parsedown = (new Parsedown())
-			->setMarkupEscaped(true);
+			->setSafeMode(true);
 
 		if ($template['readme'] !== '') {
 			$template['readme'] = $parsedown->text($template['readme']);
