@@ -91,6 +91,27 @@ class testMediatype extends CAPITest {
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be 0.'
+			],
+			'OAuth redirection_url shold be valid URL' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth with tokens',
+					'redirection_url' => '    '
+				]],
+				'Invalid parameter "/1/redirection_url": unacceptable URL.'
+			],
+			'OAuth authorization_url shold be valid URL' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth with tokens',
+					'authorization_url' => '/relative/url'
+				]],
+				'Invalid parameter "/1/authorization_url": unacceptable URL.'
+			],
+			'OAuth token_url shold be valid URL' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth with tokens',
+					'token_url' => 'https://'
+				]],
+				'Invalid parameter "/1/token_url": unacceptable URL.'
 			]
 		];
 	}
