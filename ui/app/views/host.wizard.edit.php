@@ -70,7 +70,7 @@ $output = [
 			'templates' => $data['templates'],
 			'linked_templates' => $data['linked_templates'],
 			'wizard_hide_welcome' => $data['wizard_hide_welcome'],
-			'csrf_token' => CCsrfTokenHelper::get('host-wizard')
+			'csrf_token' => CCsrfTokenHelper::get('host')
 		]).');',
 	'dialogue_class' => 'modal-popup-host-wizard'
 ];
