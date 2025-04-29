@@ -168,7 +168,6 @@ window.widget_topitems_form = new class {
 					this.#triggerUpdate();
 				});
 
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'edit':
@@ -193,7 +192,6 @@ window.widget_topitems_form = new class {
 					this.#triggerUpdate();
 				});
 
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'remove':
@@ -292,11 +290,6 @@ window.widget_topitems_form = new class {
 		input.setAttribute('name', name);
 		input.setAttribute('value', value);
 
-		return input
-	}
-
-	// Need to remove function after sub-popups auto close.
-	#removeColorpicker() {
-		$('#color_picker').hide();
+		return input;
 	}
 };
