@@ -102,7 +102,6 @@ foreach ($certs as $key => $cert) {
 	$cert_value = Utils::getStringBetween($cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
 	$certs[$key] = Utils::formatCert($cert_value !== '' ? $cert_value : $cert);
 }
-unset($cert);
 
 $settings = [
 	'sp' => [
