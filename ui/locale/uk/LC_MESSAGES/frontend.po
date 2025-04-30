@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-12 06:04+0000\n"
-"Last-Translator: Yurii Denys <yurii.denys@meest.com>\n"
+"PO-Revision-Date: 2024-12-17 05:38+0000\n"
+"Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -87,12 +87,12 @@ msgstr "%1$d співпадінь для %2$s знайдено"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "Показано %1$d з %1$d+ вузлів мережі"
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "Показано %1$d із %1$d+ елементів"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -213,12 +213,12 @@ msgstr[2] "%1$s з %2$s елементів в стані проблеми"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s або %2$s - дозволяє відображати сторінку лише у кадрі з того самого джерела, що й сама сторінка"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s або %2$s - запобігає відображенню сторінки у фреймі, незалежно від того, який сайт намагається це зробити"
 
 #: jsLoader.php:341
 #, c-format
@@ -1172,7 +1172,7 @@ msgstr "Розширені опції"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Після"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1399,6 +1399,14 @@ msgstr "Також використовується як мітка легенд
 #: include/classes/setup/CSetupWizard.php:1034
 msgid "Alternatively, you can install it manually:"
 msgstr "Альтернативно, ви можете встановити його вручну:"
+
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1855,6 +1863,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Авто"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr ""
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "Авто-вхід"
@@ -1948,7 +1964,7 @@ msgstr "Уникайте паролів, які легко вгадати"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Очікуються дані"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -1976,6 +1992,10 @@ msgstr "Колір фону"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Фонове зображення"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2146,7 +2166,7 @@ msgstr "Перемістити на самий перед"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Браузер"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2732,6 +2752,11 @@ msgstr ""
 msgid "Cannot delete default user directory."
 msgstr "Неможливо видалити каталог користувача за замовчуванням."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2739,6 +2764,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Не вдалося видалити правило виявлення"
 msgstr[1] "Не вдалося видалити правила виявлення"
 msgstr[2] "Не вдалося видалити правила виявлення"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2771,6 +2801,11 @@ msgstr[0] "Не вдалося видалити вузел мережі"
 msgstr[1] "Не вдалося видалити вузел мережі"
 msgstr[2] "Не вдалося видалити вузел мережі"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2785,6 +2820,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Не вдалося видалити групу вузлів мережі"
 msgstr[1] "Не вдалося видалити групи вузлів мережі"
 msgstr[2] "Не вдалося видалити групи вузлів мережі"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2947,6 +2987,11 @@ msgstr[0] "Не вдалося видалити шаблон"
 msgstr[1] "Не вдалося видалити шаблон"
 msgstr[2] "Не вдалося видалити шаблон"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2985,6 +3030,11 @@ msgstr[0] "Не вдалося видалити тригер"
 msgstr[1] "Не вдалося видалити тригер"
 msgstr[2] "Не вдалося видалити тригер"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 #, fuzzy
 msgid "Cannot delete trigger prototype"
@@ -3011,6 +3061,16 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] "Не вдалося видалити групу користувачів"
 msgstr[1] "Не вдалося видалити групи користувачів"
 msgstr[2] "Не вдалося видалити групи користувачів"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3348,6 +3408,11 @@ msgstr "Не вдалося знайти елемент даних \"%1$s\" в \
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не вдалося знайти елемент даних \"%1$s\" в \"%2$s\", який використовується як MIN значення вісі Y в прототипі графіку \"%3$s\" правила виявлення \"%4$s\" на \"%5$s\"."
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -4033,6 +4098,11 @@ msgstr "Не вдалося оновити \"%1$s\" для шаблонного 
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для шаблонного прототипу графіка \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4543,6 +4613,10 @@ msgstr "Перевіряє доступність DNS сервісу. Повер
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Перевіряє наявність файлу. Повертає 0 - не знайдено; 1 - файл зазначеного типу існує"
 
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
+
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "Перевіряє, чи хост доступний за допомогою ICMP ping. 0 – ICMP ping невдача. 1 – ICMP ping успішний."
@@ -4643,7 +4717,7 @@ msgstr "Клацніть для перегляду або редагування
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
-msgstr ""
+msgstr "ID клієнта"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
@@ -4735,7 +4809,7 @@ msgstr "Закрити проблеми"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
-msgstr ""
+msgstr "Довжина коду"
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -4783,7 +4857,7 @@ msgstr "Колір (ОК)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Інтерполяція кольорів"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5306,7 +5380,7 @@ msgstr "Ім'я контексту"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "Продовжити"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5438,6 +5512,14 @@ msgstr "Створити та редагувати обслуговування"
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
 msgstr "Створити та редагувати мапи"
+
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -5860,7 +5942,7 @@ msgstr "Щодня"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "Датська (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -6047,6 +6129,11 @@ msgstr "Шифрування бази даних TLS"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "Ключовий файл бази даних TLS"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr ""
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6744,6 +6831,22 @@ msgstr "Видалити веб сценарій?"
 msgid "Deleted"
 msgstr "Видалено"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Розділювач"
@@ -7378,6 +7481,10 @@ msgstr ""
 msgid "Display local time"
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -7432,7 +7539,7 @@ msgstr "Знаменник ділення"
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.item.prototype.edit.php:854
 msgid "Do not store"
-msgstr ""
+msgstr "Не зберігати"
 
 #: jsLoader.php:213 jsLoader.php:358
 msgid "Do you wish to replace the conditional expression?"
@@ -7535,7 +7642,7 @@ msgstr "Стиль креслення"
 
 #: app/views/administration.script.edit.php:353
 msgid "Dropdown"
-msgstr ""
+msgstr "Спадний список"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
@@ -7734,7 +7841,7 @@ msgstr "Пустий ID карти мережі."
 
 #: widgets/itemhistory/Widget.php:32
 msgid "Empty value."
-msgstr ""
+msgstr "Порожнє значення."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -7831,7 +7938,7 @@ msgstr "Активувати внутрішню очистку"
 
 #: app/views/administration.authentication.edit.php:564
 msgid "Enable multi-factor authentication"
-msgstr ""
+msgstr "Увімкніть багатофакторну автентифікацію"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -8086,6 +8193,10 @@ msgstr "Помилка в запиті пошуку в таблиці \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Повідомлення про помилку"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8966,7 +9077,7 @@ msgstr "Наданий вираз це не макрос"
 #: include/views/configuration.item.edit.php:866
 #: include/views/configuration.item.prototype.edit.php:820
 msgid "Global"
-msgstr ""
+msgstr "Глобальний"
 
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
@@ -9119,6 +9230,10 @@ msgstr[0] "Графік видалено"
 msgstr[1] "Графік видалено"
 msgstr[2] "Графік видалено"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9167,6 +9282,10 @@ msgid_plural "Graph prototypes deleted"
 msgstr[0] "Прототип графіків видалено"
 msgstr[1] "Прототип графіків видалено"
 msgstr[2] "Прототип графіків видалено"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9554,6 +9673,10 @@ msgstr "Вибір даних історії"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Функції історії"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -11302,6 +11425,10 @@ msgstr "Збільшити на"
 msgid "Indefinitely"
 msgstr "Безстроково"
 
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
 msgstr "Індикатори"
@@ -12060,6 +12187,10 @@ msgstr "Елемент даних"
 msgid "Item added"
 msgstr "Елемент додано"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
@@ -12076,12 +12207,11 @@ msgid "Item count"
 msgstr "Кількість елементів даних"
 
 #: items.php:524 items.php:735
-#, fuzzy
 msgid "Item deleted"
 msgid_plural "Items deleted"
 msgstr[0] "Елемент даних видалено"
-msgstr[1] "Елемент даних видалено"
-msgstr[2] "Елемент даних видалено"
+msgstr[1] "Елементи даних видалено"
+msgstr[2] "Елементи даних видалено"
 
 #: items.php:708
 msgid "Item disabled"
@@ -12307,11 +12437,11 @@ msgstr "Інтерфейси JMX"
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
-msgstr ""
+msgstr "JSON"
 
 #: include/classes/mvc/CController.php:240
 msgid "JSON array input is expected."
-msgstr ""
+msgstr "Очікується вхідний масив JSON."
 
 #: app/views/popup.massupdate.item.php:92
 #: include/views/configuration.host.discovery.edit.php:285
@@ -12322,7 +12452,7 @@ msgstr "JSON дані"
 
 #: include/classes/validators/CApiInputValidator.php:3982
 msgid "JSON is expected"
-msgstr ""
+msgstr "Очікується JSON"
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -12331,7 +12461,7 @@ msgstr "очікувався JSON рядок"
 #: include/classes/core/CJsonRpc.php:175
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося створити помилку JSON-RPC. Немає такої помилки \"%1$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:702
 #: include/items.inc.php:1550
@@ -13681,6 +13811,10 @@ msgstr ""
 msgid "Menu path"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr ""
@@ -13747,6 +13881,10 @@ msgstr "Метод не знайдено."
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
+msgstr ""
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
 msgstr ""
 
 #: include/httptest.inc.php:392
@@ -14438,6 +14576,14 @@ msgstr "Значення тегу нової події"
 msgid "New excluded downtime"
 msgstr ""
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr ""
@@ -14458,6 +14604,10 @@ msgstr ""
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
+msgstr ""
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
 msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
@@ -16866,6 +17016,10 @@ msgstr "Prometheus в JSON"
 msgid "Properties"
 msgstr "Властивості"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr ""
@@ -17797,6 +17951,10 @@ msgstr "Скинути по замовчуванню"
 msgid "Reset to initial view"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Вирішено"
@@ -18047,6 +18205,11 @@ msgstr ""
 #: include/actions.inc.php:591
 #, c-format
 msgid "Run script \"%1$s\" on current host"
+msgstr ""
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
 msgstr ""
 
 #: include/actions.inc.php:622
@@ -19212,6 +19375,12 @@ msgstr ""
 msgid "Show hosts in maintenance"
 msgstr "Відображувати вузли мережі в періодах сервісу"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr ""
@@ -19229,6 +19398,14 @@ msgstr "Відображувати легенду"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Відображувати лінії"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19686,12 +19863,20 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Статично"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -20733,6 +20918,14 @@ msgstr "Тема інтерфейсу"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr ""
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20782,6 +20975,10 @@ msgstr ""
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:129
@@ -23019,6 +23216,10 @@ msgstr ""
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr ""
@@ -24082,6 +24283,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix сервер (проксі)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сервер не запущено: відображувана інформація може бути не актуальною."
@@ -24097,6 +24306,10 @@ msgstr "Ім'я Zabbix сервера"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
 msgstr ""
 
 #: include/items.inc.php:92
@@ -24267,6 +24480,41 @@ msgstr ""
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr ""
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24433,6 +24681,18 @@ msgstr ""
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24487,6 +24747,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
 msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:149
@@ -25007,6 +25271,10 @@ msgstr ""
 msgid "exp() - Euler's number at a power of a value"
 msgstr ""
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
@@ -25036,6 +25304,10 @@ msgstr "перший"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
@@ -25127,6 +25399,10 @@ msgstr "група вузлів мережі"
 msgid "host group with the same UUID already exists"
 msgstr ""
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -25143,6 +25419,10 @@ msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
 msgstr ""
 
 #: include/classes/api/services/CMap.php:844
@@ -25203,6 +25483,10 @@ msgstr "некоректна кількість елементів"
 #: include/classes/parsers/CExpressionParser.php:140
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
+msgstr ""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
 msgstr ""
 
 #: include/classes/api/services/CAction.php:2851
@@ -25435,6 +25719,10 @@ msgstr "ост."
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Останнє (найбільш недавнє) значення Т"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "зліва"
@@ -25469,6 +25757,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
@@ -25755,6 +26047,14 @@ msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
 msgstr ""
 
 #: include/classes/api/services/CEvent.php:1566
@@ -26617,6 +26917,14 @@ msgstr[2] ""
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
+msgstr ""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676

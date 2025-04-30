@@ -21,8 +21,11 @@
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"
+#include "zbxalgo.h"
 
 #include <signal.h>
+
+ZBX_VECTOR_IMPL(fping_host, zbx_fping_host_t)
 
 static const zbx_config_icmpping_t	*config_icmpping;
 
@@ -54,6 +57,7 @@ typedef struct
 	int			requests_count;
 	unsigned char		allow_redirect;
 	int			rdns;
+	int			retries;
 #ifdef HAVE_IPV6
 #	define FPING_EXISTS	0x1
 #	define FPING6_EXISTS	0x2
@@ -141,6 +145,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	fd = mkstemp(filename);
 	umask(mode);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "prepare fping input file %s", filename);
+
 	if (-1 == fd)
 	{
 		zbx_snprintf(error, max_error_len, "Cannot create temporary file \"%s\": %s", filename,
@@ -163,6 +169,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 		(void)close(fd);
 		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "    %s", address);
 
 	if (n != (ssize_t)len)
 	{
@@ -225,7 +233,7 @@ out:
  *                                      down                                  *
  *                                   1: redirected response is not treated    *
  *                                      as host                               *
- *             linebuf        - [IN]    bufuer containing fping output line   *
+ *             linebuf        - [IN]    buffer containing fping output line   *
  *                                                                            *
  * Return value: SUCCEED - no redirect was detected or                        *
  *                         redirect was detected and redirect is allowed      *
@@ -688,13 +696,32 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf: \"%s\"", __func__, resp->linebuf);
 
 	if (SUCCEED != redirect_detect(resp->linebuf, args->allow_redirect))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): failed redirect detection", __func__);
 		return;
+	}
 
 	if (SUCCEED != redirect_remove(resp->linebuf))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): failed redirect removal", __func__);
 		return;
+	}
 
 	if (SUCCEED != host_get(resp, args, &dnsname_len, &host))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): failed host retrieval", __func__);
 		return;
+	}
+
+	if (-1 != args->retries)
+	{
+		if (NULL != strstr(resp->linebuf, "is alive"))
+			host->rcv = 1;
+
+		host->cnt = 1;
+
+		goto out;
+	}
 
 	if (NULL == (linebuf_p = strstr(resp->linebuf, " : ")))
 		return;
@@ -721,7 +748,7 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 		/* 8.8.8.8 : 91.7 37.0 29.2 − 36.8                                                        */
 		stats_calc(linebuf_p, host, args);
 	}
-
+out:
 	if (0 != args->rdns && (NULL == host->dnsname || ('\0' == *host->dnsname && 0 != dnsname_len)))
 	{
 		host->dnsname = zbx_dsprintf(host->dnsname, "%.*s", (int)dnsname_len, resp->linebuf);
@@ -777,7 +804,8 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 }
 
 static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int interval, int size,
-		int timeout, unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
+		int timeout, int retries, double backoff, unsigned char allow_redirect, int rdns, char *error,
+		size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
@@ -785,7 +813,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	char		filename[MAX_STRING_LEN];
 	char		*linebuf = NULL;
 	size_t		linebuf_size;
-	size_t		offset;
+	size_t		offset = 0;
 	int 		i, ret = NOTSUPPORTED, rc;
 	sigset_t	mask, orig_mask;
 	zbx_fping_args	fping_args;
@@ -864,14 +892,19 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 		fping_existence |= FPING6_EXISTS;
 #endif	/* HAVE_IPV6 */
 
-	offset = zbx_snprintf(params, sizeof(params), "-C%d", requests_count);
-	if (0 != interval)
+	if (0 < requests_count)
+		offset += zbx_snprintf(params, sizeof(params), "-C%d", requests_count);
+	if (0 < interval)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -p%d", interval);
-	if (0 != size)
+	if (0 < retries)
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, "-r%d", retries);
+	if (0 < backoff)
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -B%.1f", backoff);
+	if (0 < size)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -b%d", size);
-	if (0 != timeout)
+	if (0 < timeout)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
-	if (0 != rdns)
+	if (0 < rdns)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -dA");
 
 #ifdef HAVE_IPV6
@@ -1080,7 +1113,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", filename);
+	zabbix_log(LOG_LEVEL_DEBUG, "prepare fping input file %s", filename);
 
 	for (i = 0; i < hosts_count; i++)
 	{
@@ -1117,9 +1150,12 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 
 	fping_args.hosts = hosts;
 	fping_args.hosts_count = hosts_count;
-	fping_args.requests_count = requests_count;
+
+	/* reserve one output slot when retries are used */
+	fping_args.requests_count = (-1 == retries ? requests_count : 1);
 	fping_args.allow_redirect = allow_redirect;
 	fping_args.rdns = rdns;
+	fping_args.retries = retries;
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
@@ -1189,6 +1225,8 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  *             timeout        - [IN]  individual target initial timeout       *
  *                                    except when count > 1, where it's the   *
  *                                    -p period (fping option -t)             *
+ *             retries        - [IN]  number of retries                       *
+ *             backoff        - [IN]  backoff time between retries            *
  *             allow_redirect - [IN]  treat redirected response as host up:   *
  *                                    0 - no, 1 - yes                         *
  *             rdns          - [IN]  flag required rdns option                *
@@ -1201,16 +1239,19 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  *                                                                            *
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
+ *          The requests_count+period parameters are mutually exclusive with  *
+ *          retries+backoff parameters.                                       *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int period, int size, int timeout,
-		unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
+		int retries, double backoff, unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout,
-			allow_redirect, rdns, error, max_error_len)))
+	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout, retries,
+			backoff, allow_redirect, rdns, error, max_error_len)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 	}

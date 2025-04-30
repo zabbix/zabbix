@@ -41,7 +41,7 @@ type resultWriter interface {
 }
 
 type valueResult struct {
-	data interface{}
+	data any
 }
 
 func clearOle(quals *ole.VARIANT) {
@@ -102,7 +102,7 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 		return errors.New("Empty WMI search result.")
 	}
 
-	var propertyKeyFieldValue interface{}
+	var propertyKeyFieldValue any
 
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
@@ -166,27 +166,62 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 }
 
 type tableResult struct {
-	data []map[string]interface{}
+	data []map[string]any
 }
 
-func variantToValue(v *ole.VARIANT) (result interface{}) {
-	if (v.VT & ole.VT_ARRAY) == 0 {
-		ret := v.Value()
+func processValueArray(v *ole.VARIANT) []any {
+	values := v.ToArray().ToValueArray()
 
-		if dispatch, ok := ret.(*ole.IDispatch); ok {
-			prop, err := oleutil.GetProperty(dispatch, "Value")
-			if err == nil {
-				defer prop.Clear()
-				return prop.Value()
+	var result []any
+
+	for _, item := range values {
+		if s := sanitizeOLEValue(item); s != nil {
+			result = append(result, s)
+		}
+	}
+
+	return result
+}
+
+func sanitizeOLEValue(value any) any {
+	switch v := value.(type) {
+	case *ole.VARIANT:
+		return sanitizeOLEValue(v.Value())
+	case []*ole.VARIANT:
+		var sanitizedValues []any
+
+		for _, item := range v {
+			if s := sanitizeOLEValue(item); s != nil {
+				sanitizedValues = append(sanitizedValues, s)
 			}
+		}
 
+		return sanitizedValues
+	case *ole.IUnknown:
+		return nil
+	case *ole.IDispatch:
+		prop, err := oleutil.GetProperty(v, "Value")
+		if err != nil {
 			return nil
 		}
 
-		return ret
+		defer prop.Clear() //nolint:errcheck
+
+		return sanitizeOLEValue(prop.Value())
+	default:
+		return v
+	}
+}
+
+func variantToValue(v *ole.VARIANT) any {
+	if (v.VT & ole.VT_ARRAY) != 0 {
+		arr := processValueArray(v)
+		if len(arr) == 0 {
+			return nil
+		}
 	}
 
-	return v.ToArray().ToValueArray()
+	return sanitizeOLEValue(v.Value())
 }
 
 // Key Qualifier is always appended to the result from ole library. This behavior is different from agent 1 which
@@ -208,10 +243,10 @@ func (r *tableResult) write(rs *ole.IDispatch) (err error) {
 	}
 	defer clearOle(v)
 
-	r.data = make([]map[string]interface{}, 0)
+	r.data = make([]map[string]any, 0)
 
 	oleErr := oleutil.ForEach(rs, func(v *ole.VARIANT) (err error) {
-		rsRow := make(map[string]interface{})
+		rsRow := make(map[string]any)
 		row := v.ToIDispatch()
 		defer row.Release()
 
@@ -306,10 +341,10 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 // The value type depends on the column type and can one of the following:
 //
 //	nil, int64, uin64, float64, string
-func QueryValue(namespace string, query string) (value interface{}, err error) {
+func QueryValue(namespace, query string) (any, error) {
 	var r valueResult
-	if err = performQuery(namespace, query, &r); err != nil {
-		return
+	if err := performQuery(namespace, query, &r); err != nil {
+		return nil, err
 	}
 	return r.data, nil
 }
@@ -317,10 +352,10 @@ func QueryValue(namespace string, query string) (value interface{}, err error) {
 // QueryTable returns the result set returned by the query in a slice of maps, containing
 // field name, value pairs. The field values can be either nil (null value) or pointer of
 // the value in string format.
-func QueryTable(namespace string, query string) (table []map[string]interface{}, err error) {
+func QueryTable(namespace, query string) ([]map[string]any, error) {
 	var r tableResult
-	if err = performQuery(namespace, query, &r); err != nil {
-		return
+	if err := performQuery(namespace, query, &r); err != nil {
+		return nil, err
 	}
 	return r.data, nil
 }

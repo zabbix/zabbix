@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
@@ -1210,7 +1210,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		// Get the saved trigger's ID from UI.
 		$link = (array_key_exists('form_data', $data)) ? $data['form_data']['Name'] : $data['link_name'];
-		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
+		$linkElement = $this->page->query('link', $link)->one()->getAttribute('href');
+		parse_str(parse_url($linkElement, PHP_URL_QUERY), $params);
+		$triggerid = $params['triggerid'];
 
 		// Get the newly saved trigger's expression, as it is saved in the DB.
 		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);

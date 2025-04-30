@@ -25,13 +25,13 @@
 		init({eventsource}) {
 			this.eventsource = eventsource;
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
-			document.addEventListener('click', (e) => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-action-create')) {
-					window.popupManagerInstance.openPopup('action.edit', {eventsource: this.eventsource});
+					ZABBIX.PopupManager.open('action.edit', {eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-enable-action')) {
 					this.#enable(e.target, [e.target.dataset.actionid]);
@@ -49,6 +49,16 @@
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			})
+		}
+
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('action_' + this.eventsource)
+			});
 		}
 
 		#enable(target, actionids, massenable = false) {
@@ -143,21 +153,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('action_' + this.eventsource);
-				location.href = location.href;
-			});
 		}
 	};
 </script>

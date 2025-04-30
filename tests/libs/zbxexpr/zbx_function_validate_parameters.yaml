@@ -1,0 +1,56 @@
+---
+test case: "param1, param2, \"param3\""
+in:
+  expr: "param1, param2, \"param3\""
+out:
+  return: SUCCEED
+  length: 24
+---
+test case: "param1, param2, \"param3"
+in:
+  expr: "param1, param2, \"param3"
+out:
+  return: FAIL
+---
+test case: "$,30"
+in:
+  expr: "$,30"
+out:
+  return: SUCCEED
+  length: 4
+---
+test case: "#"
+in:
+  expr: "#"
+out:
+  return: SUCCEED
+  length: 1
+---
+test case: "$,5m"
+in:
+  expr: "$,5m"
+out:
+  return: SUCCEED
+  length: 4
+---
+test case: '$,#1,"eq","{$FAN_CRIT_STATUS}""'
+in:
+  expr: '$,#1,"eq","{$FAN_CRIT_STATUS}"'
+out:
+  return: SUCCEED
+  length: 30
+---
+test case: '$,#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}"'
+in:
+  expr: '$$,#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}"'
+out:
+  return: SUCCEED
+  length: 57
+---
+test case: '$,{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
+in:
+  expr: '$,{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
+out:
+  return: SUCCEED
+  length: 41
+...

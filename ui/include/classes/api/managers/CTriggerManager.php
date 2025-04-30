@@ -48,63 +48,9 @@ class CTriggerManager {
 
 		$del_triggerids = array_keys($del_triggerids);
 
-		// Disable actions.
-		$actionids = [];
-		$conditionids = [];
+		self::checkUsedInActions($del_triggerids);
 
-		$db_actions = DBselect(
-			'SELECT ac.conditionid,ac.actionid'.
-			' FROM conditions ac'.
-			' WHERE ac.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
-				' AND '.dbConditionString('ac.value', $del_triggerids)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$conditionids[] = $db_action['conditionid'];
-			$actionids[$db_action['actionid']] = true;
-		}
-
-		if ($actionids) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => array_keys($actionids)]
-			]);
-
-			// Delete action conditions.
-			DB::delete('conditions', ['conditionid' => $conditionids]);
-		}
-
-		// Remove trigger sysmap elements.
-		$selement_triggerids = [];
-		$selementids = [];
-
-		$db_selement_triggers = DBselect(
-			'SELECT st.selement_triggerid,st.selementid'.
-			' FROM sysmap_element_trigger st'.
-			' WHERE '.dbConditionInt('st.triggerid', $del_triggerids)
-		);
-
-		while ($db_selement_trigger = DBfetch($db_selement_triggers)) {
-			$selement_triggerids[] = $db_selement_trigger['selement_triggerid'];
-			$selementids[$db_selement_trigger['selementid']] = true;
-		}
-
-		if ($selement_triggerids) {
-			DB::delete('sysmap_element_trigger', ['selement_triggerid' => $selement_triggerids]);
-
-			// Remove map elements without triggers.
-			$db_selement_triggers = DBselect(
-				'SELECT DISTINCT st.selementid'.
-				' FROM sysmap_element_trigger st'.
-				' WHERE '.dbConditionInt('st.selementid', array_keys($selementids))
-			);
-			while ($db_selement_trigger = DBfetch($db_selement_triggers)) {
-				unset($selementids[$db_selement_trigger['selementid']]);
-			}
-
-			if ($selementids) {
-				DB::delete('sysmaps_elements', ['selementid' => array_keys($selementids)]);
-			}
-		}
+		API::Map()->unlinkTriggers($del_triggerids);
 
 		// Remove related events.
 		$ins_housekeeper = [];
@@ -129,5 +75,26 @@ class CTriggerManager {
 			'where' => ['triggerid' => $del_triggerids]
 		]);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
+	}
+
+	/**
+	 * @throws APIException
+	 */
+	private static function checkUsedInActions(array $del_triggerids): void {
+		$row = DBfetch(DBselect(
+			'SELECT a.name,t.description'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' JOIN triggers t ON '.zbx_dbcast_2bigint('c.value').'=t.triggerid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+				' AND '.dbConditionString('c.value', $del_triggerids),
+			1
+		));
+
+		if ($row) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete trigger "%1$s": %2$s.',
+				$row['description'], _s('action "%1$s" uses this trigger', $row['name'])
+			));
+		}
 	}
 }

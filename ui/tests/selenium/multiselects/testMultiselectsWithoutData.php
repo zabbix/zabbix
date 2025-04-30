@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
+require_once __DIR__.'/../common/testMultiselectDialogs.php';
 
 /**
  * Test for checking empty multiselects' overlays.
@@ -631,8 +631,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'graph',
-					'url' => 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D=',
-					'form' => 'name:graphForm'
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B0%5D=',
+					'form' => 'id:graph-form',
+					'overlay_form' => true
 				]
 			],
 			// #4.
@@ -660,8 +661,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'graph prototype',
-					'url' => 'graphs.php?context=host&parent_discoveryid=',
-					'form' => 'name:graphForm'
+					'url' => 'zabbix.php?action=graph.prototype.list&context=host&parent_discoveryid=',
+					'form' => 'id:graph-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// #7.
@@ -710,8 +712,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'graph',
-					'url' => 'graphs.php?filter_set=1&context=template&filter_hostids%5B0%5D=',
-					'form' => 'name:graphForm'
+					'url' => 'zabbix.php?action=graph.list&context=template&filter_set=1&filter_hostids%5B%5D=',
+					'form' => 'id:graph-form',
+					'overlay_form' => true
 				]
 			],
 			// #12.
@@ -740,8 +743,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'graph prototype',
-					'url' => 'graphs.php?context=template&parent_discoveryid=',
-					'form' => 'name:graphForm'
+					'url' => 'zabbix.php?action=graph.prototype.list&context=template&parent_discoveryid=',
+					'form' => 'id:graph-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// #15.
@@ -759,6 +763,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	 * Test function for checking the cases where no any item available for creating the entity like trigger, graph, etc.
 	 *
 	 * @dataProvider getCheckEmptyItemsData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testMultiselectsWithoutData_CheckEmptyItems($data) {
 		$context_host = str_contains($data['url'], 'context=host');

@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * Base class for Macros tests.
@@ -2364,8 +2364,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public function selectVault($vault) {
 		$vaultid = ($vault === 'Hashicorp') ? 0 : 1;
 
-		if ($vaultid !== CDBHelper::getValue('SELECT vault_provider FROM config')) {
-			DBexecute('UPDATE config SET vault_provider='.zbx_dbstr($vaultid));
+		if ($vaultid !== CDBHelper::getValue('SELECT value_int FROM settings WHERE name=\'vault_provider\'')) {
+			DBexecute('UPDATE settings SET value_int='.zbx_dbstr($vaultid).' WHERE name=\'vault_provider\'');
 		}
 	}
 

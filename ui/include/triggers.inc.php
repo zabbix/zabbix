@@ -629,7 +629,7 @@ function make_trigger_details($trigger, $eventid) {
  *
  * @return array|bool
  */
-function analyzeExpression(string $expression, int $type, string &$error = null) {
+function analyzeExpression(string $expression, int $type, ?string &$error = null) {
 	if ($expression === '') {
 		return ['', null];
 	}
@@ -993,7 +993,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
  *
  * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expression_id, $action, $new_expression, string &$error = null) {
+function remakeExpression($expression, $expression_id, $action, $new_expression, ?string &$error = null) {
 	if ($expression === '') {
 		return false;
 	}
@@ -1262,13 +1262,16 @@ function get_item_function_info(string $expr) {
 		'countunique' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'find' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'first' => $rules['numeric'] + $rules['string'],
+		'firstclock' => $rules['numeric'] + $rules['string'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'kurtosis' => $rules['numeric_as_float'],
 		'last' => $rules['numeric'] + $rules['string'],
+		'lastclock' => $rules['numeric'] + $rules['string'],
 		'logeventid' => $rules['log_as_0or1'],
 		'logseverity' => $rules['log_as_uint'],
 		'logsource' => $rules['log_as_0or1'],
+		'logtimestamp' => $rules['log_as_0or1'],
 		'mad' => $rules['numeric_as_float'],
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
@@ -1645,7 +1648,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 /**
  * Get parent templates for each given trigger.
  *
- * @param $array $triggers                  An array of triggers.
+ * @param array  $triggers                  An array of triggers.
  * @param string $triggers[]['triggerid']   ID of a trigger.
  * @param string $triggers[]['templateid']  ID of parent template trigger.
  * @param int    $flag                      Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or
@@ -1886,7 +1889,6 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 
 				$name = (new CLink($template['name'], $trigger_url))
 					->addClass('js-related-trigger-edit')
-					->setAttribute('data-action', $prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit')
 					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 					->setAttribute('data-context', 'template')
 					->setAttribute($attribute_name, $attribute_value);

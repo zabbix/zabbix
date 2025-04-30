@@ -20,7 +20,7 @@
 
 		init({default_inventory_mode, iframe_sandboxing_enabled, iframe_sandboxing_exceptions, login_attempts,
 				login_block, snmptrap_logging, uri_valid_schemes, url, validate_uri_schemes, vault_provider,
-				x_frame_options}) {
+				proxy_secrets_provider, x_frame_options}) {
 			const $form = jQuery('#miscconfig-form');
 
 			$('#validate_uri_schemes').change(function() {
@@ -74,6 +74,8 @@
 
 								// Storage of secrets.
 								$(`#vault_provider input[value=${vault_provider}]`).prop('checked', true);
+								$(`#proxy_secrets_provider input[value=${proxy_secrets_provider}]`)
+									.prop('checked', true);
 
 								// Security.
 								$('#validate_uri_schemes')
@@ -81,9 +83,7 @@
 									.change();
 								$('#uri_valid_schemes').val(uri_valid_schemes);
 								$('#x_frame_header_enabled')
-									.prop('checked',
-										<?= DB::getDefault('config', 'x_frame_options') === 'null' ? 'false' : 'true' ?>
-									)
+									.prop('checked', x_frame_options !== 'null')
 									.change();
 								$('#x_frame_options').val(x_frame_options);
 								$('#iframe_sandboxing_enabled')

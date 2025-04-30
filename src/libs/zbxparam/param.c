@@ -452,13 +452,13 @@ char	*zbx_get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *ty
  *                                                                            *
  ******************************************************************************/
 static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
-		zbx_replace_key_param_f cb, void *cb_data)
+		zbx_replace_key_param_f replace_key_param_cb, void *replace_key_param_cb_data)
 {
 	char	c = (*data)[*r], *param = NULL;
 	int	ret;
 
 	(*data)[*r] = '\0';
-	ret = cb(*data + l, key_type, level, num, quoted, cb_data, &param);
+	ret = replace_key_param_cb(*data + l, key_type, level, num, quoted, replace_key_param_cb_data, &param);
 	(*data)[*r] = c;
 
 	if (NULL != param)
@@ -479,19 +479,19 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *          callback function                                                 *
  *                                                                            *
  * Parameters:                                                                *
- *      data      - [IN/OUT] item key or SNMP OID                             *
- *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
- *      cb        - [IN] callback function                                    *
- *      cb_data   - [IN] callback function custom data                        *
- *      error     - [OUT] error message                                       *
- *      maxerrlen - [IN] error size                                           *
+ *      data                      - [IN/OUT] item key or SNMP OID             *
+ *      key_type                  - [IN] ZBX_KEY_TYPE_*                       *
+ *      replace_key_param_cb      - [IN] callback function                    *
+ *      replace_key_param_cb_data - [IN] callback function custom data        *
+ *      error                     - [OUT]                                     *
+ *      maxerrlen                 - [IN]                                      *
  *                                                                            *
  * Return value: SUCCEED - function executed successfully                     *
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_f cb, void *cb_data, char *error,
-		size_t maxerrlen)
+int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_f replace_key_param_cb,
+		void *replace_key_param_cb_data, char *error, size_t maxerrlen)
 {
 	typedef enum
 	{
@@ -543,7 +543,7 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 		}
 	}
 
-	ret = replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
+	ret = replace_key_param(data, key_type, 0, &i, level, num, 0, replace_key_param_cb, replace_key_param_cb_data);
 
 	for (; '\0' != (*data)[i] && FAIL != ret; i++)
 	{
@@ -555,8 +555,8 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 					case ' ':
 						break;
 					case ',':
-						ret = replace_key_param(data, key_type, i, &i, level, num, 0, cb,
-								cb_data);
+						ret = replace_key_param(data, key_type, i, &i, level, num, 0,
+								replace_key_param_cb, replace_key_param_cb_data);
 						if (1 == level)
 							num++;
 						break;
@@ -568,8 +568,8 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 							num++;
 						break;
 					case ']':
-						ret = replace_key_param(data, key_type, i, &i, level, num, 0, cb,
-								cb_data);
+						ret = replace_key_param(data, key_type, i, &i, level, num, 0,
+								replace_key_param_cb, replace_key_param_cb_data);
 						level--;
 						state = ZBX_STATE_END;
 						break;
@@ -604,7 +604,8 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
 				if (']' == (*data)[i] || ',' == (*data)[i])
 				{
-					ret = replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
+					ret = replace_key_param(data, key_type, l, &i, level, num, 0,
+							replace_key_param_cb, replace_key_param_cb_data);
 
 					i--;
 					state = ZBX_STATE_END;
@@ -614,7 +615,8 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
 				{
 					i++;
-					ret = replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data);
+					ret = replace_key_param(data, key_type, l, &i, level, num, 1,
+							replace_key_param_cb, replace_key_param_cb_data);
 					i--;
 
 					state = ZBX_STATE_END;
@@ -739,8 +741,11 @@ void	zbx_unquote_key_param(char *param)
  * Purpose: quotes special symbols in item key parameter                      *
  *                                                                            *
  * Parameters: param   - [IN/OUT] item key parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
+ *             forced  - [IN] 2 - enclose parameter in " even if it does not  *
  *                                contain any special characters              *
+ *                            1 - enclose parameter in " even if it does not  *
+ *                                contain any special characters, except case *
+ *                                when parameter ends with backslash          *
  *                            0 - do nothing if the parameter does not        *
  *                                contain any special characters              *
  *                                                                            *
@@ -753,18 +758,21 @@ void	zbx_unquote_key_param(char *param)
 int	zbx_quote_key_param(char **param, int forced)
 {
 	size_t	sz_src, sz_dst;
+	int	req;
 
-	if (0 == forced)
-	{
-		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']'))
-		{
-			return SUCCEED;
-		}
-	}
+	req = ('"' == **param || ' ' == **param || '[' == **param || NULL != strchr(*param, ',') ||
+			NULL != strchr(*param, ']')) ? 1 : 0;
+
+	if (0 == req && 0 == forced)
+		return SUCCEED;
 
 	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
+	{
+		if (0 == req && 2 != forced)
+			return SUCCEED;
+		else
+			return FAIL;
+	}
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 

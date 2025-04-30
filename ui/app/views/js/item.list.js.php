@@ -27,18 +27,18 @@
 <script>
 	const view = new class {
 
-		init({context, confirm_messages, field_switches, form_name, hostids, token}) {
+		init({context, confirm_messages, field_switches, form_name, hostid, token}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
 			this.context = context;
-			this.hostids = hostids;
+			this.hostid = hostid;
 
 			this.form = document.forms[form_name];
 			this.filter_form = document.querySelector('form[name="zbx_filter"]');
 
 			this.initForm(field_switches);
 			this.initEvents();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		initForm(field_switches) {
@@ -84,7 +84,8 @@
 					});
 				}
 			});
-			this.form.addEventListener('click', (e) => {
+
+			this.form.addEventListener('click', e => {
 				const target = e.target;
 				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
@@ -117,9 +118,9 @@
 				}
 			});
 
-			document.querySelector('.js-create-item')?.addEventListener('click', (e) =>
-				window.popupManagerInstance.openPopup('item.edit', e.target.dataset)
-			);
+			document.querySelector('.js-create-item')?.addEventListener('click', () => {
+				ZABBIX.PopupManager.open('item.edit', {hostid: this.hostid, context: this.context});
+			});
 		}
 
 		executeNow(target, data) {
@@ -231,9 +232,35 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				this.elementSuccess(e);
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, descriptor, event}) => {
+					if ('error' in data.submit) {
+						if ('title' in data.submit.error) {
+							postMessageError(data.submit.error.title);
+						}
+
+						postMessageDetails('error', data.submit.error.messages);
+					}
+					else {
+						chkbxRange.clearSelectedOnFilterChange();
+					}
+
+					// If host or template was deleted while being in item list, redirect to item list.
+					if (descriptor.action !== 'item.delete' && data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
+
+						url.searchParams.set('action', 'item.list');
+						url.searchParams.set('context', this.context);
+						url.searchParams.set('filter_set', 1);
+
+						event.setRedirectUrl(url.href);
+					}
+				}
 			});
 		}
 

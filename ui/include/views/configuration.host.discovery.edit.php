@@ -698,10 +698,7 @@ if ($data['can_edit_source_timeouts']
 		->getUrl();
 
 	$edit_source_timeouts_link = $data['host']['proxyid']
-		? (new CLink(_('Timeouts'), $proxy_url))
-			->addClass(ZBX_STYLE_LINK)
-			->setAttribute('data-action', 'proxy.edit')
-			->setAttribute('data-proxyid', $data['host']['proxyid'])
+		? (new CLink(_('Timeouts'), $proxy_url))->addClass(ZBX_STYLE_LINK)
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
 		))

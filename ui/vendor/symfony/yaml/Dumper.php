@@ -62,6 +62,7 @@ class Dumper
             $output .= $prefix.Inline::dump($input, $flags);
         } else {
             $dumpAsMap = Inline::isHash($input);
+            $compactNestedMapping = Yaml::DUMP_COMPACT_NESTED_MAPPING & $flags && !$dumpAsMap;
 
             foreach ($input as $key => $value) {
                 if ($inline >= 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value) && false !== strpos($value, "\n") && false === strpos($value, "\r")) {
@@ -114,8 +115,8 @@ class Dumper
                 $output .= sprintf('%s%s%s%s',
                     $prefix,
                     $dumpAsMap ? Inline::dump($key, $flags).':' : '-',
-                    $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags)
+                    $willBeInlined || ($compactNestedMapping && \is_array($value))  ? ' ' : "\n",
+                    $compactNestedMapping && \is_array($value) ? substr($this->dump($value, $inline - 1, $indent + 2, $flags), $indent + 2) : $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags)
                 ).($willBeInlined ? "\n" : '');
             }
         }

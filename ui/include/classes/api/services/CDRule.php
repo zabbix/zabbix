@@ -481,6 +481,10 @@ class CDRule extends CApiService {
 				}
 			}
 		}
+
+		self::addAffectedObjects($drules, $db_drules);
+
+		self::checkDiscoveryChecksUsedInActions($drules, $db_drules);
 	}
 
 	/**
@@ -700,6 +704,77 @@ class CDRule extends CApiService {
 		}
 	}
 
+	private static function addAffectedObjects(array $drules, array &$db_rules): void {
+		$druleids = [];
+
+		foreach ($drules as $drule) {
+			if (array_key_exists('dchecks', $drule)) {
+				$druleids[] = $drule['druleid'];
+				$db_drules[$drule['druleid']]['dchecks'] = [];
+			}
+		}
+
+		if (!$druleids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source', 'allow_redirect'
+			],
+			'filter' => ['druleid' => $druleids]
+		];
+		$db_dchecks = DBselect(DB::makeSql('dchecks', $options));
+
+		while ($db_dcheck = DBfetch($db_dchecks)) {
+			$db_rules[$db_dcheck['druleid']]['dchecks'][$db_dcheck['dcheckid']] =
+				array_diff_key($db_dcheck, array_flip(['druleid']));
+		}
+	}
+
+	private static function checkDiscoveryChecksUsedInActions(array $drules, array $db_drules): void {
+		$del_dcheckids = [];
+
+		foreach ($drules as $drule) {
+			if (!array_key_exists('dchecks', $drule)) {
+				continue;
+			}
+
+			$del_dcheckids = array_merge($del_dcheckids, array_diff(
+				array_column($db_drules[$drule['druleid']]['dchecks'], 'dcheckid'),
+				array_column($drule['dchecks'], 'dcheckid')
+			));
+		}
+
+		if (!$del_dcheckids) {
+			return;
+		}
+
+		$row = DBfetch(DBselect(
+			'SELECT a.name,dc.dcheckid,dc.druleid'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' JOIN dchecks dc ON '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
+				' AND '.dbConditionString('c.value', $del_dcheckids),
+			1
+		));
+
+		if ($row) {
+			$db_drule = $db_drules[$row['druleid']];
+			$db_dcheck = $db_drule['dchecks'][$row['dcheckid']];
+			$db_dcheck_name = discovery_check2str($db_dcheck['type'], $db_dcheck['key_'], $db_dcheck['ports'],
+				$db_dcheck['allow_redirect']
+			);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot delete discovery check "%1$s" of discovery rule "%2$s": %3$s.', $db_dcheck_name,
+				$db_drule['name'], _s('action "%1$s" uses this discovery check', $row['name'])
+			));
+		}
+	}
+
 	/**
 	 * Create new discovery rules.
 	 *
@@ -829,15 +904,6 @@ class CDRule extends CApiService {
 					}
 				}
 
-				$del_dcheckids = array_diff(
-					zbx_objectValues($db_dchecks, 'dcheckid'),
-					zbx_objectValues($old_dchecks, 'dcheckid')
-				);
-
-				if ($del_dcheckids) {
-					$this->deleteActionConditions($del_dcheckids);
-				}
-
 				DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
 			}
 		}
@@ -852,7 +918,18 @@ class CDRule extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete(array $druleids) {
+	public function delete(array $druleids): array {
+		$this->validateDelete($druleids, $db_drules);
+
+		DB::delete('dchecks', ['druleid' => $druleids]);
+		DB::delete('drules', ['druleid' => $druleids]);
+
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_drules);
+
+		return ['druleids' => $druleids];
+	}
+
+	private function validateDelete(array $druleids, ?array &$db_drules): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $druleids, '/', $error)) {
@@ -866,87 +943,42 @@ class CDRule extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($druleids as $druleid) {
-			if (!array_key_exists($druleid, $db_drules)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_drules) != count($druleids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		// Check if discovery rules are used in actions.
-		$db_actions = DBselect(
-			'SELECT a.name,c.value'.
-			' FROM actions a,conditions c'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
-				' AND '.dbConditionString('c.value', $druleids),
-			1
-		);
+		self::checkUsedInActions($db_drules);
 
-		if ($db_action = DBfetch($db_actions)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" is used in "%2$s" action.',
-				$db_drules[$db_action['value']]['name'], $db_action['name']
-			));
+		$drules = [];
+
+		foreach ($db_drules as $db_drule) {
+			$drules[] = [
+				'druleid' => $db_drule['druleid'],
+				'dchecks' => []
+			];
 		}
 
-		// Check if discovery checks are used in actions.
-		$db_actions = DBselect(
-			'SELECT a.name,dc.druleid'.
-			' FROM actions a,conditions c,dchecks dc'.
-			' WHERE a.actionid=c.actionid'.
-				' AND '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
-				' AND '.dbConditionString('dc.druleid', $druleids),
-			1
-		);
+		self::addAffectedObjects($drules, $db_drules);
 
-		if ($db_action = DBfetch($db_actions)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" is used in "%2$s" action.',
-				$db_drules[$db_action['druleid']]['name'], $db_action['name']
-			));
-		}
-
-		DB::delete('dchecks', ['druleid' => $druleids]);
-		DB::delete('drules', ['druleid' => $druleids]);
-
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_drules);
-
-		return ['druleids' => $druleids];
+		self::checkDiscoveryChecksUsedInActions($drules, $db_drules);
 	}
 
-	/**
-	 * Delete related action conditions.
-	 *
-	 * @param array $dCheckIds
-	 */
-	protected function deleteActionConditions(array $dCheckIds) {
-		$actionIds = [];
+	private static function checkUsedInActions(array $db_drules): void {
+		$druleids = array_keys($db_drules);
 
-		// conditions
-		$dbActions = DBselect(
-			'SELECT DISTINCT c.actionid'.
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS druleid,a.name'.
 			' FROM conditions c'.
-			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
-				' AND '.dbConditionString('c.value', $dCheckIds).
-			' ORDER BY c.actionid'
-		);
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
+				' AND '.dbConditionString('c.value', $druleids),
+			1
+		));
 
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionIds[] = $dbAction['actionid'];
-		}
-
-		// disabling actions with deleted conditions
-		if ($actionIds) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionIds]
-			]);
-
-			DB::delete('conditions', [
-				'conditiontype' => ZBX_CONDITION_TYPE_DCHECK,
-				'value' => $dCheckIds
-			]);
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovery rule "%1$s": %2$s.',
+				$db_drules[$row['druleid']]['name'], _s('action "%1$s" uses this discovery rule', $row['name'])
+			));
 		}
 	}
 

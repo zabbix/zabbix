@@ -44,9 +44,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'rows_per_page' =>		'db users.rows_per_page',
 			'url' =>				'db users.url',
 			'medias' =>				'array',
-			'new_media' =>			'array',
-			'enable_media' =>		'int32',
-			'disable_media' =>		'int32',
 			'roleid' =>				'id',
 			'form_refresh' =>		'int32'
 		];
@@ -68,10 +65,10 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
+					'rows_per_page', 'url', 'roleid', 'timezone', 'provisioned'
 				],
 				'selectMedias' => ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active',
-					'userdirectory_mediaid'
+					'provisioned'
 				],
 				'selectRole' => ['roleid'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -110,7 +107,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
 			'medias' => [],
-			'new_media' => [],
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
@@ -118,7 +114,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
 			'db_user' => ['username' => ''],
-			'userdirectoryid' => 0
+			'readonly' => false
 		];
 		$user_groups = [];
 
@@ -142,11 +138,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
-			$data['userdirectoryid'] = $this->user['userdirectoryid'];
 			$data['roleid_required'] = (bool) $this->user['role'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
+			}
+
+			if ($this->user['provisioned'] == CUser::PROVISION_STATUS_YES) {
+				$data['readonly'] = true;
 			}
 		}
 		else {
@@ -265,11 +264,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'output' => ['moduleid', 'relative_path', 'status']
 		]);
 
-		$data['readonly'] = false;
-		if ($data['userdirectoryid'] != 0) {
-			$data['readonly'] = true;
-		}
-
 		if ($db_modules) {
 			$module_manager = new CModuleManager(APP::getRootDir());
 
@@ -291,11 +285,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		);
 
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
-
-		$data['mediatypes'] = API::MediaType()->get([
-			'output' => ['status'],
-			'preservekeys' => true
-		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

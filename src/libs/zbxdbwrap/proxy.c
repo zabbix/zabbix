@@ -16,7 +16,6 @@
 
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
-#include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
@@ -1230,8 +1229,8 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	double			sec;
 	zbx_history_recv_item_t	*items;
 	char			*error = NULL;
-	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX], last_valueid = 0;
-	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
+	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX] = {0}, last_valueid = 0;
+	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX] = {0};
 	zbx_timespec_t		unique_shift = {0, 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1394,13 +1393,16 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 
 	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
 	{
-		char	*allowed_peers;
-		int	ret;
+		char			*allowed_peers;
+		int			ret;
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		zbx_substitute_simple_macros_allowed_hosts(item, &allowed_peers);
+		zbx_substitute_macros(&allowed_peers, NULL, 0, zbx_macro_allowed_hosts_resolv, um_handle, item);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
+
+		zbx_dc_close_user_macros(um_handle);
 
 		if (FAIL == ret)
 		{

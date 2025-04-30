@@ -181,15 +181,38 @@
 		</exec>
 	</target>
 
-	<target name="make-binaries-postgresql">
-		<!-- Binaries for integration tests -->
-		<exec executable="./bootstrap.sh" failonerror="on"/>
+	<target name="make-binaries-agent2">
 		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent2"/>
+			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
+			<arg line="--with-stacksize=128"/>
+			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+	</target>
+
+	<target name="make-binaries-postgresql">
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+
+		<antcall target="make-binaries-agent2"/>
+
+		<!-- Binaries for integration tests -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address'"/>
+			<arg line="CC='clang'"/>
+			<arg line="LDFLAGS='-fsanitize=leak,address'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
-			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
@@ -402,14 +425,19 @@
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
 	<target name="make-binaries-mysql">
-		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
+
+		<antcall target="make-binaries-agent2"/>
+
+		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address'"/>
+			<arg line="CC='clang'"/>
+			<arg line="LDFLAGS='-fsanitize=leak,address'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
-			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>

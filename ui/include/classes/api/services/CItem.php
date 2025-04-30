@@ -909,6 +909,7 @@ class CItem extends CItemGeneral {
 		self::updateTags($items, $db_items, $upd_itemids);
 		self::updatePreprocessing($items, $db_items, $upd_itemids);
 		self::updateParameters($items, $db_items, $upd_itemids);
+		self::updateMapLinks($items, $db_items);
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
@@ -917,6 +918,30 @@ class CItem extends CItemGeneral {
 		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM, $items, $db_items);
+	}
+
+	private static function updateMapLinks(array $items, array $db_items): void {
+		$itemids = [];
+
+		$num_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+		$text_types = [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT];
+
+		foreach ($items as $item) {
+			$db_item = $db_items[$item['itemid']];
+
+			if (!array_key_exists('value_type', $item) || $item['value_type'] == $db_item['value_type']) {
+				continue;
+			}
+
+			if ((in_array($db_item['value_type'], $num_types) && !in_array($item['value_type'], $num_types))
+					|| (in_array($db_item['value_type'], $text_types) && !in_array($item['value_type'], $text_types))) {
+				$itemids[] = $item['itemid'];
+			}
+		}
+
+		if ($itemids) {
+			API::Map()->unlinkItems($itemids);
+		}
 	}
 
 	/**
@@ -1026,7 +1051,7 @@ class CItem extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void {
 		$tpl_links = self::getTemplateLinks($items, $hostids);
 
@@ -1370,7 +1395,7 @@ class CItem extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function unlinkTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
@@ -1434,7 +1459,7 @@ class CItem extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$db_items = DBfetchArrayAssoc(DBselect(
@@ -1915,6 +1940,8 @@ class CItem extends CItemGeneral {
 		self::resetGraphsYAxis($del_itemids);
 		self::deleteFromFavoriteGraphs($del_itemids);
 
+		API::Map()->unlinkItems($del_itemids);
+
 		self::deleteAffectedTriggers($del_itemids);
 
 		self::clearHistoryAndTrends($del_itemids);
@@ -1944,8 +1971,8 @@ class CItem extends CItemGeneral {
 	 * @param array|null $db_lld_rules
 	 * @param array|null $db_item_prototypes
 	 */
-	protected static function addDependentItems(array &$db_items, array &$db_lld_rules = null,
-			array &$db_item_prototypes = null): void {
+	protected static function addDependentItems(array &$db_items, ?array &$db_lld_rules = null,
+			?array &$db_item_prototypes = null): void {
 		$db_lld_rules = [];
 		$db_item_prototypes = [];
 

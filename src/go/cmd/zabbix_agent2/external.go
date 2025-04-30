@@ -21,32 +21,24 @@ import (
 
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/plugins/external"
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
-type pluginOptions struct {
-	System struct {
-		Path string
-	}
-}
-
-func initExternalPlugins(options *agent.AgentOptions) (string, error) {
+func initExternalPlugins(options *agent.AgentOptions, sysOptions agent.PluginSystemOptions) (string, error) {
 	paths := make(map[string]string)
 
-	for name, p := range options.Plugins {
-		var o pluginOptions
-		if err := conf.Unmarshal(p, &o, false); err != nil {
-			// not an external plugin, just ignore the error
+	for name, s := range sysOptions {
+		// if path is not set it's an internal plugin
+		if s.Path == nil {
 			continue
 		}
 
-		if !filepath.IsAbs(o.System.Path) {
-			return "", errs.Errorf("path %q not absolute", o.System.Path)
+		if !filepath.IsAbs(*s.Path) {
+			return "", errs.Errorf("loadable plugin %q path %q is not absolute", name, *s.Path)
 		}
 
-		paths[name] = o.System.Path
+		paths[name] = *s.Path
 	}
 
 	if len(paths) == 0 {
@@ -54,7 +46,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	}
 
 	timeout := getTimeout()
-	socket := agent.Options.ExternalPluginsSocket
+	socket := options.ExternalPluginsSocket
 
 	err := os.RemoveAll(socket)
 	if err != nil {
@@ -69,12 +61,6 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	for name, path := range paths {
 		log.Debugf("initializing external plugin %q", name)
 
-		// configuratorTask from internal/agent/scheduler/task.go depends
-		// on loadable plugin configs not containing Path field, hence
-		// it needs to removed.
-		config := removePathField(options.Plugins[name])
-		options.Plugins[name] = config
-
 		accessor := external.NewPlugin(
 			name,
 			path,
@@ -83,7 +69,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 			listener,
 		)
 
-		err := accessor.RegisterMetrics(config)
+		err := accessor.RegisterMetrics(options.Plugins[name])
 		if err != nil {
 			return "", errs.Wrapf(err, "failed to register metrics of plugin %q", name)
 		}
@@ -98,24 +84,4 @@ func getTimeout() time.Duration {
 	}
 
 	return time.Second * time.Duration(agent.Options.ExternalPluginTimeout)
-}
-
-func removePathField(privateOptions any) any {
-	if root, ok := privateOptions.(*conf.Node); ok {
-		for i, v := range root.Nodes {
-			if node, ok := v.(*conf.Node); ok {
-				if node.Name == "Path" {
-					root.Nodes = remove(root.Nodes, i)
-					return root
-				}
-			}
-		}
-	}
-
-	return privateOptions
-}
-
-func remove(s []any, i int) []any {
-	s[i] = s[len(s)-1]
-	return s[:len(s)-1]
 }

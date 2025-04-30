@@ -33,10 +33,9 @@ window.mediatype_edit_popup = new class {
 		this.smtp_server_default = smtp_server_default;
 		this.smtp_email_default = smtp_email_default;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'mediatype.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'mediatype.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#loadView(mediatype);
 		this.#initActions();

@@ -2322,7 +2322,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 		ZBX_POST_VSPHERE_FOOTER
 
 	size_t	offset;
-	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
+	char	*error = NULL, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
 	int	count = 0;
 	xmlDoc	*doc = NULL;
 
@@ -3189,7 +3189,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 		zbx_vmware_service_remove(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d job_type:%X revision:%d", __func__, jobs_num,
-			job_type, revision);
+		(unsigned int)job_type, revision);
 
 	return 0 == jobs_num ? 1 : 0;
 }

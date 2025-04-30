@@ -261,7 +261,7 @@ class testExpressionMacros extends CIntegrationTest {
 	public function testExpressionMacros_checkMacros() {
 		$string = self::$alert_response['result'][1]['message'];
 		$position = strpos($string, self::TIMESTAMP_PREFIX);
-		$macroses = substr($string, 0, $position);
+		$macros = substr($string, 0, $position);
 		$timestamp = intval(substr($string, $position + strlen(self::TIMESTAMP_PREFIX)));
 
 		$this->assertEquals(self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER.
@@ -271,7 +271,7 @@ class testExpressionMacros extends CIntegrationTest {
 				'/macroN/macro:'.self::VALUE_TO_FIRE_TRIGGER.
 				'/macro/macroN:'.self::VALUE_TO_RECOVER_TRIGGER.
 				'/empty/macroN:'.self::VALUE_TO_RECOVER_TRIGGER,
-				$macroses);
+				$macros);
 
 		$this->assertTrue(abs($timestamp - microtime(true)) < 100);
 	}

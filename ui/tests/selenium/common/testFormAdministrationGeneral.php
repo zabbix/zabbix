@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Administration General configuration function tests.
@@ -45,7 +45,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param boolean    $trigger_disp   If it is Trigger displaying options form
 	 */
 	public function executeSimpleUpdate($trigger_disp = false) {
-		$config = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
+		$settings = CDBHelper::getRow('SELECT * FROM settings ORDER by name');
 		$this->page->login()->open($this->config_link);
 		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
 		$values = $form->getFields()->asValues();
@@ -57,7 +57,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->page->waitUntilReady();
 		$form->invalidate();
 		// Check that DBdata is not changed.
-		$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
+		$this->assertEquals($settings, CDBHelper::getRow('SELECT * FROM settings ORDER BY name'));
 		// Check that Frontend form is not changed.
 		$this->assertEquals($values, $form->getFields()->asValues());
 		// Check that Frontend colors are not changed.
@@ -76,7 +76,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
 		// Reset form in case of some previous scenario.
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults', $other);
-		$default_config = CDBHelper::getRow('SELECT * FROM config');
+		$default_settings = CDBHelper::getRow('SELECT * FROM settings');
 
 		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
 		foreach (['Cancel', 'Reset defaults'] as $action) {
@@ -84,15 +84,15 @@ class testFormAdministrationGeneral extends CWebTest {
 			$form->fill($this->custom_values);
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$custom_config = CDBHelper::getRow('SELECT * FROM config');
+			$custom_settings = CDBHelper::getRow('SELECT * FROM settings');
 			// Check custom data in form.
 			$this->page->refresh()->waitUntilReady();
 			$form->invalidate();
 			$form->checkValue($this->custom_values);
 			$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom_values);
 
-			$config = ($action === 'Reset defaults') ? $default_config : $custom_config;
-			$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config'));
+			$settings = ($action === 'Reset defaults') ? $default_settings : $custom_settings;
+			$this->assertEquals($settings, CDBHelper::getRow('SELECT * FROM settings'));
 		}
 	}
 
@@ -171,7 +171,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults', $other);
 
 		if ($expected === TEST_BAD && $timeouts) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+			$old_hash = CDBHelper::getHash('SELECT * FROM settings');
 		}
 
 		// Fill form with new data.
@@ -205,15 +205,15 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->checkValue($values);
 
 		// Check saved configuration in database.
-		$config = CDBHelper::getRow('SELECT * FROM config');
+		$expected_settings = CTestDBSettingsHelper::getParameters(array_keys($db));
 
 		foreach ($db as $key => $value) {
-			$this->assertArrayHasKey($key, $config);
-			$this->assertEquals($value, $config[$key]);
+			$this->assertArrayHasKey($key, $expected_settings);
+			$this->assertEquals($value, $expected_settings[$key]);
 		}
 
 		if ($expected === TEST_BAD && $timeouts) {
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 	}
 }

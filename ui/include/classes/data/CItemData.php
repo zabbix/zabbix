@@ -228,6 +228,7 @@ final class CItemData {
 			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]',
 			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>,<options>]',
 			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>,<options>]',
+			'icmppingretry[<target>,<retries>,<backoff>,<size>,<timeout>,<options>]',
 			'net.tcp.service.perf[service,<ip>,<port>]',
 			'net.tcp.service[service,<ip>,<port>]',
 			'net.udp.service.perf[service,<ip>,<port>]',
@@ -240,7 +241,7 @@ final class CItemData {
 			'vmware.cluster.status[url,name]',
 			'vmware.cluster.tags.get[url,id]',
 			'vmware.datastore.alarms.get[url,uuid]',
-			'vmware.datastore.discovery[url]',
+			'vmware.datastore.discovery[url,<filter_uuid>]',
 			'vmware.datastore.hv.list[url,datastore]',
 			'vmware.datastore.perfcounter[url,uuid,path,<instance>]',
 			'vmware.datastore.property[url,uuid,prop]',
@@ -372,6 +373,7 @@ final class CItemData {
 			'zabbix[items_unsupported]',
 			'zabbix[java,,<param>]',
 			'zabbix[lld_queue]',
+			'zabbix[preprocessing]',
 			'zabbix[preprocessing_queue]',
 			'zabbix[process,<type>,<mode>,<state>]',
 			'zabbix[proxy,<name>,<param>]',
@@ -1108,6 +1110,13 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'config/items/itemtypes/simple_checks#icmppingsec'
+				]
+			],
+			'icmppingretry[<target>,<retries>,<backoff>,<size>,<timeout>,<options>]' => [
+				'description' => _('Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_SIMPLE => 'config/items/itemtypes/simple_checks#icmppingretry'
 				]
 			],
 			'ipmi.get' => [
@@ -1927,8 +1936,8 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.datastore.alarms'
 				]
 			],
-			'vmware.datastore.discovery[url]' => [
-				'description' => _('Discovery of VMware datastores, "url" - VMware service URL. Returns JSON'),
+			'vmware.datastore.discovery[url,<filter_uuid>]' => [
+				'description' => _('Discovery of VMware datastores, "url" - VMware service URL, "filter_uuid" - one hv uuid or vm uuid (empty by default). Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.datastore.discovery'
@@ -2855,6 +2864,13 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#lld.queue'
+				]
+			],
+			'zabbix[preprocessing]' => [
+				'description' => _('Statistics of values received by the preprocessing manager.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#preprocessing'
 				]
 			],
 			'zabbix[preprocessing_queue]' => [

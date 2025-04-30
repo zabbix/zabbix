@@ -24,7 +24,6 @@ if ($data['error']) {
 }
 
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.calendar.js');
 $this->addJsFile('gtlc.js');
 
 $this->includeJsFile('monitoring.charts.view.js.php');

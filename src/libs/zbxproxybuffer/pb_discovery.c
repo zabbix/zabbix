@@ -273,7 +273,7 @@ static zbx_list_item_t	*pb_discovery_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows
 		rows_num++;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, li.current);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, (void *)li.current);
 
 	return li.current;
 }
@@ -294,7 +294,7 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
 	zbx_db_insert_t		db_insert;
 	int			rows_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, (void *)next);
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{

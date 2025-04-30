@@ -46,6 +46,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	int				ret = FAIL;
 	zbx_uint64_t			config_revision, hostmap_revision;
 	zbx_proxyconfig_write_status_t	status = ZBX_PROXYCONFIG_WRITE_STATUS_DATA;
+	zbx_config_t			cfg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -60,6 +61,8 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, config_revision);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER, (zbx_uint64_t)cfg.proxy_secrets_provider);
 
 	if (0 != hostmap_revision)
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
@@ -244,6 +247,20 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, removed_num);
 }
 
+static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyconfig_args_in)
+{
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER);
+
+	if (ZBX_PROXY_SECRETS_PROVIDER_PROXY != cfg.proxy_secrets_provider)
+		return;
+
+	zbx_dc_sync_kvs_paths(NULL, proxyconfig_args_in->config_vault, proxyconfig_args_in->config_source_ip,
+			proxyconfig_args_in->config_ssl_ca_location, proxyconfig_args_in->config_ssl_cert_location,
+			proxyconfig_args_in->config_ssl_key_location);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically request config data                                  *
@@ -285,7 +302,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
-	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
+	proxyconfig_update_vault_macros(proxyconfig_args_in);
+	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
+			get_process_type_string(process_type), &rtc);
 
 	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
@@ -320,6 +339,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 
+				proxyconfig_update_vault_macros(proxyconfig_args_in);
 				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
 					ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
 
@@ -343,6 +363,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		process_configuration_sync(&data_size, &synced, info, proxyconfig_args_in);
+		proxyconfig_update_vault_macros(proxyconfig_args_in);
 
 		interval = zbx_time() - sec;
 

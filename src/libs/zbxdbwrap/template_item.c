@@ -13,6 +13,7 @@
 **/
 
 #include "zbxdbhigh.h"
+#include "zbxdbwrap.h"
 
 #include "template.h"
 
@@ -137,7 +138,7 @@ typedef struct
 	char			*value;
 	unsigned char		operator;
 }
-lld_override_codition_t;
+lld_override_condition_t;
 
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
@@ -1013,16 +1014,27 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	zbx_uint64_t		itemid = 0;
 	zbx_db_insert_t		db_insert_items, db_insert_irtdata, db_insert_irtname;
 	zbx_template_item_t	*item;
+	zbx_vector_uint64_t	itemids_value_type_diff;
 
 	if (0 == items->values_num)
 		return;
+
+	zbx_vector_uint64_create(&itemids_value_type_diff);
 
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_template_item_t *)items->values[i];
 
 		if (NULL == item->key_)
+		{
 			upd_items++;
+
+			if (SUCCEED == zbx_db_item_value_type_changed_category(item->value_type,
+					item->value_type_orig))
+			{
+				zbx_vector_uint64_append(&itemids_value_type_diff, item->itemid);
+			}
+		}
 		else
 			new_items++;
 	}
@@ -1077,11 +1089,14 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 	if (0 != upd_items)
 	{
+		zbx_db_update_item_map_links(&itemids_value_type_diff);
+
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}
 
+	zbx_vector_uint64_destroy(&itemids_value_type_diff);
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
@@ -2157,7 +2172,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int aud
 			update_lld_macro_num, delete_lld_macro_num);
 }
 
-static void	lld_override_condition_free(lld_override_codition_t *override_condition)
+static void	lld_override_condition_free(lld_override_condition_t *override_condition)
 {
 	zbx_free(override_condition->macro);
 	zbx_free(override_condition->value);
@@ -2178,13 +2193,13 @@ static void	lld_override_free(lld_override_t *override)
 static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
 {
-	size_t			sql_offset = 0;
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_uint64_t		overrideid;
-	int			i;
-	lld_override_t		*override;
-	lld_override_codition_t	*override_condition;
+	size_t				sql_offset = 0;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	zbx_uint64_t			overrideid;
+	int				i;
+	lld_override_t			*override;
+	lld_override_condition_t	*override_condition;
 
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
 		"select lld_overrideid,lld_override_conditionid,operator,macro,value"
@@ -2206,7 +2221,7 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 
 		override = (lld_override_t *)overrides->values[i];
 
-		override_condition = (lld_override_codition_t *)zbx_malloc(NULL, sizeof(lld_override_codition_t));
+		override_condition = (lld_override_condition_t *)zbx_malloc(NULL, sizeof(lld_override_condition_t));
 		ZBX_STR2UINT64(override_condition->override_conditionid, row[1]);
 		ZBX_STR2UCHAR(override_condition->operator, row[2]);
 		override_condition->macro = zbx_strdup(NULL, row[3]);
@@ -2260,7 +2275,7 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 					db_insert_opinventory;
 	int				i, j, k, conditions_num, operations_num;
 	lld_override_t			*override;
-	lld_override_codition_t		*override_condition;
+	lld_override_condition_t	*override_condition;
 	zbx_lld_override_operation_t	*override_operation;
 	const zbx_template_item_t	**pitem;
 
@@ -2329,7 +2344,7 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 
 		for (j = 0; j < override->override_conditions.values_num; j++)
 		{
-			override_condition = (lld_override_codition_t *)override->override_conditions.values[j];
+			override_condition = (lld_override_condition_t *)override->override_conditions.values[j];
 
 			zbx_db_insert_add_values(&db_insert_oconditions, override_conditionid, overrideid,
 					(int)override_condition->operator, override_condition->macro,
@@ -2698,9 +2713,7 @@ static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
 	zbx_template_lld_macro_t	*ip1 = *(zbx_template_lld_macro_t * const *)d1;
 	zbx_template_lld_macro_t	*ip2 = *(zbx_template_lld_macro_t * const *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(ip1->lld_macro, ip2->lld_macro);
-
-	return 0;
+	return strcmp(ip1->lld_macro, ip2->lld_macro);
 }
 /******************************************************************************
  *                                                                            *

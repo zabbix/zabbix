@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  *
  * @dataSource GlobalMacros
  */
@@ -307,14 +307,14 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			[
 				[
 					'fields' => [
-						'Max history display period' => '7d',
-						'Time filter default period' => '3650d',
-						'Max period for time selector' => '3650d'
+						'Max history display period' => '1w',
+						'Time filter default period' => '521w',
+						'Max period for time selector' => '521w'
 					],
 					'db' => [
-						'history_period' => '7d',
-						'period_default' => '3650d',
-						'max_period' => '3650d'
+						'history_period' => '1w',
+						'period_default' => '521w',
+						'max_period' => '521w'
 					]
 				]
 			],
@@ -991,7 +991,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$form->fill($data['field']);
 		$form->submit();
 		// Check saved settings.
-		$this->page->open($data['link']);
+		$this->page->open($data['link'])->waitUntilReady();
 
 		switch ((array_keys($data['field']))[0]) {
 			case 'Default theme':

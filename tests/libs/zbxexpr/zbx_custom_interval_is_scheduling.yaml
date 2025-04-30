@@ -1,0 +1,19 @@
+---
+test case: "Custom interval"
+in:
+  params: "1m;0/1-7,00:00-13:00;0/1-7,13:00-24:00;wd1h15-18"
+out:
+  result: SUCCEED
+---
+test case: "No custom interval"
+in:
+  params: "1m"
+out:
+  result: FAIL
+---
+test case: "A lot of custom intervals"
+in:
+  params: "1;m0-59;h9-17/2;m0,30;m0,5,10,15,20,25,30,35,40,45,50,55;wd1-5h9-18;h9,10,11;md1h9m30;md1wd1h9m30;h9m0-59/30;h9m10-40/30;h9-10m10-40/30;h9m10-40/1;h9-12,15m0;h9-12,15m0s30;h9-12s30"
+out:
+  result: SUCCEED
+...

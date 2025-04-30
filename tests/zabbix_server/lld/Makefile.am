@@ -1,5 +1,8 @@
 if SERVER
-SERVER_tests = zbx_lld_hgsets_test
+SERVER_tests = zbx_lld_hgsets_test \
+		lld_entry_create \
+		lld_compare_entries \
+		zbx_substitute_lld_macros
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -86,6 +89,7 @@ LLD_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
@@ -114,6 +118,8 @@ zbx_lld_hgsets_test_SOURCES = \
 	../../../src/zabbix_server/lld/lld_audit.c \
 	../../../src/zabbix_server/lld/lld_item.c \
 	../../../src/zabbix_server/lld/lld_trigger.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_entry.c \
 	../../../src/zabbix_server/lld/lld.c \
 	zbx_lld_hgsets_test.c \
 	../../zbxmockexit.c \
@@ -129,4 +135,77 @@ zbx_lld_hgsets_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_lld_hgsets_test_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
+	
+lld_entry_create_SOURCES = \
+	lld_entry_create.c \
+	../../../src/zabbix_server/lld/lld_common.c \
+	../../../src/zabbix_server/lld/lld_graph.c \
+	../../../src/zabbix_server/lld/lld_audit.c \
+	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_trigger.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld.c \
+	../../zbxmockexit.c \
+	../../zbxmockdb.c \
+	../../zbxmockdata.c \
+	../../zbxmocklog.c \
+	../../zbxmockfile.c \
+	../../zbxmockdir.c
+
+lld_entry_create_LDADD = $(LLD_LIBS)
+lld_entry_create_LDADD += @SERVER_LIBS@
+lld_entry_create_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+lld_entry_create_CFLAGS = \
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
+
+lld_compare_entries_SOURCES = \
+	lld_compare_entries.c \
+	../../../src/zabbix_server/lld/lld_common.c \
+	../../../src/zabbix_server/lld/lld_graph.c \
+	../../../src/zabbix_server/lld/lld_audit.c \
+	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_trigger.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld.c \
+	../../zbxmockexit.c \
+	../../zbxmockdb.c \
+	../../zbxmockdata.c \
+	../../zbxmocklog.c \
+	../../zbxmockfile.c \
+	../../zbxmockdir.c
+
+lld_compare_entries_LDADD = $(LLD_LIBS)
+lld_compare_entries_LDADD += @SERVER_LIBS@
+lld_compare_entries_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+lld_compare_entries_CFLAGS = \
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
+
+zbx_substitute_lld_macros_SOURCES = \
+	../../../src/zabbix_server/lld/lld_common.c \
+	../../../src/zabbix_server/lld/lld_graph.c \
+	../../../src/zabbix_server/lld/lld_audit.c \
+	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_trigger.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld.c \
+	zbx_substitute_lld_macros.c \
+	../../zbxmockexit.c \
+	../../zbxmockdb.c \
+	../../zbxmockdata.c \
+	../../zbxmocklog.c \
+	../../zbxmockfile.c \
+	../../zbxmockdir.c	
+
+zbx_substitute_lld_macros_LDADD = $(LLD_LIBS)
+zbx_substitute_lld_macros_LDADD += @SERVER_LIBS@
+zbx_substitute_lld_macros_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_substitute_lld_macros_CFLAGS = \
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
+	
 endif

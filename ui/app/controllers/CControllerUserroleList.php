@@ -105,7 +105,7 @@ class CControllerUserroleList extends CController {
 		unset($role);
 
 		$users = API::User()->get([
-			'output' => ['userid', 'username', 'name', 'surname', 'gui_access', 'users_status', 'roleid'],
+			'output' => ['userid', 'username', 'name', 'surname', 'roleid'],
 			'userids' => $userids,
 			'getAccess' => true
 		]);

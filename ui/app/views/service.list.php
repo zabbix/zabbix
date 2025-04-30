@@ -20,7 +20,6 @@
  */
 
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('service.list.js.php');
 

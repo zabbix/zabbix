@@ -104,7 +104,7 @@ out:
   param: '("(.*)_([0-9]+)", \1)'
   return: SUCCEED
 ---
-test case: "Nested macro with spaces after after param"
+test case: "Nested macro with spaces after param"
 in:
   expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")    }'
 out:
@@ -115,7 +115,7 @@ out:
   func: 'regsub("App([0-9]) ([a-z]+)","App\1")'
   param: '("App([0-9]) ([a-z]+)","App\1")'
 ---
-test case: "LLD macro with spaces after after param"
+test case: "LLD macro with spaces after param"
 in:
   expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)    }'
 out:
@@ -699,5 +699,11 @@ out:
   func: 'func(param)'
   param: '(param)'
   return: SUCCEED
-
+---
+test case: "failed because of double backslash"
+in:
+  token_search: ZBX_TOKEN_SEARCH_FUNCTIONID
+  expression: '\"This is a backslash\\'
+out:
+  return: FAIL
 ...

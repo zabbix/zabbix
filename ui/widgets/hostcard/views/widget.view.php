@@ -48,7 +48,7 @@ elseif ($data['host']) {
 				break;
 
 			case CWidgetFieldHostSections::SECTION_AVAILABILITY:
-				$sections[] = makeSectionAvailability($host['interfaces'], $host['has_passive_checks']);
+				$sections[] = makeSectionAvailability($host['interfaces']);
 				break;
 
 			case CWidgetFieldHostSections::SECTION_MONITORED_BY:
@@ -123,7 +123,7 @@ function makeSectionsHeader(array $host): CDiv {
 		}
 	}
 	else {
-		$host_status = (new CDiv('('._('Disabled').')'))->addClass(ZBX_STYLE_RED);
+		$host_status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_COLOR_NEGATIVE);
 	}
 
 	return (new CDiv([
@@ -262,10 +262,10 @@ function makeSectionMonitoring(string $hostid, int $dashboard_count, int $item_c
 		->addClass('section-monitoring');
 }
 
-function makeSectionAvailability(array $interfaces, bool $has_passive_checks): CDiv {
+function makeSectionAvailability(array $interfaces): CDiv {
 	return (new CDiv([
 		(new CDiv(_('Availability')))->addClass(Widget::ZBX_STYLE_SECTION_NAME),
-		(new CDiv(getHostAvailabilityTable($interfaces, $has_passive_checks)))->addClass(Widget::ZBX_STYLE_SECTION_BODY)
+		(new CDiv(getHostAvailabilityTable($interfaces)))->addClass(Widget::ZBX_STYLE_SECTION_BODY)
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-availability');
@@ -281,26 +281,40 @@ function makeSectionMonitoredBy(array $host): CDiv {
 			break;
 
 		case ZBX_MONITORED_BY_PROXY:
+			$proxy_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'proxy.edit')
+				->setArgument('proxyid', $host['proxyid'])
+				->getUrl();
+
+			$proxy = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				? new CLink($host['proxy']['name'], $proxy_url)
+				: new CSpan($host['proxy']['name']);
+
+			$proxy->setTitle($host['proxy']['name']);
+
 			$monitored_by = [
 				new CIcon(ZBX_ICON_PROXY, _('Proxy')),
-				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
-					? (new CLink($host['proxy']['name']))
-						->setTitle($host['proxy']['name'])
-						->addClass('js-edit-proxy')
-						->setAttribute('data-proxyid', $host['proxyid'])
-					: (new CSpan($host['proxy']['name']))->setTitle($host['proxy']['name'])
-				];
+				$proxy
+			];
 			break;
 
 		case ZBX_MONITORED_BY_PROXY_GROUP:
+			$proxy_group_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'proxygroup.edit')
+				->setArgument('proxy_groupid', $host['proxy_groupid'])
+				->getUrl();
+
+			$proxy_group = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
+				? new CLink($host['proxy_group']['name'], $proxy_group_url)
+				: new CSpan($host['proxy_group']['name']);
+
+			$proxy_group->setTitle($host['proxy_group']['name']);
+
 			$monitored_by = [
 				new CIcon(ZBX_ICON_PROXY_GROUP, _('Proxy group')),
-				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
-					? (new CLink($host['proxy_group']['name']))
-						->setTitle($host['proxy_group']['name'])
-						->addClass('js-edit-proxy-group')
-						->setAttribute('data-proxy_groupid', $host['proxy_groupid'])
-					: (new CSpan($host['proxy_group']['name']))->setTitle($host['proxy_group']['name'])
+				$proxy_group
 			];
 	}
 

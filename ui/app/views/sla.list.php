@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.calendar.js');
-
 $this->includeJsFile('sla.list.js.php');
 
 $filter = (new CFilter())
@@ -138,9 +135,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 			? new CCheckBox('slaids['.$slaid.']', $slaid)
 			: null,
 		(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
-			? (new CLink($sla['name'], $sla_url))
-				->setAttribute('data-slaid', $slaid)
-				->setAttribute('data-action', 'sla.edit')
+			? new CLink($sla['name'], $sla_url)
 			: $sla['name']
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		CSlaHelper::getSloTag((float) $sla['slo']),

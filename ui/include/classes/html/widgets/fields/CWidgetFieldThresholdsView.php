@@ -23,18 +23,20 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 	}
 
 	public function getView(): CDiv {
+		$header_row = [
+			'',
+			_('Threshold'),
+			(new CColHeader(''))->setWidth('100%')
+		];
+
 		$thresholds_table = (new CTable())
 			->setId($this->field->getName().'-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setHeader([
-				'',
-				_('Threshold'),
-				(new CColHeader(''))->setWidth('100%')
-			])
+			->setHeader($header_row)
 			->setFooter(new CRow(
-				new CCol(
+				(new CCol(
 					(new CButtonLink(_('Add')))->addClass('element-table-add')
-				)
+				))->setColSpan(count($header_row))
 			));
 
 		foreach ($this->field->getValue() as $i => $threshold) {

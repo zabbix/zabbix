@@ -174,9 +174,9 @@ static double	get_selfmon_stat(double busy, unsigned char state)
 	return (ZBX_PROCESS_STATE_BUSY == state ? busy : 100.0 - busy);
 }
 
-typedef int (*zbx_selfmon_stats_threads_cb_t)(zbx_vector_dbl_t*, int*, char**);
+typedef int (*zbx_get_usage_stats_cb_t)(zbx_vector_dbl_t*, int*, char**);
 
-static int	get_selfmon_stats_threads(unsigned char aggr_func, zbx_selfmon_stats_threads_cb_t stats_func,
+static int	get_selfmon_stats_threads(unsigned char aggr_func, zbx_get_usage_stats_cb_t get_usage_stats_cb_func,
 		int proc_num, unsigned char state, double *value, char **error)
 {
 	zbx_vector_dbl_t	usage;
@@ -184,7 +184,7 @@ static int	get_selfmon_stats_threads(unsigned char aggr_func, zbx_selfmon_stats_
 
 	zbx_vector_dbl_create(&usage);
 
-	if (SUCCEED != (ret = stats_func(&usage, &count, error)))
+	if (SUCCEED != (ret = get_usage_stats_cb_func(&usage, &count, error)))
 		goto out;
 
 	if (0 == usage.values_num)
@@ -570,13 +570,13 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			if (ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ||
 					ZBX_PROCESS_TYPE_DISCOVERER == process_type)
 			{
-				zbx_selfmon_stats_threads_cb_t	stats_func;
+				zbx_get_usage_stats_cb_t	get_usage_stats_cb_func;
 
-				stats_func = ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ?
-						zbx_preprocessor_get_usage_stats : zbx_discovery_get_usage_stats;
+				get_usage_stats_cb_func = ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ?
+						zbx_get_usage_stats_preprocessor : zbx_get_usage_stats_discovery;
 
-				if (SUCCEED != get_selfmon_stats_threads(aggr_func, stats_func, process_num, state,
-						&value, &error))
+				if (SUCCEED != get_selfmon_stats_threads(aggr_func, get_usage_stats_cb_func,
+						process_num, state, &value, &error))
 				{
 					SET_MSG_RESULT(result, error);
 					goto out;
@@ -945,6 +945,26 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		}
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
+	}
+	else if (0 == strcmp(tmp, "preprocessing"))			/* zabbix[preprocessing] */
+	{
+		struct zbx_json	json;
+
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+
+		zbx_preprocessor_get_size(&json);
+
+		zbx_json_close(&json);
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+		zbx_json_free(&json);
+
 	}
 	else if (0 == strcmp(tmp, "discovery_queue"))			/* zabbix[discovery_queue] */
 	{

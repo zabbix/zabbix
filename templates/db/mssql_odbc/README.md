@@ -99,6 +99,8 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |{$MSSQL.BACKUP_FULL.USED}|<p>The flag for checking the age of a full backup. If set to a value other than "1", the trigger expression for the full backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_LOG.USED}|<p>The flag for checking the age of a log backup. If set to a value other than "1", the trigger expression for the log backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_DIFF.USED}|<p>The flag for checking the age of a differential backup. If set to a value other than "1", the trigger expression for the differential backup age will not fire. Can be used with context for database name.</p>|`1`|
+|{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered quorum member by name.</p>|`.*`|
+|{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered quorum member by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 

@@ -24,16 +24,26 @@
 
 		init() {
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
 			document.getElementById('js-create').addEventListener('click', () => {
-				window.popupManagerInstance.openPopup('script.edit', {});
+				ZABBIX.PopupManager.open('script.edit');
 			});
 
-			document.getElementById('js-massdelete').addEventListener('click', (e) => {
+			document.getElementById('js-massdelete').addEventListener('click', e => {
 				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			});
+		}
+
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('script')
 			});
 		}
 
@@ -95,21 +105,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('script');
-				location.href = location.href;
-			});
 		}
 	};
 </script>

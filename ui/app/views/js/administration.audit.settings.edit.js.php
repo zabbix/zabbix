@@ -57,19 +57,18 @@
 
 							$('#auditlog_enabled')
 								.prop('checked',
-									<?= (DB::getDefault('config', 'auditlog_enabled') == 1) ? 'true' : 'false' ?>
+									<?= json_encode((bool) CSettingsSchema::getDefault('auditlog_enabled')) ?>
 								)
 								.change();
 							$('#auditlog_mode').prop('checked',
-								<?= DB::getDefault('config', 'auditlog_mode') == 1 ? 'true' : 'false' ?>
+								<?= json_encode((bool) CSettingsSchema::getDefault('auditlog_mode')) ?>
 							);
-
 							$('#hk_audit_mode')
 								.prop('checked',
-									<?= (DB::getDefault('config', 'hk_audit_mode') == 1) ? 'true' : 'false' ?>
+									<?= json_encode((bool) CSettingsSchema::getDefault('hk_audit_mode')) ?>
 								)
 								.change();
-							$('#hk_audit').val("<?= DB::getDefault('config', 'hk_audit') ?>");
+							$('#hk_audit').val("<?= CSettingsSchema::getDefault('hk_audit') ?>");
 						}
 					}
 				]

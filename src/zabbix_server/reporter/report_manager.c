@@ -841,18 +841,27 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_db_result_t	result = zbx_db_select("select session_key,url from config");
+	zbx_db_result_t	result = zbx_db_select("select name, value_str from settings"
+			" where name='session_key' or name='url'");
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	manager->session_key = zbx_strdup(manager->session_key, "");
+	manager->zabbix_url = zbx_strdup(manager->zabbix_url, "");
+
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		manager->session_key = zbx_strdup(manager->session_key, row[0]);
-		manager->zabbix_url = zbx_strdup(manager->zabbix_url, row[1]);
+		const char	*name = row[0];
+		const char	*value = row[1];
+
+		if (0 == strcmp(name, "session_key"))
+		{
+			manager->session_key = zbx_strdup(manager->session_key, value);
+		}
+		else if (0 == strcmp(name, "url"))
+		{
+			manager->zabbix_url = zbx_strdup(manager->zabbix_url, value);
+		}
 	}
-	else
-	{
-		manager->session_key = zbx_strdup(manager->session_key, "");
-		manager->zabbix_url = zbx_strdup(manager->zabbix_url, "");
-	}
+
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

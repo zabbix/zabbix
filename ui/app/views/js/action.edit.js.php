@@ -26,11 +26,10 @@ window.action_edit_popup = new class {
 		this.actionid = actionid;
 		this.eventsource = eventsource;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'action.list');
-		backurl.setArgument('eventsource', this.eventsource);
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'action.list');
+		return_url.searchParams.set('eventsource', this.eventsource);
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this._initActionButtons();
 		this.#processTypeOfCalculation();
@@ -255,10 +254,8 @@ window.action_edit_popup = new class {
 		if (is_array(input.value)) {
 			input.value.forEach((value, index) => {
 				const element = {...input, name: input.name[index], value: input.value[index]};
-				const has_row = this._checkConditionRow(element);
 
-				const result = [has_row.some(element => element === true)]
-				if (result[0] === true) {
+				if (this.#isDuplicateCondition(element)) {
 					return;
 				}
 				else {
@@ -277,10 +274,7 @@ window.action_edit_popup = new class {
 			})
 		}
 		else {
-			const has_row = this._checkConditionRow(input);
-			const result = [has_row.some(element => element === true)];
-
-			if (result[0] === true) {
+			if (this.#isDuplicateCondition(input)) {
 				return;
 			}
 			else {
@@ -319,41 +313,61 @@ window.action_edit_popup = new class {
 	/**
 	 * Check if row with the same conditiontype and value already exists.
 	 */
-	_checkConditionRow(input) {
-		const result = [];
-		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(element => {
-			const table_row = element.getElementsByTagName('td')[2];
+	#isDuplicateCondition(input) {
+		for (const element of document.querySelectorAll(
+			`#conditionTable input[name*="[conditiontype]"][value="${input.conditiontype}"]`
+		)) {
+			const cell = element.parentNode;
+			const conditiontype = parseInt(element.value);
+			const value = cell.querySelector('input[name*="[value]"]').value;
+			const value2 = cell.querySelector('input[name*="[value2]"]').value;
 
-			if (table_row !== undefined) {
-				const conditiontype = table_row.getElementsByTagName('input')[0].value;
-				const value = table_row.getElementsByTagName('input')[2].value;
-				const value2 = table_row.getElementsByTagName('input')[3].value
-					? table_row.getElementsByTagName('input')[3].value
-					: null;
-
-				if (conditiontype == <?= ZBX_CONDITION_TYPE_SUPPRESSED ?>) {
-					result.push(input.conditiontype === conditiontype);
-				}
-				else {
-					if (input.value2 !== '') {
-						result.push(
-							input.conditiontype === conditiontype && input.value === value && input.value2 === value2
-						)
+			switch (conditiontype) {
+				case <?= ZBX_CONDITION_TYPE_HOST_GROUP ?>:
+				case <?= ZBX_CONDITION_TYPE_HOST ?>:
+				case <?= ZBX_CONDITION_TYPE_TRIGGER ?>:
+					if (input.value === value && input.value !== '0') {
+						return true;
 					}
-					else {
-						result.push(input.conditiontype === conditiontype && input.value === value)
-					}
-				}
+					break;
 
-				if (input.row_index == element.dataset.row_index) {
-					input.row_index++;
-				}
+				case <?= ZBX_CONDITION_TYPE_EVENT_NAME ?>:
+				case <?= ZBX_CONDITION_TYPE_TRIGGER_SEVERITY ?>:
+				case <?= ZBX_CONDITION_TYPE_TIME_PERIOD ?>:
+				case <?= ZBX_CONDITION_TYPE_DHOST_IP ?>:
+				case <?= ZBX_CONDITION_TYPE_DSERVICE_TYPE ?>:
+				case <?= ZBX_CONDITION_TYPE_DSERVICE_PORT ?>:
+				case <?= ZBX_CONDITION_TYPE_DSTATUS ?>:
+				case <?= ZBX_CONDITION_TYPE_DUPTIME ?>:
+				case <?= ZBX_CONDITION_TYPE_DVALUE ?>:
+				case <?= ZBX_CONDITION_TYPE_TEMPLATE ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>:
+				case <?= ZBX_CONDITION_TYPE_DRULE ?>:
+				case <?= ZBX_CONDITION_TYPE_DCHECK ?>:
+				case <?= ZBX_CONDITION_TYPE_PROXY ?>:
+				case <?= ZBX_CONDITION_TYPE_DOBJECT ?>:
+				case <?= ZBX_CONDITION_TYPE_HOST_NAME ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_TYPE ?>:
+				case <?= ZBX_CONDITION_TYPE_HOST_METADATA ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>:
+				case <?= ZBX_CONDITION_TYPE_SERVICE ?>:
+				case <?= ZBX_CONDITION_TYPE_SERVICE_NAME ?>:
+					if (input.value === value) {
+						return true;
+					}
+					break;
+
+				case <?= ZBX_CONDITION_TYPE_SUPPRESSED ?>:
+					return true;
+
+				case <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>:
+					if (input.value === value && input.value2 === value2) {
+						return true;
+					}
 			}
+		}
 
-			result.push(false);
-		});
-
-		return result;
+		return false;
 	}
 
 	submit() {

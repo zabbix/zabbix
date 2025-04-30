@@ -48,7 +48,7 @@ function Overlay(type, dialogueid) {
 		title: t('S_CLOSE')
 	}).click(function(e) {
 		e.preventDefault();
-		overlayDialogueDestroy(this.dialogueid, true);
+		overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 	}.bind(this));
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
@@ -95,6 +95,20 @@ function Overlay(type, dialogueid) {
 		content: jQuery('<div>', {'height': '68px', class: 'is-loading'})
 	});
 }
+
+/**
+ * Indication of overlay dialog being closed by user intent.
+ *
+ * @type {string}
+ */
+Overlay.prototype.CLOSE_BY_USER = 'close-by-user';
+
+/**
+ * Indication of overlay dialog being closed by script.
+ *
+ * @type {string}
+ */
+Overlay.prototype.CLOSE_BY_SCRIPT = 'close-by-script';
 
 /**
  * Centers the $dialog.
@@ -346,7 +360,7 @@ Overlay.prototype.makeButton = function(obj) {
 			this.cancel_action = null;
 
 			if (!obj.keepOpen) {
-				overlayDialogueDestroy(this.dialogueid, true);
+				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 			}
 		}
 
@@ -563,4 +577,6 @@ Overlay.prototype.setProperties = function(obj) {
 				break;
 		}
 	}
+
+	this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.update', {detail: {properties: Object.keys(obj)}}));
 };

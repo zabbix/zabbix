@@ -300,13 +300,13 @@ function getPosition(obj) {
  * Opens popup content in overlay dialogue.
  *
  * @param {string}           action              Popup controller related action.
- * @param {array|object}     parameters          Array with key/value pairs that will be used as query for popup
+ * @param {Array|Object}     parameters          Array with key/value pairs that will be used as query for popup
  *                                               request.
  *
  * @param {string}           dialogue_class      CSS class, usually based on .modal-popup and .modal-popup-{size}.
  * @param {string|null}      dialogueid          ID of overlay dialogue.
  * @param {HTMLElement|null} trigger_element     UI element which was clicked to open overlay dialogue.
- * @param {bool}             prevent_navigation  Show warning when navigating away from an active dialogue.
+ * @param {boolean}          prevent_navigation  Show warning when navigating away from an active dialogue.
  *
  * @returns {Overlay}
  */
@@ -472,28 +472,29 @@ function addToOverlaysStack(id, element, type, xhr) {
 
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
-	if (event.which == 27) { // ESC
-		var dialog = overlays_stack.end();
-		if (typeof dialog !== 'undefined') {
-			switch (dialog.type) {
+	if (event.which === KEY_ESCAPE) {
+		const overlay = overlays_stack.end();
+
+		if (typeof overlay !== 'undefined') {
+			switch (overlay.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid, true);
+					overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 					break;
 
 				// Close overlay hintbox.
 				case 'hintbox':
-					hintBox.hideHint(dialog.element, true);
+					hintBox.hideHint(overlay.element, true);
 					break;
 
 				// Close popup menu overlays.
 				case 'menu-popup':
-					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', dialog.element);
+					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', overlay.element);
 					break;
 
 				// Close context menu preloader.
 				case 'preloader':
-					overlayPreloaderDestroy(dialog.dialogueid);
+					overlayPreloaderDestroy(overlay.dialogueid);
 					break;
 
 				// Close overlay time picker.
@@ -523,18 +524,14 @@ function closeDialogHandler(event) {
 }
 
 /**
- * Removed overlay from overlays stack and sets focus to source element.
+ * Remove overlay from stack and set focus to source element.
  *
- * @param {string} dialogueid		Id of dialogue, that is being closed.
- * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
+ * @param {string}  dialogueid
+ * @param {boolean} return_focus  If true, overlay.element will be focused.
  *
- * @return {object|undefined|null}  Overlay object, if found.
+ * @return {Object|undefined}  Overlay object, if found.
  */
-function removeFromOverlaysStack(dialogueid, return_focus) {
-	if (return_focus !== false) {
-		return_focus = true;
-	}
-
+function removeFromOverlaysStack(dialogueid, return_focus = true) {
 	const overlay = overlays_stack.removeById(dialogueid);
 
 	if (overlay && return_focus) {
@@ -651,41 +648,6 @@ function addSelectedValues(object, parentid) {
 	});
 
 	jQuery(document).trigger('add.popup', data);
-}
-
-/**
- * Add media.
- *
- * @param {string} formname			name of destination form
- * @param {integer} media			media id. If -1, then assumes that this is new media
- * @param {integer} mediatypeid		media type id
- * @param {string} sendto			media sendto value
- * @param {string} period			media period value
- * @param {string} active			media active value
- * @param {string} severity			media severity value
- *
- * @returns true
- */
-function add_media(formname, media, mediatypeid, sendto, period, active, severity) {
-	var form = window.document.forms[formname];
-	var media_name = (media > -1) ? 'medias[' + media + ']' : 'new_media';
-
-	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
-	if (typeof sendto === "object") {
-		window.removeVarsBySelector(form, 'input[name^="'+media_name+'[sendto]"]');
-		jQuery(sendto).each(function(i, st) {
-			window.create_var(form, media_name + '[sendto]['+i+']', st);
-		});
-	}
-	else {
-		window.create_var(form, media_name + '[sendto]', sendto);
-	}
-	window.create_var(form, media_name + '[period]', period);
-	window.create_var(form, media_name + '[active]', active);
-	window.create_var(form, media_name + '[severity]', severity);
-
-	form.submit();
-	return true;
 }
 
 /**

@@ -57,7 +57,7 @@ $audit_settings_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Data storage period'), 'hk_audit'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('hk_audit', $data['hk_audit'], false, DB::getFieldLength('config', 'hk_audit')))
+			(new CTextBox('hk_audit', $data['hk_audit'], false, CSettingsSchema::getFieldLength('hk_audit')))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setEnabled($data['hk_audit_mode'] == 1)
 				->setAriaRequired()

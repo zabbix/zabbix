@@ -77,10 +77,7 @@ if ($data['proxies']) {
 			->setArgument('proxyid', $proxy['proxyid']);
 
 		$proxies[] = $data['user']['can_edit_proxies']
-			? (new CLink($proxy['name'], $proxy_url))
-				->setAttribute('data-proxyid', $proxy['proxyid'])
-				->setAttribute('data-action', 'proxy.edit')
-				->addClass('js-edit-proxy')
+			? new CLink($proxy['name'], $proxy_url)
 			: $proxy['name'];
 		$proxies[] = ', ';
 	}

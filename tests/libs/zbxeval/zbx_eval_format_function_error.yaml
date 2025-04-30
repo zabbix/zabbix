@@ -1,0 +1,28 @@
+---
+test case: NULL on key and host
+in:
+  func: "func"
+  param: "parameter"
+  error: "error"
+out:
+  result: "Cannot evaluate function func(/?/?,parameter): error."
+---
+test case: not NULL on key and host
+in:
+  func: "func"
+  param: "parameter"
+  error: "error"
+  host: "host"
+  key: "key"
+out:
+  result: "Cannot evaluate function func(/host/key,parameter): error."
+---
+test case: some ASCII in parameter
+in:
+  func: "func"
+  param: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+  error: "error"
+  host: "host"
+  key: "key"
+out:
+  result: "Cannot evaluate function func(/host/key,!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}): error."

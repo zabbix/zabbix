@@ -46,9 +46,9 @@
 #	include "preproc_snmp.h"
 #endif
 
-static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
-static zbx_flush_value_func_t	flush_value_func_cb = NULL;
-static zbx_get_progname_f	get_progname_func_cb = NULL;
+static zbx_preproc_prepare_value_func_t	preproc_prepare_value_func_cb = NULL;
+static zbx_preproc_flush_value_func_t	preproc_flush_value_func_cb = NULL;
+static zbx_get_progname_f		get_progname_func_cb = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -98,11 +98,11 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb, zbx_flush_value_func_t flush_value_cb,
-		zbx_get_progname_f get_progname_cb)
+void	zbx_init_library_preproc(zbx_preproc_prepare_value_func_t preproc_prepare_value_cb,
+		zbx_preproc_flush_value_func_t preproc_flush_value_cb, zbx_get_progname_f get_progname_cb)
 {
-	prepare_value_func_cb = prepare_value_cb;
-	flush_value_func_cb = flush_value_cb;
+	preproc_prepare_value_func_cb = preproc_prepare_value_cb;
+	preproc_flush_value_func_cb = preproc_flush_value_cb;
 	get_progname_func_cb = get_progname_cb;
 }
 
@@ -115,18 +115,18 @@ zbx_get_progname_f	preproc_get_progname_cb(void)
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: workers_num      - [IN] number of workers to create            *
- *             finished_cb      - [IN] callback to call after finishing       *
- *                                     task (optional)                        *
- *             finished_data    - [IN] callback data (optional)               *
- *             config_source_ip - [IN]                                        *
- *             config_timeout   - [IN]                                        *
- *             error            - [OUT]                                       *
+ * Parameters: workers_num         - [IN] number of workers to create         *
+ *             pp_finished_task_cb - [IN] callback to call after finishing    *
+ *                                        task (optional)                     *
+ *             finished_data       - [IN] callback data (optional)            *
+ *             config_source_ip    - [IN]                                     *
+ *             config_timeout      - [IN]                                     *
+ *             error               - [OUT]                                    *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
-static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_task_cb_t pp_finished_task_cb,
 		void *finished_data, const char *config_source_ip, int config_timeout, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
@@ -160,7 +160,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb
 			goto out;
 		}
 
-		pp_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
+		pp_worker_set_finished_task_cb(&manager->workers[i], pp_finished_task_cb, finished_data);
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
@@ -831,36 +831,18 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: flush preprocessed value                                          *
- *                                                                            *
- * Parameters: manager    - [IN] preprocessing manager                        *
- *             itemid     - [IN] item identifier                              *
- *             value_type - [IN] item value type                              *
- *             flags      - [IN] item flags                                   *
- *             value      - [IN] preprocessed item value                      *
- *             ts         - [IN] value timestamp                              *
- *             value_opt  - [IN] optional value data                          *
- *                                                                            *
- ******************************************************************************/
-static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
-		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
-{
-	flush_value_func_cb(manager, itemid, value_type, flags, value, ts, value_opt);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: handle new preprocessing request                                  *
  *                                                                            *
  * Parameters: manager    - [IN] preprocessing manager                        *
  *             message    - [IN] packed preprocessing request                 *
  *             direct_num - [OUT] number of directly flushed values           *
+ *             direct_sz  - [OUT] size of directly flushed values             *
  *                                                                            *
  *  Return value: The number of requests queued for preprocessing             *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
-		zbx_uint64_t *direct_num)
+		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz)
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
@@ -876,6 +858,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 	while (offset < message->size)
 	{
+		zbx_uint32_t		offset_prev = offset;
 		zbx_variant_t		var;
 		zbx_pp_value_opt_t	var_opt;
 		zbx_timespec_t		ts;
@@ -887,8 +870,9 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
 			(*direct_num)++;
+			*direct_sz += offset - offset_prev;
 			/* allow empty values */
-			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
+			preproc_flush_value_func_cb(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
 
 			zbx_variant_clear(&var);
@@ -944,6 +928,20 @@ static void	preprocessor_reply_queue_size(zbx_pp_manager_t *manager, zbx_ipc_cli
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_QUEUE, (unsigned char *)&pending_num, sizeof(pending_num));
 }
 
+static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t *client, zbx_uint64_t queued_num,
+		zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
+{
+	unsigned char	*data;
+	zbx_uint32_t	data_len;
+	zbx_uint64_t	pending_num = manager->queue.pending_num;
+
+	data_len = zbx_preprocessor_pack_values_stats(&data, queued_num, queued_sz, direct_num, direct_sz, pending_num);
+
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_SIZE, data, data_len);
+
+	zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: flush processed value task                                        *
@@ -961,8 +959,8 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
 
-	if (SUCCEED == prepare_value_func_cb(value, value_opt))
-		preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
+	if (SUCCEED == preproc_prepare_value_func_cb(value, value_opt))
+		preproc_flush_value_func_cb(manager, task->itemid, value_type, flags, value, ts, value_opt);
 }
 
 /******************************************************************************
@@ -1024,18 +1022,17 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
  *                                                                            *
  * Purpose: respond to diagnostic information request                         *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             client  - [IN] request source                                  *
- *                                                                            *
  ******************************************************************************/
-static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
+static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
 {
 	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num;
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
 	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
-	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num);
+	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num,
+			queued_num, queued_sz, direct_num, direct_sz);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 
@@ -1153,7 +1150,7 @@ static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, int worker
 	zbx_vector_dbl_destroy(&usage);
 }
 
-static void	preprocessor_finished_task_cb(void *data)
+static void	pp_finished_task_cb(void *data)
 {
 	zbx_ipc_service_alert((zbx_ipc_service_t *)data);
 }
@@ -1232,7 +1229,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_vector_pp_task_ptr_t		tasks;
 	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
-						processing_num = 0;
+						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
+						counter_direct_num = 0, counter_direct_sz = 0;
 
 	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
 						(((zbx_thread_args_t *)args)->args);
@@ -1254,7 +1252,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
+	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, pp_finished_task_cb,
 			(void *)&service, pp_manager_args_in->config_source_ip, pp_manager_args_in->config_timeout,
 			&error)))
 	{
@@ -1310,19 +1308,33 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 		if (NULL != message)
 		{
+			zbx_uint64_t	queued_once, direct_sz;
+
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
-					queued_num += preprocessor_add_request(manager, message, &direct_num);
+					direct_sz = 0;
+					queued_once = preprocessor_add_request(manager, message,
+							&direct_num, &direct_sz);
+					queued_num += queued_once;
+					counter_queued_num += queued_once;
+					counter_queued_sz += (zbx_uint64_t)message->size - direct_sz;
+					counter_direct_num += direct_num;
+					counter_direct_sz += direct_sz;
 					break;
 				case ZBX_IPC_PREPROCESSOR_QUEUE:
 					preprocessor_reply_queue_size(manager, client);
+					break;
+				case ZBX_IPC_PREPROCESSOR_SIZE:
+					preprocessor_reply_size(manager, client, counter_queued_num, counter_queued_sz,
+							counter_direct_num, counter_direct_sz);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TEST_REQUEST:
 					preprocessor_add_test_request(manager, client, message);
 					break;
 				case ZBX_IPC_PREPROCESSOR_DIAG_STATS:
-					preprocessor_reply_diag_info(manager, client);
+					preprocessor_reply_diag_info(manager, client, counter_queued_num,
+							counter_queued_sz, counter_direct_num, counter_direct_sz);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:

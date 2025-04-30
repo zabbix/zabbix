@@ -556,131 +556,6 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value2		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|actionid
 
-TABLE|config|configid|ZBX_DATA
-FIELD		|configid	|t_id		|	|NOT NULL	|0
-FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
-FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
-FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
-FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|discovery_groupid|t_id		|	|NULL		|0			|2|hstgrp	|groupid	|RESTRICT
-FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_NODATA
-FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_0|t_varchar(6)	|'97AAB3'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_1|t_varchar(6)	|'7499FF'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_2|t_varchar(6)	|'FFC859'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_3|t_varchar(6)	|'FFA059'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_4|t_varchar(6)	|'E97659'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_5|t_varchar(6)	|'E45959'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_name_0|t_varchar(32)	|'Not classified'|NOT NULL|ZBX_NODATA
-FIELD		|severity_name_1|t_varchar(32)	|'Information'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_NODATA
-FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_period	|t_varchar(32)	|'5m'	|NOT NULL	|ZBX_NODATA
-FIELD		|blink_period	|t_varchar(32)	|'2m'	|NOT NULL	|ZBX_NODATA
-FIELD		|problem_unack_color|t_varchar(6)|'CC0000'|NOT NULL	|ZBX_NODATA
-FIELD		|problem_ack_color|t_varchar(6)	|'CC0000'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_unack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_ack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
-FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|ok_ack_style	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|server_check_interval|t_integer|'10'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_trigger|t_varchar(32)|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_internal|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_discovery|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_autoreg|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_services_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_services	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_audit_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_audit	|t_varchar(32)	|'31d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_sessions_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_sessions	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_history_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_history_global|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|hk_history	|t_varchar(32)	|'31d'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
-FIELD		|custom_color	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|http_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|http_login_form	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|http_strip_domains	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_auth_enabled		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|compress_older	|t_varchar(32)	|'7d'	|NOT NULL	|ZBX_NODATA
-FIELD		|instanceid	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|default_lang		|t_varchar(5)	|'en_US'|NOT NULL	|ZBX_NODATA
-FIELD		|default_timezone	|t_varchar(50)	|'system'|NOT NULL	|ZBX_NODATA
-FIELD		|login_attempts	|t_integer	|'5'	|NOT NULL	|ZBX_NODATA
-FIELD		|login_block	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
-FIELD		|show_technical_errors	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|validate_uri_schemes	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|uri_valid_schemes	|t_varchar(255)	|'http,https,ftp,file,mailto,tel,ssh'	|NOT NULL	|ZBX_NODATA
-FIELD		|x_frame_options	|t_varchar(255)	|'SAMEORIGIN'	|NOT NULL	|ZBX_NODATA
-FIELD		|iframe_sandboxing_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|iframe_sandboxing_exceptions	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|max_overview_table_size	|t_integer	|'50'	|NOT NULL	|ZBX_NODATA
-FIELD		|history_period	|t_varchar(32)|	'24h'	|NOT NULL	|ZBX_NODATA
-FIELD		|period_default	|t_varchar(32)	|'1h'	|NOT NULL	|ZBX_NODATA
-FIELD		|max_period	|t_varchar(32)	|'2y'	|NOT NULL	|ZBX_NODATA
-FIELD		|socket_timeout	|t_varchar(32)	|'3s'	|NOT NULL	|ZBX_NODATA
-FIELD		|connect_timeout	|t_varchar(32)	|'3s'	|NOT NULL	|ZBX_NODATA
-FIELD		|media_type_test_timeout	|t_varchar(32)	|'65s'	|NOT NULL	|ZBX_NODATA
-FIELD		|script_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
-FIELD		|item_test_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
-FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|url			|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|report_test_timeout|t_varchar(32)|'60s'|NOT NULL	|ZBX_NODATA
-FIELD		|dbversion_status	|t_text	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
-FIELD		|passwd_min_length	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
-FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
-FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|ha_failover_delay	|t_varchar(32)	|'1m'	|NOT NULL	|ZBX_NODATA
-FIELD		|geomaps_tile_provider|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|geomaps_tile_url	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_userdirectoryid	|t_id	|NULL |NULL	|0		|3|userdirectory	|userdirectoryid|RESTRICT
-FIELD		|server_status		|t_text	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|jit_provision_interval		|t_varchar(32)	|'1h'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_jit_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_jit_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|disabled_usrgrpid			|t_id			|NULL	|NULL		|ZBX_NODATA	|4|usrgrp	|usrgrpid|RESTRICT
-FIELD		|timeout_zabbix_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_simple_check	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_snmp_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_external_check	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_db_monitor	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_http_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_ssh_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_telnet_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|timeout_script		|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|auditlog_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|mfa_status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|mfaid			|t_id		|	|NULL		|0		|5|mfa	|	|RESTRICT
-FIELD		|software_update_checkid|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|software_update_check_data	|t_text	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|timeout_browser	|t_varchar(255)	|'60s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-INDEX		|1		|alert_usrgrpid
-INDEX		|2		|discovery_groupid
-INDEX		|3		|ldap_userdirectoryid
-INDEX		|4		|disabled_usrgrpid
-INDEX		|5		|mfaid
-
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
 FIELD		|expression	|t_varchar(2048)|''	|NOT NULL	|0
@@ -925,6 +800,9 @@ FIELD		|severity_min	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|3|users	|		|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|show_suppressed|t_integer	|'0'	|NOT NULL	|0
+FIELD		|background_scale	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|show_element_label	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|show_link_label	|t_integer	|'1'	|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|backgroundid
 INDEX		|3		|iconmapid
@@ -950,6 +828,8 @@ FIELD		|height		|t_integer	|'200'	|NOT NULL	|0
 FIELD		|viewtype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|use_iconmap	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer		|'0'|NOT NULL	|0
+FIELD		|show_label	|t_integer	|'-1'	|NOT NULL	|0
+FIELD		|zindex		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|sysmapid
 INDEX		|2		|iconid_off
 INDEX		|3		|iconid_on
@@ -964,9 +844,13 @@ FIELD		|selementid2	|t_id		|	|NOT NULL	|0			|3|sysmaps_elements|selementid
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|color		|t_varchar(6)	|'000000'|NOT NULL	|0
 FIELD		|label		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|show_label	|t_integer	|'-1'	|NOT NULL	|0
+FIELD		|indicator_type	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NULL		|0			|4|items|itemid|RESTRICT
 INDEX		|1		|sysmapid
 INDEX		|2		|selementid1
 INDEX		|3		|selementid2
+INDEX		|4		|itemid
 
 TABLE|sysmaps_link_triggers|linktriggerid|ZBX_TEMPLATE
 FIELD		|linktriggerid	|t_id		|	|NOT NULL	|0
@@ -976,6 +860,17 @@ FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|color		|t_varchar(6)	|'000000'|NOT NULL	|0
 UNIQUE		|1		|linkid,triggerid
 INDEX		|2		|triggerid
+
+TABLE|sysmap_link_threshold|linkthresholdid|ZBX_TEMPLATE
+FIELD		|linkthresholdid	|t_id		|	|NOT NULL	|0
+FIELD		|linkid		|t_id		|	|NOT NULL	|0			|1|sysmaps_links
+FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|color		|t_varchar(6)	|'000000'|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|threshold	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|pattern	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|linkid
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_TEMPLATE
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
@@ -2325,8 +2220,22 @@ FIELD		|used_codes		|t_varchar(32)	|'' |NOT NULL	|0
 INDEX		|1			|mfaid
 INDEX		|2			|userid
 
+TABLE|settings|name|ZBX_DATA
+FIELD		|name			|t_varchar(255)	|	|NOT NULL	|0
+FIELD		|type			|t_integer	|	|NOT NULL	|ZBX_PROXY
+FIELD		|value_str		|t_text		|''	|NOT NULL	|ZBX_PROXY
+FIELD		|value_int		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|value_usrgrpid		|t_id		|	|NULL		|		|2|usrgrp		|usrgrpid		|RESTRICT
+FIELD		|value_hostgroupid	|t_id		|	|NULL		|		|3|hstgrp		|groupid		|RESTRICT
+FIELD		|value_userdirectoryid	|t_id		|	|NULL		|		|4|userdirectory|userdirectoryid|RESTRICT
+FIELD		|value_mfaid		|t_id		|	|NULL		|		|5|mfa			|mfaid			|RESTRICT
+INDEX		|2		|value_usrgrpid
+INDEX		|3		|value_hostgroupid
+INDEX		|4		|value_userdirectoryid
+INDEX		|5		|value_mfaid
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7020000	|7020000
+ROW		|1		|7030032	|7030032

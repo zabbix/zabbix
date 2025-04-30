@@ -425,7 +425,8 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  * Purpose: quotes user macro context if necessary                              *
  *                                                                              *
  * Parameters: context     - [IN] macro context                                 *
- *             force_quote - [IN] if non zero then context quoting is enforced  *
+ *             force_quote - [IN] if non zero then context quoting is enforced, *
+ *                                except case when context ends with backslash  *
  *             error       - [OUT] error message                                *
  *                                                                              *
  * Return value:                                                                *
@@ -434,23 +435,23 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  ********************************************************************************/
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error)
 {
-	int		len, quotes = 0;
+	int		len, quotes = 0, req_quote = 0;
 	char		*buffer, *ptr_buffer;
 	const char	*ptr_context = context, *start = context;
 
 	if ('"' == *ptr_context || ' ' == *ptr_context)
-		force_quote = 1;
+		req_quote = 1;
 
 	for (; '\0' != *ptr_context; ptr_context++)
 	{
 		if ('}' == *ptr_context)
-			force_quote = 1;
+			req_quote = 1;
 
 		if ('"' == *ptr_context)
 			quotes++;
 	}
 
-	if (0 == force_quote)
+	if (0 == req_quote && (0 == force_quote || (ptr_context != context && '\\' == *(--ptr_context))))
 		return zbx_strdup(NULL, context);
 
 	len = (int)strlen(context) + 2 + quotes;

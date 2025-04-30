@@ -236,7 +236,7 @@ Refer to the vendor documentation.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Sensor {#SENSOR.NAME}: Value|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>A string representation of the value of the sensor. Because sensors can present data in different formats, string representation is the most general format. Interpretation of the value (units of measure, for example) is dependent on the individual sensor.</p>|Dependent item|hw.sensor.value[fgHwSensorEntValue.{#SENSOR.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.12356.101.4.3.2.1.3.{#SENSOR.ID}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Sensor {#SENSOR.NAME}: Alarm status|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>If the sensor has an alarm threshold and has exceeded it, this will indicate its status. Not all sensors have alarms. </p>|Dependent item|hw.sensor.status[fgHwSensorEntAlarmStatus.{#SENSOR.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.12356.101.4.3.2.1.4.{#SENSOR.ID}`</p></li></ul>|
+|Sensor {#SENSOR.NAME}: Alarm status|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>If the sensor has an alarm threshold and has exceeded it, this will indicate its status. Not all sensors have alarms.</p>|Dependent item|hw.sensor.status[fgHwSensorEntAlarmStatus.{#SENSOR.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.12356.101.4.3.2.1.4.{#SENSOR.ID}`</p></li></ul>|
 
 ### LLD rule SoC3 discovery
 

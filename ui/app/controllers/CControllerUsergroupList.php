@@ -78,20 +78,51 @@ class CControllerUsergroupList extends CController {
 			'filter' => $filter,
 			'profileIdx' => 'web.usergroup.filter',
 			'active_tab' => CProfile::get('web.usergroup.filter.active', 1),
-			'usergroups' => API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
-				'selectUsers' => ['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'],
-				'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
-				'filter' => ['users_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
-				'sortfield' => $sort_field,
-				'limit' => $limit
-			]),
 			'allowed_ui_users' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)
 		];
 
-		// data sort and pager
-		CArrayHelper::sort($data['usergroups'], [['field' => $sort_field, 'order' => $sort_order]]);
+		$user_groups = API::UserGroup()->get([
+			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
+			'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
+			'filter' => ['users_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
+			'sortfield' => $sort_field,
+			'limit' => $limit,
+			'preservekeys' => true
+		]);
 
+		if ($user_groups) {
+			$users = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'usrgrpids' => array_keys($user_groups),
+				'selectUsrgrps' => ['usrgrpid'],
+				'getAccess' => true
+			]);
+
+			foreach ($user_groups as $usrgrpid => &$user_group) {
+				$usergroup_users = [];
+
+				foreach ($users as $user) {
+					if (array_key_exists($usrgrpid, array_flip(array_column($user['usrgrps'], 'usrgrpid')))) {
+						$usergroup_users[] = array_intersect_key($user,
+							array_flip(['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'])
+						);
+					}
+				}
+
+				$user_group['users'] = $usergroup_users;
+			}
+			unset($user_group);
+
+			$data['usergroups'] = $user_groups;
+
+			// data sort
+			CArrayHelper::sort($data['usergroups'], [['field' => $sort_field, 'order' => $sort_order]]);
+		}
+		else {
+			$data['usergroups'] = [];
+		}
+
+		// data pager
 		$page_num = getRequest('page', 1);
 		CPagerHelper::savePage('usergroup.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['usergroups'], $sort_order,

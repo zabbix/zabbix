@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.calendar.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.coverride.js');
 $this->addJsFile('class.crangecontrol.js');
@@ -27,10 +26,14 @@ $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
-$this->addJsFile('class.svg.canvas.js');
-$this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('class.imagecache.js');
+$this->addJsFile('class.svgcanvas.js');
+$this->addJsFile('class.svgtextarea.js');
+$this->addJsFile('class.svgelement.js');
+$this->addJsFile('class.svgmap.js');
+$this->addJsFile('class.svgmapelement.js');
+$this->addJsFile('class.svgmaplink.js');
+$this->addJsFile('class.svgmapshape.js');
 $this->addJsFile('class.widgets-data.js');
 $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
@@ -42,7 +45,6 @@ $this->addJsFile('class.widget-field.checkbox-list.js');
 $this->addJsFile('class.widget-field.multiselect.js');
 $this->addJsFile('class.widget-field.time-period.js');
 $this->addJsFile('class.widget-select.popup.js');
-$this->addJsFile('colorpicker.js');
 $this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');

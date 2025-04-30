@@ -336,7 +336,7 @@ class CProxyGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDuplicates(array $proxy_groups, array $db_proxy_groups = null): void {
+	private static function checkDuplicates(array $proxy_groups, ?array $db_proxy_groups = null): void {
 		$names = [];
 
 		foreach ($proxy_groups as $proxy_group) {

@@ -29,10 +29,9 @@ window.service_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'service.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'service.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		for (const status_rule of status_rules) {
 			this.#addStatusRule(status_rule);
@@ -433,12 +432,6 @@ window.service_edit_popup = new class {
 
 	delete() {
 		this.overlay.setLoading();
-
-		const backurl = popupManagerInstance.getBackUrl();
-
-		if (backurl) {
-			popupManagerInstance.setUrl(backurl);
-		}
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'service.delete');

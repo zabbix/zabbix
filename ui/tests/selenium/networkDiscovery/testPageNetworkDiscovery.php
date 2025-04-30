@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -566,7 +566,8 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'single' => true,
 					'action' => 'Delete',
-					'error' => 'Discovery rule "Discovery rule for deleting, used in Action" is used in "Action with discovery rule" action.'
+					'error' => 'Cannot delete discovery rule "Discovery rule for deleting, used in Action": '.
+							'action "Action with discovery rule" uses this discovery rule.'
 				]
 			],
 			// Delete action for discovery rule check which is used in action.
@@ -577,7 +578,9 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'single' => true,
 					'action' => 'Delete',
-					'error' => 'Discovery rule "Discovery rule for deleting, check used in Action" is used in "Action with discovery check" action.'
+					'error' => 'Cannot delete discovery check "Telnet (15)" of discovery rule '.
+							'"Discovery rule for deleting, check used in Action"'.
+							': action "Action with discovery check" uses this discovery check.'
 				]
 			]
 		];

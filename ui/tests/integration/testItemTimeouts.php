@@ -375,7 +375,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProviderTrace
-	 * @backup config
+	 * @backup settings
 	 */
 	public function testItemTimeouts_checkConfigSync() {
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -436,7 +436,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server, agent, agent2
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, history_text, items, item_rtdata
+	 * @backup settings, history_text, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkTimeouts() {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -476,7 +476,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, hosts, items, item_rtdata
+	 * @backup settings, hosts, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkSnmp() {
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -510,7 +510,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, hosts, items, item_rtdata
+	 * @backup settings, hosts, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkSsh() {
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -547,7 +547,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, hosts, items, item_rtdata
+	 * @backup settings, hosts, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkSimple() {
 		$response = $this->call('host.update', [

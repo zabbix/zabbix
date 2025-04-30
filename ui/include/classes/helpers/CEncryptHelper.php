@@ -94,15 +94,12 @@ class CEncryptHelper {
 	 *
 	 * @param string $key
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function updateKey(string $key): bool {
-		$db_config = DB::select('config', ['output' => ['configid']])[0];
-
-		return DBexecute(
-			'UPDATE config'.
-			' SET session_key='.zbx_dbstr($key).
-			' WHERE '.dbConditionInt('configid', [$db_config['configid']])
-		);
+		return DB::update('settings', [
+			'values' => ['value_str' => $key],
+			'where' => ['name' => 'session_key']
+		]);
 	}
 }

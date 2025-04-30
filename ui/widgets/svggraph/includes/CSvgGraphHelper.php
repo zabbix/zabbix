@@ -68,6 +68,8 @@ class CSvgGraphHelper {
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['templateid'], $options['override_hostid'], $options['overrides']);
+		// Reset unused Y-scale axes while taking overrides into account.
+		self::resetUnusedAxes($metrics, $options['axes']);
 		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
@@ -480,6 +482,29 @@ class CSvgGraphHelper {
 				}
 				unset($metric);
 			}
+		}
+	}
+
+	private static function resetUnusedAxes(array $metrics, array &$axis_options): void {
+		$left_side_has_metrics = false;
+		$right_side_has_metrics = false;
+
+		foreach ($metrics as $metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$left_side_has_metrics = true;
+			}
+
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				$right_side_has_metrics = true;
+			}
+		}
+
+		if (!$left_side_has_metrics) {
+			$axis_options['show_left_y_axis'] = false;
+		}
+
+		if (!$right_side_has_metrics) {
+			$axis_options['show_right_y_axis'] = false;
 		}
 	}
 

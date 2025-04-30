@@ -19,28 +19,13 @@
  * @var array $data
  */
 
-$this->includeJsFile('administration.user.edit.common.js.php');
-$this->includeJsFile(($data['action'] === 'user.edit')
-	? 'administration.user.edit.js.php'
-	: 'administration.userprofile.edit.js.php'
-);
+$this->includeJsFile('administration.user.edit.js.php');
 
 $html_page = new CHtmlPage();
 
-if ($data['action'] === 'user.edit') {
-	$widget_name = _('Users');
-	$doc_url = CDocHelper::USERS_USER_EDIT;
-	$csrf_token = CCsrfTokenHelper::get('user');
-}
-else {
-	$widget_name = _('User profile').NAME_DELIMITER;
-	$widget_name .= ($data['name'] !== '' || $data['surname'] !== '')
-		? $data['name'].' '.$data['surname']
-		: $data['username'];
-	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
-	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
-	$csrf_token = CCsrfTokenHelper::get('userprofile');
-}
+$widget_name = _('Users');
+$doc_url = CDocHelper::USERS_USER_EDIT;
+$csrf_token = CCsrfTokenHelper::get('user');
 
 $html_page
 	->setTitle($widget_name)
@@ -72,48 +57,46 @@ $user_form = (new CForm())
 // Create form list and user tab.
 $user_form_list = new CFormList('user_form_list');
 
-if ($data['action'] === 'user.edit') {
-	$user_form_list
-		->addRow((new CLabel(_('Username'), 'username'))->setAsteriskMark(),
-			(new CTextBox('username', $data['username']))
-				->setReadonly($data['db_user']['username'] === ZBX_GUEST_USER || $data['readonly'])
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('users', 'username'))
-		)
-		->addRow(_x('Name', 'user first name'),
-			(new CTextBox('name', $data['name']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
-				->setReadonly($data['readonly'])
-		)
-		->addRow(_('Last name'),
-			(new CTextBox('surname', $data['surname']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
-				->setReadonly($data['readonly'])
-		)
-		->addRow(
-			new CLabel(_('Groups'), 'user_groups__ms'),
-			(new CMultiSelect([
-				'name' => 'user_groups[]',
-				'object_name' => 'usersGroups',
-				'data' => $data['groups'],
-				'readonly' => $data['readonly'],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'usrgrp',
-						'srcfld1' => 'usrgrpid',
-						'dstfrm' => $user_form->getName(),
-						'dstfld1' => 'user_groups_'
-					]
+$user_form_list
+	->addRow((new CLabel(_('Username'), 'username'))->setAsteriskMark(),
+		(new CTextBox('username', $data['username']))
+			->setReadonly($data['db_user']['username'] === ZBX_GUEST_USER || $data['readonly'])
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('users', 'username'))
+	)
+	->addRow(_x('Name', 'user first name'),
+		(new CTextBox('name', $data['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
+			->setReadonly($data['readonly'])
+	)
+	->addRow(_('Last name'),
+		(new CTextBox('surname', $data['surname']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
+			->setReadonly($data['readonly'])
+	)
+	->addRow(
+		new CLabel(_('Groups'), 'user_groups__ms'),
+		(new CMultiSelect([
+			'name' => 'user_groups[]',
+			'object_name' => 'usersGroups',
+			'data' => $data['groups'],
+			'readonly' => $data['readonly'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'usrgrp',
+					'srcfld1' => 'usrgrpid',
+					'dstfrm' => $user_form->getName(),
+					'dstfld1' => 'user_groups_'
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-		);
-}
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	);
 
 if ($data['change_password']) {
 	$user_form->disablePasswordAutofill();
@@ -163,11 +146,8 @@ if ($data['change_password']) {
 	$current_password = (new CPassBox('current_password'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->setAriaRequired()
-		->setAttribute('autocomplete', 'off');
-
-	if ($data['action'] !== 'user.edit') {
-		$current_password->setAttribute('autofocus', 'autofocus');
-	}
+		->setAttribute('autocomplete', 'off')
+		->setAttribute('autofocus', 'autofocus');
 
 	if (CWebUser::$data['userid'] == $data['userid']) {
 		$user_form_list
@@ -196,7 +176,7 @@ if ($data['change_password']) {
 else {
 	$change_password_enabled = !$data['readonly'] && $data['internal_auth'];
 
-	if ($change_password_enabled && $data['action'] === 'user.edit') {
+	if ($change_password_enabled) {
 		$change_password_enabled = $data['db_user']['username'] !== ZBX_GUEST_USER;
 	}
 
@@ -227,7 +207,7 @@ $theme_select = (new CSelect('theme'))
 	->addOption(new CSelectOption(THEME_DEFAULT, _('System default')));
 
 $language_error = null;
-if ($data['action'] === 'user.edit' && $data['db_user']['username'] === ZBX_GUEST_USER) {
+if ($data['db_user']['username'] === ZBX_GUEST_USER) {
 	$lang_select
 		->setName(null)
 		->setReadonly();
@@ -286,7 +266,7 @@ $user_form_list
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
-if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER) {
+if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$user_form_list->addRow(_('Auto-login'),
@@ -322,560 +302,335 @@ $user_form_list
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
 
+$is_own_user = $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0;
+
 // Media tab.
-if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-	$media_form_list = new CFormList('userMediaFormList');
-	$user_form->addVar('medias', $data['medias']);
+$media = new CPartial('user.edit.media.tab', [
+	'form' => $user_form,
+	'can_edit_media' => $is_own_user
+		? CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
+		: CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)
+] + $data);
 
-	$media_table_info = (new CTable())
-		->setId('media-table')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')]);
-
-	foreach ($data['medias'] as $index => $media) {
-		if (!array_key_exists($media['mediatypeid'], $data['mediatypes'])) {
-			$media_name = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_DISABLED);
-			$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
-		}
-		elseif ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
-			$media_name = $media['name'];
-
-			if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-				$status = (new CButtonLink(_('Enabled')))
-					->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
-					->addClass(ZBX_STYLE_GREEN);
-			}
-			else {
-				$status = (new CButtonLink(_('Disabled')))
-					->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
-					->addClass(ZBX_STYLE_RED);
-			}
-		}
-		else {
-			$media_name = [
-				new CSpan($media['name']),
-				makeWarningIcon(_('Media type disabled by Administration.'))
-			];
-			$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
-		}
-
-		$parameters = [
-			'dstfrm' => $user_form->getName(),
-			'media' => $index,
-			'mediatypeid' => $media['mediatypeid'],
-			'period' => $media['period'],
-			'severity' => $media['severity'],
-			'active' => $media['active'],
-			'userdirectory_mediaid' => $media['userdirectory_mediaid']
-		];
-
-		if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
-			$parameters['sendto_emails'] = $media['sendto'];
-		}
-		else {
-			if (is_array($media['sendto'])) {
-				$media['sendto'] = implode(', ', $media['sendto']);
-			}
-			$parameters['sendto'] = $media['sendto'];
-		}
-
-		$media_severity = [];
-
-		if (array_key_exists('mediaid', $media)) {
-			$parameters['mediaid'] = $media['mediaid'];
-		}
-
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = CSeverityHelper::getName($severity);
-
-			$media_active = ($media['severity'] & (1 << $severity));
-
-			$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
-				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
-				->addClass($media_active
-					? CSeverityHelper::getStatusStyle($severity)
-					: ZBX_STYLE_STATUS_DISABLED
-				);
-		}
-
-		if (is_array($media['sendto'])) {
-			$media['sendto'] = implode(', ', $media['sendto']);
-		}
-
-		if (mb_strlen($media['sendto']) > 50) {
-			$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
-		}
-
-		$media_table_info->addRow(
-			(new CRow([
-				$media_name,
-				$media['sendto'],
-				(new CDiv($media['period']))
-					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-				(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
-				$status,
-				(new CCol(
-					new CHorList([
-						(new CButtonLink(_('Edit')))
-							->setAttribute('data-parameters', json_encode($parameters))
-							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters),
-								{dialogue_class: "modal-popup-generic"});'
-							),
-						(new CButtonLink(_('Remove')))
-							->setEnabled(!$parameters['userdirectory_mediaid'])
-							->onClick('removeMedia('.$index.');')
-					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			]))->setId('medias_'.$index)
-		);
-	}
-
-	$media_form_list->addRow(_('Media'),
-		(new CDiv([
-			$media_table_info,
-			(new CButtonLink(_('Add')))
-				->onClick('PopUp("popup.media", '.
-					json_encode(['dstfrm' => $user_form->getName()]).
-					', {dialogue_class: "modal-popup-generic"});'
-				)
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-
-	$tabs->addTab('mediaTab', _('Media'), $media_form_list, TAB_INDICATOR_MEDIA);
-}
+$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
 // Permissions tab.
-if ($data['action'] === 'user.edit') {
-	$permissions_form_list = new CFormList('permissionsFormList');
+$permissions_form_list = new CFormList('permissionsFormList');
 
-	$role_disabled = $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0;
-	$role_disabled |= $data['readonly'];
+$role_disabled = $is_own_user;
+$role_disabled |= $data['readonly'];
 
-	$role_multiselect = (new CMultiSelect([
-		'name' => 'roleid',
-		'object_name' => 'roles',
-		'data' => $data['role'],
-		'multiple' => false,
-		'readonly' => $role_disabled,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'roles',
-				'srcfld1' => 'roleid',
-				'dstfrm' => 'user_form',
-				'dstfld1' => 'roleid'
-			]
+$role_multiselect = (new CMultiSelect([
+	'name' => 'roleid',
+	'object_name' => 'roles',
+	'data' => $data['role'],
+	'multiple' => false,
+	'readonly' => $role_disabled,
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'roles',
+			'srcfld1' => 'roleid',
+			'dstfrm' => 'user_form',
+			'dstfld1' => 'roleid'
 		]
-	]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+	]
+]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
-	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-		$permissions_form_list->addRow(new CLabel(_('Role')),
-			(new CDiv([
-				$role_multiselect,
-				new CDiv(_('User cannot change own role.'))
-			]))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->addClass('multiselect-description-container')
-		);
+if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
+	$permissions_form_list->addRow(new CLabel(_('Role')),
+		(new CDiv([
+			$role_multiselect,
+			new CDiv(_('User cannot change own role.'))
+		]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('multiselect-description-container')
+	);
+}
+else {
+	$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark($data['roleid_required']),
+		$role_multiselect
+	);
+}
+
+if ($data['roleid']) {
+	$permissions_form_list->addRow(_('User type'),
+		new CTextBox('user_type', user_type2str($data['user_type']), true)
+	);
+
+	$permissions_table = (new CTable())
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([_('Group'), _('Type'), _('Permissions')]);
+
+	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+		$permissions_table->addRow([italic(_('All groups')), _('Hosts'), permissionText(PERM_READ_WRITE)]);
+		$permissions_table->addRow([italic(_('All groups')), _('Templates'), permissionText(PERM_READ_WRITE)]);
 	}
 	else {
-		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark($data['roleid_required']),
-			$role_multiselect
-		);
+		foreach ($data['groups_rights'] as $groupid => $group_rights) {
+			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+				$group_name = ($groupid == 0)
+					? italic(_('All groups'))
+					: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
+			}
+			else {
+				$group_name = $group_rights['name'];
+			}
+
+			$permissions_table->addRow([$group_name, _('Hosts'), permissionText($group_rights['permission'])]);
+		}
+
+		foreach ($data['templategroups_rights'] as $groupid => $group_rights) {
+			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+				$group_name = ($groupid == 0)
+					? italic(_('All groups'))
+					: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
+			}
+			else {
+				$group_name = $group_rights['name'];
+			}
+
+			$permissions_table->addRow([$group_name, _('Templates'), permissionText($group_rights['permission'])]);
+		}
 	}
 
-	if ($data['roleid']) {
-		$permissions_form_list->addRow(_('User type'),
-			new CTextBox('user_type', user_type2str($data['user_type']), true)
-		);
+	$permissions_form_list
+		->addRow(_('Permissions'),
+			(new CDiv($permissions_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addInfo(_('Permissions can be assigned for user groups only.'));
 
-		$permissions_table = (new CTable())
-			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Group'), _('Type'), _('Permissions')]);
+	// UI elements section.
 
-		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-			$permissions_table->addRow([italic(_('All groups')), _('Hosts'), permissionText(PERM_READ_WRITE)]);
-			$permissions_table->addRow([italic(_('All groups')), _('Templates'), permissionText(PERM_READ_WRITE)]);
-		}
-		else {
-			foreach ($data['groups_rights'] as $groupid => $group_rights) {
-				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
-					$group_name = ($groupid == 0)
-						? italic(_('All groups'))
-						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
-				}
-				else {
-					$group_name = $group_rights['name'];
-				}
+	$permissions_form_list
+		->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
 
-				$permissions_table->addRow([$group_name, _('Hosts'), permissionText($group_rights['permission'])]);
-			}
+	foreach (CRoleHelper::getUiSectionsLabels($data['user_type']) as $section_name => $section_label) {
+		$elements = [];
 
-			foreach ($data['templategroups_rights'] as $groupid => $group_rights) {
-				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
-					$group_name = ($groupid == 0)
-						? italic(_('All groups'))
-						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
-				}
-				else {
-					$group_name = $group_rights['name'];
-				}
-
-				$permissions_table->addRow([$group_name, _('Templates'), permissionText($group_rights['permission'])]);
-			}
-		}
-
-		$permissions_form_list
-			->addRow(_('Permissions'),
-				(new CDiv($permissions_table))
-					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			)
-			->addInfo(_('Permissions can be assigned for user groups only.'));
-
-		// UI elements section.
-
-		$permissions_form_list
-			->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
-
-		foreach (CRoleHelper::getUiSectionsLabels($data['user_type']) as $section_name => $section_label) {
-			$elements = [];
-
-			foreach (CRoleHelper::getUiSectionRulesLabels($section_name, $data['user_type']) as $rule_name => $rule_label) {
-				$elements[] = (new CSpan($rule_label))->addClass(
-					CRoleHelper::checkAccess($rule_name, $data['roleid']) ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-				);
-			}
-
-			if ($elements) {
-				$permissions_form_list->addRow($section_label, (new CDiv($elements))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-				);
-			}
-		}
-
-		// Services section.
-
-		$permissions_form_list->addRow(
-			(new CTag('h4', true, _('Access to services')))->addClass('input-section-header')
-		);
-
-		if ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
-			$permissions_form_list->addRow(
-				_('Read-write access to services'),
-				(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-		elseif ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
-			$permissions_form_list->addRow(
-				_('Read-write access to services'),
-				(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-		elseif ($data['service_write_list']) {
-			$service_list = [];
-
-			foreach ($data['service_write_list'] as $service) {
-				$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
-			}
-
-			$permissions_form_list->addRow(
-				_('Read-write access to services'),
-				(new CDiv($service_list))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
+		foreach (CRoleHelper::getUiSectionRulesLabels($section_name, $data['user_type']) as $rule_name => $rule_label) {
+			$elements[] = (new CSpan($rule_label))->addClass(
+				CRoleHelper::checkAccess($rule_name, $data['roleid']) ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
 			);
 		}
 
-		if ($data['service_write_tag']['tag'] !== '') {
-			$permissions_form_list->addRow(
-				_('Read-write access to services with tag'),
-				(new CDiv(
-					(new CSpan([
-						$data['service_write_tag']['tag'],
-						$data['service_write_tag']['value'] !== '' ? ': '.$data['service_write_tag']['value'] : null
-					]))->addClass(ZBX_STYLE_TAG)
-				))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-
-		if ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
-			$permissions_form_list->addRow(
-				_('Read-only access to services'),
-				(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-		elseif ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
-			$permissions_form_list->addRow(
-				_('Read-only access to services'),
-				(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-		elseif ($data['service_read_list']) {
-			$service_list = [];
-
-			foreach ($data['service_read_list'] as $service) {
-				$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
-			}
-
-			$permissions_form_list->addRow(
-				_('Read-only access to services'),
-				(new CDiv($service_list))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-
-		if ($data['service_read_tag']['tag'] !== '') {
-			$permissions_form_list->addRow(
-				_('Read-only access to services with tag'),
-				(new CDiv(
-					(new CSpan([
-						$data['service_read_tag']['tag'],
-						$data['service_read_tag']['value'] !== '' ? ': '.$data['service_read_tag']['value'] : null
-					]))->addClass(ZBX_STYLE_TAG)
-				))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-			);
-		}
-
-		// Modules section.
-
-		$permissions_form_list->addRow(
-			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-		);
-
-		if (!$data['modules']) {
-			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
-		}
-		else {
-			$elements = [];
-
-			foreach ($data['modules'] as $moduleid => $module_name) {
-				$elements[] = (new CSpan($module_name))->addClass(
-					array_key_exists($moduleid, $data['disabled_moduleids'])
-							|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
-						? ZBX_STYLE_STATUS_GREY
-						: ZBX_STYLE_STATUS_GREEN
-				);
-			}
-
-			if ($elements) {
-				$permissions_form_list->addRow((new CDiv($elements))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
-				);
-			}
-		}
-
-		// API section.
-
-		$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
-		$permissions_form_list
-			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
-			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-					$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-				)))
+		if ($elements) {
+			$permissions_form_list->addRow($section_label, (new CDiv($elements))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
 			);
+		}
+	}
 
-		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+	// Services section.
 
-		if ($api_methods) {
-			$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
-			$elements = [];
+	$permissions_form_list->addRow(
+		(new CTag('h4', true, _('Access to services')))->addClass('input-section-header')
+	);
 
-			foreach ($api_methods as $api_method) {
-				$elements[] = (new CSpan($api_method))->addClass(
-					$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-				);
-			}
+	if ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
+		$permissions_form_list->addRow(
+			_('Read-write access to services'),
+			(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+	elseif ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
+		$permissions_form_list->addRow(
+			_('Read-write access to services'),
+			(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+	elseif ($data['service_write_list']) {
+		$service_list = [];
 
-			$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
-				(new CDiv($elements))
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-					->addClass('rules-status-container')
+		foreach ($data['service_write_list'] as $service) {
+			$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
+		}
+
+		$permissions_form_list->addRow(
+			_('Read-write access to services'),
+			(new CDiv($service_list))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+
+	if ($data['service_write_tag']['tag'] !== '') {
+		$permissions_form_list->addRow(
+			_('Read-write access to services with tag'),
+			(new CDiv(
+				(new CSpan([
+					$data['service_write_tag']['tag'],
+					$data['service_write_tag']['value'] !== '' ? ': '.$data['service_write_tag']['value'] : null
+				]))->addClass(ZBX_STYLE_TAG)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+
+	if ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
+		$permissions_form_list->addRow(
+			_('Read-only access to services'),
+			(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+	elseif ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
+		$permissions_form_list->addRow(
+			_('Read-only access to services'),
+			(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+	elseif ($data['service_read_list']) {
+		$service_list = [];
+
+		foreach ($data['service_read_list'] as $service) {
+			$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
+		}
+
+		$permissions_form_list->addRow(
+			_('Read-only access to services'),
+			(new CDiv($service_list))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+
+	if ($data['service_read_tag']['tag'] !== '') {
+		$permissions_form_list->addRow(
+			_('Read-only access to services with tag'),
+			(new CDiv(
+				(new CSpan([
+					$data['service_read_tag']['tag'],
+					$data['service_read_tag']['value'] !== '' ? ': '.$data['service_read_tag']['value'] : null
+				]))->addClass(ZBX_STYLE_TAG)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+	}
+
+	// Modules section.
+
+	$permissions_form_list->addRow(
+		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+	);
+
+	if (!$data['modules']) {
+		$permissions_form_list->addRow(italic(_('No enabled modules found.')));
+	}
+	else {
+		$elements = [];
+
+		foreach ($data['modules'] as $moduleid => $module_name) {
+			$elements[] = (new CSpan($module_name))->addClass(
+				array_key_exists($moduleid, $data['disabled_moduleids'])
+						|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+					? ZBX_STYLE_STATUS_GREY
+					: ZBX_STYLE_STATUS_GREEN
 			);
 		}
 
-		// Actions section.
-
-		$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
-		$elements = [];
-
-		foreach (CRoleHelper::getActionsLabels($data['user_type']) as $rule_name => $rule_label) {
-			$elements[] = (new CSpan($rule_label))
-				->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
-					? ZBX_STYLE_STATUS_GREEN
-					: ZBX_STYLE_STATUS_GREY
-				);
+		if ($elements) {
+			$permissions_form_list->addRow((new CDiv($elements))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+			);
 		}
+	}
 
-		$permissions_form_list->addRow((new CDiv($elements))
+	// API section.
+
+	$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
+	$permissions_form_list
+		->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
+		->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
+				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+			)))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('rules-status-container')
 		);
+
+	$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+
+	if ($api_methods) {
+		$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
+		$elements = [];
+
+		foreach ($api_methods as $api_method) {
+			$elements[] = (new CSpan($api_method))->addClass(
+				$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+			);
+		}
+
+		$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+			(new CDiv($elements))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
 	}
 
-	$tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
-}
+	// Actions section.
 
-// Frontend notifications tab.
-if ($data['action'] !== 'user.edit') {
-	$messaging_form_list = (new CFormList())
-		->addRow(_('Frontend notifications'),
-			(new CCheckBox('messages[enabled]'))
-				->setChecked($data['messages']['enabled'] == 1)
-				->setUncheckedValue(0)
-		)
-		->addRow(_('Message timeout'),
-			(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
-			'timeout_row'
-		)
-		->addRow(new CLabel(_('Play sound'), 'label-sounds'),
-			(new CSelect('messages[sounds.repeat]'))
-				->setId('messages_sounds.repeat')
-				->setFocusableElementId('label-sounds')
-				->setValue($data['messages']['sounds.repeat'])
-				->addOptions(CSelect::createOptionsFromArray([
-					1 => _('Once'),
-					10 => _n('%1$s second', '%1$s seconds', 10),
-					-1 => _('Message timeout')
-				])),
-			'repeat_row'
-		);
+	$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
+	$elements = [];
 
-	$zbx_sounds = array_flip(getSounds());
-
-	$triggers_table = (new CTable())
-		->addRow([
-			(new CCheckBox('messages[triggers.recovery]'))
-				->setLabel(_('Recovery'))
-				->setChecked($data['messages']['triggers.recovery'] == 1)
-				->setUncheckedValue(0),
-			[
-				(new CSelect('messages[sounds.recovery]'))
-					->setId('messages_sounds.recovery')
-					->setValue($data['messages']['sounds.recovery'])
-					->addOptions(CSelect::createOptionsFromArray($zbx_sounds)),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('start', _('Play')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("testUserSound('messages_sounds.recovery');")
-					->removeId(),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('stop', _('Stop')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('AudioControl.stop();')
-					->removeId()
-			]
-		]);
-
-	$msg_visibility = ['1' => [
-		'messages[timeout]',
-		'messages[sounds.repeat]',
-		'messages[sounds.recovery]',
-		'messages[triggers.recovery]',
-		'timeout_row',
-		'repeat_row',
-		'triggers_row'
-	]];
-
-	// trigger sounds
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$triggers_table->addRow([
-			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
-				->setLabel(CSeverityHelper::getName($severity))
-				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
-				->setUncheckedValue(0),
-			[
-				(new CSelect('messages[sounds.'.$severity.']'))
-					->setId('messages_sounds.'.$severity)
-					->setValue($data['messages']['sounds.'.$severity])
-					->addOptions(CSelect::createOptionsFromArray($zbx_sounds)),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('start', _('Play')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("testUserSound('messages_sounds.".$severity."');")
-					->removeId(),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('stop', _('Stop')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('AudioControl.stop();')
-					->removeId()
-			]
-		]);
-
-		zbx_subarray_push($msg_visibility, 1, 'messages[triggers.severities]['.$severity.']');
-		zbx_subarray_push($msg_visibility, 1, 'messages[sounds.'.$severity.']');
+	foreach (CRoleHelper::getActionsLabels($data['user_type']) as $rule_name => $rule_label) {
+		$elements[] = (new CSpan($rule_label))
+			->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
+				? ZBX_STYLE_STATUS_GREEN
+				: ZBX_STYLE_STATUS_GREY
+			);
 	}
 
-	$messaging_form_list
-		->addRow(_('Trigger severity'), $triggers_table, 'triggers_row')
-		->addRow(_('Show suppressed problems'),
-			(new CCheckBox('messages[show_suppressed]'))
-				->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-		);
-
-	$tabs->addTab('notificationsTab', _('Frontend notifications'), $messaging_form_list,
-		TAB_INDICATOR_FRONTEND_NOTIFICATIONS
+	$permissions_form_list->addRow((new CDiv($elements))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		->addClass('rules-status-container')
 	);
 }
 
-// Append buttons to form.
-if ($data['action'] === 'user.edit') {
-	$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-		->setArgument('action', 'user.list')
-		->setArgument('page', CPagerHelper::loadPage('user.list', null))
-	))->setId('cancel');
+$tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 
-	if ($data['userid'] != 0) {
-		$tabs->setFooter(makeFormFooter(
-			(new CSubmitButton(_('Update'), 'action', 'user.update'))->setId('update'),
-			[
-				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'user.delete')
-					->setArgument('userids', [$data['userid']])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-					_('Delete selected user?')
-				))
-					->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)
-					->setId('delete'),
-				$cancel_button
-			]
-		));
-	}
-	else {
-		$tabs->setFooter(makeFormFooter(
-			(new CSubmitButton(_('Add'), 'action', 'user.create'))->setId('add'),
-			[
-				$cancel_button
-			]
-		));
-	}
+// Append buttons to form.
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'user.list')
+	->setArgument('page', CPagerHelper::loadPage('user.list', null))
+))->setId('cancel');
+
+if ($data['userid'] != 0) {
+	$tabs->setFooter(makeFormFooter(
+		(new CSubmitButton(_('Update'), 'action', 'user.update'))->setId('update'),
+		[
+			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'user.delete')
+				->setArgument('userids', [$data['userid']])
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token),
+				_('Delete selected user?')
+			))
+				->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)
+				->setId('delete'),
+			$cancel_button
+		]
+	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmitButton(_('Update'), 'action', 'userprofile.update'))->setId('update'),
-		[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
+		(new CSubmitButton(_('Add'), 'action', 'user.create'))->setId('add'),
+		[
+			$cancel_button
+		]
 	));
 }
+
 
 // Append tab to form.
 $user_form->addItem($tabs);
@@ -883,15 +638,8 @@ $html_page
 	->addItem($user_form)
 	->show();
 
-if ($data['action'] === 'user.edit') {
-	(new CScriptTag('view.init('.json_encode([
-		'userid' => $data['userid'] ?: null
-	]).');'))
-		->setOnDocumentReady()
-		->show();
-}
-else {
-	(new CScriptTag('view.init();'))
-		->setOnDocumentReady()
-		->show();
-}
+(new CScriptTag('view.init('.json_encode([
+	'userid' => $data['userid'] ?: null
+]).');'))
+	->setOnDocumentReady()
+	->show();

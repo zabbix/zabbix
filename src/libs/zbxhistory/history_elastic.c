@@ -407,7 +407,7 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 
 	if (SUCCEED != zbx_curl_setopt_https(data->handle, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, error);
+		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 		goto out;
 	}
 
@@ -740,7 +740,7 @@ static int	elastic_get_values_for_period(zbx_history_iface_t *hist, zbx_uint64_t
 
 	if (SUCCEED != zbx_curl_setopt_https(data->handle, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, error);
+		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 		goto out;
 	}
 
@@ -895,7 +895,6 @@ out:
 	return ret;
 }
 
-
 /************************************************************************************
  *                                                                                  *
  * Purpose: gets period window                                                      *
@@ -905,7 +904,7 @@ out:
  *              step            - [IN] period step                                  *
  *              clock_from      - [IN/OUT] period start timestamp                   *
  *              clock_to        - [IN] period end timestamp (including)             *
- *              clock_to_shift  - [OUT] next period end timestmap                   *
+ *              clock_to_shift  - [OUT] next period end timestamp                   *
  *                                                                                  *
  * Return value: period - current period                                            *
  *               FAIL - otherwise                                                   *
@@ -1187,7 +1186,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_
 
 	if (SUCCEED != zbx_curl_good_for_elasticsearch(&error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		goto out;
 	}
 
@@ -1219,7 +1218,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_
 
 	if (SUCCEED != zbx_curl_setopt_https(handle, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		goto out;
 	}
 

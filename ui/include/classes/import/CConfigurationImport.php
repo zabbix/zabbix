@@ -507,7 +507,7 @@ class CConfigurationImport {
 
 			if (array_key_exists('links', $map)) {
 				foreach ($map['links'] as $link) {
-					if (array_key_exists('linktriggers', $link)) {
+					if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
 						foreach ($link['linktriggers'] as $link_trigger) {
 							$description = $link_trigger['trigger']['description'];
 							$expression = $link_trigger['trigger']['expression'];
@@ -519,8 +519,11 @@ class CConfigurationImport {
 										$triggers_refs[$description][$expression])) {
 								$triggers_refs[$description][$expression][$recovery_expression] = [];
 							}
-
 						}
+					}
+					elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						$hosts_refs[$link['item']['host']] = [];
+						$items_refs[$link['item']['host']][$link['item']['key']] = [];
 					}
 				}
 			}

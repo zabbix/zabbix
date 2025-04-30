@@ -1233,7 +1233,7 @@ class CApiService {
 	 * @param array $objects
 	 * @param array $objects_old
 	 */
-	protected function addAuditBulk($action, $resourcetype, array $objects, array $objects_old = null) {
+	protected function addAuditBulk($action, $resourcetype, array $objects, ?array $objects_old = null) {
 		CAuditOld::addBulk(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
 			$resourcetype, $objects, $objects_old
 		);

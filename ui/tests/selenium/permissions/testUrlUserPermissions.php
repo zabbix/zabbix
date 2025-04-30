@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup, prepareUserData
@@ -294,7 +294,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			/* #23. TODO: In this test we getting expected Access denied message, but test fails with
 			 * Uncaught TypeError: Cannot read properties of null (reading 'addEventListener') error
-			 * Need to fix
+			 * Need to fix ZBX-25755
 			[[
 				'url' => 'zabbix.php?action=templategroup.list',
 				'title' => 'Configuration of template groups',
@@ -362,7 +362,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// #28.
 			[[
-				'url' => 'graphs.php?context=host',
+				'url' => 'zabbix.php?action=graph.list&context=host',
 				'title' =>	'Configuration of graphs',
 				'header' => 'Graphs',
 				'users' => [
@@ -656,8 +656,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			// #56.
 			[[
 				'url' => 'zabbix.php?action=userprofile.edit',
-				'title' =>	'User profile',
-				'header' => 'User profile: ',
+				'title' => 'Profile',
+				'header' => 'Profile',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => true,
@@ -688,12 +688,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				}
 
 				$this->zbxTestCheckTitle($data['title']);
-				if ($data['url'] === 'zabbix.php?action=userprofile.edit') {
-					$this->zbxTestCheckHeader($data['header'].$alias);
-				}
-				else {
-					$this->zbxTestCheckHeader($data['header']);
-				}
+				$this->zbxTestCheckHeader($data['header']);
 			}
 			elseif ($user && array_key_exists('no_permissions_to_object', $data) ) {
 				$this->zbxTestOpen($data['url']);

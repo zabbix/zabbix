@@ -36,8 +36,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array  $tpl_triggers
 	 * @param string $tpl_triggers[<tnum>]['triggerid']
 	 */
-	private function prepareInheritedTriggers(array $tpl_triggers, array $hostids = null, array &$ins_triggers = null,
-			array &$upd_triggers = null, array &$db_triggers = null) {
+	private function prepareInheritedTriggers(array $tpl_triggers, ?array $hostids = null, ?array &$ins_triggers = null,
+			?array &$upd_triggers = null, ?array &$db_triggers = null) {
 		$ins_triggers = [];
 		$upd_triggers = [];
 		$db_triggers = [];
@@ -296,7 +296,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function getLinkedHosts(array $tpl_hostids, array $hostids = null) {
+	private static function getLinkedHosts(array $tpl_hostids, ?array $hostids = null) {
 		// Fetch all child hosts and templates
 		$sql = 'SELECT ht.hostid,ht.templateid,h.host,h.status'.
 			' FROM hosts_templates ht,hosts h'.
@@ -338,7 +338,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function getHostTriggersByTemplateId(array $tpl_triggerids, array $hostids = null) {
+	private function getHostTriggersByTemplateId(array $tpl_triggerids, ?array $hostids = null) {
 		$output = 't.triggerid,t.expression,t.description,t.url_name,t.url,t.status,t.priority,t.comments,t.type,'.
 			't.recovery_mode,t.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,'.
 			't.templateid,t.event_name,i.hostid';
@@ -519,7 +519,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['recovery_expression']
 	 * @param array  $hostids
 	 */
-	protected function inherit(array $triggers, array $hostids = null) {
+	protected function inherit(array $triggers, ?array $hostids = null) {
 		$this->prepareInheritedTriggers($triggers, $hostids, $ins_triggers, $upd_triggers, $db_triggers);
 
 		if ($ins_triggers) {
@@ -642,7 +642,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $triggers, array $db_triggers = null): void {
+	private static function checkUuidDuplicates(array $triggers, ?array $db_triggers = null): void {
 		$trigger_indexes = [];
 
 		foreach ($triggers as $i => $trigger) {
@@ -1077,7 +1077,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException if validation failed.
 	 */
-	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
+	protected function validateUpdate(array &$triggers, ?array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
 			'uuid' => 					['type' => API_ANY],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
@@ -1356,7 +1356,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkDependencies(array $triggers, array $db_triggers = null): void {
+	private function checkDependencies(array $triggers, ?array $db_triggers = null): void {
 		$edit_triggerids_up = [];
 
 		foreach ($triggers as $trigger) {
@@ -1459,7 +1459,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array      $triggers
 	 * @param array|null $db_triggers
 	 */
-	protected function checkDependenciesLinks(array $triggers, array $db_triggers = null): void {
+	protected function checkDependenciesLinks(array $triggers, ?array $db_triggers = null): void {
 		$ins_dependencies = [];
 		$del_dependencies = [];
 
@@ -2973,7 +2973,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array      $triggers
 	 * @param array|null $db_triggers
 	 */
-	public static function updateDependencies(array &$triggers, array $db_triggers = null): void {
+	public static function updateDependencies(array &$triggers, ?array $db_triggers = null): void {
 		$ins_trigger_deps = [];
 		$del_triggerdepids = [];
 		$edit_dependencies = [];
@@ -3076,7 +3076,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array $edit_dependencies[<triggerid>][<triggerid_up>]
 	 * @param array $hostids
 	 */
-	protected static function inheritDependencies(array $edit_dependencies, array $hostids = null): void {
+	protected static function inheritDependencies(array $edit_dependencies, ?array $hostids = null): void {
 		$all_triggerids = $edit_dependencies;
 		$all_triggerids_up = [];
 

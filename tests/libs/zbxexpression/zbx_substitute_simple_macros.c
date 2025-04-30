@@ -14,14 +14,14 @@
 
 #include "zbxexpression.h"
 
+#include "zbxdbwrap.h"
+#include "zbxdbhigh.h"
+
 #include "zbxmocktest.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
 zbx_vector_uint64_t	test_hostids;
-
-int	__wrap_expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
-		int request);
 
 zbx_dc_um_handle_t	*__wrap_zbx_dc_open_user_macros(void);
 
@@ -31,17 +31,8 @@ int	__wrap_zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const z
 void	__wrap_zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro,
 		const zbx_uint64_t *hostids, int hostids_num, char **value);
 
-int	__wrap_expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
-		int request)
-{
-	ZBX_UNUSED(trigger);
-	ZBX_UNUSED(N_functionid);
-	ZBX_UNUSED(request);
-
-	*replace_to = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.macro_value"));
-
-	return SUCCEED;
-}
+int	__wrap_zbx_db_with_trigger_itemid(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		zbx_db_with_itemid_func_t cb, int request);
 
 zbx_dc_um_handle_t	*__wrap_zbx_dc_open_user_macros(void)
 {
@@ -72,6 +63,19 @@ void	__wrap_zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const cha
 	*value = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.macro_value"));
 }
 
+int	__wrap_zbx_db_with_trigger_itemid(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		zbx_db_with_itemid_func_t cb, int request)
+{
+	ZBX_UNUSED(trigger);
+	ZBX_UNUSED(N_functionid);
+	ZBX_UNUSED(cb);
+	ZBX_UNUSED(request);
+
+	*replace_to = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.macro_value"));
+
+	return SUCCEED;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	int		expected_ret, returned_ret;
@@ -80,8 +84,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_db_event	event;
 
 	ZBX_UNUSED(state);
-
-	zbx_vector_uint64_create(&test_hostids);
 
 	event.source = EVENT_SOURCE_TRIGGERS;
 	expression = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.expression"));
@@ -95,5 +97,4 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
 
 	zbx_free(expression);
-	zbx_vector_uint64_destroy(&test_hostids);
 }

@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup dashboard
@@ -43,6 +43,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	const DEFAULT_WIDGET = 'Default Item history Widget';
 	const DELETE_WIDGET = 'Widget for delete';
 	const DATA_WIDGET = 'Widget for data check';
+	const SCROLLING_WIDGET = 'Test scrollbar position in Item history';
 
 	protected static $dashboardid;
 	protected static $dashboard_create;
@@ -74,11 +75,35 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
 						'delay' => '30'
+					],
+					[
+						'name' => self::SCROLLING_WIDGET,
+						'key_' => 'widget_scrollbar_test_item',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '10'
 					]
 				]
 			]
 		]);
 		$itemids = CDataHelper::getIds('name');
+
+		// Create data to be displayed on widget with new values set to "Bottom".
+		$start_time = date('Y-m-d H:i:s', time() - 1200); // Data start time 20 minutes from now.
+
+		$timestamps = [];
+		$values = [];
+		for ($i = 1; $i <= 20; $i++) {
+			$timestamps[$i] = strtotime($start_time.' + '.$i.' minutes');
+			$values[$i] = $i;
+		}
+
+		$item_data = [
+			'itemid' => $itemids[self::SCROLLING_WIDGET],
+			'timestamps' => $timestamps,
+			'values' => $values
+		];
+		CDataHelper::addItemData($itemids[self::SCROLLING_WIDGET], $values, $timestamps);
 
 		$response = CDataHelper::call('dashboard.create', [
 			[
@@ -301,6 +326,36 @@ class testDashboardItemHistoryWidget extends testWidgets {
 										'value' => 'DASHBOARD._hostid'
 									]
 								]
+							],
+							[
+								'type' => 'itemhistory',
+								'name' => self::SCROLLING_WIDGET,
+								'x' => 0,
+								'y' => 6,
+								'width' => 20,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Item value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => $itemids[self::SCROLLING_WIDGET]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sortorder',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'YTBXE'
+									]
+								]
 							]
 						]
 					]
@@ -391,7 +446,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->assertEquals('New column', $column_overlay->getTitle());
 		$column_form = $column_overlay->asForm();
 		$this->assertEquals(['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Min', 'Max', 'Thresholds',
-				'History data', 'Use monospace font', 'Display local time', 'Show thumbnail'],
+				'History data', 'Use monospace font', 'Display log time', 'Show thumbnail'],
 				$column_form->getLabels()->asText()
 		);
 		$this->assertEquals(['Name', 'Item'], $column_form->getRequiredLabels());
@@ -406,7 +461,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'History data' => ['value' => 'Auto', 'lables' => ['Auto', 'History', 'Trends']],
 			'id:max_length' => ['value' => 100, 'maxlength' => 3],
 			'Use monospace font' => ['value' => false],
-			'Display local time' => ['value' => false],
+			'Display log time' => ['value' => false],
 			'Show thumbnail' => ['value' => false]
 		];
 
@@ -452,7 +507,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->assertEquals('Host for all item value types: '.$item, $column_form->getField('Name')->getValue());
 
 			$labels = ($item === 'Log item')
-				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display local time']
+				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display log time']
 				: ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font'];
 
 			$this->assertEquals($labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
@@ -474,8 +529,9 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 
 			if ($item === 'Log item') {
-				$this->checkHint($column_form, 'Display local time', 'This setting will display local time'.
-						' instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'
+				$this->checkHint($column_form, 'Display log time', 'This setting will display log time'.
+						' instead of item\'s timestamp. "Show timestamp" must also be checked in the advanced'.
+						' configuration.'
 				);
 			}
 		}
@@ -1601,7 +1657,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									'context' => ['values' => 'Host for all item value types']
 								],
 								'Use monospace font' => true,
-								'Display local time' => true
+								'Display log time' => true
 							]
 						]
 					]
@@ -2685,6 +2741,31 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid,
 				'Item history'
 		);
+	}
+
+	/**
+	 * Check that, in case if parameter "New values" is set to "Bottom", the scrollbar on the widget is automatically
+	 * set to the bottom position, and that it is in the top position when "New values" is set to "Top".
+	 */
+	public function testDashboardItemHistoryWidget_CheckScrollbarPosition() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)
+				->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard->getWidget(self::SCROLLING_WIDGET);
+
+		// Check widget screenshot when new values are located in bottom of the page.
+		$this->assertScreenshot($widget, 'new_values_bottom');
+
+		// Set "New values" to "Top" and check the screenshot of the widget.
+		$table = $widget->query('class:list-table')->waitUntilVisible()->one();
+		$form = $widget->edit()->asForm();
+		$form->fill(['Advanced configuration' => true, 'New values' => 'Top']);
+		$form->submit();
+		$table->waitUntilReloaded();
+		$dashboard->save();
+		$dashboard->waitUntilReady();
+
+		$this->assertScreenshot($widget, 'new_values_top');
 	}
 
 	/**

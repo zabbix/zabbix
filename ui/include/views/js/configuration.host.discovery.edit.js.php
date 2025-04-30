@@ -220,7 +220,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			});
 
 			this.updateLostResourcesFields();
-			this.setSubmitCallback();
+			this.initPopupListeners();
 		},
 
 		updateLostResourcesFields() {
@@ -341,29 +341,23 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			post(url.getUrl(), fields);
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-				let curl = null;
+		initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('host_discovery.php', location.href);
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+						url.searchParams.set('context', this.context);
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+						event.setRedirectUrl(url.href);
 					}
-
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('host_discovery.php');
-						curl.setArgument('context', this.context);
+					else {
+						this.refresh();
 					}
-				}
-
-				if (curl) {
-					location.href = curl.getUrl();
-				}
-				else {
-					view.refresh();
 				}
 			});
 		}

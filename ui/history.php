@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'history.php';
 $page['title'] = _('History');
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
+$page['scripts'] = ['gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 

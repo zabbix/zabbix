@@ -1,0 +1,17 @@
+---
+test case: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
+out:
+  refs:
+  - "//trap[1]"
+  - "/Trapper/trap[1]"
+---
+test case: 'last(/host/key,#1:now-1h)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'last(/host/key,#1:now-1h)'
+out:
+  refs:
+  - "/host/key"

@@ -29,6 +29,7 @@ class CWidgetFieldSeveritiesView extends CWidgetFieldView {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setEnabled(!$this->isDisabled())
 			->setColumns(3)
-			->setVertical();
+			->setVertical()
+			->showTitles();
 	}
 }

@@ -7,6 +7,8 @@ memory usage. It is highly recommended to use in conjunction with the official
 [Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2) 
 You can extend it or create your own template to cater specific needs.
 
+**Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the licence required for using this management pack.**
+
 ## Requirements
 
 * Zabbix Agent 2
@@ -261,7 +263,7 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Pluggable Databases (PDBs) information.
 *Parameters:*  
 `database` (optional) — the name of the database.
 
@@ -349,6 +351,10 @@ WHERE
 ``` 
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
+
+### Notes:
+ * Returned data is automatically converted into JSON.
+ * Avoid returning JSON directly from queries, as it will become corrupted when the plugin attempts to convert it into JSON again.
 
 ## Current limitations
 

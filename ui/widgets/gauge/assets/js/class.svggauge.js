@@ -260,7 +260,7 @@ class CSVGGauge {
 	 * @param {string|null} units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		if (this.#config.value.show && value !== null) {
+		if (this.#config.value.show) {
 			this.#drawValueAndUnits({value, value_text, units_text});
 		}
 
@@ -744,8 +744,14 @@ class CSVGGauge {
 				);
 			}
 		}
-		else if (this.#elements.value_and_units.space !== undefined) {
-			this.#elements.value_and_units.space.container.style.display = 'none';
+		else {
+			if (this.#elements.value_and_units.space !== undefined) {
+				this.#elements.value_and_units.space.container.style.display = 'none';
+			}
+
+			if (this.#elements.value_and_units.units !== undefined) {
+				this.#elements.value_and_units.units.container.textContent = '';
+			}
 		}
 
 		let tooltip = '';

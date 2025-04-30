@@ -1,142 +1,97 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    -
-      name: iLert
+    - name: iLert
       type: WEBHOOK
       parameters:
-        -
-          name: .ILERT.ALERT.SOURCE.KEY
+        - name: .ILERT.ALERT.SOURCE.KEY
           value: '{ALERT.SENDTO}'
-        -
-          name: .ILERT.INCIDENT.SUMMARY
-          value: ''
-        -
-          name: ALERT.MESSAGE
+        - name: .ILERT.INCIDENT.SUMMARY
+        - name: ALERT.MESSAGE
           value: '{ALERT.MESSAGE}'
-        -
-          name: ALERT.SUBJECT
+        - name: ALERT.SUBJECT
           value: '{ALERT.SUBJECT}'
-        -
-          name: EVENT.ACK.STATUS
+        - name: EVENT.ACK.STATUS
           value: '{EVENT.ACK.STATUS}'
-        -
-          name: EVENT.DATE
+        - name: EVENT.DATE
           value: '{EVENT.DATE}'
-        -
-          name: EVENT.ID
+        - name: EVENT.ID
           value: '{EVENT.ID}'
-        -
-          name: EVENT.NAME
+        - name: EVENT.NAME
           value: '{EVENT.NAME}'
-        -
-          name: EVENT.NSEVERITY
+        - name: EVENT.NSEVERITY
           value: '{EVENT.NSEVERITY}'
-        -
-          name: EVENT.OPDATA
+        - name: EVENT.OPDATA
           value: '{EVENT.OPDATA}'
-        -
-          name: EVENT.RECOVERY.DATE
+        - name: EVENT.RECOVERY.DATE
           value: '{EVENT.RECOVERY.DATE}'
-        -
-          name: EVENT.RECOVERY.TIME
+        - name: EVENT.RECOVERY.TIME
           value: '{EVENT.RECOVERY.TIME}'
-        -
-          name: EVENT.RECOVERY.VALUE
+        - name: EVENT.RECOVERY.VALUE
           value: '{EVENT.RECOVERY.VALUE}'
-        -
-          name: EVENT.SEVERITY
+        - name: EVENT.SEVERITY
           value: '{EVENT.SEVERITY}'
-        -
-          name: EVENT.TAGS
+        - name: EVENT.TAGS
           value: '{EVENT.TAGS}'
-        -
-          name: EVENT.TIME
+        - name: EVENT.TIME
           value: '{EVENT.TIME}'
-        -
-          name: EVENT.UPDATE.ACTION
+        - name: EVENT.UPDATE.ACTION
           value: '{EVENT.UPDATE.ACTION}'
-        -
-          name: EVENT.UPDATE.DATE
+        - name: EVENT.UPDATE.DATE
           value: '{EVENT.UPDATE.DATE}'
-        -
-          name: EVENT.UPDATE.MESSAGE
+        - name: EVENT.UPDATE.MESSAGE
           value: '{EVENT.UPDATE.MESSAGE}'
-        -
-          name: EVENT.UPDATE.STATUS
+        - name: EVENT.UPDATE.STATUS
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: EVENT.UPDATE.TIME
+        - name: EVENT.UPDATE.TIME
           value: '{EVENT.UPDATE.TIME}'
-        -
-          name: EVENT.VALUE
+        - name: EVENT.VALUE
           value: '{EVENT.VALUE}'
-        -
-          name: HOST.HOST
+        - name: HOST.HOST
           value: '{HOST.HOST}'
-        -
-          name: HOST.IP
+        - name: HOST.IP
           value: '{HOST.IP}'
-        -
-          name: HOST.NAME
+        - name: HOST.NAME
           value: '{HOST.NAME}'
-        -
-          name: ITEM.ID1
+        - name: ITEM.ID1
           value: '{ITEM.ID1}'
-        -
-          name: ITEM.ID2
+        - name: ITEM.ID2
           value: '{ITEM.ID2}'
-        -
-          name: ITEM.ID3
+        - name: ITEM.ID3
           value: '{ITEM.ID3}'
-        -
-          name: ITEM.ID4
+        - name: ITEM.ID4
           value: '{ITEM.ID4}'
-        -
-          name: ITEM.ID5
+        - name: ITEM.ID5
           value: '{ITEM.ID5}'
-        -
-          name: ITEM.NAME1
+        - name: ITEM.NAME1
           value: '{ITEM.NAME1}'
-        -
-          name: ITEM.NAME2
+        - name: ITEM.NAME2
           value: '{ITEM.NAME2}'
-        -
-          name: ITEM.NAME3
+        - name: ITEM.NAME3
           value: '{ITEM.NAME3}'
-        -
-          name: ITEM.NAME4
+        - name: ITEM.NAME4
           value: '{ITEM.NAME4}'
-        -
-          name: ITEM.NAME5
+        - name: ITEM.NAME5
           value: '{ITEM.NAME5}'
-        -
-          name: TRIGGER.DESCRIPTION
+        - name: TRIGGER.DESCRIPTION
           value: '{TRIGGER.DESCRIPTION}'
-        -
-          name: TRIGGER.ID
+        - name: TRIGGER.ID
           value: '{TRIGGER.ID}'
-        -
-          name: TRIGGER.NAME
+        - name: TRIGGER.NAME
           value: '{TRIGGER.NAME}'
-        -
-          name: TRIGGER.SEVERITY
+        - name: TRIGGER.SEVERITY
           value: '{TRIGGER.SEVERITY}'
-        -
-          name: TRIGGER.STATUS
+        - name: TRIGGER.STATUS
           value: '{TRIGGER.STATUS}'
-        -
-          name: TRIGGER.URL
+        - name: TRIGGER.URL
           value: '{TRIGGER.URL}'
-        -
-          name: TRIGGER.VALUE
+        - name: TRIGGER.VALUE
           value: '{TRIGGER.VALUE}'
-        -
-          name: USER.FULLNAME
+        - name: USER.FULLNAME
           value: '{USER.FULLNAME}'
-        -
-          name: ZABBIX.URL
+        - name: ZABBIX.URL
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         try {
             var result = { tags: {} },
@@ -209,8 +164,7 @@ zabbix_export:
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "iLert". You can also rewrite the incident summary via ".ILERT.INCIDENT.SUMMARY" parameter or leave it empty to use the standard pattern.
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -221,17 +175,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
-          operation_mode: UPDATE
-          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
-          message: |
-            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
-            {EVENT.UPDATE.MESSAGE}
-            
-            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
@@ -242,3 +186,11 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.

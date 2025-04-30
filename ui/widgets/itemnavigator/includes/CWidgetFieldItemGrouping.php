@@ -30,7 +30,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 
 	public const MAX_ROWS = 10;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this

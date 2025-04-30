@@ -28,18 +28,20 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SYSTEMD.NAME.SOCKET.MATCHES}|<p>Filter of systemd socket units by name</p>|`.*`|
-|{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}|<p>Filter of systemd socket units by name</p>|`CHANGE_IF_NEEDED`|
-|{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}|<p>Filter of systemd socket units by active state</p>|`active`|
-|{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}|<p>Filter of systemd socket units by active state</p>|`CHANGE_IF_NEEDED`|
-|{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}|<p>Filter of systemd socket units by unit file state</p>|`enabled`|
-|{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}|<p>Filter of systemd socket units by unit file state</p>|`CHANGE_IF_NEEDED`|
-|{$SYSTEMD.NAME.SERVICE.MATCHES}|<p>Filter of systemd service units by name</p>|`.*`|
-|{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by name</p>|`CHANGE_IF_NEEDED`|
-|{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}|<p>Filter of systemd service units by active state</p>|`active`|
-|{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by active state</p>|`CHANGE_IF_NEEDED`|
-|{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}|<p>Filter of systemd service units by unit file state</p>|`enabled`|
-|{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by unit file state</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.NAME.SOCKET.MATCHES}|<p>Filter of systemd socket units by name.</p>|`.*`|
+|{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}|<p>Filter of systemd socket units by name.</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}|<p>Filter of systemd socket units by active state.</p>|`active`|
+|{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}|<p>Filter of systemd socket units by active state.</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}|<p>Filter of systemd socket units by unit file state.</p>|`enabled`|
+|{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}|<p>Filter of systemd socket units by unit file state.</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.NAME.SERVICE.MATCHES}|<p>Filter of systemd service units by name.</p>|`.*`|
+|{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by name.</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}|<p>Filter of systemd service units by active state.</p>|`active`|
+|{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by active state.</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}|<p>Filter of systemd service units by unit file state.</p>|`enabled`|
+|{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by unit file state.</p>|`CHANGE_IF_NEEDED`|
+|{$SYSTEMD.SERVICETYPE.SERVICE.MATCHES}|<p>Filter of systemd service units by service type.</p>|`.*`|
+|{$SYSTEMD.SERVICETYPE.SERVICE.NOT_MATCHES}|<p>Filter of systemd service units by service type.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule Service units discovery
 

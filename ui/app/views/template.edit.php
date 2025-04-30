@@ -63,10 +63,7 @@ if ($data['linked_templates']) {
 				->setArgument('templateid', $template['templateid'])
 				->getUrl();
 
-			$template_link = (new CLink($template['name'], $template_url))
-				->setAttribute('data-templateid', $template['templateid'])
-				->setAttribute('data-action', 'template.edit')
-				->addClass('js-edit-template');
+			$template_link = new CLink($template['name'], $template_url);
 		}
 		else {
 			$template_link = new CSpan($template['name']);
@@ -177,7 +174,7 @@ $form->addItem(
 );
 
 // Macros tab.
-$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
+$macros_tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 
 $macros_tab = (new CFormList('macrosFormList'))
 	->addRow(null, (new CRadioButtonList('show_inherited_template_macros', (int) $data['show_inherited_macros']))
@@ -185,7 +182,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 		->addValue(_('Inherited and template macros'), 1)
 		->setModern()
 	)
-	->addRow(null, new CPartial($tmpl, [
+	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
 		'readonly' => $data['readonly']
 	]), 'template_macros_container');

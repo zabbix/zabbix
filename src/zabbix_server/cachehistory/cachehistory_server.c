@@ -24,7 +24,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxhistory.h"
-#include "zbxshmem.h"
 #include "zbxtime.h"
 #include "zbxtrends.h"
 #include "zbx_item_constants.h"
@@ -36,6 +35,7 @@
 #include "zbxstr.h"
 #include "zbxvariant.h"
 #include "zbxescalations.h"
+#include "zbxprof.h"
 
 /******************************************************************************
  *                                                                            *
@@ -935,6 +935,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		if (SUCCEED != errcodes[i])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
+			zbx_hc_clear_item_middle(h->itemid);
 			continue;
 		}
 
@@ -942,6 +943,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
+			zbx_hc_clear_item_middle(h->itemid);
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
@@ -1194,12 +1196,10 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *          and timer triggers from timer queue.                                       *
  *                                                                                     *
  * Parameters:                                                                         *
- *   values_num                       - [IN/OUT] number of synced values               *
- *   triggers_num                     - [IN/OUT] number of processed timers            *
  *   events_cbs                       - [IN]                                           *
  *   rtc                              - [IN] RTC socket                                *
  *   config_history_storage_pipelines - [IN]                                           *
- *   more                             - [OUT] flag indicating the cache emptiness:     *
+ *   stats                             - [OUT] flag indicating the cache emptiness:    *
  *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
  *                                            ZBX_SYNC_MORE - more data to sync        *
  *                                                                                     *
@@ -1213,8 +1213,8 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *            b) less than 500 (full batch) timer triggers were processed              *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
+void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -1247,6 +1247,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	unsigned char				*data = NULL;
 	size_t					data_alloc = 0, data_offset;
 	zbx_vector_connector_filter_t		connector_filters_history, connector_filters_events;
+	double					start_time, end_time;
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -1316,7 +1317,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		int			trends_num = 0, timers_num = 0, ret = SUCCEED;
 		ZBX_DC_TREND		*trends = NULL;
 
-		*more = ZBX_SYNC_DONE;
+		stats->more = ZBX_SYNC_DONE;
 
 		zbx_dbcache_lock();
 		zbx_hc_pop_items(&history_items);		/* select and take items out of history cache */
@@ -1339,6 +1340,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		if (0 != history_num)
 		{
 			zbx_dc_um_handle_t	*um_handle;
+
+			stats->values_num += history_num;
 
 			if (FAIL == connectors_retrieved)
 			{
@@ -1377,14 +1380,20 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					events_cbs->add_event_cb, &item_diff,
 					&inventory_values, compression_age, &proxy_subscriptions);
 
+			start_time = zbx_time();
+
 			if (FAIL != (ret = DBmass_add_history(history, history_num, config_history_storage_pipelines)))
 			{
+				end_time = zbx_time();
+				stats->time_write_history += end_time - start_time;
+
 				zbx_dc_config_items_apply_changes(&item_diff);
 				zbx_dc_mass_update_trends(history, history_num, &trends, &trends_num, compression_age);
 
 				if (0 != trends_num)
 					zbx_tfc_invalidate_trends(trends, trends_num);
 
+				start_time = zbx_time();
 				do
 				{
 					if (0 == trends_num)
@@ -1401,26 +1410,45 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				}
 				while (ZBX_DB_DOWN == txn_error);
 
+				end_time = zbx_time();
+				stats->time_write_trends += end_time - start_time;
+
 				do
 				{
 					if (0 == item_diff.values_num && 0 == inventory_values.values_num)
 						break;
+					zbx_prof_start("update items", ZBX_PROF_PROCESSING);
 
+					start_time = zbx_time();
 					zbx_db_begin();
 
 					zbx_db_mass_update_items(&item_diff, &inventory_values);
 
+					end_time = zbx_time();
+					stats->time_update_items += end_time - start_time;
+
 					if (NULL != events_cbs->process_events_cb)
 					{
+						start_time = end_time;
+
 						/* process internal events generated by DCmass_prepare_history() */
 						events_cbs->process_events_cb(NULL, NULL, NULL);
+
+						end_time = zbx_time();
+						stats->time_process_events += end_time - start_time;
+
 					}
 
+					start_time = end_time;
 					if (ZBX_DB_OK != (txn_error = zbx_db_commit()))
 					{
 						if (NULL != events_cbs->reset_event_recovery_cb)
 							events_cbs->reset_event_recovery_cb();
 					}
+
+					end_time = zbx_time();
+					stats->time_update_items += end_time - start_time;
+					zbx_prof_end();
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
@@ -1445,11 +1473,15 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 			timers_num = trigger_timers.values_num;
 
+			stats->timers_num += timers_num;
+			stats->triggers_num += triggerids.values_num;
+
 			if (ZBX_HC_TIMER_SOFT_MAX <= timers_num)
-				*more = ZBX_SYNC_MORE;
+				stats->more = ZBX_SYNC_MORE;
 
 			if (0 != history_num || 0 != timers_num)
 			{
+				zbx_prof_start("process triggers", ZBX_PROF_PROCESSING);
 				for (i = 0; i < trigger_timers.values_num; i++)
 				{
 					zbx_trigger_timer_t	*timer = trigger_timers.values[i];
@@ -1463,6 +1495,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					zbx_vector_escalation_new_ptr_t	escalations;
 
 					zbx_vector_escalation_new_ptr_create(&escalations);
+
+					start_time = zbx_time();
 					zbx_db_begin();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
@@ -1470,6 +1504,10 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 							trigger_itemids, trigger_timespecs, &trigger_info,
 							&trigger_order);
 
+					end_time = zbx_time();
+					stats->time_calculate_triggers += end_time - start_time;
+
+					start_time = end_time;
 					if (NULL != events_cbs->process_events_cb)
 					{
 						/* process trigger events generated by recalculate_triggers() */
@@ -1493,6 +1531,9 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 						events_cbs->clean_events_cb();
 					}
 
+					end_time = zbx_time();
+					stats->time_process_events += end_time - start_time;
+
 					zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diff, zbx_trigger_diff_free);
 					zbx_vector_escalation_new_ptr_clear_ext(&escalations,
 							zbx_escalation_new_ptr_free);
@@ -1502,12 +1543,12 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 				if (ZBX_DB_OK == txn_error && NULL != events_cbs->events_update_itservices_cb)
 					events_cbs->events_update_itservices_cb();
+				zbx_prof_end();
 			}
 		}
 
 		if (0 != triggerids.values_num)
 		{
-			*triggers_num += triggerids.values_num;
 			zbx_dc_config_unlock_triggers(&triggerids);
 			zbx_vector_uint64_clear(&triggerids);
 		}
@@ -1539,12 +1580,10 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				/* items rather than trying and failing to sync locked items over  */
 				/* and over again.                                                 */
 				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num)
-					*more = ZBX_SYNC_MORE;
+					stats->more = ZBX_SYNC_MORE;
 			}
 
 			zbx_dbcache_unlock();
-
-			*values_num += history_num;
 		}
 
 		if (FAIL != ret)
@@ -1651,7 +1690,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		/* Exit from sync loop if we have spent too much time here.       */
 		/* This is done to allow syncer process to update its statistics. */
 	}
-	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
+	while (ZBX_SYNC_MORE == stats->more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
 	zbx_free(items);
 	zbx_free(errcodes);

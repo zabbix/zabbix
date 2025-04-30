@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = ['effects.js', 'items.js', 'multilineinput.js'];
+$page['scripts'] = ['effects.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -75,11 +75,10 @@ if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
 		'itemids' => getRequest('parent_discoveryid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['flags'],
 		'editable' => true
 	]);
 	$discoveryRule = reset($discoveryRule);
-	if (!$discoveryRule || $discoveryRule['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!$discoveryRule) {
 		access_deny();
 	}
 
@@ -286,7 +285,7 @@ elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscov
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -316,7 +315,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

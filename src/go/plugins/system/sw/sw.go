@@ -25,12 +25,6 @@ var impl Plugin
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
-}
-
-// Options -
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
 }
 
 func init() {

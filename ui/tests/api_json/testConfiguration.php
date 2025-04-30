@@ -174,7 +174,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'host_groups' => []
+						'host_groups' => []
 					],
 					'prettyprint' => true
 				]
@@ -182,7 +182,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'host_groups' => ['11111111111111']
+						'host_groups' => ['11111111111111']
 					],
 					'prettyprint' => true
 				]
@@ -190,7 +190,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'host_groups' => ['50012']
+						'host_groups' => ['50012']
 					],
 					'prettyprint' => true
 				]

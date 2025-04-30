@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.calendar.js');
-
 $this->includeJsFile('slareport.list.js.php');
 
 $filter = (new CFilter())
@@ -113,8 +111,8 @@ elseif ($data['service'] === null) {
 
 	foreach ($data['sli']['periods'] as $period) {
 		$header[] = CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
-			$data['sla']['timezone']
-		)->addClass($data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY ? ZBX_STYLE_TEXT_VERTICAL : null);
+			$data['sla']['timezone'], $data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY
+		);
 	}
 
 	$report->setHeader($header);

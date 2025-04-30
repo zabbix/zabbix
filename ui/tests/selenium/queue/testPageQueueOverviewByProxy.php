@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 class testPageQueueOverviewByProxy extends CLegacyWebTest {
 	public static function allProxies() {

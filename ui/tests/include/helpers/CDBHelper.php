@@ -43,6 +43,16 @@ class CDBHelper {
 
 	static $db_extension;
 
+	const STATE_DEFAULT = 0;
+	const STATE_BROKEN = 1;
+
+	/**
+	 * DB state.
+	 *
+	 * @var integer
+	 */
+	static $state = self::STATE_DEFAULT;
+
 	/**
 	 * Perform select query and check the result.
 	 *
@@ -259,12 +269,8 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			if (self::$db_extension == null) {
-				$res = DBfetch(DBselect('SELECT db_extension FROM config'));
-
-				if ($res) {
-					self::$db_extension = $res['db_extension'];
-				}
+			if (self::$db_extension === null) {
+				self::$db_extension = self::getValue('SELECT value_str FROM settings WHERE name=\'db_extension\'');
 			}
 
 			if ($DB['PASSWORD'] !== '') {
@@ -285,9 +291,11 @@ class CDBHelper {
 			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=9 --dbname='.$DB['DATABASE'];
 			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
 
-			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			if (self::$db_extension === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd .= ' 2>/dev/null';
 			}
+
+			static::removeDumpFile($file);
 
 			exec($cmd, $output, $result_code);
 
@@ -313,6 +321,8 @@ class CDBHelper {
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
 			$cmd .= ' --user='.$DB['USER'].' --add-drop-table '.$DB['DATABASE'];
 			$cmd .= ' '.implode(' ', $tables).' | gzip -c > '.$file;
+
+			static::removeDumpFile($file);
 
 			exec($cmd, $output, $result_code);
 
@@ -358,7 +368,7 @@ class CDBHelper {
 			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=1 --clean --dbname='.$DB['DATABASE'];
 			$cmd .= ' '.$file;
 
-			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			if (self::$db_extension === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd_tdb = 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_pre_restore();"; ';
 				$cmd_tdb .= $cmd .' 2>/dev/null; ';
 				$cmd_tdb .= 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_post_restore();" ';
@@ -369,20 +379,11 @@ class CDBHelper {
 			}
 
 			if ($result_code != 0) {
+				self::$state = self::STATE_BROKEN;
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			if (strstr(strtolower(PHP_OS), 'win') !== false) {
-				$file = str_replace('/', '\\', $file);
-				exec('rd '.$file.' /q /s');
-			}
-			else {
-				exec('rm -rf '.$file, $output, $result_code);
-			}
-
-			if ($result_code != 0) {
-				throw new Exception('Failed to remove "'.$file.'".');
-			}
+			static::removeDumpFile($file);
 		}
 		else {
 			if ($DB['PASSWORD'] !== '') {
@@ -406,20 +407,11 @@ class CDBHelper {
 			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
+				self::$state = self::STATE_BROKEN;
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			if (strstr(strtolower(PHP_OS), 'win') !== false) {
-				$file = str_replace('/', '\\', $file);
-				exec('del '.$file);
-			}
-			else {
-				exec('rm -rf '.$file, $output, $result_code);
-			}
-
-			if ($result_code != 0) {
-				throw new Exception('Failed to remove "'.$file.'".');
-			}
+			static::removeDumpFile($file);
 		}
 	}
 
@@ -559,11 +551,15 @@ class CDBHelper {
 			if ($trigger) {
 				$trigger = $trigger[0];
 
-				$tags = DB::select('trigger_tag', [
+				$trigger_tags = DB::select('trigger_tag', [
 					'output' => ['tag', 'value'],
-					'filter' => ['triggerid' => $trigger['triggerid']],
-					'preservekeys' => true
+					'filter' => ['triggerid' => $trigger['triggerid']]
 				]);
+				$item_tags = CDBHelper::getAll(
+					'SELECT tag, value FROM item_tag WHERE itemid IN'.
+						' (SELECT DISTINCT itemid FROM functions WHERE triggerid='.zbx_dbstr($trigger['triggerid']).')'
+				);
+				$all_tags = array_merge($trigger_tags, $item_tags);
 
 				$time = time();
 
@@ -629,11 +625,18 @@ class CDBHelper {
 						}
 					}
 
-					if ($tags) {
-						foreach ($tags as &$tag) {
-							$tag['eventid'] = $fields['eventid'];
+					if ($all_tags) {
+						// Keep unique 'tag' => 'value' pair from merged trigger and item tags.
+						$unique = [];
+						foreach ($all_tags as &$tag) {
+							$key = $tag['tag'].'|'.$tag['value'];
+							if (!array_key_exists($key, $unique)) {
+								$unique[$key] = $tag;
+								$unique[$key]['eventid'] = $fields['eventid'];
+							}
 						}
 						unset($tag);
+						$tags = array_values($unique);
 
 						DB::insertBatch('event_tag', $tags);
 
@@ -648,5 +651,35 @@ class CDBHelper {
 		}
 
 		return $eventids;
+	}
+
+	/**
+	 * Get state of the DB.
+	 *
+	 * @return boolean
+	 */
+	public static function isValid() {
+		return (self::$state === self::STATE_DEFAULT);
+	}
+
+	/**
+	 * Remove dump file.
+	 *
+	 * @param string $file     path of the dump file
+	 *
+	 * @throws Exception on failure to remove the file
+	 */
+	public static function removeDumpFile($file) {
+		if (strstr(strtolower(PHP_OS), 'win') !== false) {
+			$file = str_replace('/', '\\', $file);
+			exec('del '.$file);
+		}
+		else {
+			exec('rm -rf '.$file, $output, $result_code);
+		}
+
+		if ($result_code != 0) {
+			throw new Exception('Failed to remove "'.$file.'".');
+		}
 	}
 }

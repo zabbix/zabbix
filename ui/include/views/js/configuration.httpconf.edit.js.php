@@ -43,9 +43,6 @@
 		/** @type {HTMLTableElement} */
 		#headers;
 
-		/** @type {boolean} */
-		#variables_headers_initialized = false;
-
 		/** @type {HTMLTableElement} */
 		#steps;
 
@@ -58,18 +55,8 @@
 			this.#steps = document.getElementById('steps');
 
 			this.#initTemplates();
-
-			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
-				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
-
-				if (panel.attr('id') === 'scenario-tab' && !this.#variables_headers_initialized) {
-					this.#initVariables(variables);
-					this.#initHeaders(headers);
-
-					this.#variables_headers_initialized = true;
-				}
-			});
-
+			this.#initVariables(variables);
+			this.#initHeaders(headers);
 			this.#initSteps(steps);
 
 			for (const id of ['agent', 'authentication']) {
@@ -77,7 +64,7 @@
 			}
 
 			this.#updateForm();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initTemplates() {
@@ -237,28 +224,23 @@
 			}
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('httpconf.php', location.href);
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+						url.searchParams.set('context', this.#context);
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
+						event.setRedirectUrl(url.href);
 					}
-
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = new Curl('httpconf.php');
-						curl.setArgument('context', this.#context);
+					else {
+						this.refresh();
 					}
-				}
-
-				if (curl === null) {
-					view.refresh();
-				}
-				else {
-					location.href = curl.getUrl();
 				}
 			});
 		}

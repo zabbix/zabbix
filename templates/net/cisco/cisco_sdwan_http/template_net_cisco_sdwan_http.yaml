@@ -155,7 +155,6 @@ zabbix_export:
             Returns an authentication token and session id; it is required only once and is used for all dependent script items.
             A session will expire after 30 minutes of inactivity or after 24 hours, which is the total lifespan of a session.
             Check the template documentation for the details.
-            
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
             - name: http_proxy

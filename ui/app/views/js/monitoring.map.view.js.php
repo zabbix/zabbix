@@ -23,24 +23,6 @@
 	const view = new class {
 		init() {
 			$('z-select[name="severity_min"]').on('change', () => document.forms['map.view'].submit());
-
-			this.#setSubmitCallback();
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
 		}
 	};
 </script>

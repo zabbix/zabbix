@@ -88,7 +88,7 @@ class CGraphPrototypeHelper extends CGraphGeneralHelper {
 	 * @throws Exception
 	 */
 	protected static function getDestinationItems(array $src_graphs, array $dst_options,
-			array $src_options = null): array {
+			?array $src_options = null): array {
 		$dst_hostids = reset($dst_options);
 		$src_item_graphs = [];
 

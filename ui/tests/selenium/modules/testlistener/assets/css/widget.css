@@ -1,0 +1,46 @@
+div.dashboard-widget-testlistener .js-view {
+	height: 100%;
+	display: grid;
+	grid-template-rows: max-content auto;
+}
+div.dashboard-widget-testlistener .sections {
+	display: grid;
+	align-items: baseline;
+	grid-template-columns: 1fr max-content 1fr max-content;
+	gap: 15px 10px;
+	padding: 10px;
+}
+div.dashboard-widget-testlistener .js-section {
+	display: contents;
+}
+div.dashboard-widget-testlistener .js-label {
+	grid-column: 1/-1;
+	margin-bottom: -10px;
+}
+div.dashboard-widget-testlistener .js-label span {
+	opacity: 0.4;
+}
+div.dashboard-widget-testlistener .js-label span:before {
+	content: "|";
+	margin: 0 5px;
+}
+div.dashboard-widget-testlistener .js-buffer {
+	margin-right: -10px;
+	font-family: monospace;
+	font-size: 1.2em;
+}
+div.dashboard-widget-testlistener .js-buffer.has-errors {
+	border-color: #dc3838;
+}
+div.dashboard-widget-testlistener .broadcasts {
+	padding: 10px;
+	box-sizing: border-box;
+	height: 100%;
+	display: grid;
+	grid-template-rows: max-content auto;
+}
+div.dashboard-widget-testlistener .broadcasts textarea {
+	font-family: monospace;
+	font-size: 1.2em;
+	text-wrap: nowrap;
+}

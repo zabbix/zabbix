@@ -1,6 +1,10 @@
 // Widget configuration.
 
 form.dashboard-widget-svggraph {
+	max-width: 1330px;
+	min-width: 1110px;
+	width: 100vw;
+
 	.svg-graph-preview,
 	.graph-widget-config-tabs {
 		grid-column: 1 / -1;
@@ -251,8 +255,15 @@ form.dashboard-widget-svggraph {
 			height: 24px;
 		}
 
-		.multiselect {
-			width: 100%;
+		.multiselect-control {
+			overflow: hidden;
+			margin: -2px;
+			padding: 2px;
+
+			.multiselect {
+				overflow: hidden;
+				flex-grow: 1;
+			}
 		}
 	}
 

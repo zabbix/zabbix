@@ -16,6 +16,27 @@
  * WARNING: the class doesn't support parsing query strings with multi-dimensional arrays.
  *
  * @param url
+ *
+ * @deprecated  Use standard URL class.
+ *     Notes:
+ *         - Use "searchParamsToObject" to convert URL search parameters into nested object.
+ *         - Use "objectToSearchParams" to convert nested data object into URL search parameters object.
+ *
+ *     Example:
+ *         const url = new URL(location.href); // Current URL.
+ *         const url = new URL('zabbix.php?action=test', location.href);
+ *         const search_params = url.searchParams;
+ *         const action = search_params.get('action');
+ *         const deep_object = searchParamsToObject(search_params);
+ *
+ *         const url_params = objectToSearchParams({
+ *             action: 'test',
+ *             itemids: [123, 456, 789]
+ *         });
+ *         const url = new URL(`zabbix.php?${url_params}`, location.href);
+ *
+ * @see searchParamsToObject
+ * @see objectToSearchParams
  */
 var Curl = function(url) {
 	url = url || location.href;

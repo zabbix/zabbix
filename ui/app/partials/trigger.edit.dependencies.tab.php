@@ -20,13 +20,13 @@
  */
 
 $discovered_trigger = array_key_exists('discovered_trigger', $data) ? $data['discovered_trigger'] : false;
+
 $dependency_link = (new CLink(['#{name}'], '#{trigger_url}'))
 	->addClass('js-related-trigger-edit')
 	->addClass(ZBX_STYLE_WORDWRAP)
 	->setAttribute('data-triggerid', '#{triggerid}')
 	->setAttribute('data-hostid', $data['hostid'])
-	->setAttribute('data-context', $data['context'])
-	->setAttribute('data-action', '#{action}');
+	->setAttribute('data-context', $data['context']);
 
 if (array_key_exists('parent_discoveryid', $data)) {
 	$dependency_link

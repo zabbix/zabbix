@@ -91,7 +91,7 @@ function prepareUrlParam($value, $name = null): string {
  * @param bool        $getFromRequest  Detect data source - input array or $_REQUEST variable.
  * @param string|null $name            If $_REQUEST variable is used this variable not used.
  */
-function url_param($param, bool $getFromRequest = true, string $name = null): string {
+function url_param($param, bool $getFromRequest = true, ?string $name = null): string {
 	if (is_array($param)) {
 		if ($getFromRequest) {
 			fatal_error(_('URL parameter cannot be array.'));
@@ -216,7 +216,9 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		],
 		'selectHostDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 		'selectDiscoveryRule' => ['lifetime_type', 'enabled_lifetime_type'],
-		'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available', 'error'],
+		'selectInterfaces' => ['interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available',
+			'error'
+		],
 		'hostids' => [$hostid],
 		'editable' => true
 	];
@@ -262,17 +264,28 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$db_host = reset($db_host);
 
 	if (!$is_template) {
-		if (getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
+		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds(
+			array_column($db_host['interfaces'], 'interfaceid')
+		);
+
+		foreach ($db_host['interfaces'] as &$interface) {
+			$interfaceid = $interface['interfaceid'];
+
+			$interface['has_enabled_items'] = array_key_exists($interfaceid, $interface_enabled_items_count)
+				&& $interface_enabled_items_count[$interfaceid] > 0;
+		}
+		unset($interface);
+
+		if (getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
 				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
 				'available' => $db_host['active_available'],
+				'has_enabled_items' => true,
 				'error' => ''
 			];
 			unset($db_host['active_available']);
 		}
-
-		$db_host['has_passive_checks'] = (bool) getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, [$hostid]);
 	}
 
 	// get lld-rules
@@ -298,11 +311,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('templateid', $db_host['templateid'])
 			->getUrl();
 
-		$template = new CSpan(
-			(new CLink($db_host['name'], $template_url))
-				->setAttribute('data-templateid', $db_host['templateid'])
-				->setAttribute('data-action', 'template.edit')
-		);
+		$template = new CSpan((new CLink($db_host['name'], $template_url)));
 
 		if ($current_element === '') {
 			$template->addClass(ZBX_STYLE_SELECTED);
@@ -339,11 +348,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('hostid', $db_host['hostid'])
 			->getUrl();
 
-		$host = new CSpan(
-			(new CLink($db_host['name'], $host_url))
-				->setAttribute('data-hostid', $db_host['hostid'])
-				->setAttribute('data-action', 'host.edit')
-		);
+		$host = new CSpan((new CLink($db_host['name'], $host_url)));
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
@@ -354,7 +359,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
 		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED && $db_host['hostDiscovery']
 			? $db_host['hostDiscovery']['disable_source']
@@ -415,10 +420,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		// graphs
 		$graphs = new CSpan([
-			new CLink(_('Graphs'), (new CUrl('graphs.php'))
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$db_host['hostid']])
-				->setArgument('context', $context)
+			new CLink(_('Graphs'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['graphs'])
 		]);
@@ -530,7 +537,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// graph prototypes
 		$graph_prototypes = new CSpan([
 			new CLink(_('Graph prototypes'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -542,20 +550,18 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$content_menu->addItem($graph_prototypes);
 
 		// host prototypes
-		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$host_prototypes = new CSpan([
-				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
-						->setArgument('context', $context)
-				),
-				CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
-			]);
-			if ($current_element === 'hosts') {
-				$host_prototypes->addClass(ZBX_STYLE_SELECTED);
-			}
-			$content_menu->addItem($host_prototypes);
+		$host_prototypes = new CSpan([
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
+			CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
+		]);
+		if ($current_element === 'hosts') {
+			$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
+		$content_menu->addItem($host_prototypes);
 	}
 
 	$list->addItem($content_menu);
@@ -613,7 +619,7 @@ function getSysmapNavigation($sysmapid, $name, $severity_min): CList {
  *
  * @throws InvalidArgumentException	if an element of $other_buttons contain something other than CButtonInterface
  */
-function makeFormFooter(CButtonInterface $main_button = null, array $other_buttons = []): CList {
+function makeFormFooter(?CButtonInterface $main_button = null, array $other_buttons = []): CList {
 	foreach ($other_buttons as $other_button) {
 		$other_button->addClass(ZBX_STYLE_BTN_ALT);
 	}
@@ -636,11 +642,10 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
  * Create HTML helper element for host interfaces availability.
  *
  * @param array $host_interfaces
- * @param bool $passive_checks
  *
  * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks = true): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -654,14 +659,14 @@ function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks =
 			'type' => $interface['type'],
 			'available' => $interface['available'],
 			'interface' => getHostInterface($interface),
+			'has_enabled_items' => $interface['has_enabled_items'],
 			'description' => $description,
-			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
+			'error' => $interface['available'] == INTERFACE_AVAILABLE_TRUE ? '' : $interface['error']
 		];
 	}
 
 	return (new CHostAvailability())
-		->setInterfaces($interfaces)
-		->enablePassiveChecks($passive_checks);
+		->setInterfaces($interfaces);
 }
 
 /**
@@ -854,24 +859,30 @@ function makePageFooter(bool $with_version = true): CTag {
  * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getUserSettingsSubmenu(): array {
-	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-		return [];
-	}
-
 	$profile_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'userprofile.edit')
 		->getUrl();
 
-	$tokens_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'user.token.list')
+	$notification = (new CUrl('zabbix.php'))
+		->setArgument('action', 'userprofile.notification.edit')
 		->getUrl();
+
+	$items = [
+		$profile_url => _('Profile'),
+		$notification => _('Notifications')
+	];
+
+	if (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+		$tokens_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'user.token.list')
+			->getUrl();
+
+		$items[$tokens_url] = _('API tokens');
+	}
 
 	return [
 		'main_section' => [
-			'items' => array_filter([
-				$profile_url => _('User profile'),
-				$tokens_url  => _('API tokens')
-			])
+			'items' => array_filter($items)
 		]
 	];
 }

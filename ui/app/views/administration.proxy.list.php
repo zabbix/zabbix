@@ -104,8 +104,6 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			? (new CLink($proxy['proxyGroup']['name'], $proxy_group_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY)
-				->setAttribute('data-proxy_groupid', $proxy['proxy_groupid'])
-				->setAttribute('data-action', 'proxygroup.edit')
 			: $proxy['proxyGroup']['name'];
 		$proxy_name_prefix[] = NAME_DELIMITER;
 	}
@@ -192,8 +190,6 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			$hosts[] = $data['user']['can_edit_hosts']
 				? (new CLink($host['name'], $host_url))
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-					->setAttribute('data-hostid', $host['hostid'])
-					->setAttribute('data-action', 'host.edit')
 				: (new CSpan($host['name']))
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null);
 			$hosts[] = ', ';
@@ -219,10 +215,8 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			->setAttribute('data-actions', $can_enable_disable_hosts ? 'enable_hosts disable_hosts' : null),
 		(new CCol([
 			$proxy_name_prefix,
-			(new CLink($proxy['name'], $proxy_url))
-				->setAttribute('data-proxyid', $proxyid)
-				->setAttribute('data-action', 'proxy.edit')
-		]))->addClass(ZBX_STYLE_WORDBREAK),
+			new CLink($proxy['name'], $proxy_url)
+		]))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['operating_mode'] == PROXY_OPERATING_MODE_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
 		$state,
@@ -233,7 +227,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : '',
 		array_key_exists('vps_total', $proxy) ? $proxy['vps_total'] : '',
 		(new CCol($host_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
-		(new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK)
+		$hosts
 	]);
 }
 

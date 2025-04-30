@@ -21,7 +21,7 @@
 
 $trigger_form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
-	->setid('trigger-form')
+	->setId('trigger-form')
 	->setName('trigger_edit_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('hostid', $data['hostid'])
@@ -121,7 +121,7 @@ if ($data['hostid']) {
 	$popup_parameters['hostid'] = $data['hostid'];
 }
 
-$backurl = (new CUrl('zabbix.php'))
+$return_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'trigger.list')
 	->setArgument('context', $data['context'])
 	->getUrl();
@@ -137,7 +137,7 @@ $trigger_form
 			'action' => 'trigger.edit',
 			'context' => $data['context'],
 			'db_trigger' => $data['db_trigger'],
-			'backurl' => $backurl,
+			'return_url' => $return_url,
 			'overlayid' => 'trigger.edit',
 			'parent_discoveryid' => null
 		]).');'))->setOnDocumentReady()

@@ -97,7 +97,7 @@
 	<tr id="dependency_#{triggerid}" data-triggerid="#{triggerid}">
 		<td>
 			<input type="hidden" name="dependencies[]" id="dependencies_#{triggerid}" value="#{triggerid}">
-			<a href="#{trigger_url}" class="js-edit-dependency" data-triggerid="#{triggerid}" data-context="#{context}" data-parent_discoveryid="#{parent_discoveryid}" data-prototype="#{prototype}" data-action="#{action}">#{name}</a>
+			<a href="#{trigger_url}" class="js-edit-dependency" data-triggerid="#{triggerid}" data-context="#{context}" data-parent_discoveryid="#{parent_discoveryid}" data-prototype="#{prototype}">#{name}</a>
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<?= (new CButton('remove', _('Remove')))

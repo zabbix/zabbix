@@ -122,7 +122,7 @@ class Settings
      * @throws Error If any settings parameter is invalid
      * @throws Exception If Settings is incorrectly supplied
      */
-    public function __construct(array $settings = null, $spValidationOnly = false)
+    public function __construct(?array $settings = null, $spValidationOnly = false)
     {
         $this->_spValidationOnly = $spValidationOnly;
         $this->_loadPaths();

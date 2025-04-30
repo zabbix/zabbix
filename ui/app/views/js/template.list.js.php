@@ -28,10 +28,11 @@
 		init() {
 			this.#initActions();
 			this.#initFilter();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
-			document.addEventListener('click', (e) => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-massupdate')) {
 					openMassupdatePopup('template.massupdate', {
 						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('template')) ?>
@@ -48,10 +49,8 @@
 				}
 			});
 
-			document.getElementById('js-create').addEventListener('click', (e) => {
-				window.popupManagerInstance.openPopup('template.edit',
-					{groupids: JSON.parse(e.target.dataset.groupids)}
-				);
+			document.getElementById('js-create').addEventListener('click', e => {
+				ZABBIX.PopupManager.open('template.edit', {groupids: JSON.parse(e.target.dataset.groupids)});
 			});
 
 			document.getElementById('js-import').addEventListener('click', () => {
@@ -63,8 +62,6 @@
 					dialogue_class: "modal-popup-generic"
 				});
 			});
-
-			this.#setSubmitCallback();
 		}
 
 		#initFilter() {
@@ -86,6 +83,16 @@
 				$(filter).on('change', () => this.#updateMultiselect($(filter)));
 				this.#updateMultiselect($(filter));
 			})
+		}
+
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('templates')
+			});
 		}
 
 		#delete(target, templateids, clear) {
@@ -162,21 +169,6 @@
 
 		#updateMultiselect($ms) {
 			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('templates');
-				location.href = location.href;
-			});
 		}
 	};
 </script>

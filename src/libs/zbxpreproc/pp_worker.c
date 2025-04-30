@@ -164,8 +164,8 @@ static void	*pp_worker_entry(void *args)
 			pp_task_queue_lock(queue);
 			pp_task_queue_push_finished(queue, in);
 
-			if (NULL != worker->finished_cb)
-				worker->finished_cb(worker->finished_data);
+			if (NULL != worker->pp_finished_task_cb)
+				worker->pp_finished_task_cb(worker->pp_finished_task_data);
 
 			continue;
 		}
@@ -267,14 +267,15 @@ void	pp_worker_destroy(zbx_pp_worker_t *worker)
  *                                                                            *
  * Purpose: set callback to call after task is processed                      *
  *                                                                            *
- * Parameters: worker         - [IN] the preprocessing worker                 *
- *             finished_cb   - [IN] a callback to call after finishing        *
- *                                     task                                   *
- *             finished_data - [IN] the callback data                         *
+ * Parameters: worker                - [IN] preprocessing worker              *
+ *             pp_finished_task_cb   - [IN] callback to call after finishing  *
+ *                                          task                              *
+ *             pp_finished_task_data - [IN] callback data                     *
  *                                                                            *
  ******************************************************************************/
-void	pp_worker_set_finished_cb(zbx_pp_worker_t *worker, zbx_pp_notify_cb_t finished_cb, void *finished_data)
+void	pp_worker_set_finished_task_cb(zbx_pp_worker_t *worker, zbx_pp_finished_task_cb_t pp_finished_task_cb,
+		void *pp_finished_task_data)
 {
-	worker->finished_cb = finished_cb;
-	worker->finished_data = finished_data;
+	worker->pp_finished_task_cb = pp_finished_task_cb;
+	worker->pp_finished_task_data = pp_finished_task_data;
 }

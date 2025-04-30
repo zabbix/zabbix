@@ -16,7 +16,9 @@
 - *Azure PostgreSQL Flexible Server by HTTP*
 - *Azure PostgreSQL Single Server by HTTP*
 - *Azure Microsoft SQL Serverless Database by HTTP*
+- *Azure Microsoft SQL DTU Database by HTTP*
 - *Azure Microsoft SQL Database by HTTP*
+- *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
 
 ## Requirements
@@ -61,6 +63,10 @@ This template has been tested on:
 |{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.SCALESET.LOCATION.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
 |{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.NAME.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
+|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
+|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
 |{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
@@ -173,37 +179,43 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Virtual machines discovery|<p>The list of the virtual machines is provided by the subscription.</p>|Dependent item|azure.vm.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Virtual machines discovery|<p>The list of virtual machines provided by the subscription.</p>|Dependent item|azure.vm.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### LLD rule Virtual machine scale set discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Virtual machine scale set discovery|<p>The list of the virtual machine scale sets provided by the subscription.</p>|Dependent item|azure.scaleset.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Virtual machine scale set discovery|<p>The list of virtual machine scale sets provided by the subscription.</p>|Dependent item|azure.scaleset.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### LLD rule Azure SQL managed instance discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure SQL managed instance discovery|<p>The list of Azure SQL managed instances provided by the subscription.</p>|Dependent item|azure.sql_inst.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### LLD rule MySQL servers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|MySQL servers discovery|<p>The list of the MySQL servers is provided by the subscription.</p>|Dependent item|azure.mysql.servers.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|MySQL servers discovery|<p>The list of MySQL servers provided by the subscription.</p>|Dependent item|azure.mysql.servers.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### LLD rule PostgreSQL servers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PostgreSQL servers discovery|<p>The list of the PostgreSQL servers is provided by the subscription.</p>|Dependent item|azure.pgsql.servers.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|PostgreSQL servers discovery|<p>The list of PostgreSQL servers provided by the subscription.</p>|Dependent item|azure.pgsql.servers.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### LLD rule Microsoft SQL databases discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Microsoft SQL databases discovery|<p>The list of the Microsoft SQL databases is provided by the subscription.</p>|Dependent item|azure.mssql.databases.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Microsoft SQL databases discovery|<p>The list of Microsoft SQL databases provided by the subscription.</p>|Dependent item|azure.mssql.databases.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### LLD rule Cosmos DB account discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cosmos DB account discovery|<p>The list of the Cosmos databases is provided by the subscription.</p>|Dependent item|azure.cosmos.mongo.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Cosmos DB account discovery|<p>The list of Cosmos databases provided by the subscription.</p>|Dependent item|azure.cosmos.mongo.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 # Azure VM Scale Set by HTTP
 
@@ -877,6 +889,99 @@ This template has been tested on:
 |Azure MSSQL Serverless: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
 |Azure MSSQL Serverless: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
+# Azure Microsoft SQL DTU Database by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft SQL DTU-based databases via HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 7.4 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Microsoft Azure SQL DTU-based databases
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure SQL DTU-based database ID.</p>||
+|{$AZURE.DB.DTU.UTIL.CRIT}|<p>The critical threshold of DTU utilization, expressed in %.</p>|`90`|
+|{$AZURE.DB.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
+|{$AZURE.DB.MEMORY.UTIL.CRIT}|<p>The critical threshold of memory utilization, expressed in %.</p>|`90`|
+|{$AZURE.DB.STORAGE.PUSED.WARN}|<p>The warning threshold of storage utilization, expressed in %.</p>|`80`|
+|{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>The result of API requests is expressed in JSON format.</p>|Script|azure.db.mssql.data.get|
+|Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.db.mssql.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability state|<p>The availability status of the resource.</p>|Dependent item|azure.db.mssql.availability.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.availabilityState`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Replace: `Available -> 0`</p></li><li><p>Replace: `Degraded -> 1`</p></li><li><p>Replace: `Unavailable -> 2`</p></li><li><p>Replace: `Unknown -> 3`</p></li><li><p>In range: `0 -> 3`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability status detailed|<p>A detailed summary of the availability status.</p>|Dependent item|azure.db.mssql.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU percentage|<p>The average percentage of CPU usage on a host.</p>|Dependent item|azure.db.mssql.cpu.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.cpu_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DTU percentage|<p>The average percentage of DTU consumption for a DTU-based database.</p>|Dependent item|azure.db.mssql.dtu.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_consumption_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data IO percentage|<p>The average percentage of physical data read.</p>|Dependent item|azure.db.mssql.data.read.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.physical_data_read_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Log IO percentage|<p>The percentage of I/O used for log writes. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.log.write.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.log_write_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data space used|<p>Data space used. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.storage.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Connections successful|<p>The number of successful connections.</p>|Dependent item|azure.db.mssql.connections.successful<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.connection_successful.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Connections failed: System errors|<p>The number of failed connections with system errors.</p>|Dependent item|azure.db.mssql.connections.failed.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.connection_failed.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Connections blocked by firewall|<p>The number of connections blocked by the firewall.</p>|Dependent item|azure.db.mssql.firewall.blocked<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.blocked_by_firewall.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Deadlocks|<p>The number of deadlocks. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.deadlocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.deadlock.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data space used percent|<p>Data space used in percent. Not applicable to data warehouses or Hyperscale databases.</p>|Dependent item|azure.db.mssql.storage.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|In-Memory OLTP storage percent|<p>In-Memory OLTP storage percent. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.storage.xtp.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.xtp_storage_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Workers percentage|<p>The percentage of workers. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.workers.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.workers_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Sessions percentage|<p>The percentage of sessions. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.sessions.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sessions_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Sessions count|<p>The number of active sessions. Not applicable to Synapse DW Analytics.</p>|Dependent item|azure.db.mssql.sessions.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sessions_count.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DTU limit|<p>The DTU limit. Applicable to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.limit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_limit.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DTU used|<p>The DTU used. Applicable to DTU-based databases.</p>|Dependent item|azure.db.mssql.dtu.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dtu_used.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|SQL instance CPU percent|<p>CPU usage from all user and system workloads. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.server.cpu.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sql_instance_cpu_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|SQL instance memory percent|<p>The percentage of memory used by the database engine instance. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.server.memory.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.sql_instance_cpu_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Tempdb data file size|<p>The space used in `tempdb` data files, expressed in bytes. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.data.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_data_size.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Tempdb log file size|<p>The space used in the `tempdb` transaction log file, expressed in bytes. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.log.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_log_size.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Tempdb log used percent|<p>The percentage of space used in the `tempdb` transaction log file. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.tempdb.log.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.tempdb_log_used_percent.maximum`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data space allocated|<p>The allocated data storage. Not applicable to data warehouses.</p>|Dependent item|azure.db.mssql.storage.allocated<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.allocated_data_storage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Log backup storage size|<p>The cumulative log backup storage size. Applies to vCore-based and Hyperscale databases.</p>|Dependent item|azure.db.mssql.storage.backup.log.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.log_backup_size_bytes.maximum`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure MSSQL DTU: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
+|Azure MSSQL DTU: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=2`|High||
+|Azure MSSQL DTU: Microsoft SQL database is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
+|Azure MSSQL DTU: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
+|Azure MSSQL DTU: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure MSSQL DTU: High DTU utilization|<p>The DTU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.dtu.percentage,5m)>{$AZURE.DB.DTU.UTIL.CRIT}`|High||
+|Azure MSSQL DTU: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure MSSQL DTU: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL DTU Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning|**Depends on**:<br><ul><li>Azure MSSQL DTU: Storage space is critically low</li></ul>|
+
 # Azure Microsoft SQL Database by HTTP
 
 ## Overview
@@ -1085,6 +1190,7 @@ This template has been tested on:
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.BILLING.MONTH}|<p>Months to get historical data from Azure Cost Management API, no more than 11 (plus current month). The time period for pulling the data cannot exceed 1 year.</p>|`11`|
 |{$AZURE.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable services by name.</p>|`.*`|
 |{$AZURE.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered services by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1099,6 +1205,15 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |Get monthly costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.monthly.costs|
 |Get daily costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.daily.costs|
+|Azure Cost: Get monthly costs errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.monthly.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure Cost: Get daily costs errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.daily.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.monthly.costs.errors))>0`|Average||
+|Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.daily.costs.errors))>0`|Average||
 
 ### LLD rule Azure daily costs by services discovery
 
@@ -1159,6 +1274,89 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost.</p>|Dependent item|azure.monthly.cost["{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+# Azure SQL Managed Instance by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure SQL Managed Instance by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 7.4 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Azure SQL Managed Instance
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure SQL managed instance ID.</p>||
+|{$AZURE.SQL.INST.SPACE.CRIT}|<p>Storage space critical threshold, expressed in %.</p>|`90`|
+|{$AZURE.SQL.INST.SPACE.WARN}|<p>Storage space warning threshold, expressed in %.</p>|`80`|
+|{$AZURE.SQL.INST.CPU.WARN}|<p>CPU utilization warning threshold, expressed in %.</p>|`80`|
+|{$AZURE.SQL.INST.CPU.CRIT}|<p>CPU utilization critical threshold, expressed in %.</p>|`90`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data of the Azure SQL managed instance.</p>|Script|azure.sql_inst.data.get|
+|Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.sql_inst.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability state|<p>The availability status of the resource.</p><p>0 - Available - no events detected that affect the health of the resource.</p><p>1 - Degraded  - your resource detected a loss in performance, although it's still available for use.</p><p>2 - Unavailable - the service detected an ongoing platform or non-platform event that affects the health of the resource.</p><p>3 - Unknown - Resource Health hasn't received information about the resource for more than 10 minutes.</p>|Dependent item|azure.sql_inst.availability.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.availabilityState`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Replace: `Available -> 0`</p></li><li><p>Replace: `Degraded -> 1`</p></li><li><p>Replace: `Unavailable -> 2`</p></li><li><p>Replace: `Unknown -> 3`</p></li><li><p>In range: `0 -> 3`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability status detailed|<p>The summary description of the availability status.</p>|Dependent item|azure.sql_inst.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Average CPU utilization|<p>Average CPU utilization of the instance.</p>|Dependent item|azure.sql_inst.cpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.avg_cpu_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IO bytes read|<p>Bytes read by the managed instance.</p>|Dependent item|azure.sql_inst.bytes.read<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.io_bytes_read.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IO bytes write|<p>Bytes written by the managed instance.</p>|Dependent item|azure.sql_inst.bytes.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.io_bytes_written.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IO request count|<p>IO request count by the managed instance.</p>|Dependent item|azure.sql_inst.requests<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.io_requests.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Storage space reserved|<p>Storage space reserved by the managed instance.</p>|Dependent item|azure.sql_inst.storage.reserved<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.reserved_storage_mb.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Storage space used|<p>Storage space used by the managed instance.</p>|Dependent item|azure.sql_inst.storage.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage_space_used_mb.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Storage space utilization|<p>Managed instance storage space utilization, in percent.</p>|Calculated|azure.sql_inst.storage.utilization|
+|Virtual core count|<p>Virtual core count available to the managed instance.</p>|Dependent item|azure.sql_inst.core.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.virtual_core_count.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Instance state|<p>State of the managed instance.</p>|Dependent item|azure.sql_inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.instance.properties.state`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Instance collation|<p>Collation of the managed instance.</p>|Dependent item|azure.sql_inst.collation<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.instance.properties.collation`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Instance provisioning state|<p>Provisioning state of the managed instance.</p>|Dependent item|azure.sql_inst.provision<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.instance.properties.provisioningState`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure SQL instance: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.data.errors))>0`|Average||
+|Azure SQL instance: Azure SQL managed instance is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.availability.state)=2`|High||
+|Azure SQL instance: Azure SQL managed instance is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.availability.state)=1`|Average||
+|Azure SQL instance: Azure SQL managed instance is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.availability.state)=3`|Warning||
+|Azure SQL instance: Critically high CPU utilization|<p>CPU utilization is critically high.</p>|`min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.CRIT}`|Average|**Depends on**:<br><ul><li>Azure SQL instance: High CPU utilization</li></ul>|
+|Azure SQL instance: High CPU utilization|<p>CPU utilization is too high.</p>|`min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.WARN}`|Warning||
+|Azure SQL instance: Storage free space is critically low|<p>The free storage space has been less than `{$AZURE.SQL.INST.SPACE.CRIT}`% for 5m.</p>|`min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.CRIT}`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Azure SQL instance: Storage free space is low</li></ul>|
+|Azure SQL instance: Storage free space is low|<p>The free storage space has been less than `{$AZURE.SQL.INST.SPACE.WARN}`% for 5m.</p>|`min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}`|Warning|**Manual close**: Yes|
+|Azure SQL instance: Instance state has changed|<p>Azure SQL managed instance state has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.state)=1`|Warning||
+|Azure SQL instance: Instance collation has changed|<p>Azure SQL managed instance collation has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.collation)=1`|Average||
+|Azure SQL instance: Instance provisioning state has changed|<p>Azure SQL managed instance provisioning state has changed.</p>|`change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.provision)<>0`|Warning||
 
 ## Feedback
 

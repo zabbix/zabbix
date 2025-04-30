@@ -53,23 +53,18 @@ class CWidgetMap extends CWidget {
 	}
 
 	promiseUpdate() {
-		const fields_data = this.getFieldsData();
-
-		fields_data.sysmapid = fields_data.sysmapid ? fields_data.sysmapid[0] : fields_data.sysmapid;
+		const sysmapid = this.getFieldsData().sysmapid[0];
 
 		if (this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
-		}
-
-		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
-			if (this.#sysmapid != fields_data.sysmapid) {
-				this.#sysmapid = fields_data.sysmapid;
-			}
-
+			this.#sysmapid = sysmapid;
 			this.#map_svg = null;
 		}
+		else if (this.#sysmapid !== null && sysmapid != this.#sysmapid) {
+			this.feedback({sysmapid: [this.#sysmapid]});
+		}
 
-		if (this.#map_svg === null || this.#sysmapid !== fields_data.sysmapid) {
+		if (this.#map_svg === null) {
 			return super.promiseUpdate();
 		}
 
@@ -80,11 +75,14 @@ class CWidgetMap extends CWidget {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
 			},
-			body: JSON.stringify(this.getUpdateRequestData())
+			body: JSON.stringify(this.getUpdateRequestData()),
+			signal: this._update_abort_controller.signal
 		})
-			.then((response) => response.json())
-			.then((response) => {
-				if (response.mapid != 0 && this.#map_svg !== null) {
+			.then(response => response.json())
+			.then(response => {
+				if (response.mapid != 0) {
+					this.#map_svg.selected_element_id = this.#selected_element_id;
+					response.caller = 'widget';
 					this.#map_svg.update(response);
 				}
 				else {
@@ -203,7 +201,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	#activateContentEvents() {
-		this.#map_svg?.container.addEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+		this.#map_svg?.container.addEventListener(SVGMap.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
 
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.addEventListener('click', this.#event_handlers.back);
@@ -211,7 +209,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	#deactivateContentEvents() {
-		this.#map_svg?.container.removeEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+		this.#map_svg?.container.removeEventListener(SVGMap.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
 
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.removeEventListener('click', this.#event_handlers.back);

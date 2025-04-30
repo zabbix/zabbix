@@ -2,6 +2,7 @@ include ../Makefile.include
 
 SUBDIRS = \
 	common \
+	agent \
 	@ARCH@
 
 if SERVER

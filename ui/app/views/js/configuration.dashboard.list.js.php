@@ -24,34 +24,25 @@
 
 		init({checkbox_hash}) {
 			this.checkbox_hash = checkbox_hash;
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					uncheckTableRows(this.checkbox_hash);
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
+						url.searchParams.set('action', 'template.list');
+
+						event.setRedirectUrl(url.href);
 					}
-
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = new Curl('zabbix.php');
-
-						curl.setArgument('action', 'template.list');
-					}
-				}
-
-				uncheckTableRows(this.checkbox_hash);
-
-				if (curl === null) {
-					location.href = location.href;
-				}
-				else {
-					location.href = curl.getUrl();
 				}
 			});
 		}

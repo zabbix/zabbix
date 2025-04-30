@@ -29,7 +29,7 @@
 		init() {
 			this.#initTagFilter();
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initTagFilter() {
@@ -47,9 +47,9 @@
 		}
 
 		#initActions() {
-			document.addEventListener('click', (e) => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-create-sla')) {
-					window.popupManagerInstance.openPopup('sla.edit', {});
+					ZABBIX.PopupManager.open('sla.edit');
 				}
 				else if (e.target.classList.contains('js-enable-sla')) {
 					this.#enable(e.target, [e.target.dataset.slaid]);
@@ -163,18 +163,13 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('sla');
-				location.href = location.href;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('sla')
 			});
 		}
 	};

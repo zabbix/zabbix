@@ -39,13 +39,11 @@ else {
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$table_header = [];
 
-		$column_title_class = $data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-			? ZBX_STYLE_TEXT_VERTICAL
-			: null;
-
 		if ($data['show_timestamp']) {
 			$table_header[] = (new CColHeader(
-				(new CSpan(_x('Timestamp', 'compact table header')))->addClass($column_title_class)
+				$data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical(_x('Timestamp', 'compact table header'))
+					: new CSpan(_x('Timestamp', 'compact table header'))
 			))
 				->addClass(ZBX_STYLE_CELL_WIDTH)
 				->addClass(ZBX_STYLE_NOWRAP);
@@ -53,22 +51,28 @@ else {
 
 		if ($is_layout_vertical) {
 			foreach ($data['columns'] as $column) {
+				$tag = $data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical($column['name'])
+					: new CSpan($column['name']);
+
 				$table_header[] = (new CColHeader(
-					(new CSpan($column['name']))
-						->addClass($column_title_class)
-						->setTitle($column['name'])
+					$tag->setTitle($column['name'])
 				))->setColSpan(2);
 			}
 		}
 		else {
 			$table_header[] = (new CColHeader(
-				(new CSpan(_x('Name', 'compact table header')))->addClass($column_title_class)
+				$data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical(_x('Name', 'compact table header'))
+					: new CSpan(_x('Name', 'compact table header'))
 			))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$table_header[] = (new CColHeader(
-				(new CSpan(_x('Value', 'compact table header')))->addClass($column_title_class)
+				$data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical(_x('Value', 'compact table header'))
+					: new CSpan(_x('Value', 'compact table header'))
 			))->setColSpan(2);
 		}
 
@@ -181,7 +185,7 @@ function getRowClock(array $columns, array $row): string | int {
 }
 
 function makeValueCell(array $column, array $item_value, bool $text_wordbreak = false,
-		string $cell_class = null): array {
+		?string $cell_class = null): array {
 	$color = $column['base_color'];
 
 	switch ($column['item_value_type']) {
@@ -268,12 +272,16 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 
 			$cell = new CCol();
 
+			$formatted_value = zbx_nl2br($item_value['value']);
+
 			switch ($column['display']) {
 				case CWidgetFieldColumnsList::DISPLAY_AS_IS:
 					$cell
 						->addItem(
-							(new CSpan(zbx_nl2br($item_value['value'])))->setHint(
-								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							(new CPre($formatted_value))->setHint(
+								(new CDiv($formatted_value))
+									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
+									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
 						)
 						->addClass($text_wordbreak ? ZBX_STYLE_WORDBREAK : ZBX_STYLE_NOWRAP);
@@ -289,7 +297,9 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 					$cell
 						->addItem(
 							(new CSpan($single_line_value))->setHint(
-								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+								(new CDiv($formatted_value))
+									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
+									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
 						)
 						->addClass(ZBX_STYLE_NOWRAP);

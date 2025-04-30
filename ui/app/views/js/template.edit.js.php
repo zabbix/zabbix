@@ -28,11 +28,11 @@ window.template_edit_popup = new class {
 		this.templateid = templateid;
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.macros_templateids = null;
+		this.show_inherited_macros = false;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'template.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'template.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		if (warnings.length > 0) {
 			const message_box = warnings.length > 1
@@ -47,15 +47,13 @@ window.template_edit_popup = new class {
 		this.#initActions();
 		this.#initTemplateTab();
 		this.#initMacrosTab();
+		this.#initPopupListeners();
 
 		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#initActions() {
-		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-edit-template')) {
-				this.setActions(e.target.dataset.templateid);
-			}
+		this.form.addEventListener('click', e => {
 			if (e.target.classList.contains('js-unlink')) {
 				this.#unlink(e);
 			}
@@ -71,35 +69,6 @@ window.template_edit_popup = new class {
 
 		template_name.addEventListener('input', () => visible_name.placeholder = template_name.value);
 		template_name.dispatchEvent(new Event('input'));
-	}
-
-	setActions(templateid) {
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const form_fields = getFormFields(this.form);
-
-			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					const url = new Curl(location.href);
-
-					url.setArgument('templateid', templateid);
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
-				}
-			}
-
-			const url = new Curl(location.href);
-
-			url.setArgument('templateid', templateid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
 	}
 
 	#initTemplateTab() {
@@ -122,43 +91,70 @@ window.template_edit_popup = new class {
 		this.macros_manager = new HostMacrosManager({
 			container: $('#template_macros_container .table-forms-td-right')
 		});
-		let macros_initialized = false;
 
-		$('#template-tabs', this.form).on('tabscreate tabsactivate', (event, ui) => {
-			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
-			const show_inherited_macros = this.form
-				.querySelector('input[name=show_inherited_template_macros]:checked').value == 1;
+		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');
+		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
-			if (panel.attr('id') === 'template-macro-tab') {
-				// Please note that macro initialization must take place once and only when the tab is visible.
-				if (event.type === 'tabsactivate') {
-					const templateids = this.linked_templateids.concat(this.#getNewTemplates());
+		this.macros_manager.initMacroTable(this.show_inherited_macros);
 
-					if (this.macros_templateids === null) {
-						this.macros_templateids = templateids;
-					}
+		const observer = new IntersectionObserver(entries => {
+			if (entries[0].isIntersecting && this.show_inherited_macros) {
+				const templateids = this.linked_templateids.concat(this.#getNewTemplates());
 
-					// After initialization load inherited macros only if templates changed.
-					if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
-						this.macros_templateids = templateids;
-						this.macros_manager.load(show_inherited_macros, templateids);
-					}
+				if (this.macros_templateids === null || this.macros_templateids.xor(templateids).length > 0) {
+					this.macros_templateids = templateids;
+
+					this.macros_manager.load(this.show_inherited_macros, templateids);
 				}
-
-				if (macros_initialized) {
-					return;
-				}
-
-				// Initialize macros.
-				this.macros_manager.initMacroTable(show_inherited_macros);
-
-				macros_initialized = true;
 			}
 		});
+		observer.observe(document.getElementById('template-macro-tab'));
 
-		this.form.querySelector('#show_inherited_template_macros').onchange = (e) => {
-			this.macros_manager.load(e.target.value == 1, this.linked_templateids.concat(this.#getNewTemplates()));
-		}
+		show_inherited_macros_element.addEventListener('change', e => {
+			this.show_inherited_macros = e.target.value == 1;
+			this.macros_templateids = this.linked_templateids.concat(this.#getNewTemplates());
+
+			this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
+		});
+	}
+
+	#initPopupListeners() {
+		const subscriptions = [];
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
+					action: 'template.edit'
+				},
+				callback: ({data, event}) => {
+					if (data.action_parameters.templateid === this.templateid || this.templateid === null) {
+						return;
+					}
+
+					if (!this.#isConfirmed()) {
+						event.preventDefault();
+					}
+				}
+			})
+		);
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
+	}
+
+	#isConfirmed() {
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	/**
@@ -231,7 +227,7 @@ window.template_edit_popup = new class {
 		parameters.templateid = this.templateid;
 		this.#prepareFields(parameters);
 
-		this.overlay = window.popupManagerInstance.openPopup('template.edit', parameters);
+		this.overlay = ZABBIX.PopupManager.open('template.edit', parameters);
 	}
 
 	deleteAndClear() {

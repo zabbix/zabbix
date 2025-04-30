@@ -29,7 +29,7 @@ class CConfigHelper {
 	 * Saves zabbix.conf.php configuration file in temporary storage.
 	 */
 	public static function backupConfig() {
-		$file_name = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$file_name = __DIR__.'/../../../conf/zabbix.conf.php';
 		$backup_name = PHPUNIT_COMPONENT_DIR.'zabbix.conf.php.'.count(self::$backups);
 		self::$backups[] = $backup_name;
 
@@ -42,7 +42,7 @@ class CConfigHelper {
 	 * Restores zabbix.conf.php configuration file from temporary storage. backupConfig() must be called first.
 	 */
 	public static function restoreConfig() {
-		$file_name = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$file_name = __DIR__.'/../../../conf/zabbix.conf.php';
 		$backup_name = array_pop(self::$backups);
 
 		if (copy($backup_name, $file_name) === false || unlink($backup_name) === false) {

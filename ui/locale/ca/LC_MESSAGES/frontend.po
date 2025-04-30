@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-21 10:54+0000\n"
+"PO-Revision-Date: 2025-04-10 19:38+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1375,6 +1375,14 @@ msgstr "També emprat com a etiqueta de llegenda per als grups de dades agregade
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativament, podeu instal·lar-lo manualment:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr "Sempre"
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Quantitat de memòria física convidada que s'intercanvia a l'espai d'intercanvi, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
@@ -1828,6 +1836,14 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Automàtic"
 
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr "Ocultació automàtica"
+
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
 msgstr "Inici de sessió automàtic"
@@ -1949,6 +1965,10 @@ msgstr "Color de fons"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Imatge de fons"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr "Escala de fons"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2695,12 +2715,22 @@ msgstr "No es pot pas esborrar el mètode MFA predeterminat."
 msgid "Cannot delete default user directory."
 msgstr "No es pot pas esborrar el directori d'usuaris per defecte."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "No es pot esborrar la comprovació de descoberta \"%1$s\" de la regla de descoberta \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es pot pas esborrar la regla de descoberta"
 msgstr[1] "No es poden pas esborrar les regles de descoberta"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar la regla de descoberta \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2726,6 +2756,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "No es pot esborrar l'equip"
 msgstr[1] "No es poden pas esborrar els equips"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar l'equip \"%1$s\": %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2738,6 +2773,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "No es pot pas esborrar el grup d'equips"
 msgstr[1] "No es poden pas esborrar els grups d'equips"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar el grup d'equips \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2881,6 +2921,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "No es pot pas esborrar la plantilla"
 msgstr[1] "No es poden pas esborrar les plantilles"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar la plantilla \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2916,6 +2961,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "No es pot pas esborrar el trigger"
 msgstr[1] "No es poden pas esborrar els triggers"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar el trigger \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2938,6 +2988,16 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "No es pot pas esborrar el grup d'usuaris"
 msgstr[1] "No es poden pas esborrar els grups d'usuaris"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris LDAP \"%2$s\"."
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris de SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3246,6 +3306,11 @@ msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MI
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descoberta \"%4$s\" a \"%5$s\"."
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat a l'enllaç del mapa \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -3926,6 +3991,11 @@ msgstr "No es pot pas actualitzar \"%1$s\" per al trigger de plantilla \"%2$s\".
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "No es pot pas actualitzar \"%1$s\" per al prototip de trigger amb plantilla \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr "No es pot actualitzar el paràmetre \"%1$s\" perquè actualment és només de lectura. Penseu en actualitzar Zabbix per treure aquesta limitació."
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4422,6 +4492,10 @@ msgstr "Comprova si el servei DNS és actiu. Retorna 0: el DNS és inactiu (el s
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Comprova si existeix el fitxer. Retorna 0 - no trobat; 1: existeix un fitxer del tipus especificat"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr "Comprova si l'equip és accessible per via de ping ICMP amb reintents. 0 - El ping ICMP falla. 1 - Ping ICMP correcte."
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -5313,6 +5387,14 @@ msgstr "Crear i editar manteniment"
 msgid "Create and edit maps"
 msgstr "Crear i editar mapes"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr "Crear i editar suports propis"
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr "Crear i editar suports d'usuaris"
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Crea fons"
@@ -5920,6 +6002,11 @@ msgstr "Xifratge TLS de bases de dades"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "Fitxer de claus TLS de la base de dades"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr "S'ha produït un error de base de dades."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6617,6 +6704,22 @@ msgstr "Vols esborrar l'escenari web?"
 msgid "Deleted"
 msgstr "Esborrat"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Equip esborrat"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Grup d'equips esborrat"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Grup(s) d'equips esborrat(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Trigger esborrat"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Delimitador"
@@ -7247,6 +7350,10 @@ msgstr "Mostra el valor de l'element com a"
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Mostra l'hora local"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr "Veure l'hora del registre"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7956,6 +8063,10 @@ msgstr "Error a la sol·licitud de cerca de la taula \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Missatge d'error"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8982,6 +9093,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gràfic esborrat"
 msgstr[1] "Gràfics esborrats"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr "Edició de gràfics"
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9028,6 +9143,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip de gràfic"
 msgstr[1] "S'han esborrat els prototips de gràfics"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr "Edició de prototip de gràfic"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9415,6 +9534,10 @@ msgstr "Selecció de dades de l'historial"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Històric de funcions"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr "Història, tendències i compressió del registre d'auditoria"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -11150,6 +11273,10 @@ msgstr "Augmentar en"
 msgid "Indefinitely"
 msgstr "Indefinidament"
 
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr "Tipus d'indicador"
+
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
 msgstr "Indicadors"
@@ -11907,6 +12034,10 @@ msgstr "Element"
 #: items.php:667
 msgid "Item added"
 msgstr "Element afegit"
+
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -13508,6 +13639,10 @@ msgstr "El nom de l'entrada del menú s'empra com a etiqueta per l'URL del trigg
 msgid "Menu path"
 msgstr "Ruta del menú"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr "Combina sectors més petits que"
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "Combina sectors més petits que"
@@ -13575,6 +13710,10 @@ msgstr "No s'ha trobat pas el mètode."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "Mètodes"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -14258,6 +14397,14 @@ msgstr "Nou esdeveniment d'etiqueta de valors"
 msgid "New excluded downtime"
 msgstr "Nou temps d'inactivitat exclòs"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr "Nou gràfic"
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr "Nou prototip de gràfic"
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nou equip"
@@ -14279,6 +14426,10 @@ msgstr "Nou prototip d'element"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Nou període de manteniment"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr "Nou mitjà de suport"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -16685,6 +16836,10 @@ msgstr "Prometheus a JSON"
 msgid "Properties"
 msgstr "Propietats"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr "Proporcionalment"
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "Protocol"
@@ -17613,6 +17768,10 @@ msgstr "Restableix els valors per defecte"
 msgid "Reset to initial view"
 msgstr "Restableix a la vista inicial"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr "Resol les macros secretes de la caixa forta per"
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Resolt"
@@ -17864,6 +18023,11 @@ msgstr "Executeu l'script \"%1$s\" al servidor Zabbix"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Executeu l'script \"%1$s\" a l'equip actual"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Executa l'script \"%1$s\" als objectes esborrats"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -19019,6 +19183,12 @@ msgstr "Mostra la capçalera"
 msgid "Show hosts in maintenance"
 msgstr "Mostra els equips que són en manteniment"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr "Veure l'etiqueta"
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "Mostra les etiquetes"
@@ -19036,6 +19206,14 @@ msgstr "Mostra la llegenda"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Mostra les línies"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr "Veure les etiquetes dels enllaços"
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr "Veure les etiquetes dels elements del mapa"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19493,6 +19671,10 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Estàtic"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr "Enllaç estàtic"
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbix. Memòria cau: un dels valors (modes: all, float, uint, str, log, text, not supported), historial (modes: pfree, free, total, used, pused), índex (modes: pfree, free, total, used, pused), tendència (modes: pfree, free, total, used, pused)."
@@ -19500,6 +19682,10 @@ msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbi
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat del buffer de memòria proxy. Mode (modes: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Estadístiques dels valors rebuts pel gestor de preprocessament."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20533,6 +20719,14 @@ msgstr "Tema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Els paràmetre es passaran a l'script com arguments de línia de comandes en l'ordre donat."
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Aquesta acció té condicions o operacions que fan referència a objectes esborrats."
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "Aquesta acció té condicions o operacions que manquen a causa d'objectes esborrats anteriorment."
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20582,6 +20776,10 @@ msgstr "Aquesta configuració hauria d'ésser actives, doncs les taules de tend�
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Aquesta configuració ensenya l'hora local en lloc de la marca de temps. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr "Aquesta configuració ensenya l'hora del registre en lloc de la marca de temps de l'element. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22802,6 +23000,10 @@ msgstr "Comptador de rendiment de la màquina virtual de VMware, \"url\" - URL d
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Estat d'energia de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
@@ -23864,13 +24066,21 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Servidor Zabbix (servidor intermediari)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr "Servidor i proxy Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr "Servidor i proxy Zabbix: els secrets són recuperats de Vault tant pel servidor com pels proxys Zabbix, cosa que els permet resoldre les macros de manera independent."
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "El servidor Zabbix no s'està executant: és possible que la informació mostrada no sigui l'actual."
 
 #: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
-msgstr "El servidor de Zabbix és executant-se"
+msgstr "Servidor Zabbix en marxa"
 
 #: include/classes/setup/CSetupWizard.php:711
 #: include/classes/setup/CSetupWizard.php:870
@@ -23880,6 +24090,10 @@ msgstr "Nom del servidor Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Versió del servidor Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr "Servidor Zabbix: el servidor Zabbix recupera els secrets de Vault i l'envia als proxys quan cal."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24049,6 +24263,41 @@ msgstr "abs() - Valor absolut"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - L'arccosinus d'un valor com a angle, expressat en radians"
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "l'acció \"%1$s\" empra aquesta comprovació de descoberta"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "l'acció \"%1$s\" empra aquesta regla de descoberta"
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "l'acció \"%1$s\" empra aquest equip"
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "l'acció \"%1$s\" empra aquest grup d'equips"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "l'acció \"%1$s\" empra aquest servei"
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "l'acció \"%1$s\" empra aquesta plantilla"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "l'acció \"%1$s\" empra aquest trigger"
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24215,6 +24464,18 @@ msgstr "ascii() - Retorna el codi ASCII del caràcter més a l'esquerra del valo
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - L'arc sinus d'un valor com a angle, expressat en radians"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr "Cal destacar com a mínim 1 enllaç"
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr "Cal com a mínim 1 llindar d'enllaç"
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr "Cal com a mínim 1 trigger d'enllaç"
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24270,6 +24531,10 @@ msgstr "baselinewma() - Calcula la línia de base fent la mitjana de períodes d
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Comprova si un valor pertany a l'interval donat (1 - dins l'interval, 0 - en cas contrari)"
+
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr "L'element binari no és pas compatible"
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -24789,6 +25054,10 @@ msgstr "existeix"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - El nombre d'Euler a una potència d'un valor"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr "S'espera un codi de color hexadecimal (6 símbols)"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - El nombre d'Euler a una potència d'un valor menys 1"
@@ -24819,6 +25088,10 @@ msgstr "primer"
 #: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - El valor més antic de l'interval de temps especificat"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr "firstclock() - Marca de temps del valor més antic de l'interval de temps especificat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -24909,6 +25182,10 @@ msgstr "grup d'equips"
 msgid "host group with the same UUID already exists"
 msgstr "ja existeix un grup d'equips amb el mateix UUID"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr "S'espera l'ID de l'element equip"
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -24926,6 +25203,10 @@ msgstr "patrons d'equips"
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "ja existeix un prototip d'equip amb el mateix UUID"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr "S'espera l'ID del trigger d'equip"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -24986,6 +25267,10 @@ msgstr "recompte d'elements incorrecta"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expressió incorrecta a partir de \"%1$s\""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr "Tipus de valor d'element incorrecte"
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25217,6 +25502,10 @@ msgstr "darrer"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Darrer valor T (més recent)."
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr "lastclock() - Marca de temps del darrer valor T (més recent)."
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "esquerra"
@@ -25252,6 +25541,10 @@ msgstr "logseverity() - Registre de gravetats de lla darrera entrada al registre
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Font de registre de la darrera entrada de registre que coincideix amb el paràmetre V per al període T (1 - coincidència, 0 - sense coincidència)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr "logtimestamp() - Marca de temps del darrer missatge de registre T (més recent)."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
@@ -25538,6 +25831,14 @@ msgstr "no hi a permisos per convertir el símptoma dels problemes en causes"
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
 msgstr "no hi ha permís per crear i editar mapes"
+
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr "no hi ha permís per crear i editar el propi suport"
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr "no hi ha permís per crear i suport d'usuaris"
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
@@ -26399,6 +26700,14 @@ msgstr[1] "els valors han d'ésser un d'entre %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\" dígits després del punt decimal"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

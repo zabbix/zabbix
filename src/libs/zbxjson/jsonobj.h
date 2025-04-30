@@ -21,11 +21,9 @@
 
 typedef struct
 {
-	char		*name;
-	zbx_jsonobj_t	*value;
-	unsigned char	external;	/* 1 - the reference is to an external object.                */
-					/* 0 - the reference is to a local object which must be freed */
-					/*     when reference is destroyed                            */
+	char			*name;
+	const zbx_jsonobj_t	*value;
+	zbx_jsonobj_t		*internal;	/* can optionally hold the object value refers to */
 }
 zbx_jsonobj_ref_t;
 

@@ -851,7 +851,7 @@ static int	addr_compare_func(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
-		add_serveractive_host_f cb, zbx_vector_str_t *hostnames, void *data, char **error)
+		add_serveractive_host_f add_serveractive_host_cb, zbx_vector_str_t *hostnames, void *data, char **error)
 {
 	char			*r, *r_node;
 	zbx_vector_addr_ptr_t	addrs, cluster_addrs;
@@ -909,7 +909,7 @@ int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const c
 		}
 		while (NULL != r_node);
 
-		cb(&cluster_addrs, hostnames, data);
+		add_serveractive_host_cb(&cluster_addrs, hostnames, data);
 
 		cluster_addrs.values_num = 0;
 

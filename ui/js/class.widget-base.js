@@ -385,7 +385,7 @@ class CWidgetBase {
 		}
 
 		for (const [type, value] of Object.entries(data)) {
-			ZABBIX.EventHub.publish({
+			ZABBIX.EventHub.publish(new CEventHubEvent({
 				data: value,
 				descriptor: {
 					context: 'dashboard',
@@ -397,7 +397,7 @@ class CWidgetBase {
 					reference: this._fields.reference,
 					type
 				}
-			});
+			}));
 
 			this.#broadcast_cache.set(type, value);
 		}
@@ -458,7 +458,7 @@ class CWidgetBase {
 			const {reference, type} = CWidgetBase.parseTypedReference(accessors.get(path).getTypedReference());
 
 			if (reference !== '') {
-				ZABBIX.EventHub.publish({
+				ZABBIX.EventHub.publish(new CEventHubEvent({
 					data: value,
 					descriptor: {
 						context: 'dashboard',
@@ -470,7 +470,7 @@ class CWidgetBase {
 						reference,
 						type
 					}
-				});
+				}));
 			}
 		}
 	}
@@ -532,7 +532,8 @@ class CWidgetBase {
 					if (this._state === WIDGET_STATE_ACTIVE) {
 						this._startUpdating();
 					}
-				}
+				},
+				accept_cached: true
 			});
 
 			this.#fields_referred_data_subscriptions.push(broadcast_subscription);
@@ -541,14 +542,14 @@ class CWidgetBase {
 		const broadcast_types = this.getBroadcastTypes();
 
 		if (broadcast_types.length > 0) {
-			for (const event of [CEventHub.EVENT_SUBSCRIBE, CEventHub.EVENT_UNSUBSCRIBE]) {
+			for (const require_type of [CEventHubEvent.TYPE_SUBSCRIBE, CEventHubEvent.TYPE_UNSUBSCRIBE]) {
 				const event_subscription = ZABBIX.EventHub.subscribe({
 					require: {
-						[CEventHub.EVENT]: event,
 						context: 'dashboard',
 						event_type: 'broadcast',
 						reference: this._fields.reference
 					},
+					require_type,
 					callback: ({descriptor}) => {
 						if (!('type' in descriptor) || !broadcast_types.includes(descriptor.type)) {
 							return;
@@ -578,7 +579,7 @@ class CWidgetBase {
 						this.#broadcast_cache.set(descriptor.type, data);
 
 						if (this.onFeedback({type: descriptor.type, value: data})) {
-							ZABBIX.EventHub.publish({
+							ZABBIX.EventHub.publish(new CEventHubEvent({
 								data,
 								descriptor: {
 									context: 'dashboard',
@@ -590,10 +591,11 @@ class CWidgetBase {
 									reference: this._fields.reference,
 									type: descriptor.type
 								}
-							});
+							}));
 						}
 					}
-				}
+				},
+				accept_cached: true
 			});
 
 			this.#fields_referred_data_subscriptions.push(feedback_subscription);
@@ -611,9 +613,7 @@ class CWidgetBase {
 			sender_unique_id: this._unique_id
 		});
 
-		for (const subscription of this.#fields_referred_data_subscriptions) {
-			ZABBIX.EventHub.unsubscribe(subscription);
-		}
+		ZABBIX.EventHub.unsubscribeAll(this.#fields_referred_data_subscriptions);
 
 		this.#fields_referred_data.clear();
 		this.#fields_referred_data_updated.clear();

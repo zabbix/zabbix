@@ -191,9 +191,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 		->getUrl();
 
 	$host = $this->data['hostid'] == 0
-		? (new CLink($httpTest['hostname'], $host_url))
-			->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $httpTest['hostid'])
-			->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
+		? new CLink($httpTest['hostname'], $host_url)
 		: null;
 
 	$httpTable->addRow([

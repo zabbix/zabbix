@@ -20,12 +20,12 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup hosts, regexps, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
+ * @backup hosts, regexps, settings, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
  */
 class testInitialConfSync extends CIntegrationTest
 {
 	private $expected_initial = [
-			'config' =>
+			'settings' =>
 			[
 				'insert' => '1',
 				'update' => '0',
@@ -265,7 +265,7 @@ class testInitialConfSync extends CIntegrationTest
 
 	private $expected_update =
 	[
-		"config" =>
+		"settings" =>
 		[
 			"insert" =>
 			"1",
@@ -574,7 +574,7 @@ class testInitialConfSync extends CIntegrationTest
 	];
 
 	private $expected_delete = [
-		"config" =>
+		"settings" =>
 		[
 			"insert" =>
 			"1",
@@ -1672,6 +1672,7 @@ class testInitialConfSync extends CIntegrationTest
 	 */
 	public function testInitialConfSync_Insert()
 	{
+		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('proxygroup', 'extend');
@@ -1679,7 +1680,6 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('trigger', 'triggerids');
 		$this->purgeExisting('regexp', 'extend');
-		$this->purgeExisting('action', 'actionids');
 		$this->purgeHostGroups();
 		$this->purgeGlobalMacros();
 
@@ -1796,6 +1796,7 @@ class testInitialConfSync extends CIntegrationTest
 
 	public function testInitialConfSync_Delete()
 	{
+		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
@@ -1803,7 +1804,6 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('regexp', 'extend');
-		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeHostGroups();
 

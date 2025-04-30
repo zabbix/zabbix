@@ -15,335 +15,337 @@
 
 
 // Actions.
-require_once dirname(__FILE__).'/actions/testFormAction.php';
-require_once dirname(__FILE__).'/actions/testPageActions.php';
+require_once __DIR__.'/actions/testFormAction.php';
+require_once __DIR__.'/actions/testPageActions.php';
 
 // Administration.
-require_once dirname(__FILE__).'/administration/testFormAdministrationAuditLog.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralAutoregistration.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralGeomaps.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralGUI.php';
-//require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralImages.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralOtherParams.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralTimeouts.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationHousekeeping.php';
-require_once dirname(__FILE__).'/administration/testPageAdministrationGeneralImages.php';
-require_once dirname(__FILE__).'/administration/testPageAdministrationGeneralModules.php';
+require_once __DIR__.'/administration/testFormAdministrationAuditLog.php';
+require_once __DIR__.'/administration/testFormAdministrationGeneralAutoregistration.php';
+require_once __DIR__.'/administration/testFormAdministrationGeneralGeomaps.php';
+require_once __DIR__.'/administration/testFormAdministrationGeneralGUI.php';
+//require_once __DIR__.'/administration/testFormAdministrationGeneralImages.php';
+require_once __DIR__.'/administration/testFormAdministrationGeneralOtherParams.php';
+require_once __DIR__.'/administration/testFormAdministrationGeneralTimeouts.php';
+require_once __DIR__.'/administration/testFormAdministrationGeneralTrigDisplOptions.php';
+require_once __DIR__.'/administration/testFormAdministrationHousekeeping.php';
+require_once __DIR__.'/administration/testPageAdministrationGeneralImages.php';
+require_once __DIR__.'/administration/testPageAdministrationGeneralModules.php';
 
 // Api tokens.
-require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGeneral.php';
-require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
-require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGeneral.php';
-require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
+require_once __DIR__.'/apiTokens/testPageApiTokensAdministrationGeneral.php';
+require_once __DIR__.'/apiTokens/testPageApiTokensUserSettings.php';
+require_once __DIR__.'/apiTokens/testFormApiTokensAdministrationGeneral.php';
+require_once __DIR__.'/apiTokens/testFormApiTokensUserSettings.php';
 
 // Authentication.
-require_once dirname(__FILE__).'/authentication/testUsersAuthentication.php';
-require_once dirname(__FILE__).'/authentication/testUsersAuthenticationHttp.php';
-require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php';
-require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
-require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
+require_once __DIR__.'/authentication/testUsersAuthentication.php';
+require_once __DIR__.'/authentication/testUsersAuthenticationHttp.php';
+require_once __DIR__.'/authentication/testUsersAuthenticationLdap.php';
+require_once __DIR__.'/authentication/testUsersAuthenticationSaml.php';
+require_once __DIR__.'/authentication/testUsersPasswordComplexity.php';
 
 // Connectors.
-require_once dirname(__FILE__).'/connectors/testFormConnectors.php';
-require_once dirname(__FILE__).'/connectors/testPageConnectors.php';
+require_once __DIR__.'/connectors/testFormConnectors.php';
+require_once __DIR__.'/connectors/testPageConnectors.php';
 
 // Dashboards.
-require_once dirname(__FILE__).'/dashboards/testDashboardsForm.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsHostDashboardPage.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsListPage.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsPages.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsTemplatedDashboardForm.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsTemplatedDashboardPage.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsViewMode.php';
-require_once dirname(__FILE__).'/dashboards/testDashboardsWidgetsPage.php';
+require_once __DIR__.'/dashboards/testDashboardsForm.php';
+require_once __DIR__.'/dashboards/testDashboardsHostDashboardPage.php';
+require_once __DIR__.'/dashboards/testDashboardsListPage.php';
+require_once __DIR__.'/dashboards/testDashboardsPages.php';
+require_once __DIR__.'/dashboards/testDashboardsTemplatedDashboardForm.php';
+require_once __DIR__.'/dashboards/testDashboardsTemplatedDashboardPage.php';
+require_once __DIR__.'/dashboards/testDashboardsViewMode.php';
+require_once __DIR__.'/dashboards/testDashboardsWidgetsPage.php';
 
 // Dashboard widgets.
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardClockWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardCopyWidgets.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDiscoveryStatusWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDynamicItemWidgets.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteGraphsWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGaugeWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidgetScreenshots.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHoneycombWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPieChartWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidgetDisplay.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardSlaReportWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardSystemInformationWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopHostsWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopTriggersWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardURLWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardWidgetCommunication.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardClockWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardCopyWidgets.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardDiscoveryStatusWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardDynamicItemWidgets.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardFavoriteGraphsWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardGaugeWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardGeomapWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardGeomapWidgetScreenshots.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardHoneycombWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardPieChartWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidgetDisplay.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardSlaReportWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardSystemInformationWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardTopHostsWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardTopTriggersWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardURLWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardWidgetBroadcastedData.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
 // Event correlation.
-require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
-require_once dirname(__FILE__).'/eventCorrelation/testPageEventCorrelation.php';
+require_once __DIR__.'/eventCorrelation/testFormEventCorrelation.php';
+require_once __DIR__.'/eventCorrelation/testPageEventCorrelation.php';
 
 // Filter tabs.
-require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
-require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
-require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
+require_once __DIR__.'/filterTabs/testFormFilterHosts.php';
+require_once __DIR__.'/filterTabs/testFormFilterLatestData.php';
+require_once __DIR__.'/filterTabs/testFormFilterProblems.php';
 
 // Graphs.
-require_once dirname(__FILE__).'/graphs/testDataDisplayInGraphs.php';
-require_once dirname(__FILE__).'/graphs/testFormGraph.php';
-require_once dirname(__FILE__).'/graphs/testFormGraphPrototype.php';
-require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
-require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
-require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
-require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
-require_once dirname(__FILE__).'/graphs/testPageGraphPrototypesTemplate.php';
-require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
-require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
+require_once __DIR__.'/graphs/testDataDisplayInGraphs.php';
+require_once __DIR__.'/graphs/testFormGraph.php';
+require_once __DIR__.'/graphs/testFormGraphPrototype.php';
+require_once __DIR__.'/graphs/testGraphAxis.php';
+require_once __DIR__.'/graphs/testInheritanceGraph.php';
+require_once __DIR__.'/graphs/testInheritanceGraphPrototype.php';
+require_once __DIR__.'/graphs/testPageGraphPrototypes.php';
+require_once __DIR__.'/graphs/testPageGraphPrototypesTemplate.php';
+require_once __DIR__.'/graphs/testPageHostGraph.php';
+require_once __DIR__.'/graphs/testPageMonitoringHostsGraph.php';
 
 // Host and template groups.
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroup.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupSearchPage.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroup.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageHostGroups.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageTemplateGroups.php';
+require_once __DIR__.'/hostAndTemplateGroups/testFormHostGroup.php';
+require_once __DIR__.'/hostAndTemplateGroups/testFormHostGroupSearchPage.php';
+require_once __DIR__.'/hostAndTemplateGroups/testFormTemplateGroup.php';
+require_once __DIR__.'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
+require_once __DIR__.'/hostAndTemplateGroups/testPageHostGroups.php';
+require_once __DIR__.'/hostAndTemplateGroups/testPageTemplateGroups.php';
 
 // Hosts.
-require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
-require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
-require_once dirname(__FILE__).'/hosts/testFormHostLinkTemplates.php';
-require_once dirname(__FILE__).'/hosts/testFormHostPrototype.php';
-require_once dirname(__FILE__).'/hosts/testInheritanceHostPrototype.php';
-require_once dirname(__FILE__).'/hosts/testPageHostInterfaces.php';
-require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
-require_once dirname(__FILE__).'/hosts/testPageHostPrototypesTemplate.php';
-require_once dirname(__FILE__).'/hosts/testPageHosts.php';
-require_once dirname(__FILE__).'/hosts/testPageMonitoringHosts.php';
+require_once __DIR__.'/hosts/testFormHostFromConfiguration.php';
+require_once __DIR__.'/hosts/testFormHostFromMonitoring.php';
+require_once __DIR__.'/hosts/testFormHostLinkTemplates.php';
+require_once __DIR__.'/hosts/testFormHostPrototype.php';
+require_once __DIR__.'/hosts/testInheritanceHostPrototype.php';
+require_once __DIR__.'/hosts/testPageHostInterfaces.php';
+require_once __DIR__.'/hosts/testPageHostPrototypes.php';
+require_once __DIR__.'/hosts/testPageHostPrototypesTemplate.php';
+require_once __DIR__.'/hosts/testPageHosts.php';
+require_once __DIR__.'/hosts/testPageMonitoringHosts.php';
 
 // Icon mapping.
-require_once dirname(__FILE__).'/iconMapping/testFormAdministrationGeneralIconMapping.php';
-require_once dirname(__FILE__).'/iconMapping/testPageAdministrationGeneralIconMapping.php';
+require_once __DIR__.'/iconMapping/testFormAdministrationGeneralIconMapping.php';
+require_once __DIR__.'/iconMapping/testPageAdministrationGeneralIconMapping.php';
 
 // Items.
-require_once dirname(__FILE__).'/items/testFormItem.php';
-require_once dirname(__FILE__).'/items/testFormItemHttpAgent.php';
-require_once dirname(__FILE__).'/items/testFormItemPrototype.php';
-require_once dirname(__FILE__).'/items/testFormTestItem.php';
-require_once dirname(__FILE__).'/items/testFormTestItemPrototype.php';
-require_once dirname(__FILE__).'/items/testFormulaCalculatedItem.php';
-require_once dirname(__FILE__).'/items/testFormulaCalculatedItemPrototype.php';
-require_once dirname(__FILE__).'/items/testInheritanceItem.php';
-require_once dirname(__FILE__).'/items/testInheritanceItemPrototype.php';
-require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
-require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
-require_once dirname(__FILE__).'/items/testPageItemPrototypesTemplate.php';
-require_once dirname(__FILE__).'/items/testPageItems.php';
-require_once dirname(__FILE__).'/items/testPageMassUpdateItemPrototypes.php';
-require_once dirname(__FILE__).'/items/testPageMassUpdateItems.php';
+require_once __DIR__.'/items/testFormItem.php';
+require_once __DIR__.'/items/testFormItemHttpAgent.php';
+require_once __DIR__.'/items/testFormItemPrototype.php';
+require_once __DIR__.'/items/testFormTestItem.php';
+require_once __DIR__.'/items/testFormTestItemPrototype.php';
+require_once __DIR__.'/items/testFormulaCalculatedItem.php';
+require_once __DIR__.'/items/testFormulaCalculatedItemPrototype.php';
+require_once __DIR__.'/items/testInheritanceItem.php';
+require_once __DIR__.'/items/testInheritanceItemPrototype.php';
+require_once __DIR__.'/items/testItemTypeSelection.php';
+require_once __DIR__.'/items/testPageItemPrototypes.php';
+require_once __DIR__.'/items/testPageItemPrototypesTemplate.php';
+require_once __DIR__.'/items/testPageItems.php';
+require_once __DIR__.'/items/testPageMassUpdateItemPrototypes.php';
+require_once __DIR__.'/items/testPageMassUpdateItems.php';
 
 // Latest data.
-require_once dirname(__FILE__).'/latestData/testPageItemHistory.php';
-require_once dirname(__FILE__).'/latestData/testPageMonitoringLatestData.php';
+require_once __DIR__.'/latestData/testPageItemHistory.php';
+require_once __DIR__.'/latestData/testPageMonitoringLatestData.php';
 
 // LLD.
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromHost.php';
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromTemplate.php';
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
-require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
-require_once dirname(__FILE__).'/lld/testLowLevelDiscoveryDisabledObjects.php';
-require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
+require_once __DIR__.'/lld/testFormLowLevelDiscoveryFromHost.php';
+require_once __DIR__.'/lld/testFormLowLevelDiscoveryFromTemplate.php';
+require_once __DIR__.'/lld/testFormLowLevelDiscoveryOverrides.php';
+require_once __DIR__.'/lld/testFormTestLowLevelDiscovery.php';
+require_once __DIR__.'/lld/testInheritanceDiscoveryRule.php';
+require_once __DIR__.'/lld/testLowLevelDiscoveryDisabledObjects.php';
+require_once __DIR__.'/lld/testPageLowLevelDiscovery.php';
 
 // Macros.
-require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosDiscoveredHost.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
+require_once __DIR__.'/macros/testFormMacrosAdministrationGeneral.php';
+require_once __DIR__.'/macros/testFormMacrosDiscoveredHost.php';
+require_once __DIR__.'/macros/testFormMacrosHost.php';
+require_once __DIR__.'/macros/testFormMacrosHostPrototype.php';
+require_once __DIR__.'/macros/testFormMacrosTemplate.php';
 
 // Maps.
-require_once dirname(__FILE__).'/maps/testFormMapConstructor.php';
-require_once dirname(__FILE__).'/maps/testFormMapProperties.php';
-require_once dirname(__FILE__).'/maps/testPageMaps.php';
+require_once __DIR__.'/maps/testFormMapConstructor.php';
+require_once __DIR__.'/maps/testFormMapProperties.php';
+require_once __DIR__.'/maps/testPageMaps.php';
 
 // Maintenance.
-require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
-require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
+require_once __DIR__.'/maintenance/testFormMaintenance.php';
+require_once __DIR__.'/maintenance/testPageMaintenance.php';
 
 // Media types.
-require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
-require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
-require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
+require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypes.php';
+require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
+require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
+require_once __DIR__.'/mediaTypes/testPageAdministrationMediaTypes.php';
 
 // Multiselects.
-require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
-require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
-require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
-require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
-require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
+require_once __DIR__.'/multiselects/testMultiselects.php';
+require_once __DIR__.'/multiselects/testMultiselectsErrorsHostsTemplates.php';
+require_once __DIR__.'/multiselects/testMultiselectsLatestData.php';
+require_once __DIR__.'/multiselects/testMultiselectsProblems.php';
+require_once __DIR__.'/multiselects/testMultiselectsWithoutData.php';
 
 // Network discovery.
-require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
-require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
+require_once __DIR__.'/networkDiscovery/testFormNetworkDiscovery.php';
+require_once __DIR__.'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
-require_once dirname(__FILE__).'/permissions/testPermissionsWithoutCSRF.php';
-require_once dirname(__FILE__).'/permissions/testTagBasedPermissions.php';
-require_once dirname(__FILE__).'/permissions/testUrlUserPermissions.php';
+require_once __DIR__.'/permissions/testPermissionsWithoutCSRF.php';
+require_once __DIR__.'/permissions/testTagBasedPermissions.php';
+require_once __DIR__.'/permissions/testUrlUserPermissions.php';
 
 // Preprocessing.
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
+require_once __DIR__.'/preprocessing/testFormPreprocessingCloneHost.php';
+require_once __DIR__.'/preprocessing/testFormPreprocessingCloneTemplate.php';
+require_once __DIR__.'/preprocessing/testFormPreprocessingItem.php';
+require_once __DIR__.'/preprocessing/testFormPreprocessingItemPrototype.php';
+require_once __DIR__.'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
+require_once __DIR__.'/preprocessing/testFormPreprocessingTest.php';
 
 // Problems.
-require_once dirname(__FILE__).'/problems/testCauseAndSymptomEvents.php';
-require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
-require_once dirname(__FILE__).'/problems/testPageProblems.php';
+require_once __DIR__.'/problems/testCauseAndSymptomEvents.php';
+require_once __DIR__.'/problems/testFormUpdateProblem.php';
+require_once __DIR__.'/problems/testPageProblems.php';
 
 // Proxies.
-require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
-require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
+require_once __DIR__.'/proxies/testFormAdministrationProxies.php';
+require_once __DIR__.'/proxies/testPageAdministrationProxies.php';
 
 // Proxy Groups.
-require_once dirname(__FILE__).'/proxyGroups/testFormAdministrationProxyGroups.php';
-require_once dirname(__FILE__).'/proxyGroups/testPageAdministrationProxyGroups.php';
+require_once __DIR__.'/proxyGroups/testFormAdministrationProxyGroups.php';
+require_once __DIR__.'/proxyGroups/testPageAdministrationProxyGroups.php';
 
 // Queue.
 /*
-require_once dirname(__FILE__).'/queue/testPageQueueDetails.php';
-require_once dirname(__FILE__).'/queue/testPageQueueOverview.php';
-require_once dirname(__FILE__).'/queue/testPageQueueOverviewByProxy.php';
+require_once __DIR__.'/queue/testPageQueueDetails.php';
+require_once __DIR__.'/queue/testPageQueueOverview.php';
+require_once __DIR__.'/queue/testPageQueueOverviewByProxy.php';
 */
 
 // Regexp.
-require_once dirname(__FILE__).'/regexp/testFormAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/regexp/testPageAdministrationGeneralRegexp.php';
+require_once __DIR__.'/regexp/testFormAdministrationGeneralRegexp.php';
+require_once __DIR__.'/regexp/testPageAdministrationGeneralRegexp.php';
 
 // Reports.
-require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
-require_once dirname(__FILE__).'/reports/testPageAvailabilityReport.php';
-require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
-require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
-require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
-require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__).'/reports/testPageReportsTopTriggers.php';
-require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
-require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
+require_once __DIR__.'/reports/testFormScheduledReport.php';
+require_once __DIR__.'/reports/testPageAvailabilityReport.php';
+require_once __DIR__.'/reports/testPageReportsActionLog.php';
+require_once __DIR__.'/reports/testPageReportsAudit.php';
+require_once __DIR__.'/reports/testPageReportsNotifications.php';
+require_once __DIR__.'/reports/testPageReportsSystemInformation.php';
+require_once __DIR__.'/reports/testPageReportsTopTriggers.php';
+require_once __DIR__.'/reports/testPageScheduledReport.php';
+require_once __DIR__.'/reports/testScheduledReportPermissions.php';
 
 // Roles.
-require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
-require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
-require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
+require_once __DIR__.'/roles/testFormUserRoles.php';
+require_once __DIR__.'/roles/testPageUserRoles.php';
+require_once __DIR__.'/roles/testUserRolesPermissions.php';
 
 // Scripts.
-require_once dirname(__FILE__).'/scripts/testFormAlertsScripts.php';
-require_once dirname(__FILE__).'/scripts/testManualActionScripts.php';
-require_once dirname(__FILE__).'/scripts/testPageAlertsScripts.php';
+require_once __DIR__.'/scripts/testFormAlertsScripts.php';
+require_once __DIR__.'/scripts/testManualActionScripts.php';
+require_once __DIR__.'/scripts/testPageAlertsScripts.php';
 
 // Services.
-require_once dirname(__FILE__).'/services/testFormServicesServices.php';
-require_once dirname(__FILE__).'/services/testPageServicesServices.php';
-require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
+require_once __DIR__.'/services/testFormServicesServices.php';
+require_once __DIR__.'/services/testPageServicesServices.php';
+require_once __DIR__.'/services/testPageServicesServicesMassUpdate.php';
 
 // SLA.
-require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
-require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
-require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
+require_once __DIR__.'/sla/testFormServicesSla.php';
+require_once __DIR__.'/sla/testPageServicesSla.php';
+require_once __DIR__.'/sla/testPageServicesSlaReport.php';
 
 // Tags.
-require_once dirname(__FILE__).'/tags/testFormTagsConnectors.php';
-require_once dirname(__FILE__).'/tags/testFormTagsDiscoveredHost.php';
-require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
-require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
-require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
-require_once dirname(__FILE__).'/tags/testFormTagsServicesProblemTags.php';
-require_once dirname(__FILE__).'/tags/testFormTagsItem.php';
-require_once dirname(__FILE__).'/tags/testFormTagsItemPrototype.php';
-require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
-require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
-require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
-require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
+require_once __DIR__.'/tags/testFormTagsConnectors.php';
+require_once __DIR__.'/tags/testFormTagsDiscoveredHost.php';
+require_once __DIR__.'/tags/testFormTagsHost.php';
+require_once __DIR__.'/tags/testFormTagsHostPrototype.php';
+require_once __DIR__.'/tags/testFormTagsServices.php';
+require_once __DIR__.'/tags/testFormTagsServicesProblemTags.php';
+require_once __DIR__.'/tags/testFormTagsItem.php';
+require_once __DIR__.'/tags/testFormTagsItemPrototype.php';
+require_once __DIR__.'/tags/testFormTagsTemplate.php';
+require_once __DIR__.'/tags/testFormTagsTrigger.php';
+require_once __DIR__.'/tags/testFormTagsTriggerPrototype.php';
+require_once __DIR__.'/tags/testFormTagsWeb.php';
 
 // Templates.
-require_once dirname(__FILE__).'/templates/testFormTemplate.php';
-require_once dirname(__FILE__).'/templates/testPageTemplates.php';
-require_once dirname(__FILE__).'/templates/testTemplateInheritance.php';
+require_once __DIR__.'/templates/testFormTemplate.php';
+require_once __DIR__.'/templates/testPageTemplates.php';
+require_once __DIR__.'/templates/testTemplateInheritance.php';
 
 // Timeouts.
-require_once dirname(__FILE__).'/timeouts/testTimeoutsHosts.php';
-require_once dirname(__FILE__).'/timeouts/testTimeoutsLinkedTemplates.php';
-require_once dirname(__FILE__).'/timeouts/testTimeoutsTemplates.php';
+require_once __DIR__.'/timeouts/testTimeoutsHosts.php';
+require_once __DIR__.'/timeouts/testTimeoutsLinkedTemplates.php';
+require_once __DIR__.'/timeouts/testTimeoutsTemplates.php';
 
 // Trigger dependencies.
-require_once dirname(__FILE__).'/triggers/testHostTriggerDependencies.php';
-require_once dirname(__FILE__).'/triggers/testTemplateTriggerDependencies.php';
+require_once __DIR__.'/triggers/testHostTriggerDependencies.php';
+require_once __DIR__.'/triggers/testTemplateTriggerDependencies.php';
 
 // Triggers.
-require_once dirname(__FILE__).'/triggers/testFormTrigger.php';
-require_once dirname(__FILE__).'/triggers/testFormTriggerPrototype.php';
-require_once dirname(__FILE__).'/triggers/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/triggers/testInheritanceTriggerPrototype.php';
-require_once dirname(__FILE__).'/triggers/testPageTriggerDescription.php';
-require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypes.php';
-require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypesTemplate.php';
-require_once dirname(__FILE__).'/triggers/testPageTriggers.php';
-require_once dirname(__FILE__).'/triggers/testPageTriggerUrl.php';
-require_once dirname(__FILE__).'/triggers/testTriggerExpressions.php';
+require_once __DIR__.'/triggers/testFormTrigger.php';
+require_once __DIR__.'/triggers/testFormTriggerPrototype.php';
+require_once __DIR__.'/triggers/testInheritanceTrigger.php';
+require_once __DIR__.'/triggers/testInheritanceTriggerPrototype.php';
+require_once __DIR__.'/triggers/testPageTriggerDescription.php';
+require_once __DIR__.'/triggers/testPageTriggerPrototypes.php';
+require_once __DIR__.'/triggers/testPageTriggerPrototypesTemplate.php';
+require_once __DIR__.'/triggers/testPageTriggers.php';
+require_once __DIR__.'/triggers/testPageTriggerUrl.php';
+require_once __DIR__.'/triggers/testTriggerExpressions.php';
 
 // Users.
-require_once dirname(__FILE__).'/users/testFormUser.php';
-require_once dirname(__FILE__).'/users/testFormUserGroups.php';
-require_once dirname(__FILE__).'/users/testFormUserMedia.php';
-require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
-require_once dirname(__FILE__).'/users/testFormUserProfile.php';
-require_once dirname(__FILE__).'/users/testAlarmNotification.php';
-require_once dirname(__FILE__).'/users/testPageUserGroups.php';
-require_once dirname(__FILE__).'/users/testPageUsers.php';
+require_once __DIR__.'/users/testFormUser.php';
+require_once __DIR__.'/users/testFormUserGroups.php';
+require_once __DIR__.'/users/testFormUserMedia.php';
+require_once __DIR__.'/users/testFormUserLdapMediaJit.php';
+require_once __DIR__.'/users/testFormUserPermissions.php';
+require_once __DIR__.'/users/testFormUserProfile.php';
+require_once __DIR__.'/users/testAlarmNotification.php';
+require_once __DIR__.'/users/testPageUserGroups.php';
+require_once __DIR__.'/users/testPageUsers.php';
 
 // Value mapping.
-require_once dirname(__FILE__).'/valueMapping/testFormValueMappingsHost.php';
-require_once dirname(__FILE__).'/valueMapping/testFormValueMappingsTemplate.php';
+require_once __DIR__.'/valueMapping/testFormValueMappingsHost.php';
+require_once __DIR__.'/valueMapping/testFormValueMappingsTemplate.php';
 
 // Web scenarios.
-require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
-require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
-require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
-require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
+require_once __DIR__.'/webScenarios/testFormWebScenario.php';
+require_once __DIR__.'/webScenarios/testFormWebScenarioStep.php';
+require_once __DIR__.'/webScenarios/testPageMonitoringWeb.php';
+require_once __DIR__.'/webScenarios/testInheritanceWeb.php';
+require_once __DIR__.'/webScenarios/testPageMonitoringWebDetails.php';
 
-require_once dirname(__FILE__).'/testDocumentationLinks.php';
-require_once dirname(__FILE__).'/testExecuteNow.php';
-require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
-require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/testFormSetup.php';
-require_once dirname(__FILE__).'/testFormTabIndicators.php';
-require_once dirname(__FILE__).'/testGeneric.php';
-require_once dirname(__FILE__).'/testLanguage.php';
-require_once dirname(__FILE__).'/testPageBrowserWarning.php';
-require_once dirname(__FILE__).'/testPageInventory.php';
-require_once dirname(__FILE__).'/testPageSearch.php';
-require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
-require_once dirname(__FILE__).'/testPagesWithoutData.php';
-require_once dirname(__FILE__).'/testPSKEncryption.php';
-require_once dirname(__FILE__).'/testSidebarMenu.php';
-require_once dirname(__FILE__).'/testTimezone.php';
-require_once dirname(__FILE__).'/testUrlParameters.php';
-require_once dirname(__FILE__).'/testZBX6663.php';
+require_once __DIR__.'/testDocumentationLinks.php';
+require_once __DIR__.'/testExecuteNow.php';
+require_once __DIR__.'/testExpandExpressionMacros.php';
+require_once __DIR__.'/testFormLogin.php';
+require_once __DIR__.'/testFormSetup.php';
+require_once __DIR__.'/testFormTabIndicators.php';
+require_once __DIR__.'/testGeneric.php';
+require_once __DIR__.'/testLanguage.php';
+require_once __DIR__.'/testPageBrowserWarning.php';
+require_once __DIR__.'/testPageInventory.php';
+require_once __DIR__.'/testPageSearch.php';
+require_once __DIR__.'/testPageStatusOfZabbix.php';
+require_once __DIR__.'/testPagesWithoutData.php';
+require_once __DIR__.'/testPSKEncryption.php';
+require_once __DIR__.'/testSidebarMenu.php';
+require_once __DIR__.'/testTimezone.php';
+require_once __DIR__.'/testUrlParameters.php';
+require_once __DIR__.'/testZBX6663.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -424,6 +426,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
 		$suite->addTestSuite('testDashboardWidgetCommunication');
 
 		// Event correlation.
@@ -646,6 +649,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUser');
 		$suite->addTestSuite('testFormUserGroups');
 		$suite->addTestSuite('testFormUserMedia');
+		$suite->addTestSuite('testFormUserLdapMediaJit');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testAlarmNotification');
 		$suite->addTestSuite('testFormUserProfile');

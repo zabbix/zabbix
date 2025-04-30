@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxdbhigh.a
 
 libzbxdbhigh_a_SOURCES = \
+	db_settings.c \
 	db.c \
 	item.c \
 	maintenance.c \

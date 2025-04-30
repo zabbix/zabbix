@@ -1,0 +1,33 @@
+---
+test case: "value:max uint64 pattern: max uint64 op:ZBX_CONDITION_OPERATOR_EQUAL"
+in:
+  value: 18446744073709551615
+  pattern: 18446744073709551615
+  op: 0
+out:
+  return: SUCCEED
+---
+test case: "value:max uint64 pattern: max uint64 op:ZBX_CONDITION_OPERATOR_NOT_EQUAL"
+in:
+  value: 18446744073709551615
+  pattern: 18446744073709551615
+  op: 1
+out:
+  return: FAIL
+---
+test case: "value:max uint64 pattern: 0 op:ZBX_CONDITION_OPERATOR_EQUAL"
+in:
+  value: 18446744073709551615
+  pattern: 0
+  op: 0
+out:
+  return: FAIL
+---
+test case: "value:max uint64 pattern: 0 op:ZBX_CONDITION_OPERATOR_NOT_EQUAL"
+in:
+  value: 18446744073709551615
+  pattern: 0
+  op: 1
+out:
+  return: SUCCEED
+...

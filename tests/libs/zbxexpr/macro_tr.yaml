@@ -243,4 +243,67 @@ in:
 out:
   value: 'вABCabc123вв'
   return: SUCCEED
+---
+test case: characters to newlines
+in:
+  data: "TEST"
+  param1: "A-Z"
+  param2: "\\n"
+out:
+  value: "\n\n\n\n"
+  return: SUCCEED
+---
+test case: characters to audible bell characters
+in:
+  data: "TEST"
+  param1: "A-Z"
+  param2: "\\a"
+out:
+  value: "\a\a\a\a"
+  return: SUCCEED
+---
+test case: characters to escape sequence characters
+in:
+  data: "TEST"
+  param1: "A-Z"
+  param2: "\\b"
+out:
+  value: "\b\b\b\b"
+  return: SUCCEED
+---
+test case: characters to form feed characters
+in:
+  data: "TEST"
+  param1: "A-Z"
+  param2: "\\f"
+out:
+  value: "\f\f\f\f"
+  return: SUCCEED
+---
+test case: characters to beginning of the current line characters
+in:
+  data: "TEST"
+  param1: "A-Z"
+  param2: "\\r"
+out:
+  value: "\r\r\r\r"
+  return: SUCCEED
+---
+test case: characters to tab characters
+in:
+  data: "TEST"
+  param1: "A-Z"
+  param2: "\\t"
+out:
+  value: "\t\t\t\t"
+  return: SUCCEED
+---
+test case: characters to zeros long macro string
+in:
+  data: '{$MACRO:regex:"\.+\\"[a-z]+"} {{#MACRO}.iregsub("\.+\\"([a-z]+)", \1)} {$MACRO:"{{#MACRO}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$MACRO:regex:\"\\.+\\\\\"[a-z]+\"}") {$MACRO:regex:"\.+\\"[a-z]+"}'
+  param1: "A-Z"
+  param2: "0"
+out:
+  value: '{$00000:regex:"\.+\\"[a-z]+"} {{#00000}.iregsub("\.+\\"([a-z]+)", \1)} {$00000:"{{#00000}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$00000:regex:\"\\.+\\\\\"[a-z]+\"}") {$00000:regex:"\.+\\"[a-z]+"}'
+  return: SUCCEED
 ...

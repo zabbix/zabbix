@@ -14,14 +14,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormMacros.php';
+require_once __DIR__.'/../common/testFormMacros.php';
 
 /**
  * @onBefore prepareDiscoveredHostMacrosData
  *
  * @dataSource GlobalMacros
  *
- * @backup hosts, config
+ * @backup hosts, settings
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
 

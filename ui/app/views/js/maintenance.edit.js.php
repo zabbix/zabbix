@@ -23,11 +23,11 @@ window.maintenance_edit = new class {
 		this._overlay = overlays_stack.getById('maintenance.edit');
 		this._dialogue = this._overlay.$dialogue[0];
 		this._form = this._overlay.$dialogue.$body[0].querySelector('form');
+		this._allowed_edit = allowed_edit;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'maintenance.list');
-		this._overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'maintenance.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		timeperiods.forEach((timeperiod, row_index) => {
 			this._addTimePeriod({row_index, ...timeperiod});
@@ -67,11 +67,10 @@ window.maintenance_edit = new class {
 			this._updateMultiselect($hostids);
 
 			// Update form field state according to the form data.
-
 			document.getElementById('maintenance_type').addEventListener('change', () => this._update());
-
-			this._update();
 		}
+
+		this._update();
 
 		this._form.style.display = '';
 		this._overlay.recoverFocus();
@@ -88,11 +87,11 @@ window.maintenance_edit = new class {
 		});
 
 		tags_container.querySelectorAll('[name="tags_evaltype"], [name$="[operator]"]').forEach((radio_button) => {
-			radio_button.disabled = !tags_enabled;
+			radio_button.disabled = !tags_enabled || !this._allowed_edit;
 		});
 
 		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) => {
-			button.disabled = !tags_enabled;
+			button.disabled = !tags_enabled || !this._allowed_edit;
 		});
 
 		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) => {

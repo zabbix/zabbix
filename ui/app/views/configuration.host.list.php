@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
 if ($data['uncheck']) {
@@ -286,9 +283,7 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostid', $host['hostid'])
 		->getUrl();
 
-	$description[] = (new CLink($host['name'], $host_url))
-		->setAttribute('data-hostid', $host['hostid'])
-		->setAttribute('data-action', 'host.edit');
+	$description[] = new CLink($host['name'], $host_url);
 
 	$maintenance_icon = false;
 
@@ -345,8 +340,6 @@ foreach ($data['hosts'] as $host) {
 
 			$caption = [
 				(new CLink($template['name'], $template_url))
-					->setAttribute('data-templateid', $template['templateid'])
-					->setAttribute('data-action', 'template.edit')
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
 			];
@@ -374,8 +367,6 @@ foreach ($data['hosts'] as $host) {
 						->getUrl();
 
 					$caption[] = (new CLink($parent_template['name'], $parent_template_url))
-						->setAttribute('data-templateid', $parent_template['templateid'])
-						->setAttribute('data-action', 'template.edit')
 						->addClass(ZBX_STYLE_LINK_ALT)
 						->addClass(ZBX_STYLE_GREY);
 				}
@@ -470,8 +461,6 @@ foreach ($data['hosts'] as $host) {
 				? (new CLink($data['proxies'][$host['proxyid']]['name'],
 					$proxy_url->setArgument('proxyid', $host['proxyid'])
 				))
-					->setAttribute('data-proxyid', $host['proxyid'])
-					->setAttribute('data-action', 'proxy.edit')
 				: $data['proxies'][$host['proxyid']]['name'];
 		}
 		elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
@@ -485,8 +474,6 @@ foreach ($data['hosts'] as $host) {
 				? (new CLink($data['proxy_groups'][$host['proxy_groupid']]['name'], $proxy_group_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
-					->setAttribute('data-proxy_groupid', $host['proxy_groupid'])
-					->setAttribute('data-action', 'proxygroup.edit')
 				: $data['proxy_groups'][$host['proxy_groupid']]['name'];
 
 			if ($host['assigned_proxyid'] != 0) {
@@ -496,8 +483,6 @@ foreach ($data['hosts'] as $host) {
 					? (new CLink($data['proxies'][$host['assigned_proxyid']]['name'],
 						$proxy_url->setArgument('proxyid', $host['assigned_proxyid'])
 					))
-						->setAttribute('data-proxyid', $host['assigned_proxyid'])
-						->setAttribute('data-action', 'proxy.edit')
 					: $data['proxies'][$host['assigned_proxyid']]['name'];
 			}
 		}
@@ -510,7 +495,7 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
 				(new CUrl('zabbix.php'))
@@ -533,7 +518,8 @@ foreach ($data['hosts'] as $host) {
 		],
 		[
 			new CLink(_('Graphs'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')
@@ -558,14 +544,14 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($monitored_by))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($hostTemplates))->addClass(ZBX_STYLE_WORDBREAK),
+		getHostInterface($interface),
+		$monitored_by,
+		$hostTemplates,
 		[
 			$toggle_status_link,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		],
-		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
+		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]

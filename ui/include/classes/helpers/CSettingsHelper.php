@@ -19,70 +19,21 @@
  */
 class CSettingsHelper {
 
-	public const ALERT_USRGRPID = 'alert_usrgrpid';
-	public const BLINK_PERIOD = 'blink_period';
-	public const CONNECT_TIMEOUT = 'connect_timeout';
-	public const CUSTOM_COLOR = 'custom_color';
-	public const DEFAULT_INVENTORY_MODE = 'default_inventory_mode';
+	// GUI.
 	public const DEFAULT_LANG = 'default_lang';
-	public const DEFAULT_THEME = 'default_theme';
 	public const DEFAULT_TIMEZONE = 'default_timezone';
-	public const DISCOVERY_GROUPID = 'discovery_groupid';
-	public const HISTORY_PERIOD = 'history_period';
-	public const IFRAME_SANDBOXING_ENABLED = 'iframe_sandboxing_enabled';
-	public const IFRAME_SANDBOXING_EXCEPTIONS = 'iframe_sandboxing_exceptions';
-	public const ITEM_TEST_TIMEOUT = 'item_test_timeout';
-	public const LOGIN_ATTEMPTS = 'login_attempts';
-	public const LOGIN_BLOCK = 'login_block';
-	public const MAX_IN_TABLE = 'max_in_table';
-	public const MAX_PERIOD = 'max_period';
-	public const MAX_OVERVIEW_TABLE_SIZE = 'max_overview_table_size';
-	public const MEDIA_TYPE_TEST_TIMEOUT = 'media_type_test_timeout';
-	public const OK_ACK_COLOR = 'ok_ack_color';
-	public const OK_ACK_STYLE = 'ok_ack_style';
-	public const OK_PERIOD = 'ok_period';
-	public const OK_UNACK_COLOR = 'ok_unack_color';
-	public const OK_UNACK_STYLE = 'ok_unack_style';
-	public const PERIOD_DEFAULT = 'period_default';
-	public const PROBLEM_ACK_COLOR = 'problem_ack_color';
-	public const PROBLEM_ACK_STYLE = 'problem_ack_style';
-	public const PROBLEM_UNACK_COLOR = 'problem_unack_color';
-	public const PROBLEM_UNACK_STYLE = 'problem_unack_style';
-	public const SCRIPT_TIMEOUT = 'script_timeout';
+	public const DEFAULT_THEME = 'default_theme';
 	public const SEARCH_LIMIT = 'search_limit';
+	public const MAX_OVERVIEW_TABLE_SIZE = 'max_overview_table_size';
+	public const MAX_IN_TABLE = 'max_in_table';
 	public const SERVER_CHECK_INTERVAL = 'server_check_interval';
-	public const SEVERITY_COLOR_0 = 'severity_color_0';
-	public const SEVERITY_COLOR_1 = 'severity_color_1';
-	public const SEVERITY_COLOR_2 = 'severity_color_2';
-	public const SEVERITY_COLOR_3 = 'severity_color_3';
-	public const SEVERITY_COLOR_4 = 'severity_color_4';
-	public const SEVERITY_COLOR_5 = 'severity_color_5';
-	public const SEVERITY_NAME_0 = 'severity_name_0';
-	public const SEVERITY_NAME_1 = 'severity_name_1';
-	public const SEVERITY_NAME_2 = 'severity_name_2';
-	public const SEVERITY_NAME_3 = 'severity_name_3';
-	public const SEVERITY_NAME_4 = 'severity_name_4';
-	public const SEVERITY_NAME_5 = 'severity_name_5';
-	public const SHOW_TECHNICAL_ERRORS = 'show_technical_errors';
-	public const SNMPTRAP_LOGGING = 'snmptrap_logging';
-	public const SOCKET_TIMEOUT = 'socket_timeout';
-	public const URI_VALID_SCHEMES = 'uri_valid_schemes';
-	public const VALIDATE_URI_SCHEMES = 'validate_uri_schemes';
 	public const WORK_PERIOD = 'work_period';
-	public const X_FRAME_OPTIONS = 'x_frame_options';
-	public const SESSION_KEY = 'session_key';
-	public const URL = 'url';
-	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
-	public const DBVERSION_STATUS = 'dbversion_status';
-	public const SERVER_STATUS = 'server_status';
-	public const AUDITLOG_ENABLED = 'auditlog_enabled';
-	public const AUDITLOG_MODE = 'auditlog_mode';
-	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
-	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';
-	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
-	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
-	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
-	public const VAULT_PROVIDER = 'vault_provider';
+	public const SHOW_TECHNICAL_ERRORS = 'show_technical_errors';
+	public const HISTORY_PERIOD = 'history_period';
+	public const PERIOD_DEFAULT = 'period_default';
+	public const MAX_PERIOD = 'max_period';
+
+	// Timeouts.
 	public const TIMEOUT_ZABBIX_AGENT = 'timeout_zabbix_agent';
 	public const TIMEOUT_SIMPLE_CHECK = 'timeout_simple_check';
 	public const TIMEOUT_SNMP_AGENT = 'timeout_snmp_agent';
@@ -93,8 +44,71 @@ class CSettingsHelper {
 	public const TIMEOUT_TELNET_AGENT = 'timeout_telnet_agent';
 	public const TIMEOUT_SCRIPT = 'timeout_script';
 	public const TIMEOUT_BROWSER = 'timeout_browser';
+	public const SOCKET_TIMEOUT = 'socket_timeout';
+	public const CONNECT_TIMEOUT = 'connect_timeout';
+	public const MEDIA_TYPE_TEST_TIMEOUT = 'media_type_test_timeout';
+	public const SCRIPT_TIMEOUT = 'script_timeout';
+	public const ITEM_TEST_TIMEOUT = 'item_test_timeout';
+	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
+
+	// Trigger displaying options.
+	public const CUSTOM_COLOR = 'custom_color';
+	public const PROBLEM_UNACK_COLOR = 'problem_unack_color';
+	public const PROBLEM_UNACK_STYLE = 'problem_unack_style';
+	public const PROBLEM_ACK_COLOR = 'problem_ack_color';
+	public const PROBLEM_ACK_STYLE = 'problem_ack_style';
+	public const OK_UNACK_COLOR = 'ok_unack_color';
+	public const OK_UNACK_STYLE = 'ok_unack_style';
+	public const OK_ACK_COLOR = 'ok_ack_color';
+	public const OK_ACK_STYLE = 'ok_ack_style';
+	public const OK_PERIOD = 'ok_period';
+	public const BLINK_PERIOD = 'blink_period';
+	public const SEVERITY_NAME_0 = 'severity_name_0';
+	public const SEVERITY_COLOR_0 = 'severity_color_0';
+	public const SEVERITY_NAME_1 = 'severity_name_1';
+	public const SEVERITY_COLOR_1 = 'severity_color_1';
+	public const SEVERITY_NAME_2 = 'severity_name_2';
+	public const SEVERITY_COLOR_2 = 'severity_color_2';
+	public const SEVERITY_NAME_3 = 'severity_name_3';
+	public const SEVERITY_COLOR_3 = 'severity_color_3';
+	public const SEVERITY_NAME_4 = 'severity_name_4';
+	public const SEVERITY_COLOR_4 = 'severity_color_4';
+	public const SEVERITY_NAME_5 = 'severity_name_5';
+	public const SEVERITY_COLOR_5 = 'severity_color_5';
+
+	// Geographical maps.
+	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
+	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';
+	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
+	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
+
+	// Other configuration parameters.
+	public const URL = 'url';
+	public const DISCOVERY_GROUPID = 'discovery_groupid';
+	public const DEFAULT_INVENTORY_MODE = 'default_inventory_mode';
+	public const ALERT_USRGRPID = 'alert_usrgrpid';
+	public const SNMPTRAP_LOGGING = 'snmptrap_logging';
+	public const LOGIN_ATTEMPTS = 'login_attempts';
+	public const LOGIN_BLOCK = 'login_block';
+	public const VAULT_PROVIDER = 'vault_provider';
+	public const PROXY_SECRETS_PROVIDER = 'proxy_secrets_provider';
+	public const VALIDATE_URI_SCHEMES = 'validate_uri_schemes';
+	public const URI_VALID_SCHEMES = 'uri_valid_schemes';
+	public const X_FRAME_OPTIONS = 'x_frame_options';
+	public const IFRAME_SANDBOXING_ENABLED = 'iframe_sandboxing_enabled';
+	public const IFRAME_SANDBOXING_EXCEPTIONS = 'iframe_sandboxing_exceptions';
+
+	// Audit log.
+	public const AUDITLOG_ENABLED = 'auditlog_enabled';
+	public const AUDITLOG_MODE = 'auditlog_mode';
+
+	// Read-only parameters.
+	public const SESSION_KEY = 'session_key';
+	public const DBVERSION_STATUS = 'dbversion_status';
+	public const SERVER_STATUS = 'server_status';
 	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
+	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 
 	private static $params = [];
 	private static $params_public = [];
@@ -113,22 +127,37 @@ class CSettingsHelper {
 		if (!self::$params) {
 			self::$params = API::Settings()->get([
 				'output' => [
-					'default_theme', 'search_limit', 'max_in_table', 'server_check_interval', 'work_period',
-					'show_technical_errors', 'history_period', 'period_default', 'max_period', 'severity_color_0',
-					'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5',
-					'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3', 'severity_name_4',
-					'severity_name_5', 'custom_color', 'ok_period', 'blink_period', 'problem_unack_color',
-					'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style',
-					'ok_unack_style', 'ok_ack_style', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid',
-					'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block',
-					'validate_uri_schemes', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled',
-					'iframe_sandboxing_exceptions', 'max_overview_table_size', 'connect_timeout', 'socket_timeout',
-					'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'url', 'report_test_timeout',
-					'auditlog_enabled', 'auditlog_mode', 'ha_failover_delay', 'geomaps_tile_provider',
-					'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider',
+					// GUI.
+					'default_lang', 'default_timezone', 'default_theme', 'search_limit', 'max_overview_table_size',
+					'max_in_table', 'server_check_interval', 'work_period', 'show_technical_errors', 'history_period',
+					'period_default', 'max_period',
+
+					// Timeouts.
 					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
-					'timeout_script', 'timeout_browser'
+					'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout',
+					'script_timeout', 'item_test_timeout', 'report_test_timeout',
+
+					// Trigger displaying options.
+					'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color',
+					'problem_ack_style', 'ok_unack_color', 'ok_unack_style', 'ok_ack_color', 'ok_ack_style',
+					'ok_period', 'blink_period', 'severity_name_0', 'severity_color_0', 'severity_name_1',
+					'severity_color_1', 'severity_name_2', 'severity_color_2', 'severity_name_3', 'severity_color_3',
+					'severity_name_4', 'severity_color_4', 'severity_name_5', 'severity_color_5',
+
+					// Geographical maps.
+					'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
+
+					// Other configuration parameters.
+					'url', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging',
+					'login_attempts', 'login_block', 'vault_provider', 'proxy_secrets_provider', 'validate_uri_schemes',
+					'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
+
+					// Audit log.
+					'auditlog_enabled', 'auditlog_mode',
+
+					// Read-only parameters.
+					'ha_failover_delay'
 				]
 			]);
 

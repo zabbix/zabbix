@@ -187,7 +187,7 @@
 				this.#addEventListeners();
 			}
 
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#activateHostDashboardNavigation() {
@@ -370,33 +370,29 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
-				const data = e.detail;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					if ('error' in data.submit) {
+						if ('title' in data.submit.error) {
+							postMessageError(data.submit.error.title);
+						}
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+						postMessageDetails('error', data.submit.error.messages);
 					}
 
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('zabbix.php');
-						curl.setArgument('action', 'host.view');
-					}
-				}
-				else {
-					postMessageError(data.error.title);
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
 
-					if ('messages' in data.error) {
-						postMessageDetails('error', data.error.messages);
+						url.searchParams.set('action', 'host.view');
+
+						event.setRedirectUrl(url.href);
 					}
 				}
-
-				location.href = curl === null ? location.href : curl.getUrl();
 			});
 		}
 	}
