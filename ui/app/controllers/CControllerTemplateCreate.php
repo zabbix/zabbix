@@ -16,6 +16,8 @@
 
 class CControllerTemplateCreate extends CController {
 
+	private ?array $src_template = null;
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -52,7 +54,25 @@ class CControllerTemplateCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			return false;
+		}
+
+		if ($this->hasInput('clone_templateid') && $this->hasInput('clone')) {
+			$src_templates = API::Template()->get([
+				'output' => ['templateid', 'wizard_ready', 'readme'],
+				'selectMacros' => ['macro', 'config'],
+				'templateids' => $this->getInput('clone_templateid')
+			]);
+
+			if (!$src_templates) {
+				return false;
+			}
+
+			$this->src_template = $src_templates[0];
+		}
+
+		return true;
 	}
 
 	protected function doAction(): void {
@@ -117,7 +137,15 @@ class CControllerTemplateCreate extends CController {
 				return (bool) array_filter(array_intersect_key($macro, $keys));
 			});
 
+			$src_macros = $this->src_template !== null
+				? array_column($this->src_template['macros'], null, 'macro')
+				: [];
+
 			foreach ($macros as &$macro) {
+				if (array_key_exists($macro['macro'], $src_macros)) {
+					$macro['config'] = $src_macros[$macro['macro']]['config'];
+				}
+
 				unset($macro['discovery_state']);
 				unset($macro['allow_revert']);
 			}
@@ -129,9 +157,14 @@ class CControllerTemplateCreate extends CController {
 				'templates' => $templates,
 				'groups' => zbx_toObject($groups, 'groupid'),
 				'description' => $this->getInput('description', ''),
-				'tags' =>$tags,
+				'tags' => $tags,
 				'macros' => $macros
 			];
+
+			if ($this->src_template !== null) {
+				$template['wizard_ready'] = $this->src_template['wizard_ready'];
+				$template['readme'] = $this->src_template['readme'];
+			}
 
 			$result = API::Template()->create($template);
 
@@ -140,10 +173,10 @@ class CControllerTemplateCreate extends CController {
 			}
 
 			$template = ['templateid' => $result['templateids'][0]] + $template;
-			$src_templateid = $this->getInput('clone_templateid', 0);
 
 			if (!$this->createValueMaps($template['templateid'], $this->getInput('valuemaps', []))
-					|| ($this->hasInput('clone') && !$this->copyFromCloneSourceTemplate($src_templateid, $template))) {
+					|| ($this->hasInput('clone')
+						&& !$this->copyFromCloneSourceTemplate($this->src_template['templateid'], $template))) {
 				throw new Exception();
 			}
 
