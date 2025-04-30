@@ -6936,12 +6936,12 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     top: 50px;
     width: var(--modal-width, 100%);
     max-width: var(--modal-max-width, 1024px);
-    min-width: var(--modal-min-width, initial); }
+    min-width: var(--modal-min-width, auto); }
     .overlay-dialogue.modal-popup.modal-popup-medium {
-      --modal-width: initial;
+      --modal-width: auto;
       --modal-min-width: 450px; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
-      --modal-width: initial;
+      --modal-width: auto;
       --modal-min-width: 650px; }
     .overlay-dialogue.modal-popup.modal-popup-small {
       --modal-max-width: 450px; }
