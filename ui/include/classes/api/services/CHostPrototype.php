@@ -85,8 +85,6 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$options['filter']['flags'] = [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED];
-
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $output_fields;
 		}
@@ -147,6 +145,10 @@ class CHostPrototype extends CHostBase {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts['where'] = [
+			$this->fieldId('flags').' IN('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'
+		];
+
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {

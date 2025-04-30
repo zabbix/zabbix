@@ -28,7 +28,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		'privatekey', 'flags', 'interfaceid', 'description', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
 		'enabled_lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
 		'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file',
-		'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'parameters', 'discover'
+		'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'parameters', 'discover',
+		'uuid'
 	];
 
 	/**

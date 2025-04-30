@@ -1052,12 +1052,6 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
-						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('cannot be empty')
-						));
-					}
-
 					// if key cannot be resolved
 					if ($this->referencer->findItemidByKey($hostid,
 							$discovery_rule[$master_item_key]['key']) === null) {
@@ -1115,12 +1109,6 @@ class CConfigurationImport {
 				unset($discovery_rule['interface_ref']);
 
 				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
-						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('cannot be empty')
-						));
-					}
-
 					$discovery_rule['master_itemid'] = $this->referencer->findItemidByKey($hostid,
 						$discovery_rule[$master_item_key]['key'], true
 					);
@@ -1218,22 +1206,12 @@ class CConfigurationImport {
 
 	/**
 	 * Separate LLD rules from prototypes. Move LLD rule prototypes to their parent's 'discovery_prototypes' array.
-	 *
-	 * @throws Exception
 	 */
 	private function organizeDiscoveryPrototypes(array &$discovery_rules_by_hosts): void {
 		$lldrule_links = [];
 
 		foreach ($discovery_rules_by_hosts as $host => &$discovery_rules) {
 			foreach ($discovery_rules as &$discovery_rule) {
-				if (array_key_exists('parent_discovery_rule', $discovery_rule)) {
-					if (!array_key_exists('key', $discovery_rule['parent_discovery_rule'])) {
-						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'parent_discovery_rule',
-							_('cannot be empty')
-						));
-					}
-				}
-
 				$discovery_rule['discovery_prototypes'] = [];
 				$lldrule_links[$host][$discovery_rule['key_']] = &$discovery_rule;
 			}
@@ -1524,12 +1502,6 @@ class CConfigurationImport {
 					$discovery_levels[$level] = true;
 
 					if ($discovery_prototype['type'] == ITEM_TYPE_DEPENDENT) {
-						if (!array_key_exists('key', $discovery_prototype[$master_item_key])) {
-							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-								_('cannot be empty')
-							));
-						}
-
 						$master_discovery_prototypeid = $this->referencer->findItemidByKey($hostid,
 							$discovery_prototype[$master_item_key]['key'], true
 						);
