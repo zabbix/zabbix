@@ -2181,6 +2181,7 @@ static void	lld_rule_override_merge_rowset(zbx_sync_rowset_t *dst, const zbx_syn
 		row->cols[col] = zbx_strdup(row->cols[col], depid);
 	}
 
+	zbx_sync_rowset_sort_by_rows(&rowset);
 	zbx_sync_rowset_merge(dst, &rowset);
 	zbx_sync_rowset_clear(&rowset);
 }
