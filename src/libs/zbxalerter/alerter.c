@@ -235,13 +235,12 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 			mailauth.oauthbearer = zbx_strdup(NULL, data.access_token);
 			mailauth.username = zbx_strdup(mailauth.username, smtp_email);
-			ZBX_FALLTHROUGH;
-		}
-		default:
-			zbx_free(expression);
-			zbx_free(recovery_expression);
 			break;
+		}
 	}
+
+	zbx_free(expression);
+	zbx_free(recovery_expression);
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 
