@@ -749,7 +749,16 @@ Overlay.prototype.setProperties = function(properties) {
 				break;
 
 			case 'content':
-				this.$dialogue.$body.html(value);
+				if (typeof value === 'string') {
+					// Preserve inline script execution.
+					this.$dialogue.$body[0].innerHTML = '';
+					this.$dialogue.$body[0].appendChild(
+						document.createRange().createContextualFragment(value)
+					);
+				}
+				else {
+					this.$dialogue.$body.html(value);
+				}
 				if (this.$dialogue.$debug.html().length) {
 					this.$dialogue.$body.append(this.$dialogue.$debug);
 				}
