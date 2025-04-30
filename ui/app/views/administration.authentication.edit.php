@@ -332,7 +332,7 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 						->addClass('saml-enabled')
 				]))
 					->addClass('saml-change-identity-div')
-					->addClass($data['idp_certificate_hash'] === '' ? 'display-none' : ''),
+					->addClass($data['idp_certificate_hash'] === '' ? ZBX_STYLE_DISPLAY_NONE : ''),
 				(new CDiv([
 					(new CTextArea('idp_certificate', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -346,12 +346,12 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 							->addClass('saml-upload-identity-button')
 							->addClass('saml-enabled'),
 						(new CFile('idp_certificate_input_file'))
-							->addClass('display-none')
+							->addClass(ZBX_STYLE_DISPLAY_NONE)
 							->setAttribute('accept', '.cer, .crt, .pem, .txt')
 					]))->addClass('file-upload-wrapper')
 				]))
 					->addClass('saml-add-identity-div')
-					->addClass($data['idp_certificate_hash'] !== '' ? 'display-none' : ''),
+					->addClass($data['idp_certificate_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
 			]))->addClass('saml-identity')
 		])
 		->addItem([
@@ -364,7 +364,7 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 						->addClass('saml-enabled')
 				]))
 					->addClass('saml-change-identity-div')
-					->addClass($data['sp_private_key_hash'] === '' ? 'display-none' : ''),
+					->addClass($data['sp_private_key_hash'] === '' ? ZBX_STYLE_DISPLAY_NONE : ''),
 				(new CDiv([
 					(new CTextArea('sp_private_key', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -378,12 +378,12 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 							->addClass('saml-upload-identity-button')
 							->addClass('saml-enabled'),
 						(new CFile('sp_private_key_input_file'))
-							->addClass('display-none')
+							->addClass(ZBX_STYLE_DISPLAY_NONE)
 							->setAttribute('accept', '.key, .pem, .txt')
 					]))->addClass('file-upload-wrapper')
 				]))
 					->addClass('saml-add-identity-div')
-					->addClass($data['sp_private_key_hash'] !== '' ? 'display-none' : ''),
+					->addClass($data['sp_private_key_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
 			]))->addClass('saml-identity')
 		])
 		->addItem([
@@ -396,7 +396,7 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 						->addClass('saml-enabled')
 				]))
 					->addClass('saml-change-identity-div')
-					->addClass($data['sp_certificate_hash'] === '' ? 'display-none' : ''),
+					->addClass($data['sp_certificate_hash'] === '' ? ZBX_STYLE_DISPLAY_NONE : ''),
 				(new CDiv([
 					(new CTextArea('sp_certificate', ''))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -410,12 +410,12 @@ if (array_key_exists('idp_certificate_hash', $data) && array_key_exists('sp_cert
 							->addClass('saml-upload-identity-button')
 							->addClass('saml-enabled'),
 						(new CFile('sp_certificate_input_file'))
-							->addClass('display-none')
+							->addClass(ZBX_STYLE_DISPLAY_NONE)
 							->setAttribute('accept', '.cer, .crt, .pem, .txt')
 					]))->addClass('file-upload-wrapper')
 				]))
 					->addClass('saml-add-identity-div')
-					->addClass($data['sp_certificate_hash'] !== '' ? 'display-none' : ''),
+					->addClass($data['sp_certificate_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
 			]))->addClass('saml-identity')
 		]);
 }
