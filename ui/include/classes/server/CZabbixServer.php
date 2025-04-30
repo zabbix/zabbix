@@ -592,62 +592,64 @@ class CZabbixServer {
 			$protocol = '';
 			$context = stream_context_create([]);
 
-			if ($ZBX_SERVER_TLS['ACTIVE']) {
+			if ($ZBX_SERVER_TLS['ACTIVE'] == 1) {
 				$protocol = 'tls://';
 				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
 				stream_context_set_option($context, 'ssl', 'verify_peer_name', (bool)$ZBX_SERVER_TLS['VERIFY_NAME']);
+				stream_context_set_option($context, 'ssl', 'verify_peer', true);
+				stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
 			}
 
 			if (!$socket = @stream_socket_client($protocol . $this->host . ':' . $this->port, $errorCode, $errorMsg,
-					$this->connect_timeout, STREAM_CLIENT_CONNECT, $context)) {
+				$this->connect_timeout, STREAM_CLIENT_CONNECT, $context)) {
+				$host_port = $this->host . ':' . $this->port;
 				switch ($errorMsg) {
 					case 'Connection refused':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $host_port);
 						break;
 
 					case 'No route to host':
-						$dErrorMsg = _s("Zabbix server \"%1\$s\" cannot be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
+						$dErrorMsg = _s("Zabbix server \"%1\$s\" cannot be reached. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $host_port);
 						break;
 
 					case 'Connection timed out':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $host_port);
 						break;
 
 					default:
 						if ($ZBX_SERVER_TLS['ACTIVE']) {
-							$dErrorMsg = _("Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.");
-						}
-						else {
-							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+							$dErrorMsg = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+						} else {
+							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
 						}
 				}
 
-				$this->error = rtrim($dErrorMsg.$errorMsg);
+				$this->error = rtrim($dErrorMsg . $errorMsg);
 				return false;
 			}
 
-			if ($ZBX_SERVER_TLS['ACTIVE'] && ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
+			if ($ZBX_SERVER_TLS['ACTIVE'] == 1 && ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
 					|| $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== '')) {
 				$params = stream_context_get_params($socket);
-				$cert = $params['options']['ssl']['peer_certificate'];
-
-				$parsed_cert = openssl_x509_parse($cert);
+				$info = openssl_x509_parse($params['options']['ssl']['peer_certificate']);
+				$subject = $info['subject'] ?? [];
+				$issuer = $info['issuer'] ?? [];
 
 				$subject_string = implode(', ', array_map(static fn($k, $v) => "$k=$v",
-					array_keys($parsed_cert['subject']), $parsed_cert['subject']));
-				$issuer_string  = implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($parsed_cert['issuer']),
-					$parsed_cert['issuer']));
+					array_keys($subject), $subject));
+				$issuer_string = implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($issuer),
+					$issuer));
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
-						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
+					&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
 					$this->error = _('Issuer of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
 					return false;
 				}
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
-						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
+					&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
 					$this->error = _('Subject of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
 					return false;
 				}

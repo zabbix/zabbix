@@ -58,13 +58,12 @@ const view = new class {
 				break;
 
 			case STEP_SETTINGS:
-				document.getElementById('default-theme').addEventListener('change', () => form.submit())
+				document.querySelector('#default-theme').addEventListener('change', () => form.submit())
 
-				for (const id of ['zbx_server_tls_box', 'zbx_server_tls_verify_name_box']) {
-					document.getElementById(id).addEventListener('change', () => this._updateSetting());
-				}
+				document.querySelector('#zbx_server_tls').addEventListener('change', (e) =>
+					this._updateEncryptionFields(e));
 
-				this._updateSetting();
+				this._updateEncryptionFields();
 				break;
 		}
 	}
@@ -161,14 +160,8 @@ const view = new class {
 		}
 	}
 
-	_updateSetting() {
-		const zbx_server_tls_box = document.getElementById('zbx_server_tls_box');
-		const zbx_server_tls = document.getElementById('zbx_server_tls');
-		const zbx_server_tls_verify_name_box = document.getElementById('zbx_server_tls_verify_name_box');
-		const zbx_server_tls_verify_name = document.getElementById('zbx_server_tls_verify_name');
-
-		const encryption_enabled = zbx_server_tls_box.checked;
-		const verify_name_enabled = zbx_server_tls_verify_name_box.checked;
+	_updateEncryptionFields(e) {
+		const encryption_enabled = document.querySelector('#zbx_server_tls').checked;
 
 		const rows = {
 			'zbx_server_tls_ca_file': encryption_enabled,
@@ -176,7 +169,7 @@ const view = new class {
 			'zbx_server_tls_cert_file': encryption_enabled,
 			'zbx_server_tls_certificate_issuer': encryption_enabled,
 			'zbx_server_tls_certificate_subject': encryption_enabled,
-			'zbx_server_tls_verify_name_box': encryption_enabled,
+			'zbx_server_tls_verify_name': encryption_enabled,
 		}
 
 		for (let id in rows) {
@@ -191,18 +184,8 @@ const view = new class {
 			}
 		}
 
-		if (encryption_enabled) {
-			zbx_server_tls.setAttribute('value', '1');
-		}
-		else {
-			zbx_server_tls.setAttribute('value', '0');
-		}
-
-		if (verify_name_enabled) {
-			zbx_server_tls_verify_name.setAttribute('value', '1');
-		}
-		else {
-			zbx_server_tls_verify_name.setAttribute('value', '0');
+		if (e !== undefined && encryption_enabled) {
+			document.querySelector('#zbx_server_tls_verify_name').checked = 'checked';
 		}
 	}
 };
