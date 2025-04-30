@@ -465,6 +465,10 @@ window.host_wizard_edit = new class {
 
 	#renderReadme() {
 		const step = this.#view_templates.step_readme.evaluateToElement();
+		const substep_counter = this.#steps_queue.includes(this.STEP_README)
+			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
+
+		step.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		step.querySelector(`.${ZBX_STYLE_MARKDOWN}`).innerHTML = this.#template.readme;
 
@@ -473,7 +477,11 @@ window.host_wizard_edit = new class {
 
 	#renderConfigureHost() {
 		const step = this.#view_templates.step_configure_host.evaluateToElement();
+		const substep_counter = this.#steps_queue.includes(this.STEP_README)
+			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
 		const macros_list = step.querySelector('.js-host-macro-list');
+
+		step.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		this.#template.macros.forEach((macro, row_index) => {
 			const {field, description} = this.#makeMacroField(macro, row_index);

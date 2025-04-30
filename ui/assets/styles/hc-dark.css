@@ -5713,6 +5713,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         .modal-popup-host-wizard section.grid-columns .section-head .formated-text:not(:first-of-type),
         .modal-popup-host-wizard section.grid-columns .section-body .formated-text:not(:first-of-type) {
           margin-top: 8px; }
+  .modal-popup-host-wizard .formated-text .sub-step-counter {
+    margin-left: 6px;
+    color: #acbbc2; }
   .modal-popup-host-wizard .ordered-list {
     --counter-width: 2ch; }
     .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text:not(:first-child),

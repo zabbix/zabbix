@@ -679,7 +679,10 @@ function stepReadme(): CTemplateTag {
 			(new CSection())
 				->addItem(
 					(new CDiv([
-						new CTag('h1', true, _('Configure host')),
+						new CTag('h1', true, [
+							_('Configure host'),
+							(new CSpan('(1/2)'))->addClass('sub-step-counter')
+						]),
 						new CTag('p', true, _('The template you selected (Apache by HTTP) requires additional configuration.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -707,7 +710,10 @@ function stepConfigureHost(): array {
 				(new CSection())
 					->addItem(
 						(new CDiv([
-							new CTag('h1', true, _('Configure host')),
+							new CTag('h1', true, [
+								_('Configure host'),
+								(new CSpan('(2/2)'))->addClass('sub-step-counter')
+							]),
 							new CTag('p', true, _('To complete the setup, configure the following variables (host macros).')),
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)

@@ -99,6 +99,11 @@
 
 	.formated-text {
 		@extend .markdown;
+
+		.sub-step-counter {
+			margin-left: 6px;
+			color: $font-light-color;
+		}
 	}
 
 	.ordered-list {
