@@ -1459,14 +1459,14 @@ abstract class CHostBase extends CApiService {
 
 		foreach (CHostTemplateCacheHelper::getLinksToDelete($hosts_templates, $ancestors, $descendants)
 				as $hostid => $link_hostids) {
-			$sql_where[] = dbConditionId('htc.hostid', [$hostid]).
-				' AND '.dbConditionId('htc.link_hostid', $link_hostids);
+			$sql_where[] = dbConditionId('hostid', [$hostid]).
+				' AND '.dbConditionId('link_hostid', $link_hostids);
 		}
 
-		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
 
 		DBexecute(
-			'DELETE FROM host_template_cache htc'.
+			'DELETE FROM host_template_cache'.
 			' WHERE '.$sql_where
 		);
 	}

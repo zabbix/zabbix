@@ -1464,14 +1464,14 @@ abstract class CItemGeneral extends CApiService {
 		$sql_where = [];
 
 		foreach ($del_item_template_cache as $itemid => $link_hostids) {
-			$sql_where[] = dbConditionId('itc.itemid', [$itemid]).
-				' AND '.dbConditionId('itc.link_hostid', $link_hostids);
+			$sql_where[] = dbConditionId('itemid', [$itemid]).
+				' AND '.dbConditionId('link_hostid', $link_hostids);
 		}
 
-		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
 
 		DBexecute(
-			'DELETE FROM item_template_cache itc'.
+			'DELETE FROM item_template_cache'.
 			' WHERE '.$sql_where
 		);
 	}
@@ -1552,14 +1552,14 @@ abstract class CItemGeneral extends CApiService {
 			$sql_where = [];
 
 			foreach ($del_item_template_cache as $itemid => $link_hostids) {
-				$sql_where[] = dbConditionId('itc.itemid', [$itemid]).
-					' AND '.dbConditionId('itc.link_hostid', $link_hostids);
+				$sql_where[] = dbConditionId('itemid', [$itemid]).
+					' AND '.dbConditionId('link_hostid', $link_hostids);
 			}
 
-			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
 
 			DBexecute(
-				'DELETE FROM item_template_cache itc'.
+				'DELETE FROM item_template_cache'.
 				' WHERE '.$sql_where
 			);
 		}

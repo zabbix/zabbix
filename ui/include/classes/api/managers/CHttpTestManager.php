@@ -156,14 +156,14 @@ class CHttpTestManager {
 		$sql_where = [];
 
 		foreach ($del_httptest_template_cache as $httptestid => $link_hostids) {
-			$sql_where[] = dbConditionId('htc.httptestid', [$httptestid]).
-				' AND '.dbConditionId('htc.link_hostid', $link_hostids);
+			$sql_where[] = dbConditionId('httptestid', [$httptestid]).
+				' AND '.dbConditionId('link_hostid', $link_hostids);
 		}
 
-		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
 
 		DBexecute(
-			'DELETE FROM httptest_template_cache htc'.
+			'DELETE FROM httptest_template_cache'.
 			' WHERE '.$sql_where
 		);
 	}
@@ -244,14 +244,14 @@ class CHttpTestManager {
 			$sql_where = [];
 
 			foreach ($del_httptest_template_cache as $httptestid => $link_hostids) {
-				$sql_where[] = dbConditionId('htc.httptestid', [$httptestid]).
-					' AND '.dbConditionId('htc.link_hostid', $link_hostids);
+				$sql_where[] = dbConditionId('httptestid', [$httptestid]).
+					' AND '.dbConditionId('link_hostid', $link_hostids);
 			}
 
-			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(' OR ', $sql_where).')';
+			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
 
 			DBexecute(
-				'DELETE FROM httptest_template_cache htc'.
+				'DELETE FROM httptest_template_cache'.
 				' WHERE '.$sql_where
 			);
 		}
