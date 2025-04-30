@@ -18,6 +18,7 @@ class ZColorPicker extends HTMLElement {
 	static ZBX_STYLE_CLASS =				'color-picker';
 	static ZBX_STYLE_BOX =					'color-picker-box';
 	static ZBX_STYLE_DIALOG =				'color-picker-dialog';
+	static ZBX_STYLE_DIALOG_ID =			'color_picker';
 	static ZBX_STYLE_TABS =					'color-picker-tabs';
 	static ZBX_STYLE_TAB =					'color-picker-tab';
 	static ZBX_STYLE_TAB_SELECTED =			'color-picker-tab-selected';
@@ -92,7 +93,7 @@ class ZColorPicker extends HTMLElement {
 	`;
 
 	static #dialog_template = `
-		<div class="${ZColorPicker.ZBX_STYLE_DIALOG} ${ZBX_STYLE_OVERLAY_DIALOGUE}">
+		<div class="${ZColorPicker.ZBX_STYLE_DIALOG} ${ZBX_STYLE_OVERLAY_DIALOGUE}" id="${ZColorPicker.ZBX_STYLE_DIALOG_ID}">
 			<ul class="${ZColorPicker.ZBX_STYLE_TABS}">
 				<li class="${ZColorPicker.ZBX_STYLE_TAB} ${ZColorPicker.ZBX_STYLE_TAB_SOLID}" data-content="${ZColorPicker.ZBX_STYLE_CONTENT_SOLID}">
 					<input type="radio" id="${ZColorPicker.ZBX_STYLE_TAB_SOLID}" name="${ZColorPicker.ZBX_STYLE_TAB}"/>
