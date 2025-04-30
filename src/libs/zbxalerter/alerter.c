@@ -239,9 +239,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		}
 	}
 
-	zbx_free(expression);
-	zbx_free(recovery_expression);
-
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
@@ -251,6 +248,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 out:
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
+	zbx_free(expression);
+	zbx_free(recovery_expression);
 	zbx_free(error);
 	zbx_free(inreplyto);
 	zbx_free(sendto);
