@@ -219,8 +219,11 @@ window.host_wizard_edit = new class {
 		this.#next_button = this.#dialogue.querySelector('.js-next');
 		this.#next_button.addEventListener('click', () => {
 			this.#onBeforeNextStep()
-				.then(() => {
+				.finally(() => {
+					this.#overlay.setLoading();
 					this.#updateStepsQueue();
+				})
+				.then(() => {
 					this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
 				})
 				.catch(() => {
@@ -232,6 +235,10 @@ window.host_wizard_edit = new class {
 		this.#create_button.style.display = 'none';
 		this.#create_button.addEventListener('click', () => {
 			this.#onBeforeNextStep()
+				.finally(() => {
+					this.#overlay.setLoading();
+					this.#updateStepsQueue();
+				})
 				.then(() => {
 					this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
 				})
@@ -304,8 +311,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#gotoStep(step) {
-		this.#overlay.setLoading();
-
 		this.#current_step = step;
 
 		let show_back_button = true;
@@ -643,7 +648,7 @@ window.host_wizard_edit = new class {
 	#updateStepsQueue() {
 		this.#steps_queue = [];
 
-		if (!this.#data.do_not_show_welcome) {
+		if (this.#data.do_not_show_welcome === 0) {
 			this.#steps_queue.push(this.STEP_WELCOME);
 		}
 
@@ -749,7 +754,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
-		switch (this.#current_step) {
+		switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_WELCOME:
 				break;
 
@@ -1098,13 +1103,13 @@ window.host_wizard_edit = new class {
 	}
 
 	#disableWelcomeStep() {
-		if (this.#data.do_not_show_welcome === 1) {
-			// TODO call profile update
-
-			this.#current_step--;
+		if (this.#data.do_not_show_welcome === 0) {
+			return Promise.resolve();
 		}
 
-		return Promise.resolve();
+		// TODO save to profile
+
+		return Promise.reject();
 	}
 
 	#onFormDataChange(path, new_value, old_value) {
