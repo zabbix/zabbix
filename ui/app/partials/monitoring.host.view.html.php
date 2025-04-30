@@ -55,13 +55,15 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_link = new CLink('',
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'problem.view')
-			->setArgument('severities', $data['filter']['severities'])
-			->setArgument('hostids', [$host['hostid']])
-			->setArgument('filter_set', '1')
-	);
+	$problems = $data['allowed_ui_problems']
+		? new CLink('',
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('severities', $data['filter']['severities'])
+				->setArgument('hostids', [$host['hostid']])
+				->setArgument('filter_set', '1')
+		)
+		: null;
 
 	$total_problem_count = 0;
 
@@ -71,20 +73,23 @@ foreach ($data['hosts'] as $hostid => $host) {
 				|| (!$data['filter']['severities'] && $count > 0)) {
 			$total_problem_count += $count;
 
-			$problems_link->addItem((new CSpan($count))
+			$problems_span = (new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(CSeverityHelper::getStatusStyle($severity))
-				->setAttribute('title', CSeverityHelper::getName($severity))
-			);
+				->setAttribute('title', CSeverityHelper::getName($severity));
+
+			$problems = $data['allowed_ui_problems']
+				? $problems->addItem($problems_span)
+				: $problems_span->addClass(ZBX_STYLE_DISABLED);
 		}
 
 	}
 
 	if ($total_problem_count == 0) {
-		$problems_link->addItem(_('Problems'));
+		$problems->addItem(_('Problems'));
 	}
 	else {
-		$problems_link->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
+		$problems->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
 	}
 
 	$maintenance_icon = '';
@@ -122,7 +127,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
 				CViewHelper::showNum($host['items_count'])
 		],
-		$problems_link,
+		$problems,
 		$host['graphs']
 			? [
 				new CLink(_('Graphs'),
