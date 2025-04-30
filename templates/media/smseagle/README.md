@@ -36,8 +36,8 @@ Other required parameters are message type specific. More information can be fou
 
 3\. in the **Administration > Users** click on a User, and add a new media called **SMSEagle**. Enter SMS recipient. Available recipient formats:<br>
 Phone number: <code>phone_number</code><br>
-Contact in SMSEagle Phonebook: <code>contact_name:c</code><br>
-Group in SMSEagle Phonebook: <code>group_name:g</code><br>
+Contact in SMSEagle Phonebook: <code>contact_id:c</code><br>
+Group in SMSEagle Phonebook: <code>group_id:g</code><br>
 
 Multiple recipients can be separated by comma.
 
