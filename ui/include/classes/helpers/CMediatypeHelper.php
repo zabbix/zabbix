@@ -445,7 +445,7 @@ class CMediatypeHelper {
 			],
 			self::EMAIL_PROVIDER_OFFICE365 => [
 				'redirection_url' => $redirection_url,
-				'authorization_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&scope=https://outlook.office.com/SMTP.Send, offline_access',
+				'authorization_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&scope=https://outlook.office.com/SMTP.Send offline_access',
 				'token_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/token?grant_type=authorization_code'
 			]
 		];
