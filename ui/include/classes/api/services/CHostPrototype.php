@@ -145,8 +145,8 @@ class CHostPrototype extends CHostBase {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts['where'] = [
-			$this->fieldId('flags').' IN('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'
+		$sqlParts['where'][] = [
+			'h.flags IN('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'
 		];
 
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -160,7 +160,7 @@ class CHostPrototype extends CHostBase {
 				$sqlParts['from'][] = 'items i';
 				$sqlParts['from'][] = 'host_hgset hh';
 				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
+				$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
 				$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
 				$sqlParts['where'][] = 'i.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
@@ -175,7 +175,7 @@ class CHostPrototype extends CHostBase {
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
 			$sqlParts['from']['hd'] = 'host_discovery hd';
-			$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
+			$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
 			$sqlParts['where'][] = dbConditionId('hd.lldruleid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
