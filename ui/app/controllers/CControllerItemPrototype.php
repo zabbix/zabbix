@@ -130,7 +130,7 @@ abstract class CControllerItemPrototype extends CController {
 
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => true,
-			'lldmacros' => false
+			'lldmacros' => true
 		]);
 
 		if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
