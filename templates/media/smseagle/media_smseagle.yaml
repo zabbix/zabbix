@@ -28,7 +28,7 @@ zabbix_export:
           value: 'default'
         -
           name: encoding
-          value: 'default'
+          value: 'standard'
         -
           name: date
           value: 'YYYYmmDDHHMM'
@@ -91,10 +91,6 @@ zabbix_export:
                             params[key] = parseInt(params[key]);
                         }
 
-                        if (key === 'text') {
-                            params[key] = encodeURIComponent(params[key]);
-                        }
-
                         SMSEagle.addParam(key, params[key]);
                         Zabbix.log(4, '[ SMSEagle Webhook ] ' + key + ": " + SMSEagle.requestBody[key]);
                     }
@@ -120,7 +116,7 @@ zabbix_export:
                         Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'contacts' + ": " + parseInt(recipientSplit[0]));
                     } else {
                         recipientNumbers.push(recipientSplit[0]);
-                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'to' + ": " + encodeURIComponent(recipientSplit[0]));
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'to' + ": " + recipientSplit[0]);
                     }
         
                     SMSEagle.addParam('groups', recipientGroups);
