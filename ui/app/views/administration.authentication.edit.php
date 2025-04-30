@@ -217,15 +217,31 @@ $saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
 $saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
 
 $saml_tab = (new CFormGrid());
+$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+	$samlEnabledCheckbox = [
+		(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED))
+			->setChecked($saml_auth_enabled)
+			->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
+			->setReadonly(true),
+		(new CSpan(makeWarningIcon(_('PHP OpenSSL extension missing.'))))->addClass('js-hint')
+	];
+}
+else {
+	$samlEnabledCheckbox = [
+		$data['saml_error']
+			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
+			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
+			->setChecked($saml_auth_enabled)
+			->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
+	];
+}
+
 $saml_tab
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
-		new CFormField($data['saml_error']
-			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
-				->setChecked($saml_auth_enabled)
-				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
-		)
+		new CFormField($samlEnabledCheckbox)
 	])
 	->addItem([
 		new CLabel(_('Enable JIT provisioning'), 'saml_jit_status'),
