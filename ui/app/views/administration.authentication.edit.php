@@ -225,7 +225,7 @@ if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
 			->setChecked($saml_auth_enabled)
 			->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
 			->setReadonly(true),
-		(new CSpan(makeWarningIcon(_('PHP OpenSSL extension missing.'))))->addClass('js-hint')
+		(new CSpan(makeWarningIcon($openssl_status['error'])))->addClass('js-hint')
 	];
 }
 else {
