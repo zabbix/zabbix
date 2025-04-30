@@ -140,7 +140,9 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('primary_label_bold', _('Bold'))
 			)
 			->addField(
-				(new CWidgetFieldColor('primary_label_color', _('Color')))->prefixLabel(_('Primary label'))
+				(new CWidgetFieldColor('primary_label_color', _('Color')))
+					->prefixLabel(_('Primary label'))
+					->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(1)
@@ -187,7 +189,9 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(1)
 			)
 			->addField(
-				(new CWidgetFieldColor('secondary_label_color', _('Color')))->prefixLabel(_('Secondary label'))
+				(new CWidgetFieldColor('secondary_label_color', _('Color')))
+					->prefixLabel(_('Secondary label'))
+					->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(1)
@@ -202,7 +206,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::UNITS_POSITION_AFTER)
 			)
 			->addField(
-				new CWidgetFieldColor('bg_color', _('Background color'))
+				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
 			)
 			->addField(
 				new CWidgetFieldCheckBox('interpolation', _('Color interpolation'))
