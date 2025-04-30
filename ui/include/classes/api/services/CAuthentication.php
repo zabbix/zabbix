@@ -227,7 +227,7 @@ class CAuthentication extends CApiService {
 
 	private static function checkOpenSslExtension(): void {
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
-		
+
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
 			static::exception(ZBX_API_ERROR_INTERNAL, _('PHP OpenSSL extension missing.'));
 		}
