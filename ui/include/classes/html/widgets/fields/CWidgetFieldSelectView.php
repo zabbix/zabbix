@@ -45,4 +45,15 @@ class CWidgetFieldSelectView extends CWidgetFieldView {
 
 		return $this->select;
 	}
+
+	public function getJavaScript(): string {
+		return '
+			CWidgetForm.addField(
+				new CWidgetFieldSelect('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
+			);
+		';
+	}
 }

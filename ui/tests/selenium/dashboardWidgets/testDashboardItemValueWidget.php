@@ -2026,7 +2026,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD]);
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$form = $create
@@ -3252,11 +3252,12 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
-			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertTrue($filter->isExpanded(false));
 
 			// Check zoom filter layout.
 			if (array_key_exists('filter_layout', $data)) {
-				$filter = CFilterElement::find()->one();
+				$filter->open();
 				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
 				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
@@ -3284,7 +3285,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isVisible());
 		}
 
 		// Clear particular dashboard for next test case.

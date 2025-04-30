@@ -182,7 +182,12 @@
 		},
 
 		updateBusy() {
-			document.getElementById('dashboard-save').disabled = this.is_busy || this.is_busy_saving;
+			const do_disable = this.is_busy || this.is_busy_saving;
+
+			document.getElementById('dashboard-config').disabled = do_disable;
+			document.getElementById('dashboard-add-widget').disabled = do_disable;
+			document.getElementById('dashboard-add').disabled = do_disable;
+			document.getElementById('dashboard-save').disabled = do_disable;
 		},
 
 		cancelEditing() {
