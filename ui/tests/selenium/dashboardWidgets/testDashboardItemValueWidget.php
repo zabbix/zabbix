@@ -52,6 +52,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
 	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
+	const INDICATOR_CHANGE_HOST = 'Host for checking widget without show value option';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -78,6 +79,20 @@ class testDashboardItemValueWidget extends testWidgets {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
+
+		// Add 2 values of data for items, to check that there are no errors without show value option selected.
+		$items_data = [
+			'Indicator - Numeric (float)' => 0.1,
+			'Indicator - Character' => 1,
+			'Indicator - Numeric (unsigned)' => 1,
+			'Indicator - Text' => 1,
+			'Indicator - Log' => 1
+		];
+
+		foreach ($items_data as $name => $value) {
+			CDataHelper::addItemData(self::$itemids[$name], $value, time());
+			CDataHelper::addItemData(self::$itemids[$name], $value + 1, time() + 1);
+		}
 
 		CDataHelper::call('usermacro.createglobal', [
 			[
@@ -1686,6 +1701,81 @@ class testDashboardItemValueWidget extends testWidgets {
 					],
 					'trim' => true
 				]
+			],
+			// #57 Check that there is no errors, when show value option is unchecked (for each data type).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - float',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (float)'
+					]
+				]
+			],
+			// #58.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - character',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Character'
+					]
+				]
+			],
+			// #59.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - log',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Log'
+					]
+				]
+			],
+			// #60.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - numeric (unsigned)',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (unsigned)'
+					]
+				]
+			],
+			// #61.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - text',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Text'
+					]
+				]
 			]
 		];
 	}
@@ -1701,7 +1791,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	public static function getWidgetUpdateData() {
 		return [
-			// #57.
+			// #62.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1720,7 +1810,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #58.
+			// #63.
 			[
 				[
 					'expected' => TEST_GOOD,

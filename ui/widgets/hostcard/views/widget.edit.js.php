@@ -21,29 +21,29 @@ use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 window.widget_form = new class extends CWidgetForm {
 
 	/**
-	 * @type {HTMLFormElement};
+	 * @type {HTMLFormElement}
 	 */
 	#form;
 
 	/**
-	 * @type {HTMLTableElement};
+	 * @type {HTMLTableElement}
 	 */
-	#table;
+	#sections_table;
 
 	init() {
 		this.#form = this.getForm();
-		this.#table = document.getElementById('sections-table');
+		this.#sections_table = document.getElementById('sections-table');
 
-		this.#table.addEventListener('change', () => this.#updateForm());
+		this.#form.addEventListener('change', () => this.#updateForm());
 
-		jQuery(this.#table).on('tableupdate.dynamicRows', () => this.#updateForm());
+		jQuery(this.#sections_table).on('tableupdate.dynamicRows', () => this.#updateForm());
 
 		this.#updateForm();
 		this.ready();
 	}
 
 	#updateForm() {
-		const sections = this.#table.querySelectorAll('z-select');
+		const sections = this.#sections_table.querySelectorAll('z-select');
 
 		document.getElementById('add-row').disabled = sections.length > 0
 			&& sections.length === sections[0].getOptions().length;
@@ -52,8 +52,8 @@ window.widget_form = new class extends CWidgetForm {
 
 		for (const element of sections) {
 			if (element.value == <?= CWidgetFieldHostSections::SECTION_INVENTORY ?>) {
-
 				show_inventory_field = true;
+
 				break;
 			}
 		}

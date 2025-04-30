@@ -19,17 +19,17 @@ class ItemNavigator_CWidgetFieldItemGrouping extends CWidgetField {
 	static GROUP_BY_ITEM_TAG_VALUE = 3;
 
 	/**
-	 * @type {HTMLTableElement};
+	 * @type {HTMLTableElement}
 	 */
 	#table;
 
 	/**
-	 * @type {Array};
+	 * @type {Array}
 	 */
 	#value;
 
 	/**
-	 * type {number};
+	 * type {number}
 	 */
 	#max_rows;
 

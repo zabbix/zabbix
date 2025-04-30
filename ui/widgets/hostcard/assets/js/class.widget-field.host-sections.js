@@ -40,7 +40,7 @@ class HostCard_CWidgetFieldHostSections extends CWidgetField {
 			.dynamicRows({
 				template: `#${this.getName()}-row-tmpl`,
 				allow_empty: true,
-				rows: this.#value.map((type) => ({['section']: type})),
+				rows: this.#value.map(type => ({section: type})),
 				sortable: true,
 				sortable_options: {
 					target: 'tbody',

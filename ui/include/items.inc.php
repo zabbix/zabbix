@@ -532,10 +532,11 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ * @param bool   $set_title         Adds a title attribute to the created element.
  *
  * @return array|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links, bool $set_title = false) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -572,6 +573,10 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	}
 	else {
 		$name = new CSpan($template['name']);
+	}
+
+	if ($set_title) {
+		$name->setTitle($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -2442,7 +2447,10 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
-		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+		'filter' => [
+			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMP],
+			'status' => ITEM_STATUS_ACTIVE
+		]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];
