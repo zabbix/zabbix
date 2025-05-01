@@ -492,15 +492,15 @@ static int	DBpatch_7030036(void)
 static int	DBpatch_7030037(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
-			" insert into host_template_cache"
-				" (with recursive cte as"
-					" ("
-					" select h0.templateid, h0.hostid from hosts_templates h0"
-						" union all"
-					" select h1.templateid, c.hostid from cte c"
-						" join hosts_templates h1 on c.templateid=h1.hostid"
-					" )"
-				" select hostid,templateid from cte)"))
+			"insert into host_template_cache ("
+			"	with recursive cte as ("
+					"select h0.templateid,h0.hostid from hosts_templates h0"
+					" union all "
+					"select h1.templateid,c.hostid from cte c"
+					" join hosts_templates h1 on c.templateid=h1.hostid"
+				")"
+				" select hostid,templateid from cte"
+			")"))
 	{
 		return FAIL;
 	}
@@ -549,28 +549,33 @@ static int	DBpatch_7030041(void)
 
 static int	DBpatch_7030042(void)
 {
-	/* 1 - ZBX_FLAG_DISCOVERY_RULE */
+	/* 0 - ZBX_FLAG_DISCOVERY_NORMAL */
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 4 - ZBX_FLAG_DISCOVERY_CREATED */
+
 	if (ZBX_DB_OK > zbx_db_execute(
-			" insert into item_template_cache"
-				" (with recursive cte as"
-					" ("
-						"select i0.templateid, i0.itemid from items i0 where i0.flags!=1"
-						" union all"
-						" select i1.templateid, c.itemid from cte c join items i1 on"
-							" c.templateid=i1.itemid"
-							" where i1.templateid is not null"
-					" )"
-			" select cte.itemid,h.hostid from cte,hosts h,items i where"
-				" cte.templateid=i.itemid and i.hostid=h.hostid)"))
+			"insert into item_template_cache ("
+				"with recursive cte as ("
+					"select i0.templateid,i0.itemid from items i0"
+					" where i0.flags in (0,2,4)"
+					" union all "
+					"select i1.templateid,c.itemid from cte c"
+					" join items i1 on c.templateid=i1.itemid"
+					" where i1.templateid is not null"
+				")"
+				" select cte.itemid,h.hostid from cte,hosts h,items i"
+				" where cte.templateid=i.itemid and i.hostid=h.hostid"
+			")"))
 	{
 		return FAIL;
 	}
 
-	/* 1 - ZBX_FLAG_DISCOVERY_RULE */
+
 	if (ZBX_DB_OK > zbx_db_execute(
-			"insert into item_template_cache"
-				" (select i.itemid,h.hostid from items i,hosts h"
-				" where i.hostid=h.hostid and i.flags != 1)"))
+			"insert into item_template_cache ("
+				"select i.itemid,h.hostid from items i,hosts h"
+				" where i.hostid=h.hostid and i.flags in (0,2,4)"
+			")"))
 	{
 		return FAIL;
 	}
@@ -617,25 +622,26 @@ static int  DBpatch_7030046(void)
 static int	DBpatch_7030047(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
-			" insert into httptest_template_cache"
-				" (with recursive cte as"
-					" ("
-						" select ht0.templateid, ht0.httptestid from httptest ht0"
-						" union all"
-						" select ht1.templateid, c.httptestid from cte c join httptest ht1 on"
-							" c.templateid=ht1.httptestid"
-							" where ht1.templateid is not null"
-					" )"
-			" select cte.httptestid,ht.hostid from cte,hosts h,httptest ht where"
-			"	cte.templateid=ht.httptestid and ht.hostid=h.hostid)"))
+			"insert into httptest_template_cache ("
+				"with recursive cte as ("
+					"select ht0.templateid,ht0.httptestid from httptest ht0"
+					" union all "
+					"select ht1.templateid,c.httptestid from cte c"
+					" join httptest ht1 on c.templateid=ht1.httptestid"
+					" where ht1.templateid is not null"
+				")"
+				" select cte.httptestid,ht.hostid from cte,hosts h,httptest ht"
+				" where cte.templateid=ht.httptestid and ht.hostid=h.hostid"
+			")"))
 	{
 		return FAIL;
 	}
 
 	if (ZBX_DB_OK > zbx_db_execute(
-			"insert into httptest_template_cache"
-				" (select ht.httptestid,h.hostid from httptest ht,hosts h"
-					" where ht.hostid=h.hostid)"))
+			"insert into httptest_template_cache ("
+				"select ht.httptestid,h.hostid from httptest ht,hosts h"
+				" where ht.hostid=h.hostid"
+			")"))
 	{
 		return FAIL;
 	}
