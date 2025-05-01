@@ -1721,7 +1721,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 			httptestids->values, httptestids->values_num);
 	zbx_db_execute("%s", sql);
 
-	zbx_db_execute_multiple_query("delete from httptest_template_cache where", "itemid", httptestids);
+	zbx_db_execute_multiple_query("delete from httptest_template_cache where", "httptestid", httptestids);
 
 	zbx_vector_uint64_destroy(&httpstepids);
 	zbx_vector_uint64_destroy(&itemids);
