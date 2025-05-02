@@ -216,10 +216,6 @@ class CConfigFile {
 			$this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'] = $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'];
 		}
 
-		if (isset($ZBX_SERVER_TLS['VERIFY_NAME'])) {
-			$this->config['ZBX_SERVER_TLS']['VERIFY_NAME'] = $ZBX_SERVER_TLS['VERIFY_NAME'];
-		}
-
 		$this->makeGlobal();
 
 		return $this->config;
@@ -343,7 +339,6 @@ $ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS'][
 $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
-$ZBX_SERVER_TLS[\'VERIFY_NAME\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['VERIFY_NAME'], "'\\").'\';
 ';
 	}
 
@@ -384,8 +379,7 @@ $ZBX_SERVER_TLS[\'VERIFY_NAME\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS
 			'KEY_FILE' => '',
 			'CERT_FILE' => '',
 			'CERTIFICATE_ISSUER' => '',
-			'CERTIFICATE_SUBJECT' => '',
-			'VERIFY_NAME' => 1
+			'CERTIFICATE_SUBJECT' => ''
 		];
 	}
 }

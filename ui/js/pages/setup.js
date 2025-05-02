@@ -58,10 +58,9 @@ const view = new class {
 				break;
 
 			case STEP_SETTINGS:
-				document.querySelector('#default-theme').addEventListener('change', () => form.submit())
-
-				document.querySelector('#zbx_server_tls').addEventListener('change', (e) =>
-					this._updateEncryptionFields(e));
+				document.getElementById('default-theme').addEventListener('change', () => form.submit())
+				document.getElementById('zbx_server_tls').addEventListener('change', () =>
+					this._updateEncryptionFields());
 
 				this._updateEncryptionFields();
 				break;
@@ -160,32 +159,26 @@ const view = new class {
 		}
 	}
 
-	_updateEncryptionFields(e) {
-		const encryption_enabled = document.querySelector('#zbx_server_tls').checked;
+	_updateEncryptionFields() {
+		const encryption_enabled = document.getElementById('zbx_server_tls').checked;
 
 		const rows = {
 			'zbx_server_tls_ca_file': encryption_enabled,
 			'zbx_server_tls_key_file': encryption_enabled,
 			'zbx_server_tls_cert_file': encryption_enabled,
 			'zbx_server_tls_certificate_issuer': encryption_enabled,
-			'zbx_server_tls_certificate_subject': encryption_enabled,
-			'zbx_server_tls_verify_name': encryption_enabled,
+			'zbx_server_tls_certificate_subject': encryption_enabled
 		}
 
 		for (let id in rows) {
-			const input = document.querySelector(`#${id}`);
-			const label = document.querySelector(`label[for="${id}"]`);
+			const input = document.getElementById(id);
 
 			input.parentElement.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
-			label.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
+			input.parentElement.previousElementSibling.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
 
 			if (!encryption_enabled) {
 				input.value = null;
 			}
-		}
-
-		if (e !== undefined && encryption_enabled) {
-			document.querySelector('#zbx_server_tls_verify_name').checked = 'checked';
 		}
 	}
 };

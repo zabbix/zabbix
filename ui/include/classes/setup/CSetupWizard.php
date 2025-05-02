@@ -306,8 +306,6 @@ class CSetupWizard extends CForm {
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', getRequest('zbx_server_tls_certificate_subject',
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')));
-			$this->setConfig('ZBX_SERVER_TLS_VERIFY_NAME', getRequest('zbx_server_tls_verify_name',
-				$this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', '')));
 
 			if (!$this->checkServerTLSConfiguration()) {
 				$this->step_failed = true;
@@ -366,8 +364,7 @@ class CSetupWizard extends CForm {
 						'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 						'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
 						'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
-						'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', ''),
-						'VERIFY_NAME' => $this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', '1')
+						'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
 					];
 				}
 				else {
@@ -377,8 +374,7 @@ class CSetupWizard extends CForm {
 						'KEY_FILE' => '',
 						'CERT_FILE' => '',
 						'CERTIFICATE_ISSUER' => '',
-						'CERTIFICATE_SUBJECT' => '',
-						'VERIFY_NAME' => '1'
+						'CERTIFICATE_SUBJECT' => ''
 					];
 				}
 
@@ -837,7 +833,7 @@ class CSetupWizard extends CForm {
 			])
 			->addItem([
 				new CDiv(),
-				new CTag('h2', true, _('Encrypt connections from Web interface')),
+				new CTag('h2', true, _('Encrypt connections from Web interface'))
 			])
 			->addItem([
 				(new CLabel(_('Encrypt connections')))
@@ -891,16 +887,6 @@ class CSetupWizard extends CForm {
 					(new CTextBox('zbx_server_tls_certificate_subject',
 						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				))->addClass(ZBX_STYLE_DISPLAY_NONE)
-			])
-			->addItem([
-				(new CLabel(_('TLS check name')))
-					->setFor('zbx_server_tls_verify_name')
-					->addClass(ZBX_STYLE_DISPLAY_NONE),
-				(new CFormField(
-					(new CCheckBox('zbx_server_tls_verify_name'))
-						->setChecked($this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', true))
-						->setUncheckedValue(0)
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			]);
 
@@ -1094,10 +1080,6 @@ class CSetupWizard extends CForm {
 			->addRow(
 				(new CSpan(_('Server TLS encryption certificate subject')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT')
-			)
-			->addRow(
-				(new CSpan(_('Server TLS encryption check name')))->addClass(ZBX_STYLE_GREY),
-				$this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME') ? 'true' : 'false'
 			);
 		}
 
@@ -1219,8 +1201,7 @@ class CSetupWizard extends CForm {
 				'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 				'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
 				'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
-				'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', ''),
-				'VERIFY_NAME' => $this->getConfig('ZBX_SERVER_TLS_VERIFY_NAME', '1')
+				'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
 			];
 		}
 		else {
@@ -1230,8 +1211,7 @@ class CSetupWizard extends CForm {
 				'KEY_FILE' => '',
 				'CERT_FILE' => '',
 				'CERTIFICATE_ISSUER' => '',
-				'CERTIFICATE_SUBJECT' => '',
-				'VERIFY_NAME' => '1'
+				'CERTIFICATE_SUBJECT' => ''
 			];
 		}
 

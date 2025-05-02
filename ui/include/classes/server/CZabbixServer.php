@@ -597,8 +597,7 @@ class CZabbixServer {
 				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
-				stream_context_set_option($context, 'ssl', 'verify_peer_name', (bool)$ZBX_SERVER_TLS['VERIFY_NAME']);
-				stream_context_set_option($context, 'ssl', 'verify_peer', true);
+				stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 				stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
 			}
 
@@ -643,13 +642,13 @@ class CZabbixServer {
 					$issuer));
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
-					&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
+						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
 					$this->error = _('Issuer of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
 					return false;
 				}
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
-					&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
+						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
 					$this->error = _('Subject of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
 					return false;
 				}
