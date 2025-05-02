@@ -15,7 +15,7 @@ zabbix_export:
       template: 'Azure Backup Jobs by HTTP'
       name: 'Azure Backup Jobs by HTTP'
       description: |
-        This template is designed to monitor Azure backup jobs by HTTP.
+        This template is designed to monitor Azure Backup Jobs via HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -332,7 +332,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.backup
           delay: '0'
-          description: 'The number of backup jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of backup jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -347,7 +347,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.backup.config
           delay: '0'
-          description: 'The number of configuring backup jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of backup configuration jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -361,10 +361,10 @@ zabbix_export:
             - uuid: 881f3faf12da40458266c62f047c3c1e
               expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.config)>0'
               recovery_mode: NONE
-              name: 'Azure backup jobs: Configuring backup job has appeared'
+              name: 'Azure backup jobs: Backup configuration job has appeared'
               opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'New configuring backup job has appeared.'
+              description: 'New backup configuration job has appeared.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -374,7 +374,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.backup.delete
           delay: '0'
-          description: 'The number of deleting backup data jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of backup data deletion jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -388,10 +388,10 @@ zabbix_export:
             - uuid: 7d4a36701e3c4384991858c34017b04f
               expression: 'change(/Azure Backup Jobs by HTTP/azure.vault.jobs.backup.delete)>0'
               recovery_mode: NONE
-              name: 'Azure backup jobs: Deleting backup data job has appeared'
+              name: 'Azure backup jobs: Backup data deletion job has appeared'
               opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'New deleting backup data job has appeared.'
+              description: 'New backup data deletion job has appeared.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -401,7 +401,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.cancelled
           delay: '0'
-          description: 'The number of cancelled jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of cancelled jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -416,7 +416,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.completed
           delay: '0'
-          description: 'The number of completed jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of completed jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -431,7 +431,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.failed
           delay: '0'
-          description: 'The number of failed jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of failed jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -446,7 +446,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.in_progress
           delay: '0'
-          description: 'The number of jobs that are in progress, over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of jobs in progress over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -461,7 +461,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.restore
           delay: '0'
-          description: 'The number of restore jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of restore jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -488,7 +488,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.total
           delay: '0'
-          description: 'The number of jobs over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of jobs over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -503,7 +503,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.vault.jobs.with_warning
           delay: '0'
-          description: 'The number of jobs that are completed with warnings, over the {$AZURE.VAULT.PERIOD} day(s) period.'
+          description: 'The number of jobs completed with warnings over the period of `{$AZURE.VAULT.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -599,7 +599,7 @@ zabbix_export:
                   event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has cancelled.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Job have received "Cancelled" status.'
+                  description: 'Job has received "Cancelled" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -610,7 +610,7 @@ zabbix_export:
                   event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has completed with warnings.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Job have received "Completed with warnings" status.'
+                  description: 'Job has received "Completed with warnings" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -621,7 +621,7 @@ zabbix_export:
                   event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has  expired.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Job have received "Expired" status.'
+                  description: 'Job has received "Expired" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -632,7 +632,7 @@ zabbix_export:
                   event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] has failed.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Job have received "Failed" status.'
+                  description: 'Job has received "Failed" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -643,7 +643,7 @@ zabbix_export:
                   event_name: 'Azure backup jobs: Job type [{#JOB.OPERATION}] for [{#JOB.FRIENDLY.NAME}] with ID [{#JOB.NAME}] is in unknown status.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Job have received "Unknown" status.'
+                  description: 'Job has received "Unknown" status.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -693,22 +693,22 @@ zabbix_export:
           description: 'API response timeout.'
         - macro: '{$AZURE.JOBS.FRIENDLY.NAME.MATCHES}'
           value: '.*'
-          description: 'Set the regex string to include backup jobs by its `entityFriendlyName`.'
+          description: 'Set the regex string to include backup jobs based on `entityFriendlyName`.'
         - macro: '{$AZURE.JOBS.FRIENDLY.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Set the regex string to exclude backup jobs by its `entityFriendlyName`.'
+          description: 'Set the regex string to exclude backup jobs based on `entityFriendlyName`.'
         - macro: '{$AZURE.JOBS.OPERATION.MATCHES}'
           value: '.*'
-          description: 'Set the regex string to include backup jobs by its operation type.'
+          description: 'Set the regex string to include backup jobs based on operation type.'
         - macro: '{$AZURE.JOBS.OPERATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Set the regex string to exclude backup jobs by its operation type.'
+          description: 'Set the regex string to exclude backup jobs based on operation type.'
         - macro: '{$AZURE.JOBS.STATUS.MATCHES}'
           value: '.*'
-          description: 'Set the regex string to include backup jobs by its status.'
+          description: 'Set the regex string to include backup jobs based on status.'
         - macro: '{$AZURE.JOBS.STATUS.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Set the regex string to exclude backup jobs by its status.'
+          description: 'Set the regex string to exclude backup jobs based on status.'
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
@@ -722,7 +722,7 @@ zabbix_export:
           description: 'Microsoft Azure tenant ID.'
         - macro: '{$AZURE.VAULT.PERIOD}'
           value: '7'
-          description: 'The number of days to receive backup jobs from.'
+          description: 'The number of days over which to retrieve backup jobs.'
       dashboards:
         - uuid: dd616732edf646cba117f8de257bafba
           name: 'Azure backup jobs'
