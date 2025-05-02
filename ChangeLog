@@ -1,6 +1,7 @@
 Changes for 7.4.0beta2
 
 New features:
+..F....... [ZBXNEXT-9319] implemented dynamic widget editor (averza)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 ........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
 .......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
