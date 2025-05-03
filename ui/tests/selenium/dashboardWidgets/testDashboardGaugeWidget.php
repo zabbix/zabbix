@@ -1327,7 +1327,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->save()->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		// Without updateViewport on Jenkins error - requested image region is invalid.
+		// TODO: Without updateViewport on Jenkins error - requested image region is invalid.
 		$this->page->updateViewport();
 
 		// Wait until the gauge is animated.
