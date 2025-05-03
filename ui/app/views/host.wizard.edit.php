@@ -72,7 +72,7 @@ $output = [
 		.'host_wizard_edit.init('.json_encode([
 			'templates' => $data['templates'],
 			'linked_templates' => $data['linked_templates'],
-			'wizard_hide_welcome' => $data['wizard_hide_welcome'],
+			'wizard_show_welcome' => $data['wizard_show_welcome'],
 			'csrf_token' => CCsrfTokenHelper::get('host')
 		]).');',
 	'dialogue_class' => 'modal-popup-host-wizard'

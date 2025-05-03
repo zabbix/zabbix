@@ -188,12 +188,12 @@ window.host_wizard_edit = new class {
 		macros: {}
 	}
 
-	async init({templates, linked_templates, wizard_hide_welcome, csrf_token}) {
+	async init({templates, linked_templates, wizard_show_welcome, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
-		this.#data.do_not_show_welcome = wizard_hide_welcome;
+		this.#data.do_not_show_welcome = wizard_show_welcome == 1 ? 0 : 1;
 		this.#csrf_token = csrf_token;
 
 		this.#initViewTemplates();
@@ -563,7 +563,7 @@ window.host_wizard_edit = new class {
 			action: 'host.wizard.get',
 			templateid: this.#data.template_selected,
 			...(hostid !== null && {hostid})
-		})
+		});
 		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
 
 		return fetch(get_url.href)
@@ -1107,7 +1107,7 @@ window.host_wizard_edit = new class {
 			return Promise.resolve();
 		}
 
-		// TODO save to profile
+		updateUserProfile('web.host.wizard.show.welcome', 0, []);
 
 		return Promise.reject();
 	}

@@ -134,7 +134,7 @@ class CControllerHostWizardEdit extends CController {
 			'templates' => $wizard_ready_templates,
 			'linked_templates' => array_keys($linked_templates),
 			'old_template_count' => $vendor_template_count - $wizard_vendor_template_count,
-			'wizard_hide_welcome' => CProfile::get('web.host.wizard.hide.welcome', 0),
+			'wizard_show_welcome' => CProfile::get('web.host.wizard.show.welcome', 1),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
