@@ -337,7 +337,7 @@ zabbix_export:
               error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
             - type: XML_TO_JSON
           timeout: 10s
-          url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info'
+          url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info?skipApps=false'
           status_codes: '200,401'
           http_proxy: '{$NEXTCLOUD.PROXY}'
           headers:
