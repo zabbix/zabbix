@@ -809,7 +809,8 @@ window.host_wizard_edit = new class {
 					this.#data.tls_psk = this.#generatePSK();
 				}
 
-				if (!path || path === 'monitoring_os' || path === 'monitoring_os_distribution') {
+				if (!path || path === 'monitoring_os' || path === 'monitoring_os_distribution'
+						|| path === 'tls_psk_identity' || path === 'tls_psk') {
 					const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
 					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
 
@@ -826,7 +827,19 @@ window.host_wizard_edit = new class {
 						}
 					})();
 
-					this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({});
+					const option_prefix = this.#data.monitoring_os === 'linux' ? '--' : '-';
+					let psk = this.#data.tls_psk_identity !== ''
+						? option_prefix + 'psk-identity ' + this.#data.tls_psk_identity
+						: option_prefix + 'psk-identity-stdin';
+
+					psk += ' ';
+					psk += this.#data.tls_psk !== ''
+						? option_prefix + 'psk ' + this.#data.tls_psk
+						: option_prefix + 'psk-stdin';
+
+					this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
+						psk: psk
+					});
 				}
 				break;
 

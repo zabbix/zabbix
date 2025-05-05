@@ -35,7 +35,7 @@ $output = [
 			stepWelcome(),
 			stepSelectTemplate($data['old_template_count']),
 			stepCreateHost($form),
-			stepInstallAgent(),
+			stepInstallAgent($data['agent_script_data']),
 			stepAddHostInterface(),
 			stepReadme(),
 			stepConfigureHost(),
@@ -305,7 +305,7 @@ function stepCreateHost($form): CTemplateTag {
 	);
 }
 
-function stepInstallAgent(): array {
+function stepInstallAgent($agent_script_data): array {
 	return [
 		new CTemplateTag('host-wizard-step-install-agent',
 			(new CDiv([
@@ -407,7 +407,7 @@ function stepInstallAgent(): array {
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/#{version}/install-zabbix.sh | bash -s -- --agent2 --server-host #{serverHost} --hostname #{hostname} --psk-identity string --psk XXXXXXXX"),
+						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- --agent2 --server-host {$agent_script_data['server_host']} #{psk}"),
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -420,8 +420,8 @@ function stepInstallAgent(): array {
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/#{version}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
-						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 -serverHost #{serverHost} -hostname '#{hostname}' -pskIdentity 'qeqweqweqweqwe' -psk AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
+						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 -serverHost {$agent_script_data['server_host']} #{psk}"),
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),

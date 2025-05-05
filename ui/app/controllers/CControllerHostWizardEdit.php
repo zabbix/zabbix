@@ -135,10 +135,36 @@ class CControllerHostWizardEdit extends CController {
 			'linked_templates' => array_keys($linked_templates),
 			'old_template_count' => $vendor_template_count - $wizard_vendor_template_count,
 			'wizard_show_welcome' => CProfile::get('web.host.wizard.show.welcome', 1),
+			'agent_script_data' => [
+				'version' => preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version) ? $version[0] : '',
+				'server_host' => static::getServerHost()
+			],
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
+	}
+
+	protected static function getServerHost(): string {
+		$result = [];
+
+		/** @var CConfigFile $config */
+		$config = ZBase::getInstance()->Component()->get('config')->config;
+		if ($config['ZBX_SERVER'] && $config['ZBX_SERVER_PORT']) {
+			$result[] = $config['ZBX_SERVER'].':'.$config['ZBX_SERVER_PORT'];
+		}
+		else {
+			$hanodes = API::HaNode()->get([
+				'output' => ['address', 'port'],
+				'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE]
+			]);
+
+			foreach ($hanodes as $hanode) {
+				$result[] = $hanode['address'].':'.$hanode['port'];
+			}
+		}
+
+		return implode(',', $result);
 	}
 }
