@@ -268,8 +268,9 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 					'verify_host', 'allow_traps', 'discover'
 				],
-				'selectDiscoveryRule' => ['itemid', 'templateid'],
-				'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name', 'templateid'],
+				'selectDiscoveryData' => ['parent_itemid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')

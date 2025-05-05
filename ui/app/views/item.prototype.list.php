@@ -56,27 +56,17 @@ foreach ($data['items'] as $item) {
 	)];
 
 	if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		if ($item['discoveryRule']) {
-			if ($item['is_discovery_rule_editable']) {
-				$name[] = (new CLink($item['discoveryRule']['name'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'popup')
-						->setArgument('popup', 'item.prototype.edit')
-						->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
-						->setArgument('itemid', $item['discoveryData']['parent_itemid'])
-						->setArgument('context', 'host')
-						->getUrl()
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_ORANGE);
-			}
-			else {
-				$name[] = (new CSpan($item['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
-			}
-		}
-		else {
-			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
-		}
+		$name[] = (new CLink($item['parent_lld']['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'item.prototype.edit')
+				->setArgument('parent_discoveryid', $item['parent_lld']['itemid'])
+				->setArgument('itemid', $item['discoveryData']['parent_itemid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 
 		$name[] = NAME_DELIMITER;
 	}

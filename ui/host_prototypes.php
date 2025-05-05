@@ -102,13 +102,18 @@ if (getRequest('parent_discoveryid')) {
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_hostid'],
 			'hostids' => $hostid,
 			'editable' => true
 		]);
-		$hostPrototype = reset($hostPrototype);
+
 		if (!$hostPrototype) {
 			access_deny();
 		}
+
+		$hostPrototype = reset($hostPrototype);
 	}
 }
 else {
@@ -608,36 +613,62 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
 		'selectTags' => ['tag', 'value'],
-		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectDiscoveryRule' => ['itemid'],
+		'selectDiscoveryRulePrototype' => ['itemid'],
 		'selectDiscoveryData' => ['parent_hostid'],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $limit
+		'limit' => $limit,
+		'preservekeys' => true
 	]);
 
-	$lld_parentids = [];
+	// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
+	$parent_hostids = [];
+	$parent_lldruleids = [];
 
 	foreach ($data['hostPrototypes'] as $host_prototype) {
-		if ($host_prototype['discoveryRule']) {
-			$lld_parentids[$host_prototype['discoveryRule']['itemid']] = true;
+		if ($host_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$parent_lld = $host_prototype['discoveryRule'] ?: $host_prototype['discoveryRulePrototype'];
+			$parent_hostids[$host_prototype['discoveryData']['parent_hostid']] = $host_prototype['hostid'];
+			$parent_lldruleids[$parent_lld['itemid']][] = $host_prototype['hostid'];
 		}
 	}
 
-	if ($lld_parentids) {
-		$editable_lld_parents = API::DiscoveryRule()->get([
+	if ($parent_hostids) {
+		$parent_host_prototypes = API::HostPrototype()->get([
 			'output' => [],
-			'itemids' => array_keys($lld_parentids),
-			'editable' => true,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
+			'hostids' => array_keys($parent_hostids),
 			'preservekeys' => true
 		]);
 
-		foreach ($data['hostPrototypes'] as &$host_prototype) {
-			if ($host_prototype['discoveryRule']) {
-				$host_prototype['is_discovery_rule_editable'] =
-					array_key_exists($host_prototype['discoveryRule']['itemid'], $editable_lld_parents);
+		foreach ($parent_host_prototypes as $hostid => $parent_host_prototype) {
+			$parent_lld = $parent_host_prototype['discoveryRule'] ?: $parent_host_prototype['discoveryRulePrototype'];
+			$data['hostPrototypes'][$parent_hostids[$hostid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
+		}
+
+		$lld_rules = API::DiscoveryRule()->get([
+			'output' => [],
+			'selectDiscoveryRule' => ['name'],
+			'itemids' => array_keys($parent_lldruleids),
+			'preservekeys' => true
+		]);
+
+		if (!$lld_rules) {
+			$lld_rules = API::DiscoveryRulePrototype()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['name'],
+				'itemids' => array_keys($parent_lldruleids),
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($lld_rules as $lldruleid => $lld_rule) {
+			foreach ($parent_lldruleids[$lldruleid] as $hostid) {
+				$data['hostPrototypes'][$hostid]['parent_lld']['name'] = $lld_rule['discoveryRule']['name'];
 			}
 		}
-		unset($host_prototype);
 	}
 
 	order_result($data['hostPrototypes'], $sortField, $sortOrder);

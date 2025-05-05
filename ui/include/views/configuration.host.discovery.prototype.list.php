@@ -86,25 +86,15 @@ foreach ($data['discoveries'] as $discovery) {
 	);
 
 	if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		if ($discovery['discoveryRule']) {
-			if ($discovery['is_discovery_rule_editable']) {
-				$description[] = (new CLink($discovery['discoveryRule']['name'],
-					(new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('parent_discoveryid', $discovery['discoveryRule']['itemid'])
-						->setArgument('itemid', $discovery['discoveryData']['parent_itemid'])
-						->setArgument('context', 'host')
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_ORANGE);
-			}
-			else {
-				$description[] = (new CSpan($discovery['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
-			}
-		}
-		else {
-			$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
-		}
+		$description[] = (new CLink($discovery['parent_lld']['name'],
+			(new CUrl('host_discovery_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $discovery['parent_lld']['itemid'])
+				->setArgument('itemid', $discovery['discoveryData']['parent_itemid'])
+				->setArgument('context', 'host')
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 
 		$description[] = NAME_DELIMITER;
 	}
@@ -175,10 +165,11 @@ foreach ($data['discoveries'] as $discovery) {
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
-	// Hide zeros for trapper, SNMP trap and dependent items.
+	// Hide zeros for trapper, SNMP trap, dependent and nested items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT
+			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)
+			|| $discovery['type'] == ITEM_TYPE_NESTED) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

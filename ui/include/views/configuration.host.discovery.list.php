@@ -312,10 +312,11 @@ foreach ($data['discoveries'] as $discovery) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
-	// Hide zeros for trapper, SNMP trap and dependent items.
+	// Hide zeros for trapper, SNMP trap, dependent and nested items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT
+			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)
+			|| $discovery['type'] == ITEM_TYPE_NESTED) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

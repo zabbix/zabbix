@@ -21,6 +21,7 @@
 
 $item = $data['item'];
 $readonly = $item['templated'] || $item['discovered'];
+$parent_lld = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
 
 if ($item['discovered']) {
 	$discovered_url = (new CUrl('zabbix.php'))
@@ -28,7 +29,7 @@ if ($item['discovered']) {
 		->setArgument('popup', 'item.prototype.edit')
 		->setArgument('context', $item['context'])
 		->setArgument('itemid', $item['discoveryData']['parent_itemid'])
-		->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+		->setArgument('parent_discoveryid', $parent_lld['itemid'])
 		->getUrl();
 }
 
@@ -42,7 +43,7 @@ $formgrid = (new CFormGrid())
 	)
 	->addItem($item['discovered'] ? [
 		new CLabel(_('Discovered by')),
-		(new CFormField(new CLink($item['discoveryRule']['name'], $discovered_url)))->addClass('js-parent-items')
+		(new CFormField(new CLink($parent_lld['name'], $discovered_url)))->addClass('js-parent-items')
 	] : null)
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),

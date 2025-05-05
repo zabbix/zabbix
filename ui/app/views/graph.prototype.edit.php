@@ -32,8 +32,7 @@ $graph_form = (new CForm())
 	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
-$discovered_graph = array_key_exists('flags', $data) && $data['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
-$readonly = $is_templated || $discovered_graph || $data['discovered_prototype'];
+$readonly = $is_templated || $data['discovered_graph'] || $data['discovered_prototype'];
 
 // Preview tab.
 $preview_table = (new CTable())
@@ -97,7 +96,7 @@ $graph_form
 				new CPartial('graph.edit.graph.tab', array_merge($data,[
 					'readonly' => $readonly,
 					'is_templated' => $is_templated,
-					'discovered_graph' => $discovered_graph,
+					'discovered_graph' => $data['discovered_prototype'],
 					'form_name' => $graph_form->getName()
 				]))
 			)

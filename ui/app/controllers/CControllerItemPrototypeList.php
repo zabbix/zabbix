@@ -118,6 +118,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 
 	protected function getItems(array $profile): array {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
 		$items = API::ItemPrototype()->get([
 			'output' => [
 				'delay', 'history', 'key_', 'name', 'status', 'trends', 'type', 'discover',
@@ -125,36 +126,62 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			],
 			'discoveryids' => [$this->getInput('parent_discoveryid')],
 			'selectTags' => ['tag', 'value'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectDiscoveryData' => ['parent_itemid'],
 			'editable' => true,
 			'sortfield' => $profile['sort'],
-			'limit' => $limit
+			'limit' => $limit,
+			'preservekeys' => true
 		]);
 
-		$lld_parentids = [];
+		// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
+		$parent_itemids = [];
+		$parent_lldruleids = [];
 
 		foreach ($items as $item) {
-			if ($item['discoveryRule']) {
-				$lld_parentids[$item['discoveryRule']['itemid']] = true;
+			if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$parent_lld = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+				$parent_itemids[$item['discoveryData']['parent_itemid']] = $item['itemid'];
+				$parent_lldruleids[$parent_lld['itemid']][] = $item['itemid'];
 			}
 		}
 
-		if ($lld_parentids) {
-			$editable_lld_parents = API::DiscoveryRule()->get([
+		if ($parent_itemids) {
+			$parent_item_prototypes = API::ItemPrototype()->get([
 				'output' => [],
-				'itemids' => array_keys($lld_parentids),
-				'editable' => true,
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'itemids' => array_keys($parent_itemids),
 				'preservekeys' => true
 			]);
 
-			foreach ($items as &$item) {
-				if ($item['discoveryRule']) {
-					$item['is_discovery_rule_editable'] =
-						array_key_exists($item['discoveryRule']['itemid'], $editable_lld_parents);
+			foreach ($parent_item_prototypes as $itemid => $parent_item_prototype) {
+				$parent_lld = $parent_item_prototype['discoveryRule'] ?: $parent_item_prototype['discoveryRulePrototype'];
+				$items[$parent_itemids[$itemid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
+			}
+
+			$lld_rules = API::DiscoveryRule()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['name'],
+				'itemids' => array_keys($parent_lldruleids),
+				'preservekeys' => true
+			]);
+
+			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['name'],
+					'itemids' => array_keys($parent_lldruleids),
+					'preservekeys' => true
+				]);
+			}
+
+			foreach ($lld_rules as $lldruleid => $lld_rule) {
+				foreach ($parent_lldruleids[$lldruleid] as $itemid) {
+					$items[$itemid]['parent_lld']['name'] = $lld_rule['discoveryRule']['name'];
 				}
 			}
-			unset($item);
 		}
 
 		$items = expandItemNamesWithMasterItems($items, 'itemprototypes');

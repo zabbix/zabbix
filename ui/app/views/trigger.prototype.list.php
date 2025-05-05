@@ -82,27 +82,17 @@ foreach ($data['triggers'] as $trigger) {
 	);
 
 	if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		if ($trigger['discoveryRule']) {
-			if ($trigger['is_discovery_rule_editable']) {
-				$description[] = (new CLink($trigger['discoveryRule']['name'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'popup')
-						->setArgument('popup', 'trigger.prototype.edit')
-						->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
-						->setArgument('triggerid', $trigger['discoveryData']['parent_triggerid'])
-						->setArgument('context', 'host')
-						->getUrl()
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_ORANGE);
-			}
-			else {
-				$description[] = (new CSpan($trigger['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
-			}
-		}
-		else {
-			$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
-		}
+		$description[] = (new CLink($trigger['parent_lld']['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'trigger.prototype.edit')
+				->setArgument('parent_discoveryid', $trigger['parent_lld']['itemid'])
+				->setArgument('triggerid', $trigger['discoveryData']['parent_triggerid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 
 		$description[] = NAME_DELIMITER;
 	}

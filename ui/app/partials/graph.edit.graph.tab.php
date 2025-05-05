@@ -28,15 +28,15 @@ if ($data['is_templated']) {
 	]);
 }
 
-if (array_key_exists('parent_lld', $data) && $data['parent_lld']) {
+if ($data['discovered_graph']) {
 	$graph_tab->addItem([
 		new CLabel(_('Discovered by')),
 		new CFormField(
-			new CLink($data['parent_lld']['name'],
+			new CLink($data['discoveryRule']['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'graph.prototype.edit')
-					->setArgument('parent_discoveryid', $data['parent_lld']['itemid'])
+					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 					->setArgument('graphid', $data['discoveryData']['parent_graphid'])
 					->setArgument('context', $data['context'])
 			)

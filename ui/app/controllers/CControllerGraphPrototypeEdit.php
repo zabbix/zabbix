@@ -135,6 +135,8 @@ class CControllerGraphPrototypeEdit extends CController {
 			$options = [
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectDiscoveryData' => ['parent_graphid'],
 				'graphids' => $data['graphid']
 			];
 
@@ -143,7 +145,7 @@ class CControllerGraphPrototypeEdit extends CController {
 
 			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
 				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'templateid', 'discover'
+				'percent_right', 'templateid', 'discover', 'discoveryRule', 'discoveryData'
 			];
 
 			foreach ($fields as $field) {
