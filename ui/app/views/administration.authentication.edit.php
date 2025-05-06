@@ -217,8 +217,7 @@ $saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
 $saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
 
 $warning_saml_enabled = '';
-$checkbox_saml_enabled = 
-	(new CCheckBox('saml_auth_enabled',
+$checkbox_saml_enabled = (new CCheckBox('saml_auth_enabled',
 		$data['saml_error'] != '' ? ZBX_AUTH_SAML_DISABLED : ZBX_AUTH_SAML_ENABLED
 	))->setChecked($saml_auth_enabled)->setUncheckedValue(ZBX_AUTH_SAML_DISABLED);
 
