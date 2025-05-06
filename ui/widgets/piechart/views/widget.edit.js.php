@@ -107,7 +107,7 @@ window.widget_form = new class extends CWidgetForm {
 				}
 
 				if (e.target.classList.contains('js-click-expand')
-						|| e.target.closest('.<?= ZBX_STYLE_COLOR_PICKER ?>') !== null) {
+						|| e.target.closest(`.${ZBX_STYLE_COLOR_PICKER}`) !== null) {
 					$data_sets.zbx_vertical_accordion('expandNth',
 						[...list_item.parentElement.children].indexOf(list_item)
 					);
@@ -197,7 +197,7 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	#displayingOptionsTabInit() {
-		const merge_color = document.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="merge_color"]');
+		const merge_color = document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="merge_color"]`);
 
 		if (merge_color.color === '') {
 			merge_color.color = '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>';
@@ -587,7 +587,7 @@ window.widget_form = new class extends CWidgetForm {
 			}
 		}
 
-		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').color = colorPalette.getNextColor(used_colors);
+		row.querySelector(`.${ZBX_STYLE_COLOR_PICKER}`).color = colorPalette.getNextColor(used_colors);
 
 		this.registerUpdateEvent();
 	}
@@ -763,11 +763,12 @@ window.widget_form = new class extends CWidgetForm {
 		jQuery('#stroke').rangeControl(is_doughnut ? 'enable' : 'disable');
 
 		document.getElementById('merge_percent').disabled = !do_merge_sectors;
-		this.#form.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="merge_color"]').disabled = !do_merge_sectors;
+		this.#form.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="merge_color"]`).disabled =
+			!do_merge_sectors;
 
-		for (const field of this.#form.querySelectorAll('#value_size_type_0, #value_size_type_1,' +
-			'#value_size_custom_input, #decimal_places, #units_show, #units, #value_bold,' +
-			'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="value_color"]'
+		for (const field of this.#form.querySelectorAll(`#value_size_type_0, #value_size_type_1,
+			#value_size_custom_input, #decimal_places, #units_show, #units, #value_bold,
+			.${ZBX_STYLE_COLOR_PICKER}[color-field-name="value_color"]`
 		)) {
 			field.disabled = !is_total_value_visible;
 		}

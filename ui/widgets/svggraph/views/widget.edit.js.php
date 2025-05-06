@@ -145,7 +145,7 @@ window.widget_form = new class extends CWidgetForm {
 				}
 
 				if (e.target.classList.contains('js-click-expand')
-						|| e.target.closest('.<?= ZBX_STYLE_COLOR_PICKER ?>') !== null) {
+						|| e.target.closest(`.${ZBX_STYLE_COLOR_PICKER}`) !== null) {
 					$data_sets.zbx_vertical_accordion('expandNth',
 						[...list_item.parentElement.children].indexOf(list_item)
 					);
@@ -642,7 +642,7 @@ window.widget_form = new class extends CWidgetForm {
 			}
 		}
 
-		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').color = colorPalette.getNextColor(used_colors);
+		row.querySelector(`.${ZBX_STYLE_COLOR_PICKER}`).color = colorPalette.getNextColor(used_colors);
 
 		this.registerUpdateEvent();
 	}
