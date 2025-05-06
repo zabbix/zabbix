@@ -34,6 +34,7 @@
 #include "zbxalgo.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
+#include "zbxip.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -481,7 +482,12 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp), NULL))
-			zabbix_log(level_error, "no active checks on server [%s:%hu]: %s", host, port, tmp);
+		{
+			char	host_port[MAX_STRING_LEN];
+
+			zbx_join_hostport(host_port, sizeof(host_port), host, port);
+			zabbix_log(LOG_LEVEL_ERR, "no active checks on server [%s]: %s", host_port, tmp);
+		}
 		else
 			zabbix_log(level_error, "no active checks on server");
 
@@ -972,9 +978,12 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 	if (SUCCEED == ret && SUCCEED != last_ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
-				" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
-				((zbx_addr_t *)addrs->values[0])->port);
+		char	host_port[MAX_STRING_LEN];
+
+		zbx_join_hostport(host_port, sizeof(host_port), ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port);
+		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s] is working again",
+			host_port);
 	}
 
 	last_ret = ret;

@@ -285,3 +285,26 @@ fail:
 
 	return res;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: combines IP and Port into a network address of the form "IP:Port" *
+ *                                                                            *
+ * Parameters: hostport 	- [IN/OUT] string formatting buffer pointer       *
+ *             hostport_sz  - [IN] size of buffer							  *
+ *             ip 			- [IN] ip address pointer  	              		  *
+ *             port 		- [IN] port 		                    		  *
+ *                                                                            *
+ * Return value: size_t - size of destination buffer after formatting   	  *
+ *                                                                            *
+ ******************************************************************************/
+size_t zbx_join_hostport(char *hostport, size_t hostport_sz, const char *ip, unsigned short port)
+{
+	const char	*format = "%s:%hu";
+#ifdef HAVE_IPV6
+	if (SUCCEED == zbx_is_ip6(ip)) //test
+		format = "[%s]:%hu";
+#endif
+	return zbx_snprintf(hostport, hostport_sz, format, ip, port);
+}
+
