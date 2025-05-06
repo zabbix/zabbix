@@ -633,7 +633,7 @@ class CUserDirectory extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 			elseif (array_key_exists('sp_private_key', $userdirectory)
-				&& self::checkSamlPrivateKey($userdirectory['sp_private_key'], $error) === false) {
+					&& self::checkSamlPrivateKey($userdirectory['sp_private_key'], $error) === false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 			elseif (array_key_exists('sp_certificate', $userdirectory)
