@@ -305,7 +305,7 @@ $saml_tab = (new CFormGrid())
 		)
 	]);
 
-if ($data['sso_certs_editable'] === true) {
+if ($data['saml_certs_editable'] === true) {
 	$saml_tab
 		->addItem([
 			(new CLabel(_('IdP certificate')))->addClass('saml-identity-label'),

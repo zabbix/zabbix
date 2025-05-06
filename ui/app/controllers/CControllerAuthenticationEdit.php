@@ -117,7 +117,7 @@ class CControllerAuthenticationEdit extends CController {
 			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
-			'sso_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),
+			'saml_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),
 			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
 
@@ -185,7 +185,7 @@ class CControllerAuthenticationEdit extends CController {
 				'mfa_status' => MFA_DISABLED
 			];
 
-			if ($data['sso_certs_editable'] === true) {
+			if ($data['saml_certs_editable'] === true) {
 				$config_fields += [
 					'idp_certificate' => '',
 					'sp_certificate' => '',
@@ -284,7 +284,7 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_provision_media' => []
 				];
 
-				if ($data['sso_certs_editable'] === true) {
+				if ($data['saml_certs_editable'] === true) {
 					$saml_configuration += [
 						'idp_certificate' => '',
 						'sp_certificate' => '',
