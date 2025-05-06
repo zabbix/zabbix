@@ -8146,13 +8146,3 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   color: #e99003; }
   .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus) {
     border-color: #e99003; }
-
-.file-upload-wrapper {
-  display: inline-block; }
-
-.file-upload-wrapper .file-upload-btn {
-  margin-left: .3em; }
-
-.saml-change-identity-button {
-  width: 100%;
-  max-width: 200px; }
