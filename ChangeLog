@@ -7,6 +7,7 @@ New features:
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+.........T [ZBX-25931] updated LLD filters in systemd by Zabbix agent 2 template (drasikhov)
 .........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
 ........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
 ..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)
