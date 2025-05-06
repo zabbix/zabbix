@@ -176,17 +176,17 @@ static int	substitute_item_key_params_args(char **data, char *error, size_t maxe
 	size_t	i = 0;
 	int	level = 0, ret = SUCCEED;
 
-	for (; SUCCEED == zbx_is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
+	for (; SUCCEED == zbx_is_key_char((*data)[i]); i++)
 		;
 
 	if (0 == i)
-		goto clean;
+		goto out;
 
 	if ('[' != (*data)[i] && '\0' != (*data)[i])
-		goto clean;
+		goto out;
 
 	ret = parse_params(data, &i, &level, 1, cb, args);
-clean:
+out:
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
 		if (NULL != error)
@@ -201,7 +201,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: safely substitutes macros in parameters of an item key            *
+ * Purpose: safely substitutes macros in item key parameters                  *
  *                                                                            *
  * Parameters:                                                                *
  *      data      - [IN/OUT] item key                                         *
@@ -216,14 +216,13 @@ clean:
  ******************************************************************************/
 int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...)
 {
-	int	ret;
 	va_list	args;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s", __func__, *data);
 
 	va_start(args, cb);
 
-	ret = substitute_item_key_params_args(data, error, maxerrlen, cb, args);
+	int	ret = substitute_item_key_params_args(data, error, maxerrlen, cb, args);
 
 	va_end(args);
 
@@ -234,7 +233,8 @@ int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: replaces SNMP OID or their parameters by using callback function  *
+ * Purpose: substitutes macros in SNMP OID or their parameters by using       *
+ *          callback function                                                 *
  *                                                                            *
  * Parameters:                                                                *
  *      data      - [IN/OUT] SNMP OID                                         *
@@ -250,7 +250,7 @@ int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, z
 int	zbx_substitute_snmp_oid_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...)
 {
 	size_t		i = 0;
-	int		len, c_l, c_r, level = 0, ret = SUCCEED;
+	int		len, c_l, c_r, level = 0;
 	zbx_token_t	token;
 	va_list		args;
 
@@ -261,9 +261,10 @@ int	zbx_substitute_snmp_oid_params(char **data, char *error, size_t maxerrlen, z
 		if ('{' == (*data)[i] && '$' == (*data)[i + 1] &&
 				SUCCEED == zbx_user_macro_parse(&(*data)[i], &len, &c_l, &c_r, NULL))
 		{
-			i += len + 1;	/* skip to the position after user macro */
+			i += (size_t)len + 1;	/* skip to the position after user macro */
 		}
-		else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '#' == (*data)[i + 2] &&
+		else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '\0' != (*data)[i + 1] &&
+				'#' == (*data)[i + 2] &&
 				SUCCEED == zbx_token_parse_nested_macro(&(*data)[i], &(*data)[i], 0, &token))
 		{
 			i += token.loc.r - token.loc.l + 1;
@@ -276,7 +277,7 @@ int	zbx_substitute_snmp_oid_params(char **data, char *error, size_t maxerrlen, z
 			break;
 	}
 
-	ret = parse_params(data, &i, &level, 0, cb, args);
+	int	ret = parse_params(data, &i, &level, 0, cb, args);
 
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{

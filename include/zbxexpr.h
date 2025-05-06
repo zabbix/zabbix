@@ -18,7 +18,7 @@
 #include "zbxcommon.h"
 
 int	zbx_is_hostname_char(unsigned char c);
-int	zbx_is_key_char(unsigned char c);
+int	zbx_is_key_char(int c);
 int	zbx_is_function_char(unsigned char c);
 int	zbx_is_macro_char(unsigned char c);
 int	zbx_is_discovery_macro(const char *name);
