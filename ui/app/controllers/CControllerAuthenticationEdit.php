@@ -67,11 +67,16 @@ class CControllerAuthenticationEdit extends CController {
 			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
-			'mfa_removed_mfaids' =>				'array_id',
-			'idp_certificate' =>				'db userdirectory_saml.idp_certificate',
-			'sp_certificate' =>					'db userdirectory_saml.sp_certificate',
-			'sp_private_key' =>					'db userdirectory_saml.sp_private_key'
+			'mfa_removed_mfaids' =>				'array_id'
 		];
+		
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$fields += [
+				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
+				'sp_certificate' => 'db userdirectory_saml.sp_certificate',
+				'sp_private_key' => 'db userdirectory_saml.sp_private_key'
+			];
+		}
 
 		if ($ALLOW_HTTP_AUTH) {
 			$fields += [
@@ -112,6 +117,7 @@ class CControllerAuthenticationEdit extends CController {
 			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
+			'sso_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),
 			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
 
@@ -176,17 +182,22 @@ class CControllerAuthenticationEdit extends CController {
 				'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
 				'passwd_min_length' => '',
 				'passwd_check_rules' => 0,
-				'mfa_status' => MFA_DISABLED,
-				'idp_certificate' => '',
-				'sp_certificate' => '',
-				'sp_private_key' => ''
+				'mfa_status' => MFA_DISABLED
 			];
 
-			$config_fields += [
-				'idp_certificate_hash' => $this->hasInput('idp_certificate') ? '' : '1',
-				'sp_certificate_hash' => $this->hasInput('sp_certificate') ? '' : '1',
-				'sp_private_key_hash' => $this->hasInput('sp_private_key') ? '' : '1',
-			];
+			if ($data['sso_certs_editable'] === true) {
+				$config_fields += [
+					'idp_certificate' => '',
+					'sp_certificate' => '',
+					'sp_private_key' => ''
+				];
+				
+				$config_fields += [
+					'idp_certificate_hash' => $this->hasInput('idp_certificate') ? '' : '1',
+					'sp_certificate_hash' => $this->hasInput('sp_certificate') ? '' : '1',
+					'sp_private_key_hash' => $this->hasInput('sp_private_key') ? '' : '1',
+				];
+			}
 
 			if ($ALLOW_HTTP_AUTH) {
 				$config_fields += [
@@ -270,11 +281,16 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_user_lastname' => '',
 					'scim_status' => '',
 					'saml_provision_groups' => [],
-					'saml_provision_media' => [],
-					'idp_certificate' => '',
-					'sp_certificate' => '',
-					'sp_private_key' => ''
+					'saml_provision_media' => []
 				];
+
+				if ($data['sso_certs_editable'] === true) {
+					$saml_configuration += [
+						'idp_certificate' => '',
+						'sp_certificate' => '',
+						'sp_private_key' => ''
+					];
+				}
 			}
 
 			self::extendProvisionGroups($saml_configuration['saml_provision_groups']);

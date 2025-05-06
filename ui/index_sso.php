@@ -75,7 +75,7 @@ $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
 $saml_settings = $provisioning->getIdpConfig();
 
-if (array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database')) {
+if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
 	$certs = [
 		'SP_KEY' => $saml_settings['sp_private_key'],
 		'SP_CERT' => $saml_settings['sp_certificate'],

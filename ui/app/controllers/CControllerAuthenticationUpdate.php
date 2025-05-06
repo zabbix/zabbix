@@ -73,11 +73,16 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
 			'mfa_methods' =>					'array',
 			'mfa_default_row_index' =>			'int32',
-			'mfa_removed_mfaids' =>				'array_id',
-			'idp_certificate' =>				'db userdirectory_saml.idp_certificate',
-			'sp_certificate' =>					'db userdirectory_saml.sp_certificate',
-			'sp_private_key' =>					'db userdirectory_saml.sp_private_key'
+			'mfa_removed_mfaids' =>				'array_id'
 		];
+
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$fields += [
+				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
+				'sp_certificate' => 'db userdirectory_saml.sp_certificate',
+				'sp_private_key' => 'db userdirectory_saml.sp_private_key'
+			];
+		}
 
 		if ($ALLOW_HTTP_AUTH) {
 			$fields += [
@@ -555,12 +560,13 @@ class CControllerAuthenticationUpdate extends CController {
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
 
-		// we need any of these fields if there is input, otherwise ignored
-		$this->getInputs($saml_data, [
-			'idp_certificate',
-			'sp_certificate',
-			'sp_private_key'
-		]);
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$this->getInputs($saml_data, [
+				'idp_certificate',
+				'sp_certificate',
+				'sp_private_key'
+			]);
+		}
 
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$provisioning_fields = [
