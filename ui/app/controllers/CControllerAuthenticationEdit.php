@@ -69,7 +69,7 @@ class CControllerAuthenticationEdit extends CController {
 			'mfa_default_row_index' =>			'int32',
 			'mfa_removed_mfaids' =>				'array_id'
 		];
-		
+
 		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
 			$fields += [
 				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
@@ -191,7 +191,7 @@ class CControllerAuthenticationEdit extends CController {
 					'sp_certificate' => '',
 					'sp_private_key' => ''
 				];
-				
+
 				$config_fields += [
 					'idp_certificate_hash' => $this->hasInput('idp_certificate') ? '' : '1',
 					'sp_certificate_hash' => $this->hasInput('sp_certificate') ? '' : '1',
