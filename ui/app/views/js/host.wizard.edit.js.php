@@ -519,15 +519,16 @@ window.host_wizard_edit = new class {
 		if (this.#template.templateid !== this.#selected_templateid) {
 			this.#selected_templateid = this.#template.templateid;
 
-			this.#data.macros = Object.fromEntries(
-				this.#template.macros.map((macro, index) => [index, {
-					type: macro.type,
-					macro: macro.macro,
-					value: macro.value, // TODO get from host if exists
-					description: macro.description,
+			this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
+				return [index, {
+					type: template_macro.type,
+					macro: template_macro.macro,
+					value: (this.#host?.macros.find(({macro}) => macro === template_macro.macro))?.value
+						|| template_macro.value,
+					description: template_macro.description,
 					discovery_state: this.DISCOVERY_STATE_MANUAL
-				}])
-			);
+				}]
+			}));
 		}
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -945,7 +946,7 @@ window.host_wizard_edit = new class {
 				break;
 			case 'radio':
 				for (const radio of this.#dialogue.querySelectorAll(`[name="${name}"]`)) {
-					radio.checked = radio.value == value;
+					radio.checked = (radio === selected);
 				}
 				break;
 			default:
