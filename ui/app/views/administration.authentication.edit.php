@@ -216,32 +216,24 @@ $view_url = (new CUrl('zabbix.php'))
 $saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
 $saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
 
-$saml_tab = (new CFormGrid());
-$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+$warning_saml_enabled = '';
+$checkbox_saml_enabled = 
+	(new CCheckBox('saml_auth_enabled',
+		$data['saml_error'] != '' ? ZBX_AUTH_SAML_DISABLED : ZBX_AUTH_SAML_ENABLED
+	))->setChecked($saml_auth_enabled)->setUncheckedValue(ZBX_AUTH_SAML_DISABLED);
 
-if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-	$samlEnabledCheckbox = [
-		(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED))
-			->setChecked($saml_auth_enabled)
-			->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
-			->setReadonly(true),
-		(new CSpan(makeWarningIcon($openssl_status['error'])))->addClass('js-hint')
-	];
-}
-else {
-	$samlEnabledCheckbox = [
-		$data['saml_error']
-			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
-			->setChecked($saml_auth_enabled)
-			->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
-	];
+if ($data['saml_error'] != '') {
+	$checkbox_saml_enabled->setReadonly(true);
+	$warning_saml_enabled = (new CSpan(makeWarningIcon($data['saml_error'])))->addClass('js-hint');
 }
 
-$saml_tab
+$saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
-		new CFormField($samlEnabledCheckbox)
+		new CFormField([
+			$checkbox_saml_enabled,
+			$warning_saml_enabled
+		])
 	])
 	->addItem([
 		new CLabel(_('Enable JIT provisioning'), 'saml_jit_status'),
