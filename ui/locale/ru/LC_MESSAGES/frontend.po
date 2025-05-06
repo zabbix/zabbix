@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-21 17:27+0000\n"
-"Last-Translator: Aleksei <suineglive13@gmail.com>\n"
+"PO-Revision-Date: 2025-04-28 11:52+0000\n"
+"Last-Translator: Andrey <i@ashekhov.ru>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -7253,6 +7253,10 @@ msgstr "Объект обнаружения"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Обнаружение VMware кластеров, \"url\" - URL службы VMware. Возвращает JSON"
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -19611,7 +19615,7 @@ msgstr "Статистика и доступность буфера памяти
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "Статистика значений, полученных менеджером предварительной обработки."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -22443,7 +22447,7 @@ msgstr "Пользовательские макросы"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr "Оповещения"
+msgstr "Пользовательские оповещения"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
