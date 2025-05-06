@@ -117,13 +117,15 @@ class CControllerGraphList extends CController {
 		}
 
 		// Select graphs.
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
 		$graphs = API::Graph()->get([
 			'output' => ['graphid', 'name', 'graphtype'],
 			'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 			'groupids' => $filter_groupids ?: null,
 			'templated' => $context === 'template',
 			'editable' => true,
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+			'limit' => $limit
 		]);
 
 		$data = [

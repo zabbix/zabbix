@@ -126,16 +126,14 @@ class CControllerGraphPrototypeList extends CController {
 		);
 
 		// Get graphs after paging.
-		$options = [
+		$data['graphs'] = API::GraphPrototype()->get([
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover', 'flags'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectDiscoveryData' => ['parent_graphid'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
-		];
-
-		$data['graphs'] = API::GraphPrototype()->get($options);
+		]);
 
 		// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
 		$parent_graphids = [];
