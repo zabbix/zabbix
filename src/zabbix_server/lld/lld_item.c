@@ -269,8 +269,8 @@ typedef struct
 }
 zbx_item_discovery_t;
 
-ZBX_PTR_VECTOR_DECL(item_discovery_ptr, zbx_item_discovery_t *);
-ZBX_PTR_VECTOR_IMPL(item_discovery_ptr, zbx_item_discovery_t *);
+ZBX_PTR_VECTOR_DECL(item_discovery_ptr, zbx_item_discovery_t *)
+ZBX_PTR_VECTOR_IMPL(item_discovery_ptr, zbx_item_discovery_t *)
 
 static int	item_discovery_compare_func(const void *d1, const void *d2)
 {
