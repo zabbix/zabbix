@@ -459,31 +459,36 @@ function stepInstallAgent($agent_script_data): array {
 	];
 }
 
-function stepAddHostInterface(): CTemplateTag {
-	return new CTemplateTag('host-wizard-step-add-host-interface',
-		(new CDiv([
-			(new CSection())
-				->addItem(
-					(new CDiv([
-						new CTag('h1', true, _('Add host interface')),
-						new CTag('p', true, _s('The template you selected (%1$s) requires the %2$s to be added to the host (%3$s).', '#{template_name}', '#{interfaces_long}', '#{host_name}')),
-						new CTag('p', true, _s('Note: %1$s must be configured and enabled on your monitoring target.', '#{interfaces_short}'))
-					]))
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-						->addClass(ZBX_STYLE_FORMATED_TEXT)
-				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+function stepAddHostInterface(): array {
+	return [
+		new CTemplateTag('host-wizard-step-add-host-interface',
+			(new CDiv(
+				(new CSection())
+					->addItem(
+						(new CDiv([
+							new CTag('h1', true, _('Add host interface')),
+							new CTag('p', true, _s('The template you selected (%1$s) requires the %2$s to be added to the host (%3$s).', '#{template_name}', '#{interfaces_long}', '#{host_name}')),
+							new CTag('p', true, _s('Note: %1$s must be configured and enabled on your monitoring target.', '#{interfaces_short}'))
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							->addClass(ZBX_STYLE_FORMATED_TEXT)
+					)
+					->addClass(ZBX_STYLE_GRID_COLUMNS)
+					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+			))->addClass('step-form-body')
+		),
+
+		new CTemplateTag('host-wizard-step-add-host-interface-agent',
 			(new CSection())
 				->addItem(
 					(new CDiv([
 						new CFormField([
 							new CLabel(_('Agent address')),
-							new CTextBox('address')
+							new CTextBox('interfaces[#{row_index}][address]')
 						]),
 						new CFormField([
 							new CLabel(_('Agent port')),
-							new CTextBox('port', '10050')
+							new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
 						]),
 						(new CDiv(
 							_('Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target.')
@@ -496,10 +501,191 @@ function stepAddHostInterface(): CTemplateTag {
 						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+				->addClass('js-host-interface')
+		),
+
+		new CTemplateTag('host-wizard-step-add-host-interface-snmp',
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						(new CDiv([
+							new CFormField([
+								new CLabel(_('SNMP address')),
+								new CTextBox('interfaces[#{row_index}][address]')
+							]),
+							new CFormField([
+								new CLabel(_('SNMP port')),
+								new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
+							]),
+							(new CDiv(
+								_('Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target.')
+							))
+								->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+								->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMNS)
+							->addClass(ZBX_STYLE_FORM_COLUMNS)
+							->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+						(new CDiv([
+							new CFormField([
+								(new CLabel(_('SNMP version'), 'label_interfaces_#{row_index}_details_version'))->setAsteriskMark(),
+								(new CSelect('interfaces[#{row_index}][details][version]'))
+									->addOptions(CSelect::createOptionsFromArray([
+										SNMP_V1 => _('SNMPv1'),
+										SNMP_V2C => _('SNMPv2'),
+										SNMP_V3 => _('SNMPv3')
+									]))
+									->setValue(SNMP_V2C)
+									->setFocusableElementId('label_interfaces_#{row_index}_details_version')
+									->setWidthAuto()
+							]),
+							(new CFormField([
+								(new CLabel(_('SNMP community'), 'interfaces[#{row_index}][details][community]'))
+									->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][details][community]', '', false,
+									DB::getFieldLength('interface_snmp', 'community')
+								))->setAriaRequired()
+							]))->addClass('js-snmp-community'),
+							(new CFormField([
+								(new CLabel([
+									_('Max repetition count'),
+									makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
+								], 'interfaces[#{row_index}][details][max_repetitions]')),
+								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
+									false, false, false
+								)
+							]))->addClass('js-snmp-repetition-count'),
+							(new CFormField([
+								new CLabel(_('Context name'), 'interfaces[#{row_index}][details][contextname]'),
+								new CTextBox('interfaces[#{row_index}][details][contextname]', '', false,
+									DB::getFieldLength('interface_snmp', 'contextname')
+								)
+							]))->addClass('js-snmpv3-contextname'),
+							(new CFormField([
+								new CLabel(_('Security name'), 'interfaces[#{row_index}][details][securityname]'),
+								new CTextBox('interfaces[#{row_index}][details][securityname]', '', false,
+									DB::getFieldLength('interface_snmp', 'securityname')
+								)
+							]))->addClass('js-snmpv3-securityname'),
+							(new CFormField([
+								new CLabel(_('Security level'),
+									'label_interfaces_#{row_index}_details_securitylevel'
+								),
+								(new CSelect('interfaces[#{row_index}][details][securitylevel]'))
+									->addOptions(CSelect::createOptionsFromArray([
+										ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+										ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+										ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+									]))
+									->setFocusableElementId('label_interfaces_#{row_index}_details_securitylevel')
+									->setWidthAuto()
+							]))->addClass('js-snmpv3-securitylevel'),
+							(new CFormField([
+								new CLabel(_('Authentication protocol'),
+									'label_interfaces_#{row_index}_details_authprotocol'
+								),
+								(new CSelect('interfaces[#{row_index}][details][authprotocol]'))
+									->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols()))
+									->setFocusableElementId('label_interfaces_#{row_index}_details_authprotocol')
+									->setWidthAuto()
+							]))->addClass('js-snmpv3-authprotocol'),
+							(new CFormField([
+								new CLabel(_('Authentication passphrase'),
+									'interfaces[#{row_index}][details][authpassphrase]'
+								),
+								(new CTextBox('interfaces[#{row_index}][details][authpassphrase]', '', false,
+									DB::getFieldLength('interface_snmp', 'authpassphrase')
+								))->disableAutocomplete()
+							]))->addClass('js-snmpv3-authpassphrase'),
+							(new CFormField([
+								new CLabel(_('Privacy protocol'),
+									'label_interfaces[#{row_index}][details][privprotocol]'
+								),
+								(new CSelect('interfaces[#{row_index}][details][privprotocol]'))
+									->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols()))
+									->setFocusableElementId('label_interfaces[#{row_index}][details][privprotocol]')
+									->setWidthAuto()
+							]))->addClass('js-snmpv3-privprotocol'),
+							(new CFormField([
+								new CLabel(_('Privacy passphrase'),
+									'interfaces[#{row_index}][details][privpassphrase]'
+								),
+								(new CTextBox('interfaces[#{row_index}][details][privpassphrase]', '', false,
+									DB::getFieldLength('interface_snmp', 'privpassphrase')
+								))->disableAutocomplete()
+							]))->addClass('js-snmpv3-privpassphrase'),
+							new CFormField(
+								(new CCheckBox('interfaces[#{row_index}][details][bulk]', SNMP_BULK_ENABLED))
+									->setLabel(_('Use combined requests'))
+							)
+						]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+					]))
+						->addClass(ZBX_STYLE_FORM_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+				->addClass('js-host-interface')
+		),
+
+		new CTemplateTag('host-wizard-step-add-host-interface-ipmi',
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						(new CDiv([
+							new CFormField([
+								new CLabel(_('IPMI address')),
+								new CTextBox('interfaces[#{row_index}][address]')
+							]),
+							new CFormField([
+								new CLabel(_('IPMI port')),
+								new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
+							]),
+							(new CDiv(
+								_('Enter the IP/DNS address and port of your IPMI-enabled monitoring target.')
+							))
+								->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+								->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMNS)
+							->addClass(ZBX_STYLE_FORM_COLUMNS)
+							->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+						(new CDiv([
+							new CFormField([
+								new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+								(new CSelect('ipmi_authtype'))
+									->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+									->setFocusableElementId('label_ipmi_authtype')
+									->setWidthAuto()
+							]),
+							new CFormField([
+								new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+								(new CSelect('ipmi_privilege'))
+									->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+									->setFocusableElementId('label_ipmi_privilege')
+									->setWidthAuto()
+							]),
+							new CFormField([
+								new CLabel(_('Username'), 'ipmi_username'),
+								(new CTextBox('ipmi_username', '', false, DB::getFieldLength('hosts', 'ipmi_username')))
+									->disableAutocomplete()
+							]),
+							new CFormField([
+								new CLabel(_('Password'), 'ipmi_password'),
+								(new CTextBox('ipmi_password', '', false, DB::getFieldLength('hosts', 'ipmi_password')))
+									->disableAutocomplete()
+							])
+						]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+					]))
+						->addClass(ZBX_STYLE_FORM_COLUMNS)
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+				)
 				->addItem(
 					(new CDiv([
 						new CTag('h4', true, _('Enable IPMI checks on Zabbix server')),
-						new CTag('p', true, _('In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value.')),
+						new CTag('p', true, _('In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value.')),
 						new CTag('p', true, [
 							_('For more details, see'),
 							' ',
@@ -511,68 +697,20 @@ function stepAddHostInterface(): CTemplateTag {
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-				->addClass('js-host-interface-'.INTERFACE_TYPE_AGENT),
-			(new CSection())
-				->addItem(
-					(new CDiv([
-						new CFormField([
-							new CLabel(_('IPMI address')),
-							new CTextBox('address')
-						]),
-						new CFormField([
-							new CLabel(_('IPMI port')),
-							new CTextBox('port', '10050')
-						]),
-						(new CDiv(
-							_('Enter the IP/DNS address and port of your IPMI-enabled monitoring target.')
-						))
-							->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
-					]))
-						->addClass(ZBX_STYLE_GRID_COLUMNS)
-						->addClass(ZBX_STYLE_FORM_COLUMNS)
-						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addItem(
-					(new CDiv([
-						new CFormField([
-							new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
-							(new CSelect('ipmi_authtype'))
-								->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
-								->setWidthAuto()
-						]),
-						new CFormField([
-							new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
-							(new CSelect('ipmi_privilege'))
-								->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
-								->setWidthAuto()
-						]),
-						new CFormField([
-							new CLabel(_('Username'), 'ipmi_username'),
-							new CTextBox('ipmi_username')
-						]),
-						new CFormField([
-							new CLabel(_('Password'), 'ipmi_password'),
-							new CTextBox('ipmi_password')
-						]),
-					]))
-						->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-				->addClass('js-host-interface-'.INTERFACE_TYPE_IPMI),
+				->addClass('js-host-interface')
+		),
+
+		new CTemplateTag('host-wizard-step-add-host-interface-jmx',
 			(new CSection())
 				->addItem(
 					(new CDiv([
 						new CFormField([
 							new CLabel(_('JMX address')),
-							new CTextBox('address')
+							new CTextBox('interfaces[#{row_index}][address]')
 						]),
 						new CFormField([
 							new CLabel(_('JMX port')),
-							new CTextBox('port', '1089')
+							new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
 						]),
 						(new CDiv(
 							_('Enter the IP/DNS address and port of your JMX-enabled monitoring target.')
@@ -602,75 +740,9 @@ function stepAddHostInterface(): CTemplateTag {
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-				->addClass('js-host-interface-'.INTERFACE_TYPE_JMX),
-			(new CSection())
-				->addItem(
-					(new CDiv([
-						new CFormField([
-							new CLabel(_('SNMP address')),
-							new CTextBox('address')
-						]),
-						new CFormField([
-							new CLabel(_('SNMP port')),
-							new CTextBox('port', '444')
-						]),
-						(new CDiv(
-							_('Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target.')
-						))
-							->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
-					]))
-						->addClass(ZBX_STYLE_GRID_COLUMNS)
-						->addClass(ZBX_STYLE_FORM_COLUMNS)
-						->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addItem(
-					(new CDiv([
-						new CFormField([
-							new CLabel(_('SNMP version'), 'label_ipmi_authtype'),
-							(new CSelect('ipmi_authtype'))
-								->addOptions(CSelect::createOptionsFromArray([
-									SNMP_V1 => _('SNMPv1'),
-									SNMP_V2C => _('SNMPv2'),
-									SNMP_V3 => _('SNMPv3')
-								]))
-								->setValue(SNMP_V2C)
-								->setWidthAuto()
-						]),
-						new CFormField([
-							new CLabel(_('Context name'), 'label_ipmi_privilege'),
-							new CTextBox('contextname', '', false, DB::getFieldLength('interface_snmp', 'contextname'))
-						]),
-						new CFormField([
-							new CLabel(_('Security name'), 'ipmi_username'),
-							new CTextBox('ipmi_username')
-						]),
-						new CFormField([
-							new CLabel(_('Security level'), 'ipmi_password'),
-							(new CSelect('securitylevel'))
-								->addOptions(CSelect::createOptionsFromArray([
-									ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-									ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-									ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-								]))
-								->setValue(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
-								->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_securitylevel')
-								->setWidthAuto()
-						]),
-						new CFormField([
-							(new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))
-								->setLabel(_('Use combined requests'))
-						])
-					]))
-						->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-				->addClass('js-host-interface-'.INTERFACE_TYPE_SNMP)
-		]))->addClass('step-form-body')
-	);
+				->addClass('js-host-interface')
+		)
+	];
 }
 
 function stepReadme(): CTemplateTag {
@@ -729,7 +801,7 @@ function stepConfigureHost(): array {
 		),
 		new CTemplateTag('host-wizard-macro-field-checkbox',
 			(new CFormField([
-				(new CCheckBox('macros[#{index}][value]', '#{value}'))
+				(new CCheckBox('macros[#{row_index}][value]', '#{value}'))
 					->setLabel('#{label}')
 					->setUncheckedValue('#{unchecked_value}'),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
@@ -740,7 +812,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-select',
 			(new CFormField([
 				new CLabel('#{label}'),
-				(new CSelect('macros[#{index}][value]'))->setWidthAuto(),
+				(new CSelect('macros[#{row_index}][value]'))->setWidthAuto(),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -749,7 +821,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-radio',
 			(new CFormField([
 				new CLabel('#{label}'),
-				(new CRadioButtonList('macros[#{index}][value]'))->setModern(),
+				(new CRadioButtonList('macros[#{row_index}][value]'))->setModern(),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -758,7 +830,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-text',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{index}]', null, false),
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{row_index}]', null, false),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -767,7 +839,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-secret',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{index}]', null, false),
+				new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{row_index}]', null, false),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -776,7 +848,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-vault',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{index}]', null, false),
+				new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{row_index}]', null, false),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)

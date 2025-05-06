@@ -183,17 +183,19 @@
 		}
 
 		&.form-columns {
-			gap: 8px 16px;
-
 			> .form-fields-hint {
 				margin-top: -4px;
 			}
 		}
 	}
 
+	.form-columns,
 	.fields-group {
 		display: grid;
 		gap: 8px 16px;
+	}
+
+	.fields-group {
 		padding: 8px;
 		background: $form-darker-bg-color;
 		border-radius: 2px;
@@ -205,6 +207,10 @@
 
 		> label {
 			line-height: 16px;
+
+			.btn-small {
+				margin-left: 4px;
+			}
 		}
 
 		input,

@@ -5759,13 +5759,13 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     gap: 16px; }
     .modal-popup-host-wizard .grid-columns .form-fields-inline .radio-list-control label {
       margin: 0; }
-  .modal-popup-host-wizard .grid-columns.form-columns {
-    gap: 8px 16px; }
-    .modal-popup-host-wizard .grid-columns.form-columns > .form-fields-hint {
-      margin-top: -4px; }
+  .modal-popup-host-wizard .grid-columns.form-columns > .form-fields-hint {
+    margin-top: -4px; }
+  .modal-popup-host-wizard .form-columns,
   .modal-popup-host-wizard .fields-group {
     display: grid;
-    gap: 8px 16px;
+    gap: 8px 16px; }
+  .modal-popup-host-wizard .fields-group {
     padding: 8px;
     background: #ebebeb;
     border-radius: 2px; }
@@ -5774,6 +5774,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     gap: 4px; }
     .modal-popup-host-wizard .form-field > label {
       line-height: 16px; }
+      .modal-popup-host-wizard .form-field > label .btn-small {
+        margin-left: 4px; }
     .modal-popup-host-wizard .form-field input,
     .modal-popup-host-wizard .form-field textarea,
     .modal-popup-host-wizard .form-field z-select > button {

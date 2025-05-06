@@ -44,6 +44,8 @@ window.host_wizard_edit = new class {
 	TEMPLATE_SHOW_LINKED = 0;
 	TEMPLATE_SHOW_NOT_LINKED = 1;
 
+	HOST_ENCRYPTION_PSK = 2;
+
 	INTERFACE_TYPE_AGENT = 1;
 	INTERFACE_TYPE_SNMP = 2;
 	INTERFACE_TYPE_IPMI = 3;
@@ -85,6 +87,20 @@ window.host_wizard_edit = new class {
 
 	#view_templates;
 
+	#interface_names_long_titles = {
+		[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent interface')) ?>,
+		[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('Simple Network Management Protocol (SNMP) interface')) ?>,
+		[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('Intelligent Platform Management Interface (IPMI)')) ?>,
+		[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('Java Management Extensions (JMX) interface')) ?>
+	};
+
+	#interface_names_short_titles = {
+		[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent')) ?>,
+		[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('SNMP')) ?>,
+		[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('IPMI')) ?>,
+		[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('JMX')) ?>
+	};
+
 	/** @type {Map<number, object>} */
 	#templates;
 	#linked_templates;
@@ -125,6 +141,7 @@ window.host_wizard_edit = new class {
 
 	#data = {
 		do_not_show_welcome: 0,
+		tls_required: true,
 		template_search_query: '',
 		template_selected: null,
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
@@ -132,60 +149,57 @@ window.host_wizard_edit = new class {
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
 		monitoring_os: 'linux',
 		monitoring_os_distribution: 'windows-new',
-		interface_required: {
-			[this.INTERFACE_TYPE_AGENT]: false,
-			[this.INTERFACE_TYPE_SNMP]: false,
-			[this.INTERFACE_TYPE_IPMI]: false,
-			[this.INTERFACE_TYPE_JMX]: false
+		interface_required: {},
+		interface_default: {
+			[this.INTERFACE_TYPE_AGENT]: {
+				type: this.INTERFACE_TYPE_AGENT,
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_AGENT]
+			},
+			[this.INTERFACE_TYPE_SNMP]: {
+				type: this.INTERFACE_TYPE_SNMP,
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_SNMP],
+				// the details should not differ from master branch
+				details: {
+					version: this.SNMP_V2C,
+					community: '{$SNMP_COMMUNITY}',
+					max_repetitions: 10,
+					contextname: '',
+					securityname: '',
+					securitylevel: this.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
+					authprotocol: this.ITEM_SNMPV3_AUTHPROTOCOL_MD5,
+					authpassphrase: '',
+					privprotocol: this.ITEM_SNMPV3_PRIVPROTOCOL_DES,
+					privpassphrase: '',
+					bulk: 1
+				}
+			},
+			[this.INTERFACE_TYPE_IPMI]: {
+				type: this.INTERFACE_TYPE_IPMI,
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_IPMI]
+			},
+			[this.INTERFACE_TYPE_JMX]: {
+				type: this.INTERFACE_TYPE_JMX,
+				address: '127.0.0.1',
+				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_JMX]
+			}
 		},
 		host: null,
 		groups: [],
 		templates: [],
 		tls_psk: '',
 		tls_psk_identity: '',
-		ipmi_authtype: 0,
-		ipmi_password: 'psswd',
-		ipmi_privilege: 4,
-		ipmi_username: 'username',
-		interfaces: {
-			[this.INTERFACE_TYPE_AGENT]: {
-				address: '127.0.0.1',
-				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_AGENT],
-				type: this.INTERFACE_TYPE_AGENT
-			},
-			[this.INTERFACE_TYPE_SNMP]: {
-				address: '127.0.0.1',
-				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_SNMP],
-				type: this.INTERFACE_TYPE_SNMP,
-				// the details should not differ from master branch
-				details: {
-					version: this.SNMP_V3,
-					community: '',
-					max_repetitions: 10,
-					contextname: 'context-name',
-					securityname: 'sec-name',
-					securitylevel: 2,
-					authprotocol: 0,
-					authpassphrase: 'auth-passphr',
-					privprotocol: 0,
-					privpassphrase: 'priv-passpht',
-					bulk: 1
-				}
-			},
-			[this.INTERFACE_TYPE_IPMI]: {
-				address: '127.0.0.1',
-				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_IPMI],
-				type: this.INTERFACE_TYPE_IPMI
-			},
-			[this.INTERFACE_TYPE_JMX]: {
-				address: '127.0.0.1',
-				port: this.DEFAULT_PORTS[this.INTERFACE_TYPE_JMX],
-				type: this.INTERFACE_TYPE_JMX
-			}
-		},
-
+		ipmi_authtype: -1,
+		ipmi_password: '',
+		ipmi_privilege: 2,
+		ipmi_username: '',
+		interfaces: {},
 		macros: {}
 	}
+
+	#updating_locked = true;
 
 	async init({templates, linked_templates, wizard_show_welcome, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
@@ -262,6 +276,10 @@ window.host_wizard_edit = new class {
 			step_create_host: tmpl('host-wizard-step-create-host'),
 			step_install_agent: tmpl('host-wizard-step-install-agent'),
 			step_add_host_interface: tmpl('host-wizard-step-add-host-interface'),
+			step_add_host_interface_agent: tmpl('host-wizard-step-add-host-interface-agent'),
+			step_add_host_interface_snmp: tmpl('host-wizard-step-add-host-interface-snmp'),
+			step_add_host_interface_ipmi: tmpl('host-wizard-step-add-host-interface-ipmi'),
+			step_add_host_interface_jmx: tmpl('host-wizard-step-add-host-interface-jmx'),
 			step_readme: tmpl('host-wizard-step-readme'),
 			step_configure_host: tmpl('host-wizard-step-configure-host'),
 			step_configuration_finish: tmpl('host-wizard-step-configuration-finish'),
@@ -311,6 +329,7 @@ window.host_wizard_edit = new class {
 
 	#gotoStep(step) {
 		this.#current_step = step;
+		this.#updating_locked = true;
 
 		let show_back_button = true;
 		let show_next_button = true;
@@ -357,6 +376,7 @@ window.host_wizard_edit = new class {
 		}
 
 		this.#next_button.removeAttribute('disabled');
+		this.#updating_locked = false;
 
 		this.#updateForm();
 		this.#updateFields();
@@ -378,27 +398,27 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderWelcome() {
-		const step = this.#view_templates.step_welcome.evaluateToElement();
+		const view = this.#view_templates.step_welcome.evaluateToElement();
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#renderSelectTemplate() {
-		const step = this.#view_templates.step_select_template.evaluateToElement();
+		const view = this.#view_templates.step_select_template.evaluateToElement();
 
-		step.querySelector('.js-show-templates').style.display = this.#host !== null ? '' : 'none';
+		view.querySelector('.js-show-templates').style.display = this.#host !== null ? '' : 'none';
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#renderCreateHost() {
-		const step = this.#view_templates.step_create_host.evaluateToElement({
+		const view = this.#view_templates.step_create_host.evaluateToElement({
 			template_name: this.#templates.get(this.#data.template_selected)?.name
 		});
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
-		const host_ms = jQuery("#host", step).multiSelect().on('change', (_, {options, values}) => {
+		const host_ms = jQuery("#host", view).multiSelect().on('change', (_, {options, values}) => {
 			this.#setValueByName(this.#data, options.name,
 				Object.keys(values.selected).length ? Object.values(values.selected)[0] : null
 			);
@@ -408,7 +428,7 @@ window.host_wizard_edit = new class {
 			host_ms.multiSelect('addData', [this.#data.host]);
 		}
 
-		const groups_ms = jQuery("#groups_", step).multiSelect().on('change', (_, {options, values}) => {
+		const groups_ms = jQuery("#groups_", view).multiSelect().on('change', (_, {options, values}) => {
 			this.#setValueByName(this.#data, options.name, Object.values(values.selected));
 		});
 
@@ -418,74 +438,68 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderInstallAgent() {
-		const step = this.#view_templates.step_install_agent.evaluateToElement({
+		const view = this.#view_templates.step_install_agent.evaluateToElement({
 			template_name: this.#templates.get(this.#data.template_selected)?.name
 		});
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#renderAddHostInterface() {
-		const interface_names_long = {
-			[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent interface')) ?>,
-			[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('Simple Network Management Protocol (SNMP) interface')) ?>,
-			[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('Intelligent Platform Management Interface (IPMI)')) ?>,
-			[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('Java Management Extensions (JMX) interface')) ?>
-		};
+		const interface_required = Object.entries(this.#data.interface_required)
+			.filter(([_, required]) => required)
+			.map(([type]) => Number(type));
 
-		const interface_names_short = {
-			[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent')) ?>,
-			[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('SNMP')) ?>,
-			[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('IPMI')) ?>,
-			[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('JMX')) ?>
-		};
+		const interfaces_long = [];
+		const interfaces_short = [];
 
-		let interfaces_long = [];
-		let interfaces_short = [];
-
-		for (const [interface_type, required] of Object.entries(this.#data.interface_required)) {
-			if (required) {
-				interfaces_long.push(interface_names_long[interface_type]);
-				interfaces_short.push(interface_names_short[interface_type]);
-			}
+		for (const interface_type of interface_required) {
+			interfaces_long.push(this.#interface_names_long_titles[Number(interface_type)]);
+			interfaces_short.push(this.#interface_names_short_titles[Number(interface_type)]);
 		}
 
-		interfaces_long = interfaces_long.join(' / ');
-		interfaces_short = interfaces_short.join('/');
+		const interface_templates = {
+			[this.INTERFACE_TYPE_AGENT]: this.#view_templates.step_add_host_interface_agent,
+			[this.INTERFACE_TYPE_IPMI]: this.#view_templates.step_add_host_interface_ipmi,
+			[this.INTERFACE_TYPE_SNMP]: this.#view_templates.step_add_host_interface_snmp,
+			[this.INTERFACE_TYPE_JMX]: this.#view_templates.step_add_host_interface_jmx
+		};
 
-		const step = this.#view_templates.step_add_host_interface.evaluateToElement({
+		const view = this.#view_templates.step_add_host_interface.evaluateToElement({
 			template_name: this.#templates.get(this.#data.template_selected)?.name,
 			host_name: this.#data.host.isNew ? this.#data.host.id : this.#data.host.name,
-			interfaces_long: interfaces_long,
-			interfaces_short: interfaces_short
+			interfaces_long: interfaces_long.join(' / '),
+			interfaces_short: interfaces_short.join('/')
 		});
 
-		for (const [interface_type, required] of Object.entries(this.#data.interface_required)) {
-			step.querySelector(`.js-host-interface-${interface_type}`).style.display = required ? '' : 'none';
-		}
+		interface_required.forEach((interface_type, row_index) => {
+			this.#data.interfaces[row_index] = this.#data.interface_default[interface_type];
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+			view.appendChild(interface_templates[interface_type].evaluateToElement({row_index}));
+		});
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#renderReadme() {
-		const step = this.#view_templates.step_readme.evaluateToElement();
+		const view = this.#view_templates.step_readme.evaluateToElement();
 		const substep_counter = this.#steps_queue.includes(this.STEP_README)
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
 
-		step.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
+		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
-		step.querySelector(`.${ZBX_STYLE_MARKDOWN}`).innerHTML = this.#template.readme;
+		view.querySelector(`.${ZBX_STYLE_MARKDOWN}`).innerHTML = this.#template.readme;
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#renderConfigureHost() {
-		const step = this.#view_templates.step_configure_host.evaluateToElement();
+		const view = this.#view_templates.step_configure_host.evaluateToElement();
 		const substep_counter = this.#steps_queue.includes(this.STEP_README)
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
-		const macros_list = step.querySelector('.js-host-macro-list');
+		const macros_list = view.querySelector('.js-host-macro-list');
 
-		step.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
+		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		this.#template.macros.forEach((macro, row_index) => {
 			const {field, description} = this.#makeMacroField(macro, row_index);
@@ -514,22 +528,22 @@ window.host_wizard_edit = new class {
 			);
 		}
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
-		jQuery(".macro-input-group", step).macroValue();
-		jQuery('.input-secret', step).inputSecret();
+		jQuery(".macro-input-group", view).macroValue();
+		jQuery('.input-secret', view).inputSecret();
 	}
 
 	#renderConfigurationFinish() {
-		const step = this.#view_templates.step_configuration_finish.evaluateToElement();
+		const view = this.#view_templates.step_configuration_finish.evaluateToElement();
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#renderComplete() {
-		const step = this.#view_templates.step_complete.evaluateToElement();
+		const view = this.#view_templates.step_complete.evaluateToElement();
 
-		this.#dialogue.querySelector('.step-form-body').replaceWith(step);
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
 
 	#onBeforeNextStep() {
@@ -568,15 +582,18 @@ window.host_wizard_edit = new class {
 		return fetch(get_url.href)
 			.then(response => response.json())
 			.then(response => {
-				this.#data.interface_required = {
-					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
-					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
-					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
-					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required
-				};
-
 				this.#template = response.template;
 				this.#host = response.host;
+
+				this.#data.tls_required = this.#host === null
+					|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && this.#host.tls_in_psk !== 1);
+
+				this.#data.interface_required = {
+					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
+					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
+					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required,
+					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required
+				}
 			});
 	}
 
@@ -584,19 +601,25 @@ window.host_wizard_edit = new class {
 		const submit_url = new URL('zabbix.php', location.href);
 		submit_url.searchParams.set('action', 'host.wizard.create');
 
-		fetch(submit_url.href, {
+		return fetch(submit_url.href, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				...this.#data,
-				host: this.#data.host.id,
-				groups: this.#data.groups.map(ms_group => (ms_group.isNew
-					? {new: ms_group.id}
-					: ms_group.id
-				)),
-				interfaces: Object.fromEntries(
-					Object.entries(this.#data.interfaces).filter(([type]) => this.#data.interface_required[type])
-				),
+				[this.#data.host.isNew ? 'host' : 'hostid']: this.#data.host.id,
+				groups: this.#data.groups.map(ms_group => (ms_group.isNew ? {new: ms_group.id} : ms_group.id)),
+				templates: [this.#selected_templateid],
+				...(this.#data.tls_required && {
+					tls_psk: this.#data.tls_psk,
+					tls_psk_identity: this.#data.tls_psk_identity
+				}),
+				interfaces: Object.values(this.#data.interfaces)
+					.filter(({type}) => this.#data.interface_required[type]),
+				ipmi_authtype: this.#data.ipmi_authtype,
+				ipmi_privilege: this.#data.ipmi_privilege,
+				ipmi_username: this.#data.ipmi_username,
+				ipmi_password: this.#data.ipmi_password,
+				macros: Object.values(this.#data.macros),
+
 				[CSRF_TOKEN_NAME]: this.#csrf_token
 			})
 		})
@@ -612,9 +635,8 @@ window.host_wizard_edit = new class {
 			})
 			.catch(exception => {
 				this.#ajaxExceptionHandler(exception);
-			})
-			.finally(() => {
-				this.#overlay.unsetLoading();
+
+				return Promise.reject();
 			});
 	}
 
@@ -799,8 +821,8 @@ window.host_wizard_edit = new class {
 
 			case this.STEP_INSTALL_AGENT:
 				if (!path || path === 'tls_psk_identity' || path === 'tls_psk') {
-					this.#next_button.toggleAttribute('disabled',
-						this.#data.tls_psk_identity.trim() === '' || this.#data.tls_psk.trim() === ''
+					this.#next_button.toggleAttribute('disabled', this.#data.tls_required
+						&& (this.#data.tls_psk_identity.trim() === '' || this.#data.tls_psk.trim() === '')
 					);
 				}
 
@@ -842,7 +864,62 @@ window.host_wizard_edit = new class {
 				}
 				break;
 
-			case this.STEP_CONFIGURE_HOST:
+			case this.STEP_ADD_HOST_INTERFACE:
+				const interfaces_view = this.#dialogue.querySelectorAll('.js-host-interface');
+
+				for (const [row_index, field] of Object.entries(this.#data.interfaces)) {
+					if (field.type === this.INTERFACE_TYPE_SNMP) {
+						const visible_fields = {
+							'js-snmp-community': false,
+							'js-snmp-repetition-count': false,
+							'js-snmpv3-contextname': false,
+							'js-snmpv3-securityname': false,
+							'js-snmpv3-securitylevel': false,
+							'js-snmpv3-authprotocol': false,
+							'js-snmpv3-authpassphrase': false,
+							'js-snmpv3-privprotocol': false,
+							'js-snmpv3-privpassphrase': false
+						};
+
+						switch (Number(field.details.version)) {
+							case this.SNMP_V1:
+								visible_fields['js-snmp-community'] = true;
+								break;
+
+							case this.SNMP_V2C:
+								visible_fields['js-snmp-community'] = true;
+								visible_fields['js-snmp-repetition-count'] = true;
+								break;
+
+							case this.SNMP_V3:
+								visible_fields['js-snmpv3-contextname'] = true;
+								visible_fields['js-snmpv3-securityname'] = true;
+								visible_fields['js-snmpv3-securitylevel'] = true;
+								visible_fields['js-snmp-repetition-count'] = true;
+
+								switch (Number(field.details.securitylevel)) {
+									case this.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+										visible_fields['js-snmpv3-authprotocol'] = true;
+										visible_fields['js-snmpv3-authpassphrase'] = true;
+										break;
+
+									case this.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
+										visible_fields['js-snmpv3-authprotocol'] = true;
+										visible_fields['js-snmpv3-authpassphrase'] = true;
+										visible_fields['js-snmpv3-privprotocol'] = true;
+										visible_fields['js-snmpv3-privpassphrase'] = true;
+										break;
+								}
+								break;
+						}
+
+						for (const [selector, is_visible] of Object.entries(visible_fields)) {
+							interfaces_view[row_index].querySelector(`.${selector}`).style.display = is_visible
+								? ''
+								: 'none';
+						}
+					}
+				}
 				break;
 		}
 	}
@@ -1053,25 +1130,25 @@ window.host_wizard_edit = new class {
 		return {field: field_view, description: description_view};
 	}
 
-	#makeMacroFieldText(macro, row_index) {
-		switch (macro.type) {
+	#makeMacroFieldText({type, macro, config}, row_index) {
+		switch (type) {
 			case this.MACRO_TYPE_SECRET:
 				return this.#view_templates.macro_field_secret.evaluateToElement({
-					index: row_index,
-					label: macro.config.label,
-					macro: macro.macro
+					row_index,
+					label: config.label,
+					macro
 				});
 			case this.MACRO_TYPE_VAULT:
 				return this.#view_templates.macro_field_vault.evaluateToElement({
-					index: row_index,
-					label: macro.config.label,
-					macro: macro.macro
+					row_index,
+					label: config.label,
+					macro
 				});
 			default:
 				return this.#view_templates.macro_field_text.evaluateToElement({
-					index: row_index,
-					label: macro.config.label,
-					macro: macro.macro
+					row_index,
+					label: config.label,
+					macro
 				});
 		}
 	}
@@ -1137,6 +1214,10 @@ window.host_wizard_edit = new class {
 	}
 
 	#onFormDataChange(path, new_value, old_value) {
+		if (this.#updating_locked) {
+			return;
+		}
+
 		this.#updateField(this.#pathToInputName(path), new_value);
 		this.#updateForm(path, new_value, old_value);
 	}
@@ -1154,13 +1235,25 @@ window.host_wizard_edit = new class {
 	}
 
 	#initReactiveData(target_object, on_change_callback) {
+		const proxy_cache = new WeakMap();
+
 		const createProxy = (obj, path = []) => {
-			return new Proxy(obj, {
+			if (proxy_cache.has(obj)) {
+				return proxy_cache.get(obj);
+			}
+
+			const proxy = new Proxy(obj, {
 				get(target, property, receiver) {
 					const value = Reflect.get(target, property, receiver);
+
 					if (typeof value === 'object' && value !== null) {
+						if (proxy_cache.has(value)) {
+							return proxy_cache.get(value);
+						}
+
 						return createProxy(value, [...path, property]);
 					}
+
 					return value;
 				},
 				set(target, property, value, receiver) {
@@ -1168,12 +1261,16 @@ window.host_wizard_edit = new class {
 					const result = Reflect.set(target, property, value, receiver);
 
 					if (old_value !== value) {
-						on_change_callback([...path, property].join('.'), value, old_value);
+						on_change_callback([...path, String(property)].join('.'), value, old_value);
 					}
 
 					return result;
 				}
 			});
+
+			proxy_cache.set(obj, proxy);
+
+			return proxy;
 		};
 
 		return createProxy(target_object);
