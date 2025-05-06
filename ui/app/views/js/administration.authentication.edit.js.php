@@ -341,7 +341,7 @@
 				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
 						&& idp_certificate_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('You are about to erase existing IdP certificate')
+						_('You are about to erase existing IdP certificate.')
 					) ?>);
 				}
 			}
@@ -352,7 +352,7 @@
 				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
 						&& sp_certificate_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('You are about to erase existing SP certificate')
+						_('You are about to erase existing SP certificate.')
 					) ?>);
 				}
 			}
@@ -362,22 +362,13 @@
 				if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
 						&& sp_private_key_input.value === '') {
 					warning_msg.push(<?= json_encode(
-						_('You are about to erase existing SP private key')
+						_('You are about to erase existing SP private key.')
 					) ?>);
 				}
 			}
 
 			if (warning_msg.length > 0) {
-				let confirmText = '';
-
-				warning_msg.forEach((msg, index) => {
-					if (warning_msg.length === 1) {
-						confirmText = `${msg}\n`;
-					}
-					else {
-						confirmText += `${index + 1}. ${msg}\n`;
-					}
-				});
+				let confirmText = warning_msg.join("\n");
 
 				return confirm(confirmText);
 			}
