@@ -2072,6 +2072,7 @@ define('ZBX_STYLE_FORM_FIELDS_HINT', 'form-fields-hint');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
+define('ZBX_STYLE_FORMATED_GROUP', 'formated-group');
 define('ZBX_STYLE_FORMATED_TEXT', 'formated-text');
 define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');

@@ -97,6 +97,19 @@
 		}
 	}
 
+	.formated-group {
+		display: grid;
+		gap: 16px;
+
+		.formated-text {
+			margin-top: 0;
+		}
+
+		&:not(:first-child) {
+			margin-top: 8px;
+		}
+	}
+
 	.formated-text {
 		@extend .markdown;
 
@@ -118,6 +131,10 @@
 			}
 
 			.formated-text + .form-field {
+				margin-top: 16px;
+			}
+
+			.formated-group + .form-field {
 				margin-top: 16px;
 			}
 

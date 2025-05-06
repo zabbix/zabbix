@@ -331,25 +331,38 @@ function stepInstallAgent($agent_script_data): array {
 										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 								)
 								->addItem(
-									(new CDiv(
-										new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
-									))->addClass(ZBX_STYLE_FORMATED_TEXT)
+									(new CDiv([
+										(new CDiv(
+											new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
+										))->addClass(ZBX_STYLE_FORMATED_TEXT),
+										(new CDiv(
+											new CTag('p', true, _('If you don\'t know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations.'))
+										))
+											->addClass(ZBX_STYLE_FORMATED_TEXT)
+											->addClass('js-tls-exists'),
+										(new CDiv(
+											(new CSimpleButton(_('Change pre-shared key')))
+												->addClass(ZBX_STYLE_BTN_ALT)
+												->addClass('js-tls-key-change')
+										))->addClass('js-tls-exists')
+									]))->addClass(ZBX_STYLE_FORMATED_GROUP)
 								)
 								->addItem(
-									new CFormField([
-										new CLabel(_('Pre-shared key identity')),
-										new CTextBox('tls_psk_identity'),
+									(new CFormField([
+										(new CLabel(_('Pre-shared key identity')))->setAsteriskMark(),
+										(new CTextBox('tls_psk_identity'))->setAriaRequired(),
 										(new CDiv(
 											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-									])
+									]))->addClass('js-tls-input')
 								)
 								->addItem(
-									new CFormField([
-										new CLabel(_('Pre-shared key')),
+									(new CFormField([
+										(new CLabel(_('Pre-shared key')))->setAsteriskMark(),
 										(new CDiv([
 											(new CTextArea('tls_psk'))
-												->setRows(3),
+												->setRows(3)
+												->setAriaRequired(),
 											(new CSimpleButton(_('Generate new')))
 												->addClass(ZBX_STYLE_BTN_GREY)
 												->addClass('js-generate-pre-shared-key'),
@@ -358,7 +371,7 @@ function stepInstallAgent($agent_script_data): array {
 										(new CDiv(
 											_('Generate a secret pre-shared key hexadecimal string.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-									])
+									]))->addClass('js-tls-input')
 								)
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
 

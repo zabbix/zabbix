@@ -219,6 +219,9 @@ window.host_wizard_edit = new class {
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 
 		this.#dialogue.addEventListener('click', ({target}) => {
+			if (target.classList.contains('js-tls-key-change')) {
+				this.#data.tls_required = true;
+			}
 			if (target.classList.contains('js-generate-pre-shared-key')) {
 				this.#data.tls_psk = this.#generatePSK();
 			}
@@ -829,8 +832,16 @@ window.host_wizard_edit = new class {
 					);
 				}
 
-				if (!path && this.#data.tls_psk.trim() === '') {
+				if (!path && this.#data.tls_psk.trim() === '' && this.#data.tls_required) {
 					this.#data.tls_psk = this.#generatePSK();
+				}
+
+				for (const element of this.#dialogue.querySelectorAll('.js-tls-exists')) {
+					element.style.display = !this.#data.tls_required ? '' : 'none';
+				}
+
+				for (const element of this.#dialogue.querySelectorAll('.js-tls-input')) {
+					element.style.display = this.#data.tls_required ? '' : 'none';
 				}
 
 				if (!path || path === 'monitoring_os' || path === 'monitoring_os_distribution'
@@ -946,7 +957,7 @@ window.host_wizard_edit = new class {
 				break;
 			case 'radio':
 				for (const radio of this.#dialogue.querySelectorAll(`[name="${name}"]`)) {
-					radio.checked = (radio === selected);
+					radio.checked = radio.value == value;
 				}
 				break;
 			default:
