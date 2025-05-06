@@ -216,22 +216,17 @@ $view_url = (new CUrl('zabbix.php'))
 $saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
 $saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
 
-$warning_saml_enabled = '';
-$checkbox_saml_enabled = (new CCheckBox('saml_auth_enabled',
-		$data['saml_error'] != '' ? ZBX_AUTH_SAML_DISABLED : ZBX_AUTH_SAML_ENABLED
-	))->setChecked($saml_auth_enabled)->setUncheckedValue(ZBX_AUTH_SAML_DISABLED);
-
-if ($data['saml_error'] != '') {
-	$checkbox_saml_enabled->setReadonly(true);
-	$warning_saml_enabled = (new CSpan(makeWarningIcon($data['saml_error'])))->addClass('js-hint');
-}
-
 $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
 		new CFormField([
-			$checkbox_saml_enabled,
-			$warning_saml_enabled
+			(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
+				->setChecked($saml_auth_enabled)
+				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
+				->setEnabled($data['saml_error'] === ''),
+			$data['saml_error'] === '' 
+				? null 
+				: (new CSpan(makeWarningIcon($data['saml_error'])))->addClass('js-hint')
 		])
 	])
 	->addItem([
