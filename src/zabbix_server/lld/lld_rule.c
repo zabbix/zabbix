@@ -2877,8 +2877,6 @@ static void	lld_rule_process_nested_rules(zbx_uint64_t hostid, const zbx_vector_
  *             lld_ruleid       - [IN] LLD rule identifier                    *
  *             lld_rows         - [IN] discovery data rows                    *
  *             error            - [OUT] error message                         *
- *             lifetime         - [IN] item lifetime period                   *
- *             enabled_lifetime - [IN] enabled item lifetime period           *
  *             lastcheck        - [IN] timestamp of the last check            *
  *             rule_index       - [IN] mapping of LLD rows to discovered LLD  *
  *                                    rules                                   *
@@ -2889,7 +2887,7 @@ static void	lld_rule_process_nested_rules(zbx_uint64_t hostid, const zbx_vector_
  ******************************************************************************/
 int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
-		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, zbx_hashset_t *items_index)
+		char **error, int lastcheck, zbx_hashset_t *items_index)
 {
 	int				ret = SUCCEED;
 	zbx_hashset_t			prototype_rules;
@@ -2958,7 +2956,8 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 
 	/* discovery corresponding LLD rule prototypes */
 
-	zbx_lld_lifetime_t	proto_enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
+	zbx_lld_lifetime_t	lifetime = {ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY, 0},
+				enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
 
 	for (int i = 0; i < item_prototypes->values_num; i++)
 	{
@@ -2975,8 +2974,8 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		else
 			proto_rule_index = NULL;
 
-		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &lld_rows_copy, error, lifetime,
-				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index))
+		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &lld_rows_copy, error, &lifetime,
+				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
@@ -2985,15 +2984,15 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 
 		lld_item_links_sort(&lld_rows_copy);
 
-		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, &lld_rows_copy, error, lifetime,
-				&proto_enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, &lld_rows_copy, error, &lifetime,
+				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 					" processing lld rule");
 			goto out;
 		}
 
-		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, &lld_rows_copy, error, lifetime,
+		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, &lld_rows_copy, error, &lifetime,
 				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
@@ -3001,7 +3000,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 			goto out;
 		}
 
-		lld_update_hosts(item_prototype->itemid, &lld_rows_copy, error, lifetime, &proto_enabled_lifetime,
+		lld_update_hosts(item_prototype->itemid, &lld_rows_copy, error, &lifetime, &enabled_lifetime,
 				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index);
 	}
 

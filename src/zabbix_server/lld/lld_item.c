@@ -4728,8 +4728,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 
-	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lifetime, lastcheck,
-			&items_index);
+	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lastcheck, &items_index);
 clean:
 	zbx_hashset_destroy(&items_index);
 
