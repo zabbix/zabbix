@@ -892,7 +892,7 @@ class CSetupWizard extends CForm {
 
 		if ($this->step_failed) {
 			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, CMessageHelper::getMessages(),
-				_('TLS fields not filled in correctly, or no access to files.'), false, true
+				_('TLS fields are misconfigured or the files are not accessible.'), false, true
 			);
 		}
 		else {
@@ -1056,29 +1056,29 @@ class CSetupWizard extends CForm {
 		$server_tls = $this->getConfig('ZBX_SERVER_TLS');
 
 		$table->addRow(
-			(new CSpan(_('Server TLS encryption')))->addClass(ZBX_STYLE_GREY),
+			(new CSpan(_('Encrypt connections from Web interface')))->addClass(ZBX_STYLE_GREY),
 			$server_tls ? 'true' : 'false'
 		);
 
 		if ($server_tls) {
 			$table->addRow(
-				(new CSpan(_('Server TLS encryption CA file')))->addClass(ZBX_STYLE_GREY),
+				(new CSpan(_('Web interface TLS CA file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CA_FILE')
 			)
 			->addRow(
-				(new CSpan(_('Server TLS encryption key file')))->addClass(ZBX_STYLE_GREY),
+				(new CSpan(_('Web interface TLS key file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE')
 			)
 			->addRow(
-				(new CSpan(_('Server TLS encryption certificate file')))->addClass(ZBX_STYLE_GREY),
+				(new CSpan(_('Web interface TLS certificate file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE')
 			)
 			->addRow(
-				(new CSpan(_('Server TLS encryption certificate issuer')))->addClass(ZBX_STYLE_GREY),
+				(new CSpan(_('Server TLS certificate issuer')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
 			)
 			->addRow(
-				(new CSpan(_('Server TLS encryption certificate subject')))->addClass(ZBX_STYLE_GREY),
+				(new CSpan(_('Server TLS certificate subject')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT')
 			);
 		}

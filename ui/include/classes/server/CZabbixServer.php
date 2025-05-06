@@ -643,13 +643,13 @@ class CZabbixServer {
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
 						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
-					$this->error = _('Issuer of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
+					$this->error = _('TLS certificate issuer is incorrect. Possible cause: UI misconfiguration.');
 					return false;
 				}
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
 						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
-					$this->error = _('Subject of the TLS certificate is incorrect. Possible reason: Incorrect UI configuration.');
+					$this->error = _('TLS certificate subject is incorrect. Possible cause: UI misconfiguration.');
 					return false;
 				}
 			}
