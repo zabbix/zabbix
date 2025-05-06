@@ -24,7 +24,7 @@
  * Parameters: data        - [IN/OUT] item key or SNMP OID data               *
  *             l           - [IN] left index of item key or SNMP OID          *
  *                                parameter                                   *
- *             r           - [IN] right index of item key or SNMP OID         *
+ *             r           - [IN/OUT] right index of item key or SNMP OID     *
  *                                parameter                                   *
  *             level       - [IN] level of [] brackets                        *
  *             num         - [IN] number of parameter                         *
@@ -84,9 +84,9 @@ static int	parse_params(char **data, size_t *i, int *level, int is_item_key, zbx
 
 	size_t			l = 0;
 	zbx_parser_state_t	state = ZBX_STATE_NEW;
-	int			ret, num = 0;
+	int			num = 0;
 
-	ret = substitute_item_key(data, 0, i, *level, num, 0, is_item_key, cb, args);
+	int	ret = substitute_item_key(data, 0, i, *level, num, 0, is_item_key, cb, args);
 
 	for (; '\0' != (*data)[*i] && FAIL != ret; (*i)++)
 	{
@@ -105,7 +105,7 @@ static int	parse_params(char **data, size_t *i, int *level, int is_item_key, zbx
 						break;
 					case '[':
 						if (2 == *level)
-							goto ret;	/* incorrect syntax: multi-level array */
+							goto out;	/* incorrect syntax: multi-level array */
 						(*level)++;
 						if (1 == *level)
 							num++;
@@ -137,11 +137,11 @@ static int	parse_params(char **data, size_t *i, int *level, int is_item_key, zbx
 						break;
 					case ']':
 						if (0 == *level)
-							goto ret;	/* incorrect syntax: redundant ']' */
+							goto out;	/* incorrect syntax: redundant ']' */
 						(*level)--;
 						break;
 					default:
-						goto ret;
+						goto out;
 				}
 				break;
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
@@ -166,7 +166,7 @@ static int	parse_params(char **data, size_t *i, int *level, int is_item_key, zbx
 		}
 	}
 
-ret:
+out:
 	return ret;
 }
 

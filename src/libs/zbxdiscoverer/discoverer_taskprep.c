@@ -53,7 +53,6 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 	zbx_ds_dcheck_t	*ds_dcheck, ds_dcheck_cmp = {.dcheck.dcheckid = dcheck->dcheckid};
 	zbx_dc_dcheck_t	*dcheck_ptr;
 	int		idx;
-	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	if (FAIL != (idx = zbx_vector_ds_dcheck_ptr_search(ds_dchecks_common, &ds_dcheck_cmp,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -61,8 +60,8 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 		return ds_dchecks_common->values[idx];
 	}
 
-	um_handle = zbx_dc_open_user_macros();
-	um_handle_secure = zbx_dc_open_user_macros_secure();
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+	zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
 
 	ds_dcheck = (zbx_ds_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_ds_dcheck_t));
 	dcheck_ptr = &ds_dcheck->dcheck;
