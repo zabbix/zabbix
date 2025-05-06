@@ -224,8 +224,8 @@ $saml_tab = (new CFormGrid())
 				->setChecked($saml_auth_enabled)
 				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
 				->setEnabled($data['saml_error'] === ''),
-			$data['saml_error'] === '' 
-				? null 
+			$data['saml_error'] === ''
+				? null
 				: (new CSpan(makeWarningIcon($data['saml_error'])))->addClass('js-hint')
 		])
 	])
