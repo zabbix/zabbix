@@ -325,16 +325,14 @@ if ($data['saml_certs_editable'] === true) {
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 						->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
 						->addClass('saml-enabled'),
-					(new CDiv([
-						(new CButton('idp_certificate_input_button', _('Choose file')))
-							->addClass('file-upload-btn')
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->addClass('saml-upload-identity-button')
-							->addClass('saml-enabled'),
-						(new CFile('idp_certificate_input_file'))
-							->addClass(ZBX_STYLE_DISPLAY_NONE)
-							->setAttribute('accept', '.cer, .crt, .pem, .txt')
-					]))->addClass(ZBX_STYLE_REL_CONTAINER)
+					(new CButton('idp_certificate_input_button', _('Choose file')))
+						->addClass('file-upload-btn')
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-upload-identity-button')
+						->addClass('saml-enabled'),
+					(new CFile('idp_certificate_input_file'))
+						->addClass(ZBX_STYLE_DISPLAY_NONE)
+						->setAttribute('accept', '.cer, .crt, .pem, .txt')
 				]))
 					->addClass('saml-add-identity-div')
 					->addClass($data['idp_certificate_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
@@ -358,16 +356,14 @@ if ($data['saml_certs_editable'] === true) {
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 						->setAttribute('placeholder', _('PEM-encoded SP private key'))
 						->addClass('saml-enabled'),
-					(new CDiv([
-						(new CButton('sp_private_key_input_button', _('Choose file')))
-							->addClass('file-upload-btn')
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->addClass('saml-upload-identity-button')
-							->addClass('saml-enabled'),
-						(new CFile('sp_private_key_input_file'))
-							->addClass(ZBX_STYLE_DISPLAY_NONE)
-							->setAttribute('accept', '.key, .pem, .txt')
-					]))->addClass(ZBX_STYLE_REL_CONTAINER)
+					(new CButton('sp_private_key_input_button', _('Choose file')))
+						->addClass('file-upload-btn')
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-upload-identity-button')
+						->addClass('saml-enabled'),
+					(new CFile('sp_private_key_input_file'))
+						->addClass(ZBX_STYLE_DISPLAY_NONE)
+						->setAttribute('accept', '.key, .pem, .txt')
 				]))
 					->addClass('saml-add-identity-div')
 					->addClass($data['sp_private_key_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
@@ -391,16 +387,14 @@ if ($data['saml_certs_editable'] === true) {
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 						->setAttribute('placeholder', _('PEM-encoded SP certificate'))
 						->addClass('saml-enabled'),
-					(new CDiv([
-						(new CButton('sp_certificate_input_button', _('Choose file')))
-							->addClass('file-upload-btn')
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->addClass('saml-upload-identity-button')
-							->addClass('saml-enabled'),
-						(new CFile('sp_certificate_input_file'))
-							->addClass(ZBX_STYLE_DISPLAY_NONE)
-							->setAttribute('accept', '.cer, .crt, .pem, .txt')
-					]))->addClass(ZBX_STYLE_REL_CONTAINER)
+					(new CButton('sp_certificate_input_button', _('Choose file')))
+						->addClass('file-upload-btn')
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-upload-identity-button')
+						->addClass('saml-enabled'),
+					(new CFile('sp_certificate_input_file'))
+						->addClass(ZBX_STYLE_DISPLAY_NONE)
+						->setAttribute('accept', '.cer, .crt, .pem, .txt')
 				]))
 					->addClass('saml-add-identity-div')
 					->addClass($data['sp_certificate_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
