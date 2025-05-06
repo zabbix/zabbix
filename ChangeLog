@@ -1,6 +1,9 @@
-Changes for 7.4.0rc1
+Changes for 7.4.0beta2
 
 New features:
+........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
+........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
+.......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 ..F.I..... [ZBXNEXT-9087] implemented Item card widget (dfofanovs)
 ..F.I..PS. [ZBXNEXT-9910] changed default user session storage period from 365d to 31d (aluchko, askolmeisters)
@@ -11,6 +14,11 @@ A.F.I..... [ZBXNEXT-875] implemented map element stacking order control (Ivo)
 .........T [ZBXNEXT-9646] added Juniper MX by NETCONF template (egordymov)
 
 Bug fixes:
+.........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
+........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
+..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)
+.......PS. [ZBX-26178] fixed logging noise when vault path does not exist (mprihodko)
+..F....... [ZBX-26120] fixed data loss warning on opening the trigger form after closing the mass update pop-up (isharha)
 ..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
 .........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
 ........S. [ZBX-26235] fixed Zabbix server crash caused by audit when autoregistration deletes host tags (arimdjonoks)
@@ -131,9 +139,16 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.7rc1
 
 New features:
+........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
+........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
+.......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+.........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
+..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)
+........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
+..F....... [ZBX-26120] fixed data loss warning on opening the trigger form after closing the mass update pop-up (isharha)
 ..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
 ........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
 .........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
@@ -566,9 +581,15 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.13rc1
 
 New features:
+........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
+.......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
+........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+.........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
+........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
+..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)
 ..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
 ........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
 .........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
@@ -4061,6 +4082,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.41rc1
 
 New features:
+........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
 

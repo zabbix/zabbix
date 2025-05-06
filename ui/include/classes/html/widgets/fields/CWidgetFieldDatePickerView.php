@@ -43,6 +43,17 @@ class CWidgetFieldDatePickerView extends CWidgetFieldView {
 		return $view;
 	}
 
+	public function getJavaScript(): string {
+		return '
+			CWidgetForm.addField(
+				new CWidgetFieldDatePicker('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
+			);
+		';
+	}
+
 	public function setDateFormat(string $date_format): self {
 		$this->date_format = $date_format;
 

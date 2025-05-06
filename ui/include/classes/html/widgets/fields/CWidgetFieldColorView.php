@@ -49,4 +49,15 @@ class CWidgetFieldColorView extends CWidgetFieldView {
 			->setColor($this->field->getValue())
 			->setHasDefault($this->field->hasAllowInherited());
 	}
+
+	public function getJavaScript(): string {
+		return '
+			CWidgetForm.addField(
+				new CWidgetFieldColor('.json_encode([
+				'name' => $this->field->getName(),
+				'form_name' => $this->form_name
+			]).')
+			);
+		';
+	}
 }

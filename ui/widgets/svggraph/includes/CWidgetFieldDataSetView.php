@@ -306,7 +306,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			}
 
 			$override_host_html[] = implode('', $override_host_field_view->getTemplates());
-			$override_host_html[] = (new CScriptTag($override_host_field_view->getJavaScript()))->setOnDocumentReady();
+			$override_host_html[] = new CScriptTag($override_host_field_view->getJavaScript());
 		}
 
 		return (new CListItem([

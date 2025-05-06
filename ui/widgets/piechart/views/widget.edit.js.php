@@ -21,7 +21,7 @@ use Widgets\PieChart\Includes\{
 
 ?>
 
-window.widget_pie_chart_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * @type {HTMLFormElement}
@@ -51,7 +51,7 @@ window.widget_pie_chart_form = new class {
 	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
 
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 		this.#dataset_wrapper = document.getElementById('data_sets');
 
 		this.#templateid = templateid;
@@ -62,11 +62,22 @@ window.widget_pie_chart_form = new class {
 		jQuery('.overlay-dialogue-body').off('scroll');
 
 		jQuery(`#${form_tabs_id}`)
-			.on('change', 'input, z-color-picker, z-select, .multiselect', () => this.#updateForm());
+			.on('change', 'input, z-color-picker, z-select, .multiselect', () => {
+				this.#updateForm();
+
+				this.registerUpdateEvent();
+			});
+
+		this.#dataset_wrapper.addEventListener('input', e => {
+			if (e.target.matches('input[name$="[data_set_label]"]')) {
+				this.registerUpdateEvent();
+			}
+		});
 
 		this.#datasetTabInit();
 		this.#displayingOptionsTabInit();
 		this.#updateForm();
+		this.ready();
 	}
 
 	#datasetTabInit() {
@@ -243,7 +254,7 @@ window.widget_pie_chart_form = new class {
 
 		const used_colors = [];
 
-		for (const color_picker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
+		for (const color_picker of this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
 			if (color_picker.color !== '') {
 				used_colors.push(color_picker.color);
 			}
@@ -267,6 +278,8 @@ window.widget_pie_chart_form = new class {
 
 		this.#initDataSetSortable();
 		this.#updateForm();
+
+		this.registerUpdateEvent();
 	}
 
 	#cloneDataset() {
@@ -343,6 +356,8 @@ window.widget_pie_chart_form = new class {
 		this.#initDataSetSortable();
 		this.updateSingleItemsReferences();
 		this.#updateForm();
+
+		this.registerUpdateEvent();
 	}
 
 	#getOpenedDataset() {
@@ -374,6 +389,8 @@ window.widget_pie_chart_form = new class {
 			this._sortable_data_set.on(CSortable.EVENT_SORT, () => {
 				this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this.#updateDatasetsLabel();
+
+				this.registerUpdateEvent();
 			});
 		}
 	}
@@ -432,7 +449,7 @@ window.widget_pie_chart_form = new class {
 					srctbl: 'items',
 					srcfld1: 'itemid',
 					srcfld2: 'name',
-					dstfrm: widget_svggraph_form._form.id,
+					dstfrm: this.#form.id,
 					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
 					dstfld2: `items_${dataset_index}_${row_index}_name`,
 					numeric: 1,
@@ -448,7 +465,7 @@ window.widget_pie_chart_form = new class {
 					srctbl: 'items',
 					srcfld1: 'itemid',
 					srcfld2: 'name',
-					dstfrm: widget_svggraph_form._form.id,
+					dstfrm: this.#form.id,
 					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
 					dstfld2: `items_${dataset_index}_${row_index}_name`,
 					numeric: 1,
@@ -476,7 +493,7 @@ window.widget_pie_chart_form = new class {
 	#selectWidget(row = null, exclude_typed_references = []) {
 		const widgets = ZABBIX.Dashboard.getReferableWidgets({
 			type: CWidgetsData.DATA_TYPE_ITEM_ID,
-			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+			widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 		});
 
 		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
@@ -500,7 +517,6 @@ window.widget_pie_chart_form = new class {
 				}),
 				name: widget.getHeaderName()
 			});
-
 		}
 
 		const popup = new CWidgetSelectPopup(result);
@@ -565,13 +581,15 @@ window.widget_pie_chart_form = new class {
 
 		const used_colors = [];
 
-		for (const color_picker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>')) {
+		for (const color_picker of this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
 			if (color_picker.color !== '') {
 				used_colors.push(color_picker.color);
 			}
 		}
 
 		row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>').color = colorPalette.getNextColor(used_colors);
+
+		this.registerUpdateEvent();
 	}
 
 	#removeSingleItem(element) {
@@ -581,6 +599,8 @@ window.widget_pie_chart_form = new class {
 
 		this.#updateSingleItemsOrder(dataset);
 		this.#initSingleItemSortable(dataset);
+
+		this.registerUpdateEvent();
 	}
 
 	#initSingleItemSortable(dataset) {
@@ -600,6 +620,8 @@ window.widget_pie_chart_form = new class {
 
 		sortable.on(CSortable.EVENT_SORT, () => {
 			this.#updateSingleItemsOrder(dataset);
+
+			this.registerUpdateEvent();
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);
@@ -609,7 +631,7 @@ window.widget_pie_chart_form = new class {
 		const widgets = ZABBIX.Dashboard
 			.getReferableWidgets({
 				type: CWidgetsData.DATA_TYPE_ITEM_ID,
-				widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+				widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 			})
 			.reduce((map, widget) => map.set(widget.getFields().reference, widget.getHeaderName()), new Map());
 

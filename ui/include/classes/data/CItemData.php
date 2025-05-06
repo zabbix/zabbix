@@ -241,7 +241,7 @@ final class CItemData {
 			'vmware.cluster.status[url,name]',
 			'vmware.cluster.tags.get[url,id]',
 			'vmware.datastore.alarms.get[url,uuid]',
-			'vmware.datastore.discovery[url]',
+			'vmware.datastore.discovery[url,<filter_uuid>]',
 			'vmware.datastore.hv.list[url,datastore]',
 			'vmware.datastore.perfcounter[url,uuid,path,<instance>]',
 			'vmware.datastore.property[url,uuid,prop]',
@@ -1936,8 +1936,8 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.datastore.alarms'
 				]
 			],
-			'vmware.datastore.discovery[url]' => [
-				'description' => _('Discovery of VMware datastores, "url" - VMware service URL. Returns JSON'),
+			'vmware.datastore.discovery[url,<filter_uuid>]' => [
+				'description' => _('Discovery of VMware datastores, "url" - VMware service URL, "filter_uuid" - one hv uuid or vm uuid (empty by default). Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.datastore.discovery'
