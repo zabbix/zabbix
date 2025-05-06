@@ -337,7 +337,7 @@
 			}
 
 			const idp_certificate_input = document.getElementById('idp_certificate');
-			
+
 			console.log('Test ', this.saml_idp_certificate_exists)
 			if (idp_certificate_input) {
 				// if texarea is available for input and it's empty
