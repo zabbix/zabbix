@@ -18,10 +18,10 @@ use Widgets\Clock\Widget;
 
 ?>
 
-window.widget_clock_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init() {
-		this._form = document.getElementById('widget-dialogue-form');
+		this._form = this.getForm();
 		this._time_type = document.getElementById('time_type');
 		this._clock_type = document.getElementById('clock_type');
 
@@ -40,6 +40,7 @@ window.widget_clock_form = new class {
 		}
 
 		this.updateForm();
+		this.ready();
 	}
 
 	updateForm() {

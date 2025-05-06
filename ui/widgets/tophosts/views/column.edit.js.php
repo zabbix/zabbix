@@ -88,7 +88,7 @@ window.tophosts_column_edit_form = new class {
 				allow_empty: true,
 				dataCallback: row_data => {
 					if (!('color' in row_data)) {
-						const color_pickers = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>');
+						const color_pickers = this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 						const used_colors = [];
 
 						for (const color_picker of color_pickers) {
@@ -114,7 +114,7 @@ window.tophosts_column_edit_form = new class {
 				allow_empty: true,
 				dataCallback: row_data => {
 					if (!('color' in row_data)) {
-						const color_pickers = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?>');
+						const color_pickers = this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 						const used_colors = [];
 
 						for (const color_picker of color_pickers) {

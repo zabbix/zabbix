@@ -18,7 +18,7 @@ use Widgets\Gauge\Widget;
 
 ?>
 
-window.widget_gauge_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * @type {HTMLFormElement}
@@ -26,7 +26,7 @@ window.widget_gauge_form = new class {
 	#form;
 
 	init({thresholds_colors}) {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 
 		this.#form.addEventListener('change', () => this.#updateForm());
 
@@ -43,6 +43,7 @@ window.widget_gauge_form = new class {
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {

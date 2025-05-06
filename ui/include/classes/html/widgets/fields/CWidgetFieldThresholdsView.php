@@ -50,20 +50,12 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			var $thresholds_table = jQuery("#'.$this->field->getName().'-table");
-
-			$thresholds_table
-				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true})
-				.on("afteradd.dynamicRows", function() {
-					const color_pickers = this.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.'");
-					const used_colors = [];
-					for (const color_picker of color_pickers) {
-						if (color_picker.color !== "") {
-							used_colors.push(color_picker.color);
-						}
-					}
-					color_pickers[color_pickers.length - 1].color = colorPalette.getNextColor(used_colors);
-				});
+			CWidgetForm.addField(
+				new CWidgetFieldThresholds('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
+			);
 		';
 	}
 

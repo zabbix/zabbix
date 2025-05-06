@@ -2441,7 +2441,13 @@ class testDocumentationLinks extends CWebTest {
 		// Execute the corresponding callback function to open the form with doc link.
 		if (array_key_exists('actions', $data)) {
 			foreach ($data['actions'] as $action) {
-				call_user_func_array([$this, $action['callback']], [CTestArrayHelper::get($action, 'element', null)]);
+				$element = CTestArrayHelper::get($action, 'element', null);
+				call_user_func_array([$this, $action['callback']], [$element]);
+
+				// $dialog->isValid() can be false if a widget is added.
+				if ($element === 'id:dashboard-add-widget') {
+					COverlayDialogElement::get('Add widget')->waitUntilReady();
+				}
 			}
 		}
 

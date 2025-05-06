@@ -18,7 +18,7 @@ use Widgets\Item\Widget;
 
 ?>
 
-window.widget_item_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	#is_item_numeric = false;
 
@@ -28,7 +28,7 @@ window.widget_item_form = new class {
 	#form;
 
 	init({thresholds_colors}) {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 
 		this._show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
 		this._show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
@@ -75,7 +75,8 @@ window.widget_item_form = new class {
 					this.#is_item_numeric = type !== null && this.#isItemValueTypeNumeric(type);
 					this.updateForm();
 				}
-			});
+			})
+			.finally(() => this.ready());
 	}
 
 	updateForm() {
@@ -126,9 +127,9 @@ window.widget_item_form = new class {
 			}
 		}
 
-		this.#form.fields['sparkline[time_period]'].disabled = !this._show_sparkline.checked;
+		this.getField('sparkline[time_period]').disabled = !this._show_sparkline.checked;
 
-		this.#form.fields.time_period.hidden = aggregate_function.value == <?= AGGREGATE_NONE ?>;
+		this.getField('time_period').hidden = aggregate_function.value == <?= AGGREGATE_NONE ?>;
 
 		const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
 			<?= AGGREGATE_SUM ?>

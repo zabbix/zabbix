@@ -1610,8 +1610,7 @@ button {
 
 .dashboard-grid {
   position: relative;
-  margin: -4px;
-  z-index: 3; }
+  margin: -4px; }
   .dashboard-grid.reserve-header-lines-1 {
     margin-top: 2rem; }
   .dashboard-grid.reserve-header-lines-2 {
@@ -1621,6 +1620,10 @@ button {
   display: none; }
 .dashboard.dashboard-is-edit-mode .btn-dashboard-toggle-slideshow, .dashboard:not(.dashboard-is-multipage) .btn-dashboard-toggle-slideshow {
   display: none; }
+.dashboard.dashboard-is-busy .dashboard-navigation-tabs .sortable li, .dashboard.dashboard-is-busy .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li, .host-dashboard-header-navigation .host-dashboard-navigation .dashboard.dashboard-is-busy .host-dashboard-navigation-tabs .sortable li {
+  pointer-events: none; }
+  .dashboard.dashboard-is-busy .dashboard-navigation-tabs .sortable li div, .dashboard.dashboard-is-busy .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div, .host-dashboard-header-navigation .host-dashboard-navigation .dashboard.dashboard-is-busy .host-dashboard-navigation-tabs .sortable li div {
+    opacity: 0.75; }
 
 .dashboard-grid-widget-blocker {
   position: absolute;
@@ -1694,7 +1697,7 @@ button {
   border: 1px solid #9f9f9f;
   border-bottom: 0;
   background-color: #ffffff;
-  z-index: 3; }
+  z-index: 10; }
   .dashboard-grid-widget-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
@@ -1772,7 +1775,8 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: 0; }
+    height: 0;
+    z-index: 11; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
@@ -1788,8 +1792,7 @@ button {
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
     height: 2rem;
     margin-top: -2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-    z-index: 5; }
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
   .dashboard-grid-widget.dashboard-grid-widget-focus .dashboard-grid-widget-actions {
     opacity: 1; }
 
@@ -1816,7 +1819,7 @@ button {
   border-bottom: 0;
   background-color: #ffffff;
   opacity: 0;
-  z-index: 3; }
+  z-index: 11; }
   .dashboard-grid-iterator-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
@@ -1897,18 +1900,16 @@ button {
     display: flex; }
   .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-contents {
     display: none; }
-  .dashboard-grid-iterator.dashboard-grid-iterator-focus {
-    z-index: 5; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
-      margin-top: -2rem;
-      height: 2rem;
-      box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-      opacity: 1; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
-      opacity: 1; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
-      margin-top: calc(-4rem - 8px);
-      height: calc(4rem + 8px); }
+  .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
+    margin-top: -2rem;
+    height: 2rem;
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+    opacity: 1; }
+  .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
+    opacity: 1; }
+  .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
+    margin-top: calc(-4rem - 8px);
+    height: calc(4rem + 8px); }
   .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents {
     position: absolute;
     top: .25rem;
@@ -1947,14 +1948,6 @@ button {
 
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-actions {
   opacity: 1; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-  transition: none; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-  transition: none; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget-mask {
-  display: block; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator-mask {
-  display: block; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget .ui-resizable-handle {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-focus .ui-resizable-handle {
@@ -2038,6 +2031,42 @@ button {
     right: .25rem;
     bottom: .25rem;
     background-color: #f0f0f0; }
+.dashboard.dashboard-is-edit-mode .highlight {
+  position: absolute;
+  z-index: 10; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
+    border-bottom: 3px solid #000000;
+    top: calc(.25rem - 1px);
+    right: calc(.25rem - 1px);
+    left: calc(.25rem - 1px);
+    height: 0;
+    z-index: 11; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-e {
+    border-left: 3px solid #000000;
+    top: calc(.25rem - 1px);
+    right: calc(.25rem - 1px);
+    bottom: calc(.25rem - 1px);
+    width: 0; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-s {
+    border-top: 3px solid #000000;
+    right: calc(.25rem - 1px);
+    bottom: calc(.25rem - 1px);
+    left: calc(.25rem - 1px);
+    height: 0; }
+  .dashboard.dashboard-is-edit-mode .highlight.highlight-w {
+    border-right: 3px solid #000000;
+    top: calc(.25rem - 1px);
+    bottom: calc(.25rem - 1px);
+    left: calc(.25rem - 1px);
+    width: 0; }
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle .ui-resizable-dot {
+  z-index: 10; }
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-n,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-n .ui-resizable-dot, .dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-nw,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-nw .ui-resizable-dot, .dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-ne,
+.dashboard.dashboard-is-edit-mode .ui-resizable-handle.ui-resizable-ne .ui-resizable-dot {
+  z-index: 11; }
 
 .dashboard-grid-widget-contents .list-table th:first-child, .dashboard-grid-widget-contents .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:first-child {
   padding-left: 10px; }
@@ -2060,8 +2089,9 @@ button {
   border-color: #555555; }
 
 .overlay-dialogue.modal-popup.modal-widget-configuration {
-  max-width: calc(100vw - 40px);
-  min-width: 650px; }
+  max-width: calc(100vw - 20px);
+  min-width: 650px;
+  box-sizing: border-box; }
   .overlay-dialogue.modal-popup.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
@@ -3863,7 +3893,7 @@ section {
     cursor: default;
     color: #999999;
     background-color: transparent;
-    border: none; }
+    border-color: transparent; }
     .ui-tabs-nav .ui-state-disabled .ui-tabs-anchor:hover {
       background-color: transparent;
       box-shadow: none; }
@@ -5143,7 +5173,7 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
 
 form.dashboard-widget-piechart {
   max-width: 1330px;
-  min-width: 1110px;
+  min-width: 1120px;
   width: 100vw; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
@@ -5288,14 +5318,13 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
 
 form.dashboard-widget-svggraph {
   max-width: 1330px;
-  min-width: 1110px;
+  min-width: 1120px;
   width: 100vw; }
   form.dashboard-widget-svggraph .svg-graph-preview,
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-svggraph .svg-graph-preview {
     position: relative;
-    min-width: 1110px;
     height: 300px; }
     form.dashboard-widget-svggraph .svg-graph-preview > div {
       position: absolute;

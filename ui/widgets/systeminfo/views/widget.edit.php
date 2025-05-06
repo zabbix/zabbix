@@ -31,5 +31,5 @@
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_systeminfo_form.init();')
+	->initFormJs('widget_form.init();')
 	->show();
