@@ -32,7 +32,7 @@ $graph_form = (new CForm())
 	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
-$readonly = $is_templated || $data['discovered_graph'] || $data['discovered_prototype'];
+$readonly = $is_templated || $data['discovered_prototype'];
 
 // Preview tab.
 $preview_table = (new CTable())
