@@ -868,7 +868,7 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
  * Purpose: checks if report is active based on specified time                *
  *                                                                            *
  * Parameters: report - [IN]                                                  *
- *             when   - [IN] current  time                                    *
+ *             when   - [IN] specific time                                    *
  *                                                                            *
  * Return value: SUCCEED - report is active                                   *
  *               FAIL    - otherwise                                          *
