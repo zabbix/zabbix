@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-06 14:51+0000\n"
+"PO-Revision-Date: 2025-05-02 18:01+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2551,8 +2551,8 @@ msgstr "No se puede copiar el prototipo del gráfico \"%1$s\", porque la métric
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] "No se pudo copiar el monitor"
-msgstr[1] "No se pudo copiar los monitores"
+msgstr[0] "No se pudo copiar la métrica"
+msgstr[1] "No se pudieron copiar las métricas"
 
 #: include/classes/api/services/CDiscoveryRule.php:3643
 #, c-format
@@ -4908,7 +4908,7 @@ msgstr "Configuración de prototipos de ítem"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr "Configuración de monitores"
+msgstr "Configuración de métricas"
 
 #: app/controllers/CControllerMacrosEdit.php:64
 msgid "Configuration of macros"
@@ -7207,6 +7207,10 @@ msgstr "Objeto de descubrimiento"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de clústeres de VMware, \"url\": URL del servicio de VMware. Devuelve JSON"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Detección de almacenes de datos de VMware, \"url\": URL del servicio de VMware, \"filter_uuid\": un UUID de hv o de vm (vacío por defecto). Devuelve JSON."
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de almacenes de datos de VMware, \"url\": URL del servicio de VMware. Devuelve JSON"
@@ -7628,6 +7632,10 @@ msgstr "Editar árbol de elementos"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Editar widget"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr "No se permite editar otros objetos en el modo de edición del tablero."
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8064,6 +8072,10 @@ msgstr "Error en la solicitud de búsqueda de la tabla \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Mensaje de error"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr "Texto de error"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -9092,7 +9104,7 @@ msgstr[1] "Gráficos eliminados"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "Edición de gráficos"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -9143,7 +9155,7 @@ msgstr[1] "Prototipos de gráfico eliminados"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "Edición de prototipos de gráficos"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12032,6 +12044,10 @@ msgstr "Monitor"
 msgid "Item added"
 msgstr "Monitor añadido"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr "Tarjeta de metrica"
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "La métrica contiene macros definidas por el usuario con valores secretos. Los valores de estas macros deben ingresarse manualmente."
@@ -12235,7 +12251,7 @@ msgstr "La métrica con ID \"%1$s\" no está disponible."
 #: widgets/dataover/partials/table.top.php:31
 #: widgets/plaintext/includes/WidgetForm.php:45
 msgid "Items"
-msgstr "Monitores"
+msgstr "Métricas"
 
 #: include/views/monitoring.history.php:140
 msgid "Items list"
@@ -13704,6 +13720,10 @@ msgstr "Método no encontrado."
 msgid "Methods"
 msgstr "Métodos"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr "Métricas"
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14388,11 +14408,11 @@ msgstr "Nuevo tiempo de inactividad excluido"
 
 #: app/views/graph.edit.php:130
 msgid "New graph"
-msgstr ""
+msgstr "Nuevo gráfico"
 
 #: app/views/graph.prototype.edit.php:131
 msgid "New graph prototype"
-msgstr ""
+msgstr "Nuevo prototipo de gráfico"
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -14688,7 +14708,7 @@ msgstr "Ninguna métrica seleccionada."
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
-msgstr "Sin monitores definidos."
+msgstr "Sin métricas definidas."
 
 #: app/partials/hostmacros.inherited.list.html.php:28
 #: app/partials/hostmacros.list.html.php:28
@@ -15530,7 +15550,7 @@ msgstr "Solo se puede configurar un grupo desactivado para usuarios dados de baj
 
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Sólo cuentan los monitores asignados a equipos habilitados"
+msgstr "Sólo cuentan las métricas asignadas a equipos habilitados"
 
 #: include/classes/api/services/CDRule.php:648
 msgid "Only one check can be unique."
@@ -15565,7 +15585,7 @@ msgstr "Solo los superadministradores pueden definir el propietario del informe.
 
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de monitores habilitados"
+msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de métricas habilitadas"
 
 #: jsLoader.php:439
 msgid "Open URL"
@@ -19674,7 +19694,7 @@ msgstr "Estadísticas y disponibilidad de búfer de memoria del proxy. Modo (mod
 
 #: include/classes/data/CItemData.php:2870
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "Estadísticas de valores recibidos por el gestor de preprocesamiento."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -23585,6 +23605,10 @@ msgstr "Widget"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "El widget en X:%3$d, Y:%4$d en la página #%2$d del tablero \"%1$s\" está fuera de los límites."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr "Se revertirá la configuración del widget."
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El widget está en desuso."
@@ -26696,7 +26720,7 @@ msgstr "el valor debe estar entre \"%1$s\" y \"%2$s\""
 #: app/controllers/CControllerGraphUpdate.php:228
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
-msgstr ""
+msgstr "El valor debe estar entre \"%1$s\" y \"%2$s\", y no tener más de \"%3$s\" dígitos después del punto decimal"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

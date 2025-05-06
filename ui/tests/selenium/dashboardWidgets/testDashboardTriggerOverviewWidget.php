@@ -655,6 +655,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		else {
 			$dialog = COverlayDialogElement::find()->one();
 			$dialog->query('button:Cancel')->one()->click();
+			// Accept alert when widget update is cancelled.
+			if (CTestArrayHelper::get($data, 'update', false)) {
+				$this->page->acceptAlert();
+			}
 			$dialog->ensureNotPresent();
 
 			if (CTestArrayHelper::get($data, 'update', false)) {

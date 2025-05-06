@@ -40,20 +40,19 @@
 
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
-				'title': <?= json_encode(_('Reset confirmation')) ?>,
-				'class': 'position-middle',
-				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				'buttons': [
+				title: <?= json_encode(_('Reset confirmation')) ?>,
+				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
+				buttons: [
 					{
-						'title': <?= json_encode(_('Cancel')) ?>,
-						'cancel': true,
-						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-						'action': function() {}
+						title: <?= json_encode(_('Cancel')) ?>,
+						cancel: true,
+						class: '<?= ZBX_STYLE_BTN_ALT ?>',
+						action: function() {}
 					},
 					{
-						'title': <?= json_encode(_('Reset defaults')) ?>,
-						'focused': true,
-						'action': function() {
+						title: <?= json_encode(_('Reset defaults')) ?>,
+						focused: true,
+						action: function() {
 							$('main')
 								.prev('.msg-bad')
 								.remove();
@@ -130,7 +129,10 @@
 						}
 					}
 				]
-			}, this);
+			}, {
+				position: Overlay.prototype.POSITION_CENTER,
+				trigger_element: this
+			});
 		});
 	});
 </script>

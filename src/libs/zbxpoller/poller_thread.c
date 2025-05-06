@@ -187,22 +187,22 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
 	}
 	else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.dns_orig);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.addr);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.port_orig);
 	}
 	else if (0 == strcmp(p->macro, MVAR_ITEM_ID))

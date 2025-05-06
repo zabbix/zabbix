@@ -99,8 +99,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 		// Opening widget configuration form for new Clock widget.
 		$overlay = $dashboard->addWidget();
 		$default_form = $overlay->asForm();
-		$default_form->fill(['Type' => 'Clock']);
-		$default_form->waitUntilReloaded();
+		$default_form->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
 		$overlay->close();
 		// Check that widget type is not remembered without submitting the form.
 		$this->checkLastSelectedWidgetType();
@@ -114,10 +113,8 @@ class testDashboardsWidgetsPage extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Opening edit widget form and change widget type.
-		$change_form = $dashboard->getWidget('System information')->edit();
-		$change_form->fill(['Type' => 'Trigger overview']);
-		$change_form->waitUntilReloaded();
-		$change_form->submit();
+		$dashboard->getWidget('System information')->edit()->fill(['Type' => 'Trigger overview']);
+		COverlayDialogElement::get('Edit widget')->asForm()->submit();
 		// Check that widget type inherited from previous widget.
 		$this->checkLastSelectedWidgetType('Trigger overview', 'trigover');
 
@@ -146,7 +143,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 18,
+			'Zabbix servers'					=> 19,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];
