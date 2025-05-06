@@ -201,12 +201,13 @@ window.host_wizard_edit = new class {
 
 	#updating_locked = true;
 
-	async init({templates, linked_templates, wizard_show_welcome, csrf_token}) {
+	async init({templates, linked_templates, wizard_show_welcome, source_hostid, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
 		this.#data.do_not_show_welcome = wizard_show_welcome == 1 ? 0 : 1;
+		this.#source_hostid = source_hostid;
 		this.#csrf_token = csrf_token;
 
 		this.#initViewTemplates();
@@ -591,8 +592,17 @@ window.host_wizard_edit = new class {
 				this.#template = response.template;
 				this.#host = response.host;
 
+				if (this.#host !== null) {
+					this.#data.host = {
+						...this.#data.host,
+						id: this.#host.hostid,
+						name: this.#host.name,
+						isNew: false
+					}
+				}
+
 				this.#data.tls_required = this.#host === null
-					|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && this.#host.tls_in_psk !== 1);
+					|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk);
 
 				this.#data.interface_required = {
 					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,

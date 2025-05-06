@@ -20,7 +20,7 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 		$fields = [
 			'hostid' =>				'required|db hosts.hostid',
 			'groups' =>				'array',
-			'templates' =>			'required|array_db hosts.hostid',
+			'templates' =>			'required|array_db hosts.hostid', // TODO VM: should be templateid
 			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
 			'tls_psk' =>			'db hosts.tls_psk|not_empty',
 			'interfaces' =>			'array|not_empty',
@@ -60,7 +60,6 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 			'output' => ['ipmi_authtype','ipmi_privilege', 'ipmi_username', 'ipmi_password'],
 			'selectHostGroups' => ['groupid'],
 			'selectInterfaces' => ['interfaceid', 'type', 'main', 'ip', 'dns', 'port', 'useip', 'details'],
-			'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
 			'selectParentTemplates' => ['templateid'],
 			'hostids' => $this->getInput('hostid')

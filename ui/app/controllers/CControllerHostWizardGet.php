@@ -79,9 +79,9 @@ class CControllerHostWizardGet extends CController {
 
 		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name', 'active_available'],
+				'output' => ['hostid', 'name', 'tls_connect', 'tls_accept'],
 				'selectHostGroups' => ['groupid'],
-				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip'],
+				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip'], // TODO VM: add details
 				'selectMacros' => ['macro', 'value', 'description', 'type'],
 				'hostids' => $this->getInput('hostid')
 			]);
@@ -90,6 +90,9 @@ class CControllerHostWizardGet extends CController {
 			// Potentially changed field for multiselect ease-of-use.
 			$host['groups'] = $host['hostgroups'];
 			unset($host['hostgroups']);
+
+			$host['tls_in_psk'] = (bool)($host['tls_accept'] & HOST_ENCRYPTION_PSK);
+			unset($host['tls_accept']);
 
 			// Take only first interface from each type if possible.
 			$interfaces_by_type = [];

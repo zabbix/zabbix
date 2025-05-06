@@ -24,7 +24,7 @@ class CControllerHostWizardCreate extends CControllerHostUpdateGeneral {
 		$fields = [
 			'host' =>				'required|db hosts.host|not_empty',
 			'groups' =>				'required|array',
-			'templates' =>			'required|array_db hosts.hostid', // FIXME - need change to templateid
+			'templates' =>			'required|array_db hosts.hostid', // TODO VM: should be templateid
 			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
 			'tls_psk' =>			'db hosts.tls_psk|not_empty',
 			'interfaces' =>			'array|not_empty',
