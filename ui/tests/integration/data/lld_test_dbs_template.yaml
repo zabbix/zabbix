@@ -1,0 +1,33 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: d37f71c7e3f7469bab645852a69a2018
+      name: 'Templates/Video surveillance'
+  templates:
+    - uuid: e7e4b27f17b84b0bba2c0e203edf4462
+      template: lld_test_dbs_template
+      name: lld_test_dbs_template
+      groups:
+        - name: 'Templates/Video surveillance'
+      items:
+        - uuid: d3a9243db34447f49960364281e292e4
+          name: 'Active connections to {$DB}'
+          type: TRAP
+          key: 'db.connections[{$DB}]'
+      discovery_rules:
+        - uuid: 29e2336e671e48d6bd5837915681a315
+          name: 'Discover tablespaces'
+          type: NESTED
+          key: d.tbl
+          item_prototypes:
+            - uuid: 6024174125d549bfbd030e3923bae098
+              name: 'Size of tablespace {#TSNAME} for {#DB}'
+              type: TRAP
+              key: 'db.ts.size[{#DB},{#TSNAME}]'
+          lld_macro_paths:
+            - lld_macro: '{#TSNAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.tablespaces
