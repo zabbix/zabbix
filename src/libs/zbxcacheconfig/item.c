@@ -121,27 +121,27 @@ out:
 	return ret;
 }
 
-int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to)
+int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **key)
 {
-	zbx_dc_item_t		dc_item;
-	int			ret = FAIL, errcode;
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
+	zbx_dc_item_t	dc_item;
+	int		ret = FAIL, errcode;
 
 	zbx_dc_config_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 	if (SUCCEED == errcode)
 	{
-		char	*key = zbx_strdup(NULL, dc_item.key_orig);
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
+		char			*key_tmp = zbx_strdup(NULL, dc_item.key_orig);
 
-		zbx_substitute_item_key_params(&key, NULL, 0, zbx_item_key_subst_cb, um_handle, &dc_item);
+		zbx_substitute_item_key_params(&key_tmp, NULL, 0, zbx_item_key_subst_cb, um_handle, &dc_item);
+		zbx_dc_close_user_macros(um_handle);
 
-		zbx_free(*replace_to);
-		*replace_to = key;
+		zbx_free(*key);
+		*key = key_tmp;
 		ret = SUCCEED;
 	}
 
 	zbx_dc_config_clean_items(&dc_item, &errcode, 1);
-	zbx_dc_close_user_macros(um_handle);
 
 	return ret;
 }
