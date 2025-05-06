@@ -205,7 +205,9 @@ class ZColorPicker extends HTMLElement {
 			this.#preview = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_PREVIEW}`);
 
 			this.#mutation_observer = new MutationObserver(() => {
-				if (!isVisible(this.#box)) {
+				const box_rect = this.#box.getBoundingClientRect();
+
+				if (!isVisible(this.#box) || box_rect.x !== this.#box.pos.x || box_rect.y !== this.#box.pos.y) {
 					this.#closeDialog();
 				}
 			});
@@ -527,6 +529,13 @@ class ZColorPicker extends HTMLElement {
 		document.body.appendChild(this.#dialog);
 
 		this.#is_dialog_open = true;
+
+		const box_rect = this.#box.getBoundingClientRect();
+
+		this.#box.pos = {
+			x: box_rect.x,
+			y: box_rect.y
+		};
 
 		this.#updatePreview();
 		this.#updateHighlight();
