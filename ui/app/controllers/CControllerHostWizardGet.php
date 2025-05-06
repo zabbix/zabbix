@@ -176,7 +176,6 @@ class CControllerHostWizardGet extends CController {
 			 * interface remains (could be non-main interface) so it will pre-fill the fields if needed.
 			 */
 			'host' => $host,
-			'agent_install_required' => !$host || $host['active_available'] != INTERFACE_AVAILABLE_TRUE,
 			/*
 			 * All template data. Only config-required macros are available here. Includes unparsed "readme". If host
 			 * exists and macro names match, macro value is pre-filled from host instead of template.

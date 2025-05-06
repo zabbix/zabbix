@@ -132,7 +132,6 @@ window.host_wizard_edit = new class {
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
 		monitoring_os: 'linux',
 		monitoring_os_distribution: 'windows-new',
-		agent_install_required: false,
 		interface_required: {
 			[this.INTERFACE_TYPE_AGENT]: false,
 			[this.INTERFACE_TYPE_SNMP]: false,
@@ -569,8 +568,6 @@ window.host_wizard_edit = new class {
 		return fetch(get_url.href)
 			.then(response => response.json())
 			.then(response => {
-				this.#data.agent_install_required = response.agent_install_required;
-
 				this.#data.interface_required = {
 					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
 					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required,
@@ -646,6 +643,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateStepsQueue() {
+		const template_loaded = this.#template !== null;
 		this.#steps_queue = [];
 
 		if (this.#data.do_not_show_welcome === 0) {
@@ -658,19 +656,19 @@ window.host_wizard_edit = new class {
 			this.#steps_queue.push(this.STEP_CREATE_HOST);
 		}
 
-		if (this.#data.agent_install_required) {
+		if (template_loaded && this.#isRequiredInstallAgent()) {
 			this.#steps_queue.push(this.STEP_INSTALL_AGENT);
 		}
 
-		if (Object.values(this.#data.interface_required).some(required => required)) {
+		if (template_loaded && this.#isRequiredAddHostInterface()) {
 			this.#steps_queue.push(this.STEP_ADD_HOST_INTERFACE);
 		}
 
-		if (this.#template?.readme !== '') {
+		if (template_loaded && this.#template.readme !== '') {
 			this.#steps_queue.push(this.STEP_README);
 		}
 
-		if (this.#template?.macros.length) {
+		if (template_loaded && this.#template.macros.length) {
 			this.#steps_queue.push(this.STEP_CONFIGURE_HOST);
 		}
 
@@ -678,6 +676,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateProgress() {
+		const template_loaded = this.#template !== null;
 		let progress = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER} .progress`);
 
 		if (this.#steps_queue[this.#current_step] === this.STEP_WELCOME) {
@@ -705,27 +704,27 @@ window.host_wizard_edit = new class {
 			{
 				label: t('Create or select a host'),
 				info: this.#data.host?.name,
-				visible: true,
+				visible: this.#source_hostid === null,
 				steps: [this.STEP_CREATE_HOST]
 			},
 			{
 				label: t('Install Zabbix agent'),
-				visible: this.#data.agent_install_required,
+				visible: template_loaded && this.#isRequiredInstallAgent(),
 				steps: [this.STEP_INSTALL_AGENT]
 			},
 			{
 				label: t('Add host interface'),
-				visible: this.#data.host !== null && Object.values(this.#data.interface_required).some(value => value),
+				visible: template_loaded && this.#isRequiredAddHostInterface(),
 				steps: [this.STEP_ADD_HOST_INTERFACE]
 			},
 			{
 				label: t('Configure host'),
-				visible: this.#data.host !== null,
+				visible: template_loaded,
 				steps: [this.STEP_README, this.STEP_CONFIGURE_HOST, this.STEP_CONFIGURATION_FINISH]
 			},
 			{
 				label: t('A few more steps'),
-				visible: this.#data.host === null,
+				visible: !template_loaded,
 				steps: []
 			}
 		];
@@ -873,6 +872,18 @@ window.host_wizard_edit = new class {
 			default:
 				field.value = value;
 		}
+	}
+
+	#isRequiredInstallAgent() {
+		return this.#data.interface_required[this.INTERFACE_TYPE_AGENT]
+			&& (!this.#host?.interfaces.some(({interface_type}) => interface_type === this.INTERFACE_TYPE_AGENT));
+	}
+
+	#isRequiredAddHostInterface() {
+		return Object.entries(this.#data.interface_required).some(([required_type, is_required]) => {
+			return is_required
+				&& !this.#host?.interfaces.some(({interface_type}) => interface_type === required_type);
+		});
 	}
 
 	#generatePSK() {
