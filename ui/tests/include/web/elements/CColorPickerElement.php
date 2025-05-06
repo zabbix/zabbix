@@ -17,6 +17,8 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Color picker element.
  */
@@ -46,10 +48,17 @@ class CColorPickerElement extends CElement {
 			$overlay->query('button:Use default')->one()->click();
 		}
 		else {
-			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
+			$overlay->query('xpath:.//div[contains(@class, "color-picker-input")]/input')->one()->overwrite($color);
 		}
 
-		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		if ($overlay->query('button:Apply')->exists()) {
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$overlay->waitUntilNotVisible();
+		}
+		else {
+			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+
+		}
 
 		return $this;
 	}
