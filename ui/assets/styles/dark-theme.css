@@ -8216,13 +8216,3 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   content: " /"; }
 .breadcrumbs > :last-child::after {
   content: ""; }
-
-.file-upload-wrapper {
-  display: inline-block; }
-
-.file-upload-wrapper .file-upload-btn {
-  margin-left: .3em; }
-
-.saml-change-identity-button {
-  width: 100%;
-  max-width: 200px; }

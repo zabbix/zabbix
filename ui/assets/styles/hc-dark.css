@@ -8568,13 +8568,3 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container .tabfilter-item-label.focused {
   box-shadow: 0 0 0 2px #ffffff; }
-
-.file-upload-wrapper {
-  display: inline-block; }
-
-.file-upload-wrapper .file-upload-btn {
-  margin-left: .3em; }
-
-.saml-change-identity-button {
-  width: 100%;
-  max-width: 200px; }
