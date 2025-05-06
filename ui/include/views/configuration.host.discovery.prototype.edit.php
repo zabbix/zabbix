@@ -45,7 +45,7 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if ($data['parent_lld']) {
+if ($data['discovered_prototype']) {
 	$discovered_url = (new CUrl('host_discovery_prototypes.php'))
 		->setArgument('form', 'update')
 		->setArgument('parent_discoveryid', $data['parent_lld']['itemid'])
