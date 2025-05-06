@@ -1699,7 +1699,7 @@ class CUserDirectory extends CApiService {
 			$is_certificate = @openssl_x509_read($value);
 
 			if (!$is_certificate) {
-				$error = _s('Provided '.$name.' is not a valid certificate');
+				$error = _s('Provided '.$name.' is not a valid certificate.');
 
 				return false;
 			}
@@ -1725,7 +1725,7 @@ class CUserDirectory extends CApiService {
 			$is_private_key = @openssl_pkey_get_private($value);
 
 			if (!$is_private_key) {
-				$error = _s('Provided SP private key is not a valid key');
+				$error = _s('Provided SP private key is not a valid key.');
 
 				return false;
 			}
