@@ -27,12 +27,14 @@ use Widgets\TopItems\Includes\{
 };
 use Widgets\TopItems\Widget;
 
-$table = new CTableInfo();
-
 if ($data['error'] !== null) {
-	$table->setNoDataMessage($data['error']);
+	$table = (new CDiv($data['error']))
+		->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
+		->addClass(ZBX_ICON_SEARCH_LARGE);
 }
 else {
+	$table = new CTableInfo();
+
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$header = [];
 

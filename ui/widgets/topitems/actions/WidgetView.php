@@ -112,7 +112,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$table = self::concatenateTables($column_tables);
 
 		if (!$table) {
-			return ['error' => _('No data.')];
+			return ['error' => _('No data found')];
 		}
 
 		$this->applyHostOrdering($table, $db_hosts);
