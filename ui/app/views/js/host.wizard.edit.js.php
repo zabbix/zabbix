@@ -473,7 +473,9 @@ window.host_wizard_edit = new class {
 		});
 
 		interface_required.forEach((interface_type, row_index) => {
-			this.#data.interfaces[row_index] = this.#data.interface_default[interface_type];
+			this.#data.interfaces[row_index] = this.#host !== null
+				? this.#host.interfaces.find(host_interface => Number(host_interface.type) === interface_type)
+				: this.#data.interface_default[interface_type];
 
 			view.appendChild(interface_templates[interface_type].evaluateToElement({row_index}));
 		});
