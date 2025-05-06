@@ -249,7 +249,7 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'template']);
+		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype']);
 
 		switch ($object) {
 			case 'trigger':
@@ -482,7 +482,7 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'template']);
+		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype']);
 
 		switch ($object) {
 			case 'trigger':
@@ -566,12 +566,12 @@ class testFormTags extends CWebTest {
 	/**
 	 * Check result after creating or updating object with tags.
 	 *
-	 * @param array     $data        data provider
-	 * @param string    $object      host, template, trigger, item or prototype
-	 * @param element   $form        object configuration form
-	 * @param string    $action      create or update object
-	 * @param string    $sql         selected table from db
-	 * @param string    $old_hash    db hash before changes
+	 * @param array     $data               data provider
+	 * @param string    $object             host, template, trigger, item or prototype
+	 * @param element   $form               object configuration form
+	 * @param string    $action             create or update object
+	 * @param string    $sql                selected table from db
+	 * @param string    $old_hash           db hash before changes
 	 * @param bool      $inline_validation  flag that determines if inline validation is enabled in the form
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {

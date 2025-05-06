@@ -202,7 +202,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM triggers',
 					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF test name',
+						'id:expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1])>0'
+					]
 				]
 			],
 			// #14 Graph update.

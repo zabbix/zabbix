@@ -457,7 +457,10 @@ class CForm {
 	focusErrorField(field_names) {
 		for (const [key, field] of Object.entries(this.#fields)) {
 			if (field_names.includes(key) && field.hasErrors()) {
-				$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
+				if (field.getTabId() !== null) {
+					$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
+				}
+
 				field.focusErrorField();
 				break;
 			}
