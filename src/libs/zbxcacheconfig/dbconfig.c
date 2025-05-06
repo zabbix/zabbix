@@ -3631,6 +3631,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			template_item->hostid = hostid;
 			template_item->templateid = templateid;
+
 			continue;
 		}
 
@@ -3657,7 +3658,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 				continue;
 		}
-
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
 
