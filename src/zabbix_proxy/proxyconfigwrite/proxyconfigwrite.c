@@ -1060,16 +1060,16 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 	zbx_hashset_iter_t		iter;
 	zbx_vector_table_row_ptr_t	rows;
 	zbx_table_row_t			*row;
-	zbx_vector_uint64_t		reset_fields;
+	zbx_flags128_t			reset_flags;
 
-	zbx_vector_uint64_create(&reset_fields);
+	zbx_flags128_init(&reset_flags);
 
 	for (int i = 0; i < td->reset_fields.values_num; i++)
 	{
 		int reset_index;
 
 		if (-1 != (reset_index = table_data_get_field_index(td, td->reset_fields.values[i])))
-			zbx_vector_uint64_append(&reset_fields, (zbx_uint64_t)reset_index);
+			zbx_flags128_set(&reset_flags, reset_index);
 	}
 
 	zbx_vector_table_row_ptr_create(&rows);
@@ -1110,18 +1110,8 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 					j++)
 			{
 				zbx_db_value_t	*value;
-				int		reset_index = -1;
 
-				for (int k = 0; k < reset_fields.values_num; k++)
-				{
-					if (reset_fields.values[k] == (zbx_uint64_t)j)
-					{
-						reset_index = (int)reset_fields.values[k];
-						break;
-					}
-				}
-
-				if (j == reset_index)
+				if (SUCCEED == zbx_flags128_isset(&reset_flags, j))
 				{
 					if (ZBX_TYPE_ID != fields[j]->type)
 					{
@@ -1185,7 +1175,6 @@ clean:
 	}
 
 	zbx_vector_table_row_ptr_destroy(&rows);
-	zbx_vector_uint64_destroy(&reset_fields);
 
 	if (SUCCEED != ret && NULL == *error)
 		*error = zbx_dsprintf(NULL, "cannot insert rows in table \"%s\"", td->table->table);
