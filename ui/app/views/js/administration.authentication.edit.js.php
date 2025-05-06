@@ -841,7 +841,7 @@
 						.appendChild(this.#prepareMfaRow(mfa));
 				}
 				else {
-					mfa.has_default = row.querySelector('[name="mfa_default_row_index"]').checked === true;
+					mfa.is_default = row.querySelector('[name="mfa_default_row_index"]').checked === true;
 					mfa.usrgrps = row.querySelector('.js-mfa-usergroups').textContent;
 
 					row.parentNode.insertBefore(this.#prepareMfaRow(mfa), row);
