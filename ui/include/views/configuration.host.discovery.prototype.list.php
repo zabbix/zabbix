@@ -165,11 +165,9 @@ foreach ($data['discoveries'] as $discovery) {
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
-	// Hide zeros for trapper, SNMP trap, dependent and nested items.
-	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT
-			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)
-			|| $discovery['type'] == ITEM_TYPE_NESTED) {
+	// Hide zeros for specific items.
+	if (in_array($discovery['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED])
+			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

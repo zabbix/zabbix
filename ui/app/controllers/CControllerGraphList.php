@@ -117,16 +117,14 @@ class CControllerGraphList extends CController {
 		}
 
 		// Select graphs.
-		$options = [
+		$graphs = API::Graph()->get([
 			'output' => ['graphid', 'name', 'graphtype'],
 			'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 			'groupids' => $filter_groupids ?: null,
 			'templated' => $context === 'template',
 			'editable' => true,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
-		];
-
-		$graphs = API::Graph()->get($options);
+		]);
 
 		$data = [
 			'graphs' => $graphs,
@@ -163,15 +161,14 @@ class CControllerGraphList extends CController {
 		);
 
 		// Get graphs after paging.
-		$options = [
+		$data['graphs'] = API::Graph()->get([
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['status', 'ts_delete'],
 			'selectHosts' => ['name'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
-		];
-
-		$data['graphs'] = API::Graph()->get($options + ['selectDiscoveryData' => ['status', 'ts_delete']]);
+		]);
 
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
