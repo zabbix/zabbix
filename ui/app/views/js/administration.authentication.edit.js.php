@@ -317,8 +317,8 @@
 
 		_authFormSubmit() {
 			const fields_to_trim = ['#http_strip_domains', '#idp_entityid', '#sso_url', '#slo_url',
-			'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
-			'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
+				'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
+				'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
 			];
 
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
@@ -337,6 +337,8 @@
 			}
 
 			const idp_certificate_input = document.getElementById('idp_certificate');
+			
+			console.log('Test ', this.saml_idp_certificate_exists)
 			if (idp_certificate_input) {
 				// if texarea is available for input and it's empty
 				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false

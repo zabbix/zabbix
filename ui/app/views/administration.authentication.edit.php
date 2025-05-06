@@ -832,9 +832,9 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'mfa_methods' => $data['mfa_methods'],
 		'mfa_default_row_index' => $data['mfa_default_row_index'],
 		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
-		'saml_idp_certificate_exists' => array_key_exists('idp_certificate_hash', $data),
-		'saml_sp_certificate_exists' => array_key_exists('sp_certificate_hash', $data),
-		'saml_sp_private_key_exists' => array_key_exists('sp_private_key_hash', $data),
+		'saml_idp_certificate_exists' => array_key_exists('idp_certificate_hash', $data) && $data['idp_certificate_hash'] !== '',
+		'saml_sp_certificate_exists' => array_key_exists('sp_certificate_hash', $data) && $data['sp_certificate_hash'] !== '',
+		'saml_sp_private_key_exists' => array_key_exists('sp_private_key_hash', $data) && $data['sp_private_key_hash'] !== '',
 	]).');'
 ))
 	->setOnDocumentReady()

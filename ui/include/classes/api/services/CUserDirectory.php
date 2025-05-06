@@ -629,15 +629,15 @@ class CUserDirectory extends CApiService {
 				);
 			}
 			elseif (array_key_exists('idp_certificate', $userdirectory)
-					&& self::checkSamlCertificate($userdirectory['idp_certificate'], $error) === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-			elseif (array_key_exists('sp_certificate', $userdirectory)
-					&& self::checkSamlCertificate($userdirectory['sp_certificate'], $error) === false) {
+					&& self::checkSamlCertificate($userdirectory['idp_certificate'], $error, 'IdP certificate') === false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 			elseif (array_key_exists('sp_private_key', $userdirectory)
-					&& self::checkSamlPrivateKey($userdirectory['sp_private_key'], $error) === false) {
+				&& self::checkSamlPrivateKey($userdirectory['sp_private_key'], $error) === false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+			elseif (array_key_exists('sp_certificate', $userdirectory)
+					&& self::checkSamlCertificate($userdirectory['sp_certificate'], $error, 'SP certificate') === false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
@@ -1682,7 +1682,7 @@ class CUserDirectory extends CApiService {
 		return $saml_output;
 	}
 
-	private static function checkSamlCertificate($value, &$error): bool {
+	private static function checkSamlCertificate($value, &$error, $name): bool {
 		if (!extension_loaded('openssl')) {
 			$error = _s('OpenSSL extension is required');
 
@@ -1690,7 +1690,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if (mb_strlen($value) > 10000) {
-			$error = _s('Incorrect value for %1$s.', 'certificate').' '.
+			$error = _s('Incorrect value for %1$s', '').' '._s($name).'. '.
 				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
 
 			return false;
@@ -1699,7 +1699,7 @@ class CUserDirectory extends CApiService {
 			$is_certificate = @openssl_x509_read($value);
 
 			if (!$is_certificate) {
-				$error = _s('Provided %1$s is not a valid %2$s', $value, 'certificate');
+				$error = _s('Provided '.$name.' is not a valid certificate');
 
 				return false;
 			}
@@ -1716,7 +1716,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if (mb_strlen($value) > 10000) {
-			$error = _s('Incorrect value for %1$s.', 'SP private key').' '.
+			$error = _s('Incorrect value for %1$s', '').' '._s('SP private key').'. '.
 				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
 
 			return false;
@@ -1725,7 +1725,7 @@ class CUserDirectory extends CApiService {
 			$is_private_key = @openssl_pkey_get_private($value);
 
 			if (!$is_private_key) {
-				$error = _s('Provided %1$s is not a valid %2$s', $value, 'key');
+				$error = _s('Provided SP private key is not a valid key');
 
 				return false;
 			}
