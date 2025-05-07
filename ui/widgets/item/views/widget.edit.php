@@ -89,7 +89,7 @@ $form
 			)
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_item_form.init('.json_encode([
+	->initFormJs('widget_form.init('.json_encode([
 		'thresholds_colors' => Widget::DEFAULT_COLOR_PALETTE
 	], JSON_THROW_ON_ERROR).');')
 	->show();

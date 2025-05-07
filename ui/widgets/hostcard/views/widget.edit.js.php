@@ -18,20 +18,20 @@ use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 
 ?>
 
-window.widget_hostcard_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
-	 * @type {HTMLFormElement};
+	 * @type {HTMLFormElement}
 	 */
 	#form;
 
 	/**
-	 * @type {HTMLTableElement};
+	 * @type {HTMLTableElement}
 	 */
 	#sections_table;
 
 	init() {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 		this.#sections_table = document.getElementById('sections-table');
 
 		this.#form.addEventListener('change', () => this.#updateForm());
@@ -39,6 +39,7 @@ window.widget_hostcard_form = new class {
 		jQuery(this.#sections_table).on('tableupdate.dynamicRows', () => this.#updateForm());
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {
