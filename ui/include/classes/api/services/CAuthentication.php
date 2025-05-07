@@ -138,11 +138,7 @@ class CAuthentication extends CApiService {
 		]));
 
 		if ($auth['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED && $auth['saml_auth_enabled'] != $db_auth['saml_auth_enabled']) {
-			$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
-
-			if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-				static::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
-			}
+			self::checkOpenSslExtension();
 		}
 
 		self::checkUserDirectoryid($auth, $db_auth);
@@ -245,5 +241,13 @@ class CAuthentication extends CApiService {
 		$http_output_fields = ['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'];
 
 		return $ALLOW_HTTP_AUTH ? array_merge($output_fields, $http_output_fields) : $output_fields;
+	}
+
+	public static function checkOpenSslExtension(): void {
+		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+			static::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
+		}
 	}
 }

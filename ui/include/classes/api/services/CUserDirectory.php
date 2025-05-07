@@ -628,18 +628,6 @@ class CUserDirectory extends CApiService {
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/idp_type', _('cannot be changed'))
 				);
 			}
-			elseif (array_key_exists('idp_certificate', $userdirectory)
-					&& self::checkSamlCertificate($userdirectory['idp_certificate'], $error, 'IdP certificate') === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-			elseif (array_key_exists('sp_private_key', $userdirectory)
-					&& self::checkSamlPrivateKey($userdirectory['sp_private_key'], $error) === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-			elseif (array_key_exists('sp_certificate', $userdirectory)
-					&& self::checkSamlCertificate($userdirectory['sp_certificate'], $error, 'SP certificate') === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
 		}
 		unset($userdirectory);
 
@@ -1656,15 +1644,15 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_CERTIFICATE, 'length' => 10000],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_CERTIFICATE, 'length' => 10000],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_PRIVATE_KEY, 'length' => 10000],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 		]];
@@ -1680,57 +1668,5 @@ class CUserDirectory extends CApiService {
 		unset($value);
 
 		return $saml_output;
-	}
-
-	private static function checkSamlCertificate($value, &$error, $name): bool {
-		if (!extension_loaded('openssl')) {
-			$error = _s('OpenSSL extension is required');
-
-			return false;
-		}
-
-		if (mb_strlen($value) > 10000) {
-			$error = _s('Incorrect value for %1$s', '').' '._s($name).'. '.
-				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
-
-			return false;
-		}
-		elseif ($value !== '') {
-			$is_certificate = @openssl_x509_read($value);
-
-			if (!$is_certificate) {
-				$error = _s('Provided '.$name.' is not a valid certificate.');
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private static function checkSamlPrivateKey($value, &$error): bool {
-		if (!extension_loaded('openssl')) {
-			$error = _s('OpenSSL extension is required');
-
-			return false;
-		}
-
-		if (mb_strlen($value) > 10000) {
-			$error = _s('Incorrect value for %1$s', '').' '._s('SP private key').'. '.
-				_s('%1$d characters exceeds maximum length of %2$d characters', mb_strlen($value), 10000);
-
-			return false;
-		}
-		elseif ($value !== '') {
-			$is_private_key = @openssl_pkey_get_private($value);
-
-			if (!$is_private_key) {
-				$error = _s('Provided SP private key is not a valid key.');
-
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
