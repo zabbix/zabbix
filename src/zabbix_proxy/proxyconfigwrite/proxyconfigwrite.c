@@ -1103,6 +1103,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 		{
 			const char	*pf = NULL;
 			zbx_json_type_t	type;
+			zbx_table_row_t	*update_row = NULL;
 
 			row = rows.values[i];
 
@@ -1110,7 +1111,6 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 					j++)
 			{
 				zbx_db_value_t	*value;
-				zbx_table_row_t *update_row = NULL;
 
 				if (SUCCEED == zbx_flags128_isset(&reset_flags, j))
 				{
@@ -1147,11 +1147,11 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 					}
 				}
 
-				if (NULL != update_row)
-					zbx_vector_table_row_ptr_append(&td->updates, update_row);
-
 				zbx_vector_db_value_ptr_append(&values, value);
 			}
+
+			if (NULL != update_row)
+				zbx_vector_table_row_ptr_append(&td->updates, update_row);
 
 			zbx_db_insert_add_values_dyn(&db_insert, values.values, values.values_num);
 clean:
