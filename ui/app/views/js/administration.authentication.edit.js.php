@@ -345,7 +345,7 @@
 					) ?>);
 				}
 			}
-			
+
 			const sp_certificate_input = document.getElementById('sp_certificate');
 			if (sp_certificate_input) {
 				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
@@ -365,7 +365,7 @@
 					) ?>);
 				}
 			}
-			
+
 			return warnings.length > 0 ? confirm(warnings.join("\n")) : true;
 		}
 
