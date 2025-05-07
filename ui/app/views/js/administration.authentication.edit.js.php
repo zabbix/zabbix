@@ -129,9 +129,9 @@
 				);
 			});
 
-			for (const button of [...this.form.querySelectorAll('.saml-change-identity-button')]) {
+			for (const button of [...this.form.querySelectorAll('.js-saml-cert-change-button')]) {
 				button.addEventListener('click', e => {
-					const container = e.target.parentNode.querySelector('.saml-add-identity-div');
+					const container = e.target.parentNode.querySelector('.js-saml-cert-input');
 					const textarea = container.querySelector('textarea');
 
 					container.style.display = '';
@@ -141,7 +141,7 @@
 				});
 			}
 
-			for (const button of [...this.form.querySelectorAll('.saml-upload-identity-button')]) {
+			for (const button of [...this.form.querySelectorAll('.js-saml-cert-file-button')]) {
 				button.addEventListener('click', e => {
 					const textarea = e.target.parentNode.querySelector('textarea');
 					const extension_filter = textarea.name === 'sp_private_key'
@@ -817,23 +817,6 @@
 
 					row.parentNode.insertBefore(this.#prepareMfaRow(mfa), row);
 					row.remove();
-				}
-			});
-		}
-
-		#loadSamlIdentityElements() {
-			this.form.querySelectorAll('.saml-identity').forEach(identity => {
-				const button = identity.querySelector('.saml-change-identity-div');
-				const input = identity.querySelector('.saml-add-identity-div');
-				const textarea = input.querySelector('textarea');
-
-				if (input.classList.contains('display-none')) {
-					textarea.classList.remove('saml-enabled');
-					textarea.disabled = true;
-				}
-
-				if (textarea.classList.length === 0) {
-					textarea.removeAttribute('class');
 				}
 			});
 		}
