@@ -16,7 +16,7 @@
 class ZVertical extends HTMLElement {
 
 	/**
-	 * @type {HTMLElement|null};
+	 * @type {HTMLElement|null}
 	 */
 	#inner_container = null;
 

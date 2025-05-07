@@ -289,18 +289,17 @@ class CSvgGraphHelper {
 						]
 					]);
 
-					if ($items) {
-						$data_set['itemids'] = [];
-
-						foreach ($items as $item) {
-							$data_set['itemids'][$keys_index[$item['key_']]] = $item['itemid'];
-						}
-
-						ksort($data_set['itemids']);
+					if (!$items) {
+						continue;
 					}
-					else {
-						$data_set['itemids'] = null;
+
+					$data_set['itemids'] = [];
+
+					foreach ($items as $item) {
+						$data_set['itemids'][$keys_index[$item['key_']]] = $item['itemid'];
 					}
+
+					ksort($data_set['itemids']);
 				}
 			}
 

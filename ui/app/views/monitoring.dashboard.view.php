@@ -28,10 +28,40 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
-$this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget.create-placeholder.js');
+$this->addJsFile('class.widget-field.js');
+$this->addJsFile('class.widget-edit.dialogue.js');
+$this->addJsFile('class.widget-edit.sandbox.js');
+$this->addJsFile('class.widget-edit.validator.js');
+$this->addJsFile('class.widget-field.checkbox.js');
 $this->addJsFile('class.widget-field.checkbox-list.js');
+$this->addJsFile('class.widget-field.color.js');
+$this->addJsFile('class.widget-field.date-picker.js');
 $this->addJsFile('class.widget-field.multiselect.js');
+$this->addJsFile('class.widget-field.pattern-select.js');
+$this->addJsFile('class.widget-field.radio-button-list.js');
+$this->addJsFile('class.widget-field.range-control.js');
+
+// Keep loading order for the following file group:
+$this->addJsFile('class.widget-field.select.js');
+$this->addJsFile('class.widget-field.time-zone.js');
+
+$this->addJsFile('class.widget-field.severities.js');
+$this->addJsFile('class.widget-field.tags.js');
+$this->addJsFile('class.widget-field.text-area.js');
+
+// Keep loading order for the following file group:
+$this->addJsFile('class.widget-field.text-box.js');
+$this->addJsFile('class.widget-field.lat-lng.js');
+$this->addJsFile('class.widget-field.numeric-box.js');
+$this->addJsFile('class.widget-field.integer-box.js');
+
+$this->addJsFile('class.widget-field.thresholds.js');
 $this->addJsFile('class.widget-field.time-period.js');
+$this->addJsFile('class.widget-field.url.js');
+$this->addJsFile('class.widget-field-event.js');
+$this->addJsFile('class.widget-form.js');
+$this->addJsFile('class.widget-form-event.js');
 $this->addJsFile('class.widget-select.popup.js');
 
 if (array_key_exists('error', $data)) {
@@ -196,10 +226,8 @@ $html_page = (new CHtmlPage())
 					->setId('dashboard-direct-link')
 			)
 			->addClass(ZBX_STYLE_SELECTED)
-	])));
-
-if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requirements'])) {
-	$html_page->addItem(
+	])))
+	->addItem(
 		(new CFilter())
 			->setProfile($data['dashboard_time_period']['profileIdx'], $data['dashboard_time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -207,8 +235,9 @@ if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requi
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 			->preventHistoryUpdates()
+			->setManualSetup()
+			->setHidden()
 	);
-}
 
 $dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 

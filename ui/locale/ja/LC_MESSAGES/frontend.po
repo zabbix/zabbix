@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-12 12:23+0000\n"
-"Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
+"PO-Revision-Date: 2025-04-29 15:16+0000\n"
+"Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -2156,7 +2156,7 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "スワップインの待機の為に費やされたCPU時間、\"url\" - VMwareサービスURL、 \"uuid\" - VMware仮想マシンのグローバル一意識別子、\"instance\" - CPUインスタンス"
 
 #: include/classes/data/CItemData.php:1939
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -5281,11 +5281,11 @@ msgstr "マップの作成と変更"
 
 #: include/classes/helpers/CRoleHelper.php:550
 msgid "Create and edit own media"
-msgstr ""
+msgstr "独自メディアの作成と変更"
 
 #: include/classes/helpers/CRoleHelper.php:554
 msgid "Create and edit user media"
-msgstr ""
+msgstr "ユーザーメディアの作成と変更"
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -5897,7 +5897,7 @@ msgstr "データベースのTLSキーファイル"
 #: include/classes/api/clients/CLocalApiClient.php:124
 #: include/classes/api/clients/CLocalApiClient.php:138
 msgid "Database error occurred."
-msgstr ""
+msgstr "データベースエラーが発生しました。"
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6597,19 +6597,19 @@ msgstr "削除しました"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "削除されたホスト"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "削除されたホストグループ"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "削除されたホストグループ"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "削除されたトリガー"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -7097,6 +7097,10 @@ msgstr "ディスカバリオブジェクト"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
@@ -7225,7 +7229,7 @@ msgstr "正常イベントの表示期間"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "アクションを表示"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7241,7 +7245,7 @@ msgstr "ローカル時間を表示"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "ログ時間を表示"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7515,6 +7519,10 @@ msgstr "ツリー要素の変更"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "ウィジェットの変更"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7951,6 +7959,10 @@ msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "エラーメッセージ"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr "エラーテキスト"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8482,7 +8494,7 @@ msgstr "フィールド名"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr ""
+msgstr "フィールド要件:"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8973,7 +8985,7 @@ msgstr[0] "グラフを削除しました"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "グラフの編集"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -9023,7 +9035,7 @@ msgstr[0] "グラフのプロトタイプを削除しました"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "グラフのプロトタイプの編集"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9535,7 +9547,7 @@ msgstr "ホストに同じタイプのデフォルトインターフェースは
 
 #: widgets/hostcard/Widget.php:32
 msgid "Host card"
-msgstr ""
+msgstr "ホストカード"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -9560,7 +9572,7 @@ msgstr[0] "ホストを無効にしました"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "ホストの編集"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9621,7 +9633,7 @@ msgstr[0] "ホストグループを削除しました"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "ホストグループの編集"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9759,7 +9771,7 @@ msgstr "ホストネットワーク"
 #: widgets/topitems/includes/WidgetForm.php:128
 #: widgets/topitems/views/widget.edit.php:63
 msgid "Host ordering"
-msgstr ""
+msgstr "ホストの順序"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11902,6 +11914,10 @@ msgstr "アイテム"
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr "アイテムカード"
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "アイテムは秘密な値を持つユーザー定義マクロを含んでいます。これらのマクロの値は手動で入力する必要があります。"
@@ -11927,7 +11943,7 @@ msgstr[0] "アイテムを無効にしました"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "アイテムの編集"
 
 #: items.php:707
 msgid "Item enabled"
@@ -11967,7 +11983,7 @@ msgstr "アイテムが選択されていません"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr ""
+msgstr "アイテムの順序"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -12002,7 +12018,7 @@ msgstr[0] "アイテムのプロトタイプを削除しました"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "アイテムのプロトタイプの編集"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12300,7 +12316,7 @@ msgstr "LLDルール"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのLLDルールがすでに存在します。"
 
 #: app/views/correlation.edit.php:175 app/views/popup.action.edit.php:53
 #: app/views/popup.lldoverride.php:99 app/views/popup.operation.edit.php:435
@@ -12514,7 +12530,7 @@ msgstr "ライセンスは"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "制限"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
@@ -12927,7 +12943,7 @@ msgstr "メンテナンス\"%1$s\"はすでに存在します。"
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "メンテナンスの編集"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13454,7 +13470,7 @@ msgstr "メモリ上限: %1$s"
 
 #: include/classes/data/CItemData.php:2212
 msgid "Memory metrics of VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id, \"mode\"- consumed(default)/ballooned/overhead memory"
-msgstr ""
+msgstr "VMwareリソースプールのメモリメトリクス、\"url\" - VMwareサービスURL、\"rpid\" - VMwareリソースプールID、\"mode\" - consumed(デフォルト)/ballooned/overhead memory"
 
 #: include/classes/data/CItemData.php:1727
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -13555,6 +13571,10 @@ msgstr "メソッドが見つかりません。"
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "認証方法"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr "メトリクス"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13727,7 +13747,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "モジュールの編集"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -17118,7 +17138,7 @@ msgstr "リファレンスの属性"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
-msgstr ""
+msgstr "参照しているウィジェットが利用できなくなりました。設定を更新してください。"
 
 #: jsLoader.php:195
 msgid "Referred widget is unavailable"
@@ -20873,7 +20893,7 @@ msgstr "上位ホスト"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "上位アイテム"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21594,7 +21614,7 @@ msgstr "利用不可"
 
 #: jsLoader.php:206 jsLoader.php:211
 msgid "Unavailable widget"
-msgstr ""
+msgstr "利用できないウィジェット"
 
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
@@ -22179,7 +22199,7 @@ msgstr "ユーザーは無効のグループやGUIアクセスが無効のグル
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "ユーザーは無効なグループまたはGUIアクセスが無効なグループに自分自身を追加することはできません。"
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22316,7 +22336,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "ユーザーは自分自身を削除することはできません。"
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -23397,6 +23417,10 @@ msgstr "ウィジェット"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "ダッシュボード\"%1$s\"のページ#%2$d上の X:%3$d, Y:%4$d のウィジェットは範囲外です。"
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "ウィジェットは廃止予定です。"
@@ -24335,7 +24359,7 @@ msgstr "between() - 値が指定された範囲内であるかチェック (1 - 
 
 #: include/classes/api/services/CMap.php:1973
 msgid "binary item is not supported"
-msgstr ""
+msgstr "バイナリアイテムはサポートされていません"
 
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
@@ -25635,11 +25659,11 @@ msgstr "マップの作成と変更の権限がありません"
 
 #: include/classes/api/services/CUser.php:502
 msgid "no permissions to create and edit own media"
-msgstr ""
+msgstr "独自メディアの作成と変更の権限がありません"
 
 #: include/classes/api/services/CUser.php:508
 msgid "no permissions to create and edit user media"
-msgstr ""
+msgstr "ユーザーメディアの作成と変更の権限がありません"
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
@@ -25869,7 +25893,7 @@ msgstr "参照したオブジェクトが存在しません"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
 msgid "referred widget is unavailable"
-msgstr ""
+msgstr "参照しているウィジェットが利用できません"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

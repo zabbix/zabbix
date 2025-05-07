@@ -1325,13 +1325,14 @@ class testDashboardGaugeWidget extends testWidgets {
 			: self::HOST.': '.$data['fields']['Item'];
 
 		// Wait until widget with header appears on the Dashboard.
-		$dashboard->save();
-		$widget = $dashboard->waitUntilReady()->getWidget($header);
-		// Without scroll down on Jenkins error - requested image region is invalid.
-		$this->page->scrollDown();
+		$dashboard->save()->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		// TODO: Without updateViewport on Jenkins error - requested image region is invalid.
+		$this->page->updateViewport();
 
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
+		$widget = $dashboard->getWidget($header);
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 

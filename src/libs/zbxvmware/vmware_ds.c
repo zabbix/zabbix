@@ -42,6 +42,7 @@ void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 	zbx_free(dsname->name);
 	zbx_free(dsname->uuid);
+	zbx_free(dsname->id);
 	zbx_free(dsname);
 }
 

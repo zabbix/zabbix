@@ -26,7 +26,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
  *
  * @dataSource UserPermissions
  */
-class testDashboardTopTriggersWidget extends CWebTest {
+class testDashboardTopTriggersWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
