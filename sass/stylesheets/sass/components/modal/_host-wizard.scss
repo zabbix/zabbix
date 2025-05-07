@@ -155,6 +155,7 @@
 		.progress-step {
 			position: relative;
 			padding-bottom: 8px;
+			min-width: 0;
 			color: $font-alt-color;
 
 			&::after {
@@ -184,6 +185,11 @@
 			&.progress-step-disabled {
 				--progress-stype-style: dashed;
 			}
+		}
+
+		.progress-info {
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 
@@ -221,6 +227,10 @@
 	.form-field {
 		display: grid;
 		gap: 4px;
+
+		> * {
+			min-width: 0;
+		}
 
 		> label {
 			line-height: 16px;

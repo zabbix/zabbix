@@ -2990,7 +2990,11 @@ output {
   position: relative;
   vertical-align: top;
   white-space: nowrap; }
+  .multiselect-control .multiselect {
+    flex: 1 1 auto;
+    min-width: 0; }
   .multiselect-control .btn-split {
+    flex: 0 0 auto;
     margin-right: 0; }
     .multiselect-control .btn-split li:first-child {
       margin-left: 0; }
@@ -5745,6 +5749,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .progress .progress-step {
       position: relative;
       padding-bottom: 8px;
+      min-width: 0;
       color: #333333; }
       .modal-popup-host-wizard .progress .progress-step::after {
         content: '';
@@ -5764,6 +5769,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         --pregress-step-color: #990000; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-disabled {
         --progress-stype-style: dashed; }
+    .modal-popup-host-wizard .progress .progress-info {
+      overflow: hidden;
+      text-overflow: ellipsis; }
   .modal-popup-host-wizard .grid-columns .form-fields-inline {
     display: flex;
     gap: 16px; }
@@ -5782,6 +5790,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .form-field {
     display: grid;
     gap: 4px; }
+    .modal-popup-host-wizard .form-field > * {
+      min-width: 0; }
     .modal-popup-host-wizard .form-field > label {
       line-height: 16px; }
       .modal-popup-host-wizard .form-field > label .btn-small {
