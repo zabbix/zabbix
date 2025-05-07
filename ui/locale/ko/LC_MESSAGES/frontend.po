@@ -7097,6 +7097,10 @@ msgstr "디스커버리 오브젝트"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 클러스터 검색, \"url\" - VMware 서비스 URL. JSON을 반환함"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 데이터 저장소 검색, \"url\" - VMware 서비스 URL. JSON을 반환함"
@@ -7516,6 +7520,10 @@ msgstr "트리 요소의 변경"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "위젯의 변경"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -23409,6 +23417,10 @@ msgstr "위젯"
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "대시보드 \"%1$s\" 의 #%2$d 페이지에 있는 X:%3$d, Y:%4$d 의 위젯이 범위를 벗어났습니다."
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."

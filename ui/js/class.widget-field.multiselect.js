@@ -13,7 +13,7 @@
 **/
 
 
-class CWidgetFieldMultiselect {
+class CWidgetFieldMultiselect extends CWidgetField {
 
 	static #reference_icon_template = `
 		<li class="reference">
@@ -37,13 +37,6 @@ class CWidgetFieldMultiselect {
 	 * @type {Object}
 	 */
 	#multiselect_params;
-
-	/**
-	 * Field name.
-	 *
-	 * @type {string}
-	 */
-	#field_name;
 
 	/**
 	 * Data type accepted from referred data sources.
@@ -98,9 +91,10 @@ class CWidgetFieldMultiselect {
 	#is_selected_typed_reference = false;
 
 	constructor({
+		name,
+		form_name,
 		multiselect_id,
-		field_name,
-		field_value,
+		value,
 		in_type,
 		default_prevented = false,
 		widget_accepted = false,
@@ -108,7 +102,8 @@ class CWidgetFieldMultiselect {
 		object_labels,
 		params
 	}) {
-		this.#field_name = field_name;
+		super({name, form_name});
+
 		this.#labels = object_labels;
 		this.#in_type = in_type;
 		this.#default_prevented = default_prevented;
@@ -123,8 +118,8 @@ class CWidgetFieldMultiselect {
 
 		this.#initField(multiselect_id);
 
-		if (CWidgetBase.FOREIGN_REFERENCE_KEY in field_value) {
-			this.#selectTypedReference(field_value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
+		if (CWidgetBase.FOREIGN_REFERENCE_KEY in value) {
+			this.#selectTypedReference(value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 		}
 	}
 
@@ -169,13 +164,13 @@ class CWidgetFieldMultiselect {
 
 					if (this.#is_selecting_typed_reference) {
 						this.#multiselect.multiSelect('modify', {
-							name: `${this.#field_name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
+							name: `${this.getName()}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
 							selectedLimit: 1
 						});
 					}
 					else {
 						this.#multiselect.multiSelect('modify', {
-							name: `${this.#field_name}${this.#is_multiple ? '[]' : ''}`,
+							name: `${this.getName()}${this.#is_multiple ? '[]' : ''}`,
 							selectedLimit: this.#selected_limit
 						});
 					}
@@ -189,7 +184,8 @@ class CWidgetFieldMultiselect {
 				if (this.#is_selected_typed_reference) {
 					this.#multiselect_list.innerHTML = '';
 				}
-			});
+			})
+			.on('change', () => this.dispatchUpdateEvent());
 
 		this.#multiselect_list = this.#multiselect[0].querySelector('.multiselect-list');
 
@@ -345,7 +341,7 @@ class CWidgetFieldMultiselect {
 	#getWidgets() {
 		const widgets = ZABBIX.Dashboard.getReferableWidgets({
 			type: this.#in_type,
-			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+			widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 		});
 
 		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));

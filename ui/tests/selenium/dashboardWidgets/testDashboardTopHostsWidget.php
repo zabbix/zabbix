@@ -2970,7 +2970,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$column_count = 1;
 		}
 
-		$form = $this->query('id:widget-dialogue-form')->one()->asForm();
+		$form = $this->query('id:widget-form')->one()->asForm();
 		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
@@ -4173,11 +4173,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
-			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertTrue($filter->isExpanded(false));
 
 			// Check zoom filter layout.
 			if (array_key_exists('filter_layout', $data)) {
-				$filter = CFilterElement::find()->one();
+				$filter->open();
 				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
 				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
@@ -4205,7 +4206,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isVisible());
 		}
 
 		// Clear particular dashboard for next test case.
