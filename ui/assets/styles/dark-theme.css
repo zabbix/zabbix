@@ -1067,6 +1067,8 @@ footer {
   .grid-columns.columns-4 {
     grid-auto-flow: initial;
     grid-template-columns: repeat(4, 1fr); }
+  .grid-columns .column {
+    min-width: 0; }
   .grid-columns .column-first {
     grid-column-start: 1; }
   .grid-columns .column-last {
@@ -2686,17 +2688,22 @@ button {
     line-height: 18px; }
   .markdown h1:not(:first-child), .modal-popup-host-wizard .formated-text h1:not(:first-child), .markdown h2:not(:first-child), .modal-popup-host-wizard .formated-text h2:not(:first-child), .markdown h3:not(:first-child), .modal-popup-host-wizard .formated-text h3:not(:first-child), .markdown h4:not(:first-child), .modal-popup-host-wizard .formated-text h4:not(:first-child) {
     margin-top: 24px; }
-  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
+  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre, .markdown li, .modal-popup-host-wizard .formated-text li {
     margin-bottom: 0; }
-    .markdown ol:not(:first-child), .modal-popup-host-wizard .formated-text ol:not(:first-child), .markdown p:not(:first-child), .modal-popup-host-wizard .formated-text p:not(:first-child), .markdown pre:not(:first-child), .modal-popup-host-wizard .formated-text pre:not(:first-child) {
+    .markdown ol:not(:first-child), .modal-popup-host-wizard .formated-text ol:not(:first-child), .markdown ul:not(:first-child), .modal-popup-host-wizard .formated-text ul:not(:first-child), .markdown p:not(:first-child), .modal-popup-host-wizard .formated-text p:not(:first-child), .markdown pre:not(:first-child), .modal-popup-host-wizard .formated-text pre:not(:first-child), .markdown li:not(:first-child), .modal-popup-host-wizard .formated-text li:not(:first-child) {
       margin-top: 16px; }
+  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
+    list-style-position: outside;
+    padding-left: 1.5em; }
+    .markdown ol li, .modal-popup-host-wizard .formated-text ol li, .markdown ul li, .modal-popup-host-wizard .formated-text ul li {
+      padding-bottom: 0; }
+  .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
+    overflow: hidden; }
   .markdown pre, .modal-popup-host-wizard .formated-text pre {
     padding: 5px;
     background: #f8f8f8;
     border: 1px solid #4f4f4f;
     border-radius: 2px; }
-  .markdown a, .modal-popup-host-wizard .formated-text a {
-    margin-right: calc(12px + 2px); }
 
 .menu-main > li {
   line-height: 16px; }
@@ -3064,10 +3071,8 @@ output {
   vertical-align: top;
   white-space: nowrap; }
   .multiselect-control .multiselect {
-    flex: 1 1 auto;
     min-width: 0; }
   .multiselect-control .btn-split {
-    flex: 0 0 auto;
     margin-right: 0; }
     .multiselect-control .btn-split li:first-child {
       margin-left: 0; }
@@ -5846,8 +5851,14 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-radius: 2px; }
     .modal-popup-host-wizard .form-field input[type="checkbox"] + label {
       cursor: pointer; }
-    .modal-popup-host-wizard .form-field .multiselect {
-      width: 100%; }
+    .modal-popup-host-wizard .form-field .multiselect-control {
+      width: auto; }
+      .modal-popup-host-wizard .form-field .multiselect-control .multiselect {
+        flex: 1 1 auto; }
+      .modal-popup-host-wizard .form-field .multiselect-control .btn-split {
+        margin-right: 0; }
+        .modal-popup-host-wizard .form-field .multiselect-control .btn-split li:first-child {
+          margin-left: 0; }
     .modal-popup-host-wizard .form-field.field-checkbox {
       gap: 0; }
       .modal-popup-host-wizard .form-field.field-checkbox label {
@@ -5955,9 +5966,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   position: relative; }
   .link-external::after, .markdown a::after, .modal-popup-host-wizard .formated-text a::after {
     content: "";
-    position: absolute;
+    position: relative;
     bottom: 1px;
-    right: calc(-12px - 2px);
+    margin-left: 2px;
     font-size: 12px; }
 
 .disabled {

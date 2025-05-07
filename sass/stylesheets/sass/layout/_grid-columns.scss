@@ -19,6 +19,10 @@
 		grid-template-columns: repeat(4, 1fr);
 	}
 
+	.column {
+		min-width: 0;
+	}
+
 	.column-first {
 		grid-column-start: 1;
 	}

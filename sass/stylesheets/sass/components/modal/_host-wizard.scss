@@ -250,8 +250,20 @@
 			cursor: pointer;
 		}
 
-		.multiselect {
-			width: 100%;
+		.multiselect-control {
+			width: auto;
+
+			.multiselect {
+				flex: 1 1 auto;
+			}
+
+			.btn-split {
+				margin-right: 0;
+
+				li:first-child {
+					margin-left: 0;
+				}
+			}
 		}
 
 		&.field-checkbox {

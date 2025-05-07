@@ -23,12 +23,25 @@
 		}
 	}
 
-	ol, p, pre {
+	ol, ul, p, pre, li {
 		margin-bottom: 0;
 
 		&:not(:first-child) {
 			margin-top: 16px;
 		}
+	}
+
+	ol, ul {
+		list-style-position: outside;
+		padding-left: 1.5em;
+
+		li {
+			padding-bottom: 0;
+		}
+	}
+
+	p, pre {
+		overflow: hidden;
 	}
 
 	pre {
@@ -40,7 +53,5 @@
 
 	a {
 		@extend .link-external;
-
-		margin-right: calc(#{$icon-small-size} + 2px);
 	}
 }

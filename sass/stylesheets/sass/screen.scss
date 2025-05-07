@@ -172,9 +172,9 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		@extend %icons-font;
 
 		content: $zi-link-external-small;
-		position: absolute;
+		position: relative;
 		bottom: 1px;
-		right: calc(-#{$icon-small-size} - 2px);
+		margin-left: 2px;
 		font-size: $icon-small-size;
 	}
 }

@@ -2285,6 +2285,7 @@ define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');
 define('ZBX_STYLE_GRID_COLUMNS_2', 'columns-2');
 define('ZBX_STYLE_GRID_COLUMNS_3', 'columns-3');
 define('ZBX_STYLE_GRID_COLUMNS_4', 'columns-4');
+define('ZBX_STYLE_GRID_COLUMN', 'column');
 define('ZBX_STYLE_GRID_COLUMN_FIRST', 'column-first');
 define('ZBX_STYLE_GRID_COLUMN_LAST', 'column-last');
 define('ZBX_STYLE_GRID_COLUMN_FULL', 'column-full');

@@ -493,6 +493,7 @@ function stepAddHostInterface(): array {
 							new CTag('p', true, _s('The template you selected (%1$s) requires the %2$s to be added to the host (%3$s).', '#{template_name}', '#{interfaces_long}', '#{host_name}')),
 							new CTag('p', true, _s('Note: %1$s must be configured and enabled on your monitoring target.', '#{interfaces_short}'))
 						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN)
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 							->addClass(ZBX_STYLE_FORMATED_TEXT)
 					)
