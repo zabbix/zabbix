@@ -292,6 +292,7 @@ window.host_wizard_edit = new class {
 			templates_section: tmpl('host-wizard-templates-section'),
 			card: tmpl('host-wizard-template-card'),
 			tag: tmpl('host-wizard-template-tag'),
+			tags_more: tmpl('host-wizard-template-tags-more'),
 
 			install_agent_readme_linux: tmpl('host-wizard-step-install-agent-os-linux'),
 			install_agent_readme_windows_new: tmpl('host-wizard-step-install-agent-os-windows-new'),
@@ -313,9 +314,6 @@ window.host_wizard_edit = new class {
 			`),
 			progress_step_info: new Template(`
 				<div class="progress-info">#{info}</div>
-			`),
-			tag_more: new Template(`
-				<button type="button" class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_MORE}"></button>
 			`),
 			description: new Template(`
 				<div class="${ZBX_STYLE_FORM_DESCRIPTION} ${ZBX_STYLE_MARKDOWN}">#{description}</div>
@@ -1082,6 +1080,10 @@ window.host_wizard_edit = new class {
 
 		const tags_list = card.querySelector(`.${ZBX_STYLE_TAGS_LIST}`);
 
+		const tag = (tag_value) => this.#view_templates.tag.evaluateToElement({
+			tag_value: Object.values(tag_value).join(':')
+		});
+
 		/**
 		 * @type {HTMLDivElement}
 		 */
@@ -1099,9 +1101,7 @@ window.host_wizard_edit = new class {
 		let all_fits = true;
 
 		for (let i = 0; i < template.tags.length; i++) {
-			const tag_value = Object.values(template.tags[i]).join(':');
-			const tag_element = this.#view_templates.tag.evaluateToElement({tag_value});
-
+			const tag_element = tag(template.tags[i]);
 			temp_tag_list.appendChild(tag_element);
 
 			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
@@ -1112,7 +1112,9 @@ window.host_wizard_edit = new class {
 		}
 
 		if (!all_fits) {
-			temp_tag_list.appendChild(this.#view_templates.tag_more.evaluateToElement());
+			temp_tag_list.appendChild(this.#view_templates.tags_more.evaluateToElement({
+				tag_values: template.tags.map(tag_value => tag(tag_value).outerHTML).join('')
+			}));
 
 			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
 				const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);

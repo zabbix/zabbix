@@ -241,6 +241,10 @@ function stepSelectTemplate($old_template_count): array {
 			(new CSpan('#{tag_value}'))
 				->addClass(ZBX_STYLE_TAG)
 				->setHint('#{tag_value}')
+		),
+		new CTemplateTag('host-wizard-template-tags-more',
+			(new CButtonIcon(ZBX_ICON_MORE))
+				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP)
 		)
 	];
 }
