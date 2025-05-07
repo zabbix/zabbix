@@ -222,6 +222,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		'hostids' => [$hostid],
 		'editable' => true
 	];
+
 	if ($lld_ruleid == 0) {
 		$options['selectItems'] = API_OUTPUT_COUNT;
 		$options['selectTriggers'] = API_OUTPUT_COUNT;
@@ -239,6 +240,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			'templateids' => [$hostid],
 			'editable' => true
 		];
+
 		if ($lld_ruleid == 0) {
 			$options['selectItems'] = API_OUTPUT_COUNT;
 			$options['selectTriggers'] = API_OUTPUT_COUNT;
@@ -332,7 +334,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			while (!$db_current_discovery['discoveryRule']) {
 				$db_current_discovery = API::DiscoveryRulePrototype()->get([
 					'output' => ['itemid', 'name'],
-					'discoveryruleids' => [$parent['itemid']],
+					'itemids' => [$parent['itemid']],
 					'selectDiscoveryRule' => ['itemid', 'name'],
 					'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 					'editable' => true

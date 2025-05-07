@@ -725,6 +725,9 @@ if (hasRequest('form')) {
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_itemid'],
 			'itemids' => $itemid
 		]);
 		$item = $items[0];
@@ -773,6 +776,8 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+	$data['discovered_lld'] = false;
+
 	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
 		throw new CAccessDeniedException();
 	}
@@ -847,6 +852,10 @@ if (hasRequest('form')) {
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
+
+		$data['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+		$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+		$data['discoveryData'] = $item['discoveryData'];
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
