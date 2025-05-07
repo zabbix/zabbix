@@ -1440,8 +1440,8 @@ class CSetupWizard extends CForm {
 		return $result;
 	}
 
-	private function checkServerTLSConfiguration(): bool {
-		if ((int)$this->getConfig('ZBX_SERVER_TLS') === 0) {
+	private function checkServerTLSConfiguration() {
+		if ((int) $this->getConfig('ZBX_SERVER_TLS') === 0) {
 			return true;
 		}
 
