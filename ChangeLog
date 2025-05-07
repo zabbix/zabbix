@@ -1,12 +1,16 @@
 Changes for 7.0.13rc1
 
 New features:
+.........T [ZBXNEXT-9909] added Azure Backup Jobs by HTTP template (abrosimovs)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 .......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
 ........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+.........T [ZBX-26050] updated dashboards in Zabbix server/proxy health templates (aiantsen)
+..F....... [ZBX-26390] updated templated dashboard help icon link (Sasha)
+..F....... [ZBX-25691] fixed the Problems by severity widget to display all existing problems (wczerneha)
 .........T [ZBX-25931] updated LLD filters in systemd by Zabbix agent 2 template (drasikhov)
 .........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
 ........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
