@@ -236,6 +236,11 @@ function stepSelectTemplate($old_template_count): array {
 					]))->addClass('template-info-toggles')
 				)
 				->addClass(CRadioCardList::ZBX_STYLE_CLASS_CARD)
+		),
+		new CTemplateTag('host-wizard-template-tag',
+			(new CSpan('#{tag_value}'))
+				->addClass(ZBX_STYLE_TAG)
+				->setHint('#{tag_value}')
 		)
 	];
 }
