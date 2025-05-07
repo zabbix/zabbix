@@ -4376,7 +4376,7 @@ class CApiInputValidator {
 
 	private static function validateCertificate($rule, &$data, $path, &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-		
+
 		if (str_contains($path, 'sp_certificate')) {
 			$path = _s('SP certificate');
 		}
