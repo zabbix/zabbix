@@ -1812,7 +1812,7 @@ class testLld extends CIntegrationTest
 				],
 				'countOutput' => true
 			]);
-			//$this->assertEquals($tc['expected']['hosts'], $response['result']);
+			$this->assertEquals($tc['expected']['hosts'], $response['result']);
 		}
 	}
 
@@ -1877,8 +1877,6 @@ class testLld extends CIntegrationTest
 		];
 
 		$this->checkResourceRemoval($hostname, $hostid, $testcases);
-
-		CDataHelper::call('host.delete', [$hostid]);
 	}
 
 	private function importHost($name)
