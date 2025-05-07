@@ -59,7 +59,6 @@
 			this.#addMfaMethods(mfa_methods, mfa_default_row_index);
 			this.#setTableVisiblityState(this.mfa_table, mfa_readonly);
 			this.#disableRemoveLinksWithUserGroups(this.mfa_table);
-			this.#loadSamlIdentityElements();
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
 		}
@@ -130,50 +129,27 @@
 				);
 			});
 
-			// SSO upload
-			this.form.querySelectorAll('.saml-identity').forEach(identity => {
-				const button = identity.querySelector('.saml-change-identity-div');
-				const input = identity.querySelector('.saml-add-identity-div');
-				const textarea = input.querySelector('textarea');
+			for (const button of [...this.form.querySelectorAll('.saml-change-identity-button')]) {
+				button.addEventListener('click', e => {
+					const container = e.target.parentNode.querySelector('.saml-add-identity-div');
+					const textarea = container.querySelector('textarea');
 
-				button.addEventListener('click', (e) => {
+					container.style.display = '';
 					textarea.classList.add('saml-enabled');
-					textarea.disabled = false;
-
-					input.classList.remove('display-none');
-					button.classList.add('display-none');
-
-					textarea.value = '';
-
-					if (textarea.classList.length === 0) {
-						textarea.removeAttribute('class');
-					}
+					textarea.removeAttribute('disabled');
+					e.target.remove();
 				});
-			});
+			}
 
-			this.form.querySelectorAll('.saml-upload-identity-button').forEach(upload_button => {
-				const file_input = upload_button.parentElement.querySelector('input[type="file"]');
-				const file_content = upload_button.parentElement.querySelector('textarea');
+			for (const button of [...this.form.querySelectorAll('.saml-upload-identity-button')]) {
+				button.addEventListener('click', e => {
+					const textarea = e.target.parentNode.querySelector('textarea');
+					const extension_filter = textarea.name === 'sp_private_key'
+						? '.key, .pem, .txt' : '.cer, .crt, .pem, .txt';
 
-				upload_button.addEventListener('click', function() {
-					file_input.click();
+					this.#setSelectedFileContentTo(textarea, extension_filter);
 				});
-
-				file_input.addEventListener('change', function(event) {
-					const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
-
-					if (file) {
-						const reader = new FileReader();
-
-						reader.onload = function(e) {
-							file_content.value = e.target.result;
-						};
-
-						reader.readAsText(file);
-					}
-				});
-			});
-			// End SSO upload
+			}
 
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
 				if (e.target.classList.contains('disabled')) {
@@ -261,6 +237,27 @@
 			});
 		}
 
+		#setSelectedFileContentTo(textarea, extension_filter) {
+			const input = document.createElement('input');
+
+			input.type = 'file';
+			input.accept = extension_filter;
+			input.addEventListener('change', e => {
+				const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+
+				if (file) {
+					const reader = new FileReader();
+
+					reader.onload = function(e) {
+						textarea.value = e.target.result;
+					};
+
+					reader.readAsText(file);
+				}
+			});
+			input.dispatchEvent(new MouseEvent('click'));
+		}
+
 		#addLdapSettingsEventListeners() {
 			if (this.ldap_auth_enabled === null) {
 				return;
@@ -334,33 +331,27 @@
 			}
 
 			const idp_certificate_input = document.getElementById('idp_certificate');
-			if (idp_certificate_input) {
-				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
-						&& idp_certificate_input.value === '') {
-					warnings.push(<?= json_encode(
-						_('You are about to erase existing IdP certificate.')
-					) ?>);
-				}
+			if (this.saml_idp_certificate_exists && !idp_certificate_input.disabled
+					&& idp_certificate_input.value === '') {
+				warnings.push(<?= json_encode(
+					_('You are about to erase existing IdP certificate.')
+				) ?>);
 			}
 
 			const sp_certificate_input = document.getElementById('sp_certificate');
-			if (sp_certificate_input) {
-				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
-						&& sp_certificate_input.value === '') {
-					warnings.push(<?= json_encode(
-						_('You are about to erase existing SP certificate.')
-					) ?>);
-				}
+			if (this.saml_sp_certificate_exists && !sp_certificate_input.disabled
+					&& sp_certificate_input.value === '') {
+				warnings.push(<?= json_encode(
+					_('You are about to erase existing SP certificate.')
+				) ?>);
 			}
 
 			const sp_private_key_input = document.getElementById('sp_private_key');
-			if (sp_private_key_input) {
-				if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
-						&& sp_private_key_input.value === '') {
-					warnings.push(<?= json_encode(
-						_('You are about to erase existing SP private key.')
-					) ?>);
-				}
+			if (this.saml_sp_private_key_exists && !sp_private_key_input.disabled
+					&& sp_private_key_input.value === '') {
+				warnings.push(<?= json_encode(
+					_('You are about to erase existing SP private key.')
+				) ?>);
 			}
 
 			return warnings.length > 0 ? confirm(warnings.join("\n")) : true;

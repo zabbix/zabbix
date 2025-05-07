@@ -310,94 +310,79 @@ if ($data['saml_certs_editable']) {
 		->addItem([
 			(new CLabel(_('IdP certificate')))->addClass('saml-identity-label'),
 			(new CFormField([
-				(new CDiv([
-					(new CSimpleButton(_('Change IdP certificate')))
+				$data['idp_certificate_hash'] === ''
+					? null
+					: (new CSimpleButton(_('Change IdP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
-						->addClass('saml-enabled')
-				]))
-					->addClass('saml-change-identity-div')
-					->addClass($data['idp_certificate_hash'] === '' ? ZBX_STYLE_DISPLAY_NONE : ''),
+						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('idp_certificate', ''))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					(new CTextArea('idp_certificate'))
+						->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-						->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
-						->addClass('saml-enabled'),
+						->addClass($data['idp_certificate_hash'] === '' ? 'saml-enabled' : '')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setEnabled($data['idp_certificate_hash'] === ''),
 					(new CButton('idp_certificate_input_button', _('Choose file')))
-						->addClass('file-upload-btn')
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-upload-identity-button')
 						->addClass('saml-enabled'),
-					(new CFile('idp_certificate_input_file'))
-						->addClass(ZBX_STYLE_DISPLAY_NONE)
-						->setAttribute('accept', '.cer, .crt, .pem, .txt')
 				]))
 					->addClass('saml-add-identity-div')
-					->addClass($data['idp_certificate_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
+					->addStyle($data['idp_certificate_hash'] === '' ? '' : 'display:none'),
 			]))->addClass('saml-identity')
 		])
 		->addItem([
 			(new CLabel(_('SP private key')))->addClass('saml-identity-label'),
 			(new CFormField([
-				(new CDiv([
-					(new CSimpleButton(_('Change SP private key')))
+				$data['sp_private_key_hash'] === ''
+					? null
+					: (new CSimpleButton(_('Change SP private key')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
-						->addClass('saml-enabled')
-				]))
-					->addClass('saml-change-identity-div')
-					->addClass($data['sp_private_key_hash'] === '' ? ZBX_STYLE_DISPLAY_NONE : ''),
+						->addClass('saml-enabled'),
 				(new CDiv([
 					(new CTextArea('sp_private_key', ''))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('PEM-encoded SP private key'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-						->setAttribute('placeholder', _('PEM-encoded SP private key'))
-						->addClass('saml-enabled'),
+						->addClass($data['sp_private_key_hash'] === '' ? 'saml-enabled' : '')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setEnabled($data['sp_private_key_hash'] === ''),
 					(new CButton('sp_private_key_input_button', _('Choose file')))
-						->addClass('file-upload-btn')
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-upload-identity-button')
 						->addClass('saml-enabled'),
-					(new CFile('sp_private_key_input_file'))
-						->addClass(ZBX_STYLE_DISPLAY_NONE)
-						->setAttribute('accept', '.key, .pem, .txt')
 				]))
 					->addClass('saml-add-identity-div')
-					->addClass($data['sp_private_key_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
+					->addStyle($data['sp_private_key_hash'] === '' ? '' : 'display:none'),
 			]))->addClass('saml-identity')
 		])
 		->addItem([
 			(new CLabel(_('SP certificate')))->addClass('saml-identity-label'),
 			(new CFormField([
-				(new CDiv([
-					(new CSimpleButton(_('Change SP certificate')))
+				$data['sp_certificate_hash'] === ''
+					? null
+					: (new CSimpleButton(_('Change SP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-change-identity-button')
-						->addClass('saml-enabled')
-				]))
-					->addClass('saml-change-identity-div')
-					->addClass($data['sp_certificate_hash'] === '' ? ZBX_STYLE_DISPLAY_NONE : ''),
+						->addClass('saml-enabled'),
 				(new CDiv([
 					(new CTextArea('sp_certificate', ''))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('PEM-encoded SP certificate'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-						->setAttribute('placeholder', _('PEM-encoded SP certificate'))
-						->addClass('saml-enabled'),
+						->addClass($data['sp_certificate_hash'] === '' ? 'saml-enabled' : '')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setEnabled($data['sp_certificate_hash'] === ''),
 					(new CButton('sp_certificate_input_button', _('Choose file')))
-						->addClass('file-upload-btn')
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('saml-upload-identity-button')
 						->addClass('saml-enabled'),
-					(new CFile('sp_certificate_input_file'))
-						->addClass(ZBX_STYLE_DISPLAY_NONE)
-						->setAttribute('accept', '.cer, .crt, .pem, .txt')
 				]))
 					->addClass('saml-add-identity-div')
-					->addClass($data['sp_certificate_hash'] !== '' ? ZBX_STYLE_DISPLAY_NONE : ''),
+					->addStyle($data['sp_certificate_hash'] === '' ? '' : 'display:none'),
 			]))->addClass('saml-identity')
 		]);
 }
