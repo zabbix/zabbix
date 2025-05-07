@@ -28,7 +28,7 @@ class CSystemInfoHelper {
 	 */
 	public static function getData(): array {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-		
+
 		$data = [
 			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),

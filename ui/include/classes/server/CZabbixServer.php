@@ -398,7 +398,7 @@ class CZabbixServer {
 		if ($this->connect() === false) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -609,14 +609,14 @@ class CZabbixServer {
 					$this->error = _('TLS fields are misconfigured or the files are not accessible.');
 					return false;
 				}
-				
+
 				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
 				stream_context_set_option($context, 'ssl', 'capture_peer_cert', $ZBX_SERVER_TLS['CERTIFICATE_CHECK']);
 				stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 			}
-			
+
 			if (!$socket = @stream_socket_client($protocol . $this->host . ':' . $this->port, $errorCode, $errorMsg,
 				$this->connect_timeout, STREAM_CLIENT_CONNECT, $context)) {
 				$host_port = $this->host . ':' . $this->port;

@@ -898,7 +898,7 @@ class CSetupWizard extends CForm {
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			]);
-		
+
 		if ($this->step_failed) {
 			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, CMessageHelper::getMessages(),
 				_('TLS fields are misconfigured or the files are not accessible.'), false, true
