@@ -205,9 +205,7 @@ class ZColorPicker extends HTMLElement {
 			this.#preview = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_PREVIEW}`);
 
 			this.#mutation_observer = new MutationObserver(() => {
-				const box_rect = this.#box.getBoundingClientRect();
-
-				if (!isVisible(this.#box) || box_rect.x !== this.#box.pos.x || box_rect.y !== this.#box.pos.y) {
+				if (!isVisible(this.#box)) {
 					this.#closeDialog();
 				}
 			});
@@ -452,17 +450,19 @@ class ZColorPicker extends HTMLElement {
 						}
 					}
 				}
-				else if (e.target.closest(`.${ZColorPicker.ZBX_STYLE_DIALOG}`) === null) {
-					if (this.#is_dialog_open) {
-						this.#closeDialog();
-					}
-				}
 			},
 
 			documentKeydown: e => {
 				if (e.key === 'Escape') {
 					e.stopPropagation();
 
+					this.#closeDialog();
+				}
+			},
+
+			documentMousedown: e => {
+				if (e.target.closest(`.${ZColorPicker.ZBX_STYLE_BOX}`) === null
+						&& e.target.closest(`.${ZColorPicker.ZBX_STYLE_DIALOG}`) === null && this.#is_dialog_open) {
 					this.#closeDialog();
 				}
 			},
@@ -530,13 +530,6 @@ class ZColorPicker extends HTMLElement {
 
 		this.#is_dialog_open = true;
 
-		const box_rect = this.#box.getBoundingClientRect();
-
-		this.#box.pos = {
-			x: box_rect.x,
-			y: box_rect.y
-		};
-
 		this.#updatePreview();
 		this.#updateHighlight();
 		this.#updateApplyButton();
@@ -600,6 +593,7 @@ class ZColorPicker extends HTMLElement {
 		this.#input.addEventListener('input', this.#events.inputChange);
 
 		document.addEventListener('keydown', this.#events.documentKeydown, {capture: true});
+		document.addEventListener('mousedown', this.#events.documentMousedown);
 
 		addEventListener('resize', this.#events.windowResize);
 		addEventListener('scroll', this.#events.windowScroll, {capture: true});
@@ -624,6 +618,7 @@ class ZColorPicker extends HTMLElement {
 		this.#input.removeEventListener('input', this.#events.inputChange);
 
 		document.removeEventListener('keydown', this.#events.documentKeydown, {capture: true});
+		document.removeEventListener('mousedown', this.#events.documentMousedown);
 
 		removeEventListener('resize', this.#events.windowResize);
 		removeEventListener('scroll', this.#events.windowScroll, {capture: true});
