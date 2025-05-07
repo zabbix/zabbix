@@ -1656,15 +1656,15 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => 10000],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => 10000],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => 10000],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 		]];
