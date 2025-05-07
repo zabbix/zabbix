@@ -21,11 +21,11 @@
  *
  * @param {string}      type             Dialogue type (currently supported: "popup").
  * @param {string|null} dialogueid       Dialogue ID.
- * @param {*}           trigger_element  Focusable element to focus back when overlay is closed.
  * @param {boolean}     is_modal         Whether to prevent interaction with background objects.
  * @param {boolean}     is_draggable     Whether to allow dragging the form around.
  * @param {string}      position         Positioning strategy (Overlay.prototype.POSITION_*).
  * @param {Object|null} position_fix     Specific position, if not null (same as returned by "this.getPositionFix").
+ * @param {*}           trigger_element  Focusable element to focus back when overlay is closed.
  */
 function Overlay({
 	type,
@@ -34,7 +34,7 @@ function Overlay({
 	is_draggable = false,
 	position = this.POSITION_CENTER_TOP,
 	position_fix = null,
-	trigger_element = null
+	trigger_element = undefined
 } = {}) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
