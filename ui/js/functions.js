@@ -62,20 +62,8 @@ function testUserSound(idx) {
 	}
 }
 
-function escapeHtml(input) {
-	if (typeof input !== 'string') return '';
-
-	const blacklist = ['script', 'iframe', 'object', 'embed', 'link', 'style'];
-	let cleaned = input;
-
-	for (const tag of blacklist) {
-		const regex = new RegExp(`<${tag}\\b[^<]*(?:(?!</${tag}>)[^<]*)*</${tag}>`, 'gi');
-		cleaned = cleaned.replace(regex, '');
-	}
-
-	return cleaned
-		.replace(/<(script|iframe|object|embed|link|style)(\s[^>]*)?>/gi, '')
-		.replace(/\son\w+='[^']*'/gi, '')
+function escapeHtml(string) {
+	return string
 		.replace(/&/g,'&amp;')
 		.replace(/</g,'&lt;')
 		.replace(/>/g,'&gt;')

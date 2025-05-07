@@ -1079,9 +1079,11 @@ window.host_wizard_edit = new class {
 
 		const tags_list = card.querySelector(`.${ZBX_STYLE_TAGS_LIST}`);
 
-		const tag = (tag_value) => this.#view_templates.tag.evaluateToElement({
-			tag_value: Object.values(tag_value).join(':')
-		});
+		const tag = ({tag, value}) => {
+			const tag_value = [tag, value].filter(val => val !== '').join(': ');
+
+			return this.#view_templates.tag.evaluateToElement({tag_value, hint_tag_value: escapeHtml(tag_value)});
+		}
 
 		/**
 		 * @type {HTMLDivElement}

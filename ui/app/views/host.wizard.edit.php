@@ -236,7 +236,7 @@ function stepSelectTemplate($old_template_count): array {
 		new CTemplateTag('host-wizard-template-tag',
 			(new CSpan('#{tag_value}'))
 				->addClass(ZBX_STYLE_TAG)
-				->setHint('#{tag_value}')
+				->setHint('#{hint_tag_value}')
 		),
 		new CTemplateTag('host-wizard-template-tags-more',
 			(new CButtonIcon(ZBX_ICON_MORE))
