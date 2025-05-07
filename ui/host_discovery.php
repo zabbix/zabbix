@@ -726,7 +726,6 @@ if (hasRequest('form')) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 			'selectDiscoveryData' => ['parent_itemid'],
 			'itemids' => $itemid
 		]);
@@ -854,8 +853,11 @@ if (hasRequest('form')) {
 		CArrayHelper::sort($data['overrides'], ['step']);
 
 		$data['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
-		$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
-		$data['discoveryData'] = $item['discoveryData'];
+
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$data['discoveryRule'] = $item['discoveryRule'];
+			$data['discoveryData'] = $item['discoveryData'];
+		}
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
