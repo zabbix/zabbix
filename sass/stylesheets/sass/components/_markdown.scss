@@ -17,7 +17,13 @@
 		line-height: 18px;
 	}
 
-	p {
+	h1, h2, h3, h4 {
+		&:not(:first-child) {
+			margin-top: 24px;
+		}
+	}
+
+	ol, p, pre {
 		margin-bottom: 0;
 
 		&:not(:first-child) {
@@ -34,5 +40,7 @@
 
 	a {
 		@extend .link-external;
+
+		margin-right: calc(#{$icon-small-size} + 2px);
 	}
 }

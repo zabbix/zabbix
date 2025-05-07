@@ -126,49 +126,53 @@ function stepSelectTemplate($old_template_count): array {
 
 				(new CSection())
 					->addItem(
-						(new CDiv([
-							new CTag('h1', true, _('Select a template')),
-							new CTag('p', true, _('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.')),
-						]))
-							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-							->addClass(ZBX_STYLE_FORMATED_TEXT)
-					)
-					->addItem(
-						(new CFormField([
-							(new CTextBox('template_search_query'))
-								->setAttribute('placeholder', _('Apache, AWS, MySQL, etc.')),
-							(new CDiv(_('Type a keyword to search for templates.')))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-						]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-					)
-					->addItem(
-						(new CDiv([
-							new CFormField([
-								new CLabel(_('Data collection')),
-								(new CRadioButtonList('data_collection'))
-									->addValue(_('All'), ZBX_TEMPLATE_DATA_COLLECTION_ANY)
-									->addValue(_('Agent-based'), ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED)
-									->addValue(_('Agentless'), ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS)
-									->setModern()
-							]),
-							new CFormField([
-								new CLabel(_('Agent mode')),
-								(new CRadioButtonList('agent_mode'))
-									->addValue(_('All'), ZBX_TEMPLATE_AGENT_MODE_ANY)
-									->addValue(_('Active'), ZBX_TEMPLATE_AGENT_MODE_ACTIVE)
-									->addValue(_('Passive'), ZBX_TEMPLATE_AGENT_MODE_PASSIVE)
-									->setModern()
-							]),
-							(new CFormField([
-								new CLabel(_('Show templates')),
-								(new CRadioButtonList('show_templates'))
-									->addValue(_('All'), ZBX_TEMPLATE_SHOW_ANY)
-									->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
-									->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
-									->setModern()
-							]))->addClass('js-show-templates'),
-						]))
-							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
-							->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
+						(new CDiv())
+							->addItem(
+								(new CDiv([
+									new CTag('h1', true, _('Select a template')),
+									new CTag('p', true, _('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.')),
+								]))
+									->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+									->addClass(ZBX_STYLE_FORMATED_TEXT)
+							)
+							->addItem(
+								(new CFormField([
+									(new CTextBox('template_search_query'))
+										->setAttribute('placeholder', _('Apache, AWS, MySQL, etc.')),
+									(new CDiv(_('Type a keyword to search for templates.')))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							)
+							->addItem(
+								(new CDiv([
+									new CFormField([
+										new CLabel(_('Data collection')),
+										(new CRadioButtonList('data_collection'))
+											->addValue(_('All'), ZBX_TEMPLATE_DATA_COLLECTION_ANY)
+											->addValue(_('Agent-based'), ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED)
+											->addValue(_('Agentless'), ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS)
+											->setModern()
+									]),
+									new CFormField([
+										new CLabel(_('Agent mode')),
+										(new CRadioButtonList('agent_mode'))
+											->addValue(_('All'), ZBX_TEMPLATE_AGENT_MODE_ANY)
+											->addValue(_('Active'), ZBX_TEMPLATE_AGENT_MODE_ACTIVE)
+											->addValue(_('Passive'), ZBX_TEMPLATE_AGENT_MODE_PASSIVE)
+											->setModern()
+									]),
+									(new CFormField([
+										new CLabel(_('Show templates')),
+										(new CRadioButtonList('show_templates'))
+											->addValue(_('All'), ZBX_TEMPLATE_SHOW_ANY)
+											->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
+											->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
+											->setModern()
+									]))->addClass('js-show-templates'),
+								]))
+									->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
+									->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
+							)
+							->addClass(ZBX_STYLE_FORMATED_GROUP)
 					)
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2),

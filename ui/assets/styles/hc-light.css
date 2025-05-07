@@ -2625,15 +2625,19 @@ button {
     font-size: 12px;
     font-weight: 700;
     line-height: 18px; }
-  .markdown p, .modal-popup-host-wizard .formated-text p {
+  .markdown h1:not(:first-child), .modal-popup-host-wizard .formated-text h1:not(:first-child), .markdown h2:not(:first-child), .modal-popup-host-wizard .formated-text h2:not(:first-child), .markdown h3:not(:first-child), .modal-popup-host-wizard .formated-text h3:not(:first-child), .markdown h4:not(:first-child), .modal-popup-host-wizard .formated-text h4:not(:first-child) {
+    margin-top: 24px; }
+  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
     margin-bottom: 0; }
-    .markdown p:not(:first-child), .modal-popup-host-wizard .formated-text p:not(:first-child) {
+    .markdown ol:not(:first-child), .modal-popup-host-wizard .formated-text ol:not(:first-child), .markdown p:not(:first-child), .modal-popup-host-wizard .formated-text p:not(:first-child), .markdown pre:not(:first-child), .modal-popup-host-wizard .formated-text pre:not(:first-child) {
       margin-top: 16px; }
   .markdown pre, .modal-popup-host-wizard .formated-text pre {
     padding: 5px;
     background: #f8f8f8;
     border: 1px solid #888888;
     border-radius: 2px; }
+  .markdown a, .modal-popup-host-wizard .formated-text a {
+    margin-right: calc(12px + 2px); }
 
 .menu-main > li {
   line-height: 16px; }
