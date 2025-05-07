@@ -434,11 +434,8 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	char			*param = NULL, *port = NULL;
 	zbx_dc_item_t		item;
 	int			version;
-	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	um_handle = zbx_dc_open_user_macros_masked();
 
 	*error = '\0';
 	memset(&item, 0, sizeof(item));
@@ -452,7 +449,9 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	port = zbx_strdup(port, item.interface.port_orig);
 
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 	zbx_dc_expand_user_and_func_macros(um_handle, &port, &host->hostid, 1, NULL);
+	zbx_dc_close_user_macros(um_handle);
 
 	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
@@ -492,8 +491,6 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 fail:
 	zbx_free(port);
 	zbx_free(param);
-
-	zbx_dc_close_user_macros(um_handle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -748,12 +745,15 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
-	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
+	zbx_dc_um_handle_t	*um_handle = NULL, *um_handle_secure = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	um_handle = zbx_dc_open_user_macros_masked();
-	um_handle_secure = zbx_dc_open_user_macros_secure();
+	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
+	{
+		um_handle = zbx_dc_open_user_macros_masked();
+		um_handle_secure = zbx_dc_open_user_macros_secure();
+	}
 
 	switch (script->type)
 	{
@@ -784,8 +784,11 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 			goto out;
 	}
 
-	zbx_dc_close_user_macros(um_handle_secure);
-	zbx_dc_close_user_macros(um_handle);
+	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
+	{
+		zbx_dc_close_user_macros(um_handle_secure);
+		zbx_dc_close_user_macros(um_handle);
+	}
 
 	ret = SUCCEED;
 out:

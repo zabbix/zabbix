@@ -697,9 +697,6 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
 			__func__, httptest->httptest.httptestid, httptest->httptest.name);
 
-	um_handle = zbx_dc_open_user_macros_masked();
-	um_handle_secure = zbx_dc_open_user_macros_secure();
-
 	result = zbx_db_select(
 			"select httpstepid,no,name,url,timeout,posts,required,status_codes,post_type,follow_redirects,"
 				"retrieve_mode"
@@ -709,7 +706,9 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 			httptest->httptest.httptestid);
 
 	buffer = zbx_strdup(buffer, httptest->httptest.delay);
+	um_handle = zbx_dc_open_user_macros_masked();
 	zbx_dc_expand_user_and_func_macros(um_handle, &buffer, &host->hostid, 1, NULL);
+	zbx_dc_close_user_macros(um_handle);
 
 	/* Avoid the potential usage of uninitialized values when: */
 	/* 1) compile without libCURL support */
@@ -770,6 +769,9 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
 
+		um_handle = zbx_dc_open_user_macros_masked();
+		um_handle_secure = zbx_dc_open_user_macros_secure();
+
 		zbx_substitute_macros(&db_httpstep.url, NULL, 0, &macro_httptest_field_resolv, um_handle_secure, host);
 
 		http_substitute_variables(httptest, &db_httpstep.url);
@@ -795,14 +797,17 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		else
 			db_httpstep.posts = NULL;
 
+		buffer = zbx_strdup(buffer, row[4]);
+		zbx_dc_expand_user_and_func_macros(um_handle, &buffer, &host->hostid, 1, NULL);
+
+		zbx_dc_close_user_macros(um_handle_secure);
+		zbx_dc_close_user_macros(um_handle);
+
 		if (SUCCEED != httpstep_load_pairs(host, &httpstep))
 		{
 			err_str = zbx_strdup(err_str, "cannot load web scenario step data");
 			goto httpstep_error;
 		}
-
-		buffer = zbx_strdup(buffer, row[4]);
-		zbx_dc_expand_user_and_func_macros(um_handle, &buffer, &host->hostid, 1, NULL);
 
 		if (SUCCEED != zbx_is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
 		{
@@ -1102,9 +1107,6 @@ httptest_error:
 	zbx_free(err_str);
 	zbx_preprocessor_flush();
 
-	zbx_dc_close_user_macros(um_handle_secure);
-	zbx_dc_close_user_macros(um_handle);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1131,12 +1133,8 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 	zbx_httptest_t		httptest;
 	zbx_dc_host_t		host;
 	int			httptests_count = 0;
-	zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	um_handle_masked = zbx_dc_open_user_macros_masked();
-	um_handle_secure = zbx_dc_open_user_macros_secure();
 
 	if (SUCCEED != zbx_dc_httptest_next(now, &httptestid, nextcheck))
 		goto out;
@@ -1160,6 +1158,8 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
+			zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
+
 			ZBX_STR2UINT64(host.hostid, row[0]);
 			zbx_strscpy(host.host, row[1]);
 			zbx_strlcpy_utf8(host.name, row[2], sizeof(host.name));
@@ -1175,6 +1175,9 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
+
+			um_handle_masked = zbx_dc_open_user_macros_masked();
+			um_handle_secure = zbx_dc_open_user_macros_secure();
 
 			httptest.httptest.agent = zbx_strdup(NULL, row[5]);
 			zbx_dc_expand_user_and_func_macros(um_handle_masked, &httptest.httptest.agent, &host.hostid, 1,
@@ -1214,6 +1217,9 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 			zbx_dc_expand_user_and_func_macros(um_handle_secure, &httptest.httptest.ssl_key_password,
 					&host.hostid, 1, NULL);
 
+			zbx_dc_close_user_macros(um_handle_secure);
+			zbx_dc_close_user_macros(um_handle_masked);
+
 			httptest.httptest.verify_peer = atoi(row[14]);
 			httptest.httptest.verify_host = atoi(row[15]);
 
@@ -1252,9 +1258,6 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 	/* destroy the macro cache used in HTTP tests */
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
 out:
-	zbx_dc_close_user_macros(um_handle_secure);
-	zbx_dc_close_user_macros(um_handle_masked);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return httptests_count;

@@ -48,6 +48,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 
 	zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
+	zbx_dc_close_user_macros(um_handle);
 
 	if (FAIL == zbx_is_ushort(tmp, port) || 0 == *port)
 	{
@@ -55,7 +56,6 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 		ret = FAIL;
 	}
 
-	zbx_dc_close_user_macros(um_handle);
 	zbx_free(tmp);
 
 	return ret;

@@ -28,14 +28,15 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hosti
 	unsigned char		*ptr;
 	char			*user, *pwd;
 	zbx_uint32_t		data_len, addr_len, username_len, password_len, sensor_len, key_len;
-	zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
 
 	addr_len = strlen(addr) + 1;
 	user = zbx_strdup(NULL, username);
 	pwd = zbx_strdup(NULL, password);
 
+	zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
 	zbx_dc_expand_user_and_func_macros(um_handle_secure, &user, &hostid, 1, NULL);
 	zbx_dc_expand_user_and_func_macros(um_handle_secure, &pwd, &hostid, 1, NULL);
+	zbx_dc_close_user_macros(um_handle_secure);
 
 	username_len = strlen(user) + 1;
 	password_len = strlen(pwd) + 1;
@@ -60,8 +61,6 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hosti
 
 	zbx_free(user);
 	zbx_free(pwd);
-
-	zbx_dc_close_user_macros(um_handle_secure);
 
 	return data_len;
 }

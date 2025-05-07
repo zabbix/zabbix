@@ -587,15 +587,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 	{
 		zbx_dc_item_t		*dc_items;
 		int			*errcodes, delay;
-		zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
 		char			*timeout = NULL;
 
 		dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
 		zbx_dc_config_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
 
-		um_handle_masked = zbx_dc_open_user_macros_masked();
-		um_handle_secure = zbx_dc_open_user_macros_secure();
+		zbx_dc_um_handle_t	*um_handle_masked = zbx_dc_open_user_macros_masked();
+		zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
 
 		for (int i = 0; i < num; i++)
 		{
@@ -675,8 +674,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		zbx_free(errcodes);
 		zbx_free(dc_items);
 
-		zbx_dc_close_user_macros(um_handle_masked);
 		zbx_dc_close_user_macros(um_handle_secure);
+		zbx_dc_close_user_macros(um_handle_masked);
 	}
 
 	zbx_json_close(&json);
