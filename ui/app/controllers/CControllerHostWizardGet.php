@@ -81,7 +81,7 @@ class CControllerHostWizardGet extends CController {
 			$hosts = API::Host()->get([
 				'output' => ['hostid', 'name', 'tls_connect', 'tls_accept'],
 				'selectHostGroups' => ['groupid'],
-				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip'], // TODO VM: add details
+				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip', 'details'],
 				'selectMacros' => ['macro', 'value', 'description', 'type'],
 				'hostids' => $this->getInput('hostid')
 			]);

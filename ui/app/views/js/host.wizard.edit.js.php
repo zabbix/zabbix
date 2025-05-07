@@ -525,8 +525,7 @@ window.host_wizard_edit = new class {
 					macro: template_macro.macro,
 					value: (this.#host?.macros.find(({macro}) => macro === template_macro.macro))?.value
 						|| template_macro.value,
-					description: template_macro.description,
-					discovery_state: this.DISCOVERY_STATE_MANUAL
+					description: template_macro.description
 				}]
 			}));
 		}
@@ -611,7 +610,7 @@ window.host_wizard_edit = new class {
 
 	#saveHost() {
 		const submit_url = new URL('zabbix.php', location.href);
-		submit_url.searchParams.set('action', 'host.wizard.create');
+		submit_url.searchParams.set('action', this.#data.host.isNew ? 'host.wizard.create' : 'host.wizard.update');
 
 		return fetch(submit_url.href, {
 			method: 'POST',

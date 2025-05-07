@@ -71,7 +71,7 @@ class CDocHelper {
 	const DATA_COLLECTION_HOST_PROTOTYPE_LIST =					'web_interface/frontend_sections/data_collection/hosts/discovery/host_prototypes';
 	const DATA_COLLECTION_HOST_TRIGGERS_LIST =					'web_interface/frontend_sections/data_collection/hosts/triggers';
 	const DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes';
-	const DATA_COLLECTION_HOST_WIZARD =							'config/hosts/host#configuration'; // TODO VM: need propper link
+	const DATA_COLLECTION_HOST_WIZARD =							'config/hosts/host_wizard';
 	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host#creating-a-host-group';
 	const DATA_COLLECTION_HOSTGROUPS_LIST =						'web_interface/frontend_sections/data_collection/hostgroups';
 	const DATA_COLLECTION_HTTPCONF_EDIT =						'web_monitoring#configuring-a-web-scenario';
@@ -99,7 +99,7 @@ class CDocHelper {
 	const INVENTORY_HOST_OVERVIEW =								'web_interface/frontend_sections/inventory/overview';
 	const INSTALLATION_PACKAGES_MAC =							'installation/install_from_packages/mac_pkg';
 	const INSTALLATION_PACKAGES_MSI =							'installation/install_from_packages/win_msi';
-	const INSTALLATION_PACKAGES_OTHER =							'installation/install_from_packages'; // TODO VM: update link
+	const INSTALLATION_PACKAGES_OTHER =							'installation/install_from_packages';
 	const ITEM_TYPES_DB_MONITOR =								'config/items/itemtypes/odbc_checks';
 	const ITEM_TYPES_IPMI_AGENT =								'config/items/itemtypes/ipmi';
 	const ITEM_TYPES_JMX_AGENT =								'config/items/itemtypes/jmx_monitoring';

@@ -16,6 +16,10 @@
 
 class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'hostid' =>				'required|db hosts.hostid',
@@ -81,8 +85,7 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 					$this->getInput('templates', []), array_column($db_host['parentTemplates'], 'templateid')
 				))]),
 				'interfaces' => array_merge($db_host['interfaces'], $this->processHostInterfaces($interfaces)),
-				'macros' => $this->prepareMacros($this->getInput('macros', []), $db_host['macros']),
-				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE)
+				'macros' => $this->prepareMacros($this->getInput('macros', []), $db_host['macros'])
 			];
 
 			$ipmi_fields = ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'];
@@ -95,13 +98,11 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 
 			if ($this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk')) {
 				$host += [
+					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
-					'tls_psk_identity' => $this->getInput('tls_psk_identity', ''),
-					'tls_psk' => $this->getInput('tls_psk', '')
+					'tls_psk_identity' => $this->getInput('tls_psk_identity'),
+					'tls_psk' => $this->getInput('tls_psk')
 				];
-			}
-			else {
-				$host['tls_connect'] = HOST_ENCRYPTION_NONE;
 			}
 
 			$result = API::Host()->update($host);
