@@ -327,11 +327,11 @@
 				}
 			});
 
-			let warning_msg = [];
+			let warnings = [];
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
 				if (auth_type != this.db_authentication_type) {
-					warning_msg.push(<?= json_encode(
+					warnings.push(<?= json_encode(
 					_('Switching authentication method will reset all except this session!')
 				) ?>);
 			}
@@ -340,18 +340,17 @@
 			if (idp_certificate_input) {
 				if (this.saml_idp_certificate_exists === true && idp_certificate_input.disabled === false
 						&& idp_certificate_input.value === '') {
-					warning_msg.push(<?= json_encode(
+					warnings.push(<?= json_encode(
 						_('You are about to erase existing IdP certificate.')
 					) ?>);
 				}
 			}
-
-
+			
 			const sp_certificate_input = document.getElementById('sp_certificate');
 			if (sp_certificate_input) {
 				if (this.saml_sp_certificate_exists === true && sp_certificate_input.disabled === false
 						&& sp_certificate_input.value === '') {
-					warning_msg.push(<?= json_encode(
+					warnings.push(<?= json_encode(
 						_('You are about to erase existing SP certificate.')
 					) ?>);
 				}
@@ -361,19 +360,13 @@
 			if (sp_private_key_input) {
 				if (this.saml_sp_private_key_exists === true && sp_private_key_input.disabled === false
 						&& sp_private_key_input.value === '') {
-					warning_msg.push(<?= json_encode(
+					warnings.push(<?= json_encode(
 						_('You are about to erase existing SP private key.')
 					) ?>);
 				}
 			}
-
-			if (warning_msg.length > 0) {
-				let confirmText = warning_msg.join("\n");
-
-				return confirm(confirmText);
-			}
-
-			return true;
+			
+			return warnings.length > 0 ? confirm(warnings.join("\n")) : true;
 		}
 
 		_addLdapServers(ldap_servers, ldap_default_row_index) {
