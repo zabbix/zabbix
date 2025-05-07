@@ -320,13 +320,10 @@
 				'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
 				'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
 			];
-
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
-				if (elem) {
-					elem.value = elem.value.trim();
-				}
+				elem.value = elem.value.trim();
 			});
-
+			
 			let warnings = [];
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;

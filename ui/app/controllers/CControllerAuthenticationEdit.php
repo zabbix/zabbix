@@ -185,7 +185,7 @@ class CControllerAuthenticationEdit extends CController {
 				'mfa_status' => MFA_DISABLED
 			];
 
-			if ($data['saml_certs_editable'] === true) {
+			if ($data['saml_certs_editable']) {
 				$config_fields += [
 					'idp_certificate' => '',
 					'sp_certificate' => '',
@@ -281,7 +281,7 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_provision_media' => []
 				];
 
-				if ($data['saml_certs_editable'] === true) {
+				if ($data['saml_certs_editable']) {
 					$saml_configuration += [
 						'idp_certificate' => '',
 						'sp_certificate' => '',
