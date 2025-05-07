@@ -224,4 +224,98 @@ abstract class CControllerHostUpdateGeneral extends CController {
 
 		return zbx_toObject($all_templates, 'templateid');
 	}
+
+	/**
+	 * Check that all macros are following macro config rules.
+	 *
+	 * @return bool
+	 */
+	protected function validateMacrosByConfig(): bool {
+		$templateid = $this->getInput('templates', []);
+		$templateid = reset($templateid); // TODO VM: should be templateid
+
+		$template = API::Template()->get([
+			'output' => [],
+			'selectMacros' => ['macro', 'config'],
+			'templateids' => $templateid
+		]);
+		$template = reset($template);
+
+		$macros = $this->getInput('macros', []);
+		$indexed_macros = [];
+
+		foreach ($macros as $index => $macro) {
+			$indexed_macros[$macro['macro']] = ['index' => $index] + $macro;
+		}
+
+		foreach ($template['macros'] as $tempalte_macro) {
+			if ($tempalte_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+				continue;
+			}
+
+			$config = $tempalte_macro['config'];
+
+			// Check if mandatory macros are present.
+			if (!array_key_exists($tempalte_macro['macro'], $indexed_macros) && (
+				($config['type'] == ZBX_WIZARD_FIELD_TEXT && $config['required'] == ZBX_WIZARD_FIELD_REQUIRED)
+					|| $config['type'] == ZBX_WIZARD_FIELD_LIST
+					|| $config['type'] == ZBX_WIZARD_FIELD_CHECKBOX
+			)) {
+				error(_s('Macro "%1$s" is missing.', $config['label']));
+
+				return false;
+			}
+
+			$macro_value = trim($indexed_macros[$tempalte_macro['macro']]['value']);
+
+			if ($macro_value === ''
+					&& $config['type'] == ZBX_WIZARD_FIELD_TEXT
+					&& $config['required'] == ZBX_WIZARD_FIELD_REQUIRED) {
+				error(_s('Incorrect value for macro "%1$s": %2$s.', $config['label'], _('cannot be empty')));
+
+				return false;
+			}
+
+			if ($config['regex'] !== '' && !preg_match('/'.$config['regex'].'/', $macro_value)) {
+				error(_s('Incorrect value for macro "%1$s": %2$s.', $config['label'],
+					_s('input does not match the pattern: %1$s', '/'.$config['regex'].'/')
+				));
+
+				return false;
+			}
+
+			$allowed_values = [];
+			if ($config['type'] == ZBX_WIZARD_FIELD_LIST) {
+				$allowed_values = array_column($config['options'], 'value');
+
+				if ($config['required'] === ZBX_WIZARD_FIELD_NOT_REQUIRED) {
+					$allowed_values[] = '';
+				}
+			}
+			elseif ($config['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+				$allowed_values = array_values($config['options'][0]);
+			}
+
+			if ($allowed_values && !in_array($macro_value, $allowed_values)) {
+				error(_s('Incorrect value for macro "%1$s": %2$s.', $config['label'],
+					_s('value must be one of %1$s', implode(', ', $allowed_values))
+				));
+
+				return false;
+			}
+
+			unset($indexed_macros[$tempalte_macro['macro']]);
+		}
+
+		// Check that only configurable macros were passed.
+		if ($indexed_macros) {
+			error(_n('Unexpected macro "%1$s"', 'Unexpected macros "%1$s"', implode(', ', array_keys($indexed_macros)),
+				count($indexed_macros)
+			));
+
+			return false;
+		}
+
+		return true;
+	}
 }

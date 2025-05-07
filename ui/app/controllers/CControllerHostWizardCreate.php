@@ -39,7 +39,7 @@ class CControllerHostWizardCreate extends CControllerHostUpdateGeneral {
 			'macros' =>				'array|not_empty'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateMacrosByConfig();
 
 		if (!$ret) {
 			$this->setResponse(

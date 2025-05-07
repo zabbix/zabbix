@@ -597,8 +597,9 @@ window.host_wizard_edit = new class {
 					}
 				}
 
-				this.#data.tls_required = this.#host === null
-					|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk);
+				this.#data.tls_required = response.agent_interface_required
+					&& (this.#host === null
+						|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
 
 				this.#data.interface_required = {
 					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
@@ -729,6 +730,12 @@ window.host_wizard_edit = new class {
 		}
 
 		const progress_labels = [
+			{
+				label: t('Selected host'),
+				info: '<TODO: Template name>', // TODO VM: update
+				visible: this.#source_hostid !== null,
+				steps: [this.STEP_WELCOME]
+			},
 			{
 				label: t('Select a template'),
 				info: this.#templates.get(this.#data.template_selected)?.name,
@@ -1222,7 +1229,7 @@ window.host_wizard_edit = new class {
 
 	#makeMacroFieldCheckbox(macro, row_index) {
 		return this.#view_templates.macro_field_checkbox.evaluateToElement({
-			index: row_index,
+			row_index,
 			label: macro.config.label,
 			macro: macro.macro,
 			value: macro.config.options[0].checked,
