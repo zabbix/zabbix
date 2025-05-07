@@ -497,6 +497,16 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
+		if (0 == addrs->values[i]->revision && 0 == strcmp(host, addrs->values[i]->ip) &&
+				port == addrs->values[i]->port)
+		{
+			*retry = ZBX_REDIRECT_RETRY;
+			return SUCCEED;
+		}
+	}
+
+	for (i = 0; i < addrs->values_num; i++)
+	{
 		if (0 != addrs->values[i]->revision)
 			break;
 	}
