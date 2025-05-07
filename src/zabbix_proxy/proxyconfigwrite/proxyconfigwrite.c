@@ -1110,6 +1110,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 					j++)
 			{
 				zbx_db_value_t	*value;
+				zbx_table_row_t *update_row = NULL;
 
 				if (SUCCEED == zbx_flags128_isset(&reset_flags, j))
 				{
@@ -1132,7 +1133,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 					/* so the correct ID will be updated later     */
 					zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_EXISTS);
 					zbx_flags128_set(&row->flags, j);
-					zbx_vector_table_row_ptr_append(&td->updates, row);
+					update_row = row;
 
 					value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 					value->ui64 = 0;
@@ -1145,6 +1146,9 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 						goto clean;
 					}
 				}
+
+				if (NULL != update_row)
+					zbx_vector_table_row_ptr_append(&td->updates, update_row);
 
 				zbx_vector_db_value_ptr_append(&values, value);
 			}
