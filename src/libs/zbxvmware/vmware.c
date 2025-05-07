@@ -2863,7 +2863,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->eventlog.job_revision = 0;
-	service->eventlog.end_time = ZBX_VMWARE_EVENT_DATETIME_UNINITIALIZED;
+	service->eventlog.end_time = 0;
 	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;

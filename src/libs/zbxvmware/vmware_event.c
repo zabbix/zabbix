@@ -310,7 +310,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 		}
 	}
 
-	if (now > end_time && now - end_time > SEC_PER_HOUR)
+	if (0 != end_time && now - end_time > SEC_PER_HOUR)
 	{
 		struct	tm	st;
 		char		end_dt[ZBX_XML_DATETIME];
@@ -945,8 +945,10 @@ static zbx_uint64_t	vmware_service_clear_event_data_mem(const zbx_uint64_t max_m
 	}
 
 	memsz -= vmware_service_evt_vector_memsize(events);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() removed:%d current:%d max_mem:" ZBX_FS_UI64 " free mem:" ZBX_FS_UI64,
-			__func__, events_num - events->values_num, events->values_num, max_mem, memsz);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() removed:%d current:%d/" ZBX_FS_UI64 "/" ZBX_FS_UI64 " max_mem:"
+			ZBX_FS_UI64 " free mem:" ZBX_FS_UI64, __func__, events_num - events->values_num,
+			events->values_num, 0 != events->values_num ? events->values[0]->key : 0,
+			0 != events->values_num ? events->values[events->values_num - 1]->key : 0, max_mem, memsz);
 
 	return memsz;
 }
@@ -981,8 +983,10 @@ static zbx_uint64_t	vmware_service_clear_event_data_keeptime(const time_t keep_t
 	}
 
 	memsz -= vmware_service_evt_vector_memsize(events);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() removed:%d current:%d save limit:" ZBX_FS_TIME_T " time interval:"
-			ZBX_FS_UI64, __func__, events_num - events->values_num, events->values_num, keep_time, memsz);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() removed:%d current:%d/" ZBX_FS_UI64 "/" ZBX_FS_UI64 " time interval:"
+			ZBX_FS_TIME_T " free mem::" ZBX_FS_UI64, __func__, events_num - events->values_num,
+			events->values_num, 0 != events->values_num ? events->values[0]->key : 0,
+			0 != events->values_num ? events->values[events->values_num - 1]->key : 0, keep_time, memsz);
 
 	return memsz;
 }
@@ -1040,7 +1044,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			&service->eventlog, evt_severity, strpool_sz, NULL, skip_old) &&
 			(0 != *skip_old || LAST_KEY(events) == last_key + 1))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() latestPage events:%d", __func__, events->values_num);
 
 		ret = SUCCEED;
 		goto end_session;
@@ -1323,13 +1327,16 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 				if (evt_query_interval > SEC_PER_DAY)
 					evt_query_interval = ZBX_EVT_QUERY_LIMIT;
 
-				if (ZBX_VMWARE_EVENT_DATETIME_UNINITIALIZED == service->eventlog.end_time)
-					service->eventlog.end_time = 0 != evt_last_ts ? evt_last_ts : now;
+				if (0 == service->eventlog.end_time && 0 != evt_last_ts)
+					service->eventlog.end_time = evt_last_ts;
 
-				if (service->eventlog.end_time < now - evt_query_interval)
-					service->eventlog.end_time += evt_query_interval;
-				else
-					service->eventlog.end_time = now;
+				if (0 != service->eventlog.end_time)
+				{
+					if (service->eventlog.end_time < now - evt_query_interval)
+						service->eventlog.end_time += evt_query_interval;
+					else
+						service->eventlog.end_time = now;
+				}
 			}
 			else
 				evt_pause = 1;
@@ -1345,10 +1352,11 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() state pause:%u end_time/delta:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T
 			" last_ts/delta:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " last_key:" ZBX_FS_UI64
-			" skip_old:%u severity:%u shmem_free_sz:" ZBX_FS_UI64 " req_sz:" ZBX_FS_UI64 " oom:%u",
-			__func__, evt_pause, service->eventlog.end_time, now - service->eventlog.end_time, evt_last_ts,
-			now - evt_last_ts, evt_last_key, evt_skip_old, evt_severity, shmem_free_sz,
-			service->eventlog.req_sz, service->eventlog.oom);
+			" interval:" ZBX_FS_TIME_T " skip_old:%u severity:%u shmem_free_sz:" ZBX_FS_UI64
+			" req_sz:" ZBX_FS_UI64 " oom:%u", __func__, evt_pause, service->eventlog.end_time,
+			now - service->eventlog.end_time, evt_last_ts, now - evt_last_ts, evt_last_key,
+			evt_query_interval, evt_skip_old, evt_severity, shmem_free_sz, service->eventlog.req_sz,
+			service->eventlog.oom);
 
 	if (0 != evt_pause)
 	{
