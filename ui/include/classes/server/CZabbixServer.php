@@ -394,6 +394,14 @@ class CZabbixServer {
 		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 
+	public function isConnectAvailable() {
+		if ($this->connect() === false) {
+			return false;
+		}
+		
+		return true;
+	}
+
 	/**
 	 * Evaluate trigger expressions.
 	 *
@@ -594,13 +602,21 @@ class CZabbixServer {
 
 			if ($ZBX_SERVER_TLS['ACTIVE'] == 1) {
 				$protocol = 'tls://';
+
+				if (!$this->checkTLSFiles($ZBX_SERVER_TLS['CA_FILE'])
+						|| !$this->checkTLSFiles($ZBX_SERVER_TLS['KEY_FILE'])
+						|| !$this->checkTLSFiles($ZBX_SERVER_TLS['CERT_FILE'])) {
+					$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+					return false;
+				}
+				
 				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
 				stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
+				stream_context_set_option($context, 'ssl', 'capture_peer_cert', $ZBX_SERVER_TLS['CERTIFICATE_CHECK']);
 				stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
-				stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
 			}
-
+			
 			if (!$socket = @stream_socket_client($protocol . $this->host . ':' . $this->port, $errorCode, $errorMsg,
 				$this->connect_timeout, STREAM_CLIENT_CONNECT, $context)) {
 				$host_port = $this->host . ':' . $this->port;
@@ -629,16 +645,15 @@ class CZabbixServer {
 				return false;
 			}
 
-			if ($ZBX_SERVER_TLS['ACTIVE'] == 1 && ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
-					|| $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== '')) {
+			if ($ZBX_SERVER_TLS['CERTIFICATE_CHECK'] == 1) {
 				$params = stream_context_get_params($socket);
 				$info = openssl_x509_parse($params['options']['ssl']['peer_certificate']);
 				$subject = $info['subject'] ?? [];
 				$issuer = $info['issuer'] ?? [];
 
-				$subject_string = implode(', ', array_map(static fn($k, $v) => "$k=$v",
-					array_keys($subject), $subject));
-				$issuer_string = implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($issuer),
+				$subject_string = implode(', ', array_map(static fn($k, $v) => "$k = $v", array_keys($subject),
+					$subject));
+				$issuer_string = implode(', ', array_map(static fn($k, $v) => "$k = $v", array_keys($issuer),
 					$issuer));
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
@@ -671,5 +686,20 @@ class CZabbixServer {
 		return (array_key_exists('response', $response) && ($response['response'] == self::RESPONSE_SUCCESS
 				|| $response['response'] == self::RESPONSE_FAILED && array_key_exists('info', $response))
 		);
+	}
+
+	/**
+	 * Returns true if file exist and is readable
+	 *
+	 * @param string $file_path
+	 *
+	 * @return bool
+	 */
+	protected function checkTLSFiles(string $file_path): bool {
+		if ($file_path === '' || !file_exists($file_path) || !is_readable($file_path)) {
+			return false;
+		}
+
+		return true;
 	}
 }

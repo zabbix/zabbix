@@ -65,6 +65,7 @@ $fields = [
 	'zbx_server_tls_ca_file' =>             [T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_tls_key_file' =>            [T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_tls_cert_file' =>           [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_tls_certificate_check' =>   [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
 	'zbx_server_tls_certificate_issuer' =>  [T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_tls_certificate_subject' => [T_ZBX_STR, O_OPT, null,	null,				null],
 	// actions

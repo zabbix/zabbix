@@ -302,6 +302,8 @@ class CSetupWizard extends CForm {
 				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE', '')));
 			$this->setConfig('ZBX_SERVER_TLS_CERT_FILE', getRequest('zbx_server_tls_cert_file',
 				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE', '')));
+			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', getRequest('zbx_server_tls_certificate_check',
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0')));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', getRequest('zbx_server_tls_certificate_issuer',
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', getRequest('zbx_server_tls_certificate_subject',
@@ -363,6 +365,7 @@ class CSetupWizard extends CForm {
 						'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
 						'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 						'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
+						'CERTIFICATE_CHECK' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0'),
 						'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
 						'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
 					];
@@ -373,6 +376,7 @@ class CSetupWizard extends CForm {
 						'CA_FILE' => '',
 						'KEY_FILE' => '',
 						'CERT_FILE' => '',
+						'CERTIFICATE_CHECK' => '0',
 						'CERTIFICATE_ISSUER' => '',
 						'CERTIFICATE_SUBJECT' => ''
 					];
@@ -832,11 +836,7 @@ class CSetupWizard extends CForm {
 					->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
 			])
 			->addItem([
-				new CDiv(),
-				new CTag('h2', true, _('Encrypt connections from Web interface'))
-			])
-			->addItem([
-				(new CLabel(_('Encrypt connections')))
+				(new CLabel(_('Encrypt connections from Web interface')))
 					->setFor('zbx_server_tls'),
 				new CFormField(
 					(new CCheckBox('zbx_server_tls'))
@@ -871,7 +871,16 @@ class CSetupWizard extends CForm {
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			])
 			->addItem([
-				(new CLabel(_('TLS certificate issuer')))
+				(new CLabel(_('Verify server certificate')))
+					->setFor('zbx_server_tls_certificate_check')->addClass(ZBX_STYLE_DISPLAY_NONE),
+				(new CFormField(
+					(new CCheckBox('zbx_server_tls_certificate_check'))
+						->setChecked($this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', false))
+						->setUncheckedValue(0)
+				))->addClass(ZBX_STYLE_DISPLAY_NONE)
+			])
+			->addItem([
+				(new CLabel(_('Server TLS certificate issuer')))
 					->setFor('zbx_server_tls_certificate_issuer')
 					->addClass(ZBX_STYLE_DISPLAY_NONE),
 				(new CFormField(
@@ -880,7 +889,7 @@ class CSetupWizard extends CForm {
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			])
 			->addItem([
-				(new CLabel(_('TLS certificate subject')))
+				(new CLabel(_('Server TLS certificate subject')))
 					->setFor('zbx_server_tls_certificate_subject')
 					->addClass(ZBX_STYLE_DISPLAY_NONE),
 				(new CFormField(
@@ -889,7 +898,7 @@ class CSetupWizard extends CForm {
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			]);
-
+		
 		if ($this->step_failed) {
 			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, CMessageHelper::getMessages(),
 				_('TLS fields are misconfigured or the files are not accessible.'), false, true
@@ -1072,15 +1081,18 @@ class CSetupWizard extends CForm {
 			->addRow(
 				(new CSpan(_('Web interface TLS certificate file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE')
-			)
-			->addRow(
-				(new CSpan(_('Server TLS certificate issuer')))->addClass(ZBX_STYLE_GREY),
-				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
-			)
-			->addRow(
-				(new CSpan(_('Server TLS certificate subject')))->addClass(ZBX_STYLE_GREY),
-				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT')
 			);
+
+			if ($this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0') !== '0') {
+				$table->addRow(
+						(new CSpan(_('Server TLS certificate issuer')))->addClass(ZBX_STYLE_GREY),
+						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
+					)
+					->addRow(
+						(new CSpan(_('Server TLS certificate subject')))->addClass(ZBX_STYLE_GREY),
+						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT')
+					);
+			}
 		}
 
 		return [
@@ -1200,6 +1212,7 @@ class CSetupWizard extends CForm {
 				'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
 				'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 				'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
+				'CERTIFICATE_CHECK' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0'),
 				'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
 				'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
 			];
@@ -1210,6 +1223,7 @@ class CSetupWizard extends CForm {
 				'CA_FILE' => '',
 				'KEY_FILE' => '',
 				'CERT_FILE' => '',
+				'CERTIFICATE_CHECK' => '0',
 				'CERTIFICATE_ISSUER' => '',
 				'CERTIFICATE_SUBJECT' => ''
 			];
