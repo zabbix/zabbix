@@ -172,8 +172,6 @@ class ZColorPicker extends HTMLElement {
 	#is_connected = false;
 	#is_dialog_open = false;
 
-	#mutation_observer;
-
 	constructor() {
 		super();
 	}
@@ -203,12 +201,6 @@ class ZColorPicker extends HTMLElement {
 			this.#dialog = this.#createDialog();
 			this.#input = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_INPUT}`);
 			this.#preview = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_PREVIEW}`);
-
-			this.#mutation_observer = new MutationObserver(() => {
-				if (!isVisible(this.#box)) {
-					this.#closeDialog();
-				}
-			});
 		}
 
 		this.#refresh();
@@ -597,13 +589,6 @@ class ZColorPicker extends HTMLElement {
 
 		addEventListener('resize', this.#events.windowResize);
 		addEventListener('scroll', this.#events.windowScroll, {capture: true});
-
-		this.#mutation_observer.observe(document.body, {
-			attributes: true,
-			attributeFilter: ['style', 'class'],
-			subtree: true,
-			childList: true
-		});
 	}
 
 	#closeDialog() {
@@ -626,8 +611,6 @@ class ZColorPicker extends HTMLElement {
 		this.#dialog.remove();
 
 		this.#is_dialog_open = false;
-
-		this.#mutation_observer.disconnect();
 
 		if (document.activeElement === document.body) {
 			// Focus only if other focusable element in document was not clicked.
