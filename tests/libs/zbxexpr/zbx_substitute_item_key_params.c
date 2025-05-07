@@ -21,11 +21,11 @@
 
 typedef struct
 {
-	int	func_hit;	/* substitution function was called */
-	int	no_macros;	/* substitution function had no macros */
-	int	quoted;		/* quoted parameters */
-	int	unquoted_first;	/* parameter were unquoted first */
-	int	quoted_after;	/* parameter were quoted after */
+	int	func_hit;	/* number of times substitution function was called */
+	int	no_macros;	/* number of times substitution function had no macros */
+	int	quoted;		/* number of times parameters were quoted */
+	int	unquoted_first;	/* number of times parameters were unquoted first */
+	int	quoted_after;	/* number of times parameters were quoted after */
 }
 subst_data_t;
 
@@ -45,6 +45,7 @@ static int	resolv_func(zbx_macro_resolv_data_t *p, va_list args, char **replace_
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
+	/* using only {$MACRO}: no need to test user macro cache */
 	if (0 == strcmp(p->macro, "{$MACRO}"))
 	{
 		if (NULL == macro)
@@ -66,7 +67,9 @@ static int	subst_func_resolved(const char *data, int level, int num, int quoted,
 			quoted, *param);
 
 	subst_data.func_hit++;
-	if (1 == quoted) subst_data.quoted++;
+
+	if (1 == quoted)
+		subst_data.quoted++;
 
 	/* Passed parameters */
 	const char	*macro = va_arg(args, const char *);
@@ -107,23 +110,23 @@ out:
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*key, *macro = NULL;
-	char			*result, error[MAX_BUFFER_LEN];
-	int			ret, exp_ret;
+	const char		*macro = NULL;
+	char			error[MAX_BUFFER_LEN];
 
 	ZBX_UNUSED(state);
 
 	memset(&subst_data, 0, sizeof(subst_data));
 
-	key = zbx_mock_get_parameter_string("in.key");
+	const char	*key = zbx_mock_get_parameter_string("in.key");
+
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.macro"))
 		macro = zbx_mock_get_parameter_string("in.macro");
 
-	exp_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	int	exp_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	result = zbx_strdup(NULL, key);
+	char	*result = zbx_strdup(NULL, key);
 
-	ret = zbx_substitute_item_key_params(&result, error, MAX_BUFFER_LEN, &subst_func_resolved, macro);
+	int	ret = zbx_substitute_item_key_params(&result, error, MAX_BUFFER_LEN, &subst_func_resolved, macro);
 
 	zbx_mock_assert_int_eq("return value", exp_ret, ret);
 
