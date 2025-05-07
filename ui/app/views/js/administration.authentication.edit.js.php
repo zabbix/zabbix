@@ -323,7 +323,7 @@
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
 				elem.value = elem.value.trim();
 			});
-			
+
 			let warnings = [];
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
