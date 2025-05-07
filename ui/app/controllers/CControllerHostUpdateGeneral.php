@@ -256,11 +256,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			$config = $tempalte_macro['config'];
 
 			// Check if mandatory macros are present.
-			if (!array_key_exists($tempalte_macro['macro'], $indexed_macros) && (
-				($config['type'] == ZBX_WIZARD_FIELD_TEXT && $config['required'] == ZBX_WIZARD_FIELD_REQUIRED)
-					|| $config['type'] == ZBX_WIZARD_FIELD_LIST
-					|| $config['type'] == ZBX_WIZARD_FIELD_CHECKBOX
-			)) {
+			if (!array_key_exists($tempalte_macro['macro'], $indexed_macros)) {
 				error(_s('Macro "%1$s" is missing.', $config['label']));
 
 				return false;
