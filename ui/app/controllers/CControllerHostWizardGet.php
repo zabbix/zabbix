@@ -135,13 +135,9 @@ class CControllerHostWizardGet extends CController {
 		}
 		$template['macros'] = array_values($template['macros']);
 
-		$agent_interface_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH,
-			ITEM_TYPE_TELNET
-		];
-		$snmp_interface_types = [ITEM_TYPE_SNMP, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_SSH, ITEM_TYPE_TELNET
-		];
-		$ipmi_interface_types = [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET];
+		$agent_interface_types = [ITEM_TYPE_ZABBIX];
+		$snmp_interface_types = [ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP];
+		$ipmi_interface_types = [ITEM_TYPE_IPMI];
 		$jmx_interface_types = [ITEM_TYPE_JMX];
 
 		// Get template items, LLD rules and item prototypes that require interfaces.
