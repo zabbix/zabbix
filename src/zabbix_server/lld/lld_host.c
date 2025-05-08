@@ -6564,19 +6564,19 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 				tls_subject, tls_psk_identity, tls_psk, &hgsets, &permissions, &del_hostgroupids,
 				&del_hgsetids, dflags, rule_index);
 
-		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			lld_group_prototypes_save(&hosts);
-
-		/* linking of the templates */
-		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			lld_templates_link(&hosts, error);
-		else
-			lld_prototype_templates_link(&hosts, error);
-
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
 
-		lld_host_export_lld_macros(&hosts);
-		lld_host_process_nested_lld_rules(&hosts);
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			lld_templates_link(&hosts, error);
+			lld_host_export_lld_macros(&hosts);
+			lld_host_process_nested_lld_rules(&hosts);
+		}
+		else
+		{
+			lld_group_prototypes_save(&hosts);
+			lld_prototype_templates_link(&hosts, error);
+		}
 
 		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck, dflags);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);
