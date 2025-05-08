@@ -356,6 +356,8 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
+		this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
+
 		this.#next_button.removeAttribute('disabled');
 		this.#updating_locked = false;
 
