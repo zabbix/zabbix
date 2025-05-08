@@ -290,10 +290,10 @@ fail:
  *                                                                            *
  * Purpose: combines IP and Port into a network address of the form "IP:Port" *
  *                                                                            *
- * Parameters: hostport 	- [IN/OUT] string formatting buffer pointer   *
- *             hostport_sz  	- [IN] size of buffer			      *
- *             ip 		- [IN] 	              		  	      *
- *             port 		- [IN] 		                    	      *
+ * Parameters: hostport       - [IN/OUT] string formatting buffer pointer     *
+ *             hostport_sz    - [IN] size of buffer                           *
+ *             ip             - [IN]                                          *
+ *             port           - [IN]                                          *
  *                                                                            *
  * Return value: size_t - size of destination buffer after formatting         *
  *                                                                            *
