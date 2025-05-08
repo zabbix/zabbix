@@ -1171,39 +1171,6 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $item
-	 * @param array $upd_db_item
-	 *
-	 * @throws APIException
-	 */
-	protected static function showObjectMismatchError(array $item, array $upd_db_item): void {
-		parent::showObjectMismatchError($item, $upd_db_item);
-
-		$target_is_host = in_array($upd_db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-
-		$hosts = DB::select('hosts', [
-			'output' => ['host'],
-			'hostids' => [$item['hostid'], $upd_db_item['hostid']],
-			'preservekeys' => true
-		]);
-
-		$lld_rules = DB::select('items', [
-			'output' => ['name'],
-			'itemids' => [$item['ruleid'], $upd_db_item['ruleid']],
-			'preservekeys' => true
-		]);
-
-		$error = $target_is_host
-			? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" and LLD rule "%3$s" to host "%4$s", because an item prototype with the same key already belongs to LLD rule "%5$s".')
-			: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" and LLD rule "%3$s" to template "%4$s", because an item prototype with the same key already belongs to LLD rule "%5$s".');
-
-		self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $upd_db_item['key_'], $hosts[$item['hostid']]['host'],
-			$lld_rules[$item['ruleid']]['name'], $hosts[$upd_db_item['hostid']]['host'],
-			$lld_rules[$upd_db_item['ruleid']]['name']
-		));
-	}
-
-	/**
 	 * @param array $items
 	 * @param array $upd_db_items
 	 * @param array $tpl_links
