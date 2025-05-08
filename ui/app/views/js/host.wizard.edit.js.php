@@ -240,7 +240,14 @@ window.host_wizard_edit = new class {
 					this.#updateStepsQueue();
 				})
 				.then(() => {
-					this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
+					if (this.#steps_queue[this.#current_step] !== this.STEP_COMPLETE) {
+						this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
+					}
+					else {
+						overlayDialogueDestroy(this.#overlay.dialogueid);
+
+						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					}
 				})
 				.catch(() => {
 					this.#gotoStep(this.#current_step);
@@ -361,7 +368,9 @@ window.host_wizard_edit = new class {
 
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
-			this.#back_button.style.display = this.#current_step > 0 ? '' : 'none';
+			this.#back_button.style.display = this.#current_step > 0
+				|| this.#steps_queue[this.#current_step] === this.STEP_COMPLETE ? '' : 'none';
+
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 		});
 	}
@@ -499,7 +508,9 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderComplete() {
-		const view = this.#view_templates.step_complete.evaluateToElement();
+		const view = this.#view_templates.step_complete.evaluateToElement({
+			host_name: this.#data.host.isNew ? this.#data.host.id : this.#data.host.name
+		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
@@ -608,10 +619,6 @@ window.host_wizard_edit = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-
-				overlayDialogueDestroy(this.#overlay.dialogueid);
-
-				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch(exception => {
 				this.#ajaxExceptionHandler(exception);
