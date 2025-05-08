@@ -915,13 +915,12 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Create CItem, CItemPrototype or CDiscoveryRulePrototype with dependency.
+	 * Create CItem or CItemPrototype with dependency.
 	 *
 	 * @param array $items_by_level              Associative array of entities where key is entity dependency
 	 *                                             level and value is array of entities for this level.
 	 * @param string $master_item_key            Master entity array key in xml parsed data.
-	 * @param CItem|CItemPrototype|CDiscoveryRulePrototype $api_service  Entity service which is capable to proceed with
-	 *                                                                   entity create.
+	 * @param CItem|CItemPrototype $api_service  Entity service which is capable to proceed with entity create.
 	 *
 	 * @throws Exception if entity master entity can not be resolved.
 	 */
@@ -953,13 +952,12 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Update CItem, CItemPrototype or CDiscoveryRulePrototype with dependency.
+	 * Update CItem or CItemPrototype with dependency.
 	 *
 	 * @param array $items_by_level              Associative array of entities where key is entity dependency
 	 *                                           level and value is array of entities for this level.
 	 * @param string $master_item_key            Master entity array key in xml parsed data.
-	 * @param CItem|CItemPrototype|CDiscoveryRulePrototype $api_service  Entity service which is capable to proceed with
-	 *                                                                   entity update.
+	 * @param CItem|CItemPrototype $api_service  Entity service which is capable to proceed with entity update.
 	 *
 	 * @throws Exception if entity master entity can not be resolved.
 	 */
@@ -1320,23 +1318,23 @@ class CConfigurationImport {
 					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
-						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
+						if (!array_key_exists('key', $item_prototype['master_item'])) {
 							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 								_('cannot be empty')
 							));
 						}
 
 						$master_item_prototypeid = $this->referencer->findItemidByKey($hostid,
-							$item_prototype[$master_item_key]['key'], true
+							$item_prototype['master_item']['key'], true
 						);
 
 						if ($master_item_prototypeid !== null) {
 							$item_prototype['master_itemid'] = $master_item_prototypeid;
-							unset($item_prototype[$master_item_key]);
+							unset($item_prototype['master_item']);
 						}
 					}
 					else {
-						unset($item_prototype[$master_item_key]);
+						unset($item_prototype['master_item']);
 					}
 
 					$item_prototypeid = null;
@@ -1471,12 +1469,12 @@ class CConfigurationImport {
 		ksort($levels);
 		foreach (array_keys($levels) as $level) {
 			if (array_key_exists($level, $item_prototypes_to_update) && $item_prototypes_to_update[$level]) {
-				$this->updateItemsWithDependency([$item_prototypes_to_update[$level]], $master_item_key,
+				$this->updateItemsWithDependency([$item_prototypes_to_update[$level]], 'master_item',
 					API::ItemPrototype()
 				);
 			}
 			if (array_key_exists($level, $item_prototypes_to_create) && $item_prototypes_to_create[$level]) {
-				$this->createItemsWithDependency([$item_prototypes_to_create[$level]], $master_item_key,
+				$this->createItemsWithDependency([$item_prototypes_to_create[$level]], 'master_item',
 					API::ItemPrototype()
 				);
 			}
