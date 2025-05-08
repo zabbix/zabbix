@@ -868,7 +868,7 @@ window.host_wizard_edit = new class {
 				const interfaces_view = this.#dialogue.querySelectorAll('.js-host-interface');
 
 				for (const [row_index, field] of Object.entries(this.#data.interfaces)) {
-					if (field.type === this.INTERFACE_TYPE_SNMP) {
+					if (Number(field.type) === this.INTERFACE_TYPE_SNMP) {
 						const visible_fields = {
 							'js-snmp-community': false,
 							'js-snmp-repetition-count': false,
@@ -920,6 +920,10 @@ window.host_wizard_edit = new class {
 						}
 					}
 				}
+
+				this.#next_button.toggleAttribute('disabled', Object.values(this.#data.interfaces)
+					.some(({address, port}) => address === '' || port === '')
+				);
 				break;
 		}
 	}
@@ -976,7 +980,7 @@ window.host_wizard_edit = new class {
 
 	#isRequiredInstallAgent() {
 		return this.#data.interface_required[this.INTERFACE_TYPE_AGENT]
-			&& (!this.#host?.interfaces.some(({interface_type}) => interface_type === this.INTERFACE_TYPE_AGENT));
+			&& (!this.#host?.interfaces.some(({interface_type}) => interface_type == this.INTERFACE_TYPE_AGENT));
 	}
 
 	#isRequiredAddHostInterface() {
