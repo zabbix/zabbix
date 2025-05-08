@@ -683,4 +683,3 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
 
 	return proxy_groupid;
 }
-
