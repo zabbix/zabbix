@@ -71,7 +71,6 @@ class CTrigger extends CTriggerGeneral {
 			'hostids'						=> null,
 			'triggerids'					=> null,
 			'itemids'						=> null,
-			'discoveryids'					=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
 			'dependent'						=> null,
@@ -204,20 +203,6 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
-			}
-		}
-
-		if ($options['discoveryids'] !== null) {
-			zbx_value2array($options['discoveryids']);
-
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
-
-			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -1118,9 +1103,7 @@ class CTrigger extends CTriggerGeneral {
 		$triggers = $this->get([
 			'output' => $output,
 			'selectTags' => ['tag', 'value'],
-			'filter' => [
-				'hostid' => $templateids
-			],
+			'hostids' => $templateids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);

@@ -640,9 +640,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 		];
 
 		$triggers = $this->get([
-			'discoveryids' => $ruleids,
 			'output' => $output,
 			'selectTags' => ['tag', 'value'],
+			'discoveryids' => $ruleids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);

@@ -545,9 +545,9 @@ class CGraphPrototype extends CGraphGeneral {
 		];
 
 		$graphs = $this->get([
-			'discoveryids' => $ruleids,
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
+			'discoveryids' => $ruleids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);

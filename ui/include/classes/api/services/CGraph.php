@@ -61,7 +61,6 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
-			'discoveryids'				=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
 			'editable'					=> false,
@@ -189,20 +188,6 @@ class CGraph extends CGraphGeneral {
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
-			}
-		}
-
-		if ($options['discoveryids'] !== null) {
-			zbx_value2array($options['discoveryids']);
-
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
-
-			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -531,9 +516,7 @@ class CGraph extends CGraphGeneral {
 		$graphs = $this->get([
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-			'filter' => [
-				'hostid' => $templateids
-			],
+			'hostids' => $templateids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
