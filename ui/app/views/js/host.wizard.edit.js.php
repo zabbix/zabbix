@@ -108,7 +108,6 @@ window.host_wizard_edit = new class {
 	#source_hostid = null;
 	#host = null;
 
-	#selected_templateid = null;
 	#template = null;
 
 	/** @type {number} */
@@ -487,20 +486,6 @@ window.host_wizard_edit = new class {
 			}
 		});
 
-		if (this.#template.templateid !== this.#selected_templateid) {
-			this.#selected_templateid = this.#template.templateid;
-
-			this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
-				return [index, {
-					type: template_macro.type,
-					macro: template_macro.macro,
-					value: (this.#host?.macros.find(({macro}) => macro === template_macro.macro))?.value
-						|| template_macro.value,
-					description: template_macro.description
-				}]
-			}));
-		}
-
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
 		jQuery(".macro-input-group", view).macroValue();
@@ -539,6 +524,8 @@ window.host_wizard_edit = new class {
 	}
 
 	#loadWizardConfig() {
+		// TODO VM: don't make the call, when host and template hasn't changed.
+
 		const hostid = this.#source_hostid !== null
 			? this.#source_hostid
 			: this.#data.host && !this.#data.host.isNew
@@ -577,6 +564,16 @@ window.host_wizard_edit = new class {
 					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required,
 					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required
 				}
+
+				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
+					return [index, {
+						type: template_macro.type,
+						macro: template_macro.macro,
+						value: (this.#host?.macros.find(({macro}) => macro === template_macro.macro))?.value
+							|| template_macro.value,
+						description: template_macro.description
+					}]
+				}));
 			});
 	}
 
@@ -590,7 +587,7 @@ window.host_wizard_edit = new class {
 			body: JSON.stringify({
 				[this.#data.host.isNew ? 'host' : 'hostid']: this.#data.host.id,
 				groups: this.#data.groups.map(ms_group => (ms_group.isNew ? {new: ms_group.id} : ms_group.id)),
-				templates: [this.#selected_templateid],
+				templateid: this.#template.templateid,
 				...(this.#data.tls_required && {
 					tls_psk: this.#data.tls_psk,
 					tls_psk_identity: this.#data.tls_psk_identity

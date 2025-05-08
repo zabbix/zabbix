@@ -24,7 +24,7 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 		$fields = [
 			'hostid' =>				'required|db hosts.hostid',
 			'groups' =>				'array',
-			'templates' =>			'required|array_db hosts.hostid', // TODO VM: should be templateid
+			'templateid' =>			'required|db hosts.hostid',
 			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
 			'tls_psk' =>			'db hosts.tls_psk|not_empty',
 			'interfaces' =>			'array|not_empty',
@@ -81,9 +81,10 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 				'groups' => $this->processHostGroups(array_unique(
 					array_merge($this->getInput('groups', []), array_column($db_host['hostgroups'], 'groupid'))
 				)),
-				'templates' => $this->processTemplates([array_unique(array_merge(
-					$this->getInput('templates', []), array_column($db_host['parentTemplates'], 'templateid')
-				))]),
+				'templates' => $this->processTemplates([array_keys(
+					array_column($db_host['parentTemplates'], 'templateid', 'templateid')
+					+ [$this->getInput('templateid') => true]
+				)]),
 				'interfaces' => array_merge($db_host['interfaces'], $this->processHostInterfaces($interfaces)),
 				'macros' => $this->prepareMacros($this->getInput('macros', []), $db_host['macros'])
 			];

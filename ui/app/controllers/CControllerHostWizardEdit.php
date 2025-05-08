@@ -156,8 +156,7 @@ class CControllerHostWizardEdit extends CController {
 		}
 		else {
 			$hanodes = API::HaNode()->get([
-				'output' => ['address', 'port'],
-				'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE]
+				'output' => ['address', 'port']
 			]);
 
 			foreach ($hanodes as $hanode) {

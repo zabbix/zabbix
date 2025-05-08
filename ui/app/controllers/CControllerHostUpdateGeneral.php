@@ -231,13 +231,10 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 * @return bool
 	 */
 	protected function validateMacrosByConfig(): bool {
-		$templateid = $this->getInput('templates', []);
-		$templateid = reset($templateid); // TODO VM: should be templateid
-
 		$template = API::Template()->get([
 			'output' => [],
 			'selectMacros' => ['macro', 'config'],
-			'templateids' => $templateid
+			'templateids' => $this->getInput('templateid')
 		]);
 		$template = reset($template);
 

@@ -24,9 +24,9 @@ class CControllerHostWizardCreate extends CControllerHostUpdateGeneral {
 		$fields = [
 			'host' =>				'required|db hosts.host|not_empty',
 			'groups' =>				'required|array',
-			'templates' =>			'required|array_db hosts.hostid', // TODO VM: should be templateid
-			'tls_psk_identity' =>	'db hosts.tls_psk_identity|required|not_empty',
-			'tls_psk' =>			'db hosts.tls_psk|required|not_empty',
+			'templateid' =>			'required|db hosts.hostid',
+			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
+			'tls_psk' =>			'db hosts.tls_psk|not_empty',
 			'interfaces' =>			'array|not_empty',
 			'ipmi_authtype' =>		'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
 				IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM, IPMI_AUTHTYPE_RMCP_PLUS
@@ -91,15 +91,20 @@ class CControllerHostWizardCreate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'host' => $this->getInput('host'),
-				'groups' => $this->processHostGroups($this->getInput('groups', [])),
-				'templates' => $this->processTemplates([$this->getInput('templates', [])]),
+				'groups' => $this->processHostGroups($this->getInput('groups')),
+				'templates' => $this->processTemplates([[$this->getInput('templateid')]]),
 				'interfaces' => $this->processHostInterfaces($interfaces),
-				'macros' => $this->processUserMacros($this->getInput('macros', [])),
-				'tls_connect' => HOST_ENCRYPTION_PSK,
-				'tls_accept' => HOST_ENCRYPTION_PSK,
-				'tls_psk_identity' => $this->getInput('tls_psk_identity'),
-				'tls_psk' => $this->getInput('tls_psk')
+				'macros' => $this->processUserMacros($this->getInput('macros', []))
 			];
+
+			if ($this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk')) {
+				$host += [
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => $this->getInput('tls_psk_identity'),
+					'tls_psk' => $this->getInput('tls_psk')
+				];
+			}
 
 			$result = API::Host()->create($host);
 
