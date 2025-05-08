@@ -132,7 +132,8 @@ char	*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *
 
 		ptr = zbx_strdup(ptr, ptr_l);
 
-		if ('?' != ptr_l[1] && len != fm_len)
+		/* Expression macro, user macros and LLD macros are not indexable */
+		if ('?' != ptr_l[1] && '$' != ptr_l[1] && '#' != ptr_l[1] && len != fm_len)
 		{
 			if (SUCCEED == zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
 					sizeof(*N_functionid), 1, 9))
