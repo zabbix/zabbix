@@ -386,7 +386,7 @@ window.host_wizard_edit = new class {
 	#renderSelectTemplate() {
 		const view = this.#view_templates.step_select_template.evaluateToElement();
 
-		view.querySelector('.js-show-templates').style.display = this.#host !== null ? '' : 'none';
+		view.querySelector('.js-show-templates').style.display = this.#source_host !== null ? '' : 'none';
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
@@ -1002,14 +1002,23 @@ window.host_wizard_edit = new class {
 	#makeCardListSections() {
 		let template_classes = Array.from(this.#templates)
 			.filter(([_, template]) => {
-				if (this.#data.data_collection != ZBX_TEMPLATE_DATA_COLLECTION_ANY
+				if (Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_ANY
 						&& !template.data_collection.includes(Number(this.#data.data_collection))) {
 					return false;
 				}
 
-				if (this.#data.agent_mode != ZBX_TEMPLATE_AGENT_MODE_ANY
+				if (Number(this.#data.agent_mode) !== ZBX_TEMPLATE_AGENT_MODE_ANY
 						&& !template.agent_mode.includes(Number(this.#data.agent_mode))) {
 					return false;
+				}
+
+				if (this.#linked_templates.length) {
+					const linked = this.#linked_templates.includes(Number(template.templateid));
+
+					if ((Number(this.#data.show_templates) === ZBX_TEMPLATE_SHOW_LINKED && !linked)
+							|| (Number(this.#data.show_templates) === ZBX_TEMPLATE_SHOW_NOT_LINKED && linked)) {
+						return false;
+					}
 				}
 
 				const query = this.#data.template_search_query.toLowerCase();
