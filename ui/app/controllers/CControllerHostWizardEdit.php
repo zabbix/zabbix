@@ -131,7 +131,7 @@ class CControllerHostWizardEdit extends CController {
 			: [];
 
 		$data = [
-			'form_action' => $this->host['hostid'] !== null ? 'host.wizard.update' : 'host.wizard.create',
+			'form_action' => $this->host !== null ? 'host.wizard.update' : 'host.wizard.create',
 			'host' => $this->host,
 			'templates' => $wizard_ready_templates,
 			'linked_templates' => array_keys($linked_templates),

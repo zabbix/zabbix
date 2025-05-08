@@ -649,7 +649,7 @@ window.host_wizard_edit = new class {
 			step_form.parentNode.insertBefore(message_box, step_form);
 		}
 		else {
-			message_element.replaceWith(message_element);
+			message_element.replaceWith(message_box);
 		}
 	}
 
