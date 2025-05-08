@@ -499,9 +499,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 		unset($item);
 
-		if ($ins_items_discovery) {
-			DB::insertBatch('item_discovery', $ins_items_discovery);
-		}
+		DB::insertBatch('item_discovery', $ins_items_discovery);
 
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
@@ -806,7 +804,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		$items = [];
 
 		foreach ($db_items as $db_item) {
-			$item = array_intersect_key($db_item, array_flip(['itemid', 'type', 'ruleid']));
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
 
 			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 				$item += ['parameters' => []];
@@ -981,8 +979,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
 				'ht.templateid AS parent_hostid,'.dbConditionCoalesce('id.lldruleid', 0, 'ruleid').
 			' FROM hosts_templates ht'.
-			' INNER JOIN items i ON ht.hostid=i.hostid'.
-			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' JOIN items i ON ht.hostid=i.hostid'.
+			' JOIN hosts h ON ht.hostid=h.hostid'.
 			' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 			' WHERE '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
 				' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
@@ -1012,9 +1010,12 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
-				'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'output' => array_merge(
+				['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status', 'discover'
+				],
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
+			),
 			'itemids' => array_keys($upd_db_items)
 		];
 		$result = DBselect(DB::makeSql('items', $options));
@@ -1143,9 +1144,12 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	 */
 	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
 		$upd_db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
-				'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status', 'discover'
+				],
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
+			),
 			'filter' => [
 				'templateid' => array_keys($db_items),
 				'hostid' => $hostids
@@ -1159,7 +1163,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			$parent_indexes = array_flip(array_column($items, 'itemid'));
 			$upd_items = [];
 
-			foreach ($upd_db_items as &$upd_db_item) {
+			foreach ($upd_db_items as $upd_db_item) {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
 
@@ -1178,7 +1182,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 				$upd_items[] = $upd_item;
 			}
-			unset($upd_db_item);
 
 			self::addAffectedObjects($upd_items, $upd_db_items);
 		}
@@ -1332,8 +1335,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.hostid,i.flags,'.
-				'h.status AS host_status'.
+			'SELECT id.itemid,i.name,i.templateid,i.uuid,h.status AS host_status'.
 			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
@@ -1344,20 +1346,18 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$items = [];
 		$db_items = [];
-		$internal_fields = array_flip(['type', 'key_', 'hostid', 'flags']);
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'templateid' => 0,
-				'host_status' => $row['host_status']
+				'templateid' => 0
 			];
 
 			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 				$item += ['uuid' => generateUuidV4()];
 			}
 
-			$items[] = $item + array_intersect_key($row, $internal_fields);
+			$items[] = $item;
 			$db_items[$row['itemid']] = $row;
 		}
 

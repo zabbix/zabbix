@@ -434,12 +434,10 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['itemid'] = array_shift($itemids);
 
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$ins_items_discovery[] = [
-					'itemid' => $item['itemid'],
-					'lldruleid' => $item['ruleid']
-				];
-			}
+			$ins_items_discovery[] = [
+				'itemid' => $item['itemid'],
+				'lldruleid' => $item['ruleid']
+			];
 
 			$host_statuses[] = $item['host_status'];
 			$flags[] = $item['flags'];
@@ -447,9 +445,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($item);
 
-		if ($ins_items_discovery) {
-			DB::insertBatch('item_discovery', $ins_items_discovery);
-		}
+		DB::insertBatch('item_discovery', $ins_items_discovery);
 
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
@@ -1065,8 +1061,8 @@ class CItemPrototype extends CItemGeneral {
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
 				'ht.templateid AS parent_hostid,'.dbConditionCoalesce('id.lldruleid', 0, 'ruleid').
 			' FROM hosts_templates ht'.
-			' INNER JOIN items i ON ht.hostid=i.hostid'.
-			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' JOIN items i ON ht.hostid=i.hostid'.
+			' JOIN hosts h ON ht.hostid=h.hostid'.
 			' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 			' WHERE '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
 				' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).

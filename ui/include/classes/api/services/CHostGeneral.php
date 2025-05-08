@@ -600,10 +600,8 @@ abstract class CHostGeneral extends CHostBase {
 	protected static function unlinkTemplatesObjects(array $templateids, ?array $hostids = null,
 			bool $clear = false): void {
 		$flags = $clear
-			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
-			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
-			];
+			? [ZBX_FLAG_DISCOVERY_NORMAL]
+			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE];
 
 		// triggers
 		$db_triggers = DBselect(
@@ -788,10 +786,6 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $hostids
 	 */
 	private static function linkTemplatesObjects(array $templateids, array $hostids): void {
-		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
-		$templateids = zbx_toArray($templateids);
-		$hostids = zbx_toArray($hostids);
-
 		foreach ($templateids as $templateid) {
 			// Fist link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($templateid, $hostids);
