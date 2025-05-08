@@ -369,7 +369,7 @@ window.host_wizard_edit = new class {
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
 			this.#back_button.style.display = this.#current_step > 0
-				|| this.#steps_queue[this.#current_step] === this.STEP_COMPLETE ? '' : 'none';
+				&& this.#steps_queue[this.#current_step] !== this.STEP_COMPLETE ? '' : 'none';
 
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 		});
