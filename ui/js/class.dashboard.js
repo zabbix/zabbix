@@ -209,6 +209,20 @@ class CDashboard {
 		}
 	}
 
+	isReferred(type = null) {
+		const require = {
+			context: 'dashboard',
+			event_type: 'broadcast',
+			reference: CDashboard.REFERENCE_DASHBOARD
+		};
+
+		if (type !== null) {
+			require.type = type;
+		}
+
+		return ZABBIX.EventHub.hasSubscribers(require);
+	}
+
 	isEditMode() {
 		return this._is_edit_mode;
 	}
