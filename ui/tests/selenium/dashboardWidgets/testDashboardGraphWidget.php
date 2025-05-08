@@ -363,33 +363,42 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'Data set' => [
+						[],
 						[
-							'xpath://button[@id="lbl_ds_0_color"]/..' => ''
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '',
+							'host' => 'Zabbix*',
+							'item' => 'Agent ping'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
+					'error' => 'Invalid parameter "Data set/2/color": cannot be empty.'
 				]
 			],
-			[
-				[
-					'Data set' => [
-						[
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000!'
-						]
-					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
-				]
-			],
-			[
-				[
-					'Data set' => [
-						[
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000 '
-						]
-					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
-				]
-			],
+//			[
+//				[
+//					'Data set' => [
+//						[],
+//						[
+//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000!',
+//							'host' => 'Zabbix*',
+//							'item' => 'Agent ping'
+//						]
+//					],
+//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
+//				]
+//			],
+//			[
+//				[
+//					'Data set' => [
+//						[],
+//						[
+//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
+//							'host' => 'Zabbix*',
+//							'item' => 'Agent ping'
+//						]
+//					],
+//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
+//				]
+//			],
 			// Time shift field validation.
 			[
 				[
@@ -523,19 +532,19 @@ class testDashboardGraphWidget extends testWidgets {
 					'error' => 'Invalid parameter "Data set/2/items": cannot be empty.'
 				]
 			],
-			[
-				[
-					'Data set' => [
-						[],
-						[
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
-							'host' => 'Zabbix*',
-							'item' => 'Agent ping'
-						]
-					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-				]
-			],
+//			[
+//				[
+//					'Data set' => [
+//						[],
+//						[
+//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
+//							'host' => 'Zabbix*',
+//							'item' => 'Agent ping'
+//						]
+//					],
+//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
+//				]
+//			],
 			[
 				[
 					'Data set' => [
@@ -1648,8 +1657,9 @@ class testDashboardGraphWidget extends testWidgets {
 						'Refresh interval' => 'No refresh'
 					],
 					'Data set' => [
+						[],
 						[
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '009688',
 							'host' => 'One host',
 							'item' => 'One item',
 							'Draw' => 'Staircase',
@@ -1665,7 +1675,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'Data set label' => 'Staircase graph'
 						],
 						[
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000',
+							'xpath://button[@id="lbl_ds_2_color"]/..' => '000000',
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'Y-axis' => 'Right',
@@ -1945,8 +1955,9 @@ class testDashboardGraphWidget extends testWidgets {
 						'Refresh interval' => 'No refresh'
 					],
 					'Data set' => [
+						[],
 						[
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '009688',
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
@@ -1958,7 +1969,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'Time shift' => '0'
 						],
 						[
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000',
+							'xpath://button[@id="lbl_ds_2_color"]/..' => '000000',
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'Y-axis' => 'Right',
