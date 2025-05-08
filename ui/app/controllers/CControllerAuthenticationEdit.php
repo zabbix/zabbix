@@ -280,14 +280,14 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_provision_groups' => [],
 					'saml_provision_media' => []
 				];
+			}
 
-				if ($data['saml_certs_editable']) {
-					$saml_configuration += [
-						'idp_certificate' => '',
-						'sp_certificate' => '',
-						'sp_private_key' => ''
-					];
-				}
+			if ($data['saml_certs_editable']) {
+				$saml_configuration += [
+					'idp_certificate' => '',
+					'sp_certificate' => '',
+					'sp_private_key' => ''
+				];
 			}
 
 			self::extendProvisionGroups($saml_configuration['saml_provision_groups']);
