@@ -908,7 +908,7 @@ static void	DCdump_triggers(void)
 		zbx_uint64_t	*itemid;
 
 		trigger = (ZBX_DC_TRIGGER *)index.values[i];
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " flags:%u", trigger->triggerid,
 					trigger->flags);
