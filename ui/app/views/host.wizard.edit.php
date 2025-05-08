@@ -500,12 +500,14 @@ function stepAddHostInterface(): array {
 				->addItem(
 					(new CDiv([
 						new CFormField([
-							new CLabel(_('Agent address')),
-							new CTextBox('interfaces[#{row_index}][address]')
+							(new CLabel(_('Agent address')))->setAsteriskMark(),
+							(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
 						]),
 						new CFormField([
-							new CLabel(_('Agent port')),
-							new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
+							(new CLabel(_('Agent port')))->setAsteriskMark(),
+							(new CTextBox('interfaces[#{row_index}][port]', '', false,
+								DB::getFieldLength('interface', 'port')
+							))->setAriaRequired()
 						]),
 						(new CDiv(
 							_('Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target.')
@@ -529,12 +531,14 @@ function stepAddHostInterface(): array {
 					(new CDiv([
 						(new CDiv([
 							new CFormField([
-								new CLabel(_('SNMP address')),
-								new CTextBox('interfaces[#{row_index}][address]')
+								(new CLabel(_('SNMP address')))->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
 							]),
 							new CFormField([
-								new CLabel(_('SNMP port')),
-								new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
+								(new CLabel(_('SNMP port')))->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][port]', '', false,
+									DB::getFieldLength('interface', 'port')
+								))->setAriaRequired()
 							]),
 							(new CDiv(
 								_('Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target.')
@@ -653,12 +657,14 @@ function stepAddHostInterface(): array {
 					(new CDiv([
 						(new CDiv([
 							new CFormField([
-								new CLabel(_('IPMI address')),
-								new CTextBox('interfaces[#{row_index}][address]')
+								(new CLabel(_('IPMI address')))->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
 							]),
 							new CFormField([
-								new CLabel(_('IPMI port')),
-								new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
+								(new CLabel(_('IPMI port')))->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][port]', '', false,
+									DB::getFieldLength('interface', 'port')
+								))->setAriaRequired()
 							]),
 							(new CDiv(
 								_('Enter the IP/DNS address and port of your IPMI-enabled monitoring target.')
@@ -722,12 +728,14 @@ function stepAddHostInterface(): array {
 				->addItem(
 					(new CDiv([
 						new CFormField([
-							new CLabel(_('JMX address')),
-							new CTextBox('interfaces[#{row_index}][address]')
+							(new CLabel(_('JMX address')))->setAsteriskMark(),
+							(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
 						]),
 						new CFormField([
-							new CLabel(_('JMX port')),
-							new CTextBox('interfaces[#{row_index}][port]', '', false, DB::getFieldLength('interface', 'port'))
+							(new CLabel(_('JMX port')))->setAsteriskMark(),
+							(new CTextBox('interfaces[#{row_index}][port]', '', false,
+								DB::getFieldLength('interface', 'port')
+							))->setAriaRequired()
 						]),
 						(new CDiv(
 							_('Enter the IP/DNS address and port of your JMX-enabled monitoring target.')
