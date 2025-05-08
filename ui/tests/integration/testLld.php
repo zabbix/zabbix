@@ -14,14 +14,14 @@
 **/
 
 require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
-require_once dirname(__FILE__) . '/../include/helpers/CDataHelper.php';
+
 
 /**
  * Test suite for LLD.
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @onAfter clearData
+ * @backup hosts,items,item_rtdata,triggers,actions,operations,graphs
  *
  */
 class testLld extends CIntegrationTest
@@ -1716,7 +1716,7 @@ class testLld extends CIntegrationTest
 		$response = $this->call('template.get', [
 			'output' => ['templateid'],
 			'filter' => [
-				'name' => 'Um1'
+				'name' => 'lld_test_dbs_template'
 			]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
@@ -1759,6 +1759,8 @@ class testLld extends CIntegrationTest
 		$this->assertCount(1, $response['result']['actionids']);
 		self::$autoreg_actionid = $response['result']['actionids'][0];
 
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
 		$response = $this->callUntilDataIsPresent('host.get', [
 			'output' => ['hostid'],
 			'search' => [
@@ -1771,6 +1773,7 @@ class testLld extends CIntegrationTest
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->checkNestedLLDFromTemplate(self::AGENT_AUTOREG_NAME);
+		sleep(250);
 	}
 
 	public static function clearAutoregAction(): void
@@ -2021,8 +2024,6 @@ class testLld extends CIntegrationTest
 			'countOutput' => true
 		]);
 		$this->assertEquals(2, $response['result']);
-
-		CDataHelper::call('host.delete', [$hostid]);
 	}
 
 	// Test overrides of nested rules, including update.
@@ -2164,24 +2165,5 @@ class testLld extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-
-		CDataHelper::call('host.delete', [$hostid]);
-	}
-
-	/**
-	 * Delete all created data after test.
-	 */
-	public static function clearData(): void
-	{
-		return;
-		CDataHelper::call('template.delete', [
-			self::$templateid_main,
-			self::$templateid_item_types
-		]);
-
-		CDataHelper::call('host.delete', [
-			self::$hostid_main,
-			self::$hostid_item_types
-		]);
 	}
 }

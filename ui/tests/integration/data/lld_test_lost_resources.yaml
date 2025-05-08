@@ -60,6 +60,8 @@ zabbix_export:
           host_prototypes:
             - host: 'tc.removal.host.nested_{#PARENTNAME}_{#NAME}'
               name: 'tc.removal.host.nested_{#PARENTNAME}_{#NAME}'
+              templates:
+                - name: 'lld_test_dbs_template'
               group_links:
                 - group:
                     name: 'Discovered hosts'
