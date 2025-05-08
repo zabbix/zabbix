@@ -39,28 +39,28 @@ class testDashboardHostCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Ids of created Dashboards for Host Card widget check.
-     *
-	 * @var array
-	 */
+	* Ids of created Dashboards for Host Card widget check.
+	*
+	* @var array
+	*/
 	protected static $dashboardid;
 	/**
-	 * Dashboard hash before update.
-	 *
-	 * @var string
-	 */
+	* Dashboard hash before update.
+	*
+	* @var string
+	*/
 	protected static $old_hash;
 	/**
-	 * Widget counter.
-	 *
-	 * @var integer
-	 */
+	* Widget counter.
+	*
+	* @var integer
+	*/
 	protected static $old_widget_count;
 	/**
-	 * Id of host 'Fully filled host card widget'.
-	 *
-	 * @var integer
-	 */
+	* Id of host 'Fully filled host card widget'.
+	*
+	* @var integer
+	*/
 	protected static $hostid;
 
 	public static function prepareHostCardWidgetData() {
