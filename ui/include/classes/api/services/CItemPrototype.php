@@ -351,8 +351,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected static function validateCreate(array &$items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -360,8 +359,6 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
-		self::checkDiscoveryRules($items);
-
 		self::addHostStatus($items, $db_hosts, $db_templates);
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
@@ -373,7 +370,7 @@ class CItemPrototype extends CItemGeneral {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
-			'ruleid' =>			['type' => API_ANY],
+			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
@@ -416,6 +413,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkPreprocessingStepsDuplicates($items);
+		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);

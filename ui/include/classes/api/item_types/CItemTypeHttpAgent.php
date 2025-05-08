@@ -33,7 +33,10 @@ class CItemTypeHttpAgent extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getCreateValidationRules(array $item): array {
-		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$api_allow_lld_macro =
+			in_array($item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+				? API_ALLOW_LLD_MACRO
+				: 0;
 
 		return [
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
@@ -45,14 +48,14 @@ class CItemTypeHttpAgent extends CItemType {
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]), 'default' => DB::getDefault('items', 'post_type')],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
-										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.PORT}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
+										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.PORT}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECTS, 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]],
-			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'status_codes')],
+			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'status_codes')],
 			'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 			'retrieve_mode' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'request_method', 'in' => HTTPCHECK_REQUEST_HEAD], 'type' => API_INT32, 'in' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS],
@@ -80,7 +83,10 @@ class CItemTypeHttpAgent extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
-		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$api_allow_lld_macro =
+			in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+				? API_ALLOW_LLD_MACRO
+				: 0;
 
 		return [
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
@@ -92,14 +98,14 @@ class CItemTypeHttpAgent extends CItemType {
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
-										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.PORT}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
+										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.PORT}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECTS, 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]],
-			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'status_codes')],
+			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'status_codes')],
 			'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 			'retrieve_mode' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'request_method', 'in' => HTTPCHECK_REQUEST_HEAD], 'type' => API_INT32, 'in' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS],
