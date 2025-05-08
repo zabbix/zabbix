@@ -606,7 +606,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					"select hostid,proxyid,name,status,proxy_groupid,monitored_by"
 					" from hosts"
 					" where host='%s'"
-						" and flags<>%d"
+						" and flags&%d=0"
 						" and status in (%d,%d)"
 					" order by hostid",
 					host_esc, ZBX_FLAG_DISCOVERY_PROTOTYPE,
