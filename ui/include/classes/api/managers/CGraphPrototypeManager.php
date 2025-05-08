@@ -60,7 +60,7 @@ class CGraphPrototypeManager {
 			' FROM graph_discovery gd'.
 			' JOIN graphs g ON gd.graphid=g.graphid'.
 			' WHERE '.dbConditionId('gd.parent_graphid', $del_graphids).
-				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED])
+				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'graphid');
 
 		if ($db_graphids) {

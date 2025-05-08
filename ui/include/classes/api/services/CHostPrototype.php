@@ -2612,7 +2612,7 @@ class CHostPrototype extends CHostBase {
 			' FROM host_discovery hd,hosts h'.
 			' WHERE hd.hostid=h.hostid'.
 				' AND '.dbConditionId('hd.parent_hostid', $hostids).
-				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED])
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'hostid');
 
 		if ($db_host_prototypes) {

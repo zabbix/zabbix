@@ -2016,9 +2016,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
 				' AND '.dbConditionId('id.lldruleid', $del_itemids).
-				' AND '.dbConditionInt('i.flags',
-					[ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED]
-				)
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'itemid');
 
 		if ($db_items) {
@@ -2037,9 +2035,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			' FROM host_discovery hd,hosts h'.
 			' WHERE hd.hostid=h.hostid'.
 				' AND '.dbConditionId('hd.lldruleid', $del_itemids).
-				' AND '.dbConditionInt('h.flags',
-					[ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED]
-				)
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'hostid');
 
 		if ($db_host_prototypes) {

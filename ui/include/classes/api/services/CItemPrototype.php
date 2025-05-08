@@ -1460,7 +1460,11 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDependentItems($db_items);
+		self::addDependentItems($db_items, $db_lld_rule_prototypes);
+
+		if ($db_lld_rule_prototypes) {
+			CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
+		}
 
 		$del_itemids = array_keys($db_items);
 
@@ -1500,12 +1504,14 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @param array      $db_items
 	 */
-	protected static function addDependentItems(array &$db_items): void {
+	protected static function addDependentItems(array &$db_items, ?array &$db_lld_rule_prototypes = null): void {
+		$db_lld_rule_prototypes = [];
+
 		$master_itemids = array_keys($db_items);
 
 		do {
 			$options = [
-				'output' => ['itemid', 'name'],
+				'output' => ['itemid', 'name', 'flags'],
 				'filter' => ['master_itemid' => $master_itemids]
 			];
 			$result = DBselect(DB::makeSql('items', $options));
@@ -1513,9 +1519,16 @@ class CItemPrototype extends CItemGeneral {
 			$master_itemids = [];
 
 			while ($row = DBfetch($result)) {
-				$master_itemids[] = $row['itemid'];
+				if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])) {
+					$db_lld_rule_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+				}
+				else {
+					if (!array_key_exists($row['itemid'], $db_items)) {
+						$master_itemids[] = $row['itemid'];
 
-				$db_items[$row['itemid']] = $row;
+						$db_items[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+					}
+				}
 			}
 		} while ($master_itemids);
 	}
@@ -1551,7 +1564,7 @@ class CItemPrototype extends CItemGeneral {
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
 				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED])
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'itemid');
 
 		if ($db_items) {

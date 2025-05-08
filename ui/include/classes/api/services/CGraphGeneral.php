@@ -1269,7 +1269,7 @@ abstract class CGraphGeneral extends CApiService {
 		foreach ($hostids_by_name as $name => $_hostids) {
 			$flags = $this instanceof CGraph
 					? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-					: [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED];
+					: [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED];
 			$sql = 'SELECT g.graphid,g.name,g.templateid,g.flags'.
 				' FROM graphs g'.
 				' WHERE '.dbConditionString('g.name', [$name]).

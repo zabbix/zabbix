@@ -1978,16 +1978,15 @@ class CItem extends CItemGeneral {
 			$master_itemids = [];
 
 			while ($row = DBfetch($result)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE || $row['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED) {
+				if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])) {
 					$db_lld_rules[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
 				}
-				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
-						|| $row['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED) {
+				elseif (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])) {
 					$master_itemids[] = $row['itemid'];
 
 					$db_lld_rule_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
 				}
-				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				elseif (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])) {
 					$master_itemids[] = $row['itemid'];
 
 					$db_item_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));

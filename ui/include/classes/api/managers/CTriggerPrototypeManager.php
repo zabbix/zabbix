@@ -56,13 +56,13 @@ class CTriggerPrototypeManager {
 			' FOR UPDATE'
 		);
 
-		// Deleting discovered triggers.
+		// Deleting discovered trigger prototypes.
 		$db_triggerids = DBfetchColumn(DBselect(
 			'SELECT td.triggerid'.
 			' FROM trigger_discovery td'.
 			' JOIN triggers t ON td.triggerid=t.triggerid'.
 			' WHERE '.dbConditionId('td.parent_triggerid', $del_triggerids).
-				' AND '.dbConditionInt('t.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED])
+				' AND '.dbConditionInt('t.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'triggerid');
 
 		if ($db_triggerids) {
