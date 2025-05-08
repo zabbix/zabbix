@@ -104,6 +104,7 @@ class CControllerHostWizardGet extends CController {
 						? $interface['ip']
 						: $interface['dns'];
 
+					unset($interface['ip'], $interface['dns'], $interface['useip']);
 					$interfaces_by_type[$interface['type']] = $interface;
 				}
 			}

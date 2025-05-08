@@ -980,13 +980,13 @@ window.host_wizard_edit = new class {
 
 	#isRequiredInstallAgent() {
 		return this.#data.interface_required[this.INTERFACE_TYPE_AGENT]
-			&& (!this.#host?.interfaces.some(({interface_type}) => interface_type == this.INTERFACE_TYPE_AGENT));
+			&& (!this.#host?.interfaces.some(({type}) => Number(type) === this.INTERFACE_TYPE_AGENT));
 	}
 
 	#isRequiredAddHostInterface() {
 		return Object.entries(this.#data.interface_required).some(([required_type, is_required]) => {
 			return is_required
-				&& !this.#host?.interfaces.some(({interface_type}) => interface_type === required_type);
+				&& !this.#host?.interfaces.some(({type}) => type === required_type);
 		});
 	}
 
