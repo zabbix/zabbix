@@ -105,7 +105,7 @@ window.host_wizard_edit = new class {
 	#templates;
 	#linked_templates;
 
-	#source_hostid = null;
+	#source_host = null;
 	#host = null;
 
 	#template = null;
@@ -200,13 +200,13 @@ window.host_wizard_edit = new class {
 
 	#updating_locked = true;
 
-	async init({templates, linked_templates, wizard_show_welcome, source_hostid, csrf_token}) {
+	async init({templates, linked_templates, wizard_show_welcome, source_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
 		this.#data.do_not_show_welcome = wizard_show_welcome == 1 ? 0 : 1;
-		this.#source_hostid = source_hostid;
+		this.#source_host = source_host;
 		this.#csrf_token = csrf_token;
 
 		this.#initViewTemplates();
@@ -523,7 +523,7 @@ window.host_wizard_edit = new class {
 				return this.#disableWelcomeStep();
 
 			case this.STEP_SELECT_TEMPLATE:
-				return this.#source_hostid !== null ? this.#loadWizardConfig() : Promise.resolve();
+				return this.#source_host !== null ? this.#loadWizardConfig() : Promise.resolve();
 
 			case this.STEP_CREATE_HOST:
 				return this.#loadWizardConfig();
@@ -539,8 +539,8 @@ window.host_wizard_edit = new class {
 	#loadWizardConfig() {
 		// TODO VM: don't make the call, when host and template hasn't changed.
 
-		const hostid = this.#source_hostid !== null
-			? this.#source_hostid
+		const hostid = this.#source_host !== null
+			? this.#source_host.hostid
 			: this.#data.host && !this.#data.host.isNew
 				? this.#data.host.id
 				: null;
@@ -663,7 +663,7 @@ window.host_wizard_edit = new class {
 
 		this.#steps_queue.push(this.STEP_SELECT_TEMPLATE);
 
-		if (this.#source_hostid === null) {
+		if (this.#source_host === null) {
 			this.#steps_queue.push(this.STEP_CREATE_HOST);
 		}
 
@@ -708,8 +708,8 @@ window.host_wizard_edit = new class {
 		const progress_labels = [
 			{
 				label: t('Selected host'),
-				info: '<TODO: Template name>', // TODO VM: update
-				visible: this.#source_hostid !== null,
+				info: this.#source_host?.name,
+				visible: this.#source_host !== null,
 				steps: [this.STEP_WELCOME]
 			},
 			{
@@ -721,7 +721,7 @@ window.host_wizard_edit = new class {
 			{
 				label: t('Create or select a host'),
 				info: this.#data.host?.name,
-				visible: this.#source_hostid === null,
+				visible: this.#source_host === null,
 				steps: [this.STEP_CREATE_HOST]
 			},
 			{
@@ -933,7 +933,7 @@ window.host_wizard_edit = new class {
 	#updateNextButton() {
 		switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_CONFIGURATION_FINISH:
-				this.#next_button.innerText = this.#source_hostid !== null
+				this.#next_button.innerText = this.#source_host !== null
 					? <?= json_encode(_('Update')) ?>
 					: <?= json_encode(_('Create')) ?>;
 				break;

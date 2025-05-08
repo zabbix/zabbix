@@ -65,7 +65,7 @@ $output = [
 			'templates' => $data['templates'],
 			'linked_templates' => $data['linked_templates'],
 			'wizard_show_welcome' => $data['wizard_show_welcome'],
-			'source_hostid' => $data['hostid'],
+			'source_host' => $data['host'],
 			'csrf_token' => CCsrfTokenHelper::get('host')
 		]).');',
 	'dialogue_class' => 'modal-popup-host-wizard'

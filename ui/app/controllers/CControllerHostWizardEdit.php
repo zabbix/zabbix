@@ -16,6 +16,8 @@
 
 class CControllerHostWizardEdit extends CController {
 
+	private $host = null;
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -46,16 +48,18 @@ class CControllerHostWizardEdit extends CController {
 		}
 
 		if ($this->hasInput('hostid')) {
-			$hosts = API::Host()->get([
-				'output' => [],
+			$host = API::Host()->get([
+				'output' => ['hostid', 'name'],
 				'hostids' => $this->getInput('hostid'),
 				'editable' => true,
 				'limit' => 1
 			]);
 
-			if (!$hosts) {
+			if (!$host) {
 				return false;
 			}
+
+			$this->host = $host[0];
 		}
 
 		return true;
@@ -118,19 +122,17 @@ class CControllerHostWizardEdit extends CController {
 		}
 		unset($template);
 
-		$hostid = $this->hasInput('hostid') ? $this->getInput('hostid') : null;
-
-		$linked_templates = $hostid !== null
+		$linked_templates = $this->host !== null
 			? API::template()->get([
 				'output' => ['templateid'],
-				'hostids' => $hostid,
+				'hostids' => $this->host['hostid'],
 				'preservekeys' => true
 			])
 			: [];
 
 		$data = [
-			'form_action' => $hostid !== null ? 'host.wizard.update' : 'host.wizard.create',
-			'hostid' => $hostid,
+			'form_action' => $this->host['hostid'] !== null ? 'host.wizard.update' : 'host.wizard.create',
+			'host' => $this->host,
 			'templates' => $wizard_ready_templates,
 			'linked_templates' => array_keys($linked_templates),
 			'old_template_count' => $vendor_template_count - $wizard_vendor_template_count,
