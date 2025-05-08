@@ -803,6 +803,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 	{
 		char	*ch_error;
 		char	name_trunc[VALUE_ERRMSG_MAX + 1];
+		int	ret;
 
 		host = hosts->values[i];
 
@@ -814,11 +815,13 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 			continue;
 
 		/* check for valid host name unless it's a prototype */
-		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ||
-				SUCCEED == zbx_check_hostname(host->host, &ch_error))
-		{
+		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			ret = zbx_check_prototype_hostname(host->host, &ch_error);
+		else
+			ret = zbx_check_hostname(host->host, &ch_error);
+
+		if (SUCCEED == ret)
 			continue;
-		}
 
 		zbx_strlcpy(name_trunc, host->host, sizeof(name_trunc));
 
