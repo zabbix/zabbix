@@ -1705,7 +1705,7 @@ class CUserDirectory extends CApiService {
 				switch ($field) {
 					case 'idp_certificate':
 					case 'sp_certificate':
-						if (function_exists('openssl_x509_read') && !@openssl_x509_read($value)) {
+						if (function_exists('openssl_x509_parse') && !openssl_x509_parse($value)) {
 							self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 								'/'.($i + 1).'/'.$field, _('value is not PEM encoded certificate')
 							));
@@ -1713,7 +1713,7 @@ class CUserDirectory extends CApiService {
 						break;
 
 					case 'sp_private_key':
-						if (function_exists('openssl_pkey_get_private') && !@openssl_pkey_get_private($value)) {
+						if (function_exists('openssl_pkey_get_private') && !openssl_pkey_get_private($value)) {
 							self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 								'/'.($i + 1).'/'.$field, _('value is not PEM encoded private key')
 							));
