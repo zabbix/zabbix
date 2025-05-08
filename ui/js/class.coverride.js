@@ -261,8 +261,20 @@ jQuery(function ($) {
 		 * @param string value           Value of option. Can be NULL for options 'color' and 'timeshift'.
 		 */
 		addOverride: function($override, option, value) {
-			var opt = $override.data('options');
-			if ($('[name="' + opt['makeName'](option, opt.getId($override)) + '"]', $override).length > 0) {
+			const opt = $override.data('options');
+
+			let override_exists;
+
+			if (option === 'color') {
+				override_exists = $override[0].querySelector(`.${ZBX_STYLE_COLOR_PICKER}`) !== null;
+			}
+			else {
+				const field_name = opt['makeName'](option, opt.getId($override));
+
+				override_exists = $override[0].querySelector(`[name="${field_name}"]`) !== null;
+			}
+
+			if (override_exists) {
 				methods.updateOverride($override, option, value);
 			}
 			else {
@@ -284,14 +296,23 @@ jQuery(function ($) {
 		updateOverride: function($override, option, value) {
 			var opt = $override.data('options'),
 				field_name = opt['makeName'](option, opt.getId($override));
-			$('[name="' + field_name + '"]', $override).val(value);
 
 			switch (option) {
-				case 'timeshift':
 				case 'color':
+					const color_picker = $override[0].querySelector(`.${ZBX_STYLE_COLOR_PICKER}`);
+
+					if (color_picker !== null) {
+						color_picker.color = value;
+					}
+					break;
+
+				case 'timeshift':
+					$('[name="' + field_name + '"]', $override).val(value);
 					break;
 
 				default:
+					$('[name="' + field_name + '"]', $override).val(value);
+
 					var visible_name = (typeof opt.captions[option] !== 'undefined') ? opt.captions[option] : option,
 						visible_value = (typeof opt.captions[option + value] !== 'undefined')
 							? opt.captions[option + value]
