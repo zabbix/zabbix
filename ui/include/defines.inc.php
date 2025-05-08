@@ -1617,8 +1617,6 @@ define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
 define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
-define('API_CERTIFICATE',		    73);
-define('API_PRIVATE_KEY',		    74);
 
 // flags
 define('API_REQUIRED',					0x00001);

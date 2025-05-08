@@ -273,12 +273,6 @@ class CApiInputValidator {
 
 			case API_SELEMENTID:
 				return self::validateSelementId($rule, $data, $path, $error);
-
-			case API_CERTIFICATE:
-				return self::validateCertificate($rule, $data, $path, $error);
-
-			case API_PRIVATE_KEY:
-				return self::validatePrivateKey($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -363,8 +357,6 @@ class CApiInputValidator {
 			case API_PROMETHEUS_LABEL:
 			case API_NUMBER:
 			case API_SELEMENTID:
-			case API_CERTIFICATE:
-			case API_PRIVATE_KEY:
 				return true;
 
 			case API_OBJECT:
@@ -4372,65 +4364,5 @@ class CApiInputValidator {
 		return is_string($data)
 			? self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error)
 			: self::validateId([], $data, $path, $error);
-	}
-
-	private static function validateCertificate($rule, &$data, $path, &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (str_contains($path, 'sp_certificate')) {
-			$path = _s('SP certificate');
-		}
-		elseif (str_contains($path, 'idp_certificate')) {
-			$path = _s('IdP certificate');
-		}
-
-		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Incorrect value for %1$s.', $path).' '.
-				_s('%1$d characters exceeds maximum length of %2$d characters', strlen($data), $rule['length']);
-
-			return false;
-		}
-		elseif ($data !== '') {
-			$is_certificate = @openssl_x509_read($data);
-
-			if (!$is_certificate) {
-				$error = _s('Provided %1$s is not a valid %2$s.', $path, 'certificate');
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private static function validatePrivateKey($rule, &$data, $path, &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-		$path = str_contains($path, 'sp_private_key') ? _s('SP private key') : $path;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Incorrect value for %1$s.', $path).' '.
-				_s('%1$d characters exceeds maximum length of %2$d characters', strlen($data), $rule['length']);
-
-			return false;
-		}
-		elseif ($data !== '') {
-			$is_private_key = openssl_pkey_get_private($data);
-
-			if (!$is_private_key) {
-				$error = _s('Provided %1$s is not a valid %2$s.', $path, 'key');
-
-				return false;
-			}
-		}
-
-		return true;
 	}
 }

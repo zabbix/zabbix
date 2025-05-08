@@ -317,7 +317,7 @@ if ($data['saml_certs_editable']) {
 						->addClass('js-saml-cert-change-button')
 						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('idp_certificate', $data['idp_certificate'] ?? ''))
+					(new CTextArea('idp_certificate', $data['idp_certificate']))
 						->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
@@ -343,7 +343,7 @@ if ($data['saml_certs_editable']) {
 						->addClass('js-saml-cert-change-button')
 						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('sp_private_key', $data['sp_private_key'] ?? ''))
+					(new CTextArea('sp_private_key', $data['sp_private_key']))
 						->setAttribute('placeholder', _('PEM-encoded SP private key'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
@@ -369,7 +369,7 @@ if ($data['saml_certs_editable']) {
 						->addClass('js-saml-cert-change-button')
 						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('sp_certificate', $data['sp_certificate'] ?? ''))
+					(new CTextArea('sp_certificate', $data['sp_certificate']))
 						->setAttribute('placeholder', _('PEM-encoded SP certificate'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)

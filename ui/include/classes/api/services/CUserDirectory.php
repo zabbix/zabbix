@@ -457,6 +457,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkSamlCertificates($userdirectories);
 		self::checkDuplicates($userdirectories);
 		self::checkProvisionGroups($userdirectories);
 		self::checkMediaTypes($userdirectories);
@@ -616,6 +617,16 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$db_saml_userdirectories = DB::select('userdirectory_saml', [
+			'output' => ['idp_certificate', 'sp_certificate', 'sp_private_key'],
+			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
+			'preservekeys' => true
+		]);
+
+		foreach ($db_saml_userdirectories as $db_saml_userdirectoryid => $db_saml_userdirectory) {
+			$db_userdirectories[$db_saml_userdirectoryid] += $db_saml_userdirectory;
+		}
+
 		foreach ($userdirectories as $i => &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 			$userdirectory += [
@@ -643,6 +654,7 @@ class CUserDirectory extends CApiService {
 
 		self::validateProvisionMedias($userdirectories, $db_userdirectories);
 
+		self::checkSamlCertificates($userdirectories, $db_userdirectories);
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
@@ -1644,16 +1656,16 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_CERTIFICATE, 'length' => 10000],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_CERTIFICATE, 'length' => 10000],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_PRIVATE_KEY, 'length' => 10000],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
 			]],
 		]];
 	}
@@ -1668,5 +1680,51 @@ class CUserDirectory extends CApiService {
 		unset($value);
 
 		return $saml_output;
+	}
+
+	private static function checkSamlCertificates(array $userdirectories, ?array $db_userdirectories = null): void {
+		$fields = array_flip(['idp_certificate', 'sp_certificate', 'sp_private_key']);
+		$check_openssl = false;
+
+		foreach ($userdirectories as $i => $userdirectory) {
+			$db_userdirectory = $db_userdirectories !== null
+				? $db_userdirectories[$userdirectory['userdirectoryid']]
+				: null;
+
+			foreach (array_intersect_key($userdirectory, $fields) as $field => $value) {
+				if ($value === '') {
+					continue;
+				}
+
+				if ($db_userdirectory !== null && $db_userdirectory[$field] === $value) {
+					continue;
+				}
+
+				$check_openssl = true;
+
+				switch ($field) {
+					case 'idp_certificate':
+					case 'sp_certificate':
+						if (function_exists('openssl_x509_read') && !@openssl_x509_read($value)) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/'.$field, _('value is not PEM encoded certificate')
+							));
+						}
+						break;
+
+					case 'sp_private_key':
+						if (function_exists('openssl_pkey_get_private') && !@openssl_pkey_get_private($value)) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/'.$field, _('value is not PEM encoded private key')
+							));
+						}
+						break;
+				}
+			}
+		}
+
+		if ($check_openssl) {
+			CAuthentication::checkOpenSslExtension();
+		}
 	}
 }
