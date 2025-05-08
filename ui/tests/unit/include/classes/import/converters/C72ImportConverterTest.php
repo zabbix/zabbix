@@ -34,7 +34,16 @@ class C72ImportConverterTest extends CImportConverterTest {
 									'label' => 'element-02'
 								]
 							],
-							'links' => []
+							'links' => [
+								[
+									'drawtype' => CXmlConstantValue::DOTTED_LINE,
+									'linktriggers' => [
+										[
+											'drawtype' => CXmlConstantValue::BOLD_LINE
+										]
+									]
+								]
+							]
 						]
 					]
 				],
@@ -51,8 +60,18 @@ class C72ImportConverterTest extends CImportConverterTest {
 									'zindex' => '1'
 								]
 							],
-							'links' => [],
-							'background_scale' => 'NONE'
+							'background_scale' => CXmlConstantName::MAP_BACKGROUND_SCALE_NONE,
+							'links' => [
+								[
+									'drawtype' => CXmlConstantName::DOTTED_LINE,
+									'indicator_type' => CXmlConstantName::INDICATOR_TYPE_TRIGGER,
+									'linktriggers' => [
+										[
+											'drawtype' => CXmlConstantName::BOLD_LINE
+										]
+									]
+								]
+							]
 						]
 					]
 				]
@@ -106,8 +125,7 @@ class C72ImportConverterTest extends CImportConverterTest {
 	 * @param array $expected
 	 */
 	public function testConvert(array $source, array $expected): void {
-		$result = $this->createConverter()->convert($this->createSource($source));
-		$this->assertConvert($this->createExpectedResult($expected), $result);
+		$this->assertConvert($this->createExpectedResult($expected), $this->createSource($source));
 	}
 
 	protected function createSource(array $data = []): array {

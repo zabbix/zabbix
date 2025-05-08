@@ -42,10 +42,10 @@ class C72ImportConverter extends CConverter {
 
 	private static function convertMaps(array $maps): array {
 		$drawtypes = [
-			DRAWTYPE_LINE => CXmlConstantName::SINGLE_LINE,
-			DRAWTYPE_BOLD_LINE => CXmlConstantName::BOLD_LINE,
-			DRAWTYPE_DOT => CXmlConstantName::DOTTED_LINE,
-			DRAWTYPE_DASHED_LINE => CXmlConstantName::DASHED_LINE
+			CXmlConstantValue::SINGLE_LINE => CXmlConstantName::SINGLE_LINE,
+			CXmlConstantValue::BOLD_LINE => CXmlConstantName::BOLD_LINE,
+			CXmlConstantValue::DOTTED_LINE => CXmlConstantName::DOTTED_LINE,
+			CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE
 		];
 
 		foreach ($maps as &$map) {

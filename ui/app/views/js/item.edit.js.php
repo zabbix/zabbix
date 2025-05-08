@@ -432,7 +432,7 @@ window.item_edit_form = new class {
 	#showErrorDialog(body, trigger_element) {
 		overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
-			class: 'modal-popup position-middle',
+			class: 'modal-popup',
 			content: jQuery('<span>').html(body),
 			buttons: [{
 				title: <?= json_encode(_('Ok')) ?>,
@@ -440,7 +440,10 @@ window.item_edit_form = new class {
 				focused: true,
 				action: function() {}
 			}]
-		}, jQuery(trigger_element));
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: jQuery(trigger_element)
+		});
 	}
 
 	#getFormFields() {

@@ -271,6 +271,7 @@ void	vmware_shmem_dsname_free(zbx_vmware_dsname_t *dsname)
 {
 	vmware_shared_strfree(dsname->name);
 	vmware_shared_strfree(dsname->uuid);
+	vmware_shared_strfree(dsname->id);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 
 	__vm_shmem_free_func(dsname);
@@ -599,6 +600,7 @@ zbx_vmware_vm_t	*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src)
 	VMWARE_VECTOR_CREATE(&vm->file_systems, vmware_fs_ptr);
 	VMWARE_VECTOR_CREATE(&vm->custom_attrs, vmware_custom_attr_ptr);
 	VMWARE_VECTOR_CREATE(&vm->alarm_ids, str);
+	VMWARE_VECTOR_CREATE(&vm->ds_ids, str);
 	zbx_vector_vmware_dev_ptr_reserve(&vm->devs, (size_t)src->devs.values_num);
 	zbx_vector_vmware_fs_ptr_reserve(&vm->file_systems, (size_t)src->file_systems.values_num);
 	zbx_vector_vmware_custom_attr_ptr_reserve(&vm->custom_attrs, (size_t)src->custom_attrs.values_num);
@@ -624,6 +626,9 @@ zbx_vmware_vm_t	*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src)
 	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&vm->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
+	for (int i = 0; i < src->ds_ids.values_num; i++)
+		zbx_vector_str_append(&vm->ds_ids, vmware_shared_strdup(src->ds_ids.values[i]));
+
 	return vm;
 }
 
@@ -644,6 +649,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 
 	dsname->name = vmware_shared_strdup(src->name);
 	dsname->uuid = vmware_shared_strdup(src->uuid);
+	dsname->id = vmware_shared_strdup(src->id);
 
 	VMWARE_VECTOR_CREATE(&dsname->hvdisks, vmware_hvdisk);
 	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, (size_t)src->hvdisks.values_num);

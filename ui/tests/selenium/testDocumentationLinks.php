@@ -287,7 +287,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #16 Latest data view.
@@ -690,7 +690,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #66 Template dashboard create popup.
@@ -2441,7 +2441,13 @@ class testDocumentationLinks extends CWebTest {
 		// Execute the corresponding callback function to open the form with doc link.
 		if (array_key_exists('actions', $data)) {
 			foreach ($data['actions'] as $action) {
-				call_user_func_array([$this, $action['callback']], [CTestArrayHelper::get($action, 'element', null)]);
+				$element = CTestArrayHelper::get($action, 'element', null);
+				call_user_func_array([$this, $action['callback']], [$element]);
+
+				// $dialog->isValid() can be false if a widget is added.
+				if ($element === 'id:dashboard-add-widget') {
+					COverlayDialogElement::get('Add widget')->waitUntilReady();
+				}
 			}
 		}
 

@@ -2031,7 +2031,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		if (array_key_exists('Items', $data)) {
 			foreach ($data['Items'] as $column) {
 				$form->getFieldContainer('Items')->query('button:Add')->one()->waitUntilClickable()->click();
-				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay = COverlayDialogElement::get('New column');
 				$column_overlay_form = $column_overlay->asForm();
 				$column_overlay_form->fill($column['fields']);
 
@@ -2052,7 +2052,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				}
 
 				$column_overlay->waitUntilNotVisible();
-				$form->waitUntilReloaded();
+				$form = COverlayDialogElement::get($update ? 'Edit widget' : 'Add widget')->asForm();
 			}
 		}
 
@@ -2079,12 +2079,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 
 			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
-			$dialogs = COverlayDialogElement::find()->all();
-			$dialog_count = $dialogs->count();
-
-			for ($i = $dialog_count - 1; $i >= 0; $i--) {
-				$dialogs->get($i)->close(true);
-			}
+			COverlayDialogElement::closeAll(true);
 
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -2206,10 +2201,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
 			$form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+			$overlay_title = 'Edit widget';
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
+			$overlay_title = 'Add widget';
 		}
 
 		$form->fill([
@@ -2218,7 +2215,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		]);
 
 		$form->getFieldContainer('Items')->query('button:Add')->waitUntilClickable()->one()->click();
-		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$column_overlay = COverlayDialogElement::get('New column');
 		$column_overlay->asForm()->fill([
 			'Item' => [
 				'values' => 'Test Item history',
@@ -2227,10 +2224,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		]);
 		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay->waitUntilNotVisible();
-		$form->waitUntilReloaded();
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
+			// Initialize $form again after reload and name change.
+			$form = COverlayDialogElement::get($overlay_title)->asForm();
 			$form->submit();
 
 			// Check that changes took place on the unsaved dashboard.

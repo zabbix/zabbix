@@ -13,27 +13,23 @@
 **/
 
 
-class CWidgetFieldHostSections {
+class HostCard_CWidgetFieldHostSections extends CWidgetField {
 
 	/**
-	 * @type {HTMLTableElement};
+	 * @type {HTMLTableElement}
 	 */
 	#table;
 
 	/**
-	 * @type {string};
+	 * @type {Array}
 	 */
-	#field_name;
+	#value;
 
-	/**
-	 * @type {Array};
-	 */
-	#field_value;
+	constructor({name, form_name, value}) {
+		super({name, form_name});
 
-	constructor({field_name, field_value}) {
-		this.#table = document.getElementById(`${field_name}-table`);
-		this.#field_name = field_name;
-		this.#field_value = field_value;
+		this.#table = document.getElementById(`${name}-table`);
+		this.#value = value;
 
 		this.#init();
 		this.#update();
@@ -42,9 +38,9 @@ class CWidgetFieldHostSections {
 	#init() {
 		jQuery(this.#table)
 			.dynamicRows({
-				template: `#${this.#field_name}-row-tmpl`,
+				template: `#${this.getName()}-row-tmpl`,
 				allow_empty: true,
-				rows: this.#field_value.map(type => ({section: type})),
+				rows: this.#value.map(type => ({section: type})),
 				sortable: true,
 				sortable_options: {
 					target: 'tbody',
@@ -52,17 +48,24 @@ class CWidgetFieldHostSections {
 					freeze_end: 1
 				}
 			})
-			.on('tableupdate.dynamicRows', () => this.#update())
+			.on('tableupdate.dynamicRows', () => {
+				this.#update();
+				this.dispatchUpdateEvent();
+			})
 			.on('afteradd.dynamicRows', () => this.#selectNextSection());
 
-		jQuery(this.#table).on('change', () => this.#toggleSelectedSections());
+		this.#table.addEventListener('input', () => this.dispatchUpdateEvent());
+		this.#table.addEventListener('change', () => {
+			this.#toggleSelectedSections();
+			this.dispatchUpdateEvent();
+		});
 
 		this.#toggleSelectedSections();
 	}
 
 	#update() {
 		this.#table.querySelectorAll('.form_row').forEach((row, index) => {
-			for (const field of row.querySelectorAll(`[name^="${this.#field_name}["]`)) {
+			for (const field of row.querySelectorAll(`[name^="${this.getName()}["]`)) {
 				field.id = field.id.replace(/_\d+/g, `_${index}`);
 				field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
 			}
