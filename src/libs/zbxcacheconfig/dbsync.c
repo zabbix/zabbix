@@ -1900,7 +1900,7 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 
 	ZBX_STR2UCHAR(flags, row[19]);
 
-	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
+	if (0 != (flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		return row;
 
 	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
