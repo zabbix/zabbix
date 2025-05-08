@@ -560,7 +560,9 @@ class CLineGraphDraw extends CGraphDraw {
 				$history = Manager::History()->getLastValues($items);
 
 				if ($history) {
-					return $history[$items[0]['itemid']][0]['value'];
+					return $history[$items[0]['itemid']][0]['value'] > 1000
+						? round($history[$items[0]['itemid']][0]['value'], -3)
+						: ceil($history[$items[0]['itemid']][0]['value']);
 				}
 			}
 			else {
@@ -639,7 +641,9 @@ class CLineGraphDraw extends CGraphDraw {
 				$history = Manager::History()->getLastValues($items);
 
 				if ($history) {
-					return $history[$items[0]['itemid']][0]['value'];
+					return $history[$items[0]['itemid']][0]['value'] > 1000
+						? round($history[$items[0]['itemid']][0]['value'], -3)
+						: ceil($history[$items[0]['itemid']][0]['value']);
 				}
 			}
 			else {
