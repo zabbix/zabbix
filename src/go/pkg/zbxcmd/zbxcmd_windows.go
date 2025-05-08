@@ -16,100 +16,76 @@ package zbxcmd
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
-	"unsafe"
 
 	"golang.org/x/sys/windows"
-	"golang.zabbix.com/sdk/log"
 )
 
-type process struct {
-	Pid    int
-	Handle uintptr
-}
+const cmd = "cmd.exe"
 
 var (
-	ntResumeProcess *syscall.Proc
-	cmd_path        string
+	cmd_path string
 )
 
-func execute(s string, timeout time.Duration, path string, strict bool) (out string, err error) {
-	if cmd_path == "" {
-		cmd_exe := "cmd.exe"
-		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil && !errors.Is(err, exec.ErrDot) {
-			return "", fmt.Errorf("Cannot find path to %s command: %s", cmd_exe, err)
-		}
-		if cmd_path, err = filepath.Abs(cmd_exe); err != nil {
-			return "", fmt.Errorf("Cannot find full path to %s command: %s", cmd_exe, err)
-		}
+func InitExecutor(s string, timeout time.Duration, path string, strict bool) (*Executor, error) {
+	cmdPath, err := exec.LookPath(cmd)
+	if err != nil && !errors.Is(err, exec.ErrDot) {
+		return nil, fmt.Errorf("cannot find path to %s command: %s", cmdPath, err)
 	}
-	cmd := exec.Command(cmd_path)
-	cmd.Dir = path
+
+	cmdFullPath, err := filepath.Abs(cmdPath)
+	if err != nil {
+		return nil, fmt.Errorf("cannot find full path to %s command: %s", cmdFullPath, err)
+	}
+
+	return &Executor{
+		shellPath: cmdFullPath,
+		command:   s,
+		execDir:   path,
+		strict:    strict,
+		timeout:   timeout,
+	}, nil
+}
+
+func (e *Executor) execute() (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
+	defer cancel()
 
 	var b bytes.Buffer
+
+	cmd := exec.CommandContext(ctx, e.shellPath)
+	cmd.Dir = e.execDir
 	cmd.Stdout = &b
 	cmd.Stderr = &b
-
-	var job windows.Handle
-	if job, err = windows.CreateJobObject(nil, nil); err != nil {
-		return
-	}
-	defer windows.CloseHandle(job)
-
 	cmd.SysProcAttr = &windows.SysProcAttr{
-		CreationFlags: windows.CREATE_SUSPENDED,
-		CmdLine:       fmt.Sprintf(`/C "%s"`, s),
-	}
-	if err = cmd.Start(); err != nil {
-		return "", fmt.Errorf("Cannot execute command (%s, path: %s): %s", s, path, err)
+		CmdLine: fmt.Sprintf(`/C "%s"`, e.command),
 	}
 
-	processHandle := windows.Handle((*process)(unsafe.Pointer(cmd.Process)).Handle)
-
-	defer func() {
-		if cmd.ProcessState == nil {
-			log.Warningf("attempting to terminate process because normal processing was interrupted by error: %s", err)
-			windows.TerminateProcess(processHandle, 0)
-			_ = cmd.Wait()
-		}
-	}()
-
-	if err = windows.AssignProcessToJobObject(job, processHandle); err != nil {
-		log.Warningf("cannot assign process to a job: %s", err)
-		return
-	}
-
-	t := time.AfterFunc(timeout, func() {
-		if err = windows.TerminateJobObject(job, 0); err != nil {
-			log.Warningf("failed to kill [%s]: %s", s, err)
-		}
-	})
-
-	var rc uintptr
-	if rc, _, err = ntResumeProcess.Call(uintptr(processHandle)); int32(rc) < 0 {
-		log.Warningf("cannot resume process: %s", err)
-		return
+	err := cmd.Start()
+	if err != nil {
+		return "", fmt.Errorf("failed to start command (%s, path: %s): %s", e.command, e.execDir, err)
 	}
 
 	werr := cmd.Wait()
 
-	if !t.Stop() {
-		return "", fmt.Errorf("Timeout while executing a shell script.")
+	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
+	// terminated the command
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return "", fmt.Errorf("command execution failed: %s", ctx.Err())
 	}
 
-	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
-	if strict && werr != nil {
-		return "", fmt.Errorf("Command execution failed: %s", werr)
+	if e.strict && werr != nil {
+		return "", fmt.Errorf("command execution failed: %s", werr.Error())
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
+		return "", fmt.Errorf("command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
 	}
 
 	return strings.TrimRight(b.String(), " \t\r\n"), nil
@@ -137,10 +113,4 @@ func ExecuteBackground(s string) (err error) {
 	go func() { _ = cmd.Wait() }()
 
 	return nil
-}
-
-func init() {
-	dll := syscall.MustLoadDLL("ntdll.dll")
-	defer dll.Release()
-	ntResumeProcess = dll.MustFindProc("NtResumeProcess")
 }
