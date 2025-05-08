@@ -5808,7 +5808,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         --progress-stype-style: dashed; }
     .modal-popup-host-wizard .progress .progress-info {
       overflow: hidden;
-      text-overflow: ellipsis; }
+      text-overflow: ellipsis;
+      white-space: nowrap; }
   .modal-popup-host-wizard .grid-columns .form-fields-inline {
     display: flex;
     gap: 16px; }

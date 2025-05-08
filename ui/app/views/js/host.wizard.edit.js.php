@@ -294,7 +294,7 @@ window.host_wizard_edit = new class {
 				<div class="progress-step">#{label}</div>
 			`),
 			progress_step_info: new Template(`
-				<div class="progress-info">#{info}</div>
+				<div class="progress-info" title="#{info}">#{info}</div>
 			`),
 			description: new Template(`
 				<div class="${ZBX_STYLE_FORM_DESCRIPTION} ${ZBX_STYLE_MARKDOWN}">#{description}</div>
@@ -363,7 +363,7 @@ window.host_wizard_edit = new class {
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
 			this.#back_button.style.display = this.#current_step > 0 ? '' : 'none';
-			this.#next_button.toggleAttribute('disabled', next_button_disabled;
+			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 		});
 	}
 
