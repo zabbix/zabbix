@@ -387,9 +387,9 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
-		const host_ms = jQuery("#host", view).multiSelect().on('change', (_, {options, values}) => {
-			this.#setValueByName(this.#data, options.name,
-				Object.keys(values.selected).length ? Object.values(values.selected)[0] : null
+		const host_ms = jQuery("#host", view).multiSelect().on('change', (e, detail) => {
+			detail && this.#setValueByName(this.#data, detail.options.name,
+				Object.keys(detail.values.selected).length ? Object.values(detail.values.selected)[0] : null
 			);
 		});
 
@@ -397,8 +397,8 @@ window.host_wizard_edit = new class {
 			host_ms.multiSelect('addData', [this.#data.host]);
 		}
 
-		const groups_ms = jQuery("#groups_", view).multiSelect().on('change', (_, {options, values}) => {
-			this.#setValueByName(this.#data, options.name, Object.values(values.selected));
+		const groups_ms = jQuery("#groups_", view).multiSelect().on('change', (_, detail) => {
+			detail && this.#setValueByName(this.#data, detail.options.name, Object.values(detail.values.selected));
 		});
 
 		if (this.#data.groups.length) {
