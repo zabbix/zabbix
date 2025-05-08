@@ -324,8 +324,8 @@ class testDashboardHostCardWidget extends testWidgets {
 		foreach ([100, 200, 300, 400, 500] as $i => $value) {
 			CDataHelper::addItemData($itemids['Fully filled host card widget:item_key_'.($i + 1)], $value);
 		}
-		
-		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger', 
+
+		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 			'High trigger', 'Disaster trigger'];
 		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
 
