@@ -5971,7 +5971,7 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 			ZBX_FLAG_DISCOVERY_RULE);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_db_select("%s order by hostid", sql);
 	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
