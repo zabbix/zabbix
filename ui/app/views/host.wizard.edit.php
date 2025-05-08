@@ -196,7 +196,8 @@ function stepSelectTemplate($old_template_count): array {
 					(new CLabel([
 						'#{title}',
 						(new CSpan(
-							(new CInput('radio', null, '#{templateid}'))->setAttribute('name', 'template_selected')
+							(new CInput('radio', null, '#{category}:#{templateid}'))
+								->setAttribute('name', 'selected_template')
 						))->addClass(CRadioCardList::ZBX_STYLE_CLASS_SELECTOR)
 					]))->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
 				)

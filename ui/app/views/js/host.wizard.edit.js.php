@@ -143,7 +143,7 @@ window.host_wizard_edit = new class {
 		do_not_show_welcome: 0,
 		tls_required: true,
 		template_search_query: '',
-		template_selected: null,
+		selected_template: null,
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
@@ -383,7 +383,7 @@ window.host_wizard_edit = new class {
 
 	#renderCreateHost() {
 		const view = this.#view_templates.step_create_host.evaluateToElement({
-			template_name: this.#templates.get(this.#data.template_selected)?.name
+			template_name: this.#getSelectedTemplate()?.name
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -409,7 +409,7 @@ window.host_wizard_edit = new class {
 
 	#renderInstallAgent() {
 		const view = this.#view_templates.step_install_agent.evaluateToElement({
-			template_name: this.#templates.get(this.#data.template_selected)?.name
+			template_name: this.#getSelectedTemplate()?.name
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -436,7 +436,7 @@ window.host_wizard_edit = new class {
 		};
 
 		const view = this.#view_templates.step_add_host_interface.evaluateToElement({
-			template_name: this.#templates.get(this.#data.template_selected)?.name,
+			template_name: this.#getSelectedTemplate()?.name,
 			host_name: this.#data.host.isNew ? this.#data.host.id : this.#data.host.name,
 			interfaces_long: interfaces_long.join(' / '),
 			interfaces_short: interfaces_short.join('/')
@@ -547,7 +547,7 @@ window.host_wizard_edit = new class {
 
 		const url_params = objectToSearchParams({
 			action: 'host.wizard.get',
-			templateid: this.#data.template_selected,
+			templateid: this.#getSelectedTemplate().templateid,
 			...(hostid !== null && {hostid})
 		});
 		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
@@ -708,7 +708,7 @@ window.host_wizard_edit = new class {
 			},
 			{
 				label: t('Select a template'),
-				info: this.#templates.get(this.#data.template_selected)?.name,
+				info: this.#getSelectedTemplate()?.name,
 				visible: true,
 				steps: [this.STEP_SELECT_TEMPLATE]
 			},
@@ -780,13 +780,12 @@ window.host_wizard_edit = new class {
 					}
 				}
 
-				if (!path || path === 'template_selected') {
-					if (this.#data.template_selected !== null) {
+				if (!path || path === 'selected_template') {
+					if (this.#getSelectedTemplate()) {
 						this.#updateProgress();
 					}
 
-					this.#next_button.toggleAttribute('disabled', this.#data.template_selected === null);
-
+					this.#next_button.toggleAttribute('disabled', !this.#getSelectedTemplate());
 				}
 				break;
 
@@ -965,6 +964,12 @@ window.host_wizard_edit = new class {
 		}
 	}
 
+	#getSelectedTemplate() {
+		const selected = this.#data.selected_template;
+
+		return selected && this.#templates.get(selected.split(':').pop());
+	}
+
 	#isRequiredInstallAgent() {
 		return this.#data.interface_required[this.INTERFACE_TYPE_AGENT]
 			&& (!this.#host?.interfaces.some(({interface_type}) => interface_type === this.INTERFACE_TYPE_AGENT));
@@ -1034,16 +1039,17 @@ window.host_wizard_edit = new class {
 			return a[0].localeCompare(b[0]);
 		}));
 
+		const selected_templateid = this.#getSelectedTemplate()?.templateid;
 		const sections = [];
 
-		for (const [title, templateids] of template_classes) {
+		for (const [category, templateids] of template_classes) {
 			const section = this.#view_templates.templates_section.evaluateToElement({
-				title: title.charAt(0).toUpperCase() + title.slice(1),
+				title: category.charAt(0).toUpperCase() + category.slice(1),
 				count: templateids.length
 			});
 
-			const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(title);
-			this.#sections_expanded.set(title, expanded);
+			const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(category);
+			this.#sections_expanded.set(category, expanded);
 
 			if (!expanded && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
 				toggleSection(section.querySelector('.toggle'));
@@ -1053,12 +1059,12 @@ window.host_wizard_edit = new class {
 
 			for (const templateid of templateids) {
 				card_list.appendChild(
-					this.#makeCard(this.#templates.get(templateid), templateid === this.#data.template_selected)
+					this.#makeCard(category, this.#templates.get(templateid), templateid === selected_templateid)
 				);
 			}
 
-			section.addEventListener('expand', () => this.#sections_expanded.set(title, true));
-			section.addEventListener('collapse', () => this.#sections_expanded.set(title, false));
+			section.addEventListener('expand', () => this.#sections_expanded.set(category, true));
+			section.addEventListener('collapse', () => this.#sections_expanded.set(category, false));
 
 			sections.push(section);
 		}
@@ -1066,9 +1072,10 @@ window.host_wizard_edit = new class {
 		return sections;
 	}
 
-	#makeCard(template, checked) {
+	#makeCard(category, template, checked) {
 		const card = this.#view_templates.card.evaluateToElement({
 			...template,
+			category,
 			title: template.name
 		});
 
