@@ -1706,7 +1706,7 @@ class CHost extends CHostGeneral {
 			'output' => ['itemid', 'name'],
 			'filter' => [
 				'hostid' => $hostids,
-				'flags' => [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED]
+				'flags' => [ZBX_FLAG_DISCOVERY_RULE]
 			],
 			'preservekeys' => true
 		]);

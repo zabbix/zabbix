@@ -816,20 +816,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		self::checkDoubleInheritedNames($items, $db_items, $tpl_links);
 
-		if ($hostids !== null && !$is_dep_items) {
-			$dep_items_to_link = [];
-
-			$item_indexes = array_flip(array_column($items, 'itemid'));
-
-			foreach ($items as $i => $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists($item['master_itemid'], $item_indexes)) {
-					$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
-
-					unset($items[$i]);
-				}
-			}
-		}
-
 		$chunks = self::getInheritChunks($items, $tpl_links);
 
 		foreach ($chunks as $chunk) {
@@ -838,10 +824,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			$_hostids = array_keys($chunk['hosts']);
 
 			self::inheritChunk($_items, $_db_items, $tpl_links, $_hostids);
-		}
-
-		if ($hostids !== null && !$is_dep_items) {
-			self::inheritDependentItems($dep_items_to_link, $items, $hostids);
 		}
 	}
 
@@ -909,28 +891,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 
 		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
-	}
-
-	/**
-	 * @param array $items
-	 * @param array $tpl_links
-	 *
-	 * @return array
-	 */
-	private static function getLldLinks(array $items): array {
-		$options = [
-			'output' => ['templateid', 'hostid', 'itemid'],
-			'filter' => ['templateid' => array_unique(array_column($items, 'ruleid'))]
-		];
-		$result = DBselect(DB::makeSql('items', $options));
-
-		$lld_links = [];
-
-		while ($row = DBfetch($result)) {
-			$lld_links[$row['templateid']][$row['hostid']] = $row['itemid'];
-		}
-
-		return $lld_links;
 	}
 
 	/**
@@ -1258,7 +1218,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDiscoveredItems($db_items);
 
 		$del_itemids = array_keys($db_items);
 
@@ -1273,10 +1232,9 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
 		self::deleteAffectedDiscoveryRulePrototypes($del_itemids);
-
+		self::deleteDiscoveredLldRulePrototypes($del_itemids);
+		self::deleteDiscoveredLldRules($del_itemids);
 		self::deleteAffectedOverrides($del_itemids);
-
-		self::deleteDiscoveredRules($del_itemids);
 
 		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
@@ -1292,19 +1250,18 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_LLD_RULE_PROTOTYPE, $db_items);
 	}
 
-	/**
-	 * Add the (nested) discovered rule prototypes of the given items to the given item array.
-	 *
-	 * @param array $db_items
-	 */
-	private static function addDiscoveredItems(array &$db_items): void {
-		$db_items += DBfetchArrayAssoc(DBselect(
+	private static function deleteDiscoveredLldRulePrototypes(array $del_itemids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.parent_itemid', array_keys($db_items)).
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
 		), 'itemid');
+
+		if ($db_items) {
+			self::deleteForce($db_items);
+		}
 	}
 
 	/**
@@ -1312,7 +1269,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	 *
 	 * @param array $del_itemids
 	 */
-	private static function deleteDiscoveredRules(array $del_itemids): void {
+	private static function deleteDiscoveredLldRules(array $del_itemids): void {
 		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.

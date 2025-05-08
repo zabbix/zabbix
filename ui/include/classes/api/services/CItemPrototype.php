@@ -1057,28 +1057,6 @@ class CItemPrototype extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 * @param array $tpl_links
-	 *
-	 * @return array
-	 */
-	private static function getLldLinks(array $items): array {
-		$options = [
-			'output' => ['templateid', 'hostid', 'itemid'],
-			'filter' => ['templateid' => array_unique(array_column($items, 'ruleid'))]
-		];
-		$result = DBselect(DB::makeSql('items', $options));
-
-		$lld_links = [];
-
-		while ($row = DBfetch($result)) {
-			$lld_links[$row['templateid']][$row['hostid']] = $row['itemid'];
-		}
-
-		return $lld_links;
-	}
-
-	/**
-	 * @param array $items
 	 * @param array $hostids
 	 * @param array $lld_links
 	 *
@@ -1536,6 +1514,7 @@ class CItemPrototype extends CItemGeneral {
 		self::deleteAffectedGraphPrototypes($del_itemids);
 		self::resetGraphsYAxis($del_itemids);
 
+		self::deleteDiscoveredItemPrototypes($del_itemids);
 		self::deleteDiscoveredItems($del_itemids);
 
 		self::deleteAffectedTriggers($del_itemids);
@@ -1605,6 +1584,20 @@ class CItemPrototype extends CItemGeneral {
 		}
 	}
 
+	private static function deleteDiscoveredItemPrototypes(array $del_itemids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT id.itemid,i.name'.
+			' FROM item_discovery id,items i'.
+			' WHERE id.itemid=i.itemid'.
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED])
+		), 'itemid');
+
+		if ($db_items) {
+			self::deleteForce($db_items);
+		}
+	}
+
 	/**
 	 * Delete discovered items of the given item prototypes.
 	 *
@@ -1615,7 +1608,8 @@ class CItemPrototype extends CItemGeneral {
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.parent_itemid', $del_itemids)
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_CREATED])
 		), 'itemid');
 
 		if ($db_items) {

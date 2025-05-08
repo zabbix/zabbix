@@ -2550,14 +2550,8 @@ class CHostPrototype extends CHostBase {
 			self::deleteGroupPrototypes($del_group_prototypeids);
 		}
 
-		$discovered_hosts = DBfetchArrayAssoc(DBselect(
-			'SELECT hd.hostid,h.host'.
-			' FROM host_discovery hd,hosts h'.
-			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.lldruleid', $hostids)
-		), 'hostid');
-
-		CHost::deleteForce($discovered_hosts);
+		self::deleteDiscoveredHostPrototypes($hostids);
+		self::deleteDiscoveredHosts($hostids);
 
 		DB::delete('interface', ['hostid' => $hostids]);
 		DB::delete('hosts_templates', ['hostid' => $hostids]);
@@ -2609,6 +2603,34 @@ class CHostPrototype extends CHostBase {
 			'where' => ['templateid' => $del_group_prototypeids]
 		]);
 		DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
+	}
+
+	private static function deleteDiscoveredHostPrototypes(array $hostids) {
+		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED])
+		), 'hostid');
+
+		if ($db_host_prototypes) {
+			self::deleteForce($db_host_prototypes);
+		}
+	}
+
+	private static function deleteDiscoveredHosts(array $hostids) {
+		$db_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_CREATED])
+		), 'hostid');
+
+		if ($db_hosts) {
+			CHost::deleteForce($db_hosts);
+		}
 	}
 
 	/**

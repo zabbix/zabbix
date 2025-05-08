@@ -2119,7 +2119,10 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			'SELECT hd.hostid,h.host'.
 			' FROM host_discovery hd,hosts h'.
 			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.lldruleid', $del_itemids)
+				' AND '.dbConditionId('hd.lldruleid', $del_itemids).
+				' AND '.dbConditionInt('h.flags',
+					[ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED]
+				)
 		), 'hostid');
 
 		if ($db_host_prototypes) {
