@@ -968,11 +968,15 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
 				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_RULE == item->flags ||
+				ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 		{
 			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
-			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 		}
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
 		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(audit_context_mode, *itemid, item, hostid);
