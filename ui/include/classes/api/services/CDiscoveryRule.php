@@ -1310,7 +1310,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		DB::delete('lld_macro_export', ['itemid' => $del_itemids]);
 		DB::delete('lld_macro_path', ['itemid' => $del_itemids]);
 		DB::delete('item_condition', ['itemid' => $del_itemids]);
-		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $del_itemids]
