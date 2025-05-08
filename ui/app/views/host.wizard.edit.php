@@ -257,7 +257,7 @@ function stepCreateHost($form): CTemplateTag {
 			(new CSection())
 				->addItem(
 					(new CFormField([
-						new CLabel(_('Host name')),
+						(new CLabel(_('Host name')))->setAsteriskMark(),
 						new CMultiSelect([
 							'name' => 'host',
 							'object_name' => 'hosts',
