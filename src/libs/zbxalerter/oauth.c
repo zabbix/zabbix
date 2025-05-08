@@ -261,7 +261,7 @@ void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetc
 	}
 	else
 	{
-		data->tokens_status |= ZBX_OAUTH_TOKEN_ACCESS_VALID;
+		data->tokens_status |= (ZBX_OAUTH_TOKEN_ACCESS_VALID | ZBX_OAUTH_TOKEN_REFRESH_VALID);
 
 		if (NULL != data->old_refresh_token)	 /* data->refresh_token has changed */
 		{
