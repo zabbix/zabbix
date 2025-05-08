@@ -2191,9 +2191,10 @@ abstract class CItemGeneral extends CApiService {
 						$check = true;
 					}
 					else {
-						$error = $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
-							? _('an item/item prototype ID is expected')
-							: _('an item ID is expected');
+						$error =
+							in_array($item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+								? _('an item/item prototype ID is expected')
+								: _('an item ID is expected');
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 							'/'.($i + 1).'/master_itemid', $error
@@ -2212,9 +2213,10 @@ abstract class CItemGeneral extends CApiService {
 							}
 						}
 						else {
-							$error = $item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
-								? _('an item/item prototype ID is expected')
-								: _('an item ID is expected');
+							$error =
+								in_array($item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+									? _('an item/item prototype ID is expected')
+									: _('an item ID is expected');
 
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 								'/'.($i + 1).'/master_itemid', $error
@@ -2259,17 +2261,13 @@ abstract class CItemGeneral extends CApiService {
 		$master_itemids = array_unique(array_column($items, 'master_itemid'));
 		$flags = $items[key($items)]['flags'];
 
-		if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if (in_array($flags, [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])) {
 			$db_master_items = DBfetchArrayAssoc(DBselect(
 				'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.lldruleid AS ruleid'.
 				' FROM items i'.
 				' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 				' WHERE '.dbConditionId('i.itemid', $master_itemids).
-					' AND '.dbConditionInt('i.flags', [
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED
-					])
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
 			), 'itemid');
 		}
 		else {
@@ -2285,7 +2283,7 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $i => $item) {
 			if (!array_key_exists($item['master_itemid'], $db_master_items)) {
-				$error = $flags & ZBX_FLAG_DISCOVERY_PROTOTYPE
+				$error = in_array($flags, [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
 					? _('an item/item prototype ID is expected')
 					: _('an item ID is expected');
 
@@ -2297,7 +2295,7 @@ abstract class CItemGeneral extends CApiService {
 			$db_master_item = $db_master_items[$item['master_itemid']];
 
 			if (bccomp($db_master_item['hostid'], $item['hostid']) != 0) {
-				$error = $flags & ZBX_FLAG_DISCOVERY_PROTOTYPE
+				$error = in_array($flags, [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
 					? _('cannot be an item/item prototype ID from another host or template')
 					: _('cannot be an item ID from another host or template');
 
@@ -2306,7 +2304,8 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 
-			if ($flags & ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
+			if (in_array($flags, [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+					&& $db_master_item['ruleid'] != 0) {
 				$item_ruleid = array_key_exists('itemid', $item)
 					? $db_items[$item['itemid']]['ruleid']
 					: $item['ruleid'];
