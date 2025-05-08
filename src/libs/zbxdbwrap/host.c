@@ -1020,10 +1020,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				"select i.key_"
 				" from items i,items t"
 				" where i.key_=t.key_"
-					" and i.flags<>t.flags"
+					" and i.flags&%d<>t.flags&%d"
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
-				hostid);
+				ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE, hostid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid",
 				templateids->values, templateids->values_num);
 

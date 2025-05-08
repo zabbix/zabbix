@@ -979,7 +979,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 				"select host,name"
 				" from hosts"
 				" where status in (%d,%d,%d)"
-					" and flags<>%d"
+					" and flags&%d=0"
 					" and",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 				ZBX_FLAG_DISCOVERY_PROTOTYPE);

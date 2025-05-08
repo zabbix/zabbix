@@ -3417,7 +3417,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_lld_trigger_
 					" from trigger_depends td"
 						" left join triggers t"
 							" on td.triggerid_up=t.triggerid"
-					" where t.flags<>%d"
+					" where t.flags&%d=0"
 						" and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
 			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down",
 					triggerids_down.values, triggerids_down.values_num);
@@ -3500,7 +3500,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_lld_trigger_
 					" from trigger_depends td"
 						" left join triggers t"
 							" on t.triggerid=td.triggerid_down"
-					" where t.flags<>%d"
+					" where t.flags&%d=0"
 						" and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
 			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_up",
 					triggerids_up.values, triggerids_up.values_num);
