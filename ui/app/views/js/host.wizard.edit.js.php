@@ -924,7 +924,7 @@ window.host_wizard_edit = new class {
 				}
 
 				this.#next_button.toggleAttribute('disabled', Object.values(this.#data.interfaces)
-					.some(({address, port}) => address === '' || port === '')
+					.some(({address, port}) => address.trim() === '' || port.trim() === '')
 				);
 				break;
 		}
