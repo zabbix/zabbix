@@ -1,1 +1,1 @@
-..F....... [ZBX-26064] fixed remove button present in media added by provisioning maping and user (rgontarski)
+..F....... [ZBX-26064] enabled the "Remove" link for LDAP users manually added medias (rgontarski)
