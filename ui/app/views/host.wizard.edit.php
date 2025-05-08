@@ -58,14 +58,6 @@ $output = [
 		[
 			'title' => _('Next'),
 			'class' => 'js-next',
-		],
-		[
-			'title' => _('Create'),
-			'class' => 'js-create',
-		],
-		[
-			'title' => _('Finish'),
-			'class' => 'js-finish',
 		]
 	],
 	'script_inline' => $this->readJsFile('host.wizard.edit.js.php')

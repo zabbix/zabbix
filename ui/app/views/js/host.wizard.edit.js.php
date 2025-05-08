@@ -248,25 +248,6 @@ window.host_wizard_edit = new class {
 				});
 		});
 
-		this.#create_button = this.#dialogue.querySelector('.js-create');
-		this.#create_button.style.display = 'none';
-		this.#create_button.addEventListener('click', () => {
-			this.#onBeforeNextStep()
-				.finally(() => {
-					this.#overlay.setLoading();
-					this.#updateStepsQueue();
-				})
-				.then(() => {
-					this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
-				})
-				.catch(() => {
-					this.#gotoStep(this.#current_step);
-				});
-		});
-
-		this.#finish_button = this.#dialogue.querySelector('.js-finish');
-		this.#finish_button.style.display = 'none';
-
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
 	}
@@ -331,47 +312,41 @@ window.host_wizard_edit = new class {
 		this.#current_step = step;
 		this.#updating_locked = true;
 
-		let show_back_button = true;
-		let show_next_button = true;
-		let show_create_button = false;
-		let show_finish_button = false;
-
-		let allow_back_button = this.#current_step > 0;
-
 		switch (this.#steps_queue[step]) {
 			case this.STEP_WELCOME:
 				this.#renderWelcome();
 				break;
+
 			case this.STEP_SELECT_TEMPLATE:
 				this.#renderSelectTemplate();
 				break;
+
 			case this.STEP_CREATE_HOST:
 				this.#renderCreateHost();
 				break;
+
 			case this.STEP_INSTALL_AGENT:
 				this.#renderInstallAgent();
 				break;
+
 			case this.STEP_ADD_HOST_INTERFACE:
 				this.#renderAddHostInterface();
 				break;
+
 			case this.STEP_README:
 				this.#renderReadme();
 				break;
+
 			case this.STEP_CONFIGURE_HOST:
 				this.#renderConfigureHost();
 				break;
+
 			case this.STEP_CONFIGURATION_FINISH:
 				this.#renderConfigurationFinish();
-
-				show_next_button = false;
-				show_create_button = true;
 				break;
+
 			case this.STEP_COMPLETE:
 				this.#renderComplete();
-
-				show_back_button = false;
-				show_next_button = false;
-				show_finish_button = true;
 				break;
 		}
 
@@ -381,19 +356,14 @@ window.host_wizard_edit = new class {
 		this.#updateForm();
 		this.#updateFields();
 		this.#updateProgress();
+		this.#updateNextButton();
 
-		const allow_next_button = !this.#next_button.hasAttribute('disabled');
+		const next_button_disabled = this.#next_button.hasAttribute('disabled');
 
 		setTimeout(() => {
 			this.#overlay.unsetLoading();
-
-			this.#back_button.style.display = show_back_button ? '' : 'none';
-			this.#next_button.style.display = show_next_button ? '' : 'none';
-			this.#create_button.style.display = show_create_button ? '' : 'none';
-			this.#finish_button.style.display = show_finish_button ? '' : 'none';
-
-			this.#back_button.toggleAttribute('disabled', !allow_back_button);
-			this.#next_button.toggleAttribute('disabled', !allow_next_button);
+			this.#back_button.style.display = this.#current_step > 0 ? '' : 'none';
+			this.#next_button.toggleAttribute('disabled', next_button_disabled;
 		});
 	}
 
@@ -948,6 +918,23 @@ window.host_wizard_edit = new class {
 					}
 				}
 				break;
+		}
+	}
+
+	#updateNextButton() {
+		switch (this.#steps_queue[this.#current_step]) {
+			case this.STEP_CONFIGURATION_FINISH:
+				this.#next_button.innerText = this.#source_hostid !== null
+					? <?= json_encode(_('Update')) ?>
+					: <?= json_encode(_('Create')) ?>;
+				break;
+
+			case this.STEP_COMPLETE:
+				this.#next_button.innerText = <?= json_encode(_('Complete')) ?>;
+				break;
+
+			default:
+				this.#next_button.innerText = <?= json_encode(_('Next')) ?>;
 		}
 	}
 
