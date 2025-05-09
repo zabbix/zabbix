@@ -376,41 +376,6 @@ reparse_type:
 	while (' ' == *data)
 		data++;
 
-	if (0 == strncmp(data, "Wrong Type", ZBX_CONST_STRLEN("Wrong Type")))
-	{
-		while ('(' != *data && '\0' != *data)
-			data++;
-
-		if ('(' == *data)
-			data++;
-
-		char	*expected_types = NULL;
-
-		if (0 == strncmp(data, "should be ", ZBX_CONST_STRLEN("should be ")))
-		{
-			data += ZBX_CONST_STRLEN("should be ");
-			expected_types = zbx_strdup(NULL, data);
-		}
-
-		int	expected_type_end = 0;
-
-		while (')' != *data && '\0' != *data && '\n' != *data)
-		{
-			data++;
-			expected_type_end++;
-		}
-
-		expected_types[expected_type_end] = '\0';
-
-		while (')' == *data || ':' == *data || ' ' == *data)
-			data++;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "SNMP type mismatch at OID %s: expected type(s) %s", p->oid,
-				expected_types);
-
-		zbx_free(expected_types);
-	}
-
 	if (0 != isupper((unsigned char)*data))
 	{
 		len = preproc_snmp_parse_type(data, &type);
