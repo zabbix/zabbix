@@ -96,7 +96,6 @@ $graph_form
 				new CPartial('graph.edit.graph.tab', array_merge($data,[
 					'readonly' => $readonly,
 					'is_templated' => $is_templated,
-					'discovered_graph' => $data['discovered_prototype'],
 					'form_name' => $graph_form->getName()
 				]))
 			)

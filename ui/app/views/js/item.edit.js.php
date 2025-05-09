@@ -823,7 +823,7 @@ window.item_edit_form = new class {
 			dstfrm: this.form.getAttribute('name'),
 			dstfld1: 'master_itemid',
 			parent_discoveryid: this.form_data.parent_discoveryid,
-			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : [],
+			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : []
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});

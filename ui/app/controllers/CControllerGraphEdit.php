@@ -97,12 +97,17 @@ class CControllerGraphEdit extends CController {
 			'hostid' => $this->getInput('hostid', 0),
 			'context' => $this->getInput('context'),
 			'normal_only' => $this->getInput('normal_only', 0),
-			'readonly' => false
+			'readonly' => false,
+			'discovered' => false,
+			'discovered_prototype' => false
 		];
 
 		if ($data['graphid'] != 0) {
 			$options = [
-				'output' => API_OUTPUT_EXTEND,
+				'output' => ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'yaxismin',
+					'ymax_itemid', 'yaxismax', 'show_work_period', 'show_triggers', 'graphtype', 'show_legend',
+					'show_3d', 'percent_left', 'percent_right', 'templateid', 'flags'
+				],
 				'selectHosts' => ['hostid'],
 				'graphids' => $data['graphid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
@@ -112,17 +117,9 @@ class CControllerGraphEdit extends CController {
 			$graph = API::Graph()->get($options);
 			$graph = reset($graph);
 
-			$data['discovered_graph'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+			$data += $graph;
 
-			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
-				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'templateid', 'flags', 'discoveryData'
-			];
-
-			foreach ($fields as $field) {
-				$data[$field] = $graph[$field];
-			}
-
+			$data['discovered'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 
@@ -220,9 +217,6 @@ class CControllerGraphEdit extends CController {
 				'output' => ['itemid', 'hostid', 'name', 'flags'],
 				'selectHosts' => ['hostid', 'name'],
 				'itemids' => array_column($data['items'], 'itemid'),
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
-				],
 				'webitems' => true,
 				'preservekeys' => true
 			]);
@@ -249,9 +243,6 @@ class CControllerGraphEdit extends CController {
 				'output' => ['itemid', 'name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_filter([$data['ymin_itemid'], $data['ymax_itemid']]),
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
-				],
 				'webitems' => true,
 				'preservekeys' => true
 			]);

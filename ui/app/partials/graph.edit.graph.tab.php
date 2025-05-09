@@ -28,7 +28,7 @@ if ($data['is_templated']) {
 	]);
 }
 
-if ($data['discovered_graph']) {
+if ($data['discovered']) {
 	$graph_tab->addItem([
 		new CLabel(_('Discovered by')),
 		new CFormField(

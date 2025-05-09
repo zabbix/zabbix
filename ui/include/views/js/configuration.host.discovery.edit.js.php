@@ -95,11 +95,13 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token, readonly, query_fields, headers, parent_discoveryid}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers, parent_discoveryid, itemid}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
 			this.parent_discoveryid = parent_discoveryid;
+			this.readonly = readonly;
+			this.itemid = itemid;
 
 			$('#conditions')
 				.dynamicRows({
@@ -222,6 +224,10 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 
 			this.updateLostResourcesFields();
 			this.initPopupListeners();
+
+			if (this.parent_discoveryid !== undefined) {
+				this.initItemPrototypeForm();
+			}
 		},
 
 		updateLostResourcesFields() {
@@ -350,7 +356,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = isNaN(parseInt(this.parent_discoveryid))
+						const url = this.parent_discoveryid === undefined
 							? new URL('host_discovery.php', location.href)
 							: new URL('host_discovery_prototypes.php', location.href)
 								.searchParams.set('parent_discoveryid', this.parent_discoveryid);
@@ -364,6 +370,52 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 					}
 				}
 			});
+		},
+
+		initItemPrototypeForm() {
+			const observer = new MutationObserver(() => {
+				const form = document.getElementsByName(this.form_name)[0];
+				const master_item = form.querySelector('#master_itemid').closest('.multiselect-control');
+
+				if (master_item === null) {
+					return;
+				}
+
+				let node = document.createElement('div');
+				node.classList.add('<?= ZBX_STYLE_FORM_INPUT_MARGIN ?>');
+				master_item.append(node);
+
+				node = document.createElement('button');
+				node.classList.add(ZBX_STYLE_BTN_GREY);
+				node.setAttribute('name', 'master-item-prototype');
+				node.disabled = this.readonly;
+				node.textContent = <?= json_encode(_('Select prototype')) ?>;
+				master_item.append(node);
+
+				form.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
+					this.openMasterItemPrototypePopup();
+
+					return cancelEvent(e);
+				});
+
+				observer.disconnect();
+			});
+
+			observer.observe(document.getElementById('js-item-master-item-field'), {childList: true});
+		},
+
+		openMasterItemPrototypePopup() {
+			const parameters = {
+				srctbl: 'item_prototypes',
+				srcfld1: 'itemid',
+				srcfld2: 'name',
+				dstfrm: this.form_name,
+				dstfld1: 'master_itemid',
+				parent_discoveryid: this.parent_discoveryid,
+				excludeids: this.itemid ? [this.itemid] : []
+			}
+
+			PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 		}
 	};
 </script>
