@@ -88,19 +88,26 @@ window.host_wizard_edit = new class {
 
 	#view_templates;
 
+	#filter_hints = {
+		'data_collection_1': <?= json_encode(_('Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target.')) ?>,
+		'data_collection_2': <?= json_encode(_('Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH).')) ?>,
+		'agent_mode_1': <?= json_encode(_('Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall.')) ?>,
+		'agent_mode_2': <?= json_encode(_('Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports.')) ?>
+	}
+
 	#interface_names_long_titles = {
 		[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent interface')) ?>,
 		[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('Simple Network Management Protocol (SNMP) interface')) ?>,
 		[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('Intelligent Platform Management Interface (IPMI)')) ?>,
 		[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('Java Management Extensions (JMX) interface')) ?>
-	};
+	}
 
 	#interface_names_short_titles = {
 		[this.INTERFACE_TYPE_AGENT]: <?= json_encode(_('Agent')) ?>,
 		[this.INTERFACE_TYPE_SNMP]: <?= json_encode(_('SNMP')) ?>,
 		[this.INTERFACE_TYPE_IPMI]: <?= json_encode(_('IPMI')) ?>,
 		[this.INTERFACE_TYPE_JMX]: <?= json_encode(_('JMX')) ?>
-	};
+	}
 
 	/** @type {Map<number, object>} */
 	#templates;
@@ -382,6 +389,16 @@ window.host_wizard_edit = new class {
 
 	#renderSelectTemplate() {
 		const view = this.#view_templates.step_select_template.evaluateToElement();
+
+		for (const [id, hint] of Object.entries(this.#filter_hints)) {
+			const label = view.querySelector(`label[for="${id}"]`);
+
+			if (label !== null) {
+				label.setAttribute('data-hintbox-contents', hint);
+				label.setAttribute('data-hintbox', '1');
+				label.setAttribute('data-hintbox-static', '1');
+			}
+		}
 
 		view.querySelector('.js-show-templates').style.display = this.#source_host !== null ? '' : 'none';
 
