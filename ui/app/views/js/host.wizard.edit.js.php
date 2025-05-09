@@ -190,12 +190,12 @@ window.host_wizard_edit = new class {
 		host: null,
 		groups: [],
 		templates: [],
-		tls_psk: '',
-		tls_psk_identity: '',
-		ipmi_authtype: <?= IPMI_AUTHTYPE_DEFAULT ?>,
-		ipmi_password: '',
-		ipmi_privilege: <?= IPMI_PRIVILEGE_USER ?>,
-		ipmi_username: '',
+		tls_psk: null,
+		tls_psk_identity: null,
+		ipmi_authtype: null,
+		ipmi_password: null,
+		ipmi_privilege: null,
+		ipmi_username: null,
 		interfaces: {},
 		macros: {}
 	}
@@ -398,9 +398,7 @@ window.host_wizard_edit = new class {
 			const label = view.querySelector(`label[for="${id}"]`);
 
 			if (label !== null) {
-				label.setAttribute('data-hintbox-contents', hint);
-				label.setAttribute('data-hintbox', '1');
-				label.setAttribute('data-hintbox-static', '1');
+				label.setAttribute('title', hint);
 			}
 		}
 
