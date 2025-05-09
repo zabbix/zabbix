@@ -4138,7 +4138,7 @@ in:
 out:
   return: FAIL
 ---
-test case: SNMP walk to JSON - param with dot at the end - 4
+test case: SNMP walk to JSON - wrong type warning
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
