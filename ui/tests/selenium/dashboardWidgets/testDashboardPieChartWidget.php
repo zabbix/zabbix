@@ -774,7 +774,6 @@ class testDashboardPieChartWidget extends testWidgets {
 			// Bad color value in data set.
 			[
 				[
-					'expected' => TEST_BAD,
 					'fields' => [
 						'Data set' => [
 							'host' => 'Host*',
@@ -788,7 +787,6 @@ class testDashboardPieChartWidget extends testWidgets {
 			// Bad value in "Merge sectors smaller than" color.
 			[
 				[
-					'expected' => TEST_BAD,
 					'fields' => [
 						'Data set' => [
 							'host' => 'Host*',
@@ -805,7 +803,6 @@ class testDashboardPieChartWidget extends testWidgets {
 			// Bad value in total value color.
 			[
 				[
-					'expected' => TEST_BAD,
 					'fields' => [
 						'Data set' => [
 							'host' => 'Host*',

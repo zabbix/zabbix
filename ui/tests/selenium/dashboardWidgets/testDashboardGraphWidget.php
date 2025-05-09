@@ -19,6 +19,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup widget, profiles
  *
@@ -338,6 +340,18 @@ class testDashboardGraphWidget extends testWidgets {
 				$form->fill($data[$tab]);
 		}
 
+		if (CTestArrayHelper::get($data, 'invalid_color')) {
+			$color_picker_dialog = $this->query('class:color-picker-dialog')->one();
+			$this->assertFalse($color_picker_dialog->query('button:Apply')->one()->isClickable());
+
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$this->assertTrue($color_picker_dialog->isDisplayed());
+
+			COverlayDialogElement::closeAll();
+
+			return;
+		}
+
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
@@ -370,35 +384,35 @@ class testDashboardGraphWidget extends testWidgets {
 							'item' => 'Agent ping'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": cannot be empty.'
+					'invalid_color' => true
 				]
 			],
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000!',
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
+			[
+				[
+					'Data set' => [
+						[],
+						[
+							'xpath:.//z-color-picker[@color-field-name="ds[1][color]"]' => '00000!',
+							'host' => 'Zabbix*',
+							'item' => 'Agent ping'
+						]
+					],
+					'invalid_color' => true
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[],
+						[
+							'xpath:.//z-color-picker[@color-field-name="ds[1][color]"]' => '00000 ',
+							'host' => 'Zabbix*',
+							'item' => 'Agent ping'
+						]
+					],
+					'invalid_color' => true
+				]
+			],
 			// Time shift field validation.
 			[
 				[
@@ -532,19 +546,6 @@ class testDashboardGraphWidget extends testWidgets {
 					'error' => 'Invalid parameter "Data set/2/items": cannot be empty.'
 				]
 			],
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
 			[
 				[
 					'Data set' => [
