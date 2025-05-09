@@ -60,6 +60,7 @@ class CControllerMediatypeUpdate extends CController {
 			'token_url' =>				'db media_type_oauth.token_url',
 			'tokens_status' =>			'int32|in '.implode(',', range(0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID)),
 			'access_token' =>			'db media_type_oauth.access_token',
+			'access_token_updated' =>	'db media_type_oauth.access_token_updated',
 			'access_expires_in' =>		'int32',
 			'refresh_token' =>			'db media_type_oauth.refresh_token'
 		];
@@ -156,7 +157,7 @@ class CControllerMediatypeUpdate extends CController {
 				elseif ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$this->getInputs($mediatype, [
 						'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
-						'tokens_status', 'access_token', 'access_expires_in', 'refresh_token'
+						'tokens_status', 'access_token', 'access_token_updated', 'access_expires_in', 'refresh_token'
 					]);
 				}
 				break;

@@ -160,6 +160,7 @@ class CControllerOauthAuthorize extends CController {
 		return [
 			'tokens_status' => OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID,
 			'access_token' => $response['access_token'],
+			'access_token_updated' => time(),
 			'access_expires_in' => $response['expires_in'],
 			'refresh_token' => $response['refresh_token'],
 			'message' => _s('Configured %1$s ago', zbx_date2age(time() - 1))
