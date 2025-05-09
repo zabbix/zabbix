@@ -779,6 +779,10 @@ window.host_wizard_edit = new class {
 				if (!path
 					|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
 				) {
+					this.#dialogue.querySelectorAll('input[name="agent_mode"]').forEach(input => {
+						input.disabled = Number(this.#data.data_collection) == ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
+					});
+
 					const step_body = document.querySelector('.js-templates');
 					step_body.innerHTML = '';
 
@@ -1003,12 +1007,13 @@ window.host_wizard_edit = new class {
 	#makeCardListSections() {
 		let template_classes = Array.from(this.#templates)
 			.filter(([_, template]) => {
-				if (Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_ANY
-						&& !template.data_collection.includes(Number(this.#data.data_collection))) {
+				if (Number(this.#data.data_collection) != ZBX_TEMPLATE_DATA_COLLECTION_ANY
+						&& template.data_collection != Number(this.#data.data_collection)) {
 					return false;
 				}
 
-				if (Number(this.#data.agent_mode) !== ZBX_TEMPLATE_AGENT_MODE_ANY
+				if (Number(this.#data.data_collection) == ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED
+						&& Number(this.#data.agent_mode) !== ZBX_TEMPLATE_AGENT_MODE_ANY
 						&& !template.agent_mode.includes(Number(this.#data.agent_mode))) {
 					return false;
 				}

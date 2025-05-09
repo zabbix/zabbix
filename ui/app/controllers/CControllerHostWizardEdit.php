@@ -100,24 +100,23 @@ class CControllerHostWizardEdit extends CController {
 			// Remove unnecessary template data.
 			unset($template['items'], $template['discoveries'], $template['vendor_version']);
 
-			$template['data_collection'] = [];
+			$template['data_collection'] = null;
 			$template['agent_mode'] = [];
 
 			foreach ($unique_types as $type) {
-				$agent_mode = $type == ITEM_TYPE_ZABBIX
-					? ZBX_TEMPLATE_AGENT_MODE_PASSIVE
-					: ZBX_TEMPLATE_AGENT_MODE_ACTIVE;
-
 				if (in_array($type, [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE])) {
-					$template['data_collection'][ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED] = true;
+					$agent_mode = $type == ITEM_TYPE_ZABBIX
+						? ZBX_TEMPLATE_AGENT_MODE_PASSIVE
+						: ZBX_TEMPLATE_AGENT_MODE_ACTIVE;
+
+					$template['data_collection'] = ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED;
 					$template['agent_mode'][$agent_mode] = true;
 				}
-				else {
-					$template['data_collection'][ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS] = true;
+				elseif ($template['data_collection'] === null) {
+					$template['data_collection'] = ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS;
 				}
 			}
 
-			$template['data_collection'] = array_keys($template['data_collection']);
 			$template['agent_mode'] = array_keys($template['agent_mode']);
 		}
 		unset($template);
