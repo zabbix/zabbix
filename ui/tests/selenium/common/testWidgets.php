@@ -48,6 +48,16 @@ class testWidgets extends CWebTest {
 			' wf.value_graphid, wf.value_hostid';
 
 	/**
+	 * Callback executed before every test case. Automatically accept the alert.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		parent::onBeforeTestCase();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
+	}
+
+	/**
 	 * Function which checks that only permitted item types are accessible for widgets.
 	 *
 	 * @param string    $url       url provided which needs to be opened
@@ -123,6 +133,7 @@ class testWidgets extends CWebTest {
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
+		$items_dialog->query('button:Select')->waitUntilClickable();
 		$table->waitUntilReloaded();
 		$items_dialog->waitUntilReady();
 		$items_dialog->query('button:Select')->waitUntilClickable();

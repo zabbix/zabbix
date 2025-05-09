@@ -1206,7 +1206,8 @@ class testFormGraphs extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('link:Graph for items change')->waitUntilClickable()->one()->click();
 		$item_number = $this->prototype ? 1 : 0;
-		$form = $this->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
 				->one()->waitUntilPresent();
 

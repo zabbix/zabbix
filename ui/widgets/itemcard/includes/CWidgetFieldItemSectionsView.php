@@ -53,11 +53,13 @@ class CWidgetFieldItemSectionsView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
-				new CWidgetFieldItemSections('.json_encode([
-					'field_name' => $this->field->getName(),
-					'field_value' => $this->field->getValue()
-				]).');
+			CWidgetForm.addField(
+				new ItemCard_CWidgetFieldItemSections('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name,
+					'value' => $this->field->getValue()
+				]).')
+			);
 		';
 	}
 

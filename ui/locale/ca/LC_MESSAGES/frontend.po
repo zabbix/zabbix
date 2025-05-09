@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-10 19:38+0000\n"
+"PO-Revision-Date: 2025-05-01 18:38+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -7206,6 +7206,10 @@ msgstr "Objecte de descobriment"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descoberta de clústers de VMware, \"url\" - URL del servei de VMware. Retorna un JSON"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Descoberta de magatzems de dades de VMware, \"url\" - URL del servei de VMware, \"filter_uuid\" - un hv uuid o vm uuid (buit per defecte). Retorna JSON"
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descoberta de magatzems de dades de VMware, \"url\" - URL del servei de VMware. Retorna un JSON"
@@ -7627,6 +7631,10 @@ msgstr "Edita l'element de l'arbre"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Editar el giny"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr "No es pot pas editar altres objectes en el mode d'edició del tauler de control."
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8066,7 +8074,7 @@ msgstr "Missatge d'error"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
 msgid "Error text"
-msgstr ""
+msgstr "Text d'error"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -12037,7 +12045,7 @@ msgstr "Element afegit"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
-msgstr ""
+msgstr "Tarja d'element"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -13713,7 +13721,7 @@ msgstr "Mètodes"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
 msgid "Metrics"
-msgstr ""
+msgstr "Mètriques"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -23595,6 +23603,10 @@ msgstr "Giny"
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "El giny a X:%3$d, Y:%4$d a la pàgina #%2$d del tauler \"%1$s\" és fora dels límits."
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr "La configuració del giny es revertirà."
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
