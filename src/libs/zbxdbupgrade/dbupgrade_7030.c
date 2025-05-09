@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "dbupgrade_common.h"
+#include "zbxtasks.h"
 
 /*
  * 7.4 development database patches
@@ -413,6 +414,45 @@ static int	DBpatch_7030029(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030030(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", (char *)NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7030031(void)
+{
+	const zbx_db_field_t	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_7030032(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'itemcard','widgets/itemcard',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -449,5 +489,8 @@ DBPATCH_ADD(7030026, 0, 1)
 DBPATCH_ADD(7030027, 0, 1)
 DBPATCH_ADD(7030028, 0, 1)
 DBPATCH_ADD(7030029, 0, 1)
+DBPATCH_ADD(7030030, 0, 1)
+DBPATCH_ADD(7030031, 0, 1)
+DBPATCH_ADD(7030032, 0, 1)
 
 DBPATCH_END()

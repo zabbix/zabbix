@@ -105,7 +105,6 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid='.
 				$this->discoveryRuleId
 		);
-
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
@@ -117,7 +116,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 				$this->zbxTestClickLinkTextWait($item['itemName']);
 				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
-			$dialog->getFooter()->query('button', 'Add')->waitUntilClickable()->one()->click();
+			$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
 
 		switch ($data['expected']) {

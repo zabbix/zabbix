@@ -68,18 +68,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 		];
 		$this->assertEquals($fields, $form->getLabels()->asText());
 
-		// Check filter collapse/expand.
-		foreach (['true', 'false'] as $status) {
-			$filter_space = $this->query('xpath://div['.CXPathHelper::fromClass('filter-space').']')->one();
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
-
-			if ($status === 'true') {
-				$filter_space->query('id:tab_0')->one()->waitUntilNotVisible();
-			}
-			else {
-				$filter_space->query('id:tab_0')->one()->waitUntilVisible();
-			}
+		// Check displaying and hiding the filter.
+		$filter = CFilterElement::find()->one();
+		$this->assertEquals('Filter', $filter->getSelectedTabName());
+		// Check that filter is expanded by default.
+		$this->assertTrue($filter->isExpanded());
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter->expand($status);
+			$this->assertTrue($filter->isExpanded($status));
 		}
 
 		// Check all dropdowns.

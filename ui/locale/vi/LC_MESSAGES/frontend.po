@@ -7088,6 +7088,10 @@ msgstr "Đối tượng phát hiện"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
@@ -7507,6 +7511,10 @@ msgstr "Chỉnh sửa phần tử cây"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Chỉnh sử ô điều khiển"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7943,6 +7951,10 @@ msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8964,6 +8976,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "Đồ thị đã xóa"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9010,6 +9026,10 @@ msgstr "Kiểu đồ thị đã được thêm vào"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Kiểu đồ thị đã xóa"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11891,6 +11911,10 @@ msgstr "Item"
 msgid "Item added"
 msgstr "Item đã được thêm vào"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
@@ -13548,6 +13572,10 @@ msgstr "Không tìm thấy giải pháp"
 msgid "Methods"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr ""
@@ -14223,6 +14251,14 @@ msgstr "Giá trị thẻ sự kiện mới"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
+msgstr ""
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
 msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
@@ -19492,6 +19528,10 @@ msgstr ""
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr ""
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -23385,6 +23425,10 @@ msgstr ""
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr ""
@@ -26484,6 +26528,14 @@ msgstr[0] ""
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
+msgstr ""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676

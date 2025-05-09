@@ -7100,6 +7100,10 @@ msgstr "自动发现对象"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的集群，“url”- VMware 服务 URL。返回 JSON"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的数据存储，“url”- VMware 服务 URL。返回 JSON"
@@ -7518,6 +7522,10 @@ msgstr "编辑树元素"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "编辑构件"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7954,6 +7962,10 @@ msgstr "查找表请求出现 \"%1$s\"的错误."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "错误信息"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8974,6 +8986,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "图形已删除"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9019,6 +9035,10 @@ msgstr "数据图模板已添加"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "数据图模板已删除"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11897,6 +11917,10 @@ msgstr "监控项"
 msgid "Item added"
 msgstr "监控项已添加"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "监控项包含具有秘密值的用户定义的宏。这些宏的值应手动输入。"
@@ -13551,6 +13575,10 @@ msgstr "未发现方法."
 msgid "Methods"
 msgstr "方法"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "微软Edge浏览器"
@@ -14226,6 +14254,14 @@ msgstr "新的事件标记值"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
 msgstr "添加排除的停机时间"
+
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -19493,6 +19529,10 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfree、free、total、used、pused）。"
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -23380,6 +23420,10 @@ msgstr "小组件"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "位于仪表盘“%1$s”的第 #%2$d 页上 X:%3$d, Y:%4$d 的小组件超出范围。"
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "小组件已弃用。"
@@ -26483,6 +26527,14 @@ msgstr[0] "值必须为 %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "值必须介于“%1$s”和“%2$s”之间"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

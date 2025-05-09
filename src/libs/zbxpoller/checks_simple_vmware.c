@@ -3248,7 +3248,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -3269,7 +3269,8 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_CLUSTER, cluster->id,
-			counterid, ZBX_VMWARE_PERF_QUERY_ALL))
+			/* cl object supports aggregate value only, which is not always suitable for "*" instance */
+			counterid, '\0' == *instance ? ZBX_VMWARE_PERF_QUERY_ALL : instance))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -3309,7 +3310,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -3598,7 +3599,7 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -3619,7 +3620,8 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 
 	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_DS, ds->id, counterid,
-			ZBX_VMWARE_PERF_QUERY_ALL))
+			/* ds object supports aggregate value only, which is not always suitable for "*" instance */
+			'\0' == *instance ? ZBX_VMWARE_PERF_QUERY_ALL : instance))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -3742,31 +3744,60 @@ out:
 int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*url;
-	zbx_vmware_service_t	*service;
-	struct zbx_json		json_data;
-	int			i, j, ret = SYSINFO_RET_FAIL;
+	const char			*url, *filter_uuid;
+	zbx_vmware_service_t		*service;
+	struct zbx_json			json_data;
+	zbx_vmware_hv_t			*hv;
+	zbx_vmware_vm_t			*vm;
+	zbx_vector_str_t		ids;
+	int				i, j, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (1 != request->nparam)
+	if (1 > request->nparam || 2 < request->nparam )
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
 	url = get_rparam(request, 0);
+	filter_uuid = get_rparam(request, 1);
 
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
+	zbx_vector_str_create(&ids);
+
+	if (NULL != filter_uuid && '\0' != *filter_uuid)
+	{
+		if (NULL != (hv = hv_get(&service->data->hvs, filter_uuid)))
+		{
+			for (i = 0; i < hv->dsnames.values_num; i++)
+				zbx_vector_str_append(&ids, hv->dsnames.values[i]->id);
+		}
+		else if (NULL != (vm = service_vm_get(service, filter_uuid)))
+		{
+			zbx_vector_str_append_array(&ids, vm->ds_ids.values, vm->ds_ids.values_num);
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() there are no vm or hv with uuid:%s", __func__, filter_uuid);
+
+		zbx_vector_str_sort(&ids, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	}
+
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < service->data->datastores.values_num; i++)
 	{
 		zbx_vmware_datastore_t	*datastore = service->data->datastores.values[i];
+
+		if (NULL != filter_uuid && '\0' != *filter_uuid &&
+				FAIL == zbx_vector_str_bsearch(&ids, datastore->id, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		{
+			continue;
+		}
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
@@ -3796,6 +3827,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
 
 	zbx_json_free(&json_data);
+	zbx_vector_str_destroy(&ids);
 
 	ret = SYSINFO_RET_OK;
 unlock:
@@ -4388,14 +4420,11 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			if (NULL == (hv_uuid = hv->props[ZBX_VMWARE_HVPROP_HW_UUID]))
 				continue;
 
-			for (int j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
+			for (int j = 0; 0 != vm->ds_ids.values_num &&
 					j < service->data->datastores.values_num; j++)
 			{
-				if (0 != strcmp(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID],
-						service->data->datastores.values[j]->id))
-				{
+				if (0 != strcmp(*vm->ds_ids.values, service->data->datastores.values[j]->id))
 					continue;
-				}
 
 				datastore = service->data->datastores.values[j];
 				break;
@@ -4404,7 +4433,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			if (NULL == datastore)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "%s() Unknown datastore id:%s", __func__,
-						ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID]));
+						0 != vm->ds_ids.values_num ? *vm->ds_ids.values : "");
 				continue;
 			}
 
@@ -4955,7 +4984,7 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 
 	for (int i = 0; i < vm->devs.values_num; i++)
 	{
-		dev = (zbx_vmware_dev_t *)vm->devs.values[i];
+		dev = vm->devs.values[i];
 
 		if (dev_type != dev->type)
 			continue;
@@ -5337,7 +5366,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 
 	for (int i = 0; i < vm->file_systems.values_num; i++)
 	{
-		zbx_vmware_fs_t	*fs = (zbx_vmware_fs_t *)vm->file_systems.values[i];
+		zbx_vmware_fs_t	*fs = vm->file_systems.values[i];
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#FSNAME}", fs->path, ZBX_JSON_TYPE_STRING);
@@ -5365,7 +5394,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	const char		*url, *uuid, *fsname, *mode;
-	int			ret = SYSINFO_RET_FAIL;
+	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vmware_fs_t		*fs = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -5398,15 +5427,15 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	for (int i = 0; i < vm->file_systems.values_num; i++)
+	for (i = 0; i < vm->file_systems.values_num; i++)
 	{
-		fs = (zbx_vmware_fs_t *)vm->file_systems.values[i];
+		fs = vm->file_systems.values[i];
 
 		if (0 == strcmp(fs->path, fsname))
 			break;
 	}
 
-	if (NULL == fs)
+	if (i == vm->file_systems.values_num)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown file system path."));
 		goto unlock;
@@ -5460,7 +5489,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	instance = get_rparam(request, 3);
 
 	if (NULL == instance)
-		instance = "";
+		instance = ZBX_VMWARE_PERF_QUERY_TOTAL;
 
 	zbx_vmware_lock();
 
@@ -5554,7 +5583,7 @@ int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, cons
 {
 	zbx_vmware_service_t		*service;
 	zbx_vmware_datacenter_t		*dc = NULL;
-	int				ret = SYSINFO_RET_FAIL;
+	int				i, ret = SYSINFO_RET_FAIL;
 	const char			*url, *id;
 	struct zbx_json			json_data;
 	char				*error = NULL;
@@ -5579,16 +5608,15 @@ int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, cons
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (int i = 0; i < service->data->datacenters.values_num; i++)
+	for (i = 0; i < service->data->datacenters.values_num; i++)
 	{
-		if (0 == strcmp(service->data->datacenters.values[i]->id, id))
-		{
-			dc = service->data->datacenters.values[i];
+		dc = service->data->datacenters.values[i];
+
+		if (0 == strcmp(dc->id, id))
 			break;
-		}
 	}
 
-	if (NULL == dc)
+	if (i == service->data->datacenters.values_num)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datacenter id."));
 		goto unlock;

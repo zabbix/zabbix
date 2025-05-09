@@ -1171,7 +1171,6 @@ class testFormGraphs extends CWebTest {
 		else {
 			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
 		}
-
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		if ($data['case'] === 'Clone' || $data['case'] === 'Delete') {
@@ -1187,6 +1186,10 @@ class testFormGraphs extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		}
 		else {
+			// After clicking the clone button the overlay dialog is reloaded again.
+			if ($data['case'] === 'Clone') {
+				$dialog->waitUntilReady();
+			}
 			$dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 
@@ -1203,7 +1206,8 @@ class testFormGraphs extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('link:Graph for items change')->waitUntilClickable()->one()->click();
 		$item_number = $this->prototype ? 1 : 0;
-		$form = $this->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
 				->one()->waitUntilPresent();
 
