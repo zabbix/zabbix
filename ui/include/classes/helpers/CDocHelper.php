@@ -139,6 +139,7 @@ class CDocHelper {
 	const POPUP_TEMPLATE_IMPORT =								'xml_export_import/templates#importing';
 	const POPUP_TOKEN_EDIT =									'web_interface/frontend_sections/users/api_tokens';
 	const POPUP_TEST_EDIT =										'config/items/item#testing';
+	const PROCESSES_JAVA_GATEWAY =								'concepts/java';
 	const QUEUE_DETAILS =										'web_interface/frontend_sections/administration/queue#list-of-waiting-items';
 	const QUEUE_OVERVIEW =										'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =								'web_interface/frontend_sections/administration/queue#overview-by-proxy';

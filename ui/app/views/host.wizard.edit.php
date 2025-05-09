@@ -452,7 +452,9 @@ function stepInstallAgent($agent_script_data): array {
 					(new CDiv([
 						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
 						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
-						new CTag('p', true, new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MSI)))
+						new CTag('p', true,
+							(new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MSI)))
+								->setTarget('_blank'))
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -467,8 +469,16 @@ function stepInstallAgent($agent_script_data): array {
 					(new CDiv([
 						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
 						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
-						new CTag('p', true, [new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)), ' (', _s('Mac OS'), ')']),
-						new CTag('p', true, [new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)), ' (', _s('Other OS'), ')'])
+						new CTag('p', true, [
+							(new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)))
+								->setTarget('_blank'),
+							' (', _s('Mac OS'), ')'
+						]),
+						new CTag('p', true, [
+							(new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)))
+								->setTarget('_blank'),
+							' (', _s('Other OS'), ')'
+						])
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -712,7 +722,8 @@ function stepAddHostInterface(): array {
 						new CTag('p', true, [
 							_('For more details, see'),
 							' ',
-							new CLink(_('IPMI checks'), '#')
+							(new CLink(_('IPMI checks'), CDocHelper::getUrl(CDocHelper::ITEM_TYPES_IPMI_AGENT)))
+								->setTarget('_blank')
 						])
 					]))
 						->addClass(ZBX_STYLE_FORM_DESCRIPTION)
@@ -754,11 +765,16 @@ function stepAddHostInterface(): array {
 						new CTag('p', true, [
 							_('1. Install Java Gateway on the same machine running Zabbix server by following the instructions in'),
 							' ',
-							new CLink(_('Zabbix documentation'), '#')
+							(new CLink(_('Zabbix documentation'), CDocHelper::getUrl(CDocHelper::ITEM_TYPES_JMX_AGENT)))
+								->setTarget('_blank')
 						]),
 						new CTag('p', true, _('2. Configure your Java application to support remote JMX monitoring. For example:')),
 						new CTag('pre', true, "JAVA_OPTS=\"-Dcom.sun.management.jmxremote \\\n-Dcom.sun.management.jmxremote.local.only=false \\\n-Dcom.sun.management.jmxremote.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.rmi.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.authenticate=false \\\n-Dcom.sun.management.jmxremote.ssl=false \\\n-Djava.rmi.server.hostname=<JMX address>\""),
-						new CTag('p', true, [_('For more details, see'), ' ', new CLink(_('JMX monitoring'), '#')])
+						new CTag('p', true, [
+							_('For more details, see'), ' ',
+							(new CLink(_('JMX monitoring'), CDocHelper::getUrl(CDocHelper::PROCESSES_JAVA_GATEWAY)))
+								->setTarget('_blank')
+						])
 					]))
 						->addClass(ZBX_STYLE_FORM_DESCRIPTION)
 						->addClass(ZBX_STYLE_MARKDOWN)
