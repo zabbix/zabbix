@@ -243,7 +243,7 @@ window.host_wizard_edit = new class {
 					else {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
-						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit'));
+						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
 					}
 				})
 				.catch(() => {
@@ -662,6 +662,8 @@ window.host_wizard_edit = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+
+				this.#ajaxSuccessHandler(response);
 			})
 			.catch(exception => {
 				this.#ajaxExceptionHandler(exception);
@@ -670,9 +672,13 @@ window.host_wizard_edit = new class {
 			});
 	}
 
-	#ajaxExceptionHandler(exception) {
-		const step_form = this.#dialogue.querySelector('.step-form');
+	#ajaxSuccessHandler({success}) {
+		if (success !== undefined) {
+			this.#addMessageBox(makeMessageBox('good', success.messages, success.title)[0]);
+		}
+	}
 
+	#ajaxExceptionHandler(exception) {
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -682,16 +688,17 @@ window.host_wizard_edit = new class {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title)[0];
+		this.#addMessageBox(makeMessageBox('bad', messages, title)[0]);
+	}
 
-		const message_element = this.#dialogue.querySelector('.msg-bad');
+	#addMessageBox(message_box) {
+		for (const messages of this.#dialogue.querySelectorAll('.overlay-dialogue-body output')) {
+			messages.remove();
+		}
 
-		if (message_element === null) {
-			step_form.parentNode.insertBefore(message_box, step_form);
-		}
-		else {
-			message_element.replaceWith(message_box);
-		}
+		const step_form = this.#dialogue.querySelector('.step-form');
+
+		step_form.parentNode.insertBefore(message_box, step_form);
 	}
 
 	#updateStepsQueue() {
