@@ -1656,7 +1656,7 @@ class CUserDirectory extends CApiService {
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
-			]],
+			]]
 		]];
 	}
 

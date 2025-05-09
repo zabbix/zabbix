@@ -327,10 +327,10 @@ if ($data['saml_certs_editable']) {
 					(new CButton('idp_certificate_file', _('Choose file')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-file-button')
-						->addClass('saml-enabled'),
+						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['idp_certificate_hash'] === '' ? '' : 'display:none'),
+					->addStyle($data['idp_certificate_hash'] === '' ? '' : 'display:none')
 			]))
 		])
 		->addItem([
@@ -353,10 +353,10 @@ if ($data['saml_certs_editable']) {
 					(new CButton('sp_private_key_file', _('Choose file')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-file-button')
-						->addClass('saml-enabled'),
+						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['sp_private_key_hash'] === '' ? '' : 'display:none'),
+					->addStyle($data['sp_private_key_hash'] === '' ? '' : 'display:none')
 			]))
 		])
 		->addItem([
@@ -379,10 +379,10 @@ if ($data['saml_certs_editable']) {
 					(new CButton('sp_certificate_file', _('Choose file')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-file-button')
-						->addClass('saml-enabled'),
+						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['sp_certificate_hash'] === '' ? '' : 'display:none'),
+					->addStyle($data['sp_certificate_hash'] === '' ? '' : 'display:none')
 			]))
 		]);
 }
@@ -813,7 +813,7 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
 		'saml_idp_certificate_exists' => $data['saml_certs_editable'] && $data['idp_certificate_hash'] !== '',
 		'saml_sp_certificate_exists' => $data['saml_certs_editable'] && $data['sp_certificate_hash'] !== '',
-		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== '',
+		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== ''
 	]).');'
 ))
 	->setOnDocumentReady()
