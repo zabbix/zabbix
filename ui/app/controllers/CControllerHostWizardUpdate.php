@@ -82,15 +82,12 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		// Validate and update interfaces.
-		$interfaces = $this->prepareInterfaces($this->getInput('interfaces', []), $this->db_host);
-
-		try {
-			DBstart();
-
-			if (!$this->validateMacrosByConfig()) {
-				throw new Exception();
-			}
+		if (!$this->validateMacrosByConfig()) {
+			$result = false;
+		}
+		else {
+			// Validate and update interfaces.
+			$interfaces = $this->prepareInterfaces($this->getInput('interfaces', []), $this->db_host);
 
 			$host = [
 				'hostid' => $this->getInput('hostid'),
@@ -123,17 +120,6 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			}
 
 			$result = API::Host()->update($host);
-
-			if ($result === false) {
-				throw new Exception();
-			}
-
-			$result = DBend();
-		}
-		catch (Exception) {
-			$result = false;
-
-			DBend(false);
 		}
 
 		$output = [];

@@ -64,38 +64,34 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		// Validate and update interfaces.
-		$address_parser = new CAddressParser(['usermacros' => true, 'lldmacros' => true, 'macros' => true]);
-		$interfaces = $this->getInput('interfaces', []);
-
-		foreach ($interfaces as &$interface) {
-			$address_parser->parse($interface['address']);
-
-			$interface += [
-				'useip' => $address_parser->getAddressType(),
-				'isNew' => true,
-				'main' => INTERFACE_PRIMARY
-			];
-
-			if ($interface['useip'] == INTERFACE_USE_DNS) {
-				$interface['dns'] = $interface['address'];
-				$interface['ip'] = '';
-			}
-			elseif ($interface['useip'] == INTERFACE_USE_IP) {
-				$interface['ip'] = $interface['address'];
-				$interface['dns'] = '';
-			}
-
-			unset($interface['address']);
+		if (!$this->validateMacrosByConfig()) {
+			$result = false;
 		}
-		unset($interface);
+		else {
+			// Validate and update interfaces.
+			$address_parser = new CAddressParser(['usermacros' => true, 'lldmacros' => true, 'macros' => true]);
+			$interfaces = $this->getInput('interfaces', []);
 
-		try {
-			DBstart();
+			foreach ($interfaces as &$interface) {
+				$address_parser->parse($interface['address']);
 
-			if (!$this->validateMacrosByConfig()) {
-				throw new Exception();
+				$interface += [
+					'useip' => $address_parser->getAddressType(),
+					'isNew' => true,
+					'main' => INTERFACE_PRIMARY
+				];
+
+				if ($interface['useip'] == INTERFACE_USE_DNS) {
+					$interface['dns'] = $interface['address'];
+					$interface['ip'] = '';
+				} elseif ($interface['useip'] == INTERFACE_USE_IP) {
+					$interface['ip'] = $interface['address'];
+					$interface['dns'] = '';
+				}
+
+				unset($interface['address']);
 			}
+			unset($interface);
 
 			$host = [
 				'host' => $this->getInput('host'),
@@ -115,17 +111,6 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 			}
 
 			$result = API::Host()->create($host);
-
-			if ($result === false) {
-				throw new Exception();
-			}
-
-			$result = DBend();
-		}
-		catch (Exception) {
-			$result = false;
-
-			DBend(false);
 		}
 
 		$output = [];
