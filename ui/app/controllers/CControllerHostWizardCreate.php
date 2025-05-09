@@ -39,7 +39,7 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 			'macros' =>				'array|not_empty'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateMacrosByConfig();
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -56,7 +56,11 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
+
+		return parent::checkPermissions();
 	}
 
 	protected function doAction(): void {
@@ -88,6 +92,10 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 
 		try {
 			DBstart();
+
+			if (!$this->validateMacrosByConfig()) {
+				throw new Exception();
+			}
 
 			$host = [
 				'host' => $this->getInput('host'),
@@ -138,6 +146,6 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 			];
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
 	}
 }

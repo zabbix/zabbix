@@ -19,19 +19,31 @@
  */
 abstract class CControllerHostWizardUpdateGeneral extends CControllerHostUpdateGeneral {
 
+	private array $template;
+
+	protected function checkPermissions(): bool {
+		$templates = API::Template()->get([
+			'output' => [],
+			'selectMacros' => ['macro', 'config'],
+			'templateids' => $this->getInput('templateid'),
+			'filter' => ['wizard_ready' => ZBX_WIZARD_READY]
+		]);
+
+		if (!$templates) {
+			return false;
+		}
+
+		$this->template = $templates[0];
+
+		return true;
+	}
+
 	/**
 	 * Check that all macros are following macro config rules.
 	 *
 	 * @return bool
 	 */
 	protected function validateMacrosByConfig(): bool {
-		$template = API::Template()->get([
-			'output' => [],
-			'selectMacros' => ['macro', 'config'],
-			'templateids' => $this->getInput('templateid')
-		]);
-		$template = reset($template);
-
 		$macros = $this->getInput('macros', []);
 		$indexed_macros = [];
 
@@ -39,7 +51,7 @@ abstract class CControllerHostWizardUpdateGeneral extends CControllerHostUpdateG
 			$indexed_macros[$macro['macro']] = ['index' => $index] + $macro;
 		}
 
-		foreach ($template['macros'] as $tempalte_macro) {
+		foreach ($this->template['macros'] as $tempalte_macro) {
 			if ($tempalte_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
 				continue;
 			}

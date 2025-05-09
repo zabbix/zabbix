@@ -16,6 +16,8 @@
 
 class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 
+	private array $db_host;
+
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -39,7 +41,7 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			'macros' =>				'array|not_empty'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateMacrosByConfig();
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -56,37 +58,51 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-	}
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
 
-	protected function doAction(): void {
 		$hosts = API::Host()->get([
 			'output' => ['ipmi_authtype','ipmi_privilege', 'ipmi_username', 'ipmi_password'],
 			'selectHostGroups' => ['groupid'],
 			'selectInterfaces' => ['interfaceid', 'type', 'main', 'ip', 'dns', 'port', 'useip', 'details'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
 			'selectParentTemplates' => ['templateid'],
-			'hostids' => $this->getInput('hostid')
+			'hostids' => $this->getInput('hostid'),
+			'editable' => true
 		]);
-		$db_host = $hosts[0];
 
+		if (!$hosts) {
+			return false;
+		}
+
+		$this->db_host = $hosts[0];
+
+		return parent::checkPermissions();
+	}
+
+	protected function doAction(): void {
 		// Validate and update interfaces.
-		$interfaces = $this->prepareInterfaces($this->getInput('interfaces', []), $db_host);
+		$interfaces = $this->prepareInterfaces($this->getInput('interfaces', []), $this->db_host);
 
 		try {
 			DBstart();
 
+			if (!$this->validateMacrosByConfig()) {
+				throw new Exception();
+			}
+
 			$host = [
 				'hostid' => $this->getInput('hostid'),
 				'groups' => $this->processHostGroups(array_unique(
-					array_merge($this->getInput('groups', []), array_column($db_host['hostgroups'], 'groupid'))
+					array_merge($this->getInput('groups', []), array_column($this->db_host['hostgroups'], 'groupid'))
 				)),
 				'templates' => $this->processTemplates([array_keys(
-					array_column($db_host['parentTemplates'], 'templateid', 'templateid')
+					array_column($this->db_host['parentTemplates'], 'templateid', 'templateid')
 					+ [$this->getInput('templateid') => true]
 				)]),
-				'interfaces' => array_merge($db_host['interfaces'], $this->processHostInterfaces($interfaces)),
-				'macros' => $this->prepareMacros($this->getInput('macros', []), $db_host['macros'])
+				'interfaces' => array_merge($this->db_host['interfaces'], $this->processHostInterfaces($interfaces)),
+				'macros' => $this->prepareMacros($this->getInput('macros', []), $this->db_host['macros'])
 			];
 
 			$ipmi_fields = ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'];
@@ -138,7 +154,7 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			];
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
 	}
 
 	private function prepareInterfaces(array $interfaces, array $host): array {
