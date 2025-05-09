@@ -104,25 +104,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'webitems' => true
 				]);
 
-				$items = API::Item()->get([
-					'output' => ['itemid', 'name_resolved'],
-					'selectHosts' => ['name'],
-					'hostids' => $this->fields_values['override_hostid'],
-					'filter' => [
-						'key_' => $src_items[0]['key_'],
-						'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
-					],
-					'webitems' => true
-				]);
-				$item = reset($items);
-
-				if ($item) {
-					$resourceid = $item['itemid'];
-					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
-				}
-				else {
+				if (count($src_items) == 0) {
 					$resourceid = null;
 					$is_resource_available = false;
+				}
+				else {
+					$items = API::Item()->get([
+						'output' => ['itemid', 'name_resolved'],
+						'selectHosts' => ['name'],
+						'hostids' => $this->fields_values['override_hostid'],
+						'filter' => [
+							'key_' => $src_items[0]['key_'],
+							'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+						],
+						'webitems' => true
+					]);
+					$item = reset($items);
+
+					if ($item) {
+						$resourceid = $item['itemid'];
+						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+					}
 				}
 			}
 			// Find requested host and change graph details.
