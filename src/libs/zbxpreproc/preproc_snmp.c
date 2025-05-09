@@ -376,6 +376,18 @@ reparse_type:
 	while (' ' == *data)
 		data++;
 
+	if (0 == strncmp(data, "Wrong Type", ZBX_CONST_STRLEN("Wrong Type")))
+	{
+		while (':' != *data && '\0' != *data && '\n' != *data)
+			data++;
+
+		if (':' == *data)
+			data++;
+
+		while (' ' == *data)
+			data++;
+	}
+
 	if (0 != isupper((unsigned char)*data))
 	{
 		len = preproc_snmp_parse_type(data, &type);
