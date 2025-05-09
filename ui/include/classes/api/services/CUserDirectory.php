@@ -41,6 +41,12 @@ class CUserDirectory extends CApiService {
 		'idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'
 	];
 
+	public const SAML_HASH_FIELDS = [
+		'idp_certificate_hash' => 'idp_certificate', 
+		'sp_certificate_hash' => 'sp_certificate', 
+		'sp_private_key_hash' => 'sp_private_key'
+	];
+
 	public const OUTPUT_FIELDS = [
 		// Common output fields.
 		'userdirectoryid', 'name', 'idp_type', 'provision_status', 'description',
@@ -113,7 +119,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
-			$saml_output = $this->prepareSamlCertificateWritingFields($saml_output);
+			$saml_output = $this->renameSamlHashFields($saml_output);
 
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
@@ -130,16 +136,16 @@ class CUserDirectory extends CApiService {
 		if ($db_userdirectories) {
 			if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
 				foreach ($db_userdirectories as $key => $db_userdirectory) {
-					foreach (['idp_certificate', 'sp_certificate', 'sp_private_key'] as $field) {
-						if (!array_key_exists($field, $db_userdirectory)) {
+					foreach (self::SAML_HASH_FIELDS as $hash_field => $db_filed) {
+						if (!array_key_exists($db_filed, $db_userdirectory)) {
 							continue;
 						}
 
-						if ($db_userdirectory[$field] !== '') {
-							$db_userdirectories[$key][$field.'_hash'] = md5($db_userdirectory[$field]);
+						if ($db_userdirectory[$db_filed] !== '') {
+							$db_userdirectories[$key][$hash_field] = md5($db_userdirectory[$db_filed]);
 						}
 						else {
-							$db_userdirectories[$key][$field.'_hash'] = '';
+							$db_userdirectories[$key][$hash_field] = '';
 						}
 					}
 					unset($field);
@@ -415,8 +421,7 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$saml_output = self::SAML_OUTPUT_FIELDS;
-				$saml_output = $this->prepareSamlCertificateWritingFields($saml_output);
+				$saml_output = $this->renameSamlHashFields();
 
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
 					array_flip($saml_output) + array_flip(['userdirectoryid'])
@@ -552,8 +557,7 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$saml_output = self::SAML_OUTPUT_FIELDS;
-				$saml_output = $this->prepareSamlCertificateWritingFields($saml_output);
+				$saml_output = $this->renameSamlHashFields();
 
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
 					array_intersect_key($userdirectory, array_flip($saml_output)), $db_userdirectory
@@ -1670,18 +1674,6 @@ class CUserDirectory extends CApiService {
 		]];
 	}
 
-	private function prepareSamlCertificateWritingFields(array $saml_output): array
-	{
-		foreach ($saml_output as $key => $value) {
-			if (in_array($value, ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'])) {
-				$saml_output[$key] =  substr($value, 0, strpos($value, '_hash'));
-			}
-		}
-		unset($value);
-
-		return $saml_output;
-	}
-
 	private static function checkSamlCertificates(array $userdirectories, ?array $db_userdirectories = null): void {
 		$fields = array_flip(['idp_certificate', 'sp_certificate', 'sp_private_key']);
 		$check_openssl = false;
@@ -1696,11 +1688,11 @@ class CUserDirectory extends CApiService {
 					continue;
 				}
 
+				$check_openssl = true;
+
 				if ($db_userdirectory !== null && $db_userdirectory[$field] === $value) {
 					continue;
 				}
-
-				$check_openssl = true;
 
 				switch ($field) {
 					case 'idp_certificate':
@@ -1726,5 +1718,18 @@ class CUserDirectory extends CApiService {
 		if ($check_openssl) {
 			CAuthentication::checkOpenSslExtension();
 		}
+	}
+
+	private function renameSamlHashFields(?array $saml_output = null): array {
+		$saml_output = $saml_output ?? self::SAML_OUTPUT_FIELDS;
+
+		foreach ($saml_output as $index => $field_name) {
+			if (array_key_exists($field_name, self::SAML_HASH_FIELDS)) {
+				$saml_output[$index] = self::SAML_HASH_FIELDS[$field_name];
+			}
+		}
+		unset($value);
+
+		return $saml_output;
 	}
 }
