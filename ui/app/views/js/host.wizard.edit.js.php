@@ -541,6 +541,12 @@ window.host_wizard_edit = new class {
 				? this.#data.host.id
 				: null;
 
+		// Don't send request if template or host hasn't changed.
+		if (this.#template?.templateid === templateid
+				&& (this.#host?.hostid === hostid || (this.#host === null && hostid === null))) {
+			return Promise.resolve();
+		}
+
 		const url_params = objectToSearchParams({
 			action: 'host.wizard.get',
 			templateid,
