@@ -258,6 +258,10 @@ window.host_wizard_edit = new class {
 				});
 		});
 
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'host.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
 	}
