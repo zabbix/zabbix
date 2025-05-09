@@ -777,14 +777,14 @@ if (hasRequest('form')) {
 			$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
 			$data['discoveryData'] = $item['discoveryData'];
 
-			$db_rule = API::DiscoveryRulePrototype()->get([
+			$db_parent = API::DiscoveryRulePrototype()->get([
 				'itemids' => $item['discoveryData']['parent_itemid'],
 				'selectDiscoveryRule' => ['itemid'],
 				'selectDiscoveryRulePrototype' => ['itemid']
 			]);
-			$db_rule = reset($db_rule);
+			$db_parent = reset($db_parent);
 
-			$parent_lld = $db_rule['discoveryRule'] ?: $db_rule['discoveryRulePrototype'];
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
 			$data['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 	}

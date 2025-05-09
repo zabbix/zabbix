@@ -147,6 +147,18 @@ class CControllerGraphPrototypeEdit extends CController {
 			$graph = API::GraphPrototype()->get($options);
 			$graph = reset($graph);
 
+			if ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_parent = API::GraphPrototype()->get([
+					'graphids' => $graph['discoveryData']['parent_graphid'],
+					'selectDiscoveryRule' => ['itemid'],
+					'selectDiscoveryRulePrototype' => ['itemid']
+				]);
+				$db_parent = reset($db_parent);
+
+				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+				$graph['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+			}
+
 			$data += $graph;
 
 			$data['discovered'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED;

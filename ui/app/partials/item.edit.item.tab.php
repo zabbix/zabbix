@@ -30,8 +30,8 @@ if ($item['discovered']) {
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'item.prototype.edit')
 		->setArgument('context', $item['context'])
+		->setArgument('parent_discoveryid', $item['discoveryData']['lldruleid'])
 		->setArgument('itemid', $item['discoveryData']['parent_itemid'])
-		->setArgument('parent_discoveryid', $parent_lld['itemid'])
 		->getUrl();
 
 	$parent_lld_link = [

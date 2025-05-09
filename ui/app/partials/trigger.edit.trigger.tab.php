@@ -32,7 +32,7 @@ if ($discovered_trigger || $discovered_prototype) {
 	$discovered_trigger_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')
-		->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+		->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
 		->setArgument('triggerid', $data['discoveryData']['parent_triggerid'])
 		->setArgument('context', $data['context'])
 		->setArgument('prototype', '1')

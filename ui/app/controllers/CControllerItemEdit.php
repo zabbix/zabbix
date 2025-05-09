@@ -139,6 +139,18 @@ class CControllerItemEdit extends CControllerItem {
 			}
 		}
 
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$db_parent = API::ItemPrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid']
+			]);
+			$db_parent = reset($db_parent);
+
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+		}
+
 		$data = [
 			'item' => $item,
 			'host' => $host,
