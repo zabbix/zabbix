@@ -43,6 +43,7 @@ class CControllerItemList extends CControllerItem {
 			'filter_with_triggers'		=> 'in -1,0,1',
 			'filter_inherited'			=> 'in -1,0,1',
 			'filter_discovered'			=> 'in '.implode(',', [-1, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_NORMAL]),
+			'subfilter_set'				=> 'in 1',
 			'subfilter_types'			=> 'array',
 			'subfilter_value_types'		=> 'array',
 			'subfilter_status'			=> 'array',
@@ -84,7 +85,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	public function doAction() {
-		if ($this->hasInput('filter_set')) {
+		if ($this->hasInput('filter_set') || $this->hasInput('subfilter_set')) {
 			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {

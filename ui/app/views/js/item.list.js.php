@@ -61,7 +61,9 @@
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
-					const subfilter = target.closest('.subfilter');
+					create_var(this.filter_form, 'subfilter_set', 1);
+
+                    const subfilter = target.closest('.subfilter');
 
 					if (subfilter.matches('.subfilter-enabled')) {
 						subfilter.querySelector('input[type="hidden"]').remove();
