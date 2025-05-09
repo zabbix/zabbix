@@ -582,8 +582,8 @@ window.host_wizard_edit = new class {
 					const is_checkbox = Number(template_macro.config.type) === this.WIZARD_FIELD_CHECKBOX;
 					const is_list = Number(template_macro.config.type) === this.WIZARD_FIELD_LIST;
 
-					const host_macro_value = this.#host?.macros.find(({macro}) => macro === template_macro.macro).value;
-					let value = template_macro.value || '';
+					const host_macro = this.#host?.macros.find(({macro}) => macro === template_macro.macro);
+					let value = host_macro?.value || template_macro.value || '';
 
 					if (is_checkbox || is_list) {
 						const options = Object.values(template_macro.config.options);
@@ -591,23 +591,23 @@ window.host_wizard_edit = new class {
 							? Object.values(options[0])
 							: options.map(option => option.value);
 
-						if (allowed_values.includes(host_macro_value)) {
-							value = host_macro_value;
-						} else {
-							this.#macro_reset_list[template_macro.macro] = true;
-						}
+						if (!allowed_values.includes(value)) {
+							if (host_macro?.value !== undefined ) {
+								this.#macro_reset_list[template_macro.macro] = true;
+							}
 
-						if (value === undefined) {
 							value = is_checkbox
 								? template_macro.config.options[0].unchecked
 								: allowed_values[0];
 						}
 					}
-					else if (host_macro_value === undefined && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
+					else if (host_macro !== undefined && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
 						value = undefined;
 					}
-					else if (host_macro_value !== undefined) {
-						value = host_macro_value;
+
+					if (Number(host_macro?.type) === this.MACRO_TYPE_SECRET
+							&& Number(template_macro.type) !== this.MACRO_TYPE_SECRET) {
+						this.#macro_reset_list[template_macro.macro] = true;
 					}
 
 					return [index, {
