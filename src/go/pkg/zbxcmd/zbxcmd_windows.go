@@ -25,15 +25,12 @@ import (
 	"time"
 
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/errs"
 )
 
 const cmd = "cmd.exe"
 
-var (
-	cmd_path string
-)
-
-func InitExecutor(s string, timeout time.Duration, path string, strict bool) (*Executor, error) {
+func InitExecutor() (Executor, error) {
 	cmdPath, err := exec.LookPath(cmd)
 	if err != nil && !errors.Is(err, exec.ErrDot) {
 		return nil, fmt.Errorf("cannot find path to %s command: %s", cmdPath, err)
@@ -44,32 +41,26 @@ func InitExecutor(s string, timeout time.Duration, path string, strict bool) (*E
 		return nil, fmt.Errorf("cannot find full path to %s command: %s", cmdFullPath, err)
 	}
 
-	return &Executor{
-		shellPath: cmdFullPath,
-		command:   s,
-		execDir:   path,
-		strict:    strict,
-		timeout:   timeout,
-	}, nil
+	return &ZBXExec{shellPath: cmdFullPath}, nil
 }
 
-func (e *Executor) execute() (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
+func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string, strict bool) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	var b bytes.Buffer
 
 	cmd := exec.CommandContext(ctx, e.shellPath)
-	cmd.Dir = e.execDir
+	cmd.Dir = execDir
 	cmd.Stdout = &b
 	cmd.Stderr = &b
 	cmd.SysProcAttr = &windows.SysProcAttr{
-		CmdLine: fmt.Sprintf(`/C "%s"`, e.command),
+		CmdLine: fmt.Sprintf(`/C "%s"`, command),
 	}
 
 	err := cmd.Start()
 	if err != nil {
-		return "", fmt.Errorf("failed to start command (%s, path: %s): %s", e.command, e.execDir, err)
+		return "", fmt.Errorf("failed to start command (%s, path: %s): %s", command, execDir, err)
 	}
 
 	werr := cmd.Wait()
@@ -80,7 +71,7 @@ func (e *Executor) execute() (string, error) {
 		return "", fmt.Errorf("command execution failed: %s", ctx.Err())
 	}
 
-	if e.strict && werr != nil {
+	if strict && werr != nil {
 		return "", fmt.Errorf("command execution failed: %s", werr.Error())
 	}
 
@@ -91,23 +82,14 @@ func (e *Executor) execute() (string, error) {
 	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
-func ExecuteBackground(s string) (err error) {
-	if cmd_path == "" {
-		cmd_exe := "cmd.exe"
-		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil && !errors.Is(err, exec.ErrDot) {
-			return fmt.Errorf("Cannot find path to %s command: %s", cmd_exe, err)
-		}
-		if cmd_path, err = filepath.Abs(cmd_exe); err != nil {
-			return fmt.Errorf("Cannot find full path to %s command: %s", cmd_exe, err)
-		}
-	}
-	cmd := exec.Command(cmd_path)
+func (e *ZBXExec) executeBackground(s string) (err error) {
+	cmd := exec.Command(e.shellPath)
 	cmd.SysProcAttr = &windows.SysProcAttr{
 		CmdLine: fmt.Sprintf(`/C "%s"`, s),
 	}
 
 	if err = cmd.Start(); err != nil {
-		return fmt.Errorf("Cannot execute command (%s): %s", s, err)
+		return errs.Wrapf(err, "cannot execute command (%s)", s)
 	}
 
 	go func() { _ = cmd.Wait() }()

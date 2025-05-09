@@ -19,12 +19,18 @@ import "time"
 // MaxExecuteOutputLenB maximum output length for Execute and ExecuteStrict in bytes.
 const MaxExecuteOutputLenB = 16 * 1024 * 1024
 
-type Executor struct {
+var (
+	_ Executor = (*ZBXExec)(nil)
+)
+
+type Executor interface {
+	Execute(string, time.Duration, string) (string, error)
+	ExecuteStrict(string, time.Duration, string) (string, error)
+	ExecuteBackground(string) error
+}
+
+type ZBXExec struct {
 	shellPath string
-	command   string
-	execDir   string
-	strict    bool
-	timeout   time.Duration
 }
 
 // Execute runs the 's' command without checking cmd.Wait error.
@@ -32,13 +38,8 @@ type Executor struct {
 // Returns an error if there is an issue with executing the command or
 // if the specified timeout has been reached or if maximum output length
 // has been reached.
-func Execute(s string, timeout time.Duration, path string) (string, error) {
-	e, err := InitExecutor(s, timeout, path, false)
-	if err != nil {
-		return "", err
-	}
-
-	return e.execute()
+func (e *ZBXExec) Execute(command string, timeout time.Duration, execDir string) (string, error) {
+	return e.execute(command, timeout, execDir, false)
 }
 
 // ExecuteStrict runs the 's' command and checks cmd.Wait error.
@@ -46,11 +47,10 @@ func Execute(s string, timeout time.Duration, path string) (string, error) {
 // Also returns an error if there is an issue with executing the command or
 // if the specified timeout has been reached or if maximum output length
 // has been reached.
-func ExecuteStrict(s string, timeout time.Duration, path string) (string, error) {
-	e, err := InitExecutor(s, timeout, path, true)
-	if err != nil {
-		return "", err
-	}
+func (e *ZBXExec) ExecuteStrict(command string, timeout time.Duration, path string) (string, error) {
+	return e.execute(command, timeout, path, true)
+}
 
-	return e.execute()
+func (e *ZBXExec) ExecuteBackground(command string) (err error) {
+	return e.executeBackground(command)
 }
