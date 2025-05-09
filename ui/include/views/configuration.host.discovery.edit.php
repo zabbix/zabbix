@@ -51,7 +51,7 @@ $item_tab = (new CFormGrid())->setId('itemFormList');
 if (array_key_exists('discoveryRule', $data)) {
 	$discovered_url = (new CUrl('host_discovery_prototypes.php'))
 		->setArgument('form', 'update')
-		->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+		->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
 		->setArgument('itemid', $data['discoveryData']['parent_itemid'])
 		->setArgument('context', 'host')
 		->getUrl();

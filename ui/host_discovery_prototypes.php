@@ -500,9 +500,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (hasRequest('update')) {
 				$item = getSanitizedItemFields($input + $db_item + [
-						'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
-						'hosts' => $hosts
-					]);
+					'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
+					'hosts' => $hosts
+				]);
 
 				$response = API::DiscoveryRulePrototype()->update(['itemid' => $itemid] + $item);
 
@@ -772,8 +772,21 @@ if (hasRequest('form')) {
 		CArrayHelper::sort($data['overrides'], ['step']);
 
 		$data['discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
-		$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
-		$data['discoveryData'] = $item['discoveryData'];
+
+		if ($data['discovered_prototype']) {
+			$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+			$data['discoveryData'] = $item['discoveryData'];
+
+			$db_rule = API::DiscoveryRulePrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid']
+			]);
+			$db_rule = reset($db_rule);
+
+			$parent_lld = $db_rule['discoveryRule'] ?: $db_rule['discoveryRulePrototype'];
+			$data['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+		}
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
