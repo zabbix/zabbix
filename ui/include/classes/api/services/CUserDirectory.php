@@ -119,11 +119,11 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
-			$saml_output = $this->renameSamlHashFields($saml_output);
+			$saml_output = CArrayHelper::renameKeys(array_flip($saml_output), self::SAML_HASH_FIELDS);
 			$dbname_hashname = array_flip(self::SAML_HASH_FIELDS);
 
 			$sql_parts = [
-				'select' => array_merge(['userdirectoryid'], $saml_output),
+				'select' => array_merge(['userdirectoryid'], array_flip($saml_output)),
 				'from' => ['userdirectory_saml'],
 				'where' => [dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_SAML])]
 			];
@@ -131,7 +131,7 @@ class CUserDirectory extends CApiService {
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
 				foreach (array_intersect_key($row, $dbname_hashname) as $db_field => $db_value) {
-					$row[$db_field] = $db_value === '' ? $db_value : md5($db_value);
+					$row[$db_field] = $db_value === '' ? '' : md5($db_value);
 				}
 
 				$db_userdirectories[$row['userdirectoryid']] += CArrayHelper::renameKeys($row, $dbname_hashname);
@@ -407,10 +407,10 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$saml_output = $this->renameSamlHashFields();
+				$saml_output = CArrayHelper::renameKeys(array_flip(self::SAML_OUTPUT_FIELDS), self::SAML_HASH_FIELDS);
 
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
-					array_flip($saml_output) + array_flip(['userdirectoryid'])
+					$saml_output + array_flip(['userdirectoryid'])
 				);
 			}
 		}
@@ -543,10 +543,10 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$saml_output = $this->renameSamlHashFields();
+				$saml_output = CArrayHelper::renameKeys(array_flip(self::SAML_OUTPUT_FIELDS), self::SAML_HASH_FIELDS);
 
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
-					array_intersect_key($userdirectory, array_flip($saml_output)), $db_userdirectory
+					array_intersect_key($userdirectory, $saml_output), $db_userdirectory
 				);
 
 				if ($upd_userdirectory_saml) {
@@ -1704,18 +1704,5 @@ class CUserDirectory extends CApiService {
 		if ($check_openssl) {
 			CAuthentication::checkOpenSslExtension();
 		}
-	}
-
-	private function renameSamlHashFields(?array $saml_output = null): array {
-		$saml_output = $saml_output ?? self::SAML_OUTPUT_FIELDS;
-
-		foreach ($saml_output as $index => $field_name) {
-			if (array_key_exists($field_name, self::SAML_HASH_FIELDS)) {
-				$saml_output[$index] = self::SAML_HASH_FIELDS[$field_name];
-			}
-		}
-		unset($value);
-
-		return $saml_output;
 	}
 }
