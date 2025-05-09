@@ -896,13 +896,14 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 
 		$templates_list->findRow('Message type', 'Problem')->query('button:Edit')->one()->click();
+		$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$form = $this->query('id:mediatype-message-form')->waitUntilVisible()->asForm()->one();
 		$form->fill([
 			'Message type' => 'Internal problem',
 			'Subject' => 'New subject',
 			'Message' => 'New message'
 		])->submit();
-		COverlayDialogElement::ensureNotPresent();
+		$message_overlay->waitUntilNotVisible();
 		$templates_list->invalidate();
 		$templates_list->findRow('Message type', 'Discovery')->query('button:Remove')->one()->click();
 		// Cancel all previously made modifications.
