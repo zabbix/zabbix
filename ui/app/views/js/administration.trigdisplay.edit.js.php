@@ -63,7 +63,7 @@
 
 							// unacknowledged problem events
 							const problem_unack_color = document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="problem_unack_color"]'
+								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="problem_unack_color"]`
 							);
 
 							problem_unack_color.color = '<?= CSettingsSchema::getDefault("problem_unack_color") ?>';
@@ -75,7 +75,7 @@
 
 							// acknowledged problem events
 							const problem_ack_color = document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="problem_ack_color"]'
+								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="problem_ack_color"]`
 							);
 
 							problem_ack_color.color = '<?= CSettingsSchema::getDefault("problem_ack_color") ?>';
@@ -87,7 +87,7 @@
 
 							// unacknowledged resolved events
 							const ok_unack_color = document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="ok_unack_color"]'
+								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="ok_unack_color"]`
 							);
 
 							ok_unack_color.color = '<?= CSettingsSchema::getDefault("ok_unack_color") ?>';
@@ -99,7 +99,7 @@
 
 							// acknowledged resolved events
 							const ok_ack_color = document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="ok_ack_color"]'
+								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="ok_ack_color"]`
 							);
 
 							ok_ack_color.color = '<?= CSettingsSchema::getDefault("ok_ack_color") ?>';
@@ -119,29 +119,23 @@
 							$('#severity_name_4').val("<?= CSettingsSchema::getDefault('severity_name_4') ?>");
 							$('#severity_name_5').val("<?= CSettingsSchema::getDefault('severity_name_5') ?>");
 
-							document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_0"]'
-							).color = '<?= CSettingsSchema::getDefault("severity_color_0") ?>';
+							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_0"]`)
+								.color = '<?= CSettingsSchema::getDefault("severity_color_0") ?>';
 
-							document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_1"]'
-							).color = '<?= CSettingsSchema::getDefault("severity_color_1") ?>';
+							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_1"]`)
+								.color = '<?= CSettingsSchema::getDefault("severity_color_1") ?>';
 
-							document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_2"]'
-							).color = '<?= CSettingsSchema::getDefault("severity_color_2") ?>';
+							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_2"]`)
+								.color = '<?= CSettingsSchema::getDefault("severity_color_2") ?>';
 
-							document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_3"]'
-							).color = '<?= CSettingsSchema::getDefault("severity_color_3") ?>';
+							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_3"]`)
+								.color = '<?= CSettingsSchema::getDefault("severity_color_3") ?>';
 
-							document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_4"]'
-							).color = '<?= CSettingsSchema::getDefault("severity_color_4") ?>';
+							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_4"]`)
+								.color = '<?= CSettingsSchema::getDefault("severity_color_4") ?>';
 
-							document.querySelector(
-								'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="severity_color_5"]'
-							).color = '<?= CSettingsSchema::getDefault("severity_color_5") ?>';
+							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_5"]`)
+								.color = '<?= CSettingsSchema::getDefault("severity_color_5") ?>';
 						}
 					}
 				]

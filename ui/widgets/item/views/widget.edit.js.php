@@ -61,7 +61,7 @@ window.widget_form = new class extends CWidgetForm {
 		document.getElementById('history').addEventListener('change', () => this.updateForm());
 
 		for (const change_indicator of ['up_color', 'down_color', 'updown_color']) {
-			this.#form.querySelector(`.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="${change_indicator}"]`)
+			this.#form.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="${change_indicator}"]`)
 				?.addEventListener('change', e => this.setIndicatorColor(change_indicator, e.target.color));
 		}
 
@@ -98,8 +98,9 @@ window.widget_form = new class extends CWidgetForm {
 			}
 		}
 
-		for (const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold,' +
-				'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="units_color"]')) {
+		for (const element of this.#form.querySelectorAll(`#units, #units_pos, #units_size, #units_bold,
+			.${ZBX_STYLE_COLOR_PICKER}[color-field-name="units_color"]`
+		)) {
 			element.disabled = !this._show_value.checked || !document.getElementById('units_show').checked;
 		}
 

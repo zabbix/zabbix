@@ -80,8 +80,9 @@ window.widget_form = new class extends CWidgetForm {
 			}
 		}
 
-		for (const element of this.#form.querySelectorAll('#units, #units_pos, #units_size, #units_bold,' +
-				'.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="units_color"]')) {
+		for (const element of this.#form.querySelectorAll(`#units, #units_pos, #units_size, #units_bold,
+			.${ZBX_STYLE_COLOR_PICKER}[color-field-name="units_color"]`
+		)) {
 			element.disabled = !value_show.checked || !units_show.checked;
 		}
 
@@ -95,7 +96,7 @@ window.widget_form = new class extends CWidgetForm {
 			element.style.display = needle_show.checked ? '' : 'none';
 		}
 
-		this.#form.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?>[color-field-name="needle_color"]').disabled =
+		this.#form.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="needle_color"]`).disabled =
 			!needle_show.checked || ((!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked);
 
 		for (const element of this.#form.querySelectorAll('.fields-group-scale')) {
