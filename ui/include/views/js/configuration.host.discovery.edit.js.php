@@ -225,7 +225,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			this.updateLostResourcesFields();
 			this.initPopupListeners();
 
-			if (this.parent_discoveryid !== undefined) {
+			if (this.parent_discoveryid) {
 				this.initItemPrototypeForm();
 			}
 		},
@@ -356,10 +356,10 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = this.parent_discoveryid === undefined
-							? new URL('host_discovery.php', location.href)
-							: new URL('host_discovery_prototypes.php', location.href)
-								.searchParams.set('parent_discoveryid', this.parent_discoveryid);
+						const url = this.parent_discoveryid
+							? new URL('host_discovery_prototypes.php', location.href)
+								.searchParams.set('parent_discoveryid', this.parent_discoveryid)
+							: new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);
 
@@ -374,29 +374,29 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 
 		initItemPrototypeForm() {
 			const observer = new MutationObserver(() => {
-				const form = document.getElementsByName(this.form_name)[0];
-				const master_item = form.querySelector('#master_itemid').closest('.multiselect-control');
+				const master_item = document.getElementById('master_itemid').closest('.multiselect-control');
 
 				if (master_item === null) {
 					return;
 				}
 
-				let node = document.createElement('div');
-				node.classList.add('<?= ZBX_STYLE_FORM_INPUT_MARGIN ?>');
-				master_item.append(node);
+				const spacer = document.createElement('div');
+				spacer.classList.add('<?= ZBX_STYLE_FORM_INPUT_MARGIN ?>');
 
-				node = document.createElement('button');
-				node.classList.add(ZBX_STYLE_BTN_GREY);
-				node.setAttribute('name', 'master-item-prototype');
-				node.disabled = this.readonly;
-				node.textContent = <?= json_encode(_('Select prototype')) ?>;
-				master_item.append(node);
+				master_item.append(spacer);
 
-				form.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
+				const button = document.createElement('button');
+				button.textContent = <?= json_encode(_('Select prototype')) ?>;
+				button.classList.add(ZBX_STYLE_BTN_GREY);
+				button.setAttribute('name', 'master-item-prototype');
+				button.disabled = this.readonly;
+				button.addEventListener('click', (e) => {
 					this.openMasterItemPrototypePopup();
 
 					return cancelEvent(e);
 				});
+
+				master_item.append(button);
 
 				observer.disconnect();
 			});
@@ -413,7 +413,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				dstfld1: 'master_itemid',
 				parent_discoveryid: this.parent_discoveryid,
 				excludeids: this.itemid ? [this.itemid] : []
-			}
+			};
 
 			PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 		}
