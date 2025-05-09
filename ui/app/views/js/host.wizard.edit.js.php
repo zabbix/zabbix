@@ -552,6 +552,10 @@ window.host_wizard_edit = new class {
 		return fetch(get_url.href)
 			.then(response => response.json())
 			.then(response => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				this.#template = response.template;
 				this.#host = response.host;
 
@@ -606,6 +610,11 @@ window.host_wizard_edit = new class {
 						description: template_macro.description
 					}];
 				}));
+			})
+			.catch(exception => {
+				this.#ajaxExceptionHandler(exception);
+
+				return Promise.reject();
 			});
 	}
 
