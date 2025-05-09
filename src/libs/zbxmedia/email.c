@@ -897,7 +897,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 error:
 	if (CURLE_LOGIN_DENIED == err && SMTP_AUTHENTICATION_OAUTH == auth->type)
 	{
-		*error = zbx_dsprintf(*error, "%s (possible manual token revocation). Please reauthorize.",
+		*error = zbx_dsprintf(*error, "%s (possible manual token revocation). Please reauthorize from frontend",
 				curl_easy_strerror(err));
 	}
 	else
