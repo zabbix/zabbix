@@ -23,6 +23,10 @@ abstract class CHostBase extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['host', 'parent_hostid', 'status', 'ts_delete', 'ts_disable',
+		'disable_source'
+	];
+
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
@@ -1876,5 +1880,27 @@ abstract class CHostBase extends CApiService {
 		}
 
 		return $result;
+	}
+
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryData'] = [];
+		}
+		unset($host);
+
+		$_options = [
+			'output' => array_merge(['hostid'], $options['selectDiscoveryData']),
+			'hostids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('host_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['hostid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['hostid']));
+		}
 	}
 }

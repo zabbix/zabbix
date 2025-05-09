@@ -606,89 +606,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	/**
 	 * @return array
 	 */
-	protected static function getValidationRules(): array {
-		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'host_status' =>			['type' => API_ANY],
-			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
-			]],
-			'itemid' =>					['type' => API_ANY],
-			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
-			'type' =>					['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
-			'key_' =>					['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
-			'lifetime_type' =>			['type' => API_ANY],
-			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-											['else' => true, 'type' => API_TIME_UNIT, 'in' => '0']
-			]],
-			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY])],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'enabled_lifetime_type')]
-			]],
-			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
-												['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
-											]],
-											['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
-			]],
-			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'discover' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::isDiscoveryRulePrototype(), 'type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'preprocessing' =>			self::getPreprocessingValidationRules(),
-			'lld_macro_paths' =>		self::getLldMacroPathsValidationRules(),
-			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
-			'overrides' =>				self::getOverridesValidationRules()
-		]];
-	}
-
-	/**
-	 * @return array
-	 */
-	protected static function getInheritedValidationRules(): array {
-		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'host_status' =>			['type' => API_ANY],
-			'uuid' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'itemid' =>					['type' => API_ANY],
-			'name' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'type' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'key_' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'lifetime_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])],
-			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-											['else' => true, 'type' => API_TIME_UNIT, 'in' => '0']
-			]],
-			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY])],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'enabled_lifetime_type')]
-			]],
-			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
-												['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
-											]],
-											['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
-			]],
-			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'discover' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::isDiscoveryRulePrototype(), 'type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'preprocessing' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'lld_macro_paths' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
-			'overrides' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
-		]];
-	}
-
-	/**
-	 * @return array
-	 */
 	protected static function getLldMacroPathsValidationRules(): array {
 		return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['lld_macro']], 'fields' => [
 			'lld_macro' =>	['type' => API_LLD_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
@@ -1124,7 +1041,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	 */
 	protected static function checkLifetimeFields(array $items): void {
 		foreach ($items as $i => $item) {
-			if ($item['lifetime_type'] != ZBX_LLD_DELETE_AFTER
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED || $item['lifetime_type'] != ZBX_LLD_DELETE_AFTER
 					|| $item['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER || $item['lifetime'][0] === '{'
 					|| $item['enabled_lifetime'][0] === '{') {
 				continue;
@@ -2099,9 +2016,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
 				' AND '.dbConditionId('id.lldruleid', $del_itemids).
-				' AND '.dbConditionInt('i.flags',
-					[ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED]
-				)
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'itemid');
 
 		if ($db_items) {
@@ -2119,32 +2034,12 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			'SELECT hd.hostid,h.host'.
 			' FROM host_discovery hd,hosts h'.
 			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.lldruleid', $del_itemids)
+				' AND '.dbConditionId('hd.lldruleid', $del_itemids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'hostid');
 
 		if ($db_host_prototypes) {
 			CHostPrototype::deleteForce($db_host_prototypes);
-		}
-	}
-
-	/**
-	 * Delete discovery prototypes which belong to the given LLD rules or discovery prototypes.
-	 *
-	 * @param array $ruleids
-	 */
-	protected static function deleteAffectedDiscoveryRulePrototypes(array $ruleids): void {
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT id.itemid,i.name'.
-			' FROM item_discovery id,items i'.
-			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', $ruleids).
-				' AND '.dbConditionInt('i.flags',
-					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
-				)
-		), 'itemid');
-
-		if ($db_items) {
-			CDiscoveryRulePrototype::deleteForce($db_items);
 		}
 	}
 

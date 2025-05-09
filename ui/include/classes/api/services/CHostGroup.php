@@ -36,7 +36,9 @@ class CHostGroup extends CApiService {
 
 	public const OUTPUT_FIELDS = ['groupid', 'name', 'flags', 'uuid'];
 
-	private const GROUP_DISCOVERY_FIELDS = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete', 'status'];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete',
+		'status'
+	];
 
 	/**
 	 * Get host groups.
@@ -86,8 +88,8 @@ class CHostGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CDiscoveryRule::OUTPUT_FIELDS, ['uuid'])), 'default' => null],
 			'selectDiscoveryRulePrototypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
@@ -1232,48 +1234,54 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		// adding group discovery
-		if ($options['selectGroupDiscoveries'] !== null) {
-			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
-				? self::GROUP_DISCOVERY_FIELDS
-				: $options['selectGroupDiscoveries'];
-
-			$group_discoveries = API::getApiService()->select('group_discovery', [
-				'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
-				'filter' => ['groupid' => $groupids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($group_discoveries, 'groupid', 'groupdiscoveryid');
-
-			$group_discoveries = $this->unsetExtraFields($group_discoveries, ['groupid', 'groupdiscoveryid'], $output);
-
-			$result = $relation_map->mapMany($result, $group_discoveries, 'groupDiscoveries');
-		}
-
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedGroupDiscoveries($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
-	private function addRelatedDiscoveryData(array $options, array &$result): void {
+	private static function addRelatedGroupDiscoveries(array $options, array &$result): void {
+		if ($options['selectGroupDiscoveries'] === null) {
+			return;
+		}
+
+		foreach ($result as &$group) {
+			$group['groupDiscoveries'] = [];
+		}
+		unset($group);
+
+		$_options = [
+			'output' => array_merge(['groupid'], $options['selectGroupDiscoveries']),
+			'filter' => ['groupid' => array_keys($result)]
+		];
+		$resource = DBselect(DB::makeSql('group_discovery', $_options));
+
+		while ($group_discovery = DBfetch($resource)) {
+			$result[$group_discovery['groupid']]['discoveryData'][] =
+				array_diff_key($group_discovery, array_flip(['groupid']));
+		}
+	}
+
+	private static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;
 		}
 
-		$output = $options['selectDiscoveryData'] === API_OUTPUT_EXTEND
-			? self::GROUP_DISCOVERY_FIELDS
-			: $options['selectDiscoveryData'];
+		foreach ($result as &$group) {
+			$group['discoveryData'] = [];
+		}
+		unset($group);
 
-		$discovery_data = API::getApiService()->select('group_discovery', [
-			'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
-			'filter' => ['groupid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($discovery_data, 'groupid', 'groupdiscoveryid');
+		$_options = [
+			'output' => array_merge(['groupid'], $options['selectDiscoveryData']),
+			'filter' => ['groupid' => array_keys($result)]
+		];
+		$resource = DBselect(DB::makeSql('group_discovery', $_options));
 
-		$discovery_data = $this->unsetExtraFields($discovery_data, ['groupid', 'groupdiscoveryid'], $output);
-
-		$result = $relation_map->mapMany($result, $discovery_data, 'discoveryData');
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['groupid']]['discoveryData'][] =
+				array_diff_key($discovery_data, array_flip(['groupid']));
+		}
 	}
 
 	/**

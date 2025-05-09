@@ -1854,16 +1854,21 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 				zbx_free(error);
 				continue;
 			}
-
 		}
 		else if (FAIL == zbx_vault_get_kvs(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
-					error);
+			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+						dc_kvs_path->path, error);
+			}
+			dc_strpool_replace(NULL != dc_kvs_path->last_error ? 1 : 0, &dc_kvs_path->last_error, error);
 			zbx_free(error);
 			continue;
 		}
+		else if (NULL != dc_kvs_path->last_error)
+			dc_strpool_release(dc_kvs_path->last_error);
 
 		zbx_hashset_iter_reset(&dc_kvs_path->kvs, &iter);
 		while (NULL != (dc_kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
@@ -3796,7 +3801,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UCHAR(trigger->flags, row[19]);
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
@@ -3850,7 +3855,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &rowid)))
 				continue;
 
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				/* force trigger list update for items used in removed trigger */
 				if (NULL != trigger->itemids)
@@ -4326,7 +4331,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
@@ -4369,7 +4374,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		if (NULL == trigger->itemids)
@@ -5392,7 +5397,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			trigger_tag->triggerid = triggerid;
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				zbx_vector_ptr_reserve(&trigger->tags, ZBX_VECTOR_ARRAY_RESERVE);
 				zbx_vector_ptr_append(&trigger->tags, trigger_tag);
@@ -5409,7 +5414,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 
 		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &trigger_tag->triggerid)))
 		{
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				if (FAIL != (index = zbx_vector_ptr_search(&trigger->tags, trigger_tag,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -6678,7 +6683,7 @@ static void	dc_trigger_update_topology(void)
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		trigger->topoindex = 1;
@@ -6830,7 +6835,7 @@ static void	dc_trigger_update_cache(void)
 			continue;
 		}
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 			continue;
@@ -12279,7 +12284,7 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if (NULL == trigger || ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags || 1 < trigger->topoindex ||
+		if (NULL == trigger || 0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) || 1 < trigger->topoindex ||
 				0 == trigdep->dependencies.values_num)
 		{
 			continue;
@@ -12894,7 +12899,7 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
 	/* loop over triggers to gather enabled and disabled trigger statistics */
 	while (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == dc_trigger->flags || NULL == dc_trigger->itemids)
+		if (0 != (dc_trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) || NULL == dc_trigger->itemids)
 			continue;
 
 		switch (dc_trigger->status)

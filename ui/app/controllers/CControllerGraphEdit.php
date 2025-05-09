@@ -112,6 +112,8 @@ class CControllerGraphEdit extends CController {
 			$graph = API::Graph()->get($options);
 			$graph = reset($graph);
 
+			$data['discovered_graph'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+
 			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
 				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
 				'percent_right', 'templateid', 'flags', 'discoveryData'
@@ -121,7 +123,6 @@ class CControllerGraphEdit extends CController {
 				$data[$field] = $graph[$field];
 			}
 
-			$data['parent_lld'] = $graph['discoveryRule'];
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 

@@ -23,9 +23,6 @@ class CGraph extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
 
-	public const GRAPH_DISCOVERY_OUTPUT_FIELDS = ['graphid', 'parent_graphid', 'status', 'ts_delete'];
-	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_graphid', 'status', 'ts_delete'];
-
 	public function __construct() {
 		parent::__construct();
 
@@ -64,7 +61,6 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
-			'discoveryids'				=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
 			'editable'					=> false,
@@ -95,7 +91,7 @@ class CGraph extends CGraphGeneral {
 
 		$options = zbx_array_merge($defOptions, $options);
 
-		$this->validateGet($options);
+		self::validateGet($options);
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -192,20 +188,6 @@ class CGraph extends CGraphGeneral {
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
-			}
-		}
-
-		if ($options['discoveryids'] !== null) {
-			zbx_value2array($options['discoveryids']);
-
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
-
-			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -320,17 +302,10 @@ class CGraph extends CGraphGeneral {
 		return $result;
 	}
 
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array &$options): void {
+	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::GRAPH_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -432,50 +407,32 @@ class CGraph extends CGraphGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		$this->addRelatedGraphDiscovery($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedGraphDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
-	private function addRelatedGraphDiscovery(array $options, array &$result): void {
+	private static function addRelatedGraphDiscovery(array $options, array &$result): void {
 		if ($options['selectGraphDiscovery'] === null) {
 			return;
 		}
 
-		if ($options['selectGraphDiscovery'] === 'extend') {
-			$options['selectGraphDiscovery'] = self::GRAPH_DISCOVERY_OUTPUT_FIELDS;
+		foreach ($result as &$graph) {
+			$graph['graphDiscovery'] = [];
 		}
+		unset($graph);
 
-		$graph_discoveries = API::getApiService()->select('graph_discovery', [
-			'output' => $this->outputExtend($options['selectGraphDiscovery'], ['graphid']),
-			'filter' => ['graphid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
+		$_options = [
+			'output' => array_merge(['graphid'], $options['selectGraphDiscovery']),
+			'graphids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('graph_discovery', $_options));
 
-		$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid'],
-			$options['selectGraphDiscovery']
-		);
-
-		$result = $relation_map->mapOne($result, $graph_discoveries, 'graphDiscovery');
-	}
-
-	private function addRelatedDiscoveryData(array $options, array &$result): void {
-		if ($options['selectDiscoveryData'] === null) {
-			return;
+		while ($graph_discovery = DBfetch($resource)) {
+			$result[$graph_discovery['graphid']]['graphDiscovery'] =
+				array_diff_key($graph_discovery, array_flip(['graphid']));
 		}
-
-		$graph_discoveries = API::getApiService()->select('graph_discovery', [
-			'output' => $this->outputExtend($options['selectDiscoveryData'], ['graphid']),
-			'filter' => ['graphid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($graph_discoveries, 'graphid', 'graphid');
-
-		$graph_discoveries = $this->unsetExtraFields($graph_discoveries, ['graphid', 'lastcheck']);
-
-		$result = $relation_map->mapOne($result, $graph_discoveries, 'discoveryData');
 	}
 
 	/**
@@ -559,9 +516,7 @@ class CGraph extends CGraphGeneral {
 		$graphs = $this->get([
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-			'filter' => [
-				'hostid' => $templateids
-			],
+			'hostids' => $templateids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);

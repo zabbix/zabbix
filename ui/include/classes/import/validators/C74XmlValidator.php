@@ -477,17 +477,20 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE,
-		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE,
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE
 	];
 
 	private $OPERATION_OBJECT_TARGETS = [
 		'status' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE
 		],
 		'delay' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE
 		],
 		'history' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
@@ -772,10 +775,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-									'key' =>				['type' => XML_STRING | XML_REQUIRED]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																'key' =>	['type' => XML_STRING | XML_REQUIRED]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
@@ -1150,10 +1153,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'key' =>				['type' => XML_STRING | XML_REQUIRED]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG]
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																		'key' =>	['type' => XML_STRING | XML_REQUIRED]
+																	]],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
@@ -1477,10 +1480,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-									'key' =>				['type' => XML_STRING | XML_REQUIRED]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																'key' =>	['type' => XML_STRING | XML_REQUIRED]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
@@ -1997,10 +2000,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-									'key' =>				['type' => XML_STRING | XML_REQUIRED]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																'key' =>	['type' => XML_STRING | XML_REQUIRED]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
@@ -2370,10 +2373,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'key' =>				['type' => XML_STRING | XML_REQUIRED]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG]
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																		'key' =>	['type' => XML_STRING | XML_REQUIRED]
+																	]],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
@@ -2701,10 +2704,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-									'key' =>				['type' => XML_STRING | XML_REQUIRED]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+																'key' =>	['type' => XML_STRING | XML_REQUIRED]
+															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],

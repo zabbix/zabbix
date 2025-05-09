@@ -637,6 +637,9 @@ if (hasRequest('form')) {
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_itemid'],
 			'itemids' => $itemid
 		]);
 
@@ -683,6 +686,7 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+	$data['discovered_prototype'] = false;
 
 	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
 		throw new CAccessDeniedException();
@@ -758,6 +762,10 @@ if (hasRequest('form')) {
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
+
+		$data['discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+		$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+		$data['discoveryData'] = $item['discoveryData'];
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
@@ -810,11 +818,14 @@ else {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
-		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectDiscoveryRule' => ['itemid'],
+		'selectDiscoveryRulePrototype' => ['itemid'],
+		'selectDiscoveryData' => ['parent_itemid'],
 		'editable' => true,
 		'templated' => ($data['context'] === 'template'),
 		'sortfield' => $sort_field,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+		'preservekeys' => true
 	];
 
 	$data['discoveries'] = API::DiscoveryRulePrototype()->get($options);
@@ -834,29 +845,53 @@ else {
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
 
-	$lld_parentids = [];
+	// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
+	$parent_itemids = [];
+	$parent_lldruleids = [];
 
 	foreach ($data['discoveries'] as $discovery) {
-		if ($discovery['discoveryRule']) {
-			$lld_parentids[$discovery['discoveryRule']['itemid']] = true;
+		if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$parent_lld = $discovery['discoveryRule'] ?: $discovery['discoveryRulePrototype'];
+			$parent_itemids[$discovery['discoveryData']['parent_itemid']] = $discovery['itemid'];
+			$parent_lldruleids[$parent_lld['itemid']][] = $discovery['itemid'];
 		}
 	}
 
-	if ($lld_parentids) {
-		$editable_lld_parents = API::DiscoveryRule()->get([
+	if ($parent_itemids) {
+		$parent_lld_prototypes = API::DiscoveryRulePrototype()->get([
 			'output' => [],
-			'itemids' => array_keys($lld_parentids),
-			'editable' => true,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
+			'itemids' => array_keys($parent_itemids),
 			'preservekeys' => true
 		]);
 
-		foreach ($data['discoveries'] as &$discovery) {
-			if ($discovery['discoveryRule']) {
-				$discovery['is_discovery_rule_editable'] =
-					array_key_exists($discovery['discoveryRule']['itemid'], $editable_lld_parents);
+		foreach ($parent_lld_prototypes as $itemid => $parent_lld_prototype) {
+			$parent_lld = $parent_lld_prototype['discoveryRule'] ?: $parent_lld_prototype['discoveryRulePrototype'];
+			$data['discoveries'][$parent_itemids[$itemid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
+		}
+
+		$lld_rules = API::DiscoveryRule()->get([
+			'output' => [],
+			'selectDiscoveryRule' => ['name'],
+			'itemids' => array_keys($parent_lldruleids),
+			'preservekeys' => true
+		]);
+
+		if (!$lld_rules) {
+			$lld_rules = API::DiscoveryRulePrototype()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['name'],
+				'itemids' => array_keys($parent_lldruleids),
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($lld_rules as $lldruleid => $lld_rule) {
+			foreach ($parent_lldruleids[$lldruleid] as $itemid) {
+				$data['discoveries'][$itemid]['parent_lld']['name'] = $lld_rule['discoveryRule']['name'];
 			}
 		}
-		unset($discovery);
 	}
 
 	// pager

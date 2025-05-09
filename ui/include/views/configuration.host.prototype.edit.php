@@ -59,6 +59,19 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
+if ($data['discovered_prototype']) {
+	$parent_lld = $host_prototype['discoveryRule'] ?: $host_prototype['discoveryRulePrototype'];
+
+	$discovered_url = (new CUrl('host_prototypes.php'))
+		->setArgument('form', 'update')
+		->setArgument('parent_discoveryid', $parent_lld['itemid'])
+		->setArgument('hostid', $host_prototype['discoveryData']['parent_hostid'])
+		->setArgument('context', $data['context'])
+		->getUrl();
+
+	$host_tab->addRow(_('Discovered by'), (new CLink($parent_lld['name'], $discovered_url)));
+}
+
 if ($data['templates']) {
 	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
 }
@@ -586,7 +599,7 @@ $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_E
 
 if ($host_prototype['hostid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('update', _('Update')))->setEnabled(!$data['discovered_prototype']),
 		[
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(

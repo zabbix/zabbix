@@ -390,10 +390,10 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 	result = zbx_db_select(
 			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
 			" from items i,hosts h"
-			" where i.flags in (%d,%d)"
+			" where i.flags&%d=0"
 				" and i.hostid=h.hostid"
 				" and h.status in (%d,%d)",
-			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
+			ZBX_FLAG_DISCOVERY_RULE | ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	um_handle = zbx_dc_open_user_macros();

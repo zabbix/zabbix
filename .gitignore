@@ -197,6 +197,7 @@ tests/libs/zbxexpr/macro_tr
 tests/libs/zbxexpr/macro_regrepl
 tests/libs/zbxexpr/parse_key
 tests/libs/zbxexpr/zbx_check_hostname
+tests/libs/zbxexpr/zbx_check_prototype_hostname
 tests/libs/zbxexpr/zbx_check_time_period
 tests/libs/zbxexpr/zbx_custom_interval_is_scheduling
 tests/libs/zbxexpr/zbx_function_find

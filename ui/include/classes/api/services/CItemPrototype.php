@@ -112,7 +112,8 @@ class CItemPrototype extends CItemGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
-		$this->validateGet($options);
+
+		self::validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -310,21 +311,13 @@ class CItemPrototype extends CItemGeneral {
 		return $items;
 	}
 
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array $options) {
-		// Validate input parameters.
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+	private static function validateGet(array &$options) {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectValueMap' => 		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
@@ -358,8 +351,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected static function validateCreate(array &$items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -367,8 +359,6 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
-		self::checkDiscoveryRules($items);
-
 		self::addHostStatus($items, $db_hosts, $db_templates);
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
@@ -380,7 +370,7 @@ class CItemPrototype extends CItemGeneral {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
-			'ruleid' =>			['type' => API_ANY],
+			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
@@ -423,6 +413,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkPreprocessingStepsDuplicates($items);
+		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
@@ -443,12 +434,10 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['itemid'] = array_shift($itemids);
 
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$ins_items_discovery[] = [
-					'itemid' => $item['itemid'],
-					'lldruleid' => $item['ruleid']
-				];
-			}
+			$ins_items_discovery[] = [
+				'itemid' => $item['itemid'],
+				'lldruleid' => $item['ruleid']
+			];
 
 			$host_statuses[] = $item['host_status'];
 			$flags[] = $item['flags'];
@@ -456,9 +445,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($item);
 
-		if ($ins_items_discovery) {
-			DB::insertBatch('item_discovery', $ins_items_discovery);
-		}
+		DB::insertBatch('item_discovery', $ins_items_discovery);
 
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
@@ -1064,28 +1051,6 @@ class CItemPrototype extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 * @param array $tpl_links
-	 *
-	 * @return array
-	 */
-	private static function getLldLinks(array $items): array {
-		$options = [
-			'output' => ['templateid', 'hostid', 'itemid'],
-			'filter' => ['templateid' => array_unique(array_column($items, 'ruleid'))]
-		];
-		$result = DBselect(DB::makeSql('items', $options));
-
-		$lld_links = [];
-
-		while ($row = DBfetch($result)) {
-			$lld_links[$row['templateid']][$row['hostid']] = $row['itemid'];
-		}
-
-		return $lld_links;
-	}
-
-	/**
-	 * @param array $items
 	 * @param array $hostids
 	 * @param array $lld_links
 	 *
@@ -1096,8 +1061,8 @@ class CItemPrototype extends CItemGeneral {
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
 				'ht.templateid AS parent_hostid,'.dbConditionCoalesce('id.lldruleid', 0, 'ruleid').
 			' FROM hosts_templates ht'.
-			' INNER JOIN items i ON ht.hostid=i.hostid'.
-			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' JOIN items i ON ht.hostid=i.hostid'.
+			' JOIN hosts h ON ht.hostid=h.hostid'.
 			' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 			' WHERE '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
 				' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
@@ -1199,39 +1164,6 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return $upd_items;
-	}
-
-	/**
-	 * @param array $item
-	 * @param array $upd_db_item
-	 *
-	 * @throws APIException
-	 */
-	protected static function showObjectMismatchError(array $item, array $upd_db_item): void {
-		parent::showObjectMismatchError($item, $upd_db_item);
-
-		$target_is_host = in_array($upd_db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-
-		$hosts = DB::select('hosts', [
-			'output' => ['host'],
-			'hostids' => [$item['hostid'], $upd_db_item['hostid']],
-			'preservekeys' => true
-		]);
-
-		$lld_rules = DB::select('items', [
-			'output' => ['name'],
-			'itemids' => [$item['ruleid'], $upd_db_item['ruleid']],
-			'preservekeys' => true
-		]);
-
-		$error = $target_is_host
-			? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" and LLD rule "%3$s" to host "%4$s", because an item prototype with the same key already belongs to LLD rule "%5$s".')
-			: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" and LLD rule "%3$s" to template "%4$s", because an item prototype with the same key already belongs to LLD rule "%5$s".');
-
-		self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $upd_db_item['key_'], $hosts[$item['hostid']]['host'],
-			$lld_rules[$item['ruleid']]['name'], $hosts[$upd_db_item['hostid']]['host'],
-			$lld_rules[$upd_db_item['ruleid']]['name']
-		));
 	}
 
 	/**
@@ -1518,6 +1450,8 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
+		self::addRelatedDiscoveryData($options, $result);
+
 		return $result;
 	}
 
@@ -1526,7 +1460,11 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDependentItems($db_items);
+		self::addDependentItems($db_items, $db_lld_rule_prototypes);
+
+		if ($db_lld_rule_prototypes) {
+			CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
+		}
 
 		$del_itemids = array_keys($db_items);
 
@@ -1541,6 +1479,7 @@ class CItemPrototype extends CItemGeneral {
 		self::deleteAffectedGraphPrototypes($del_itemids);
 		self::resetGraphsYAxis($del_itemids);
 
+		self::deleteDiscoveredItemPrototypes($del_itemids);
 		self::deleteDiscoveredItems($del_itemids);
 
 		self::deleteAffectedTriggers($del_itemids);
@@ -1565,12 +1504,14 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @param array      $db_items
 	 */
-	protected static function addDependentItems(array &$db_items): void {
+	protected static function addDependentItems(array &$db_items, ?array &$db_lld_rule_prototypes = null): void {
+		$db_lld_rule_prototypes = [];
+
 		$master_itemids = array_keys($db_items);
 
 		do {
 			$options = [
-				'output' => ['itemid', 'name'],
+				'output' => ['itemid', 'name', 'flags'],
 				'filter' => ['master_itemid' => $master_itemids]
 			];
 			$result = DBselect(DB::makeSql('items', $options));
@@ -1578,9 +1519,16 @@ class CItemPrototype extends CItemGeneral {
 			$master_itemids = [];
 
 			while ($row = DBfetch($result)) {
-				$master_itemids[] = $row['itemid'];
+				if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])) {
+					$db_lld_rule_prototypes[$row['itemid']] = $row;
+				}
+				else {
+					if (!array_key_exists($row['itemid'], $db_items)) {
+						$master_itemids[] = $row['itemid'];
 
-				$db_items[$row['itemid']] = $row;
+						$db_items[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+					}
+				}
 			}
 		} while ($master_itemids);
 	}
@@ -1610,6 +1558,20 @@ class CItemPrototype extends CItemGeneral {
 		}
 	}
 
+	private static function deleteDiscoveredItemPrototypes(array $del_itemids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT id.itemid,i.name'.
+			' FROM item_discovery id,items i'.
+			' WHERE id.itemid=i.itemid'.
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
+		), 'itemid');
+
+		if ($db_items) {
+			self::deleteForce($db_items);
+		}
+	}
+
 	/**
 	 * Delete discovered items of the given item prototypes.
 	 *
@@ -1620,7 +1582,8 @@ class CItemPrototype extends CItemGeneral {
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.parent_itemid', $del_itemids)
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_CREATED])
 		), 'itemid');
 
 		if ($db_items) {

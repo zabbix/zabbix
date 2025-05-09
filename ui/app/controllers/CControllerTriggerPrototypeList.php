@@ -140,13 +140,66 @@ class CControllerTriggerPrototypeList extends CController {
 
 		$data['triggers'] = API::TriggerPrototype()->get([
 			'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
-				'recovery_expression', 'opdata', 'discover'
+				'recovery_expression', 'opdata', 'discover', 'flags'
 			],
 			'selectHosts' => ['hostid', 'host'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectTags' => ['tag', 'value'],
-			'triggerids' => array_column($data['triggers'], 'triggerid')
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
+			'selectDiscoveryData' => ['parent_triggerid'],
+			'triggerids' => array_column($data['triggers'], 'triggerid'),
+			'preservekeys' => true
 		]);
+
+		// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
+		$parent_triggerids = [];
+		$parent_lldruleids = [];
+
+		foreach ($data['triggers'] as $trigger) {
+			if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$parent_lld = $trigger['discoveryRule'] ?: $trigger['discoveryRulePrototype'];
+				$parent_triggerids[$trigger['discoveryData']['parent_triggerid']] = $trigger['triggerid'];
+				$parent_lldruleids[$parent_lld['itemid']][] = $trigger['triggerid'];
+			}
+		}
+
+		if ($parent_triggerids) {
+			$parent_trigger_prototypes = API::TriggerPrototype()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'triggerids' => array_keys($parent_triggerids),
+				'preservekeys' => true
+			]);
+
+			foreach ($parent_trigger_prototypes as $triggerid => $parent_lld_prototype) {
+				$parent_lld = $parent_lld_prototype['discoveryRule'] ?: $parent_lld_prototype['discoveryRulePrototype'];
+				$data['triggers'][$parent_triggerids[$triggerid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
+			}
+
+			$lld_rules = API::DiscoveryRule()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['name'],
+				'itemids' => array_keys($parent_lldruleids),
+				'preservekeys' => true
+			]);
+
+			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['name'],
+					'itemids' => array_keys($parent_lldruleids),
+					'preservekeys' => true
+				]);
+			}
+
+			foreach ($lld_rules as $lldruleid => $lld_rule) {
+				foreach ($parent_lldruleids[$lldruleid] as $triggerid) {
+					$data['triggers'][$triggerid]['parent_lld']['name'] = $lld_rule['discoveryRule']['name'];
+				}
+			}
+		}
 
 		order_result($data['triggers'], $sort_field, $sort_order);
 

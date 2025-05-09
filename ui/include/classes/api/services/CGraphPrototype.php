@@ -91,6 +91,8 @@ class CGraphPrototype extends CGraphGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		self::validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
@@ -301,6 +303,16 @@ class CGraphPrototype extends CGraphGeneral {
 		return $result;
 	}
 
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
 	/**
 	 * Delete GraphPrototype.
 	 *
@@ -381,6 +393,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedDiscoveryRulePrototypes($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
@@ -532,9 +545,9 @@ class CGraphPrototype extends CGraphGeneral {
 		];
 
 		$graphs = $this->get([
-			'discoveryids' => $ruleids,
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
+			'discoveryids' => $ruleids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);

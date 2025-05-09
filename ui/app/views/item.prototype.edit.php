@@ -78,6 +78,7 @@ if ($item['itemid']) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
+			'enabled' => !$item['discovered'],
 			'action' => 'item_edit_form.update()'
 		],
 		[

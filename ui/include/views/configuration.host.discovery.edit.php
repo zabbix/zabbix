@@ -46,6 +46,20 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
+if (array_key_exists('discoveryRule', $data)) {
+	$discovered_url = (new CUrl('host_discovery_prototypes.php'))
+		->setArgument('form', 'update')
+		->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+		->setArgument('itemid', $data['discoveryData']['parent_itemid'])
+		->setArgument('context', 'host')
+		->getUrl();
+
+	$item_tab->addItem([
+		new CLabel(_('Discovered by')),
+		new CFormField((new CLink($data['discoveryRule']['name'], $discovered_url)))
+	]);
+}
+
 if (!empty($data['templates'])) {
 	$item_tab->addItem([
 		new CLabel(_('Parent discovery rules')),

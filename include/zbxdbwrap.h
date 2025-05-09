@@ -79,6 +79,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 		zbx_autoreg_prepare_host_func_t autoreg_prepare_host_cb, int *more, char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
+int	zbx_check_missing_host_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, int audit_context_mode, char **error);
 int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,

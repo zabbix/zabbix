@@ -803,6 +803,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 	{
 		char	*ch_error;
 		char	name_trunc[VALUE_ERRMSG_MAX + 1];
+		int	ret;
 
 		host = hosts->values[i];
 
@@ -814,11 +815,13 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 			continue;
 
 		/* check for valid host name unless it's a prototype */
-		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ||
-				SUCCEED == zbx_check_hostname(host->host, &ch_error))
-		{
+		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			ret = zbx_check_prototype_hostname(host->host, &ch_error);
+		else
+			ret = zbx_check_hostname(host->host, &ch_error);
+
+		if (SUCCEED == ret)
 			continue;
-		}
 
 		zbx_strlcpy(name_trunc, host->host, sizeof(name_trunc));
 
@@ -979,7 +982,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 				"select host,name"
 				" from hosts"
 				" where status in (%d,%d,%d)"
-					" and flags<>%d"
+					" and flags&%d=0"
 					" and",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 				ZBX_FLAG_DISCOVERY_PROTOTYPE);
@@ -4610,6 +4613,83 @@ static void	lld_templates_link(const zbx_vector_lld_host_ptr_t *hosts, char **er
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: link templates to host prototypes                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     hosts  - [IN] vector of host prototypes                                *
+ *     error  - [OUT] error message                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_prototype_templates_link(const zbx_vector_lld_host_ptr_t *hosts, char **error)
+{
+	zbx_lld_host_t	*host;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t	db_insert;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_db_insert_prepare(&db_insert, "hosts_templates",  "hosttemplateid", "hostid", "templateid", "link_type",
+			(char *)NULL);
+
+	zbx_db_begin();
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		host = hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 != host->del_templateids.values_num)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"delete from hosts_templates"
+						" where hostid=" ZBX_FS_UI64
+							" and",
+						host->hostid);
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
+					host->del_templateids.values, host->del_templateids.values_num);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		if (SUCCEED != zbx_check_missing_host_templates(host->hostid, &host->lnk_templateids, error))
+			goto out;
+
+		if (0 != host->lnk_templateids.values_num)
+		{
+			for (int j = 0; j < host->lnk_templateids.values_num; j++)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), host->hostid,
+						host->lnk_templateids.values[j], ZBX_TEMPLATE_LINK_LLD);
+			}
+		}
+	}
+
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
+
+	zbx_db_insert_autoincrement(&db_insert, "hosttemplateid");
+	zbx_db_insert_execute(&db_insert);
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED == ret)
+		zbx_db_commit();
+	else
+		zbx_db_rollback();
+
+	zbx_free(sql);
+	zbx_db_insert_clean(&db_insert);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static int	lld_host_disable_validate(zbx_uint64_t hostid)
 {
 	int		ret;
@@ -5971,7 +6051,7 @@ static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
 			ZBX_FLAG_DISCOVERY_RULE);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_db_select("%s order by hostid", sql);
 	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -6488,7 +6568,10 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 			lld_group_prototypes_save(&hosts);
 
 		/* linking of the templates */
-		lld_templates_link(&hosts, error);
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			lld_templates_link(&hosts, error);
+		else
+			lld_prototype_templates_link(&hosts, error);
 
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
 

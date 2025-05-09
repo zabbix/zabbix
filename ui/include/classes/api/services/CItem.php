@@ -32,9 +32,6 @@ class CItem extends CItemGeneral {
 		'allow_traps', 'state', 'error', 'parameters', 'lastclock', 'lastns', 'lastvalue', 'prevvalue', 'name_resolved'
 	];
 
-	public const ITEM_DISCOVERY_OUTPUT_FIELDS = ['itemdiscoveryid', 'itemid', 'parent_itemid', 'key_', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
-	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_itemid', 'key_', 'status', 'ts_delete', 'ts_disable', 'disable_source'];
-
 	/**
 	 * @inheritDoc
 	 */
@@ -146,7 +143,8 @@ class CItem extends CItemGeneral {
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
-		$this->validateGet($options);
+
+		self::validateGet($options);
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -455,19 +453,12 @@ class CItem extends CItemGeneral {
 		return $items;
 	}
 
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	private function validateGet(array &$options) {
+	private static function validateGet(array &$options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', self::ITEM_DISCOVERY_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1759,8 +1750,8 @@ class CItem extends CItemGeneral {
 			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
 		}
 
-		$this->addRelatedItemDiscovery($options, $result);
-		$this->addRelatedDiscoveryData($options, $result);
+		self::addRelatedItemDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		$requested_output = array_filter([
 			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
@@ -1830,27 +1821,26 @@ class CItem extends CItemGeneral {
 		return $result;
 	}
 
-	private function addRelatedItemDiscovery(array $options, array &$result): void {
+	private static function addRelatedItemDiscovery(array $options, array &$result): void {
 		if ($options['selectItemDiscovery'] === null) {
 			return;
 		}
 
-		if ($options['selectItemDiscovery'] === 'extend') {
-			$options['selectItemDiscovery'] = self::ITEM_DISCOVERY_OUTPUT_FIELDS;
+		foreach ($result as &$item) {
+			$item['itemDiscovery'] = [];
 		}
+		unset($item);
 
-		$item_discoveries = API::getApiService()->select('item_discovery', [
-			'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemdiscoveryid', 'itemid']),
-			'filter' => ['itemid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($item_discoveries, 'itemid', 'itemdiscoveryid');
+		$_options = [
+			'output' => array_merge(['itemid'], $options['selectItemDiscovery']),
+			'filter' => ['itemid' => array_keys($result)]
+		];
+		$resource = DBselect(DB::makeSql('item_discovery', $_options));
 
-		$item_discoveries = $this->unsetExtraFields($item_discoveries, ['itemid', 'itemdiscoveryid'],
-			$options['selectItemDiscovery']
-		);
-
-		$result = $relation_map->mapOne($result, $item_discoveries, 'itemDiscovery');
+		while ($item_discovery = DBfetch($resource)) {
+			$result[$item_discovery['itemid']]['itemDiscovery'] =
+				array_diff_key($item_discovery, array_flip(['itemid']));
+		}
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -1988,16 +1978,15 @@ class CItem extends CItemGeneral {
 			$master_itemids = [];
 
 			while ($row = DBfetch($result)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE || $row['flags'] == ZBX_FLAG_DISCOVERY_RULE_CREATED) {
-					$db_lld_rules[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+				if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])) {
+					$db_lld_rules[$row['itemid']] = $row;
 				}
-				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
-						|| $row['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED) {
+				elseif (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])) {
 					$master_itemids[] = $row['itemid'];
 
-					$db_lld_rule_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+					$db_lld_rule_prototypes[$row['itemid']] = $row;
 				}
-				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				elseif (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])) {
 					$master_itemids[] = $row['itemid'];
 
 					$db_item_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));

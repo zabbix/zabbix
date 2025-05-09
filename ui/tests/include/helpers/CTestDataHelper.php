@@ -18,25 +18,7 @@
  * Class for generating DB objects or API data for tests.
  */
 class CTestDataHelper {
-	public static $objectids = [];
-
-	private const OBJECT_TYPES = [
-		'actions',
-		'drules',
-		'graphs',
-		'host_groups',
-		'hosts',
-		'interfaces',
-		'proxies',
-		'roles',
-		'scripts',
-		'template_dashboards',
-		'template_groups',
-		'templates',
-		'triggers',
-		'user_groups',
-		'users'
-	];
+	private static $objectids = [];
 
 	/**
 	 * Create objects using API.
@@ -49,75 +31,26 @@ class CTestDataHelper {
 	 *
 	 * @param array $objects
 	 */
-
 	public static function createObjects(array $objects): void {
-		$objects += array_fill_keys(self::OBJECT_TYPES, []);
+		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
+			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions'
+		], []);
 
 		try {
-			foreach ($objects as $object_type => $batch) {
-				if (!$batch) {
-					continue;
-				}
-
-				switch ($object_type) {
-					case 'template_groups':
-						self::createTemplateGroups($objects['template_groups']);
-					break;
-
-					case 'host_groups':
-						self::createHostGroups($objects['host_groups']);
-					break;
-
-					case 'templates':
-						self::createTemplates($objects['templates']);
-					break;
-
-					case 'proxies':
-						self::createProxies($objects['proxies']);
-					break;
-
-					case 'hosts':
-						self::createHosts($objects['hosts']);
-					break;
-
-					case 'triggers':
-						self::createTriggers($objects['triggers']);
-					break;
-
-					case 'roles':
-						self::createRoles($objects['roles']);
-					break;
-
-					case 'user_groups':
-						self::createUserGroups($objects['user_groups']);
-					break;
-
-					case 'users':
-						self::createUsers($objects['users']);
-					break;
-
-					case 'scripts':
-						self::createScripts($objects['scripts']);
-					break;
-
-					case 'drules':
-						self::createDRules($objects['drules']);
-					break;
-
-					case 'actions':
-						self::createActions($objects['actions']);
-					break;
-
-					case 'graphs':
-						self::createGraphs($objects['graphs']);
-					break;
-
-					case 'template_dashboards':
-						self::createTemplateDashboards($objects['template_dashboards']);
-					break;
-				}
-			}
-		} catch (Throwable $e) {
+			self::createTemplateGroups($objects['template_groups']);
+			self::createHostGroups($objects['host_groups']);
+			self::createTemplates($objects['templates']);
+			self::createProxies($objects['proxies']);
+			self::createHosts($objects['hosts']);
+			self::createTriggers($objects['triggers']);
+			self::createRoles($objects['roles']);
+			self::createUserGroups($objects['user_groups']);
+			self::createUsers($objects['users']);
+			self::createScripts($objects['scripts']);
+			self::createDrules($objects['drules']);
+			self::createActions($objects['actions']);
+		}
+		catch (Exception $e) {
 			self::cleanUp();
 
 			throw $e;
@@ -177,7 +110,9 @@ class CTestDataHelper {
 	 * @return array
 	 */
 	public static function prepareProxy(array $proxy): array {
-		return $proxy + ['operating_mode' => PROXY_OPERATING_MODE_ACTIVE];
+		$proxy += ['operating_mode' => PROXY_OPERATING_MODE_ACTIVE];
+
+		return $proxy;
 	}
 
 	/**
@@ -191,15 +126,13 @@ class CTestDataHelper {
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
-		$graphs = [];
-		$dashboards = [];
-		$graph_host_refs = [];
 
-		foreach ($templates as $template) {
+		foreach ($templates as &$template) {
 			$template += [
 				'groups' => [
 					['groupid' => end(self::$objectids['template_group'])]
-				]
+				],
+				'templates' => []
 			];
 
 			if (array_key_exists('value_maps', $template)) {
@@ -218,16 +151,6 @@ class CTestDataHelper {
 				unset($template['items']);
 			}
 
-			if (array_key_exists('graphs', $template)) {
-				foreach ($template['graphs'] as $graph) {
-					$graph_host_refs[count($graphs)] = ':template:'.$template['host'];
-
-					$graphs[] = $graph;
-				}
-
-				unset($template['graphs']);
-			}
-
 			if (array_key_exists('lld_rules', $template)) {
 				foreach ($template['lld_rules'] as $lld_rule) {
 					$lld_rules[] = $lld_rule + ['hostid' => ':template:'.$template['host']];
@@ -235,26 +158,20 @@ class CTestDataHelper {
 
 				unset($template['lld_rules']);
 			}
+		}
+		unset($template);
 
-			if (array_key_exists('template_dashboards', $template)) {
-				foreach ($template['template_dashboards'] as $dashboard) {
-					$dashboards[] = $dashboard + ['templateid' => ':template:'.$template['host']];
-				}
-				unset($template['template_dashboards']);
-			}
+		self::convertTemplateReferences($templates);
 
-			self::convertTemplateReferences($template);
+		$result = CDataHelper::call('template.create', $templates);
 
-			$result = CDataHelper::call('template.create', $template);
-
+		foreach ($templates as $template) {
 			self::$objectids['template'][$template['host']] = array_shift($result['templateids']);
 		}
 
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
-		self::createGraphs($graphs, $graph_host_refs);
-		self::createTemplateDashboards($dashboards);
 	}
 
 	public static function convertTemplateReferences(array &$templates): void {
@@ -265,7 +182,6 @@ class CTestDataHelper {
 
 	/**
 	 * @param array $hosts
-	 * @param array $hosts['host_discovery]  Optional. Add this entry to discoveries table and mark host discovered.
 	 */
 	private static function createHosts(array $hosts): void {
 		if (!$hosts) {
@@ -275,27 +191,19 @@ class CTestDataHelper {
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
-		$graphs = [];
 		$httptests = [];
 
-		$make_discovered = [];
-
-		foreach ($hosts as $i => &$host) {
-			if (array_key_exists('host_discovery', $host)) {
-				$make_discovered[$i] = $host['host_discovery'];
-				unset($host['host_discovery']);
-			}
-
+		foreach ($hosts as &$host) {
 			$host += [
 				'groups' => [
 					['groupid' => end(self::$objectids['host_group'])]
-				]
+				],
+				'templates' => []
 			];
-			$host_reference = ':host:'.$host['host'];
 
 			if (array_key_exists('value_maps', $host)) {
 				foreach ($host['value_maps'] as $value_map) {
-					$value_maps[] = $value_map + ['hostid' => $host_reference];
+					$value_maps[] = $value_map + ['hostid' => ':host:'.$host['host']];
 				}
 
 				unset($host['value_maps']);
@@ -303,7 +211,7 @@ class CTestDataHelper {
 
 			if (array_key_exists('items', $host)) {
 				foreach ($host['items'] as $item) {
-					$items[] = $item + ['hostid' => $host_reference];
+					$items[] = $item + ['hostid' => ':host:'.$host['host']];
 				}
 
 				unset($host['items']);
@@ -311,23 +219,15 @@ class CTestDataHelper {
 
 			if (array_key_exists('lld_rules', $host)) {
 				foreach ($host['lld_rules'] as $lld_rule) {
-					$lld_rules[] = $lld_rule + ['hostid' => $host_reference];
+					$lld_rules[] = $lld_rule + ['hostid' => ':host:'.$host['host']];
 				}
 
 				unset($host['lld_rules']);
 			}
 
-			if (array_key_exists('graphs', $host)) {
-				foreach ($host['graphs'] as $graph) {
-					$graphs[] = $graph + ['hostid' => $host_reference];
-				}
-
-				unset($host['graphs']);
-			}
-
 			if (array_key_exists('httptests', $host)) {
 				foreach ($host['httptests'] as $httptest) {
-					$httptests[] = $httptest + ['hostid' => $host_reference];
+					$httptests[] = $httptest + ['hostid' => ':host:'.$host['host']];
 				}
 
 				unset($host['httptests']);
@@ -338,37 +238,15 @@ class CTestDataHelper {
 		self::convertHostReferences($hosts);
 
 		$result = CDataHelper::call('host.create', $hosts);
-		$templated_host_refs = [];
-		$host_discoveries = [];
-		$host_names = [];
 
-		foreach ($hosts as $i => $host) {
-			$hostid = array_shift($result['hostids']);
-
-			self::$objectids['host'][$host['host']] = $hostid;
-			$host_names[$hostid] = $host['host'];
-
-			if (array_key_exists('templates', $host) && $host['templates']) {
-				$templated_host_refs[$hostid] = ':host:'.$host['host'];
-			}
-
-			if (array_key_exists($i, $make_discovered)) {
-				$host_discoveries[$hostid] = $make_discovered[$i];
-			}
+		foreach ($hosts as $host) {
+			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
-		self::createGraphs($graphs);
 		self::createHttptests($httptests);
-
-		if ($templated_host_refs) {
-			self::addInheritedHostObjectReferences($templated_host_refs);
-		}
-
-		self::addInterfaceReferences($host_names);
-		self::makeHostsDiscovered($host_discoveries);
 	}
 
 	public static function convertHostReferences(array &$hosts): void {
@@ -376,161 +254,6 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'groups.groupid');
 		self::convertPropertyReference($hosts, 'templates.templateid');
 		self::convertPropertyReference($hosts, 'proxyid');
-	}
-
-	private static function addInheritedHostObjectReferences(array $host_refs): void {
-		self::addInheritedItemReferences($host_refs);
-		self::addInheritedLldRuleReferences($host_refs);
-		self::addInheritedGraphReferences($host_refs);
-	}
-
-	private static function addInheritedItemReferences(array $host_refs): void {
-		$items = CDataHelper::call('item.get', [
-			'output' => ['itemid', 'key_', 'hostid'],
-			'hostids' => array_keys($host_refs),
-			'inherited' => true
-		]);
-
-		foreach ($items as $item) {
-			self::$objectids['item'][$item['key_']][$host_refs[$item['hostid']]] = $item['itemid'];
-		}
-	}
-
-	private static function addInheritedLldRuleReferences(array $host_refs): void {
-		$lld_rules = CDataHelper::call('discoveryrule.get', [
-			'output' => ['key_', 'itemid', 'hostid'],
-			'hostids' => array_keys($host_refs),
-			'inherited' => true
-		]);
-		$lld_rule_refs = [];
-
-		foreach ($lld_rules as $lld_rule) {
-			$host_ref = $host_refs[$lld_rule['hostid']];
-
-			self::$objectids['lld_rule'][$lld_rule['key_']][$host_ref] = $lld_rule['itemid'];
-
-			$lld_rule_refs[$lld_rule['itemid']] = ':lld_rule:'.$lld_rule['key_'];
-		}
-
-		self::addInheritedGraphPrototypeReferences($lld_rule_refs, $host_refs);
-		self::addInheritedItemPrototypeReferences($lld_rule_refs, $host_refs);
-	}
-
-	private static function addInheritedGraphPrototypeReferences(array $lld_rule_refs, array $host_refs): void {
-		$graph_prototypes = CDataHelper::call('graphprototype.get', [
-			'output' => ['graphid', 'name'],
-			'discoveryids' => array_keys($lld_rule_refs),
-			'selectDiscoveryRule' => ['itemid'],
-			'selectHosts' => ['hostid'],
-			'inherited' => true
-		]);
-
-		foreach ($graph_prototypes as $graph_prototype) {
-			$lld_rule_ref = $lld_rule_refs[$graph_prototype['discoveryRule']['itemid']];
-
-			foreach ($graph_prototype['hosts'] as $host) {
-				$host_ref = $host_refs[$host['hostid']];
-
-				self::$objectids['graph_prototype'][$graph_prototype['name']][$lld_rule_ref][$host_ref] =
-					$graph_prototype['graphid'];
-			}
-		}
-	}
-
-	private static function addInheritedItemPrototypeReferences(array $lld_rule_refs, array $host_refs): void {
-		$item_prototypes = CDataHelper::call('itemprototype.get', [
-			'output' => ['itemid', 'key_'],
-			'discoveryids' => array_keys($lld_rule_refs),
-			'selectDiscoveryRule' => ['itemid'],
-			'selectHosts' => ['hostid'],
-			'inherited' => true
-		]);
-
-		foreach ($item_prototypes as $item_prototype) {
-			$lld_rule_ref = $lld_rule_refs[$item_prototype['discoveryRule']['itemid']];
-
-			foreach ($item_prototype['hosts'] as $host) {
-				$host_ref = $host_refs[$host['hostid']];
-
-				self::$objectids['item_prototype'][$item_prototype['key_']][$lld_rule_ref][$host_ref] =
-					$item_prototype['itemid'];
-			}
-		}
-	}
-
-	private static function addInheritedGraphReferences(array $host_refs): void {
-		$graphs = CDataHelper::call('graph.get', [
-			'output' => ['graphid', 'name'],
-			'hostids' => array_keys($host_refs),
-			'selectHosts' => ['hostid'],
-			'inherited' => true
-		]);
-
-		foreach ($graphs as $graph) {
-			foreach ($graph['hosts'] as $host) {
-				$host_ref = $host_refs[$host['hostid']];
-
-				self::$objectids['graph'][$graph['name']][$host_ref] = $graph['graphid'];
-			}
-		}
-	}
-
-	private static function addInterfaceReferences(array $host_names): void {
-		$resource = DBselect(
-			'SELECT iff.interfaceid,iff.hostid,iff.type,iff.main'.
-			' FROM interface iff'.
-			' WHERE '.dbConditionId('iff.hostid', array_keys($host_names))
-		);
-		$interfaces = [];
-
-		while ($row = DBfetch($resource)) {
-			$interfaces[$row['hostid']][] = $row;
-		}
-
-		if (!$interfaces) {
-			return;
-		}
-
-		$INTERFACE_TYPES_BY_PRIORITY = [
-			INTERFACE_TYPE_AGENT,
-			INTERFACE_TYPE_SNMP,
-			INTERFACE_TYPE_JMX,
-			INTERFACE_TYPE_IPMI
-		];
-
-		foreach ($interfaces as $hostid => $host_interfaces) {
-			usort($host_interfaces, static function(array $a, array $b) use ($INTERFACE_TYPES_BY_PRIORITY): int {
-				$comparison = (int) array_search($a['type'], $INTERFACE_TYPES_BY_PRIORITY) <=>
-					(int) array_search($b['type'], $INTERFACE_TYPES_BY_PRIORITY);
-
-				return $comparison != 0 ? $comparison : $b['main'] <=> $a['main'];
-			});
-
-			foreach ($host_interfaces as $i => $interface) {
-				self::$objectids['interface'][$host_names[$hostid].'.'.($i + 1)] = $interface['interfaceid'];
-			}
-		}
-	}
-
-	private static function makeHostsDiscovered(array $host_discoveries): void {
-		if (!$host_discoveries) {
-			return;
-		}
-
-		self::convertPropertyReference($host_discoveries, 'lldruleid');
-		self::convertPropertyReference($host_discoveries, 'parent_hostid');
-
-		$ins_discoveries = [];
-
-		foreach ($host_discoveries as $hostid => $discovery) {
-			$ins_discoveries[] = ['hostid' => $hostid] + $discovery;
-		}
-
-		DB::insertBatch('host_discovery', $ins_discoveries, false);
-		DB::update('hosts', [
-			'values' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-			'where' => ['hostid' => array_keys($host_discoveries)]
-		]);
 	}
 
 	/**
@@ -553,6 +276,7 @@ class CTestDataHelper {
 	public static function convertValueMapReferences(array &$value_maps): void {
 		self::convertPropertyReference($value_maps, 'valuemapid');
 		self::convertPropertyReference($value_maps, 'hostid');
+
 	}
 
 	/**
@@ -670,61 +394,19 @@ class CTestDataHelper {
 
 		$host_refs = [];
 		$item_prototypes = [];
-		$host_prototypes = [];
-		$trigger_prototypes = [];
-		$graph_prototypes = [];
-		$lldrule_prototypes = [];
 
 		foreach ($lld_rules as $i => &$lld_rule) {
 			$host_refs[$i] = $lld_rule['hostid'];
 
 			$lld_rule = self::prepareLldRule($lld_rule);
-			$rule_reference = ['ruleid' => ':lld_rule:'.$lld_rule['key_']];
 
 			if (array_key_exists('item_prototypes', $lld_rule)) {
 				foreach ($lld_rule['item_prototypes'] as $item_prototype) {
-					$item_prototypes[] = $item_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
+					$item_prototypes[] = $item_prototype
+						+ ['hostid' => $host_refs[$i], 'ruleid' => ':lld_rule:'.$lld_rule['key_']];
 				}
 
 				unset($lld_rule['item_prototypes']);
-			}
-
-			if (array_key_exists('trigger_prototypes', $lld_rule)) {
-				foreach ($lld_rule['trigger_prototypes'] as $alias => $trigger_prototype) {
-					$trigger_prototypes[$alias] = $trigger_prototype;
-				}
-
-				unset($lld_rule['trigger_prototypes']);
-			}
-
-			if (array_key_exists('host_prototypes', $lld_rule)) {
-				foreach ($lld_rule['host_prototypes'] as $host_prototype) {
-					$_rule_reference = $rule_reference;
-					$_rule_reference['ruleid'] .= $host_refs[$i];
-					$host_prototypes[] = $host_prototype + $_rule_reference;
-				}
-
-				unset($lld_rule['host_prototypes']);
-			}
-
-			if (array_key_exists('graph_prototypes', $lld_rule)) {
-				foreach ($lld_rule['graph_prototypes'] as $alias => $graph_prototype) {
-					$alias = is_numeric($alias) ? $graph_prototype['name'] : $alias;
-
-					$graph_prototypes[$alias] = $graph_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
-				}
-
-				unset($lld_rule['graph_prototypes']);
-			}
-
-			if (array_key_exists('lld_rule_prototypes', $lld_rule)) {
-				foreach ($lld_rule['lld_rule_prototypes'] as $alias => $lldrule_prototype) {
-					$_rule_reference = $rule_reference;
-					$_rule_reference['ruleid'] .= $host_refs[$i];
-					$lldrule_prototypes[] = $lldrule_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
-				}
-
-				unset($lld_rule['lld_rule_prototypes']);
 			}
 		}
 		unset($lld_rule);
@@ -738,10 +420,6 @@ class CTestDataHelper {
 		}
 
 		self::createItemPrototypes($item_prototypes);
-		self::createTriggerPrototypes($trigger_prototypes);
-		self::createGraphPrototypes($graph_prototypes);
-		self::createHostPrototypes($host_prototypes);
-		self::createLldRulePrototypes($lldrule_prototypes);
 	}
 
 	public static function convertLldRuleReferences(array &$lld_rules): void {
@@ -749,95 +427,6 @@ class CTestDataHelper {
 		self::convertPropertyReference($lld_rules, 'hostid');
 		self::convertPropertyReference($lld_rules, 'interfaceid');
 		self::convertPropertyReference($lld_rules, 'master_itemid');
-	}
-
-		/**
-	 * @param array $lld_rules
-	 */
-	private static function createLldRulePrototypes(array $lld_rules): void {
-		if (!$lld_rules) {
-			return;
-		}
-
-		$host_refs = [];
-		$item_prototypes = [];
-		$host_prototypes = [];
-		$trigger_prototypes = [];
-		$graph_prototypes = [];
-		$lldrule_prototypes = [];
-
-		foreach ($lld_rules as $i => &$lld_rule) {
-			$host_refs[$i] = $lld_rule['hostid'];
-
-			$lld_rule = self::prepareLldRule($lld_rule);
-			$rule_reference = ['ruleid' => ':lld_rule_prototype:'.$lld_rule['key_']];
-
-			if (array_key_exists('item_prototypes', $lld_rule)) {
-				foreach ($lld_rule['item_prototypes'] as $item_prototype) {
-					$item_prototypes[] = $item_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
-				}
-
-				unset($lld_rule['item_prototypes']);
-			}
-
-			if (array_key_exists('trigger_prototypes', $lld_rule)) {
-				foreach ($lld_rule['trigger_prototypes'] as $alias => $trigger_prototype) {
-					$trigger_prototypes[$alias] = $trigger_prototype;
-				}
-
-				unset($lld_rule['trigger_prototypes']);
-			}
-
-			if (array_key_exists('host_prototypes', $lld_rule)) {
-				foreach ($lld_rule['host_prototypes'] as $host_prototype) {
-					$_rule_reference = $rule_reference;
-					$_rule_reference['ruleid'] .= $host_refs[$i];
-					$host_prototypes[] = $host_prototype + $_rule_reference;
-				}
-
-				unset($lld_rule['host_prototypes']);
-			}
-
-			if (array_key_exists('graph_prototypes', $lld_rule)) {
-				foreach ($lld_rule['graph_prototypes'] as $alias => $graph_prototype) {
-					$alias = is_numeric($alias) ? $graph_prototype['name'] : $alias;
-
-					$graph_prototypes[$alias] = $graph_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
-				}
-
-				unset($lld_rule['graph_prototypes']);
-			}
-
-			if (array_key_exists('lld_rule_prototypes', $lld_rule)) {
-				foreach ($lld_rule['lld_rule_prototypes'] as $alias => $lldrule_prototype) {
-					$_rule_reference = $rule_reference;
-					$_rule_reference['ruleid'] .= $host_refs[$i];
-					$lldrule_prototypes[] = $lldrule_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
-				}
-
-				unset($lld_rule['lld_rule_prototypes']);
-			}
-		}
-		unset($lld_rule);
-
-		self::convertLldRulePrototypeReferences($lld_rules);
-
-		$result = CDataHelper::call('discoveryruleprototype.create', $lld_rules);
-
-		foreach ($lld_rules as $i => $lld_rule) {
-			self::$objectids['lld_rule_prototype'][$lld_rule['key_']][$host_refs[$i]] = array_shift($result['itemids']);
-		}
-
-		self::createItemPrototypes($item_prototypes);
-		self::createTriggerPrototypes($trigger_prototypes);
-		self::createGraphPrototypes($graph_prototypes);
-		self::createHostPrototypes($host_prototypes);
-		self::createLldRulePrototypes($lldrule_prototypes);
-	}
-
-	public static function convertLldRulePrototypeReferences(array &$lld_rules): void {
-		self::convertPropertyReference($lld_rules, 'ruleid');
-		self::convertLldRuleReferences($lld_rules);
 	}
 
 	/**
@@ -880,39 +469,6 @@ class CTestDataHelper {
 		return $lld_rules;
 	}
 
-	private static function createTemplateDashboards(array $dashboards): void {
-		if (!$dashboards) {
-			return;
-		}
-
-		$host_refs = [];
-
-		foreach ($dashboards as $i => $dashboard) {
-			$host_refs[$i] = $dashboard['templateid'];
-		}
-
-		self::convertTemplateDashboardReferences($dashboards);
-
-		$result = CDataHelper::call('templatedashboard.create', $dashboards);
-
-		foreach ($dashboards as $i => $dashboard) {
-			self::$objectids['template_dashboard'][$dashboard['name']][$host_refs[$i]] =
-				array_shift($result['dashboardids']);
-		}
-	}
-
-	public static function convertTemplateDashboardReferences(array &$dashboards): void {
-		self::convertPropertyReference($dashboards, 'dashboardid');
-		self::convertPropertyReference($dashboards, 'templateid');
-		self::convertPropertyReference($dashboards, 'pages.widgets.fields.value');
-	}
-
-	public static function convertHostDashboardReferences(array &$dashboards): void {
-		self::convertPropertyReference($dashboards, 'dashboardid');
-		self::convertPropertyReference($dashboards, 'hostid');
-		self::convertPropertyReference($dashboards, 'pages.widgets.fields.value');
-	}
-
 	private static function createHttptests(array $httptests): void {
 		if (!$httptests) {
 			return;
@@ -953,10 +509,8 @@ class CTestDataHelper {
 		$host_refs = [];
 		$discovered_items = [];
 		$item_indexes = [];
-		$lld_rule_refs = [];
 
 		foreach ($items as $i => &$item) {
-			$lld_rule_refs[$i] = $item['ruleid'];
 			$host_refs[$i] = $item['hostid'];
 
 			$item = self::prepareItemPrototype($item);
@@ -1002,11 +556,7 @@ class CTestDataHelper {
 			$_items = [];
 
 			foreach ($items as $i => $item) {
-				$lld_rule_ref = $lld_rule_refs[$i];
-				$host_ref = $host_refs[$i];
-
-				self::$objectids['item_prototype'][$item['key_']][$lld_rule_ref][$host_ref] =
-					array_shift($result['itemids']);
+				self::$objectids['item_prototype'][$item['key_']][$host_refs[$i]] = array_shift($result['itemids']);
 
 				if (array_key_exists($i, $dep_items)) {
 					$_items += $dep_items[$i];
@@ -1171,94 +721,8 @@ class CTestDataHelper {
 	}
 
 	public static function convertTriggerReferences(array &$triggers): void {
-		self::convertPropertyReferenceForObjects($triggers, 'triggerid');
-		self::convertPropertyReferenceForObjects($triggers, 'dependencies.triggerid');
-	}
-
-	private static function createTriggerPrototypes(array $triggers): void {
-		if (!$triggers) {
-			return;
-		}
-
-		$trigger_aliases = array_keys($triggers);
-
-		self::convertTriggerPrototypeReferences($triggers);
-
-		$result = CDataHelper::call('triggerprototype.create', array_values($triggers));
-
-		foreach ($trigger_aliases as $trigger_alias) {
-			self::$objectids['trigger_prototype'][$trigger_alias] = array_shift($result['triggerids']);
-		}
-	}
-
-	public static function convertTriggerPrototypeReferences(array &$triggers): void {
-		self::convertPropertyReferenceForObjects($triggers, 'triggerid');
-		self::convertPropertyReferenceForObjects($triggers, 'dependencies.triggerid');
-	}
-
-	/**
-	 * @param array $graph_prototypes
-	 */
-	private static function createGraphPrototypes(array &$graph_prototypes): void {
-		if (!$graph_prototypes) {
-			return;
-		}
-
-		$lld_rule_refs = [];
-		$host_refs = [];
-
-		foreach ($graph_prototypes as $i => $graph_prototype) {
-			$lld_rule_refs[$i] = $graph_prototype['ruleid'];
-			$host_refs[$i] = $graph_prototype['hostid'];
-		}
-
-		self::convertGraphPrototypeReferences($graph_prototypes);
-
-		$result = CDataHelper::call('graphprototype.create', array_values($graph_prototypes));
-
-		foreach ($graph_prototypes as $i => $graph_prototype) {
-			$lld_rule_ref = $lld_rule_refs[$i];
-			$host_ref = $host_refs[$i];
-
-			self::$objectids['graph_prototype'][$graph_prototype['name']][$lld_rule_ref][$host_ref] =
-				array_shift($result['graphids']);
-		}
-
-		unset($graph_prototype);
-	}
-
-	public static function convertGraphPrototypeReferences(array &$graph_prototypes): void {
-		self::convertPropertyReferenceForObjects($graph_prototypes, 'graphid');
-		self::convertPropertyReferenceForObjects($graph_prototypes, 'ruleid');
-		self::convertPropertyReferenceForObjects($graph_prototypes, 'hostid');
-		self::convertPropertyReferenceForObjects($graph_prototypes, 'gitems.itemid');
-	}
-
-	/**
-	 * @param array $host_prototypes
-	 */
-	private static function createHostPrototypes(array &$host_prototypes): void {
-		if (!$host_prototypes) {
-			return;
-		}
-
-		self::convertHostPrototypeReferences($host_prototypes);
-
-		$result = CDataHelper::call('hostprototype.create', array_values($host_prototypes));
-
-		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['hostid'] = array_shift($result['hostids']);
-
-			self::$objectids['host_prototype'][$host_prototype['host']] = $host_prototype['hostid'];
-		}
-		unset($host_prototype);
-	}
-
-	public static function convertHostPrototypeReferences(array &$host_prototypes): void {
-		self::convertPropertyReference($host_prototypes, 'hostid');
-		self::convertPropertyReference($host_prototypes, 'ruleid');
-		self::convertPropertyReference($host_prototypes, 'groupLinks.groupid');
-		self::convertPropertyReference($host_prototypes, 'templates.templateid');
+		self::convertPropertyReference($triggers, 'triggerid');
+		self::convertPropertyReference($triggers, 'dependencies.triggerid');
 	}
 
 	private static function createRoles(array $roles): void {
@@ -1430,103 +894,55 @@ class CTestDataHelper {
 		self::convertPropertyReference($actions, 'operations.optemplate.templateid');
 	}
 
-	private static function createGraphs(array $graphs, ?array $host_refs = []): void {
-		if (!$graphs) {
-			return;
-		}
-
-		self::convertGraphReferences($graphs);
-
-		$result = CDataHelper::call('graph.create', array_values($graphs));
-
-		foreach ($graphs as $i => $graph) {
-			if ($host_refs) {
-				self::$objectids['graph'][$graph['name']][$host_refs[$i]] = array_shift($result['graphids']);
-			}
-			else {
-				if (is_numeric($i)) {
-					throw new Exception('Standalone graphs must use alias in key.');
-				}
-
-				self::$objectids['graph'][$i] = array_shift($result['graphids']);
-			}
-		}
-	}
-
-	public static function convertGraphReferences(array &$graphs): void {
-		self::convertPropertyReferenceForObjects($graphs, 'graphid');
-		self::convertPropertyReferenceForObjects($graphs, 'gitems.itemid');
-		self::convertPropertyReferenceForObjects($graphs, 'hostid');
-	}
-
 	/**
-	 * Check for, and replace a reference ID in the given objects' property with the corresponding object's record ID.
+	 * Check for, and replace a reference ID in the given object property with the corresponding object's record ID.
 	 *
-	 * @param array  $objects   Array of objects containing the referenced property.
+	 * @param array  $object    Array containing the referenced property.
 	 * @param string $property  The reference key. A "." symbol is used as a separator for nested property references,
 	 *                          f.e., `templates.templateid`. In case of matching object names (e.g. item inherited from
 	 *                          template to host), the contained reference should include further specific parent object
 	 *                          references, e.g.: `:item:item.key:host:my.name` vs `:items:item.key:template:my.name`.
 	 */
-	private static function convertPropertyReference(array &$objects, string $property): void {
-		is_numeric(key($objects))
-			? self::convertPropertyReferenceForObjects($objects, $property)
-			: self::convertPropertyReferenceForObject($objects, $property);
-	}
-
-	private static function convertPropertyReferenceForObjects(array &$objects, string $property): void {
-		$nested = strpos($property, '.') !== false;
-
-		if ($nested) {
+	private static function convertPropertyReference(array &$object, string $property): void {
+		if (strpos($property, '.') !== false) {
 			[$property, $sub_property] = explode('.', $property, 2);
-		}
 
-		foreach ($objects as &$object) {
-			if (!array_key_exists($property, $object)) {
-				continue;
-			}
-			elseif (!$nested) {
-				self::convertValueReference($object[$property]);
-				continue;
-			}
+			if (is_string(key($object))) {
+				if (!array_key_exists($property, $object)) {
+					return;
+				}
 
-			if (strpos($sub_property, '.') !== false) {
 				self::convertPropertyReference($object[$property], $sub_property);
-				continue;
 			}
-
-			if (is_numeric(key($object[$property]))) {
-				foreach ($object[$property] as &$_object) {
-					if (array_key_exists($sub_property, $_object)) {
-						self::convertValueReference($_object[$sub_property]);
+			else {
+				foreach ($object as &$_object) {
+					if (!array_key_exists($property, $_object)) {
+						continue;
 					}
+
+					self::convertPropertyReference($_object[$property], $sub_property);
 				}
 				unset($_object);
 			}
-			elseif (array_key_exists($sub_property, $object[$property])) {
-				self::convertValueReference($object[$property][$sub_property]);
-			}
-		}
-		unset($object);
-	}
 
-	private static function convertPropertyReferenceForObject(array &$object, string $property): void {
-		$nested = strpos($property, '.') !== false;
+			return;
+		}
+		elseif (!is_string(key($object))) {
+			foreach ($object as &$_object) {
+				if (!array_key_exists($property, $_object)) {
+					continue;
+				}
 
-		if ($nested) {
-			[$property, $sub_property] = explode('.', $property, 2);
+				self::convertPropertyReference($_object, $property);
+			}
+			unset($_object);
 		}
 
-		if (array_key_exists($property, $object)) {
-			if ($nested) {
-				is_numeric(key($object[$property]))
-					? self::convertPropertyReferenceForObjects($object[$property], $sub_property)
-					: self::convertPropertyReferenceForObject($object[$property], $sub_property);
-			}
-			else {
-				self::convertValueReference($object[$property]);
-			}
+		if (!array_key_exists($property, $object)) {
+			return;
 		}
+
+		self::convertValueReference($object[$property]);
 	}
 
 	public static function unsetDeletedObjectIds(array $objectids): void {
@@ -1627,7 +1043,7 @@ class CTestDataHelper {
 			array_shift($colon_positions);
 
 			$ref = $colon_positions
-				? substr($value, $colon_start, reset($colon_positions) - $colon_start)
+				? substr($value, $colon_start, reset($colon_positions) - $colon_start - 1)
 				: substr($value, $colon_start);
 
 			if (!array_key_exists($ref, $objectid)) {
@@ -1635,18 +1051,6 @@ class CTestDataHelper {
 			}
 
 			$objectid = $objectid[$ref];
-
-			if (!$colon_positions && is_array($objectid)) {
-				do {
-					if (!$objectid) {
-						return;
-					}
-
-					end($objectid);
-					$_ref = key($objectid);
-					$objectid = $objectid[$_ref];
-				} while (is_array($objectid));
-			}
 		}
 
 		$value = $objectid;
@@ -1701,47 +1105,6 @@ class CTestDataHelper {
 		}
 
 		self::$objectids = [];
-	}
-
-	public static function getObjectFields(array $object, array $fields, ?array $except_fields = []) {
-		$object = array_intersect_key($object, array_flip($fields));
-
-		foreach ($except_fields as $path) {
-			$nested_object = &$object;
-
-			while (true) {
-				if (strpos($path, '.') === false) {
-					unset($nested_object[$path]);
-
-					break;
-				}
-
-				[$field, $path] = explode('.', $path, 2);
-
-				if (!array_key_exists($field, $nested_object)) {
-					break;
-				}
-
-				$nested_object = &$nested_object[$field];
-
-				if (strpos($path, '.') === false) {
-					if (array_key_exists($path, $nested_object)) {
-						unset($nested_object[$path]);
-					}
-					else {
-						foreach ($nested_object as &$_object) {
-							unset($_object[$path]);
-						}
-						unset($_object);
-					}
-
-					break;
-				}
-			}
-			unset($nested_object);
-		}
-
-		return $object;
 	}
 
 	private static function prepareEnabledGuestUser(): array {

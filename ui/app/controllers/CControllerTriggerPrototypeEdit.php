@@ -115,8 +115,9 @@ class CControllerTriggerPrototypeEdit extends CController {
 					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name', 'discover'
 				],
 				'selectHosts' => ['hostid'],
-				'selectDiscoveryRule' => ['itemid', 'templateid'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 				'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
+				'selectDiscoveryData' => ['parent_triggerid'],
 				'triggerids' => $this->getInput('triggerid'),
 				'selectItems' => ['itemid', 'templateid', 'flags'],
 				'selectDependencies' => ['triggerid'],

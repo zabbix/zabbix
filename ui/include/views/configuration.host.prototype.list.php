@@ -76,6 +76,21 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
 		$data['allowed_ui_conf_templates']
 	);
+
+	if ($hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$name[] = (new CLink($hostPrototype['parent_lld']['name'],
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $hostPrototype['parent_lld']['itemid'])
+				->setArgument('hostid', $hostPrototype['discoveryData']['parent_hostid'])
+				->setArgument('context', 'host')
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
+
+		$name[] = NAME_DELIMITER;
+	}
+
 	$name[] = new CLink($hostPrototype['name'],
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')

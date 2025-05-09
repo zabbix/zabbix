@@ -450,7 +450,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$options = $overrides ? ['selectOverrides' => ['step']] : [];
 
 			$db_item = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'templateid'],
+				'output' => ['itemid', 'templateid', 'flags'],
 				'itemids' => $itemid
 			] + $options)[0];
 		}
@@ -610,7 +610,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (hasRequest('update')) {
 				$item = getSanitizedItemFields($input + $db_item + [
-						'flags' => ZBX_FLAG_DISCOVERY_RULE,
 						'hosts' => $hosts
 					]);
 
@@ -726,6 +725,8 @@ if (hasRequest('form')) {
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_itemid'],
 			'itemids' => $itemid
 		]);
 		$item = $items[0];
@@ -760,7 +761,7 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
-	if ($host['status'] != HOST_STATUS_TEMPLATE && $host['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	if (getRequest('form') === 'add' && $host['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 		unset($data['types'][ITEM_TYPE_NESTED]);
 	}
 
@@ -774,6 +775,8 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+	$data['discovered_lld'] = false;
+
 	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
 		throw new CAccessDeniedException();
 	}
@@ -848,6 +851,13 @@ if (hasRequest('form')) {
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
+
+		$data['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$data['discoveryRule'] = $item['discoveryRule'];
+			$data['discoveryData'] = $item['discoveryData'];
+		}
 	}
 	// clone form
 	elseif (hasRequest('clone')) {

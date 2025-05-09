@@ -1020,10 +1020,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				"select i.key_"
 				" from items i,items t"
 				" where i.key_=t.key_"
-					" and i.flags<>t.flags"
+					" and i.flags&%d<>t.flags&%d"
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
-				hostid);
+				ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE, hostid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid",
 				templateids->values, templateids->values_num);
 
@@ -5714,6 +5714,75 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate templates for linking by filtering out already linked    *
+ *          ones and checking for potential conflicts                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    hostid          - [IN] host identifier                                  *
+ *    lnk_templateids - [IN] vector of template IDs to link                   *
+ *    error           - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - validation passed successfully                     *
+ *               FAIL    - validation failed                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_missing_host_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error)
+{
+	zbx_vector_uint64_t	templateids;
+	char			err[MAX_STRING_LEN];
+	int			ret = FAIL;
+
+	zbx_vector_uint64_create(&templateids);
+
+	get_templates_by_hostid(hostid, &templateids);
+
+	for (int i = 0; i < lnk_templateids->values_num; i++)
+	{
+		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			/* template already linked */
+			zbx_vector_uint64_remove(lnk_templateids, i--);
+		}
+		else
+			zbx_vector_uint64_append(&templateids, lnk_templateids->values[i]);
+	}
+
+	/* all templates already linked */
+	if (0 == lnk_templateids->values_num)
+		goto success;
+
+	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (SUCCEED != validate_linked_templates(&templateids, err, sizeof(err)))
+	{
+		char	*template_names = get_template_names(lnk_templateids);
+
+		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
+
+		zbx_free(template_names);
+		goto out;
+	}
+
+	if (SUCCEED != validate_host(hostid, lnk_templateids, err, sizeof(err)))
+	{
+		char	*template_names = get_template_names(lnk_templateids);
+
+		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
+
+		zbx_free(template_names);
+		goto out;
+	}
+success:
+	ret = SUCCEED;
+out:
+	zbx_vector_uint64_destroy(&templateids);
+
+	return ret;;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies elements from specified template                           *
  *                                                                            *
  * Parameters:                                                                *
@@ -5729,7 +5798,6 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, int audit_context_mode, char **error)
 {
-	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
 	char			*template_names, err[MAX_STRING_LEN];
@@ -5737,47 +5805,11 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&templateids);
+	if (SUCCEED != (res = zbx_check_missing_host_templates(hostid, lnk_templateids, error)))
+		goto clean;
 
-	get_templates_by_hostid(hostid, &templateids);
-
-	for (i = 0; i < lnk_templateids->values_num; i++)
-	{
-		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-		{
-			/* template already linked */
-			zbx_vector_uint64_remove(lnk_templateids, i--);
-		}
-		else
-			zbx_vector_uint64_append(&templateids, lnk_templateids->values[i]);
-	}
-
-	/* all templates already linked */
 	if (0 == lnk_templateids->values_num)
 		goto clean;
-
-	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (SUCCEED != (res = validate_linked_templates(&templateids, err, sizeof(err))))
-	{
-		template_names = get_template_names(lnk_templateids);
-
-		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
-
-		zbx_free(template_names);
-		goto clean;
-	}
-
-	if (SUCCEED != (res = validate_host(hostid, lnk_templateids, err, sizeof(err))))
-	{
-		template_names = get_template_names(lnk_templateids);
-
-		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
-
-		zbx_free(template_names);
-		goto clean;
-	}
 
 	hosttemplateid = zbx_db_get_maxid_num("hosts_templates", lnk_templateids->values_num);
 
@@ -5809,7 +5841,6 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		DBcopy_template_httptests(hostid, lnk_templateids, audit_context_mode);
 	}
 clean:
-	zbx_vector_uint64_destroy(&templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 

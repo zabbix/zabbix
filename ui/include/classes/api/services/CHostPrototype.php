@@ -64,6 +64,7 @@ class CHostPrototype extends CHostBase {
 			'selectGroupPrototypes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['group_prototypeid', 'name']), 'default' => null],
 			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff($discovery_fields, ['lldruleid', 'discover'])), 'default' => null],
 			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff($discovery_fields, ['lldruleid'])), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectParentHost' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectInterfaces' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
 			'selectTemplates' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
@@ -79,11 +80,10 @@ class CHostPrototype extends CHostBase {
 			'preservekeys' =>					['type' => API_BOOLEAN, 'default' => false],
 			'nopermissions' =>					['type' => API_BOOLEAN, 'default' => false]	// TODO: This property and frontend usage SHOULD BE removed.
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$options['filter']['flags'] = [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $output_fields;
@@ -145,6 +145,8 @@ class CHostPrototype extends CHostBase {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts['where'][] = 'h.flags IN('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')';
+
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -152,8 +154,12 @@ class CHostPrototype extends CHostBase {
 				$sqlParts['where'][] = '1=0';
 			}
 			else {
+				$sqlParts['from']['hd'] = 'host_discovery hd';
+				$sqlParts['from'][] = 'items i';
 				$sqlParts['from'][] = 'host_hgset hh';
 				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
+				$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
 				$sqlParts['where'][] = 'i.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
@@ -166,9 +172,9 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['from'][] = 'host_discovery hd';
-			$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
-			$sqlParts['where'][] = dbConditionInt('hd.lldruleid', (array) $options['discoveryids']);
+			$sqlParts['from']['hd'] = 'host_discovery hd';
+			$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
+			$sqlParts['where'][] = dbConditionId('hd.lldruleid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hd'] = 'hd.lldruleid';
@@ -243,6 +249,8 @@ class CHostPrototype extends CHostBase {
 				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
 			}
 		}
+
+		self::addRelatedDiscoveryData($options, $result);
 
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
@@ -2542,20 +2550,15 @@ class CHostPrototype extends CHostBase {
 			self::deleteGroupPrototypes($del_group_prototypeids);
 		}
 
-		$discovered_hosts = DBfetchArrayAssoc(DBselect(
-			'SELECT hd.hostid,h.host'.
-			' FROM host_discovery hd,hosts h'.
-			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.lldruleid', $hostids)
-		), 'hostid');
-
-		CHost::deleteForce($discovered_hosts);
+		self::deleteDiscoveredHostPrototypes($hostids);
+		self::deleteDiscoveredHosts($hostids);
 
 		DB::delete('interface', ['hostid' => $hostids]);
 		DB::delete('hosts_templates', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hostmacro', ['hostid' => $hostids]);
 		DB::delete('host_inventory', ['hostid' => $hostids]);
+		DB::delete('host_discovery', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]
@@ -2601,6 +2604,34 @@ class CHostPrototype extends CHostBase {
 			'where' => ['templateid' => $del_group_prototypeids]
 		]);
 		DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
+	}
+
+	private static function deleteDiscoveredHostPrototypes(array $hostids) {
+		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
+		), 'hostid');
+
+		if ($db_host_prototypes) {
+			self::deleteForce($db_host_prototypes);
+		}
+	}
+
+	private static function deleteDiscoveredHosts(array $hostids) {
+		$db_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_CREATED])
+		), 'hostid');
+
+		if ($db_hosts) {
+			CHost::deleteForce($db_hosts);
+		}
 	}
 
 	/**

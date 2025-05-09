@@ -26,6 +26,8 @@ abstract class CGraphGeneral extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_graphid', 'status', 'ts_delete'];
+
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
 	const ERROR_MISSING_GRAPH_NAME = 'missingGraphName';
 	const ERROR_MISSING_GRAPH_ITEMS = 'missingGraphItems';
@@ -501,6 +503,28 @@ abstract class CGraphGeneral extends CApiService {
 			: [];
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
+	}
+
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$graph) {
+			$graph['discoveryData'] = [];
+		}
+		unset($graph);
+
+		$_options = [
+			'output' => array_merge(['graphid'], $options['selectDiscoveryData']),
+			'graphids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('graph_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['graphid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['graphid']));
+		}
 	}
 
 	/**
@@ -1245,7 +1269,7 @@ abstract class CGraphGeneral extends CApiService {
 		foreach ($hostids_by_name as $name => $_hostids) {
 			$flags = $this instanceof CGraph
 					? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-					: [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE | ZBX_FLAG_DISCOVERY_CREATED];
+					: [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED];
 			$sql = 'SELECT g.graphid,g.name,g.templateid,g.flags'.
 				' FROM graphs g'.
 				' WHERE '.dbConditionString('g.name', [$name]).

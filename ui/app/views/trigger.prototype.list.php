@@ -81,6 +81,22 @@ foreach ($data['triggers'] as $trigger) {
 		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
+	if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$description[] = (new CLink($trigger['parent_lld']['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'trigger.prototype.edit')
+				->setArgument('parent_discoveryid', $trigger['parent_lld']['itemid'])
+				->setArgument('triggerid', $trigger['discoveryData']['parent_triggerid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
+
+		$description[] = NAME_DELIMITER;
+	}
+
 	$trigger_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')

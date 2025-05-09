@@ -126,18 +126,63 @@ class CControllerGraphPrototypeList extends CController {
 		);
 
 		// Get graphs after paging.
-		$options = [
-			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
+		$data['graphs'] = API::GraphPrototype()->get([
+			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover', 'flags'],
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
+			'selectDiscoveryData' => ['parent_graphid'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true
-		];
+		]);
 
-		$data['graphs'] = API::GraphPrototype()->get($options);
+		// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
+		$parent_graphids = [];
+		$parent_lldruleids = [];
 
-		foreach ($data['graphs'] as &$graph) {
-			$graph['graphtype'] = graphType($graph['graphtype']);
+		foreach ($data['graphs'] as $graph) {
+			if ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$parent_lld = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
+				$parent_graphids[$graph['discoveryData']['parent_graphid']] = $graph['graphid'];
+				$parent_lldruleids[$parent_lld['itemid']][] = $graph['graphid'];
+			}
 		}
-		unset($graph);
+
+		if ($parent_graphids) {
+			$parent_graph_prototypes = API::GraphPrototype()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'graphids' => array_keys($parent_graphids),
+				'preservekeys' => true
+			]);
+
+			foreach ($parent_graph_prototypes as $graphid => $parent_graph_prototype) {
+				$parent_lld = $parent_graph_prototype['discoveryRule'] ?: $parent_graph_prototype['discoveryRulePrototype'];
+				$data['graphs'][$parent_graphids[$graphid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
+			}
+
+			$lld_rules = API::DiscoveryRule()->get([
+				'output' => [],
+				'selectDiscoveryRule' => ['name'],
+				'itemids' => array_keys($parent_lldruleids),
+				'preservekeys' => true
+			]);
+
+			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['name'],
+					'itemids' => array_keys($parent_lldruleids),
+					'preservekeys' => true
+				]);
+			}
+
+			foreach ($lld_rules as $lldruleid => $lld_rule) {
+				foreach ($parent_lldruleids[$lldruleid] as $graphid) {
+					$data['graphs'][$graphid]['parent_lld']['name'] = $lld_rule['discoveryRule']['name'];
+				}
+			}
+		}
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 

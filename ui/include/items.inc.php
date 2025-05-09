@@ -2233,6 +2233,7 @@ function getMainItemFieldNames(array $input): array {
 			}
 
 		case ZBX_FLAG_DISCOVERY_CREATED:
+		case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 			return ['status'];
 	}
 }
@@ -2501,7 +2502,10 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
-		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+		'filter' => [
+			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMP],
+			'status' => ITEM_STATUS_ACTIVE
+		]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];

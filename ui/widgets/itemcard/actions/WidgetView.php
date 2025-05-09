@@ -190,6 +190,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($item['discoveryRule']);
 		}
 		else {
+			$item['parent_lld'] = $item['discoveryRule'];
 			$item['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => $item['discoveryRule']['itemid'],
