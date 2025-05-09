@@ -192,7 +192,7 @@ class CControllerAuthenticationEdit extends CController {
 					'sp_private_key' => '',
 					'idp_certificate_hash' => $this->hasInput('idp_certificate') ? '' : '1',
 					'sp_certificate_hash' => $this->hasInput('sp_certificate') ? '' : '1',
-					'sp_private_key_hash' => $this->hasInput('sp_private_key') ? '' : '1',
+					'sp_private_key_hash' => $this->hasInput('sp_private_key') ? '' : '1'
 				];
 			}
 
