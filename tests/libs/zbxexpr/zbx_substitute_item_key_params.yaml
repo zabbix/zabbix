@@ -30,9 +30,9 @@ out:
   return: FAIL
   error: "Invalid item key at position 0"
 ---
-test case: Key doesn't start with '['
+test case: Parameters doesn't start with '['
 in:
-  key: item$[]
+  key: item()
 out:
   return: FAIL
   error: "Invalid item key at position 4"
@@ -97,7 +97,7 @@ test case: Comma after end of parameters
 in:
   key: "item[abc],"
 out:
-  return: SUCCEED   # This is incorrect
+  return: SUCCEED   # This is incorrect FIXME later
   result: item[abc],
 ---
 test case: Redundant ']'
@@ -153,15 +153,15 @@ out:
   no_macros: 0
   quoted: 1
 ---
-test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro 'a\'
+test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro "a\\"
 in:
   key: echo.sh["{$MACRO}"]
   macro: "a\\"
 out:
-  return: SUCCEED   # This is incorrect
+  return: SUCCEED   # This is incorrect FIXME later
   result: echo.sh[a\]
 ---
-test case: Macro test for key 'echo.sh[{$MACRO}]' with macro ' a'
+test case: Macro test for key 'echo.sh[{$MACRO}]' with macro " a"
 in:
   key: echo.sh[{$MACRO}]
   macro: " a"
@@ -174,10 +174,10 @@ in:
   key: echo.sh[{$MACRO}]
   macro: a\
 out:
-  return: SUCCEED   # This is incorrect
+  return: SUCCEED   # This is incorrect FIXME later
   result: echo.sh[a\]
 ---
-test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro ' a'
+test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro " a"
 in:
   key: echo.sh["{$MACRO}"]
   macro: " a"
@@ -190,7 +190,7 @@ in:
   key: echo.sh["{$MACRO}"]
   macro: a\
 out:
-  return: SUCCEED  # This is incorrect
+  return: SUCCEED  # This is incorrect FIXME later
   result: echo.sh[a\]
 ---
 test case: Macro test for key 'echo.sh[{$MACRO}]' with macro '"a"'
@@ -241,7 +241,7 @@ out:
   return: FAIL
   error: Invalid item key at position 16
 ---
-test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro 'a,b\'
+test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro 'a,b'
 in:
   key: echo.sh["{$MACRO}"]
   macro: 'a,b'

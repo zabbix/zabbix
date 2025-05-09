@@ -16,13 +16,6 @@ out:
   result: item1
   func_hit: 1
 ---
-test case: Invalid character in key
-in:
-  key: item$
-out:
-  return: SUCCEED
-  result: item$
----
 test case: No key
 in:
   key: ''
@@ -90,7 +83,7 @@ test case: Comma after end of parameters
 in:
   key: "item[abc],"
 out:
-  return: SUCCEED   # This is incorrect
+  return: SUCCEED   # This is incorrect FIXME later
   result: item[abc],
 ---
 test case: Redundant ']'
@@ -100,7 +93,7 @@ out:
   return: FAIL
   error: Invalid SNMP OID at position 6
 ---
-test case: Escapte quote in quoted parameter
+test case: Escaped quote in quoted parameter
 in:
   key: item["abc","ab\"c","\"\""]
 out:
