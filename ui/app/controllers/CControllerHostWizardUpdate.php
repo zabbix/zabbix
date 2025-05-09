@@ -212,7 +212,9 @@ class CControllerHostWizardUpdate extends CControllerHostUpdateGeneral {
 		}
 
 		foreach ($macros as $macro) {
-			$result[$macro['macro']] = $macro;
+			$result[$macro['macro']] = array_key_exists($macro['macro'], $result)
+				? $macro + ['hostmacroid' => $result[$macro['macro']]['hostmacroid']]
+				: $macro;
 		}
 
 		return array_values($result);

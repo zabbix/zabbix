@@ -259,7 +259,15 @@ abstract class CControllerHostUpdateGeneral extends CController {
 				return false;
 			}
 
-			$macro_value = trim($indexed_macros[$tempalte_macro['macro']]['value']);
+			$macro = $indexed_macros[$tempalte_macro['macro']];
+
+			// Macro with type secret can be without value.
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+				unset($indexed_macros[$tempalte_macro['macro']]);
+				continue;
+			}
+
+			$macro_value = trim($macro['value']);
 
 			if ($macro_value === ''
 					&& $config['type'] == ZBX_WIZARD_FIELD_TEXT

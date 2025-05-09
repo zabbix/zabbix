@@ -32,40 +32,41 @@ window.host_wizard_edit = new class {
 	STEP_CONFIGURATION_FINISH = 7;
 	STEP_COMPLETE = 8;
 
-	TEMPLATE_DATA_COLLECTION_ANY = -1;
-	TEMPLATE_DATA_COLLECTION_AGENT_BASED = 0;
-	TEMPLATE_DATA_COLLECTION_AGENTLESS = 1;
+	TEMPLATE_DATA_COLLECTION_ANY = <?= ZBX_TEMPLATE_DATA_COLLECTION_ANY ?>;
+	TEMPLATE_DATA_COLLECTION_AGENT_BASED = <?= ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED ?>;
+	TEMPLATE_DATA_COLLECTION_AGENTLESS = <?= ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS ?>;
 
-	TEMPLATE_AGENT_MODE_ANY = -1;
-	TEMPLATE_AGENT_MODE_ACTIVE = 0;
-	TEMPLATE_AGENT_MODE_PASSIVE = 0;
+	TEMPLATE_AGENT_MODE_ANY = <?= ZBX_TEMPLATE_AGENT_MODE_ANY ?>;
+	TEMPLATE_AGENT_MODE_ACTIVE = <?= ZBX_TEMPLATE_AGENT_MODE_ACTIVE ?>;
+	TEMPLATE_AGENT_MODE_PASSIVE = <?= ZBX_TEMPLATE_AGENT_MODE_PASSIVE ?>;
 
-	TEMPLATE_SHOW_ANY = -1;
-	TEMPLATE_SHOW_LINKED = 0;
-	TEMPLATE_SHOW_NOT_LINKED = 1;
+	TEMPLATE_SHOW_ANY = <?= ZBX_TEMPLATE_SHOW_ANY ?>;
+	TEMPLATE_SHOW_LINKED = <?= ZBX_TEMPLATE_SHOW_LINKED ?>;
+	TEMPLATE_SHOW_NOT_LINKED = <?= ZBX_TEMPLATE_SHOW_LINKED ?>;
 
-	HOST_ENCRYPTION_PSK = 2;
+	HOST_ENCRYPTION_PSK = <?= HOST_ENCRYPTION_PSK ?>;
 
-	INTERFACE_TYPE_AGENT = 1;
-	INTERFACE_TYPE_SNMP = 2;
-	INTERFACE_TYPE_IPMI = 3;
-	INTERFACE_TYPE_JMX = 4;
+	INTERFACE_TYPE_AGENT = <?= INTERFACE_TYPE_AGENT ?>;
+	INTERFACE_TYPE_SNMP = <?= INTERFACE_TYPE_SNMP ?>;
+	INTERFACE_TYPE_IPMI = <?= INTERFACE_TYPE_IPMI ?>;
+	INTERFACE_TYPE_JMX = <?= INTERFACE_TYPE_JMX ?>;
 
-	SNMP_V1 = 1;
-	SNMP_V2C = 2;
-	SNMP_V3 = 3;
+	SNMP_V1 = <?= SNMP_V1 ?>;
+	SNMP_V2C = <?= SNMP_V2C ?>;
+	SNMP_V3 = <?= SNMP_V3 ?>;
 
-	SNMP_BULK_ENABLED = 1;
+	SNMP_BULK_ENABLED = <?= SNMP_BULK_ENABLED ?>;
 
-	INTERFACE_SECONDARY = 0;
-	INTERFACE_PRIMARY = 1;
-	INTERFACE_USE_IP = 1;
+	INTERFACE_SECONDARY = <?= INTERFACE_SECONDARY ?>;
+	INTERFACE_PRIMARY = <?= INTERFACE_PRIMARY ?>;
 
-	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV = 0
-	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV = 1;
-	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV = 2;
-	ITEM_SNMPV3_AUTHPROTOCOL_MD5 = 0;
-	ITEM_SNMPV3_PRIVPROTOCOL_DES = 0;
+	INTERFACE_USE_IP = <?= INTERFACE_USE_IP ?>;
+
+	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV = <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>;
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV = <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>;
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV = <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>;
+	ITEM_SNMPV3_AUTHPROTOCOL_MD5 = <?= ITEM_SNMPV3_AUTHPROTOCOL_MD5 ?>;
+	ITEM_SNMPV3_PRIVPROTOCOL_DES = <?= ITEM_SNMPV3_PRIVPROTOCOL_DES ?>;
 
 	DEFAULT_PORTS = {
 		[this.INTERFACE_TYPE_AGENT]: 10050,
@@ -76,14 +77,14 @@ window.host_wizard_edit = new class {
 
 	DISCOVERY_STATE_MANUAL = 0x3;
 
-	MACRO_TYPE_TEXT = 'TEXT';
-	MACRO_TYPE_SECRET = 'SECRET_TEXT';
-	MACRO_TYPE_VAULT = 'VAULT';
+	MACRO_TYPE_TEXT = <?= ZBX_MACRO_TYPE_TEXT ?>;
+	MACRO_TYPE_SECRET = <?= ZBX_MACRO_TYPE_SECRET ?>;
+	MACRO_TYPE_VAULT = <?= ZBX_MACRO_TYPE_VAULT ?>;
 
-	WIZARD_FIELD_NOCONF = 0;
-	WIZARD_FIELD_TEXT = 1;
-	WIZARD_FIELD_LIST = 2;
-	WIZARD_FIELD_CHECKBOX = 3;
+	WIZARD_FIELD_NOCONF = <?= ZBX_WIZARD_FIELD_NOCONF ?>;
+	WIZARD_FIELD_TEXT = <?= ZBX_WIZARD_FIELD_TEXT ?>;
+	WIZARD_FIELD_LIST = <?= ZBX_WIZARD_FIELD_LIST ?>;
+	WIZARD_FIELD_CHECKBOX = <?= ZBX_WIZARD_FIELD_CHECKBOX ?>;
 
 	#view_templates;
 
@@ -246,7 +247,7 @@ window.host_wizard_edit = new class {
 					else {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
-						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit'));
 					}
 				})
 				.catch(() => {
@@ -1159,26 +1160,27 @@ window.host_wizard_edit = new class {
 			switch (Number(macro.config.type)) {
 				case this.WIZARD_FIELD_TEXT:
 					return this.#makeMacroFieldText(macro, row_index);
+
 				case this.WIZARD_FIELD_LIST:
 					return this.#makeMacroFieldList(macro, row_index);
+
 				case this.WIZARD_FIELD_CHECKBOX:
 					return this.#makeMacroFieldCheckbox(macro, row_index);
+
 				default:
 					return null;
 			}
 		})();
 
 		const description_view = macro.config.description
-			? this.#view_templates.description.evaluateToElement({
-				description: macro.config.description
-			})
+			? this.#view_templates.description.evaluateToElement({description: macro.config.description})
 			: null;
 
 		return {field: field_view, description: description_view};
 	}
 
 	#makeMacroFieldText({type, macro, config}, row_index) {
-		switch (type) {
+		switch (Number(type)) {
 			case this.MACRO_TYPE_SECRET:
 				return this.#view_templates.macro_field_secret.evaluateToElement({
 					row_index,
