@@ -342,7 +342,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Units' => false,
 			'Bold' => false
 		];
-		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Color']);
+		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Colour']);
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
