@@ -73,15 +73,15 @@ $hostid = getRequest('hostid', 0);
 // permissions
 if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
+		'output' => ['itemid', 'hostid', 'flags'],
 		'itemids' => getRequest('parent_discoveryid'),
-		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
 	]);
 
 	if (!$discoveryRule) {
 		$discoveryRule = API::DiscoveryRulePrototype()->get([
+			'output' => ['itemid', 'hostid', 'flags'],
 			'itemids' => getRequest('parent_discoveryid'),
-			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		]);
 	}
@@ -601,6 +601,7 @@ else {
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'discovery_rule' => $discoveryRule,
+		'parent_discovered' => $discoveryRule['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'context' => getRequest('context')

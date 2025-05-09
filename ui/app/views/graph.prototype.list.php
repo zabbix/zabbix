@@ -34,6 +34,7 @@ $html_page = (new CHtmlPage())
 					(new CSimpleButton(_('Create graph prototype')))
 						->setId('js-create')
 						->setAttribute('data-parent_discoveryid',$data['parent_discoveryid'])
+						->setEnabled(!$data['parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -124,14 +125,14 @@ foreach ($data['graphs'] as $graph) {
 		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 		->setArgument('graphid', $graphid));
 
-	$nodiscover = ($graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes')))
-		->setAttribute('data-graphid', $graphid)
-		->setAttribute('data-discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-		->addClass('js-update-discover')
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+	$no_discover = $graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
+	$discover_toggle = $data['parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes')))
+			->setAttribute('data-graphid', $graphid)
+			->setAttribute('data-discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+			->addClass('js-update-discover')
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$graphs_table->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
@@ -140,7 +141,7 @@ foreach ($data['graphs'] as $graph) {
 		$graph['width'],
 		$graph['height'],
 		$graph['graphtype'],
-		$discover
+		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 	]);
 }
 

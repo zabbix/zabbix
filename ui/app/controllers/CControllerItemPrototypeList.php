@@ -67,36 +67,37 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			$this->updateProfileSort();
 		}
 
-		$lld = API::DiscoveryRule()->get([
-			'output' => ['hostid'],
+		$parent_lld = API::DiscoveryRule()->get([
+			'output' => ['hostid', 'flags'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
 
-		if (!$lld) {
-			$lld = API::DiscoveryRulePrototype()->get([
-				'output' => ['hostid'],
+		if (!$parent_lld) {
+			$parent_lld = API::DiscoveryRulePrototype()->get([
+				'output' => ['hostid', 'flags'],
 				'selectHosts' => ['status'],
 				'itemids' => $this->getInput('parent_discoveryid'),
 				'editable' => true
 			]);
 		}
 
-		$lld = reset($lld);
+		$parent_lld = reset($parent_lld);
 
 		$data = [
 			'action' => $this->getAction(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'context' => $this->getInput('context'),
-			'hostid' => $lld['hostid'],
+			'hostid' => $parent_lld['hostid'],
 			'items' => [],
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
+			'parent_discovered' => $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 			'sort' => $profile['sort'],
 			'sortorder' => $profile['sortorder']
 		];
 		$context = $this->getInput('context');
-		$is_template_lld = $lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
+		$is_template_lld = $parent_lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
 
 		if (($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld)) {
 			$data['items'] = $this->getItems($profile);

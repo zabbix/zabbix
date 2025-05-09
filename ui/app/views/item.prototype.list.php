@@ -116,6 +116,26 @@ foreach ($data['items'] as $item) {
 
 	$name[] = new CLink($item['name'], $item_prototype_url);
 
+	$status_disabled = $item['status'] == ITEM_STATUS_DISABLED;
+	$status_toggle = $data['parent_discovered']
+		? (new CSpan($status_disabled ? _('No') : _('Yes')))
+		: (new CLink($status_disabled ? _('No') : _('Yes')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($status_disabled ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
+			->setAttribute('data-itemid', $item['itemid'])
+			->setAttribute('data-field', 'status')
+			->setAttribute('data-context', $data['context']);
+
+	$no_discover = $item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
+	$discover_toggle = $data['parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($no_discover ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
+			->setAttribute('data-itemid', $item['itemid'])
+			->setAttribute('data-field', 'discover')
+			->setAttribute('data-context', $data['context']);
+
 	$table->addRow([
 		new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']),
 		(new CButtonIcon(ZBX_ICON_MORE))
@@ -132,20 +152,8 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		(new CLink(($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status']))
-			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
-			->setAttribute('data-itemid', $item['itemid'])
-			->setAttribute('data-field', 'status')
-			->setAttribute('data-context', $data['context']),
-		(new CLink(($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER) ? _('No') : _('Yes')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
-			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
-			->setAttribute('data-itemid', $item['itemid'])
-			->setAttribute('data-field', 'discover')
-			->setAttribute('data-context', $data['context']),
+		$status_toggle->addClass(itemIndicatorStyle($item['status'])),
+		$discover_toggle->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 		$data['tags'][$item['itemid']]
 	]);
 }
@@ -158,18 +166,24 @@ $buttons = [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massenable-itemprototype')
 			->addClass('js-no-chkbxrange')
+			->setEnabled(!$data['parent_discovered'])
+			->setAttribute('data-disabled', $data['parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Create disabled')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdisable-itemprototype')
 			->addClass('js-no-chkbxrange')
+			->setEnabled(!$data['parent_discovered'])
+			->setAttribute('data-disabled', $data['parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-itemprototype')
 			->addClass('js-no-chkbxrange')
+			->setEnabled(!$data['parent_discovered'])
+			->setAttribute('data-disabled', $data['parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Delete')))
@@ -195,6 +209,7 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_protot
 						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 						->setAttribute('data-context', $data['context'])
 						->addClass('js-create-item-prototype')
+						->setEnabled(!$data['parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

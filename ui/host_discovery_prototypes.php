@@ -249,16 +249,16 @@ $itemid = getRequest('itemid');
 
 if (getRequest('parent_discoveryid')) {
 	$db_parent_discovery = API::DiscoveryRule()->get([
-		'itemids' => getRequest('parent_discoveryid'),
 		'output' => ['itemid', 'flags'],
+		'itemids' => getRequest('parent_discoveryid'),
 		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 		'editable' => true
 	]);
 
 	if (!$db_parent_discovery) {
 		$db_parent_discovery = API::DiscoveryRulePrototype()->get([
-			'itemids' => getRequest('parent_discoveryid'),
 			'output' => ['itemid', 'flags'],
+			'itemids' => getRequest('parent_discoveryid'),
 			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 			'editable' => true
 		]);
@@ -820,13 +820,12 @@ else {
 	$data = [
 		'hostid' => $hosts[0]['hostid'],
 		'parent_discoveryid' => $db_parent_discovery['itemid'],
+		'parent_discovered' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
 		'active_tab' => CProfile::get($prefix.'discovery_prototypes.filter.active', 1),
 		'checkbox_hash' => $db_parent_discovery['itemid'],
-		'context' => getRequest('context'),
-		'readonly' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED
-				&& $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
+		'context' => getRequest('context')
 	];
 
 	// Select LLD prototypes.
