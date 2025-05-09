@@ -115,6 +115,7 @@ class testLld extends CIntegrationTest
 	public function prepareData()
 	{
 		$this->importHost("lld_test_dbs_template");
+		$this->importHost("lld_test_autoreg_main_template");
 
 		$response = $this->call('templategroup.get', [
 			'filter' => [
@@ -1642,7 +1643,9 @@ class testLld extends CIntegrationTest
 		}
 	}
 
-	// Discovering the DB instances on a DB server, then discovering the tablespaces for each instance.
+	/*
+	 * @backup hosts,items,item_rtdata,triggers
+	 */
 	public function testLld_testNestedDRulesFromHost()
 	{
 		$this->importHost("lld_test_host_dbs");
@@ -1651,17 +1654,9 @@ class testLld extends CIntegrationTest
 		$this->checkNestedLLDFromTemplate(self::HOSTNAME_NESTED_1);
 	}
 
-	/* Discovering the DB instances on the DB server by representing them as discovered hosts
-	 * then discovering the tablespaces for each DB instance. */
-	public function testLld_testNestedDRulesFromHostWithTmplLinkage()
+	private function checkDbServerDiscovery()
 	{
-		$this->importHost("lld_test_server_dbs");
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$dbs = ['db1', 'db2', 'db3'];
 
@@ -1706,6 +1701,22 @@ class testLld extends CIntegrationTest
 		}
 	}
 
+	/*
+	 * @backup hosts,items,item_rtdata,triggers
+	 */
+	public function testLld_testNestedDRulesFromHostWithTmplLinkage()
+	{
+		$this->importHost("lld_test_server_dbs");
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$this->checkDbServerDiscovery();
+	}
+
 	/**
 	 * @required-components server, agent
 	 * @configurationDataProvider agentConfigurationProvider
@@ -1716,12 +1727,12 @@ class testLld extends CIntegrationTest
 		$response = $this->call('template.get', [
 			'output' => ['templateid'],
 			'filter' => [
-				'name' => 'lld_test_dbs_template'
+				'name' => 'lld_test_autoreg_main_template'
 			]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('templateid', $response['result'][0]);
-		$templateid = $response['result'][0]['templateid'];
+		$templateid_main = $response['result'][0]['templateid'];
 
 		$response = $this->call('action.create', [
 			[
@@ -1748,10 +1759,10 @@ class testLld extends CIntegrationTest
 						'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 						'optemplate' => [
 							[
-								'templateid' => $templateid
+								'templateid' => $templateid_main
 							]
 						]
-					]
+					],
 				]
 			]
 		]);
@@ -1768,12 +1779,17 @@ class testLld extends CIntegrationTest
 			],
 			'sortorder' => 'ASC',
 			'sortfield' => 'host',
-		], 30, 2);
+		], 240, 2);
 		$this->assertCount(1, $response['result']);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->checkNestedLLDFromTemplate(self::AGENT_AUTOREG_NAME);
-		sleep(250);
+
+		$this->sendSenderValue(self::AGENT_AUTOREG_NAME, 'main_drule', self::$trapper_data_nested1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue(self::AGENT_AUTOREG_NAME, 'main_drule', self::$trapper_data_nested1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$this->checkDbServerDiscovery();
 	}
 
 	public static function clearAutoregAction(): void
