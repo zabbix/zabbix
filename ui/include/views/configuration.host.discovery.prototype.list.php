@@ -104,12 +104,23 @@ foreach ($data['discoveries'] as $discovery) {
 			$description[] = $discovery['master_item']['name'];
 		}
 		else {
-			$item_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'popup')
-				->setArgument('popup', 'item.edit')
-				->setArgument('context', $data['context'])
-				->setArgument('itemid', $discovery['master_item']['itemid'])
-				->getUrl();
+			if ($discovery['master_item']['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$item_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'item.prototype.edit')
+					->setArgument('context', $data['context'])
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('itemid', $discovery['master_item']['itemid'])
+					->getUrl();
+			}
+			else {
+				$item_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'item.edit')
+					->setArgument('context', $data['context'])
+					->setArgument('itemid', $discovery['master_item']['itemid'])
+					->getUrl();
+			}
 
 			$description[] = (new CLink($discovery['master_item']['name'], $item_url))
 				->addClass(ZBX_STYLE_LINK_ALT)

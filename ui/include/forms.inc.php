@@ -41,7 +41,7 @@ JAVASCRIPT;
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
 		'limited' => false,
-		'readonly' => false,
+		'discovered_lld' => false,
 		'interfaceid' => getRequest('interfaceid', 0),
 		'name' => getRequest('name', ''),
 		'description' => getRequest('description', ''),
@@ -201,11 +201,8 @@ JAVASCRIPT;
 		$data['interfaceid'] = $item['interfaceid'];
 
 		// Check for a discovered prototype
-		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
-				&& ($item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE || $item['flags'] & ZBX_FLAG_DISCOVERY_RULE)) {
-			$data['readonly'] = true;
-			$data['limited'] = true;
-		}
+		$data['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			&& ($item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE || $item['flags'] & ZBX_FLAG_DISCOVERY_RULE);
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $item['flags']),
 			$item['flags'], CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)

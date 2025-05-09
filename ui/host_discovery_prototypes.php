@@ -664,6 +664,14 @@ if (hasRequest('form')) {
 			'webitems' => true
 		]);
 
+		if (!$db_master_items) {
+			$db_master_items = API::ItemPrototype()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $master_itemid,
+				'webitems' => true
+			]);
+		}
+
 		if ($db_master_items) {
 			$item['master_item'] = $db_master_items[0];
 		}

@@ -606,7 +606,7 @@ if ($host_prototype['hostid'] != 0) {
 				_('Delete selected host prototype?'),
 				url_params(['form', 'hostid', 'parent_discoveryid', 'context']).'&'.CSRF_TOKEN_NAME.
 				'='.CCsrfTokenHelper::get('host_prototypes.php'), 'context'
-			))->setEnabled(!$readonly),
+			))->setEnabled(!$host_prototype['templateid']),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));
