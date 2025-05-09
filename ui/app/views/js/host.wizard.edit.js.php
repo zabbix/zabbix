@@ -534,8 +534,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#loadWizardConfig() {
-		// TODO VM: don't make the call, when host and template hasn't changed.
-
+		const {templateid} = this.#getSelectedTemplate();
 		const hostid = this.#source_host !== null
 			? this.#source_host.hostid
 			: this.#data.host && !this.#data.host.isNew
@@ -544,7 +543,7 @@ window.host_wizard_edit = new class {
 
 		const url_params = objectToSearchParams({
 			action: 'host.wizard.get',
-			templateid: this.#getSelectedTemplate().templateid,
+			templateid,
 			...(hostid !== null && {hostid})
 		});
 		const get_url = new URL(`zabbix.php?${url_params}`, location.href);
@@ -584,23 +583,31 @@ window.host_wizard_edit = new class {
 					const is_list = Number(template_macro.config.type) === this.WIZARD_FIELD_LIST;
 
 					const host_macro_value = this.#host?.macros.find(({macro}) => macro === template_macro.macro).value;
-					let value = template_macro.value;
+					let value = template_macro.value || '';
 
 					if (is_checkbox || is_list) {
 						const options = Object.values(template_macro.config.options);
-						const allowed_values = is_list ? options.map(option => option.value) : options;
+						const allowed_values = is_checkbox
+							? Object.values(options[0])
+							: options.map(option => option.value);
 
 						if (allowed_values.includes(host_macro_value)) {
 							value = host_macro_value;
 						} else {
-							this.#macro_reset_list[index] = template_macro.macro;
+							this.#macro_reset_list[template_macro.macro] = true;
 						}
 
 						if (value === undefined) {
 							value = is_checkbox
-								? template_macro.config.options.unchecked
+								? template_macro.config.options[0].unchecked
 								: allowed_values[0];
 						}
+					}
+					else if (host_macro_value === undefined && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
+						value = undefined;
+					}
+					else if (host_macro_value !== undefined) {
+						value = host_macro_value;
 					}
 
 					return [index, {
