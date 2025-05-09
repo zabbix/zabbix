@@ -21,11 +21,11 @@
 
 typedef struct
 {
-	int	func_hit;	/* substitution function was called */
-	int	no_macros;	/* substitution function had no macros */
-	int	quoted;		/* quoted parameters */
-	int	unquoted_first;	/* parameter were unquoted first */
-	int	quoted_after;	/* parameter were quoted after */
+	int	func_hit;	/* number of times substitution function was called */
+	int	no_macros;	/* number of times substitution function had no macros */
+	int	quoted;		/* number of times parameters were quoted */
+	int	unquoted_first;	/* number of times parameters were unquoted first */
+	int	quoted_after;	/* number of times parameters were quoted after */
 }
 subst_data_t;
 

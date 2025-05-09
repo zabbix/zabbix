@@ -39,13 +39,13 @@ static int	resolv_func(zbx_macro_resolv_data_t *p, va_list args, char **replace_
 	/* Passed parameters */
 	const char	*macro = va_arg(args, const char *);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:%s", __func__, p->macro);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	/* using only {$MACRO}: no need to test user macro cache */
+	/* Use a fixed macro name in tests: {$MACRO}. No need to test user macro cache. */
 	if (0 == strcmp(p->macro, "{$MACRO}"))
 	{
 		if (NULL == macro)

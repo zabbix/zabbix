@@ -434,6 +434,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	char			*param = NULL, *port = NULL;
 	zbx_dc_item_t		item;
 	int			version;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -449,7 +450,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	port = zbx_strdup(port, item.interface.port_orig);
 
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
+	um_handle = zbx_dc_open_user_macros_masked();
 	zbx_dc_expand_user_and_func_macros(um_handle, &port, &host->hostid, 1, NULL);
 	zbx_dc_close_user_macros(um_handle);
 

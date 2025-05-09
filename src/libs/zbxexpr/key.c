@@ -263,8 +263,7 @@ int	zbx_substitute_snmp_oid_params(char **data, char *error, size_t maxerrlen, z
 		{
 			i += (size_t)len + 1;	/* skip to the position after user macro */
 		}
-		else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '\0' != (*data)[i + 1] &&
-				'#' == (*data)[i + 2] &&
+		else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '#' == (*data)[i + 2] &&
 				SUCCEED == zbx_token_parse_nested_macro(&(*data)[i], &(*data)[i], 0, &token))
 		{
 			i += token.loc.r - token.loc.l + 1;

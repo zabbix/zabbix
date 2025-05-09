@@ -1158,8 +1158,6 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
-
 			ZBX_STR2UINT64(host.hostid, row[0]);
 			zbx_strscpy(host.host, row[1]);
 			zbx_strlcpy_utf8(host.name, row[2], sizeof(host.name));
@@ -1176,8 +1174,8 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 				continue;
 			}
 
-			um_handle_masked = zbx_dc_open_user_macros_masked();
-			um_handle_secure = zbx_dc_open_user_macros_secure();
+			zbx_dc_um_handle_t	*um_handle_masked = zbx_dc_open_user_macros_masked();
+			zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
 
 			httptest.httptest.agent = zbx_strdup(NULL, row[5]);
 			zbx_dc_expand_user_and_func_macros(um_handle_masked, &httptest.httptest.agent, &host.hostid, 1,
