@@ -1520,7 +1520,7 @@ class CItemPrototype extends CItemGeneral {
 
 			while ($row = DBfetch($result)) {
 				if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])) {
-					$db_lld_rule_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+					$db_lld_rule_prototypes[$row['itemid']] = $row;
 				}
 				else {
 					if (!array_key_exists($row['itemid'], $db_items)) {

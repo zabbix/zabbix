@@ -2044,27 +2044,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	}
 
 	/**
-	 * Delete discovery prototypes which belong to the given LLD rules or discovery prototypes.
-	 *
-	 * @param array $ruleids
-	 */
-	protected static function deleteAffectedDiscoveryRulePrototypes(array $ruleids): void {
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT id.itemid,i.name'.
-			' FROM item_discovery id,items i'.
-			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.lldruleid', $ruleids).
-				' AND '.dbConditionInt('i.flags',
-					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
-				)
-		), 'itemid');
-
-		if ($db_items) {
-			CDiscoveryRulePrototype::deleteForce($db_items);
-		}
-	}
-
-	/**
 	 * Delete overrides which belong to the given LLD rules.
 	 *
 	 * @param array $del_itemids

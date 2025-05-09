@@ -1240,7 +1240,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'templateid'],
+			'output' => ['itemid', 'name', 'templateid', 'flags'],
 			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1277,8 +1277,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
-		self::deleteAffectedDiscoveryRulePrototypes($del_itemids);
-		self::deleteDiscoveredLldRulePrototypes($del_itemids);
+		self::deleteAffectedLldRulePrototypes($db_items);
+		self::deleteDiscoveredLldRulePrototypes($db_items);
 		self::deleteDiscoveredLldRules($del_itemids);
 		self::deleteAffectedOverrides($del_itemids);
 
@@ -1297,17 +1297,74 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_LLD_RULE_PROTOTYPE, $db_items);
 	}
 
-	private static function deleteDiscoveredLldRulePrototypes(array $del_itemids): void {
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT id.itemid,i.name'.
-			' FROM item_discovery id,items i'.
-			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionId('id.parent_itemid', $del_itemids).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
-		), 'itemid');
+	/**
+	 * Delete LLD rule prototypes which belong to the given LLD rule prototypes.
+	 *
+	 * @param array $db_items
+	 */
+	private static function deleteAffectedLldRulePrototypes(array $db_items): void {
+		$lldruleids = [];
+		$discovered_lldruleids = [];
 
-		if ($db_items) {
-			self::deleteForce($db_items);
+		foreach ($db_items as $db_item) {
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+				$lldruleids[] = $db_item['itemid'];
+			}
+			else {
+				$discovered_lldruleids[] = $db_item['itemid'];
+			}
+		}
+
+		if ($lldruleids) {
+			$db_lld_rule_prototypes = DBfetchArrayAssoc(DBselect(
+				'SELECT id.itemid,i.name,i.flags'.
+				' FROM item_discovery id,items i'.
+				' WHERE id.itemid=i.itemid'.
+					' AND '.dbConditionId('id.lldruleid', $lldruleids).
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+			), 'itemid');
+
+			if ($db_lld_rule_prototypes) {
+				CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
+			}
+		}
+
+		if ($discovered_lldruleids) {
+			$db_lld_rule_prototypes = DBfetchArrayAssoc(DBselect(
+				'SELECT id.itemid,i.name,i.flags'.
+				' FROM item_discovery id,items i'.
+				' WHERE id.itemid=i.itemid'.
+					' AND '.dbConditionId('id.lldruleid', $discovered_lldruleids).
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
+			), 'itemid');
+
+			if ($db_lld_rule_prototypes) {
+				CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
+			}
+		}
+	}
+
+	private static function deleteDiscoveredLldRulePrototypes(array $db_items): void {
+		$lldruleids = [];
+
+		foreach ($db_items as $db_item) {
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+				$lldruleids[] = $db_item['itemid'];
+			}
+		}
+
+		if ($lldruleids) {
+			$db_lld_rule_prototypes = DBfetchArrayAssoc(DBselect(
+				'SELECT id.itemid,i.name,i.flags'.
+				' FROM item_discovery id,items i'.
+				' WHERE id.itemid=i.itemid'.
+					' AND '.dbConditionId('id.parent_itemid', $lldruleids).
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
+			), 'itemid');
+
+			if ($db_lld_rule_prototypes) {
+				self::deleteForce($db_lld_rule_prototypes);
+			}
 		}
 	}
 

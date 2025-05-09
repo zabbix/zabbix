@@ -2563,7 +2563,7 @@ abstract class CItemGeneral extends CApiService {
 
 		do {
 			$options = [
-				'output' => ['itemid', 'name'],
+				'output' => ['itemid', 'name', 'flags'],
 				'filter' => ['templateid' => $templateids]
 			];
 			$result = DBselect(DB::makeSql('items', $options));

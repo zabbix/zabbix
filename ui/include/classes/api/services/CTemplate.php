@@ -602,7 +602,7 @@ class CTemplate extends CHostGeneral {
 
 		// delete the discovery rules first
 		$db_lld_rules = DB::select('items', [
-			'output' => ['itemid', 'name'],
+			'output' => ['itemid', 'name', 'flags'],
 			'filter' => [
 				'hostid' => $templateids,
 				'flags' => ZBX_FLAG_DISCOVERY_RULE
