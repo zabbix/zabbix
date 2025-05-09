@@ -1663,7 +1663,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 
 	if ($master_itemids) {
 		$options = [
-			'output' => ['itemid', 'type', 'name'],
+			'output' => ['itemid', 'type', 'name', 'flags'],
 			'itemids' => $master_itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1689,10 +1689,10 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_itemid = $item['master_itemid'];
 			$items_index = array_search($master_itemid, $itemids);
-			$item['master_item'] = array_fill_keys(['name', 'type', 'source'], '');
-			$item['master_item'] = ($items_index === false)
-				? array_intersect_key($master_items[$master_itemid], $item['master_item'])
-				: array_intersect_key($items[$items_index], $item['master_item']);
+
+			$master_item = $items_index === false ? $master_items[$master_itemid] : $items[$items_index];
+
+			$item['master_item'] = array_intersect_key($master_item, array_flip(['name', 'type', 'source', 'flags']));
 			$item['master_item']['itemid'] = $master_itemid;
 		}
 	}
