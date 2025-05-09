@@ -47,17 +47,46 @@ class CColorPickerElement extends CElement {
 		if ($color === null) {
 			$overlay->query('button:Use default')->one()->click();
 		}
+		elseif ($overlay->query('class:color-picker-tabs')->one(false)->isValid()) {
+			$overlay->asColorPicker()->selectTab('Solid color');
+			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
+		}
 		else {
-			$overlay->query('xpath:.//div[contains(@class, "color-picker-input")]/input')->one()->overwrite($color);
+			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
-		if ($overlay->query('button:Apply')->exists()) {
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$overlay->waitUntilNotVisible();
+		$apply_button = $overlay->query('button:Apply');
+
+		if ($apply_button->exists()) {
+			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+				$overlay->waitUntilNotVisible();
+			}
+			else {
+				if (!$apply_button->one()->isAttributePresent('disabled')) {
+					throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+				}
+			}
 		}
 		else {
 			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		}
 
+		return $this;
+	}
+
+	/**
+	 * Switch color-picker tab by its name.
+	 *
+	 * @return $this
+	 */
+	public function selectTab($name) {
+		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
+		$tab_element = $this->query($selector.'/..')->one();
+
+		if (!$tab_element->hasClass('color-picker-tab-selected')) {
+			$this->query($selector)->waitUntilPresent()->one()->click();
+			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
 		}
 
 		return $this;
@@ -88,12 +117,20 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Close color pick overlay dialog.
+	 * Close color picker overlay dialog.
 	 *
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		$button = $this->query('class:btn-overlay-close')->one(false);
+		if ($button->isValid()) {
+			$button->click()->waitUntilNotVisible();
+		}
+		else {
+			$dialog = $this->query('class:color-picker-dialog')->one();
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+			$dialog->waitUntilNotPresent();
+		}
 	}
 
 	/**
