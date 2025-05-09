@@ -120,6 +120,7 @@ class CUserDirectory extends CApiService {
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
 			$saml_output = $this->renameSamlHashFields($saml_output);
+			$dbname_hashname = array_flip(self::SAML_HASH_FIELDS);
 
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
@@ -129,32 +130,17 @@ class CUserDirectory extends CApiService {
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
-				$db_userdirectories[$row['userdirectoryid']] += $row;
+				foreach (array_intersect_key($row, $dbname_hashname) as $db_field => $db_value) {
+					$row[$db_field] = $db_value === '' ? $db_value : md5($db_value);
+				}
+
+				$db_userdirectories[$row['userdirectoryid']] += CArrayHelper::renameKeys($row, $dbname_hashname);
 			}
 		}
 
 		if ($db_userdirectories) {
-			if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
-				foreach ($db_userdirectories as $key => $db_userdirectory) {
-					foreach (self::SAML_HASH_FIELDS as $hash_field => $db_filed) {
-						if (!array_key_exists($db_filed, $db_userdirectory)) {
-							continue;
-						}
-
-						if ($db_userdirectory[$db_filed] !== '') {
-							$db_userdirectories[$key][$hash_field] = md5($db_userdirectory[$db_filed]);
-						}
-						else {
-							$db_userdirectories[$key][$hash_field] = '';
-						}
-					}
-					unset($field);
-				}
-				unset($db_userdirectory);
-			}
-
 			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
-			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type', 'idp_certificate', 'sp_certificate', 'sp_private_key'],
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type'],
 				$request_output
 			);
 
