@@ -42,8 +42,8 @@ class CUserDirectory extends CApiService {
 	];
 
 	public const SAML_HASH_FIELDS = [
-		'idp_certificate_hash' => 'idp_certificate', 
-		'sp_certificate_hash' => 'sp_certificate', 
+		'idp_certificate_hash' => 'idp_certificate',
+		'sp_certificate_hash' => 'sp_certificate',
 		'sp_private_key_hash' => 'sp_private_key'
 	];
 
