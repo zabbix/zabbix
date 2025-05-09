@@ -2182,4 +2182,43 @@ class testLld extends CIntegrationTest
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 	}
+
+	public function testLld_discoveryRuleProtoWithMasterItem()
+	{
+		$hostname = "lld_dep_proto";
+		$this->importHost($hostname);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$data = [
+			[
+				"{#NAME}" => "dep_first",
+			],
+			[
+				"{#NAME}" => "dep_second",
+			],
+		];
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		foreach (["dep_first", "dep_second"] as $elem)
+		{
+			$response = $this->call('discoveryrule.get', [
+				'search' => [
+					'name' => 'dep_drule[' . $elem . ']'
+				],
+				'countOutput' => true
+			]);
+			$this->assertEquals(1, $response['result']);
+
+			$response = $this->call('item.get', [
+				'search' => [
+					'key_' => 'master_item[' . $elem . ']'
+				],
+				'countOutput' => true
+			]);
+			$this->assertEquals(1, $response['result']);
+		}
+	}
 }
