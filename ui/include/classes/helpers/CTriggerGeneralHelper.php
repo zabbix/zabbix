@@ -405,11 +405,11 @@ class CTriggerGeneralHelper {
 		);
 		$trigger = reset($triggers);
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			unset($trigger['hostid']);
 		}
 		else {
-			$data['hostid'] = $trigger['hosts'][0]['hostid'];
+			$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
 		}
 
 		if ($trigger['tags']) {
@@ -417,18 +417,11 @@ class CTriggerGeneralHelper {
 			$trigger['tags'] = array_values($trigger['tags']);
 		}
 
-		$data = [
+		return [
 			'description' => $trigger['comments'],
 			'name' => $trigger['description']
-		];
-
-		unset($trigger['comments'], $trigger['hosts'], $trigger['discoveryRule'], $trigger['flags'], $trigger['state'],
-			$trigger['templateid'], $trigger['discoveryData'], $trigger['dependencies'], $trigger['correlation_tag'],
-			$trigger['items']
-		);
-
-		$data = array_merge($trigger, $data);
-
-		return $data;
+		] + array_diff_key($trigger, array_flip(['comments', 'hosts', 'flags', 'state', 'templateid',
+			'dependencies', 'correlation_tag', 'items', 'discoveryRule', 'discoveryRulePrototype', 'discoveryData'
+		]));
 	}
 }
