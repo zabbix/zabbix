@@ -97,7 +97,7 @@ test case: Comma after end of parameters
 in:
   key: "item[abc],"
 out:
-  return: SUCCEED # This is incorrect
+  return: SUCCEED   # This is incorrect
   result: item[abc],
 ---
 test case: Redundant ']'
@@ -107,7 +107,7 @@ out:
   return: FAIL
   error: Invalid item key at position 6
 ---
-test case: Escapte quote in quoted parameter
+test case: Escaped quote in quoted parameter
 in:
   key: item["abc","ab\"c","\"\""]
 out:
@@ -158,7 +158,7 @@ in:
   key: echo.sh["{$MACRO}"]
   macro: "a\\"
 out:
-  return: SUCCEED # This is incorrect
+  return: SUCCEED   # This is incorrect
   result: echo.sh[a\]
 ---
 test case: Macro test for key 'echo.sh[{$MACRO}]' with macro ' a'
@@ -174,7 +174,7 @@ in:
   key: echo.sh[{$MACRO}]
   macro: a\
 out:
-  return: SUCCEED # This is incorrect
+  return: SUCCEED   # This is incorrect
   result: echo.sh[a\]
 ---
 test case: Macro test for key 'echo.sh["{$MACRO}"]' with macro ' a'

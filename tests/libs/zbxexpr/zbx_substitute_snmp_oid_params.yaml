@@ -90,7 +90,7 @@ test case: Comma after end of parameters
 in:
   key: "item[abc],"
 out:
-  return: SUCCEED # This is incorrect
+  return: SUCCEED   # This is incorrect
   result: item[abc],
 ---
 test case: Redundant ']'
