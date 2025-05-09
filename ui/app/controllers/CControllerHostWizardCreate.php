@@ -101,6 +101,8 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 				'macros' => $this->processUserMacros($this->getInput('macros', []))
 			];
 
+			$this->getInputs($host, ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password']);
+
 			if ($this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk')) {
 				$host += [
 					'tls_connect' => HOST_ENCRYPTION_PSK,

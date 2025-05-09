@@ -102,13 +102,7 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 				'macros' => $this->prepareMacros($this->getInput('macros', []), $this->db_host['macros'])
 			];
 
-			$ipmi_fields = ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'];
-
-			foreach ($ipmi_fields as $field) {
-				if ($this->hasInput($field)) {
-					$host[$field] = $this->getInput($field);
-				}
-			}
+			$this->getInputs($host, ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password']);
 
 			if ($this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk')) {
 				$host += [
@@ -163,9 +157,10 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 
 			foreach ($host['interfaces'] as $host_interface) {
 				if ($interface['type'] === $host_interface['type']) {
-					$same = $interface['port'] === $host_interface['port'] && $interface['ip'] === $host_interface['ip']
-						&& $interface['dns'] === $host_interface['dns']
-						&& $interface['useip'] == $host_interface['useip'];
+					$same = $interface['port'] === $host_interface['port']
+						&& $interface['useip'] == $host_interface['useip']
+						&& (($interface['useip'] == INTERFACE_USE_IP && $interface['ip'] === $host_interface['ip'])
+							|| ($interface['useip'] == INTERFACE_USE_DNS && $interface['dns'] === $host_interface['dns']));
 
 					if ($same) {
 						if (in_array($interface['type'], [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_JMX,

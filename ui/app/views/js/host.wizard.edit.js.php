@@ -192,9 +192,9 @@ window.host_wizard_edit = new class {
 		templates: [],
 		tls_psk: '',
 		tls_psk_identity: '',
-		ipmi_authtype: -1,
+		ipmi_authtype: <?= IPMI_AUTHTYPE_DEFAULT ?>,
 		ipmi_password: '',
-		ipmi_privilege: 2,
+		ipmi_privilege: <?= IPMI_PRIVILEGE_USER ?>,
 		ipmi_username: '',
 		interfaces: {},
 		macros: {}
@@ -471,11 +471,6 @@ window.host_wizard_edit = new class {
 		});
 
 		interface_required.forEach((interface_type, row_index) => {
-			const host_interface = this.#host?.interfaces.find(
-				host_interface => Number(host_interface.type) === interface_type
-			);
-
-			this.#data.interfaces[row_index] = host_interface || this.#data.interface_default[interface_type];
 			view.appendChild(interface_templates[interface_type].evaluateToElement({row_index}));
 		});
 
@@ -598,12 +593,32 @@ window.host_wizard_edit = new class {
 					&& (this.#host === null
 						|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
 
+				this.#data.tls_psk_identity = '';
+				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
+
 				this.#data.interface_required = {
 					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
 					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
 					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required,
 					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required
 				}
+
+				const interface_required = Object.entries(this.#data.interface_required)
+					.filter(([_, required]) => required)
+					.map(([type]) => Number(type));
+
+				interface_required.forEach((interface_type, row_index) => {
+					const host_interface = this.#host?.interfaces.find(
+						host_interface => Number(host_interface.type) === interface_type
+					);
+
+					this.#data.interfaces[row_index] = host_interface || this.#data.interface_default[interface_type];
+				});
+
+				this.#data.ipmi_authtype = this.#host?.ipmi_authtype || <?= IPMI_AUTHTYPE_DEFAULT ?>;
+				this.#data.ipmi_privilege = this.#host?.ipmi_privilege || <?= IPMI_PRIVILEGE_USER ?>;
+				this.#data.ipmi_username = this.#host?.ipmi_username || '';
+				this.#data.ipmi_password = this.#host?.ipmi_password || '';
 
 				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
 					const is_checkbox = Number(template_macro.config.type) === this.WIZARD_FIELD_CHECKBOX;
@@ -891,10 +906,6 @@ window.host_wizard_edit = new class {
 					this.#next_button.toggleAttribute('disabled', this.#data.tls_required
 						&& (this.#data.tls_psk_identity.trim() === '' || this.#data.tls_psk.trim() === '')
 					);
-				}
-
-				if (!path && this.#data.tls_psk.trim() === '' && this.#data.tls_required) {
-					this.#data.tls_psk = this.#generatePSK();
 				}
 
 				for (const element of this.#dialogue.querySelectorAll('.js-tls-exists')) {

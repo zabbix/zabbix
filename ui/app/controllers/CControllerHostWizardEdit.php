@@ -78,7 +78,8 @@ class CControllerHostWizardEdit extends CController {
 			'selectTags' => ['tag', 'value'],
 			'selectItems' => ['type'],
 			'selectDiscoveries' => ['type'],
-			'filter' => ['wizard_ready' => ZBX_WIZARD_READY]
+			'filter' => ['wizard_ready' => ZBX_WIZARD_READY],
+			'sortfield' => 'name'
 		]);
 
 		$wizard_vendor_template_count = 0;
