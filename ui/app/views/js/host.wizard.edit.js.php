@@ -129,12 +129,6 @@ window.host_wizard_edit = new class {
 	/** @type {HTMLButtonElement} */
 	#next_button;
 
-	/** @type {HTMLButtonElement} */
-	#create_button;
-
-	/** @type {HTMLButtonElement} */
-	#finish_button;
-
 	#sections_expanded = new Map();
 
 	#csrf_token;
@@ -198,6 +192,8 @@ window.host_wizard_edit = new class {
 		interfaces: {},
 		macros: {}
 	}
+
+	#macro_reset_list = {};
 
 	#updating_locked = true;
 
@@ -580,13 +576,35 @@ window.host_wizard_edit = new class {
 				}
 
 				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
+					const is_checkbox = Number(template_macro.config.type) === this.WIZARD_FIELD_CHECKBOX;
+					const is_list = Number(template_macro.config.type) === this.WIZARD_FIELD_LIST;
+
+					const host_macro_value = this.#host?.macros.find(({macro}) => macro === template_macro.macro).value;
+					let value = template_macro.value;
+
+					if (is_checkbox || is_list) {
+						const options = Object.values(template_macro.config.options);
+						const allowed_values = is_list ? options.map(option => option.value) : options;
+
+						if (allowed_values.includes(host_macro_value)) {
+							value = host_macro_value;
+						} else {
+							this.#macro_reset_list[index] = template_macro.macro;
+						}
+
+						if (value === undefined) {
+							value = is_checkbox
+								? template_macro.config.options.unchecked
+								: allowed_values[0];
+						}
+					}
+
 					return [index, {
 						type: template_macro.type,
 						macro: template_macro.macro,
-						value: (this.#host?.macros.find(({macro}) => macro === template_macro.macro))?.value
-							|| template_macro.value,
+						value,
 						description: template_macro.description
-					}]
+					}];
 				}));
 			});
 	}
