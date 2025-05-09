@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerHostWizardCreate extends CControllerHostUpdateGeneral {
+class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
