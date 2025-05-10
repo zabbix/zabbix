@@ -93,7 +93,7 @@ $form_grid->addItem([
 	new CFormField(
 		(new CColorPicker('base_color'))
 			->setColor($data['base_color'])
-			->showClear()
+			->allowEmpty()
 	)
 ]);
 
@@ -123,7 +123,7 @@ $highlights->addItem(
 		->addItem((new CRow([
 			(new CColorPicker('highlights[#{rowNum}][color]'))
 				->setColor('#{color}')
-				->showClear(),
+				->allowEmpty(),
 			(new CTextBox('highlights[#{rowNum}][pattern]', '#{pattern}', false))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(),
@@ -207,7 +207,7 @@ $thresholds->addItem(
 		->addItem((new CRow([
 			(new CColorPicker('thresholds[#{rowNum}][color]'))
 				->setColor('#{color}')
-				->showClear(),
+				->allowEmpty(),
 			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
