@@ -861,14 +861,20 @@ class CHistoryManager {
 								'SELECT h2.itemid,h2.clock,'.($function == AGGREGATE_FIRST ? 'MIN' : 'MAX').'(h2.ns) AS ns,s2.tick'.
 								' FROM '.$sql_from.' h2'.
 								' JOIN ('.$sql.') s2 ON h2.itemid=s2.itemid AND h2.clock=s2.clock'.
+								' WHERE h2.clock>='.zbx_dbstr($_time_from).
+									' AND h2.clock<='.zbx_dbstr($time_to).
 								' GROUP BY h2.itemid,h2.clock,s2.tick'.
-							') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns';
+							') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns'.
+							' WHERE h.clock>='.zbx_dbstr($_time_from).
+								' AND h.clock<='.zbx_dbstr($time_to);
 					}
 					else {
 						$sql =
 							'SELECT DISTINCT h.itemid,h.value_avg AS value,h.clock,0 AS ns,s.tick'.
 							' FROM '.$sql_from.' h'.
-							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock';
+							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock'.
+							' WHERE h.clock>='.zbx_dbstr($_time_from).
+								' AND h.clock<='.zbx_dbstr($time_to);
 					}
 				}
 
@@ -1440,14 +1446,20 @@ class CHistoryManager {
 								'SELECT h2.itemid,h2.clock,'.($function == AGGREGATE_FIRST ? 'MIN' : 'MAX').'(h2.ns) AS ns'.
 								' FROM '.$sql_from.' h2'.
 								' JOIN ('.$sql.') s2 ON h2.itemid=s2.itemid AND h2.clock=s2.clock'.
+								' WHERE h2.clock>='.zbx_dbstr($time_from_by_source[$source]).
+									($time_to !== null ? ' AND h2.clock<='.zbx_dbstr($time_to) : '').
 								' GROUP BY h2.itemid,h2.clock'.
-							') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns';
+							') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns'.
+							' WHERE h.clock>='.zbx_dbstr($time_from_by_source[$source]).
+								($time_to !== null ? ' AND h.clock<='.zbx_dbstr($time_to) : '');
 					}
 					else {
 						$sql =
 							'SELECT DISTINCT h.itemid,h.value_avg AS value,h.clock'.
 							' FROM '.$sql_from.' h'.
-							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock';
+							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock'.
+							' WHERE h.clock>='.zbx_dbstr($time_from_by_source[$source]).
+								($time_to !== null ? ' AND h.clock<='.zbx_dbstr($time_to) : '');
 					}
 				}
 
