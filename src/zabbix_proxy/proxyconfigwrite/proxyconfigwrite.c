@@ -694,7 +694,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 	}
 
 	memset (&reset_flags, 0, sizeof(reset_flags));
-	for (int i = 0; i < td->reset_fields.values_num; i++)
+	for (i = 0; i < td->reset_fields.values_num; i++)
 	{
 		int reset_index;
 
@@ -748,7 +748,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 		delim = ',';
 	}
 
-	for (int i = 0; i < td->reset_fields.values_num; i++)
+	for (i = 0; i < td->reset_fields.values_num; i++)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=null", delim, td->reset_fields.values[i]);
 		delim = ',';
