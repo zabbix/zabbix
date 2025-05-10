@@ -1,9 +1,21 @@
+Changes for 7.4.0rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
+
+--------------------------------------------------------------------------------
 Changes for 7.4.0beta2
 
 New features:
+.........T [ZBXNEXT-9909] added Azure Backup Jobs by HTTP template (abrosimovs)
+..F....... [ZBXNEXT-9319] implemented dynamic widget editor (averza)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
-........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
-.......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
+........S. [ZBXNEXT-9927] implemented masking of secret user macros that are explicitly used (mprihodko)
+.......PS. [ZBXNEXT-9813] added vm/hv UUID filter for vmware.datastore.discovery item (MVekslers)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 ..F.I..... [ZBXNEXT-9087] implemented Item card widget (dfofanovs)
 ..F.I..PS. [ZBXNEXT-9910] changed default user session storage period from 365d to 31d (aluchko, askolmeisters)
@@ -14,28 +26,33 @@ A.F.I..... [ZBXNEXT-875] implemented map element stacking order control (Ivo)
 .........T [ZBXNEXT-9646] added Juniper MX by NETCONF template (egordymov)
 
 Bug fixes:
+.........T [ZBX-26050] updated dashboards in Zabbix server/proxy health templates (aiantsen)
+....I..... [ZBX-26357] fixed version parsing in libssh2 library detection (askolmeisters)
+..F....... [ZBX-26390] updated templated dashboard help icon link (Sasha)
+..F....... [ZBX-25691] fixed the Problems by severity widget to display all existing problems (wczerneha)
+.........T [ZBX-25931] updated LLD filters in Systemd by Zabbix agent 2 template (drasikhov)
 .........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
-........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
+........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP}, and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
 ..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)
 .......PS. [ZBX-26178] fixed logging noise when vault path does not exist (mprihodko)
-..F....... [ZBX-26120] fixed data loss warning on opening the trigger form after closing the mass update pop-up (isharha)
+..F....... [ZBX-26120] fixed data loss warning on opening trigger form after closing mass update pop-up (isharha)
 ..F....... [ZBX-26198] filtered out items that do not affect interface availability status (dfofanovs)
 .........T [ZBX-26335] fixed trigger expression in Azure SQL Managed Instance by HTTP template (abrosimovs)
 ........S. [ZBX-26235] fixed Zabbix server crash caused by audit when autoregistration deletes host tags (arimdjonoks)
 ........S. [ZBX-26298] fixed expansions of all further user macros after undefined user macro (sboidenko)
-..F....... [ZBX-26277] fixed disabled media types being shown in black color (aluchko)
+..F....... [ZBX-26277] fixed disabled media types being displayed in black (aluchko)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 ..F....... [ZBX-26293] fixed permission issue opening trigger configuration form from context menu (gcalenko)
 ...G....S. [ZBX-24850] fixed rejected incoming connection from link-local addresses on Windows (mprihodko)
-...G...... [ZBX-25210] added 'Server parameter' configuration validation for Zabbix agent 2 (arimdjonoks)
+...G...... [ZBX-25210] added Server parameter configuration validation for Zabbix agent 2 (arimdjonoks)
 ..F....... [ZBX-26275] fixed new item preprocessing steps being saved with "Custom on fail" enabled (agriscenko)
-...G...... [ZBX-25521] ListenPort value won't be included in /status endpoint report if passive mode is off in Zabbix Agent 2 (lsurvilo)
+...G...... [ZBX-25521] ListenPort value won't be included in /status endpoint report if passive mode is off in Zabbix agent 2 (lsurvilo)
 .......PS. [ZBX-23085] fixed vmware.datastore.perfcounter and vmware.cl.perfcounter items for custom instances (MVekslers)
 ........S. [ZBX-26056] fixed undefined behavior when linking template with LLD macro (rtrizna)
 A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ...G...... [ZBX-24969] fixed vfs.file.regmatch item in Zabbix agent 2 to stop searching after first match (askolmeisters)
-.........T [ZBX-24388] fixed a trigger expression in the Check Point Next Generation Firewall by SNMP template (aiantsen)
-........S. [ZBX-25495] reverted escalator query fix for Oracle to optimise MySQL query, also removed redundant 'distinct' from original query (arimdjonoks)
+.........T [ZBX-24388] fixed trigger expression in Check Point Next Generation Firewall by SNMP template (aiantsen)
+........S. [ZBX-25495] reverted escalator query fix for Oracle to optimise MySQL query; removed redundant "distinct" from original query (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0beta1
@@ -139,12 +156,20 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.7rc1
 
 New features:
+.........T [ZBXNEXT-9909] added Azure Backup Jobs by HTTP template (abrosimovs)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 ........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
 .......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+.......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
+.........T [ZBX-26050] updated dashboards in Zabbix server/proxy health templates (aiantsen)
+..F....... [ZBX-26390] updated templated dashboard help icon link (Sasha)
+..F....... [ZBX-25691] fixed the Problems by severity widget to display all existing problems (wczerneha)
+.........T [ZBX-25931] updated LLD filters in systemd by Zabbix agent 2 template (drasikhov)
 .........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
 ..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)
 ........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
@@ -581,12 +606,20 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.13rc1
 
 New features:
+.........T [ZBXNEXT-9909] added Azure Backup Jobs by HTTP template (abrosimovs)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 .......PS. [ZBXNEXT-9813] added filter by uuid of vm/hv for vmware.datastore.discovery item (MVekslers)
 ........S. [ZBXNEXT-9927] implemented masking of secret user macros which are explicitly used (mprihodko)
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+.......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
+.........T [ZBX-26050] updated dashboards in Zabbix server/proxy health templates (aiantsen)
+..F....... [ZBX-26390] updated templated dashboard help icon link (Sasha)
+..F....... [ZBX-25691] fixed the Problems by severity widget to display all existing problems (wczerneha)
+.........T [ZBX-25931] updated LLD filters in systemd by Zabbix agent 2 template (drasikhov)
 .........T [ZBX-26292] fixed typo in script items for family of Nutanix templates (akotsegubov)
 ........S. [ZBX-24341] fixed {HOST.CONN}, {HOST.DNS}, {HOST.IP} and {HOST.PORT} macros to be properly resolved in HTTP agent item fields (asestakovs)
 ..F....... [ZBX-23996] fixed errors in Item value widget when change indicator was displayed without value (dfofanovs)

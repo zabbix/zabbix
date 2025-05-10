@@ -287,7 +287,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #16 Latest data view.
@@ -690,7 +690,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #66 Template dashboard create popup.
