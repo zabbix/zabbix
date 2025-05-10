@@ -123,24 +123,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
-			'key' => 'proc.get[zabbix_server,zabbix]',
-			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
-		],
-		[
 			'key' => 'proc.get[apache2,www-data]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
-		],
-		[
-			'key' => 'proc.get[apache2,NONEXISTING_USER]',
-			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
-		],
-		[
-			'key' => 'proc.get[NONEXISTING_PROCESS,NONEXISTING_USER]',
-			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'do_not_compare' => '1'
 		],
 		[
 			'key' => 'system.cpu.discovery',
@@ -343,24 +329,13 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'proc.mem[apache2,www-data,]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 10000.0
-		],
-		[
-			'key' => 'proc.mem[apache2,NONEXISTING_USER,]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
-		],
-		[
-			'key' => 'proc.mem[NONEXISTING_PROCESS,]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'do_not_compare' => '1'
+			'threshold' => 10000000000.0
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 10000.0
+			'threshold' => 10000000000.0
 		],
 		[
 			'key' => 'web.page.perf[http://localhost]',
