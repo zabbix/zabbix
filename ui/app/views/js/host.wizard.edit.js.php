@@ -893,7 +893,7 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_INSTALL_AGENT:
-				if (!path || path === 'tls_psk_identity' || path === 'tls_psk') {
+				if (!path || path === 'tls_psk_identity' || path === 'tls_psk' || path === 'tls_required') {
 					this.#next_button.toggleAttribute('disabled', this.#data.tls_required
 						&& (this.#data.tls_psk_identity.trim() === '' || this.#data.tls_psk.trim() === '')
 					);
