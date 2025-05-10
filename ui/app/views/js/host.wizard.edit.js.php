@@ -626,7 +626,7 @@ window.host_wizard_edit = new class {
 				this.#data.ipmi_username = this.#host?.ipmi_username || '';
 				this.#data.ipmi_password = this.#host?.ipmi_password || '';
 
-				this.#macro_reset_list = {}
+				this.#macro_reset_list = {};
 
 				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
 					const is_checkbox = Number(template_macro.config.type) === this.WIZARD_FIELD_CHECKBOX;
@@ -1020,7 +1020,7 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_CONFIGURE_HOST:
-				if (path in this.#macro_reset_list && old_value !== undefined) {
+				if (path in this.#macro_reset_list) {
 					this.#updateFieldMessages(this.#pathToInputName(path), 'warning', []);
 
 					delete this.#macro_reset_list[path];
