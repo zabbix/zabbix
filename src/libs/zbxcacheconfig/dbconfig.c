@@ -15331,7 +15331,7 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 		ZBX_DC_TEMPLATE_ITEM	*prototype_item;
 		zbx_uint64_t		parent_itemid;
 
-		if ((parent_itemid = zbx_get_parent_itemid(itemid)) != itemid)
+		if (itemid != (parent_itemid = zbx_get_parent_itemid(itemid)))
 		{
 			if (NULL != (prototype_item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(
 					&config->template_items, &parent_itemid)))
