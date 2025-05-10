@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-11 16:35+0000\n"
+"PO-Revision-Date: 2025-04-16 12:07+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1092,7 +1092,7 @@ msgstr "地址"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr "active agents地址"
+msgstr "Proxy组VIP"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -2655,7 +2655,7 @@ msgstr "无法删除默认用户目录"
 #: include/classes/api/services/CDRule.php:773
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "无法删除发现规则“%2$s”的发现检查“%1$s”：%3$s。"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2666,7 +2666,7 @@ msgstr[0] "无法删除自动发现规则"
 #: include/classes/api/services/CDRule.php:980
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除发现规则“%1$s”：%2$s。"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2691,7 +2691,7 @@ msgstr[0] "无法删除主机"
 #: include/classes/api/services/CHost.php:1636
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除主机“%1$s”：%2$s。"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2707,7 +2707,7 @@ msgstr[0] "无法删除主机组"
 #: include/classes/api/services/CHostGroup.php:769
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除主机组“%1$s”：%2$s。"
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2839,7 +2839,7 @@ msgstr[0] "无法删除模板"
 #: include/classes/api/services/CTemplate.php:809
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除模板“%1$s”：%2$s。"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2877,7 +2877,7 @@ msgstr[0] "无法删除触发器"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除触发器“%1$s”：%2$s。"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -5834,6 +5834,11 @@ msgstr "数据库 TLS 加密"
 msgid "Database TLS key file"
 msgstr "数据库 TLS 密钥文件"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "数据库历史数据表使用主键"
@@ -6532,19 +6537,19 @@ msgstr "已删除"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "已删除主机"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "已删除主机组"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "已删除主机组"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "已删除触发器"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -7032,6 +7037,10 @@ msgstr "自动发现对象"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的集群，“url”- VMware 服务 URL。返回 JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的数据存储，“url”- VMware 服务 URL。返回 JSON"
@@ -7168,7 +7177,7 @@ msgstr "显示本地时间"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "显示日志时间"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9329,7 +9338,7 @@ msgstr "历史数据函数"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "历史、趋势和审计日志压缩"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17664,7 +17673,7 @@ msgstr "在当前主机上运行脚本“%1$s”"
 #: include/actions.inc.php:601
 #, c-format
 msgid "Run script \"%1$s\" on deleted object(s)"
-msgstr ""
+msgstr "在已删除的对象上运行脚本“%1$s”"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -19275,6 +19284,10 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfree、free、total、used、pused）。"
 
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -20296,11 +20309,11 @@ msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
 #: app/views/action.list.php:156
 msgid "This action has conditions or operations referencing deleted object(s)."
-msgstr ""
+msgstr "此操作具有引用已删除对象的条件或操作。"
 
 #: app/views/action.list.php:151
 msgid "This action has missing conditions or operations due to previously deleted object(s)."
-msgstr ""
+msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20353,7 +20366,7 @@ msgstr "此设置将显示本地时间而不是时间戳。在高级配置中也
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "此设置将显示日志时间而不是项目的时间戳。“显示时间戳”也必须在高级配置中选中。"
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -23788,37 +23801,37 @@ msgstr "acos() - 以角度表示的值的反余弦值，以弧度表示"
 #: include/classes/api/services/CDRule.php:774
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "操作“%1$s”使用此发现检查"
 
 #: include/classes/api/services/CDRule.php:981
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "操作“%1$s”使用此发现规则"
 
 #: include/classes/api/services/CHost.php:1637
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "操作“%1$s”使用此主机"
 
 #: include/classes/api/services/CHostGroup.php:770
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "操作“%1$s”使用此主机组"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "操作“%1$s”使用此服务"
 
 #: include/classes/api/services/CTemplate.php:810
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "操作“%1$s”使用此模板"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "操作“%1$s”使用此触发器"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

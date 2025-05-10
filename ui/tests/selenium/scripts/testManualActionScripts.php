@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup scripts
@@ -2242,7 +2242,7 @@ class testManualActionScripts extends CWebTest {
 				$table = CDashboardElement::find()->one()->getWidget('Current problems');
 			}
 			else {
-				$table = $this->query('class:list-table')->asTable()->one();
+				$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
 			}
 
 			$table->query('link', $data[$scope])->one()->click();

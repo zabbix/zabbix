@@ -5849,6 +5849,11 @@ msgstr "데이터베이스 TLS 암호화"
 msgid "Database TLS key file"
 msgstr "데이터베이스 TLS 키 파일"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "데이터베이스 기록 테이블은 기본 키를 사용합니다."
@@ -7045,6 +7050,10 @@ msgstr "디스커버리 오브젝트"
 
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1799
@@ -19300,6 +19309,10 @@ msgstr "Zabbix 쓰기 캐시의 통계 및 가용성. 캐시 - 값 중 하나(�
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237

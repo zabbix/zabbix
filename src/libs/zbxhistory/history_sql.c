@@ -351,7 +351,8 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 
 	if (ZBX_JAN_2038 == end_timestamp)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_I64, time_from);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T,
+				(zbx_fs_time_t)time_from);
 	}
 	else if (1 == seconds)
 	{
@@ -365,8 +366,8 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	}
 	else
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_I64 " and clock<=%d",
-				time_from, end_timestamp);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T " and clock<=%d",
+				(zbx_fs_time_t)time_from, end_timestamp);
 	}
 
 	result = zbx_db_select("%s", sql);
@@ -449,7 +450,8 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 		if (clock_from != clock_to)
 		{
 			zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_I64, clock_from);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T,
+					(zbx_fs_time_t)clock_from);
 		}
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");

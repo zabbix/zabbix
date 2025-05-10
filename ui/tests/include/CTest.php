@@ -15,17 +15,17 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../include/hosts.inc.php';
+require_once __DIR__.'/../../include/defines.inc.php';
+require_once __DIR__.'/../../include/hosts.inc.php';
 
-require_once dirname(__FILE__).'/helpers/CDBHelper.php';
-require_once dirname(__FILE__).'/helpers/CConfigHelper.php';
-require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
-require_once dirname(__FILE__).'/helpers/CAPIScimHelper.php';
-require_once dirname(__FILE__).'/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
-require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
-require_once dirname(__FILE__).'/helpers/CDateTimeHelper.php';
+require_once __DIR__.'/helpers/CDBHelper.php';
+require_once __DIR__.'/helpers/CConfigHelper.php';
+require_once __DIR__.'/helpers/CAPIHelper.php';
+require_once __DIR__.'/helpers/CAPIScimHelper.php';
+require_once __DIR__.'/helpers/CDataHelper.php';
+require_once __DIR__.'/helpers/CExceptionHelper.php';
+require_once __DIR__.'/helpers/CTestArrayHelper.php';
+require_once __DIR__.'/helpers/CDateTimeHelper.php';
 
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
@@ -264,6 +264,11 @@ class CTest extends TestCase {
 	 * @before
 	 */
 	public function onBeforeTestCase() {
+		if (!CDBHelper::isValid()) {
+			self::markTestSkipped('Test case skipped because of the broken DB state.');
+			return;
+		}
+
 		global $DB;
 		static $suite = null;
 		$class_name = get_class($this);
@@ -382,6 +387,10 @@ class CTest extends TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		if (!CDBHelper::isValid()) {
+			return;
+		}
+
 		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
 
 		if ($this->case_backup_config) {

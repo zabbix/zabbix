@@ -270,11 +270,11 @@ foreach ($data['users'] as $user) {
 	// Append user to table.
 	$table->addRow([
 		$checkbox,
-		(new CCol($username))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($user['name']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($user['surname']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($user['role_name']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($users_groups))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
+		$user['name'],
+		$user['surname'],
+		$user['role_name'],
+		$users_groups,
 		$online,
 		$blocked,
 		$gui_access,

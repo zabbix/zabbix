@@ -1926,6 +1926,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 				while (nextcheck <= ticks_num)
 					nextcheck += delay;
+
+				zbx_handle_log();
 			}
 
 			if (ZBX_DB_OK <= info.db_status || ZBX_NODE_STATUS_ACTIVE != info.ha_status)

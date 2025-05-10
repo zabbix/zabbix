@@ -317,8 +317,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		$checkbox,
-		(new CCol($host))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		$host,
+		$description,
 		[
 			new CLink(_('Item prototypes'),
 				(new CUrl('zabbix.php'))
@@ -345,7 +345,7 @@ foreach ($data['discoveries'] as $discovery) {
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+		$discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
 			? [
 				new CLink(_('Host prototypes'),
 					(new CUrl('host_prototypes.php'))

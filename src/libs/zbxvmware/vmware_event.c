@@ -844,7 +844,7 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 
 			zabbix_log(LOG_LEVEL_TRACE, "event key reset, key: '" ZBX_FS_UI64 "', last_key: '"
 					ZBX_FS_UI64 "', createdTime: '" ZBX_FS_TIME_T "', last_ts: '" ZBX_FS_TIME_T "'",
-					key, last_key, xml_event.created_time, last_ts);
+					key, last_key, (zbx_fs_time_t)xml_event.created_time, (zbx_fs_time_t)last_ts);
 			*skip_old = 1;
 			goto clean;
 		}
@@ -1330,7 +1330,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		}
 		else if (0 != service->eventlog.oom)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "There is no 5% free memory. Reading new events skipped");
+			zabbix_log(LOG_LEVEL_DEBUG, "There is no 5%% free memory. Reading new events skipped");
 		}
 		else
 		{
@@ -1409,10 +1409,11 @@ out:
 	/* statistically we can expect the same number of events next time */
 	if (service->eventlog.top_key < evt_top_key)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() update top_time:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " top_key:"
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() update top_time:" ZBX_FS_UI64 "/" ZBX_FS_TIME_T " top_key:"
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 " last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T,
-				__func__, service->eventlog.top_time, evt_top_time, service->eventlog.top_key,
-				evt_top_key, service->eventlog.last_key, service->eventlog.last_ts);
+				__func__, service->eventlog.top_time, (zbx_fs_time_t)evt_top_time,
+				service->eventlog.top_key, evt_top_key, service->eventlog.last_key,
+				(zbx_fs_time_t)service->eventlog.last_ts);
 
 		if (0 == service->eventlog.top_key)	/* first run after reboot */
 			service->eventlog.expect_num = evt_top_key - service->eventlog.last_key;
@@ -1479,7 +1480,7 @@ out:
 			" / " ZBX_FS_TIME_T " VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
 			ZBX_FS_UI64 " / " ZBX_FS_UI64,
 			NULL != service->eventlog.data ? service->eventlog.data->events.values_num : 0,
-			service->eventlog.expect_num, shmem_factor, shmem_free_sz, evt_end_time,
+			service->eventlog.expect_num, shmem_factor, shmem_free_sz, (zbx_fs_time_t)evt_end_time,
 			vmware_shmem_get_vmware_mem()->free_size, zbx_vmware_get_vmware()->strpool_sz,
 			vmware_shmem_get_vmware_mem()->total_size);
 

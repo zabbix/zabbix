@@ -26,6 +26,14 @@
 				postMessageOk(response.success.title);
 				location.href = location.href;
 			});
+
+			this._initActions();
+		},
+
+		_initActions() {
+			document.querySelector('.js-correlation_edit')?.addEventListener('click', (e) =>
+				this._editCorrelation(e.target)
+			);
 		},
 
 		editItem(target, data) {
@@ -55,6 +63,24 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
+		_editCorrelation(trigger) {
+			const overlay = PopUp('correlation.edit', {correlationid: trigger.dataset.correlationid}, {
+				dialogueid: 'correlation-form',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
 		},
 
 		openHostPopup(host_data) {

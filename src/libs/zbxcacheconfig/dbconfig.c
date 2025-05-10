@@ -80,6 +80,12 @@ typedef struct
 }
 zbx_dc_item_tag_link;
 
+typedef enum
+{
+	ZBX_DB_SYNC_STATUS_UNLOCKED,
+	ZBX_DB_SYNC_STATUS_LOCKED
+}zbx_db_sync_status;
+
 typedef struct
 {
 	zbx_hashset_t	item_tag_links;
@@ -3629,19 +3635,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			continue;
 		}
 
+		item_flags = (unsigned char)atoi(row[18]);
+
+		/* item prototype does not have item_rtdata and shouldn't be present in sync */
+		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			template_item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid,
+					sizeof(ZBX_DC_TEMPLATE_ITEM), &found);
+
+			template_item->hostid = hostid;
+			template_item->templateid = templateid;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "item_rtdata entry unexpectedly is present for item "
+					"prototype: " ZBX_FS_UI64 " on hostid: " ZBX_FS_UI64, itemid, hostid);
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
 		if (NULL == host || host->hostid != hostid)
 		{
 			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 				continue;
-		}
-
-		item_flags = (unsigned char)atoi(row[18]);
-
-		/* item prototype does not have item_rtdata and shouldn't be present in sync */
-		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
-				item_flags != ZBX_FLAG_DISCOVERY_RULE)
-		{
-			continue;
 		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
@@ -9115,6 +9129,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	config->proxy_failover_delay_raw = NULL;
 	config->proxy_failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 	config->proxy_lastonline = 0;
+	config->sync_status = 0;
 
 	zbx_dbsync_env_init(config);
 	zbx_hashset_create(&config_private.item_tag_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -9546,14 +9561,17 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 	UNLOCK_CACHE;
 
-	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
 	{
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 		return psk_len;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "host PSK and autoregistration PSK have the same identity \"%s\" but"
+	/* stricter API validation for PSK identities is expected to make this use-case impossible */
+	zabbix_log(LOG_LEVEL_CRIT, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
+	THIS_SHOULD_NEVER_HAPPEN;
+
 	return psk_len;
 }
 #endif
@@ -13875,6 +13893,8 @@ void	zbx_config_clean(zbx_config_t *cfg)
  ********************************************************************************/
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
+/* the tolerance interval must be greater than maximum proxy failover delay  */
+/* to avoid triggering false interface availability resets with proxy groups */
 #define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
 #define ZBX_INTERFACE_VERSION_RESET_INTERVAL	(SEC_PER_HOUR)
 
@@ -16330,16 +16350,15 @@ out:
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
  *             env         - [IN] security environment                        *
- *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
-		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error)
+void	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env)
 {
 	/* wrap the passed user macro and func macro cache into user macro handle structure */
 	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = env, .prev = NULL};
 
-	return zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, error);
+	(void)zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, NULL);
 }
 
 typedef struct
@@ -17243,4 +17262,42 @@ int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid)
 	UNLOCK_CACHE;
 
 	return version;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update sync_status in configuration cache                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_sync_unlock(void)
+{
+	WRLOCK_CACHE;
+	config->sync_status = ZBX_DB_SYNC_STATUS_UNLOCKED;
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get sync_status in configuration cache                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_sync_lock(void)
+{
+	int	ret;
+
+	WRLOCK_CACHE;
+
+	if (ZBX_DB_SYNC_STATUS_UNLOCKED != config->sync_status)
+	{
+		ret = FAIL;
+	}
+	else
+	{
+		config->sync_status = ZBX_DB_SYNC_STATUS_LOCKED;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
 }

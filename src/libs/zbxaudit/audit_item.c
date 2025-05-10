@@ -39,7 +39,7 @@ int	zbx_audit_item_resource_is_only_item_and_item_prototype(int resource_type)
 
 int	zbx_audit_item_resource_is_only_lld_rule(int resource_type)
 {
-	return	ZBX_AUDIT_RESOURCE_DISCOVERY_RULE == resource_type;
+	return	ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type;
 }
 
 int	zbx_audit_item_flag_to_resource_type(int flag)
@@ -54,7 +54,7 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	}
 	else if (ZBX_FLAG_DISCOVERY_RULE == flag)
 	{
-		return ZBX_AUDIT_RESOURCE_DISCOVERY_RULE;
+		return ZBX_AUDIT_RESOURCE_LLD_RULE;
 	}
 	else
 	{
@@ -319,7 +319,7 @@ void	zbx_audit_discovery_rule_update_json_delete_filter_conditions(int audit_con
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.preprocessing["	\
 				ZBX_FS_UI64 "]"#nested#resource, preprocid);					\
 	}													\
-	else if (ZBX_AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
+	else if (ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.preprocessing["	\
 				ZBX_FS_UI64 "]"#nested#resource, preprocid);					\
@@ -427,7 +427,7 @@ void	zbx_audit_item_delete_preproc(int audit_context_mode, zbx_uint64_t itemid, 
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.tag["		\
 				ZBX_FS_UI64 "]"#nested#resource, tagid);					\
 	}													\
-	else if (ZBX_AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
+	else if (ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.tag["		\
 				ZBX_FS_UI64 "]"#resource, tagid);						\
@@ -521,7 +521,7 @@ void	zbx_audit_item_delete_tag(int audit_context_mode, zbx_uint64_t itemid, int 
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.parameters["	\
 				ZBX_FS_UI64 "]"#nested#resource, item_parameter_id);				\
 	}													\
-	else if (ZBX_AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
+	else if (ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.parameters["	\
 				ZBX_FS_UI64 "]"#resource, item_parameter_id);					\

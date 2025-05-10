@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * Test for checking Item Value Widget.
@@ -52,6 +52,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
 	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
+	const INDICATOR_CHANGE_HOST = 'Host for checking widget without show value option';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -78,6 +79,20 @@ class testDashboardItemValueWidget extends testWidgets {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
+
+		// Add 2 values of data for items, to check that there are no errors without show value option selected.
+		$items_data = [
+			'Indicator - Numeric (float)' => 0.1,
+			'Indicator - Character' => 1,
+			'Indicator - Numeric (unsigned)' => 1,
+			'Indicator - Text' => 1,
+			'Indicator - Log' => 1
+		];
+
+		foreach ($items_data as $name => $value) {
+			CDataHelper::addItemData(self::$itemids[$name], $value, time());
+			CDataHelper::addItemData(self::$itemids[$name], $value + 1, time() + 1);
+		}
 
 		CDataHelper::call('usermacro.createglobal', [
 			[
@@ -1121,7 +1136,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Override host' => 'Dashboard'
 					],
 					'item' => [
-						'Host for different items types' => 'Http agent item form'
+						'ЗАББИКС Сервер' => 'Available memory'
 					]
 				]
 			],
@@ -1363,6 +1378,81 @@ class testDashboardItemValueWidget extends testWidgets {
 					],
 					'trim' => true
 				]
+			],
+			// #45 Check that there is no errors, when show value option is unchecked (for each data type).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - float',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (float)'
+					]
+				]
+			],
+			// #46.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - character',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Character'
+					]
+				]
+			],
+			// #47.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - log',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Log'
+					]
+				]
+			],
+			// #48.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - numeric (unsigned)',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (unsigned)'
+					]
+				]
+			],
+			// #49.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - text',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Text'
+					]
+				]
 			]
 		];
 	}
@@ -1378,7 +1468,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	public static function getWidgetUpdateData() {
 		return [
-			// #45.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1397,7 +1487,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #46.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2934,6 +3024,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min',
+						'Decimal places' => '0',
 						'Time period' => 'Custom'
 					],
 					'item_data' => [
@@ -2958,6 +3049,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
+						'Decimal places' => '2',
 						'Time period' => 'Custom',
 						'id:time_period_from' => 'now-2h',
 						'id:time_period_to' => 'now-1h'
@@ -2977,7 +3069,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -2999,7 +3091,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)'
+					'expected_value' => 'Up (1.00)'
 				]
 			],
 			// Item with value mapping, aggregation function 'avg' and Custom time period.
@@ -3108,7 +3200,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3138,7 +3230,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Down (0)'
+					'expected_value' => 'Down (0.00)'
 				]
 			],
 			// Item with value mapping and aggregation function 'not used'.
@@ -3164,7 +3256,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],

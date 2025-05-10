@@ -14,12 +14,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once __DIR__.'/../include/CWebTest.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Proxies, Actions
+ * @dataSource Actions, Maps, Proxies
  *
  * @backup profiles, module, services, token, connector
  *
@@ -293,7 +293,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #16 Latest data view.
@@ -770,7 +770,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #67 Template dashboard create popup.
@@ -2701,6 +2701,9 @@ class testDocumentationLinks extends CWebTest {
 
 	/**
 	 * @dataProvider getGeneralDocumentationLinkData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
 		if ($data['url'] === 'host_prototype') {
@@ -2773,28 +2776,34 @@ class testDocumentationLinks extends CWebTest {
 			// #0 Edit element form.
 			[
 				[
-					'element' => 'xpath://div[@data-id="3"]',
+					'element' => 'xpath://div[contains(@class, "sysmap_iconid_7")]',
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-elements'
 				]
 			],
 			// #1 Edit shape form.
 			[
 				[
-					'element' => 'xpath://div[@data-id="101"]',
+					'element' => 'xpath://div[contains(@style, "top: 82px")]',
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			],
 			// #2 Edit element selection.
 			[
 				[
-					'element' => ['xpath://div[@data-id="7"]', 'xpath://div[@data-id="5"]'],
+					'element' => [
+						'xpath://div[contains(@class, "sysmap_iconid_19")]',
+						'xpath://div[contains(@class, "sysmap_iconid_7")]'
+					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#selecting-elements'
 				]
 			],
 			// #3 Edit shape selection.
 			[
 				[
-					'element' => ['xpath://div[@data-id="100"]', 'xpath://div[@data-id="101"]'],
+					'element' => [
+						'xpath://div[contains(@style, "top: 257px")]',
+						'xpath://div[contains(@style, "top: 82px")]'
+					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			]
@@ -2805,7 +2814,7 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getMapDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkMapElementLinks($data) {
-		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('Maps.links_mapid'))->waitUntilReady();
 
 		// Checking element selection documentation links requires pressing control key when selecting elements.
 		if (is_array($data['element'])) {

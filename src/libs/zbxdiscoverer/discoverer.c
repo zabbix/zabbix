@@ -703,7 +703,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_discoverer_task_t			*task, *task_out;
 		zbx_discoverer_job_t			*job, cmp;
 		zbx_dc_drule_t				*drule = drules.values[k];
-		zbx_vector_ds_dcheck_ptr_t	*ds_dchecks_common;
+		zbx_vector_ds_dcheck_ptr_t		*ds_dchecks_common;
 		zbx_vector_iprange_t			*ipranges;
 		char					error[MAX_STRING_LEN];
 
@@ -954,8 +954,8 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	const zbx_dc_dcheck_t		*dcheck = &task->ds_dchecks.values[dcheck_idx]->dcheck;
 	zbx_fping_host_t		host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d range id:%d dcheck_idx:%d task state count:%d",
-			log_worker_id, __func__, task->range.ipranges->values_num, task->range.id,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d range id:" ZBX_FS_UI64 " dcheck_idx:%d task state count:"
+			ZBX_FS_UI64, log_worker_id, __func__, task->range.ipranges->values_num, task->range.id,
 			dcheck_idx, task->range.state.count);
 
 	zbx_vector_fping_host_create(&hosts);
@@ -1036,7 +1036,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, (zbx_uint64_t)hosts.values_num);
 	zbx_vector_fping_host_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:%d", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:" ZBX_FS_UI64, log_worker_id, __func__,
 			task->range.state.count);
 
 	return ret;
@@ -1186,7 +1186,7 @@ err:
 
 int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 {
-	switch(ds_dcheck->dcheck.type)
+	switch (ds_dcheck->dcheck.type)
 	{
 		case SVC_AGENT:
 		case SVC_ICMPPING:
@@ -1325,8 +1325,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				zbx_free(error);
 			}
 
-			if (SVC_SNMPv3 == dcheck_type)
-				queue->snmpv3_allowed_workers++;
+			if (SVC_SNMPv3 == dcheck_type || SVC_SNMPv2c == dcheck_type || SVC_SNMPv1 == dcheck_type)
+				queue->snmp_allowed_workers++;
 
 			if (DISCOVERER_JOB_STATUS_WAITING == job->status)
 			{
@@ -1434,7 +1434,7 @@ static void	discoverer_libs_destroy(void)
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread_discoverer_args *args_in,
 		const zbx_thread_info_t *info, char **error)
 {
-#	define SNMPV3_WORKERS_MAX	1
+#	define SNMP_WORKERS_MAX	1
 
 	int		i, err, ret = FAIL, started_num = 0, checks_per_worker_max;
 	time_t		time_start;
@@ -1482,7 +1482,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 		return FAIL;
 	}
 
-	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMPV3_WORKERS_MAX, checks_per_worker_max, error))
+	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMP_WORKERS_MAX, checks_per_worker_max, error))
 	{
 		pthread_mutex_destroy(&manager->results_lock);
 		return FAIL;
@@ -1549,7 +1549,7 @@ out:
 
 	return ret;
 
-#	undef SNMPV3_WORKERS_MAX
+#	undef SNMP_WORKERS_MAX
 }
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)

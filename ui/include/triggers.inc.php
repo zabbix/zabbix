@@ -1645,7 +1645,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 /**
  * Get parent templates for each given trigger.
  *
- * @param $array $triggers                  An array of triggers.
+ * @param array  $triggers                  An array of triggers.
  * @param string $triggers[]['triggerid']   ID of a trigger.
  * @param string $triggers[]['templateid']  ID of parent template trigger.
  * @param int    $flag                      Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or

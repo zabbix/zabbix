@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
@@ -4401,7 +4401,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @return array
 	 */
 	protected function fillWidgetConfigurationFrom($data, $update = false) {
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady(30)->one();
 		$form = $dialog->asForm();
 		$form->fill($data['fields']);
 
@@ -4489,9 +4489,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$this->query('button:Apply')->one()->click();
 		CDashboardElement::find()->one()->waitUntilReady();
 
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',)->one()]
+		);
+
 		$skip_selectors = [
 			'class:clock',
-			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
 			'xpath://footer',
 			// Cover Geomap widget, because it's screenshots are not stable.
@@ -4601,6 +4605,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
+				COverlayDialogElement::ensureNotPresent();
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {

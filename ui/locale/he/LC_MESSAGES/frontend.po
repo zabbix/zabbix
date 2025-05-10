@@ -5956,6 +5956,11 @@ msgstr "הצפנת TLS של מסד הנתונים"
 msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "טבלאות היסטוריה במסד הנתונים משתמשות במפתח עיקרי"
@@ -7153,6 +7158,10 @@ msgstr "פריט גילוי"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "גילוי קלאסטרים של VMware,‏ „url” - כתובת שירות VMWare. מחזירה JSON"
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -19460,6 +19469,10 @@ msgstr "סטטיסטיקה וזמינות זיכרון מטמון הכתיבה �
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237

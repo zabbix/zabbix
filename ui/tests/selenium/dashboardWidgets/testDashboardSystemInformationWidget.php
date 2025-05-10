@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testSystemInformation.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../common/testSystemInformation.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup dashboard, ha_node, config
@@ -116,10 +116,12 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public function testDashboardSystemInformationWidget_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$this->assertScreenshotExcept(CDashboardElement::find()->one()->waitUntilReady(),
-				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')
-				->waitUntilVisible()->one(), 'widget_without_ha'
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
+		$this->assertScreenshot($dashboard, 'widget_without_ha');
 	}
 
 	public function testDashboardSystemInformationWidget_Create() {
@@ -160,14 +162,13 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		$this->executeWidgetAction($widgets, 'update');
 	}
 
-// Commented until Jenkins issue investigated.
-//	/**
-//	 * @onBefore prepareHANodeData
-//	 */
-//	public function testDashboardSystemInformationWidget_checkEnabledHA() {
-//		$this->assertEnabledHACluster(self::$dashboardid);
-//		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
-//	}
+	/**
+	 * @onBefore prepareHANodeData
+	 */
+	public function testDashboardSystemInformationWidget_checkEnabledHA() {
+		$this->assertEnabledHACluster(self::$dashboardid);
+		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
+	}
 
 	/**
 	 * Function checks that Zabbix server status is updated after failover delay passes and frontend config is re-validated.
@@ -227,8 +228,8 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	private function executeWidgetAction($widgets, $action) {
 		$page_name = ($action === 'update') ? 'Page for updating widgets' : 'Page for creating widgets';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$widgets_dashboardid);
-		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
-		$dashboard->edit();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady()->edit();
 		// Open the corresponding dashboard page in case of update.
 		if ($action === 'update') {
 			$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->one()->click();
@@ -253,10 +254,13 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		}
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$dashboard->waitUntilReady();
 
-		$this->assertScreenshotExcept(CDashboardElement::find()->one()->waitUntilReady(),
-				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->waitUntilVisible()->one(),
-			$action.'_widgets');
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+		);
+		$this->assertScreenshot(CDashboardElement::find()->one()->waitUntilReady(), $action.'_widgets');
 
 		foreach ($widgets as $widget_data) {
 			// Check widget refresh interval.

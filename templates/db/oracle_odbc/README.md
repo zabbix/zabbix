@@ -9,6 +9,8 @@ The template is developed to monitor a single DBMS Oracle Database instance with
 
 Oracle Database 12c2 and newer.
 
+**Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the licence required for using this management pack.**
+
 ## Requirements
 
 Zabbix version: 7.0 and higher.
