@@ -266,6 +266,7 @@ func (err *userNotFoundError) Error() string {
 	return fmt.Sprintf("User `%s` not found!", err.Name)
 }
 
+// cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam()) ignores remote services like SSSD
 func getUIDByName(userName string) (*uid, error) {
 	userNameC := C.CString(userName)
 
@@ -603,13 +604,10 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		fallthrough
 	case 2:
 		if username := params[1]; username != "" {
-			usr, err = user.Lookup(username)
-			if err == user.UnknownUserError(username) {
-				p.Debugf("Failed to obtain user '%s': %s", username, err.Error())
-				return 0, nil
-			}
+			_, err := getUIDByName(username)
+
 			if err != nil {
-				return nil, fmt.Errorf("Failed to obtain user '%s': %s", username, err.Error())
+				return nil, err
 			}
 		}
 		fallthrough
@@ -847,8 +845,12 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	case 2:
 		userName = params[1]
 		if userName != "" {
-			if _, err := user.Lookup(userName); err != nil {
-				return "[]", nil
+			uid, err := getUIDByName(userName)
+
+			if uid == nil {
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 		fallthrough

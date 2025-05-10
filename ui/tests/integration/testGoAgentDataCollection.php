@@ -350,10 +350,15 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'threshold' => 10000.0
 		],
 		[
-			'key' => 'proc.mem[apache2,www-data2,]',
+			'key' => 'proc.mem[apache2,NONEXISTING_USER,]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 10000.0
+		],
+		[
+			'key' => 'proc.mem[NONEXISTING_PROCESS,]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
