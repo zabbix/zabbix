@@ -114,8 +114,8 @@ class testLld extends CIntegrationTest
 	 */
 	public function prepareData()
 	{
-		$this->importHost("lld_test_dbs_template");
-		$this->importHost("lld_test_autoreg_main_template");
+		$this->importData("lld_test_dbs_template");
+		$this->importData("lld_test_autoreg_main_template");
 
 		$response = $this->call('templategroup.get', [
 			'filter' => [
@@ -1648,7 +1648,7 @@ class testLld extends CIntegrationTest
 	 */
 	public function testLld_testNestedDRulesFromHost()
 	{
-		$this->importHost("lld_test_host_dbs");
+		$this->importData("lld_test_host_dbs");
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$this->checkNestedLLDFromTemplate(self::HOSTNAME_NESTED_1);
@@ -1706,7 +1706,7 @@ class testLld extends CIntegrationTest
 	 */
 	public function testLld_testNestedDRulesFromHostWithTmplLinkage()
 	{
-		$this->importHost("lld_test_server_dbs");
+		$this->importData("lld_test_server_dbs");
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
@@ -1839,7 +1839,7 @@ class testLld extends CIntegrationTest
 	{
 		$hostname = "lld_test_lost_resources";
 
-		$this->importHost($hostname);
+		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$response = $this->call('host.get', [
@@ -1898,7 +1898,7 @@ class testLld extends CIntegrationTest
 		$this->checkResourceRemoval($hostname, $hostid, $testcases);
 	}
 
-	private function importHost($name)
+	private function importData($name)
 	{
 		$data = file_get_contents('integration/data/' . $name . '.yaml');
 
@@ -1959,6 +1959,7 @@ class testLld extends CIntegrationTest
 				],
 			]
 		]);
+		$this->assertEquals(true, $response['result']);
 	}
 
 	// Test removal of nested LLD rules
@@ -1966,7 +1967,7 @@ class testLld extends CIntegrationTest
 	{
 		$hostname = "lld_test_multilevel";
 
-		$this->importHost($hostname);
+		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$response = $this->call('host.get', [
@@ -2047,7 +2048,7 @@ class testLld extends CIntegrationTest
 	{
 		$hostname = "lld_test_overrides";
 
-		$this->importHost($hostname);
+		$this->importData($hostname);
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
@@ -2186,7 +2187,7 @@ class testLld extends CIntegrationTest
 	public function testLld_discoveryRuleProtoWithMasterItem()
 	{
 		$hostname = "lld_dep_proto";
-		$this->importHost($hostname);
+		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$data = [
@@ -2225,7 +2226,7 @@ class testLld extends CIntegrationTest
 	{
 		$hostname = "lld_drule_proto_elem_update";
 
-		$this->importHost($hostname);
+		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$response = $this->call('host.get', [
