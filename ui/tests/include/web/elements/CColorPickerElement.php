@@ -51,12 +51,14 @@ class CColorPickerElement extends CElement {
 			$overlay->asColorPicker()->selectTab('Solid color');
 			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
 		}
+		// TODO: remove the below else part and move elseif to else when DEV-4301 is ready.
 		else {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
 		$apply_button = $overlay->query('button:Apply');
 
+		// TODO: remove the else part of this if -> else and remove the condition itself after DEV-4301 is ready.
 		if ($apply_button->exists()) {
 			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
 				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
@@ -122,6 +124,7 @@ class CColorPickerElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
+		// TODO: remove the $button variable and the if part of the below if -> else after DEV-4301 is ready.
 		$button = $this->query('class:btn-overlay-close')->one(false);
 		if ($button->isValid()) {
 			$button->click()->waitUntilNotVisible();

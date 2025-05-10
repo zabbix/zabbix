@@ -610,6 +610,7 @@ class CElementQuery implements IWaitable {
 				'/div[contains(@class, "calendar-control")]'
 			],
 			'CColorPickerElement'		=> [
+				// TODO: remove the first of the below three selectors when DEV-4301 is ready.
 				'/div[contains(@class, "color-picker")]',
 				'/div[contains(@class, "dataset-head")]/z-color-picker',
 				'/z-color-picker[@color-field-name]'
