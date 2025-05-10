@@ -1348,15 +1348,14 @@ class testDashboardPieChartWidget extends testWidgets {
 			: $dashboard->edit()->addWidget()->asForm();
 		$this->fillForm($form, $data['fields'], $update_widget_name !== null);
 
+		// Verify that it is not possible to submit color-picker dialog with invalid color or proceed with form submission.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
 			$color_picker_dialog = $this->query('class:color-picker-dialog')->one();
 			$this->assertFalse($color_picker_dialog->query('button:Apply')->one()->isClickable());
 
 			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
 			$this->assertTrue($color_picker_dialog->isDisplayed());
-
 			COverlayDialogElement::closeAll();
-
 		}
 		else {
 			$form->submit();
