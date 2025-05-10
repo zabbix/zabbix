@@ -364,7 +364,9 @@ function stepInstallAgent($agent_script_data): array {
 								->addItem(
 									(new CFormField([
 										(new CLabel(_('Pre-shared key identity')))->setAsteriskMark(),
-										(new CTextBox('tls_psk_identity'))->setAriaRequired(),
+										(new CTextBox('tls_psk_identity', '', false,
+											DB::getFieldLength('hosts', 'tls_psk_identity')
+										))->setAriaRequired(),
 										(new CDiv(
 											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
@@ -375,6 +377,7 @@ function stepInstallAgent($agent_script_data): array {
 										(new CLabel(_('Pre-shared key')))->setAsteriskMark(),
 										(new CDiv([
 											(new CTextArea('tls_psk'))
+												->setMaxlength(DB::getFieldLength('hosts', 'tls_psk'))
 												->setRows(3)
 												->setAriaRequired(),
 											(new CSimpleButton(_('Generate new')))
@@ -522,7 +525,9 @@ function stepAddHostInterface(): array {
 					(new CDiv([
 						new CFormField([
 							(new CLabel(_('Agent address')))->setAsteriskMark(),
-							(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
+							(new CTextBox('interfaces[#{row_index}][address]', '', false,
+								DB::getFieldLength('interface', 'dns')
+							))->setAriaRequired()
 						]),
 						new CFormField([
 							(new CLabel(_('Agent port')))->setAsteriskMark(),
@@ -553,7 +558,9 @@ function stepAddHostInterface(): array {
 						(new CDiv([
 							new CFormField([
 								(new CLabel(_('SNMP address')))->setAsteriskMark(),
-								(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
+								(new CTextBox('interfaces[#{row_index}][address]', '', false,
+									DB::getFieldLength('interface', 'dns')
+								))->setAriaRequired()
 							]),
 							new CFormField([
 								(new CLabel(_('SNMP port')))->setAsteriskMark(),
@@ -679,7 +686,9 @@ function stepAddHostInterface(): array {
 						(new CDiv([
 							new CFormField([
 								(new CLabel(_('IPMI address')))->setAsteriskMark(),
-								(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
+								(new CTextBox('interfaces[#{row_index}][address]', '', false,
+									DB::getFieldLength('interface', 'dns')
+								))->setAriaRequired()
 							]),
 							new CFormField([
 								(new CLabel(_('IPMI port')))->setAsteriskMark(),
@@ -751,7 +760,9 @@ function stepAddHostInterface(): array {
 					(new CDiv([
 						new CFormField([
 							(new CLabel(_('JMX address')))->setAsteriskMark(),
-							(new CTextBox('interfaces[#{row_index}][address]'))->setAriaRequired()
+							(new CTextBox('interfaces[#{row_index}][address]', '', false,
+								DB::getFieldLength('interface', 'dns')
+							))->setAriaRequired()
 						]),
 						new CFormField([
 							(new CLabel(_('JMX port')))->setAsteriskMark(),

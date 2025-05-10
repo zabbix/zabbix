@@ -221,6 +221,7 @@ window.host_wizard_edit = new class {
 		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
 
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
+		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
 
 		this.#dialogue.addEventListener('click', ({target}) => {
 			if (target.classList.contains('js-tls-key-change')) {
@@ -896,7 +897,7 @@ window.host_wizard_edit = new class {
 			case this.STEP_INSTALL_AGENT:
 				if (!path || path === 'tls_psk_identity' || path === 'tls_psk' || path === 'tls_required') {
 					this.#next_button.toggleAttribute('disabled', this.#data.tls_required
-						&& (this.#data.tls_psk_identity.trim() === '' || this.#data.tls_psk.trim() === '')
+						&& (this.#data.tls_psk_identity === '' || this.#data.tls_psk === '')
 					);
 				}
 
@@ -1000,7 +1001,7 @@ window.host_wizard_edit = new class {
 				}
 
 				this.#next_button.toggleAttribute('disabled', Object.values(this.#data.interfaces)
-					.some(({address, port}) => address.trim() === '' || String(port).trim() === '')
+					.some(({address, port}) => address === '' || String(port) === '')
 				);
 				break;
 		}
@@ -1099,7 +1100,7 @@ window.host_wizard_edit = new class {
 
 				const query = this.#data.template_search_query.toLowerCase();
 
-				if (this.#data.template_search_query.trim() !== '') {
+				if (this.#data.template_search_query !== '') {
 					return template.name.toLowerCase().includes(query)
 						|| template.description.toLowerCase().includes(query)
 						|| template.tags.some(({tag, value}) => {
@@ -1363,6 +1364,14 @@ window.host_wizard_edit = new class {
 		this.#setValueByName(this.#data, target.name, value);
 	}
 
+	#onInputBlur({target}) {
+		if (!target.name || !['number', 'password', 'text'].includes(target.type)) {
+			return;
+		}
+
+		target.value = target.value.trim();
+	}
+
 	#initReactiveData(target_object, on_change_callback) {
 		const proxy_cache = new WeakMap();
 
@@ -1387,7 +1396,10 @@ window.host_wizard_edit = new class {
 				},
 				set(target, property, value, receiver) {
 					const old_value = target[property];
-					const result = Reflect.set(target, property, value, receiver);
+					const result = Reflect.set(target, property,
+						typeof value === 'string' ? value.trim() : value,
+						receiver
+					);
 
 					if (old_value !== value) {
 						on_change_callback([...path, String(property)].join('.'), value, old_value);
