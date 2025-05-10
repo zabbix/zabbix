@@ -1482,7 +1482,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT ii.itemid,ii.name'.
+			'SELECT ii.itemid,ii.name,ii.flags'.
 			' FROM items i,items ii'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND '.dbConditionId('i.hostid', $templateids).
