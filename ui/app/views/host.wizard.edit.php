@@ -190,6 +190,17 @@ function stepSelectTemplate($old_template_count): array {
 						->addClass('templates-card-list')
 				)
 		),
+		new CTemplateTag('host-wizard-templates-section-no-found',
+			(new CSection())
+				->addItem(
+					(new CDiv(
+						(new CDiv(_('No data found')))
+							->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
+							->addClass(ZBX_ICON_SEARCH_LARGE)
+					))->addClass('templates-card-list')
+				)
+				->addClass('no-found')
+		),
 		new CTemplateTag('host-wizard-template-card',
 			(new CDiv())
 				->addItem(

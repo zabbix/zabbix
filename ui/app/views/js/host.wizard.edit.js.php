@@ -285,6 +285,7 @@ window.host_wizard_edit = new class {
 			step_complete: tmpl('host-wizard-step-complete'),
 
 			templates_section: tmpl('host-wizard-templates-section'),
+			templates_section_no_found: tmpl('host-wizard-templates-section-no-found'),
 			card: tmpl('host-wizard-template-card'),
 			tag: tmpl('host-wizard-template-tag'),
 			tags_more: tmpl('host-wizard-template-tags-more'),
@@ -1136,31 +1137,36 @@ window.host_wizard_edit = new class {
 		const selected_templateid = this.#getSelectedTemplate()?.templateid;
 		const sections = [];
 
-		for (const [category, templateids] of template_classes) {
-			const section = this.#view_templates.templates_section.evaluateToElement({
-				title: category.charAt(0).toUpperCase() + category.slice(1),
-				count: templateids.length
-			});
+		if (template_classes.size) {
+			for (const [category, templateids] of template_classes) {
+				const section = this.#view_templates.templates_section.evaluateToElement({
+					title: category.charAt(0).toUpperCase() + category.slice(1),
+					count: templateids.length
+				});
 
-			const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(category);
-			this.#sections_expanded.set(category, expanded);
+				const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(category);
+				this.#sections_expanded.set(category, expanded);
 
-			if (!expanded && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
-				toggleSection(section.querySelector('.toggle'));
+				if (!expanded && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
+					toggleSection(section.querySelector('.toggle'));
+				}
+
+				const card_list = section.querySelector('.templates-card-list');
+
+				for (const templateid of templateids) {
+					card_list.appendChild(
+						this.#makeCard(category, this.#templates.get(templateid), templateid === selected_templateid)
+					);
+				}
+
+				section.addEventListener('expand', () => this.#sections_expanded.set(category, true));
+				section.addEventListener('collapse', () => this.#sections_expanded.set(category, false));
+
+				sections.push(section);
 			}
-
-			const card_list = section.querySelector('.templates-card-list');
-
-			for (const templateid of templateids) {
-				card_list.appendChild(
-					this.#makeCard(category, this.#templates.get(templateid), templateid === selected_templateid)
-				);
-			}
-
-			section.addEventListener('expand', () => this.#sections_expanded.set(category, true));
-			section.addEventListener('collapse', () => this.#sections_expanded.set(category, false));
-
-			sections.push(section);
+		}
+		else {
+			sections.push(this.#view_templates.templates_section_no_found.evaluateToElement());
 		}
 
 		return sections;

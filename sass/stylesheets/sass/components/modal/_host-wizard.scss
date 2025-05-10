@@ -63,12 +63,15 @@
 		margin-bottom: 0;
 		border: none;
 
-		&.collapsible {
+		&.collapsible,
+		&.no-found {
 			margin-top: 16px;
 			padding: 16px;
 			border: 1px solid $ui-border-color;
 			border-radius: 2px;
+		}
 
+		&.collapsible {
 			.section-head {
 				height: 24px;
 				line-height: 24px;
@@ -376,5 +379,9 @@
 
 		.template-info-toggles {}
 
+		.no-data-message {
+			padding-top: 32px;
+			padding-bottom: 32px;
+		}
 	}
 }

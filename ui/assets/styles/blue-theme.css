@@ -5776,18 +5776,18 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     margin-top: 32px;
     margin-bottom: 0;
     border: none; }
-    .modal-popup-host-wizard section.collapsible {
+    .modal-popup-host-wizard section.collapsible, .modal-popup-host-wizard section.no-found {
       margin-top: 16px;
       padding: 16px;
       border: 1px solid #dfe4e7;
       border-radius: 2px; }
-      .modal-popup-host-wizard section.collapsible .section-head {
-        height: 24px;
-        line-height: 24px; }
-      .modal-popup-host-wizard section.collapsible .section-body {
+    .modal-popup-host-wizard section.collapsible .section-head {
+      height: 24px;
+      line-height: 24px; }
+    .modal-popup-host-wizard section.collapsible .section-body {
+      margin-top: 16px; }
+      .modal-popup-host-wizard section.collapsible .section-body > div:not(:first-child) {
         margin-top: 16px; }
-        .modal-popup-host-wizard section.collapsible .section-body > div:not(:first-child) {
-          margin-top: 16px; }
     .modal-popup-host-wizard section.grid-columns {
       gap: 8px 48px; }
       .modal-popup-host-wizard section.grid-columns .section-head,
@@ -5956,6 +5956,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .templates-card-list .template-info-toggles .btn-link {
       float: right;
       color: #1f2c33; }
+  .modal-popup-host-wizard .templates-card-list .no-data-message {
+    padding-top: 32px;
+    padding-bottom: 32px; }
 
 .link-action {
   color: #1f2c33;
