@@ -47,25 +47,18 @@ class CColorPickerElement extends CElement {
 		if ($color === null) {
 			$overlay->query('button:Use default')->one()->click();
 		}
-		else {
+		elseif ($overlay->query('class:color-picker-tabs')->one(false)->isValid()) {
 			$overlay->asColorPicker()->selectTab('Solid color');
 			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
 		}
-
-		$apply_button = $overlay->query('button:Apply');
-
-		if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$overlay->waitUntilNotVisible();
-		}
+		// TODO: remove the below else part and move elseif to else when DEV-4301 is ready.
 		else {
 			if (!$apply_button->one()->isAttributePresent('disabled')) {
 				throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
 			}
 		}
 
-		return $this;
-	}
+		$apply_button = $overlay->query('button:Apply');
 
 	/**
 	 * Switch color-picker tab by its name.

@@ -165,7 +165,7 @@ class ZColorPicker extends HTMLElement {
 	#has_default;
 	#has_palette;
 	#disabled;
-	#show_clear;
+	#allow_empty;
 
 	#events;
 
@@ -191,7 +191,7 @@ class ZColorPicker extends HTMLElement {
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('palette-field-name');
 			this.#disabled = this.hasAttribute('disabled');
-			this.#show_clear = this.hasAttribute('show-clear');
+			this.#allow_empty = this.hasAttribute('allow-empty') || this.#has_default;
 
 			this.#hidden_input = new Template(ZColorPicker.#hidden_input_template).evaluateToElement();
 			this.#box = new Template(ZColorPicker.#box_template).evaluateToElement();
@@ -213,11 +213,11 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'show-clear'];
+		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'allow-empty'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
-		if (!this.#is_connected || old_value === new_value) {
+		if (!this.#is_connected) {
 			return;
 		}
 
@@ -251,8 +251,8 @@ class ZColorPicker extends HTMLElement {
 				this.#disabled = new_value !== null;
 				break;
 
-			case 'show-clear':
-				this.#show_clear = new_value !== null;
+			case 'allow-empty':
+				this.#allow_empty = new_value !== null || this.#has_default;
 				break;
 
 			default:
@@ -272,6 +272,14 @@ class ZColorPicker extends HTMLElement {
 		this.#box.id = `lbl_${name.replaceAll('[', '_').replaceAll(']', '')}`;
 		this.#box.title = this.#getTitle();
 		this.#box.classList.toggle(ZColorPicker.ZBX_STYLE_IS_PALETTE, this.#palette !== null);
+		this.#box.classList.remove(ZColorPicker.ZBX_STYLE_DEFAULT_COLOR, ZColorPicker.ZBX_STYLE_NO_COLOR);
+
+		if (this.#color === '') {
+			this.#box.classList.add(this.#has_default
+				? ZColorPicker.ZBX_STYLE_DEFAULT_COLOR
+				: ZColorPicker.ZBX_STYLE_NO_COLOR
+			);
+		}
 
 		if (isColorHex(`#${this.#color}`)) {
 			this.#box.style.background = `#${this.#color}`;
@@ -287,8 +295,6 @@ class ZColorPicker extends HTMLElement {
 			icon_parts[1].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][8]}`);
 			icon_parts[2].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][17]}`);
 		}
-
-		this.#updateEmptyState(this.#box);
 
 		if (this.#disabled) {
 			this.#hidden_input.setAttribute('disabled', '');
@@ -533,7 +539,7 @@ class ZColorPicker extends HTMLElement {
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_DEFAULT}`)
 			.style.display = this.#has_default ? '' : 'none';
 		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_CLEAR}`)
-			.style.display = !this.#has_default && this.#show_clear ? '' : 'none';
+			.style.display = !this.#has_default && this.#allow_empty ? '' : 'none';
 
 		this.#dialog.querySelectorAll(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]`)
 			.forEach(input => {
@@ -682,22 +688,6 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	/**
-	 * Update element (box or preview) emptiness states.
-	 *
-	 * @param {Element} element
-	 */
-	#updateEmptyState(element) {
-		element.classList.remove(ZColorPicker.ZBX_STYLE_DEFAULT_COLOR, ZColorPicker.ZBX_STYLE_NO_COLOR);
-
-		if (this.#color === '') {
-			element.classList.add(this.#has_default
-				? ZColorPicker.ZBX_STYLE_DEFAULT_COLOR
-				: ZColorPicker.ZBX_STYLE_NO_COLOR
-			);
-		}
-	}
-
-	/**
 	 * Update color preview inside dialog.
 	 */
 	#updatePreview() {
@@ -715,8 +705,14 @@ class ZColorPicker extends HTMLElement {
 
 		if (changed) {
 			this.#preview.title = this.#getTitle(false);
+			this.#preview.classList.remove(ZColorPicker.ZBX_STYLE_DEFAULT_COLOR, ZColorPicker.ZBX_STYLE_NO_COLOR);
 
-			this.#updateEmptyState(this.#preview);
+			if (this.#color === '' || this.#color === null) {
+				this.#preview.classList.add(this.#has_default
+					? ZColorPicker.ZBX_STYLE_DEFAULT_COLOR
+					: ZColorPicker.ZBX_STYLE_NO_COLOR
+				);
+			}
 		}
 	}
 
@@ -738,7 +734,8 @@ class ZColorPicker extends HTMLElement {
 	 * Update "Apply" button - enable or disable it based on color value.
 	 */
 	#updateApplyButton() {
-		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`).disabled = !isColorHex(`#${this.#color}`);
+		this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_BUTTON_APPLY}`).disabled =
+			!(isColorHex(`#${this.#color}`) || ((this.#color === '' || this.#color === null) && this.#allow_empty));
 	}
 
 	/**
@@ -773,15 +770,13 @@ class ZColorPicker extends HTMLElement {
 	 * @param {string} color
 	 */
 	#selectColor(color) {
-		if (!isColorHex(`#${color}`) && color !== '') {
-			return;
+		if (isColorHex(`#${color}`) || color === '' && this.#allow_empty) {
+			this.color = color;
+
+			this.#closeDialog(true);
+
+			this.dispatchEvent(new Event('change', {bubbles: true}));
 		}
-
-		this.color = color;
-
-		this.#closeDialog(true);
-
-		this.dispatchEvent(new Event('change', {bubbles: true}));
 	}
 
 	/**
@@ -826,7 +821,7 @@ class ZColorPicker extends HTMLElement {
 		else if (isColorHex(`#${this.#color}`)) {
 			return `#${this.#color}`;
 		}
-		else if (this.#color === '') {
+		else if (this.#color === '' || this.#color === null) {
 			return this.#has_default ? t('Use default') : t('No color');
 		}
 		else {
@@ -894,16 +889,16 @@ class ZColorPicker extends HTMLElement {
 		}
 	}
 
-	get showClear() {
-		return this.hasAttribute('show-clear');
+	get allowEmpty() {
+		return this.hasAttribute('allow-empty');
 	}
 
-	set showClear(show_clear) {
-		if (show_clear) {
-			this.setAttribute('show-clear', '');
+	set allowEmpty(allow_empty) {
+		if (allow_empty) {
+			this.setAttribute('allow-empty', '');
 		}
 		else {
-			this.removeAttribute('show-clear');
+			this.removeAttribute('allow-empty');
 		}
 	}
 }
