@@ -15294,6 +15294,20 @@ static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_
 	}
 }
 
+static zbx_uint64_t	zbx_get_parent_itemid(zbx_uint64_t itemid)
+{
+	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+
+	if (NULL == (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
+			&itemid)))
+		return itemid;
+
+	if (0 == item_discovery->parent_itemid)
+		return itemid;
+
+	return zbx_get_parent_itemid(item_discovery->parent_itemid);
+}
+
 void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 {
 	ZBX_DC_ITEM		*item;
@@ -15315,15 +15329,13 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 	/* check for discovered item */
 	if (ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 	{
-		ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+		ZBX_DC_TEMPLATE_ITEM	*prototype_item;
+		zbx_uint64_t		parent_itemid;
 
-		if (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
-				&itemid)))
+		if ((parent_itemid = zbx_get_parent_itemid(itemid)) != itemid)
 		{
-			ZBX_DC_TEMPLATE_ITEM	*prototype_item;
-
 			if (NULL != (prototype_item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(
-					&config->template_items, &item_discovery->parent_itemid)))
+					&config->template_items, &parent_itemid)))
 			{
 				if (0 != prototype_item->templateid)
 					zbx_gather_tags_from_template_chain(prototype_item->templateid, item_tags);
