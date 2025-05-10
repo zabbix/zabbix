@@ -145,6 +145,7 @@ window.host_wizard_edit = new class {
 		tls_required: true,
 		template_search_query: '',
 		selected_template: null,
+		selected_subclasses: {},
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
@@ -311,6 +312,9 @@ window.host_wizard_edit = new class {
 			`),
 			progress_step_info: new Template(`
 				<div class="progress-info" title="#{info}">#{info}</div>
+			`),
+			subclass_filter_item: new Template(`
+				<button type="button" class="template-subfilter-item">#{label}</button>
 			`),
 			warning: new Template(`
 				<span class="warning zi-triangle-warning">#{message}</span>
@@ -861,6 +865,8 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
+		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
+
 		switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_WELCOME:
 				break;
@@ -868,6 +874,7 @@ window.host_wizard_edit = new class {
 			case this.STEP_SELECT_TEMPLATE:
 				if (!path
 					|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
+					|| path.startsWith('selected_subclasses')
 				) {
 					this.#dialogue.querySelectorAll('input[name="agent_mode"]').forEach(input => {
 						input.disabled = Number(this.#data.data_collection) == ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
@@ -1027,6 +1034,8 @@ window.host_wizard_edit = new class {
 				}
 				break;
 		}
+
+		requestAnimationFrame(() => this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top);
 	}
 
 	#updateNextButton() {
@@ -1098,6 +1107,8 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeCardListSections() {
+		const template_subclasses = new Map();
+
 		let template_classes = Array.from(this.#templates)
 			.filter(([_, template]) => {
 				if (Number(this.#data.data_collection) != ZBX_TEMPLATE_DATA_COLLECTION_ANY
@@ -1134,17 +1145,31 @@ window.host_wizard_edit = new class {
 				return true;
 			})
 			.reduce((map, [templateid, {tags}]) => {
+				const enrichSubclasses = (class_value, tags) => {
+					const subclasses = new Set(template_subclasses.get(class_value) || []);
+
+					tags.forEach(({tag, value}) => tag === 'subclass' && subclasses.add(value));
+
+					template_subclasses.set(class_value, [...subclasses]);
+				}
+
 				let found = false;
 
-				for (const { tag, value } of tags) {
+				for (const {tag, value} of tags) {
 					if (tag === 'class') {
 						map.set(value, [...(map.get(value) || []), templateid]);
 						found = true;
+
+						enrichSubclasses(value, tags);
 					}
 				}
 
 				if (!found) {
-					map.set('other', [...(map.get('other') || []), templateid]);
+					const value = 'other';
+
+					map.set(value, [...(map.get(value) || []), templateid]);
+
+					enrichSubclasses(value, tags);
 				}
 
 				return map;
@@ -1163,8 +1188,7 @@ window.host_wizard_edit = new class {
 		if (template_classes.size) {
 			for (const [category, templateids] of template_classes) {
 				const section = this.#view_templates.templates_section.evaluateToElement({
-					title: category.charAt(0).toUpperCase() + category.slice(1),
-					count: templateids.length
+					title: category.charAt(0).toUpperCase() + category.slice(1)
 				});
 
 				const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(category);
@@ -1174,13 +1198,62 @@ window.host_wizard_edit = new class {
 					toggleSection(section.querySelector('.toggle'));
 				}
 
+				const subclasses_list = section.querySelector('.template-subfilter');
+				const subclasses = template_subclasses.get(category);
+
+				if (subclasses !== undefined) {
+					for (const subclass of subclasses.sort()) {
+						const subfilter_button = this.#view_templates.subclass_filter_item.evaluateToElement({
+							label: subclass
+						});
+
+						subfilter_button.classList.toggle('selected',
+							!!this.#data.selected_subclasses[category]?.includes(subclass)
+						);
+
+						subfilter_button.addEventListener('click', ({target}) => {
+							const selected_subclasses = new Set(this.#data.selected_subclasses[category] || []);
+
+							if (target.classList.contains('selected')) {
+								selected_subclasses.delete(subclass);
+							}
+							else {
+								selected_subclasses.add(subclass);
+							}
+
+							this.#data.selected_subclasses[category] = Array.from(selected_subclasses);
+						});
+
+						subclasses_list.appendChild(subfilter_button);
+					}
+				}
+				else {
+					subclasses_list.style.display = 'none';
+				}
+
 				const card_list = section.querySelector('.templates-card-list');
 
+				const selected_subclasses = this.#data.selected_subclasses[category] || [];
+
+				let templates_count = 0;
+
 				for (const templateid of templateids) {
+					const template = this.#templates.get(templateid);
+
+					if (selected_subclasses.length && !template.tags.find(
+						({tag, value}) => tag === 'subclass' && selected_subclasses.includes(value)
+					)) {
+						continue;
+					}
+
 					card_list.appendChild(
-						this.#makeCard(category, this.#templates.get(templateid), templateid === selected_templateid)
+						this.#makeCard(category, template, templateid === selected_templateid)
 					);
+
+					templates_count++;
 				}
+
+				section.querySelector(`.<?= CSection::ZBX_STYLE_HEAD ?> h4`).append(` (${templates_count})`);
 
 				section.addEventListener('expand', () => this.#sections_expanded.set(category, true));
 				section.addEventListener('collapse', () => this.#sections_expanded.set(category, false));

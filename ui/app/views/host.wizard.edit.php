@@ -181,7 +181,10 @@ function stepSelectTemplate($old_template_count): array {
 		),
 		new CTemplateTag('host-wizard-templates-section',
 			(new CSectionCollapsible())
-				->setToggleLabel(_('#{title}').' (#{count})')
+				->setToggleLabel(_('#{title}'))
+				->additem(
+					(new CDiv())->addClass('template-subfilter')
+				)
 				->addItem(
 					(new CDiv())
 						->addClass(ZBX_STYLE_GRID_COLUMNS)
