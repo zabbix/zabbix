@@ -15298,11 +15298,10 @@ static zbx_uint64_t	zbx_get_parent_itemid(zbx_uint64_t itemid)
 {
 	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
 
-	if (NULL == (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery, &itemid)) ||
-			0 == item_discovery->parent_itemid)
-	{
+	item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery, &itemid);
+
+	if (NULL == item_discovery || 0 == item_discovery->parent_itemid)
 		return itemid;
-	}
 
 	return zbx_get_parent_itemid(item_discovery->parent_itemid);
 }
