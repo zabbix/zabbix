@@ -248,8 +248,11 @@ function itemCompleteTest(overlay) {
 		url = new Curl('zabbix.php');
 
 	const macros = {};
-	for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
-		macros[macro_name] = form_data.macro_values[macro_index];
+
+	if (form_data.macro_names !== undefined) {
+		for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+			macros[macro_name] = form_data.macro_values[macro_index];
+		}
 	}
 
 	url.setArgument('action', 'popup.itemtest.send');
@@ -471,9 +474,12 @@ function saveItemTestInputs() {
 		});
 	<?php endif ?>
 
-	for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
-		macros[macro_name] = form_data.macro_values[macro_index];
+	if (form_data.macro_names !== undefined) {
+		for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+			macros[macro_name] = form_data.macro_values[macro_index];
+		}
 	}
+
 	input_values.macros = JSON.stringify(macros);
 
 	<?php if ($data['step_obj'] == -2): ?>
