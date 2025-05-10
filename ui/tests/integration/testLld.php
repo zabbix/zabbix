@@ -2202,8 +2202,7 @@ class testLld extends CIntegrationTest
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
-		foreach (["dep_first", "dep_second"] as $elem)
-		{
+		foreach (["dep_first", "dep_second"] as $elem) {
 			$response = $this->call('discoveryrule.get', [
 				'search' => [
 					'name' => 'dep_drule[' . $elem . ']'
@@ -2335,7 +2334,9 @@ class testLld extends CIntegrationTest
 				'description' => 'item.update.nested[A,B]'
 			],
 			'output' => [
-				'manual_close', 'type', 'priority'
+				'manual_close',
+				'type',
+				'priority'
 			]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
