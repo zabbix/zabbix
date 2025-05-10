@@ -19,6 +19,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup widget, profiles
  *
@@ -338,6 +340,18 @@ class testDashboardGraphWidget extends testWidgets {
 				$form->fill($data[$tab]);
 		}
 
+		// Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
+		if (CTestArrayHelper::get($data, 'invalid_color')) {
+			$color_picker_dialog = $this->query('class:color-picker-dialog')->one();
+			$this->assertFalse($color_picker_dialog->query('button:Apply')->one()->isClickable());
+
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$this->assertTrue($color_picker_dialog->isDisplayed());
+			COverlayDialogElement::closeAll();
+
+			return;
+		}
+
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
@@ -363,42 +377,39 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'Data set' => [
-						[],
 						[
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '',
+							'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => '',
 							'host' => 'Zabbix*',
 							'item' => 'Agent ping'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": cannot be empty.'
+					'invalid_color' => true
 				]
 			],
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000!',
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
+			[
+				[
+					'Data set' => [
+						[
+							'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => '00000!',
+							'host' => 'Zabbix*',
+							'item' => 'Agent ping'
+						]
+					],
+					'invalid_color' => true
+				]
+			],
+			[
+				[
+					'Data set' => [
+						[
+							'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => '00000 ',
+							'host' => 'Zabbix*',
+							'item' => 'Agent ping'
+						]
+					],
+					'invalid_color' => true
+				]
+			],
 			// Time shift field validation.
 			[
 				[
@@ -532,19 +543,6 @@ class testDashboardGraphWidget extends testWidgets {
 					'error' => 'Invalid parameter "Data set/2/items": cannot be empty.'
 				]
 			],
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
 			[
 				[
 					'Data set' => [
@@ -1131,7 +1129,7 @@ class testDashboardGraphWidget extends testWidgets {
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'invalid_color' => true
 				]
 			],
 			[
@@ -1144,7 +1142,7 @@ class testDashboardGraphWidget extends testWidgets {
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'invalid_color' => true
 				]
 			],
 			// Time shift field validation.
@@ -1657,9 +1655,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'Refresh interval' => 'No refresh'
 					],
 					'Data set' => [
-						[],
 						[
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '009688',
+							'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => '009688',
 							'host' => 'One host',
 							'item' => 'One item',
 							'Draw' => 'Staircase',
@@ -1675,7 +1672,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'Data set label' => 'Staircase graph'
 						],
 						[
-							'xpath://button[@id="lbl_ds_2_color"]/..' => '000000',
+							'xpath:.//z-color-picker[@color-field-name="ds[1][color]"]' => '000000',
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'Y-axis' => 'Right',
@@ -1955,9 +1952,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'Refresh interval' => 'No refresh'
 					],
 					'Data set' => [
-						[],
 						[
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '009688',
+							'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => '009688',
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
@@ -1969,7 +1965,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'Time shift' => '0'
 						],
 						[
-							'xpath://button[@id="lbl_ds_2_color"]/..' => '000000',
+							'xpath:.//z-color-picker[@color-field-name="ds[1][color]"]' => '000000',
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'Y-axis' => 'Right',
@@ -2224,7 +2220,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'time_shift' => 'name:or['.$i.'][timeshift]',
 					'color' => [
-						'selector' => 'xpath://button[@id="lbl_or_'.$i.'__color_"]/..',
+						'selector' => 'xpath://button[@id="lbl_or_'.$i.'_color"]/..',
 						'class' => CColorPickerElement::class
 					]
 				];
@@ -2316,7 +2312,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'host' => 'xpath://div[@id="or_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
 					'time_shift' => 'name:or['.$i.'][timeshift]',
-					'color' => 'xpath://button[@id="lbl_or_'.$i.'__color_"]/..'
+					'color' => 'xpath://button[@id="lbl_or_'.$i.'_color"]/..'
 				];
 				$inputs = [];
 				foreach ($mapping as $field => $selector) {
