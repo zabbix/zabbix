@@ -150,7 +150,7 @@ window.host_wizard_edit = new class {
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
 		monitoring_os: 'linux',
 		monitoring_os_distribution: 'windows-new',
-		interface_required: {},
+		interface_required: [],
 		interface_default: {
 			[this.INTERFACE_TYPE_AGENT]: {
 				type: this.INTERFACE_TYPE_AGENT,
@@ -442,16 +442,12 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderAddHostInterface() {
-		const interface_required = Object.entries(this.#data.interface_required)
-			.filter(([_, required]) => required)
-			.map(([type]) => Number(type));
-
 		const interfaces_long = [];
 		const interfaces_short = [];
 
-		for (const interface_type of interface_required) {
-			interfaces_long.push(this.#interface_names_long_titles[Number(interface_type)]);
-			interfaces_short.push(this.#interface_names_short_titles[Number(interface_type)]);
+		for (const interface_type of this.#data.interface_required) {
+			interfaces_long.push(this.#interface_names_long_titles[interface_type]);
+			interfaces_short.push(this.#interface_names_short_titles[interface_type]);
 		}
 
 		const interface_templates = {
@@ -468,7 +464,7 @@ window.host_wizard_edit = new class {
 			interfaces_short: interfaces_short.join('/')
 		});
 
-		interface_required.forEach((interface_type, row_index) => {
+		this.#data.interface_required.forEach((interface_type, row_index) => {
 			view.appendChild(interface_templates[interface_type].evaluateToElement({row_index}));
 		});
 
@@ -594,18 +590,16 @@ window.host_wizard_edit = new class {
 				this.#data.tls_psk_identity = '';
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
-				this.#data.interface_required = {
-					[this.INTERFACE_TYPE_AGENT]: response.agent_interface_required,
-					[this.INTERFACE_TYPE_IPMI]: response.ipmi_interface_required,
-					[this.INTERFACE_TYPE_JMX]: response.jmx_interface_required,
-					[this.INTERFACE_TYPE_SNMP]: response.snmp_interface_required
-				}
+				this.#data.interface_required = [
+					response.agent_interface_required && this.INTERFACE_TYPE_AGENT,
+					response.ipmi_interface_required && this.INTERFACE_TYPE_IPMI,
+					response.jmx_interface_required && this.INTERFACE_TYPE_JMX,
+					response.snmp_interface_required && this.INTERFACE_TYPE_SNMP
+				].filter(Boolean);
 
-				const interface_required = Object.entries(this.#data.interface_required)
-					.filter(([_, required]) => required)
-					.map(([type]) => Number(type));
+				this.#data.interfaces = [];
 
-				interface_required.forEach((interface_type, row_index) => {
+				this.#data.interface_required.forEach((interface_type, row_index) => {
 					const host_interface = this.#host?.interfaces.find(
 						host_interface => Number(host_interface.type) === interface_type
 					);
@@ -680,8 +674,7 @@ window.host_wizard_edit = new class {
 					tls_psk: this.#data.tls_psk,
 					tls_psk_identity: this.#data.tls_psk_identity
 				}),
-				interfaces: Object.values(this.#data.interfaces)
-					.filter(({type}) => this.#data.interface_required[type]),
+				interfaces: Object.values(this.#data.interfaces),
 				ipmi_authtype: this.#data.ipmi_authtype,
 				ipmi_privilege: this.#data.ipmi_privilege,
 				ipmi_username: this.#data.ipmi_username,
@@ -1063,15 +1056,14 @@ window.host_wizard_edit = new class {
 	}
 
 	#isRequiredInstallAgent() {
-		return this.#data.interface_required[this.INTERFACE_TYPE_AGENT]
+		return this.#data.interface_required.includes(this.INTERFACE_TYPE_AGENT)
 			&& (!this.#host?.interfaces.some(({type}) => Number(type) === this.INTERFACE_TYPE_AGENT));
 	}
 
 	#isRequiredAddHostInterface() {
-		return Object.entries(this.#data.interface_required).some(([required_type, is_required]) => {
-			return is_required
-				&& !this.#host?.interfaces.some(({type}) => type === required_type);
-		});
+		return this.#data.interface_required.some(required_type =>
+			!this.#host?.interfaces.some(({type}) => Number(type) === required_type)
+		);
 	}
 
 	#generatePSK() {
