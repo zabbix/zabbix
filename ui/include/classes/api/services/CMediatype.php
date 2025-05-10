@@ -811,11 +811,10 @@ class CMediatype extends CApiService {
 	}
 
 	private static function addFieldDefaultsByType(array &$mediatypes, array $db_mediatypes): void {
-		$type_field_defaults = array_map(static fn(array $field_data): string => $field_data['default'],
-			array_intersect_key(DB::getSchema('media_type')['fields'] + DB::getSchema('media_type_oauth')['fields'],
-				self::getDefaultTypeValidationRules() + ['access_token_updated' => time()]
-			)
-		) + ['parameters' => []];
+		$type_field_defaults = array_intersect_key(
+			DB::getDefaults('media_type') + DB::getDefaults('media_type_oauth') + ['parameters' => []],
+			self::getDefaultTypeValidationRules()
+		);
 
 		foreach ($mediatypes as &$mediatype) {
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
@@ -905,6 +904,9 @@ class CMediatype extends CApiService {
 
 			if ($mediatype['type'] == MEDIA_TYPE_EMAIL
 					&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+				if (array_key_exists('access_token', $mediatype)) {
+					$mediatype += ['access_token_updated' => time()];
+				}
 				if ($db_mediatype !== null && $db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
