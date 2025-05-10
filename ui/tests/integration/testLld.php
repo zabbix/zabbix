@@ -2221,4 +2221,141 @@ class testLld extends CIntegrationTest
 			$this->assertEquals(1, $response['result']);
 		}
 	}
+
+	public function testLld_checkUpdatesOfSecondLevelProtos()
+	{
+		$hostname = "lld_drule_proto_elem_update";
+
+		$this->importHost($hostname);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$response = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => [
+				'host' => $hostname
+			]
+		]);
+		$this->assertArrayHasKey('result', $response, json_encode($response));
+		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
+		$hostid = $response['result'][0]['hostid'];
+
+		$data = [
+			[
+				"{#PARENTNAME}" => "A",
+				"nested" => [
+					["{#NAME}" => "B"]
+				]
+			]
+		];
+
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$response = $this->call('discoveryruleprototype.get', [
+			'hostids' => [$hostid],
+			'search' => [
+				'name' => 'nested[{#PARENTNAME}]'
+			],
+			'selectItems' => ['name', 'key_'],
+			'selectTriggers' => ['description'],
+			'selectGraphs' => ['name'],
+			'selectDiscoveries' => ['name']
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey('items', $response['result'][0]);
+		$this->assertArrayHasKey(0, $response['result'][0]['items']);
+		$this->assertArrayHasKey('triggers', $response['result'][0]);
+		$this->assertArrayHasKey(0, $response['result'][0]['triggers']);
+		$this->assertArrayHasKey('graphs', $response['result'][0]);
+		$this->assertArrayHasKey(0, $response['result'][0]['graphs']);
+
+		$itemprotoid = $response['result'][0]['items'][0]['itemid'];
+		$triggerprotoid = $response['result'][0]['triggers'][0]['triggerid'];
+		$graphprotoid = $response['result'][0]['graphs'][0]['graphid'];
+
+		$response = $this->call('itemprototype.update', [
+			'itemid' => $itemprotoid,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'type' => ITEM_TYPE_SIMPLE,
+			'delay' => 10
+		]);
+		$this->assertCount(1, $response['result']['itemids']);
+
+		$response = $this->call('triggerprototype.update', [
+			'triggerid' => $triggerprotoid,
+			'manual_close' => 1,
+			'type' => 1,
+			'priority' => TRIGGER_SEVERITY_DISASTER
+		]);
+		$this->assertCount(1, $response['result']['triggerids']);
+
+		$response = $this->call('graphprototype.update', [
+			'graphid' => $graphprotoid,
+			'height' => 111,
+			'width' => 222
+		]);
+		$this->assertCount(1, $response['result']['graphids']);
+
+		$data = [
+			[
+				"{#PARENTNAME}" => "A",
+				"nested" => [
+					["{#NAME}" => "B"]
+				]
+			]
+		];
+
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$response = $this->call('item.get', [
+			'hostid' => $hostid,
+			'search' => [
+				'name' => 'item.update.nested[A,B]'
+			],
+			'output' => [
+				'value_type',
+				'type',
+				'delay'
+			]
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals(ITEM_VALUE_TYPE_FLOAT, $response['result'][0]['value_type']);
+		$this->assertEquals(ITEM_TYPE_SIMPLE, $response['result'][0]['type']);
+		$this->assertEquals(10, $response['result'][0]['delay']);
+
+		$response = $this->call('trigger.get', [
+			'hostids' => [$hostid],
+			'search' => [
+				'description' => 'item.update.nested[A,B]'
+			],
+			'output' => [
+				'manual_close', 'type', 'priority'
+			]
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals(1, $response['result'][0]['manual_close']);
+		$this->assertEquals(1, $response['result'][0]['type']);
+		$this->assertEquals(TRIGGER_SEVERITY_DISASTER, $response['result'][0]['priority']);
+
+		$response = $this->call('graph.get', [
+			'search' => [
+				'name' => 'graph.update.nested[A,B]'
+			],
+			'output' => [
+				'width',
+				'height'
+			]
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals(222, $response['result'][0]['width']);
+		$this->assertEquals(111, $response['result'][0]['height']);
+	}
 }
