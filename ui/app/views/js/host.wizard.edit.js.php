@@ -312,6 +312,12 @@ window.host_wizard_edit = new class {
 			progress_step_info: new Template(`
 				<div class="progress-info" title="#{info}">#{info}</div>
 			`),
+			warning: new Template(`
+				<span class="warning zi-triangle-warning">#{message}</span>
+			`),
+			error: new Template(`
+				<span class="error">#{message}</span>
+			`),
 			description: new Template(`
 				<div class="${ZBX_STYLE_FORM_DESCRIPTION} ${ZBX_STYLE_MARKDOWN}">#{description}</div>
 			`),
@@ -508,6 +514,12 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
+		for (const path in this.#macro_reset_list) {
+			this.#updateFieldMessages(this.#pathToInputName(path), 'warning',
+				[<?= json_encode(_('The value does not match the existing value on the selected host.')) ?>]
+			);
+		}
+
 		jQuery(".macro-input-group", view).macroValue();
 		jQuery('.input-secret', view).inputSecret();
 	}
@@ -614,6 +626,8 @@ window.host_wizard_edit = new class {
 				this.#data.ipmi_username = this.#host?.ipmi_username || '';
 				this.#data.ipmi_password = this.#host?.ipmi_password || '';
 
+				this.#macro_reset_list = {}
+
 				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
 					const is_checkbox = Number(template_macro.config.type) === this.WIZARD_FIELD_CHECKBOX;
 					const is_list = Number(template_macro.config.type) === this.WIZARD_FIELD_LIST;
@@ -629,7 +643,7 @@ window.host_wizard_edit = new class {
 
 						if (!allowed_values.includes(value)) {
 							if (host_macro?.value !== undefined ) {
-								this.#macro_reset_list[template_macro.macro] = true;
+								this.#macro_reset_list[`macros.${index}.value`] = template_macro.macro;
 							}
 
 							value = is_checkbox
@@ -643,7 +657,7 @@ window.host_wizard_edit = new class {
 
 					if (Number(host_macro?.type) === this.MACRO_TYPE_SECRET
 							&& Number(template_macro.type) !== this.MACRO_TYPE_SECRET) {
-						this.#macro_reset_list[template_macro.macro] = true;
+						this.#macro_reset_list[`macros.${index}.value`] = template_macro.macro;
 					}
 
 					return [index, {
@@ -1003,6 +1017,14 @@ window.host_wizard_edit = new class {
 				this.#next_button.toggleAttribute('disabled', Object.values(this.#data.interfaces)
 					.some(({address, port}) => address === '' || String(port) === '')
 				);
+				break;
+
+			case this.STEP_CONFIGURE_HOST:
+				if (path in this.#macro_reset_list && old_value !== undefined) {
+					this.#updateFieldMessages(this.#pathToInputName(path), 'warning', []);
+
+					delete this.#macro_reset_list[path];
+				}
 				break;
 		}
 	}
@@ -1370,6 +1392,28 @@ window.host_wizard_edit = new class {
 		}
 
 		target.value = target.value.trim();
+	}
+
+	#updateFieldMessages(name, type, messages = []) {
+		const field = this.#dialogue.querySelector(`[name="${name}"]`);
+
+		if (field === null) {
+			return;
+		}
+
+		const form_field = field.closest(`.${ZBX_STYLE_FORM_FIELD}`);
+
+		if (form_field === null) {
+			return;
+		}
+
+		field.classList.toggle(type === 'error' ? 'has-error' : 'has-warning', !!messages.length);
+
+		form_field.querySelectorAll(`.${type === 'error' ? 'error' : 'warning'}`).forEach(element => element.remove());
+
+		messages.forEach(message => form_field.appendChild(this.#view_templates[type].evaluateToElement({
+			message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
+		})));
 	}
 
 	#initReactiveData(target_object, on_change_callback) {

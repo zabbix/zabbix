@@ -5862,6 +5862,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .grid-columns .form-fields-inline {
     display: flex;
     gap: 16px; }
+    .modal-popup-host-wizard .grid-columns .form-fields-inline label {
+      margin: 0; }
     .modal-popup-host-wizard .grid-columns .form-fields-inline .radio-list-control label {
       margin: 0; }
   .modal-popup-host-wizard .grid-columns.form-columns > .form-fields-hint {
@@ -5897,6 +5899,15 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         margin-right: 0; }
         .modal-popup-host-wizard .form-field .multiselect-control .btn-split li:first-child {
           margin-left: 0; }
+    .modal-popup-host-wizard .form-field .warning {
+      line-height: 16px; }
+      .modal-popup-host-wizard .form-field .warning::before {
+        color: #e99003; }
+    .modal-popup-host-wizard .form-field .has-error {
+      border-color: #e45959; }
+    .modal-popup-host-wizard .form-field .error {
+      line-height: 16px;
+      color: #e45959; }
     .modal-popup-host-wizard .form-field.field-checkbox {
       gap: 0; }
       .modal-popup-host-wizard .form-field.field-checkbox label {

@@ -38,6 +38,7 @@ const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
 const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
 
 const ZBX_STYLE_FORM_GRID = 'form-grid';
+const ZBX_STYLE_FORM_FIELD = 'form-field';
 const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
 
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = 'form-label-asterisk';
