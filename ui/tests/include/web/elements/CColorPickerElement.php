@@ -128,7 +128,6 @@ class CColorPickerElement extends CElement {
 		$this->overwrite($color);
 	}
 
-
 	/**
 	 * Check if color-picker dialog can be submitted
 	 *
