@@ -342,12 +342,11 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one();
-			$this->assertFalse($color_picker_dialog->query('button:Apply')->one()->isClickable());
+			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
+			$color_picker_dialog->isSubmittionDisabled();
 
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$this->assertTrue($color_picker_dialog->isDisplayed());
-			COverlayDialogElement::closeAll();
+			$color_picker_dialog->close();
+			COverlayDialogElement::find()->one()->close();
 
 			return;
 		}
