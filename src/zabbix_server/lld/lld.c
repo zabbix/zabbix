@@ -35,8 +35,8 @@ ZBX_PTR_VECTOR_IMPL(lld_entry_ptr, zbx_lld_entry_t *)
 
 int	lld_item_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_t	*item_1 = *(const zbx_lld_item_t **)d1;
-	const zbx_lld_item_t	*item_2 = *(const zbx_lld_item_t **)d2;
+	const zbx_lld_item_t	*item_1 = *(const zbx_lld_item_t * const *)d1;
+	const zbx_lld_item_t	*item_2 = *(const zbx_lld_item_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
 
@@ -45,8 +45,8 @@ int	lld_item_compare_func(const void *d1, const void *d2)
 
 int	lld_item_link_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_link_t	*link_1 = *(const zbx_lld_item_link_t **)d1;
-	const zbx_lld_item_link_t	*link_2 = *(const zbx_lld_item_link_t **)d2;
+	const zbx_lld_item_link_t	*link_1 = *(const zbx_lld_item_link_t * const *)d1;
+	const zbx_lld_item_link_t	*link_2 = *(const zbx_lld_item_link_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(link_1->parent_itemid, link_2->parent_itemid);
 
@@ -55,8 +55,8 @@ int	lld_item_link_compare_func(const void *d1, const void *d2)
 
 int	lld_item_full_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_full_t	*item_1 = *(const zbx_lld_item_full_t **)d1;
-	const zbx_lld_item_full_t	*item_2 = *(const zbx_lld_item_full_t **)d2;
+	const zbx_lld_item_full_t	*item_1 = *(const zbx_lld_item_full_t * const *)d1;
+	const zbx_lld_item_full_t	*item_2 = *(const zbx_lld_item_full_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
 
@@ -65,8 +65,8 @@ int	lld_item_full_compare_func(const void *d1, const void *d2)
 
 int	lld_item_prototype_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_prototype_t	*proto_1 = *(const zbx_lld_item_prototype_t **)d1;
-	const zbx_lld_item_prototype_t	*proto_2 = *(const zbx_lld_item_prototype_t **)d2;
+	const zbx_lld_item_prototype_t	*proto_1 = *(const zbx_lld_item_prototype_t * const *)d1;
+	const zbx_lld_item_prototype_t	*proto_2 = *(const zbx_lld_item_prototype_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(proto_1->itemid, proto_2->itemid);
 
@@ -80,8 +80,8 @@ int	lld_item_prototype_compare_func(const void *d1, const void *d2)
  ******************************************************************************/
 static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
 {
-	zbx_lld_condition_t	*condition1 = *(zbx_lld_condition_t **)cond1;
-	zbx_lld_condition_t	*condition2 = *(zbx_lld_condition_t **)cond2;
+	const zbx_lld_condition_t	*condition1 = *(zbx_lld_condition_t * const *)cond1;
+	const zbx_lld_condition_t	*condition2 = *(zbx_lld_condition_t * const *)cond2;
 
 	return strcmp(condition1->macro, condition2->macro);
 }

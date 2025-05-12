@@ -270,9 +270,9 @@ static zbx_sync_row_t	*sync_row_create(zbx_uint64_t rowid, int cols_num)
 	row = (zbx_sync_row_t *)zbx_malloc(NULL, sizeof(zbx_sync_row_t));
 	row->rowid = rowid;
 	row->parent_rowid = 0;
-	row->cols = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
-	row->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * cols_num);
-	memset(row->cols_orig, 0, sizeof(char *) * cols_num);
+	row->cols = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
+	row->cols_orig = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
+	memset(row->cols_orig, 0, sizeof(char *) * (size_t)cols_num);
 	row->cols_num = cols_num;
 	row->flags = ZBX_SYNC_ROW_NONE;
 	row->data = NULL;

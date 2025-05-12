@@ -342,8 +342,8 @@ void	zbx_lld_override_free(zbx_lld_override_t *override)
 
 int	zbx_lld_override_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_override_t	*override_1 = *(const zbx_lld_override_t **)d1;
-	const zbx_lld_override_t	*override_2 = *(const zbx_lld_override_t **)d2;
+	const zbx_lld_override_t	*override_1 = *(const zbx_lld_override_t * const *)d1;
+	const zbx_lld_override_t	*override_2 = *(const zbx_lld_override_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(override_1->overrideid, override_2->overrideid);
 

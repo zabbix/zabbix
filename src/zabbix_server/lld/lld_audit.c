@@ -67,7 +67,8 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
 	ADD_JSON_P_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, "item.flags",
-			(int)(ZBX_FLAG_DISCOVERY_CREATED | item_prototype->item_flags), AUDIT_TABLE_NAME, "flags");
+			(zbx_uint64_t)(ZBX_FLAG_DISCOVERY_CREATED | item_prototype->item_flags), AUDIT_TABLE_NAME,
+			"flags");
 	ADD_JSON_S(jmx_endpoint, AUDIT_TABLE_NAME, "jmx_endpoint");
 	ADD_JSON_UI(master_itemid, AUDIT_TABLE_NAME, "master_itemid");
 	ADD_JSON_S(timeout, AUDIT_TABLE_NAME, "timeout");

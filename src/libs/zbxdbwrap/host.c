@@ -5798,10 +5798,9 @@ out:
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, int audit_context_mode, char **error)
 {
-	zbx_uint64_t		hosttemplateid;
-	int			i, res = SUCCEED;
-	char			*template_names, err[MAX_STRING_LEN];
-	zbx_db_insert_t		*db_insert_htemplates;
+	zbx_uint64_t	hosttemplateid;
+	int		i, res = SUCCEED;
+	zbx_db_insert_t	*db_insert_htemplates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

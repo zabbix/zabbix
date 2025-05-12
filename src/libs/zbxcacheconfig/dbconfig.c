@@ -3549,7 +3549,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		if (ITEM_TYPE_NESTED_LLD == item->type && 0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
 				&& 0 == (item->flags & ZBX_FLAG_DISCOVERY_CREATED))
 		{
-			zbx_timespec_t	ts = {now, 0};
+			zbx_timespec_t	ts = {(int)now, 0};
 
 			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
 					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"

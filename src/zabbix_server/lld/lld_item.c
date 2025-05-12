@@ -1023,7 +1023,7 @@ static char	*lld_item_description(int item_flags)
 	char	*desc = NULL;
 	size_t	desc_alloc = 0, desc_offset = 0;
 
-	if (0 == (item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	if (0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
 		zbx_strcpy_alloc(&desc, &desc_alloc, &desc_offset, "discovery rule");
 	else
 		zbx_strcpy_alloc(&desc, &desc_alloc, &desc_offset, "item");
@@ -1046,8 +1046,8 @@ static char	*lld_item_description(int item_flags)
  ******************************************************************************/
 static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, const char *format, ...)
 {
-	char		*message, key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-	const char	*pkey, *desc;
+	char		*message, key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *desc;
+	const char	*pkey;
 	va_list	args;
 
 	va_start(args, format);
