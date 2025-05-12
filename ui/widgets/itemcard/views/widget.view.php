@@ -418,47 +418,47 @@ function makeSectionMetrics(array $item): CDiv {
 }
 
 function makeSectionLatestData(array $item, string $context): CDiv {
-	$last_check_value = '';
-	$item_value = $context === 'template' ?  _('No data') : '';
-	$last_value = $item['last_value'];
-
-	if ($last_value !== null) {
-		$last_check_value = (new CSpan(zbx_date2age($last_value['clock'])))
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock']), '', true, '', 0);
-
-		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-			$item_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$item_value = (new CSpan(formatHistoryValue($last_value['value'], $item, false)))
-				->addClass(ZBX_STYLE_CURSOR_POINTER)
-				->setHint(
-					(new CDiv(mb_substr($last_value['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
-						->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
-						->addClass(ZBX_STYLE_HINTBOX_WRAP),
-					'', true, '', 0
-				);
-		}
-	}
+	$last_check_column_value = '';
+	$last_value_column_value = '';
 
 	$action_column = (new CDiv())->addClass('right-column');
-	$column_value = (new CDiv())->addClass('column-value');
+	$action_column_value = (new CDiv())->addClass('column-value');
+
+	$item_value = $item['last_value'];
 
 	if ($context === 'host') {
-		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-			if ($last_value !== null) {
-				$column_value = (new CButton(null, _('Show')))
+		if ($item_value !== null) {
+			$last_check_column_value = (new CSpan(zbx_date2age($item_value['clock'])))
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item_value['clock']), '', true, '', 0);
+
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				$last_value_column_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+			}
+			else {
+				$last_value_column_value = (new CSpan(formatHistoryValue($item_value['value'], $item, false)))
+					->addClass(ZBX_STYLE_CURSOR_POINTER)
+					->setHint(
+						(new CDiv(mb_substr($item_value['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+							->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
+							->addClass(ZBX_STYLE_HINTBOX_WRAP),
+						'', true, '', 0
+					);
+			}
+
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				$action_column_value = (new CButton(null, _('Show')))
 					->addClass('btn-thumbnail')
 					->addClass('js-show-binary');
 
 				$action_column
 					->setAttribute('data-itemid', $item['itemid'])
 					->setAttribute('data-key_', $item['key_'])
-					->setAttribute('data-clock', $last_value['clock'].'.'.$last_value['ns']);
+					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 			}
 		}
-		else {
+
+		if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 			$is_numeric = $item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64;
 
 			if ($item['keep_history'] != 0 || $item['keep_trends'] != 0) {
@@ -473,7 +473,7 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 			}
 
 			if ($is_numeric) {
-				$column_value->addItem(
+				$action_column_value->addItem(
 					(new CSparkline())
 						->setColor('#'.$item['sparkline']['color'])
 						->setLineWidth($item['sparkline']['width'])
@@ -485,18 +485,21 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 			}
 		}
 	}
+	else {
+		$last_value_column_value = _('No data');
+	}
 
-	$action_column->addItem($column_value);
+	$action_column->addItem($action_column_value);
 
 	return (new CDiv([
 		(new CDiv([
 			(new CDiv(_('Last check')))->addClass('column-header'),
-			(new CDiv($last_check_value))->addClass('column-value')
+			(new CDiv($last_check_column_value))->addClass('column-value')
 		]))->addClass('column'),
 		(new CDiv(
 			(new CDiv([
 				(new CDiv(_('Last value')))->addClass('column-header'),
-				(new CDiv($item_value))->addClass('column-value')
+				(new CDiv($last_value_column_value))->addClass('column-value')
 			]))->addClass('column'),
 		))->addClass('center-column'),
 		$action_column
