@@ -1216,6 +1216,16 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 define('EVENT_OBJECT_SERVICE',			6);
 
+define('ZBX_TAG_OBJECT_TEMPLATE',			0);
+define('ZBX_TAG_OBJECT_HOST',				1);
+define('ZBX_TAG_OBJECT_HOST_PROTOTYPE',		2);
+define('ZBX_TAG_OBJECT_ITEM',				3);
+define('ZBX_TAG_OBJECT_ITEM_PROTOTYPE',		4);
+define('ZBX_TAG_OBJECT_TRIGGER',			5);
+define('ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE',	6);
+define('ZBX_TAG_OBJECT_HTTPTEST',			7);
+define('ZBX_TAG_OBJECT_HTTPTEST_ITEM',		8);
+
 // System information widget constants.
 define('ZBX_SYSTEM_INFO_SERVER_STATS',	0);
 define('ZBX_SYSTEM_INFO_HAC_STATUS',	1);
