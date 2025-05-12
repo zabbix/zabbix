@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-19 06:43+0000\n"
-"Last-Translator: sergejs.olonkins <sergejs.olonkins@zabbix.com>\n"
+"PO-Revision-Date: 2025-04-11 09:45+0000\n"
+"Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -5834,7 +5834,7 @@ msgstr "データベースのTLSキーファイル"
 #: include/classes/api/clients/CLocalApiClient.php:133
 #: include/classes/api/clients/CLocalApiClient.php:147
 msgid "Database error occurred."
-msgstr "データベース エラーが発生しました。"
+msgstr "データベースエラーが発生しました。"
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -7034,6 +7034,10 @@ msgstr "ディスカバリオブジェクト"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMwareクラスターの検出、\"url\" - VMwareサービスURL。JSON形式で返します。"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMwareデータストアのディスカバリ、\"url\" - VMwareサービスURL。JSON形式で返します。"
@@ -7158,7 +7162,7 @@ msgstr "正常イベントの表示期間"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr "アクションの表示"
+msgstr "アクションを表示"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -13302,7 +13306,7 @@ msgstr "メモリ上限: %1$s"
 
 #: include/classes/data/CItemData.php:2212
 msgid "Memory metrics of VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id, \"mode\"- consumed(default)/ballooned/overhead memory"
-msgstr "VMwareリソースプールのメモリメトリクス、\"url\" - VMwareサービスURL、\"rpid\" - VMwareリソースプールID、\"mode\" - consumed(デフォルト)/ballooned/overhead"
+msgstr "VMwareリソースプールのメモリメトリクス、\"url\" - VMwareサービスURL、\"rpid\" - VMwareリソースプールID、\"mode\" - consumed(デフォルト)/ballooned/overhead memory"
 
 #: include/classes/data/CItemData.php:1727
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -16930,7 +16934,7 @@ msgstr "リファレンスの属性"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
-msgstr "参照ウィジェットが利用できなくなりました。設定を更新してください。"
+msgstr "参照しているウィジェットが利用できなくなりました。設定を更新してください。"
 
 #: jsLoader.php:195
 msgid "Referred widget is unavailable"
@@ -21926,7 +21930,7 @@ msgstr "ユーザーは無効のグループやGUIアクセスが無効のグル
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr "ユーザーは、無効なグループまたは GUI アクセスが無効になっているグループに自分自身を追加することはできません。"
+msgstr "ユーザーは無効なグループまたはGUIアクセスが無効なグループに自分自身を追加することはできません。"
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -24059,7 +24063,7 @@ msgstr "between() - 値が指定された範囲内であるかチェック (1 - 
 #: widgets/tophosts/views/widget.view.php:116
 #: widgets/tophosts/views/widget.view.php:117
 msgid "binary value"
-msgstr ""
+msgstr "バイナリ値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
@@ -24549,7 +24553,7 @@ msgstr "エラーメッセージ"
 
 #: app/views/js/popup.itemtestedit.view.js.php:479
 msgid "error text"
-msgstr ""
+msgstr "エラーテキスト"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
