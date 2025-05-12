@@ -895,6 +895,8 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	ret = SUCCEED;
 	goto clean;
 error:
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%d", __FILE__, err);
+
 	if (CURLE_LOGIN_DENIED == err && SMTP_AUTHENTICATION_OAUTH == auth->type)
 	{
 		*error = zbx_dsprintf(*error, "%s (possible manual token revocation). "
