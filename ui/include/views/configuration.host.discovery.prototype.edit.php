@@ -1136,7 +1136,7 @@ $html_page->show();
 		'query_fields' => $data['query_fields'],
 		'headers' => $data['headers'],
 		'parent_discoveryid' => $data['parent_discoveryid'],
-		'itemid' => $data['itemid']
+		'excludeids' => array_key_exists('itemid', $data) ? [$data['itemid']] : []
 	]).');
 '))
 	->setOnDocumentReady()

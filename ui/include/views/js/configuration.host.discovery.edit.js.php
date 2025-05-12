@@ -95,13 +95,13 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token, readonly, query_fields, headers, parent_discoveryid, itemid}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers, parent_discoveryid, excludeids}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
 			this.parent_discoveryid = parent_discoveryid;
 			this.readonly = readonly;
-			this.itemid = itemid;
+			this.excludeids = excludeids;
 
 			$('#conditions')
 				.dynamicRows({
@@ -389,6 +389,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				button.textContent = <?= json_encode(_('Select prototype')) ?>;
 				button.classList.add(ZBX_STYLE_BTN_GREY);
 				button.setAttribute('name', 'master-item-prototype');
+				button.setAttribute('type', 'button');
 				button.disabled = this.readonly;
 				button.addEventListener('click', (e) => {
 					this.openMasterItemPrototypePopup();
@@ -412,7 +413,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				dstfrm: this.form_name,
 				dstfld1: 'master_itemid',
 				parent_discoveryid: this.parent_discoveryid,
-				excludeids: this.itemid ? [this.itemid] : []
+				excludeids: this.excludeids
 			};
 
 			PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});

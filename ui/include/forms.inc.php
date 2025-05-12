@@ -284,10 +284,15 @@ JAVASCRIPT;
 				if ($data['delay'][0] !== '{') {
 					$delay = timeUnitToSeconds($data['delay']);
 
-					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
-							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
-						$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+					if ($delay == 0) {
+						$is_default_delay = in_array($data['type'],
+							[ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED]
+						);
+
+						if ($is_default_delay || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0)) {
+							$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+						}
 					}
 				}
 
