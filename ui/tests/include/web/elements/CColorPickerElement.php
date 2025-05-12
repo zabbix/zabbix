@@ -130,9 +130,8 @@ class CColorPickerElement extends CElement {
 			$button->click()->waitUntilNotVisible();
 		}
 		else {
-			$dialog = $this->query('class:color-picker-dialog')->one();
 			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
-			$dialog->waitUntilNotPresent();
+			$this->waitUntilNotPresent();
 		}
 	}
 
