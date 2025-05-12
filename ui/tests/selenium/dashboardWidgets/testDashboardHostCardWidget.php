@@ -64,25 +64,9 @@ class testDashboardHostCardWidget extends testWidgets {
 	protected static $hostid;
 
 	public static function prepareHostCardWidgetData() {
-		CDataHelper::call('hostgroup.create', [
-			[
-				'name' => 'Maintenance host group for HostCard widget'
-			],
-			[
-				'name' => 'Host tags group for HostCard widget'
-			],
-			[
-				'name' => 'Disabled hosts for HostCard widget'
-			]
-		]);
-
-		// Get array with Host Group names.
-		$groupids = CDataHelper::getIds('name');
-
-		// Get templates.
 		$templateids = [];
 		$template_names = ['Apache by Zabbix agent', 'Docker by Zabbix agent 2', 'Linux by Zabbix agent',
-				'PostgreSQL by Zabbix agent', 'Inheritance test template', 'Zabbix server health',
+				'PostgreSQL by Zabbix agent', 'Zabbix server health',
 				'Ceph by Zabbix agent 2'
 		];
 
@@ -180,7 +164,6 @@ class testDashboardHostCardWidget extends testWidgets {
 					['templateid' => $templateids['Linux by Zabbix agent']],
 					['templateid' => $templateids['PostgreSQL by Zabbix agent']],
 					['templateid' => $templateids['Zabbix server health']],
-					['templateid' => $templateids['Inheritance test template']],
 					['templateid' => $templateids['Ceph by Zabbix agent 2']]
 				],
 				'items' => [
@@ -315,7 +298,8 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				'description' => 'Disaster trigger',
 				'expression' => 'last(/Fully filled host card widget/item_key_6)<>0',
-				'priority' => TRIGGER_SEVERITY_DISASTER
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'type' => 1 // Generate multiple events.
 			]
 		]);
 
@@ -326,8 +310,16 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
-			'High trigger', 'Disaster trigger'];
+			'High trigger', 'Disaster trigger', 'Disaster trigger'];
 		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
+		
+		$eventid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Disaster trigger'));
+
+		CDataHelper::call('event.acknowledge', [
+			'eventids' => $eventid,
+			'action' => 32, // suppress event.
+			'suppress_until' => time() + 31536000
+		]);
 
 		// Create Maintenance and host in maintenance.
 		$maintenances = CDataHelper::call('maintenance.create', [
@@ -337,7 +329,8 @@ class testDashboardHostCardWidget extends testWidgets {
 				'active_till' => time() + 31536000,
 				'hosts' => [['hostid' => self::$hostid]],
 				'timeperiods' => [[]],
-				'description' => 'Maintenance for checking Icon and maintenance status in Host Card widget'
+				'description' => 'Maintenance for checking Icon and maintenance status in Host Card widget',
+				'maintenance_type' => 1
 			]
 		]);
 
@@ -347,7 +340,6 @@ class testDashboardHostCardWidget extends testWidgets {
 		);
 
 		$zabbix_server = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
-		$suppression_host = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Host for suppression'));
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -676,7 +668,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => $suppression_host
+										'value' => self::$hostid,
 									],
 									[
 										'type' => 0,
@@ -779,6 +771,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$show_form->query('button:Remove')->all()->click();
 		$show_form->query('button:Add')->one()->click();
 
+		$this->sleep(1000);
 		foreach ($show_options as $option) {
 			$show_form->query('id:sections_0')->one()->asDropdown()->select($option);
 
@@ -1080,8 +1073,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Web' => 4
 					],
 					'Templates' => ['Apache by Zabbix agent', 'Ceph by Zabbix agent 2', 'Docker by Zabbix agent 2',
-							'Inheritance test template', 'Linux by Zabbix agent', 'PostgreSQL by Zabbix agent',
-							'Zabbix server health'
+							'Linux by Zabbix agent', 'PostgreSQL by Zabbix agent', 'Zabbix server health'
 					],
 					'Tags' => ['class: application', 'class: database', 'class: os', 'class: software', 'target: apache',
 							'target: ceph', 'target: docker', 'target: linux', 'target: postgresql', 'target: server',
@@ -1225,7 +1217,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'Header' => 'Show suppressed problems',
-					'Host' => 'Host for suppression',
+					'Host' => self::$hostid,
 					'Severity' => [
 						'Average' => 1
 					]
@@ -1265,7 +1257,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			$icon = $host_selector->query('class:zi-wrench-alt-small')->one();
 			$this->assertTrue($icon->isVisible());
 			$icon->waitUntilClickable()->click();
-			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')
+			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]');
 			COverlayDialogElement::find()->last()->waitUntilReady()->close();
 			$this->assertEquals($data['Maintenance']['Name']."\n".$data['Maintenance']['Description'], $dialog_text);
 		}
