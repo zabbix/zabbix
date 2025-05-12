@@ -5294,21 +5294,8 @@ form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
   width: 100vw; }
-  form.dashboard-widget-svggraph .svg-graph-preview,
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
-  form.dashboard-widget-svggraph .svg-graph-preview {
-    position: relative;
-    height: 300px; }
-    form.dashboard-widget-svggraph .svg-graph-preview > div {
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      margin: 0 -10px;
-      height: 300px;
-      background: #ffffff;
-      z-index: 3; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
     border-top: 1px solid #dfe4e7; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs .ui-tabs-nav {
@@ -5317,7 +5304,6 @@ form.dashboard-widget-svggraph {
     background: #ffffff;
     z-index: 3; }
   form.dashboard-widget-svggraph .table-forms-container, form.dashboard-widget-svggraph .browser-warning-container {
-    margin: -10px 0 0 0;
     border: 1px solid #dfe4e7;
     border-top: none; }
   form.dashboard-widget-svggraph .table-forms-separator {
