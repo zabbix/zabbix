@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-20 21:01+0000\n"
+"PO-Revision-Date: 2025-05-01 18:38+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -5387,6 +5387,14 @@ msgstr "Crear i editar manteniment"
 msgid "Create and edit maps"
 msgstr "Crear i editar mapes"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr "Crear i editar suports propis"
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr "Crear i editar suports d'usuaris"
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Crea fons"
@@ -7198,6 +7206,10 @@ msgstr "Objecte de descobriment"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descoberta de clústers de VMware, \"url\" - URL del servei de VMware. Retorna un JSON"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Descoberta de magatzems de dades de VMware, \"url\" - URL del servei de VMware, \"filter_uuid\" - un hv uuid o vm uuid (buit per defecte). Retorna JSON"
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descoberta de magatzems de dades de VMware, \"url\" - URL del servei de VMware. Retorna un JSON"
@@ -7619,6 +7631,10 @@ msgstr "Edita l'element de l'arbre"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Editar el giny"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr "No es pot pas editar altres objectes en el mode d'edició del tauler de control."
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8055,6 +8071,10 @@ msgstr "Error a la sol·licitud de cerca de la taula \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Missatge d'error"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr "Text d'error"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -9081,6 +9101,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gràfic esborrat"
 msgstr[1] "Gràfics esborrats"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr "Edició de gràfics"
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9127,6 +9151,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip de gràfic"
 msgstr[1] "S'han esborrat els prototips de gràfics"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr "Edició de prototip de gràfic"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12015,6 +12043,10 @@ msgstr "Element"
 msgid "Item added"
 msgstr "Element afegit"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr "Tarja d'element"
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "L'element conté macros definides per l'usuari amb valors secrets. Els valors d'aquestes macros s'han d'introduir manualment."
@@ -13687,6 +13719,10 @@ msgstr "No s'ha trobat pas el mètode."
 msgid "Methods"
 msgstr "Mètodes"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr "Mètriques"
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14369,6 +14405,14 @@ msgstr "Nou esdeveniment d'etiqueta de valors"
 msgid "New excluded downtime"
 msgstr "Nou temps d'inactivitat exclòs"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr "Nou gràfic"
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr "Nou prototip de gràfic"
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nou equip"
@@ -14390,6 +14434,10 @@ msgstr "Nou prototip d'element"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Nou període de manteniment"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr "Nou mitjà de suport"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -19643,6 +19691,10 @@ msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbi
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat del buffer de memòria proxy. Mode (modes: pfree, free, total, used, pused)."
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Estadístiques dels valors rebuts pel gestor de preprocessament."
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -23552,6 +23604,10 @@ msgstr "Giny"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "El giny a X:%3$d, Y:%4$d a la pàgina #%2$d del tauler \"%1$s\" és fora dels límits."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr "La configuració del giny es revertirà."
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El giny és obsolet."
@@ -25788,6 +25844,14 @@ msgstr "no hi a permisos per convertir el símptoma dels problemes en causes"
 msgid "no permissions to create and edit maps"
 msgstr "no hi ha permís per crear i editar mapes"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr "no hi ha permís per crear i editar el propi suport"
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr "no hi ha permís per crear i suport d'usuaris"
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "sense permís per esborrar problemes"
@@ -26648,6 +26712,14 @@ msgstr[1] "els valors han d'ésser un d'entre %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\" dígits després del punt decimal"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0beta1');
+define('ZABBIX_VERSION',		'7.4.0rc1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7030028);
+define('ZABBIX_DB_VERSION',		7030032);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -562,6 +562,8 @@ define('SYSMAP_SHAPE_BORDER_TYPE_NONE',		0);
 define('SYSMAP_SHAPE_BORDER_TYPE_SOLID',	1);
 define('SYSMAP_SHAPE_BORDER_TYPE_DOTTED',	2);
 define('SYSMAP_SHAPE_BORDER_TYPE_DASHED',	3);
+
+define('SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT',	2);
 
 define('SYSMAP_SHAPE_LABEL_HALIGN_CENTER',	0);
 define('SYSMAP_SHAPE_LABEL_HALIGN_LEFT',	1);
@@ -2197,7 +2199,6 @@ define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
-define('ZBX_STYLE_TEXT_VERTICAL', 'text-vertical');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');

@@ -5279,6 +5279,14 @@ msgstr "유지 관리 생성 및 편집"
 msgid "Create and edit maps"
 msgstr "맵 생성 및 수정"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "배경 생성"
@@ -7089,6 +7097,10 @@ msgstr "디스커버리 오브젝트"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 클러스터 검색, \"url\" - VMware 서비스 URL. JSON을 반환함"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 데이터 저장소 검색, \"url\" - VMware 서비스 URL. JSON을 반환함"
@@ -7508,6 +7520,10 @@ msgstr "트리 요소의 변경"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "위젯의 변경"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7944,6 +7960,10 @@ msgstr "테이블 \"%1$s\"의 검색 리퀘스트를 실패하였습니다."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "에러 메세지"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8964,6 +8984,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "그래프를 삭제하였습니다"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9009,6 +9033,10 @@ msgstr "그래프 프로토타입을 추가하였습니다"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "그래프 프로토타입을 삭제하였습니다"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11887,6 +11915,10 @@ msgstr "아이템"
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "항목에 비밀 값이 있는 사용자 정의 매크로가 포함되어 있습니다. 이러한 매크로의 값은 수동으로 입력해야 합니다."
@@ -13541,6 +13573,10 @@ msgstr "메소드를 찾을 수 없습니다."
 msgid "Methods"
 msgstr "방법"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "마이크로소프트 엣지"
@@ -14217,6 +14253,14 @@ msgstr "새로운 이벤트 태그의 값"
 msgid "New excluded downtime"
 msgstr "새로 제외된 가동 중지 시간"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "새 호스트"
@@ -14238,6 +14282,10 @@ msgstr "새 항목 프로토타입"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "신규 메인터넌스 기간"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -19479,6 +19527,10 @@ msgstr "Zabbix 쓰기 캐시의 통계 및 가용성. 캐시 - 값 중 하나(�
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "프록시 메모리 버퍼의 통계 및 가용성. 모드(모드: pfree, free, total, Used, pused)."
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -23366,6 +23418,10 @@ msgstr "위젯"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "대시보드 \"%1$s\" 의 #%2$d 페이지에 있는 X:%3$d, Y:%4$d 의 위젯이 범위를 벗어났습니다."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "위젯은 더 이상 사용되지 않습니다."
@@ -25603,6 +25659,14 @@ msgstr "증상 장애를 원인 장애로 변환할 권한이 없음"
 msgid "no permissions to create and edit maps"
 msgstr "지도를 만들고 편집할 수 있는 권한이 없음"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "장애를 억제할 수 있는 권한이 없음"
@@ -26462,6 +26526,14 @@ msgstr[0] ""
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "값은 \"%1$s\"에서 \"%2$s\" 사이여야 함"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

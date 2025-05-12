@@ -5497,6 +5497,14 @@ msgstr "Vytvářejte a upravujte údržbu"
 msgid "Create and edit maps"
 msgstr "Vytvářejte a upravujte mapy"
 
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
+
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Vytvořit pozadí"
@@ -7309,6 +7317,10 @@ msgstr "Objekt objevování"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Zjištění clusterů VMware, \"url\" – URL služby VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Zjištění datových úložišť VMware, \"url\" – URL služby VMware. Vrátí JSON"
@@ -7733,6 +7745,10 @@ msgstr "Upravit prvek stromu"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Upravit widget"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8169,6 +8185,10 @@ msgstr "Chyba ve vyhledávacím požadavku nad tabulkou \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Chybná zpráva"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -9201,6 +9221,10 @@ msgstr[0] "Graf byl smazán"
 msgstr[1] "Grafy byly smazány"
 msgstr[2] "Grafy byly smazány"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9248,6 +9272,10 @@ msgid_plural "Graph prototypes deleted"
 msgstr[0] "Prototyp grafu byl smazán"
 msgstr[1] "Prototypy grafu byly smazány"
 msgstr[2] "Prototypy grafu byly smazány"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -12146,6 +12174,10 @@ msgstr "Položka"
 msgid "Item added"
 msgstr "Item přidán"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Item obsahuje uživatelem definované makra s tajnými hodnotami. Hodnoty těchto maker by se měly zadávat manuálně."
@@ -13836,6 +13868,10 @@ msgstr "Metoda nenalezena."
 msgid "Methods"
 msgstr "Metody"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14524,6 +14560,14 @@ msgstr "Nová značka hodnoty události"
 msgid "New excluded downtime"
 msgstr "Nová vyloučená odstávka"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nové zařízení"
@@ -14545,6 +14589,10 @@ msgstr "Nový prototyp itemu"
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
 msgstr "Nové servisní okno"
+
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -19810,6 +19858,10 @@ msgstr "Statistiky a dostupnost mezipaměti pro zápis Zabbix. Cache - jedna z h
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Statistiky a dostupnost vyrovnávací paměti proxy. Režim (režimy: pfree, free, total, used, pussed)."
 
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -23741,6 +23793,10 @@ msgstr "Widget"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "Widget na X: %3$d, Y: %4$d na stránce #%2$d dashboardu \"%1$s\" je mimo rozsah."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "Widget je zastaralý."
@@ -25977,6 +26033,14 @@ msgstr "bez oprávnění zkonvertovat symptomové problémy na příčinové pro
 msgid "no permissions to create and edit maps"
 msgstr "bez oprávnění k vytváření a editaci map"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "bez oprávnění k potlačování problémů"
@@ -26838,6 +26902,14 @@ msgstr[2] "hodnoty musí být %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "hodnota musí být mezi \"%1$s\" a \"%2$s\""
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

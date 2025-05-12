@@ -121,6 +121,7 @@ window.trigger_edit_popup = new class {
 			}
 			else if (e.target.name === 'recovery_mode' && !e.target.readOnly) {
 				this.#changeRecoveryMode();
+				this.#changeCorrelationMode();
 			}
 			else if (e.target.id === 'recovery-expression-constructor'
 					|| e.target.id === 'close-recovery-expression-constructor') {

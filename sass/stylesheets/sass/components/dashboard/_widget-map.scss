@@ -9,8 +9,8 @@ div.dashboard-widget-map {
 		svg {
 			flex-grow: 1;
 
-			.map-selections {
-				ellipse {
+			.map-elements {
+				ellipse.selection {
 					fill: $map-hover-fill-color;
 
 					&.selected {
@@ -84,8 +84,8 @@ div.dashboard-widget-map {
 	div.dashboard-widget-map {
 		.sysmap-widget-container {
 			svg {
-				.map-selections {
-					ellipse {
+				.map-elements {
+					ellipse.selection {
 						&.selected {
 							stroke-width: 2px;
 						}

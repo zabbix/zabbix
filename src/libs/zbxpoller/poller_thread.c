@@ -187,22 +187,22 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
 	}
 	else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.dns_orig);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.addr);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.port_orig);
 	}
 	else if (0 == strcmp(p->macro, MVAR_ITEM_ID))
@@ -573,15 +573,12 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				for (int j = 0; j < items[i].script_params.values_num; j++)
 				{
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							&items[i], NULL, NULL, NULL, NULL, NULL,
-							(char **)&items[i].script_params.values[j].first,
-							ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
-
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							&items[i], NULL, NULL, NULL, NULL, NULL,
-							(char **)&items[i].script_params.values[j].second,
-							ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
+					zbx_substitute_macros((char **)&items[i].script_params.values[j].first, NULL,
+							0, zbx_macro_script_params_field_resolv, um_handle_secure,
+							&items[i]);
+					zbx_substitute_macros((char **)&items[i].script_params.values[j].second, NULL,
+							0, zbx_macro_script_params_field_resolv, um_handle_secure,
+							&items[i]);
 				}
 
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
@@ -607,9 +604,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						NULL, NULL, NULL, NULL, NULL, &items[i].params,
-						ZBX_MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+				zbx_substitute_macros(&items[i].params, NULL, 0, zbx_macro_field_params_resolv,
+						um_handle_secure, &items[i]);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_SIMPLE:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
