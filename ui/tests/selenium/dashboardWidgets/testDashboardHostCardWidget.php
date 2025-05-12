@@ -688,7 +688,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => self::$hostid,
+										'value' => self::$hostid
 									],
 									[
 										'type' => 0,
@@ -909,7 +909,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
 						['action' => USER_ACTION_REMOVE, 'index' => 0]
-					],
+					]
 				]
 			],
 			// #5.
@@ -955,7 +955,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'fields' => [
 						'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget',
 						'Name' => 'Fully filled host card widget 2',
-						'Refresh interval' => '2 minutes',
+						'Refresh interval' => '2 minutes'
 					],
 					'Show' => [
 						['section' => 'Host groups'],
@@ -1601,7 +1601,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$form->fill([
 			'Name' => $new_name,
 			'Refresh interval' => '15 minutes',
-			'Host' => 'ЗАББИКС Сервер',
+			'Host' => 'ЗАББИКС Сервер'
 		]);
 
 		$data = [
@@ -1609,7 +1609,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
 				['action' => USER_ACTION_REMOVE, 'index' => 1],
 				['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Description'],
-				['section' => 'Inventory'],
+				['section' => 'Inventory']
 			]
 		];
 		$this->getShowTable()->fill($data['Show']);
