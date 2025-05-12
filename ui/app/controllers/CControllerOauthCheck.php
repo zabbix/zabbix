@@ -31,15 +31,10 @@ class CControllerOauthCheck extends CController {
 			'token_url' =>						'string|not_empty',
 			'token_url_parameters' =>			'array',
 			'authorization_mode' =>				'string|in auto,manual',
-			'code' =>							'string|not_empty',
-			'advanced_form' =>					'in 0,1'
+			'code' =>							'string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->getInput('advanced_form', 0)) {
-			$ret = $this->validateAdvancedForm();
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -52,24 +47,6 @@ class CControllerOauthCheck extends CController {
 					])
 				]))->disableView()
 			);
-		}
-
-		return $ret;
-	}
-
-	protected function validateAdvancedForm(): bool {
-		$ret = true;
-
-		if (parse_url($this->getInput('authorization_url', ''), PHP_URL_SCHEME) === null
-				|| strval(parse_url($this->getInput('authorization_url', ''), PHP_URL_HOST)) === '') {
-			$ret = false;
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'authorization_url', _('unacceptable URL')));
-		}
-
-		if (parse_url($this->getInput('token_url', ''), PHP_URL_SCHEME) === null
-				|| strval(parse_url($this->getInput('token_url', ''), PHP_URL_HOST)) === '') {
-			$ret = false;
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'token_url', _('unacceptable URL')));
 		}
 
 		return $ret;
