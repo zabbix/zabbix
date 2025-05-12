@@ -37,7 +37,7 @@ $html_page = (new CHtmlPage())
 							->setArgument('hostid', $data['hostid'])
 							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 							->setArgument('context', $data['context'])
-					))->setEnabled(!$data['readonly'])
+					))->setEnabled(!$data['parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -139,42 +139,41 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 	);
 
-	// status
-	$status = (new CLink(
-		($discovery['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
-		(new CUrl('host_discovery_prototypes.php'))
-			->setArgument('hostid', $discovery['hostid'])
-			->setArgument('g_hostdruleid[]', $discovery['itemid'])
-			->setArgument('action', ($discovery['status'] == ITEM_STATUS_DISABLED)
-				? 'discoveryprototype.massenable'
-				: 'discoveryprototype.massdisable'
-			)
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->setArgument('backurl', $url)
-			->getUrl()
-		))
-			->addCsrfToken($csrf_token)
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($discovery['status']));
+	$status_disabled = $discovery['status'] == ITEM_STATUS_DISABLED;
+	$status_toggle = $data['parent_discovered']
+		? (new CSpan($status_disabled ? _('No') : _('Yes')))
+		: (new CLink($status_disabled ? _('No') : _('Yes'),
+			(new CUrl('host_discovery_prototypes.php'))
+				->setArgument('hostid', $discovery['hostid'])
+				->setArgument('g_hostdruleid[]', $discovery['itemid'])
+				->setArgument('action', $status_disabled
+					? 'discoveryprototype.massenable'
+					: 'discoveryprototype.massdisable'
+				)
+				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
+				->getUrl()
+			))
+				->addCsrfToken($csrf_token)
+				->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$no_discover = $discovery['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
-
-	$discover = (new CLink(
-		$no_discover ? _('No') : _('Yes'),
-		(new CUrl('host_discovery_prototypes.php'))
-			->setArgument('hostid', $discovery['hostid'])
-			->setArgument('itemid', $discovery['itemid'])
-			->setArgument('action', 'discoveryprototype.updatediscover')
-			->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->setArgument('backurl', $url)
-			->getUrl()
-	))
-		->addCsrfToken($csrf_token)
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+	$discover_toggle = $data['parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes'),
+			(new CUrl('host_discovery_prototypes.php'))
+				->setArgument('hostid', $discovery['hostid'])
+				->setArgument('itemid', $discovery['itemid'])
+				->setArgument('action', 'discoveryprototype.updatediscover')
+				->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
+				->getUrl()
+		))
+			->addCsrfToken($csrf_token)
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	// Hide zeros for specific items.
 	if (in_array($discovery['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED])
@@ -249,8 +248,8 @@ foreach ($data['discoveries'] as $discovery) {
 		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
-		$status,
-		$discover
+		$status_toggle->addClass(itemIndicatorStyle($discovery['status'])),
+		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 	]);
 }
 
@@ -259,13 +258,15 @@ $button_list = [
 		'name' => _('Create enabled'),
 		'confirm_singular' => _('Enable selected discovery prototype?'),
 		'confirm_plural' => _('Enable selected discovery prototypes?'),
-		'csrf_token' => $csrf_token
+		'csrf_token' => $csrf_token,
+		'disabled' => $data['parent_discovered']
 	],
 	'discoveryprototype.massdisable' => [
 		'name' => _('Create disabled'),
 		'confirm_singular' => _('Disable selected discovery prototype?'),
 		'confirm_plural' => _('Disable selected discovery prototypes?'),
-		'csrf_token' => $csrf_token
+		'csrf_token' => $csrf_token,
+		'disabled' => $data['parent_discovered']
 	]
 ];
 

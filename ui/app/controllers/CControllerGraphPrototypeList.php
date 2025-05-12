@@ -45,14 +45,14 @@ class CControllerGraphPrototypeList extends CController {
 
 	protected function checkPermissions(): bool {
 		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'hostid'],
+			'output' => ['itemid', 'hostid', 'flags'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
 
 		if (!$discovery_rule) {
 			$discovery_rule = API::DiscoveryRulePrototype()->get([
-				'output' => ['itemid', 'hostid'],
+				'output' => ['itemid', 'hostid', 'flags'],
 				'itemids' => $this->getInput('parent_discoveryid'),
 				'editable' => true
 			]);
@@ -94,7 +94,8 @@ class CControllerGraphPrototypeList extends CController {
 
 		$data = [
 			'graphs' => $graphs,
-			'hostid' => $hostid
+			'hostid' => $hostid,
+			'parent_discovered' => $this->discovery_rule['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 		];
 
 		if ($context === 'host') {

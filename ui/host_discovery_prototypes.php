@@ -249,16 +249,16 @@ $itemid = getRequest('itemid');
 
 if (getRequest('parent_discoveryid')) {
 	$db_parent_discovery = API::DiscoveryRule()->get([
-		'itemids' => getRequest('parent_discoveryid'),
 		'output' => ['itemid', 'flags'],
+		'itemids' => getRequest('parent_discoveryid'),
 		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 		'editable' => true
 	]);
 
 	if (!$db_parent_discovery) {
 		$db_parent_discovery = API::DiscoveryRulePrototype()->get([
-			'itemids' => getRequest('parent_discoveryid'),
 			'output' => ['itemid', 'flags'],
+			'itemids' => getRequest('parent_discoveryid'),
 			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 			'editable' => true
 		]);
@@ -500,9 +500,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (hasRequest('update')) {
 				$item = getSanitizedItemFields($input + $db_item + [
-						'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
-						'hosts' => $hosts
-					]);
+					'flags' => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE,
+					'hosts' => $hosts
+				]);
 
 				$response = API::DiscoveryRulePrototype()->update(['itemid' => $itemid] + $item);
 
@@ -772,8 +772,21 @@ if (hasRequest('form')) {
 		CArrayHelper::sort($data['overrides'], ['step']);
 
 		$data['discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
-		$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
-		$data['discoveryData'] = $item['discoveryData'];
+
+		if ($data['discovered_prototype']) {
+			$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+			$data['discoveryData'] = $item['discoveryData'];
+
+			$db_parent = API::DiscoveryRulePrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid']
+			]);
+			$db_parent = reset($db_parent);
+
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			$data['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+		}
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
@@ -807,13 +820,12 @@ else {
 	$data = [
 		'hostid' => $hosts[0]['hostid'],
 		'parent_discoveryid' => $db_parent_discovery['itemid'],
+		'parent_discovered' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
 		'active_tab' => CProfile::get($prefix.'discovery_prototypes.filter.active', 1),
 		'checkbox_hash' => $db_parent_discovery['itemid'],
-		'context' => getRequest('context'),
-		'readonly' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED
-				&& $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE
+		'context' => getRequest('context')
 	];
 
 	// Select LLD prototypes.

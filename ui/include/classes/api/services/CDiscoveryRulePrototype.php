@@ -1375,7 +1375,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	 */
 	private static function deleteDiscoveredLldRules(array $del_itemids): void {
 		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT id.itemid,i.name'.
+			'SELECT id.itemid,i.name,i.flags'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
 				' AND '.dbConditionId('id.parent_itemid', $del_itemids).

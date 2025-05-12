@@ -857,6 +857,16 @@ if (hasRequest('form')) {
 		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 			$data['discoveryRule'] = $item['discoveryRule'];
 			$data['discoveryData'] = $item['discoveryData'];
+
+			$db_parent = API::DiscoveryRulePrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid']
+			]);
+			$db_parent = reset($db_parent);
+
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			$data['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 	}
 	// clone form

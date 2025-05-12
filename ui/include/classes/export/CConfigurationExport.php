@@ -151,11 +151,11 @@ class CConfigurationExport {
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 				'allow_traps', 'parameters', 'uuid'
 			],
-			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
-				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+			'item_prototype' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+				'status', 'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
+				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link',
+				'flags', 'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters',
+				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover', 'uuid'
 			],
@@ -865,9 +865,6 @@ class CConfigurationExport {
 			}
 		}
 
-		$this->prepareDiscoveryRules($discovery_rules);
-
-		// Discovery rules may use web items as master items.
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
 				$master_itemid = $discovery_rule['master_itemid'];
@@ -876,11 +873,11 @@ class CConfigurationExport {
 					$discovery_rule['master_item'] = ['key_' => $itemids[$master_itemid]];
 				}
 			}
+		}
 
-			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
-				$discovery_rule['itemPrototypes'][$itemid]['host'] = $hosts[$discovery_rule['hostid']]['host'];
-			}
+		$this->prepareDiscoveryRules($discovery_rules);
 
+		foreach ($discovery_rules as $discovery_rule) {
 			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
 		}
 
@@ -1159,22 +1156,50 @@ class CConfigurationExport {
 		$this->gatherDiscoveryRulePrototypes($items, $is_lld_rule_prototype);
 	}
 
-	private function gatherDiscoveryRulePrototypes(array &$items, bool $is_lld_rule_prototype = false): void {
+	private function gatherDiscoveryRulePrototypes(array &$lld_rules, bool $is_lld_rule_prototype = false): void {
 		$options = [
 			'output' => CDiscoveryRulePrototype::OUTPUT_FIELDS,
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
-			'discoveryids' => array_keys($items),
+			'discoveryids' => array_keys($lld_rules),
 			'preservekeys' => true
 		];
 
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 		$options += $is_lld_rule_prototype
 			? ['selectDiscoveryRulePrototype' => ['itemid', 'key_']]
 			: ['selectDiscoveryRule' => ['itemid', 'key_']];
 
 		$lld_rule_prototypes = API::DiscoveryRulePrototype()->get($options);
+
+		$item_prototypeids = [];
+
+		foreach ($lld_rules as $lld_rule) {
+			foreach ($lld_rule['itemPrototypes'] as $item_prototype) {
+				$item_prototypeids[$item_prototype['itemid']] = $item_prototype['key_'];
+			}
+		}
+
+		$unresolved_master_itemids = [];
+
+		foreach ($lld_rule_prototypes as $lld_rule_prototype) {
+			if ($lld_rule_prototype['type'] == ITEM_TYPE_DEPENDENT
+					&& !array_key_exists($lld_rule_prototype['master_itemid'], $item_prototypeids)) {
+				$unresolved_master_itemids[$lld_rule_prototype['master_itemid']] = true;
+			}
+		}
+
+		if ($unresolved_master_itemids) {
+			$master_items = API::Item()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($unresolved_master_itemids),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+		}
 
 		foreach ($lld_rule_prototypes as &$lld_rule_prototype) {
 			$lld_rule_prototype = [
@@ -1182,12 +1207,23 @@ class CConfigurationExport {
 					? ['key' => $lld_rule_prototype['discoveryRulePrototype']['key_']]
 					: ['key' => $lld_rule_prototype['discoveryRule']['key_']]
 			] + $lld_rule_prototype;
+
+			if ($lld_rule_prototype['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemid = $lld_rule_prototype['master_itemid'];
+
+				if (array_key_exists($master_itemid, $item_prototypeids)) {
+					$lld_rule_prototype['master_item'] = ['key_' => $item_prototypeids[$master_itemid]];
+				}
+				else {
+					$lld_rule_prototype['master_item'] = ['key_' => $master_items[$master_itemid]['key_']];
+				}
+			}
 		}
 		unset($lld_rule_prototype);
 
 		if ($lld_rule_prototypes) {
 			$this->prepareDiscoveryRules($lld_rule_prototypes, true);
-			$items += $lld_rule_prototypes;
+			$lld_rules += $lld_rule_prototypes;
 		}
 	}
 

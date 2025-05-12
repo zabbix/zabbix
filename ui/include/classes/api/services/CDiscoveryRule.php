@@ -934,6 +934,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		}
 
 		self::checkDoubleInheritedNames($items, $db_items, $tpl_links);
+		self::checkInheritedNestedItems($items, $db_items, $tpl_links);
 
 		$chunks = self::getInheritChunks($items, $tpl_links);
 
@@ -943,6 +944,55 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$_hostids = array_keys($chunk['hosts']);
 
 			self::inheritChunk($_items, $_db_items, $tpl_links, $_hostids);
+		}
+	}
+
+	private static function checkInheritedNestedItems(array $items, array $db_items, array $tpl_links): void {
+		foreach ($items as $item) {
+			$check = false;
+
+			if (array_key_exists($item['itemid'], $db_items)) {
+				if ($item['type'] != $db_items[$item['itemid']]['type'] && $item['type'] == ITEM_TYPE_NESTED) {
+					$check = true;
+				}
+			}
+			elseif ($item['type'] == ITEM_TYPE_NESTED) {
+				$check = true;
+			}
+
+			if (!$check) {
+				continue;
+			}
+
+			foreach ($tpl_links[$item['hostid']] as $host) {
+				if (!in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+						|| $host['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+					continue;
+				}
+
+				$root_item = array_key_exists($item['itemid'], $db_items)
+					? $item + ['templateid' => $db_items[$item['itemid']]['templateid']]
+					: $item;
+
+				while ($root_item['templateid'] != 0) {
+					$root_item = DB::select('items', [
+						'output' => ['hostid', 'templateid'],
+						'itemids' => $root_item['templateid']
+					])[0];
+				}
+
+				$db_hosts = DB::select('hosts', [
+					'output' => ['host'],
+					'hostids' => [$root_item['hostid'], $host['hostid']],
+					'preservekeys' => true
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('The nested LLD rule with key "%1$s" of the template "%2$s" cannot be inherited to non-discovered host "%3$s".',
+						$item['key_'], $db_hosts[$root_item['hostid']]['host'], $db_hosts[$host['hostid']]['host']
+					)
+				);
+			}
 		}
 	}
 
@@ -1432,7 +1482,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT ii.itemid,ii.name'.
+			'SELECT ii.itemid,ii.name,ii.flags'.
 			' FROM items i,items ii'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND '.dbConditionId('i.hostid', $templateids).

@@ -50,7 +50,7 @@ $item_tab = (new CFormGrid())->setId('itemFormList');
 if ($data['discovered_prototype']) {
 	$discovered_url = (new CUrl('host_discovery_prototypes.php'))
 		->setArgument('form', 'update')
-		->setArgument('parent_discoveryid', $data['parent_lld']['itemid'])
+		->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
 		->setArgument('itemid', $data['discoveryData']['parent_itemid'])
 		->setArgument('context', 'host')
 		->getUrl();
@@ -816,13 +816,13 @@ $item_tab
 		new CLabel(_('Create enabled'), 'status'),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))
 			->setChecked($data['status'] == ITEM_STATUS_ACTIVE)
-			->setEnabled(!$data['discovered_lld']))
+			->setReadonly($data['discovered_lld']))
 	])
 	->addItem([
 		new CLabel(_('Discover'), 'discover'),
 		new CFormField((new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
-			->setEnabled(!$data['discovered_lld']))
+			->setReadonly($data['discovered_lld']))
 	]);
 
 /*
@@ -1136,7 +1136,7 @@ $html_page->show();
 		'query_fields' => $data['query_fields'],
 		'headers' => $data['headers'],
 		'parent_discoveryid' => $data['parent_discoveryid'],
-		'itemid' => $data['itemid']
+		'excludeids' => array_key_exists('itemid', $data) ? [$data['itemid']] : []
 	]).');
 '))
 	->setOnDocumentReady()

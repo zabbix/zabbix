@@ -581,7 +581,7 @@ abstract class CItemGeneral extends CApiService {
 	protected static function getTemplateLinks(array $items, ?array $hostids): array {
 		if ($hostids !== null) {
 			$db_hosts = DB::select('hosts', [
-				'output' => ['hostid', 'status'],
+				'output' => ['hostid', 'status', 'flags'],
 				'hostids' => $hostids,
 				'preservekeys' => true
 			]);
@@ -606,7 +606,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid,h.status'.
+				'SELECT ht.templateid,ht.hostid,h.status,h.flags'.
 				' FROM hosts_templates ht,hosts h'.
 				' WHERE ht.hostid=h.hostid'.
 					' AND '.dbConditionId('ht.templateid', array_keys($templateids)).
@@ -618,7 +618,8 @@ abstract class CItemGeneral extends CApiService {
 			while ($row = DBfetch($result)) {
 				$tpl_links[$row['templateid']][$row['hostid']] = [
 					'hostid' => $row['hostid'],
-					'status' => $row['status']
+					'status' => $row['status'],
+					'flags' => $row['flags']
 				];
 			}
 		}

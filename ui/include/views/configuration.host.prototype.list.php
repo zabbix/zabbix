@@ -31,12 +31,12 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					new CRedirectButton(_('Create host prototype'),
+					(new CRedirectButton(_('Create host prototype'),
 						(new CUrl('host_prototypes.php'))
 							->setArgument('form', 'create')
 							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 							->setArgument('context', $data['context'])
-					)
+					))->setEnabled(!$data['parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -163,45 +163,43 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		}
 	}
 
-	// status
-	$status = (new CLink(
-		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
-		(new CUrl('host_prototypes.php'))
-			->setArgument('group_hostid[]', $hostPrototype['hostid'])
-			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
-				? 'hostprototype.massenable'
-				: 'hostprototype.massdisable'
-			)
-			->setArgument('context', $data['context'])
-			->setArgument('backurl', $url)
-			->getUrl()
-	))
-		->addCsrfToken($csrf_token)
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']));
-
-	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+	$status_disabled = $hostPrototype['status'] == HOST_STATUS_NOT_MONITORED;
+	$status_toggle = $data['parent_discovered']
+		? (new CSpan($status_disabled ? _('No') : _('Yes')))
+		: (new CLink($status_disabled ? _('No') : _('Yes'),
 			(new CUrl('host_prototypes.php'))
-				->setArgument('hostid', $hostPrototype['hostid'])
+				->setArgument('group_hostid[]', $hostPrototype['hostid'])
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-				->setArgument('action', 'hostprototype.updatediscover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('action', $status_disabled ? 'hostprototype.massenable' : 'hostprototype.massdisable')
 				->setArgument('context', $data['context'])
 				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+			->addClass(ZBX_STYLE_LINK_ACTION);
+
+	$no_discover = $hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
+	$discover_toggle = $data['parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes'),
+			(new CUrl('host_prototypes.php'))
+				->setArgument('hostid', $hostPrototype['hostid'])
+				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
+				->setArgument('action', 'hostprototype.updatediscover')
+				->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
+				->getUrl()
+		))
+			->addCsrfToken($csrf_token)
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
 		$name,
 		$hostTemplates,
-		$status,
-		$discover,
+		$status_toggle->addClass(itemIndicatorStyle($hostPrototype['status'])),
+		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 		$data['tags'][$hostPrototype['hostid']]
 	]);
 }
@@ -215,13 +213,15 @@ $itemForm->addItem([
 				'name' => _('Create enabled'),
 				'confirm_singular' => _('Create hosts from selected prototype as enabled?'),
 				'confirm_plural' => _('Create hosts from selected prototypes as enabled?'),
-				'csrf_token' => $csrf_token
+				'csrf_token' => $csrf_token,
+				'disabled' => $data['parent_discovered']
 			],
 			'hostprototype.massdisable' => [
 				'name' => _('Create disabled'),
 				'confirm_singular' => _('Create hosts from selected prototype as disabled?'),
 				'confirm_plural' => _('Create hosts from selected prototypes as disabled?'),
-				'csrf_token' => $csrf_token
+				'csrf_token' => $csrf_token,
+				'disabled' => $data['parent_discovered']
 			],
 			'hostprototype.massdelete' => [
 				'name' => _('Delete'),

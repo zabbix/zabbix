@@ -97,7 +97,7 @@ class CControllerTriggerPrototypeList extends CController {
 		];
 
 		$parent_lld = API::DiscoveryRule()->get([
-			'output' => ['hostid'],
+			'output' => ['hostid', 'flags'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
@@ -105,7 +105,7 @@ class CControllerTriggerPrototypeList extends CController {
 
 		if (!$parent_lld) {
 			$parent_lld = API::DiscoveryRulePrototype()->get([
-				'output' => ['hostid'],
+				'output' => ['hostid', 'flags'],
 				'selectHosts' => ['status'],
 				'itemids' => $this->getInput('parent_discoveryid'),
 				'editable' => true
@@ -113,6 +113,8 @@ class CControllerTriggerPrototypeList extends CController {
 		}
 
 		$parent_lld = reset($parent_lld);
+
+		$data['parent_discovered'] = $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 
 		$context = $this->getInput('context');
 		$is_template_lld = $parent_lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;

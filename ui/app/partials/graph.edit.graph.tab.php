@@ -36,7 +36,7 @@ if ($data['discovered']) {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'graph.prototype.edit')
-					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+					->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
 					->setArgument('graphid', $data['discoveryData']['parent_graphid'])
 					->setArgument('context', $data['context'])
 			)
