@@ -3339,12 +3339,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 				continue;
 		}
 
-		item_flags = (unsigned char)atoi(row[18]);
-
-		/* item prototype does not have item_rtdata and shouldn't be present in sync */
-		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			continue;
-
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
 
 		/* template item */
