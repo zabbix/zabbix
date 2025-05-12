@@ -702,7 +702,7 @@ out:
 
 static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char *errbuf, char **error)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%d", __func__, err);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%u", __func__, err);
 
 	if (CURLE_LOGIN_DENIED == err && SMTP_AUTHENTICATION_OAUTH == auth_type)
 	{
@@ -714,6 +714,8 @@ static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char 
 		*error = zbx_dsprintf(*error, "%s%s%s", curl_easy_strerror(err), ('\0' != *errbuf ? ": " : ""),
 				errbuf);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): error:%s", __func__, *error);
 }
 
 /* SMTP security options */
