@@ -1009,6 +1009,33 @@ static int	is_user_macro(const char *str)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: generate description string based on item flags                   *
+ *                                                                            *
+ * Parameters: item_flags - [IN] flags that determine item type               *
+ *                                                                            *
+ * Return value: dynamically allocated string with item description           *
+ *               ("item", "discovery rule", "item prototype" or               *
+ *                "discovery rule prototype")                                 *
+ *                                                                            *
+ ******************************************************************************/
+static char	*lld_item_description(int item_flags)
+{
+	char	*desc = NULL;
+	size_t	desc_alloc = 0, desc_offset = 0;
+
+	if (0 == (item_flags & ZBX_FLAG_DISCOVERY_RULE))
+		zbx_strcpy_alloc(&desc, &desc_alloc, &desc_offset, "discovery rule");
+	else
+		zbx_strcpy_alloc(&desc, &desc_alloc, &desc_offset, "item");
+
+	if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		zbx_strcpy_alloc(&desc, &desc_alloc, &desc_offset, " prototype");
+
+	return desc;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: add error message about an item to the error buffer               *
  *                                                                            *
  * Parameters: item   - [IN] discovered item                                  *
@@ -1020,7 +1047,7 @@ static int	is_user_macro(const char *str)
 static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, const char *format, ...)
 {
 	char		*message, key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-	const char	*pkey, *entity, *proto;
+	const char	*pkey, *desc;
 	va_list	args;
 
 	va_start(args, format);
@@ -1035,12 +1062,11 @@ static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, co
 	else
 		pkey = item->key_;
 
-	entity = (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_RULE) ? "discovery rule" : "item");
-	proto = (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ? " prototype" : "");
+	desc = lld_item_description(item->item_flags);
+	*error = zbx_strdcatf(*error, "Cannot %s %s \"%s\": %s.\n", (0 != item->itemid ? "update" : "create"),
+			desc, pkey, message);
 
-	*error = zbx_strdcatf(*error, "Cannot %s %s%s \"%s\": %s.\n", (0 != item->itemid ? "update" : "create"),
-			entity, proto, pkey, message);
-
+	zbx_free(desc);
 	zbx_free(message);
 }
 
@@ -1422,7 +1448,7 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select key_,itemid"
+			"select key_,itemid,flags"
 			" from items"
 			" where hostid=" ZBX_FS_UI64
 				" and",
@@ -1446,6 +1472,7 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 		{
 			zbx_lld_item_full_t	*item, item_stub;
 			zbx_lld_item_ref_t	*ref, ref_local = {.item = &item_stub};
+			char			*desc;
 
 			ZBX_STR2UINT64(item_stub.itemid, row[1]);
 			item_stub.key_ = row[0];
@@ -1459,9 +1486,9 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 
 			item = ref->item;
 
-			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-
-			lld_item_add_error(item, error, "item with the same key \"%s\" already exists");
+			desc = lld_item_description(atoi(row[2]));
+			lld_item_add_error(item, error, "%s with the same key already exists", desc);
+			zbx_free(desc);
 
 			if (0 != item->itemid)
 			{
@@ -1586,11 +1613,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 		if (ref->item != item)	/* another item with the same key was already indexed */
 		{
-			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+			char	*desc = lld_item_description(ref->item->item_flags);
 
-			lld_item_add_error(item, error, "item with the same key \"%s\" already exists",
-						zbx_truncate_itemkey(item->key_, VALUE_ERRMSG_MAX,
-						key_short, sizeof(key_short)));
+			lld_item_add_error(item, error, "%s with the same key already exists", desc);
+			zbx_free(desc);
 
 			if (0 != item->itemid)
 			{
