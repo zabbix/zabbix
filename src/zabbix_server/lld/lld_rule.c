@@ -14,7 +14,6 @@
 
 #include "lld.h"
 #include "zbxalgo.h"
-#include "zbxexpression.h"
 #include "lld_audit.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
@@ -28,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
-#include "zbxexpression.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0
