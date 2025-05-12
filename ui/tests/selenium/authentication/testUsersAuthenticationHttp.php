@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup, addDefaultAllowAuthKeyToConfig
@@ -32,7 +32,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_HTTP	= 3;
 
 	protected function getFilePath() {
-		return dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		return __DIR__.'/../../../conf/zabbix.conf.php';
 	}
 
 	/**

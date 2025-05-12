@@ -14,12 +14,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- * @backup settings, widget
+ * @backup dashboard, globalmacro
  *
  * @dataSource AllItemValueTypes, GlobalMacros
  *
@@ -1325,13 +1325,16 @@ class testDashboardGaugeWidget extends testWidgets {
 			: self::HOST.': '.$data['fields']['Item'];
 
 		// Wait until widget with header appears on the Dashboard.
-		$dashboard->save();
-		$widget = $dashboard->waitUntilReady()->getWidget($header);
-		// Without scroll down on Jenkins error - requested image region is invalid.
+		$dashboard->save()->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		// Without scrollDown on Jenkins error - requested image region is invalid.
 		$this->page->scrollDown();
+		// TODO: Check without updateViewport after ZBXNEXT-9319 (13) fix
+		$this->page->updateViewport();
 
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
+		$widget = $dashboard->getWidget($header);
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 

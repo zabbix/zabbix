@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * Test for checking Item Value Widget.
@@ -52,6 +52,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
 	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
+	const INDICATOR_CHANGE_HOST = 'Host for checking widget without show value option';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -78,6 +79,20 @@ class testDashboardItemValueWidget extends testWidgets {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
+
+		// Add 2 values of data for items, to check that there are no errors without show value option selected.
+		$items_data = [
+			'Indicator - Numeric (float)' => 0.1,
+			'Indicator - Character' => 1,
+			'Indicator - Numeric (unsigned)' => 1,
+			'Indicator - Text' => 1,
+			'Indicator - Log' => 1
+		];
+
+		foreach ($items_data as $name => $value) {
+			CDataHelper::addItemData(self::$itemids[$name], $value, time());
+			CDataHelper::addItemData(self::$itemids[$name], $value + 1, time() + 1);
+		}
 
 		CDataHelper::call('usermacro.createglobal', [
 			[
@@ -1686,6 +1701,81 @@ class testDashboardItemValueWidget extends testWidgets {
 					],
 					'trim' => true
 				]
+			],
+			// #57 Check that there is no errors, when show value option is unchecked (for each data type).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - float',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (float)'
+					]
+				]
+			],
+			// #58.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - character',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Character'
+					]
+				]
+			],
+			// #59.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - log',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Log'
+					]
+				]
+			],
+			// #60.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - numeric (unsigned)',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (unsigned)'
+					]
+				]
+			],
+			// #61.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - text',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Text'
+					]
+				]
 			]
 		];
 	}
@@ -1701,7 +1791,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	public static function getWidgetUpdateData() {
 		return [
-			// #57.
+			// #62.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1720,7 +1810,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #58.
+			// #63.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1936,7 +2026,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD]);
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$form = $create
@@ -3162,11 +3252,12 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
-			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertTrue($filter->isExpanded(false));
 
 			// Check zoom filter layout.
 			if (array_key_exists('filter_layout', $data)) {
-				$filter = CFilterElement::find()->one();
+				$filter->open();
 				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
 				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
@@ -3194,7 +3285,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isVisible());
 		}
 
 		// Clear particular dashboard for next test case.
@@ -3257,6 +3348,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min',
+						'Decimal places' => '0',
 						'Time period' => 'Custom'
 					],
 					'item_data' => [
@@ -3281,6 +3373,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
+						'Decimal places' => '2',
 						'Time period' => 'Custom',
 						'id:time_period_from' => 'now-2h',
 						'id:time_period_to' => 'now-1h'
@@ -3300,7 +3393,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3322,7 +3415,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)'
+					'expected_value' => 'Up (1.00)'
 				]
 			],
 			// Item with value mapping, aggregation function 'avg' and Custom time period.
@@ -3431,7 +3524,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3461,7 +3554,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Down (0)'
+					'expected_value' => 'Down (0.00)'
 				]
 			],
 			// Item with value mapping and aggregation function 'not used'.
@@ -3487,7 +3580,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],

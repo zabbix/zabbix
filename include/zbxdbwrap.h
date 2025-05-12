@@ -34,8 +34,8 @@ typedef enum
 }
 zbx_host_template_link_type;
 
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *, const char *,
-		const zbx_timespec_t *, char **);
+typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *,
+		const char *, const zbx_timespec_t *, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
 typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid,
@@ -90,11 +90,12 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode);
-void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
-		int audit_context_mode);
 
 void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
+
+void	zbx_db_copy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+		int audit_context_mode, zbx_db_insert_t *db_insert_htemplates);
 
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
@@ -137,9 +138,9 @@ void	zbx_db_trigger_get_recovery_expression(const zbx_db_trigger *trigger, char 
 void	zbx_db_trigger_clean(zbx_db_trigger *trigger);
 
 void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **expression,
-		zbx_trigger_func_t eval_func_cb, int recovery);
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb, int recovery);
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
-		zbx_trigger_func_t eval_func_cb, int recovery);
+		zbx_evaluate_function_trigger_t evaluate_function_trigger_cb, int recovery);
 
 int	zbx_db_check_user_perm2system(zbx_uint64_t userid);
 char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
@@ -186,5 +187,8 @@ int	zbx_macro_event_trigger_expr_resolv(zbx_macro_resolv_data_t *p, va_list args
 int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t token_type, char **value,
 		char **error, va_list args);
 int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **value, char **error, va_list args);
+
+int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old);
+void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids);
 
 #endif /* ZABBIX_DBWRAP_H */

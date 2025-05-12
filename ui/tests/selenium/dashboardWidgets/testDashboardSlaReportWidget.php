@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testSlaReport.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testSlaReport.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup dashboard, profiles
@@ -53,6 +53,16 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
+
+	/**
+	 * Callback executed before every test case. Automatically accept the alert.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		parent::onBeforeTestCase();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
+	}
 
 	/**
 	 * Create dashboards with widgets for test and define the corresponding dashboard ID.

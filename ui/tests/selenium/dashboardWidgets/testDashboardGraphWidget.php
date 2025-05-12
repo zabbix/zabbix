@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
@@ -281,6 +281,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
+		$dashboard->getWidget('Graph');
 		$form = $overlay->asForm();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 
@@ -340,7 +341,7 @@ class testDashboardGraphWidget extends testWidgets {
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
-				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
+				'//button[@class="js-button-submit"]')->waitUntilClickable()->one();
 
 		if (array_key_exists('error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
@@ -2133,7 +2134,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Fill "Data sets" with specified data.
 	 */
 	protected function fillDatasets($data_sets) {
-		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
+		$form = $this->query('id:widget-form')->asForm()->one();
 		if ($data_sets) {
 			if (CTestArrayHelper::isAssociative($data_sets)) {
 				$data_sets = [$data_sets];
@@ -2180,7 +2181,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Fill "Overrides" with specified data.
 	 */
 	protected function fillOverrides($overrides) {
-		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
+		$form = $this->query('id:widget-form')->asForm()->one();
 
 		// Check if override already exist in list, if not, add new override.
 		$items = $form->query('class:overrides-list-item')->all();
@@ -2241,7 +2242,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Check widget field values after creating or updating.
 	 */
 	protected function checkWidgetForm($data) {
-		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
+		$form = $this->query('id:widget-form')->asForm()->one();
 
 		// Check values in "Data set" tab.
 		if (CTestArrayHelper::isAssociative($data['Data set'])) {
@@ -2436,7 +2437,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
-		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
+		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_form"]')
 				->asOverlayDialog()->one();
 		$overlay->close();
 
@@ -2993,7 +2994,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @param boolean $id			is used field id instead of field name
 	 */
 	protected function assertEnabledFields($fields, $enabled = true) {
-		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
+		$form = $this->query('id:widget-form')->asForm()->one();
 
 		if (!is_array($fields)) {
 			$fields = [$fields];

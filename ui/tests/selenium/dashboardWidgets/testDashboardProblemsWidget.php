@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup settings, widget
@@ -27,6 +27,16 @@ class testDashboardProblemsWidget extends CWebTest {
 
 	private static $dashboardid;
 	private static $update_widget = 'Problem widget for updating';
+
+	/**
+	 * Callback executed before every test case.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		parent::onBeforeTestCase();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
+	}
 
 	/**
 	 * Attach MessageBehavior to the test.

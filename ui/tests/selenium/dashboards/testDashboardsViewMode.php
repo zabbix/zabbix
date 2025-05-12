@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -66,31 +66,54 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($data['username']));
 		$this->authenticateUser($data['sessionid'], $userid);
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
-		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Global view');
+		$dashboard = $dashboard = CDashboardElement::find()->one()->waitUntilReady();
+
+		$this->page->assertTitle('Dashboard');
+		$this->page->assertHeader('Global view');
+
+		$no_data_widgets = [
+			'No data found' => 'Top hosts by CPU utilization',
+			'No data found' => 'Current problems',
+			'No permissions to referred object or it does not exist!' => 'Zabbix server',
+			'No permissions to referred object or it does not exist!' => 'Server performance'
+		];
+		$system_rows = $dashboard->getWidget('System information')->getContent()->asTable()->getRows()->count();
+		$host_total = $dashboard->getWidget('Host availability')->getContent()->query('class:host-avail-total')->one()->getText();
+		$problems_warning = $dashboard->getWidget('Problems by severity')->getContent()->query('class:warning-bg')->one()->getText();
+		$geomap_icon = $dashboard->getWidget('Geomap')->getContent()->query('class:leaflet-marker-icon');
+
 		if ($data['username'] !== 'Admin') {
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//div[contains(@class, 'no-data-message')]",
-					'No data found');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//div[@class='no-data-message']",
-					'No permissions to referred object or it does not exist!');
+			foreach ($no_data_widgets as $content => $header) {
+				$widget = $dashboard->getWidget($header)->getContent();
+				$this->assertEquals($content, $widget->query('class:no-data-message')->one()->getText());
+			}
+
+			$this->assertEquals(2, $system_rows);
+			$this->assertEquals("0\nTotal", $host_total);
+			$this->assertEquals("0\nWarning", $problems_warning);
+			$this->assertFalse($geomap_icon->exists());
 		}
 		else {
-			$this->zbxTestCheckNoRealHostnames();
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Performance']");
-		}
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'Top hosts by CPU utilization');
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[4]//h4", 'System information');
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Host availability');
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Problems by severity');
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[9]//h4", 'Geomap');
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[10]//h4", 'Current problems');
-		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Local time']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[6]//h4[text()='Graph']");
+			foreach (array_values($no_data_widgets) as $header) {
+				$widget = $dashboard->getWidget($header)->getContent();
+				// Check widget has no "no-data-message" class, meaning it has content.
+				$this->assertFalse($widget->query('class:no-data-message')->one(false)->isValid());
+			}
 
-		// Logout.
-		$this->zbxTestLogout();
-		$this->zbxTestWaitForPageToLoad();
-		$this->webDriver->manage()->deleteAllCookies();
+			$this->zbxTestCheckNoRealHostnames();
+			$this->assertEquals(10, $system_rows);
+			$this->assertNotEquals("0\nTotal", $host_total);
+			$this->assertNotEquals("0\nWarning", $problems_warning);
+			$this->assertTrue($geomap_icon->exists());
+		}
+
+		$widget_headers = ['Top hosts by CPU utilization', 'System information', 'Host availability', 'Problems by severity',
+			'Geomap', 'Current problems', 'Local time', 'Graph'];
+		foreach ($widget_headers as $header) {
+			$this->assertTrue($dashboard->getWidget($header)->isValid());
+		}
+
+		$this->page->logout();
 	}
 
 	public function testDashboardsViewMode_KioskMode() {

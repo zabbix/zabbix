@@ -203,7 +203,7 @@ typedef struct
 	zbx_vector_eval_token_t	ops;
 	zbx_eval_function_cb_t	eval_function_common_cb;
 	zbx_eval_function_cb_t	eval_function_history_cb;
-	void			*data_cb;
+	void			*eval_function_data_cb;
 }
 zbx_eval_context_t;
 

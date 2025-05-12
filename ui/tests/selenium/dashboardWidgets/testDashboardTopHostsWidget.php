@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
@@ -2970,7 +2970,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$column_count = 1;
 		}
 
-		$form = $this->query('id:widget-dialogue-form')->one()->asForm();
+		$form = $this->query('id:widget-form')->one()->asForm();
 		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
@@ -4173,11 +4173,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
-			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertTrue($filter->isExpanded(false));
 
 			// Check zoom filter layout.
 			if (array_key_exists('filter_layout', $data)) {
-				$filter = CFilterElement::find()->one();
+				$filter->open();
 				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
 				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
@@ -4205,7 +4206,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isVisible());
 		}
 
 		// Clear particular dashboard for next test case.
@@ -5056,14 +5057,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'result' => [
 						[
-							'Min' => 'Down (0)',
-							'Max' => 'Up (1)',
-							'Avg' => 'Up (1)',
+							'Min' => 'Down (0.00)',
+							'Max' => 'Up (1.00)',
+							'Avg' => 'Up (1.00)',
 							'Avg 2' => '0.50', // Value mapping is ignored if value doesn't equals 0 or 1.
 							'Count' => '3.00', // Mapping is not used if aggregation function is 'sum' or 'count'.
 							'Sum' => '2.00',
-							'First' => 'Up (1)',
-							'Last' => 'Down (0)'
+							'First' => 'Up (1.00)',
+							'Last' => 'Down (0.00)'
 						]
 					]
 				]
@@ -5098,7 +5099,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'result' => [
 						[
-							'Value mapping with aggregation function not used' => 'Up (1)'
+							'Value mapping with aggregation function not used' => 'Up (1.00)'
 						]
 					]
 

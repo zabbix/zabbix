@@ -30,21 +30,13 @@
 #define ZBX_MACRO_TYPE_ITEM_KEY			0x00000040
 #define ZBX_MACRO_TYPE_ALERT_EMAIL		0x00000080
 #define ZBX_MACRO_TYPE_COMMON			0x00000100
-#define ZBX_MACRO_TYPE_PARAMS_FIELD		0x00000200
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400
 #define ZBX_MACRO_TYPE_SNMP_OID			0x00000800
-#define ZBX_MACRO_TYPE_LLD_FILTER		0x00002000
 #define ZBX_MACRO_TYPE_JMX_ENDPOINT		0x00008000
 #define ZBX_MACRO_TYPE_MESSAGE_UPDATE		0x00010000
-#define ZBX_MACRO_TYPE_HTTP_RAW			0x00020000
-#define ZBX_MACRO_TYPE_HTTP_JSON		0x00040000
-#define ZBX_MACRO_TYPE_HTTP_XML			0x00080000
-#define ZBX_MACRO_TYPE_ALLOWED_HOSTS		0x00100000
 #define ZBX_MACRO_TYPE_EVENT_NAME		0x00400000	/* event name in trigger configuration */
-#define ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x00800000
 #define ZBX_MACRO_TYPE_SCRIPT_NORMAL		0x01000000
 #define ZBX_MACRO_TYPE_SCRIPT_RECOVERY		0x02000000
-#define ZBX_MACRO_TYPE_QUERY_FILTER		0x08000000
 
 #define ZBX_MACRO_EXPAND_NO			0
 #define ZBX_MACRO_EXPAND_YES			1
@@ -129,8 +121,6 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
-void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
-
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
@@ -161,10 +151,6 @@ int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *
 		size_t maxerrlen);
 int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item, int macro_type,
 		char *error, size_t maxerrlen);
-int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, zbx_macro_resolver_f macro_resolver_cb,
-		const void *resolver_data, char *error, int maxerrlen);
-int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, char *error, int maxerrlen);
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);

@@ -171,9 +171,6 @@
 	position: relative;
 	margin: -4px;
 
-	// For widget sliding headers to appear over the breadcrumbs.
-	z-index: 3;
-
 	&.reserve-header-lines-1 {
 		margin-top: 2rem;
 	}
@@ -198,6 +195,32 @@
 	&:not(.dashboard-is-multipage) {
 		.btn-dashboard-toggle-slideshow {
 			display: none;
+		}
+	}
+
+	&.dashboard-is-busy {
+		.dashboard-navigation-tabs {
+			.sortable {
+				li {
+					pointer-events: none;
+
+					div {
+						opacity: 0.75;
+					}
+				}
+			}
+		}
+	}
+
+	@if $ui-transitions {
+		.dashboard-navigation-tabs {
+			.sortable {
+				li {
+					div {
+						transition: opacity $ui-transition-duration ease-out;
+					}
+				}
+			}
 		}
 	}
 }
@@ -299,10 +322,7 @@
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
 	background-color: $ui-bg-color;
-
-	// For floating headers to appear over other widgets.
-	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	z-index: 3;
+	z-index: 10;
 
 	h4 {
 		flex-grow: 1;
@@ -323,6 +343,10 @@
 				margin: 4px 0;
 			}
 		}
+	}
+
+	@if $ui-transitions {
+		transition: opacity $ui-transition-duration ease-out;
 	}
 }
 
@@ -443,6 +467,10 @@
 			}
 		}
 	}
+
+	@if $ui-transitions {
+		transition: opacity $ui-transition-duration ease-out;
+	}
 }
 
 .dashboard-grid-widget-mask {
@@ -460,11 +488,13 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
 			height: 0;
+			z-index: 11;
 
 			@if $ui-transitions {
-				transition: height $ui-transition-duration,
-							margin-top $ui-transition-duration,
-							box-shadow $ui-transition-duration;
+				transition: height $ui-transition-duration ease-out,
+							margin-top $ui-transition-duration ease-out,
+							box-shadow $ui-transition-duration ease-out,
+							opacity $ui-transition-duration ease-out;
 			}
 		}
 
@@ -499,7 +529,6 @@
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-				z-index: 5;
 			}
 		}
 	}
@@ -535,6 +564,7 @@
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 	opacity: 0;
+	z-index: 11;
 
 	// Transition for opacity is set for best border disappearance on different themes.
 	@if $ui-transitions {
@@ -543,9 +573,6 @@
 					opacity .15s .15s ease-out,
 					box-shadow $ui-transition-duration ease-out;
 	}
-
-	// Not to loose hovered header while widget underneath is updating.
-	z-index: 3;
 
 	h4 {
 		flex-grow: 1;
@@ -609,7 +636,8 @@
 	overflow: visible;
 
 	@if $ui-transitions {
-		transition: margin-top $ui-transition-duration ease-out;
+		transition: margin-top $ui-transition-duration ease-out,
+					opacity $ui-transition-duration ease-out;
 	}
 }
 
@@ -670,8 +698,6 @@
 	}
 
 	&.dashboard-grid-iterator-focus {
-		z-index: 5;
-
 		.dashboard-grid-iterator-header {
 			margin-top: -2rem;
 			height: 2rem;
@@ -768,36 +794,6 @@
 		opacity: 1;
 	}
 
-	&.dashboard-positioning {
-		// No lazy transitions while dragging or resizing.
-
-		.dashboard-grid-widget {
-			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-header {
-					transition: none;
-				}
-			}
-		}
-
-		.dashboard-grid-iterator {
-			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-header {
-					transition: none;
-				}
-			}
-		}
-
-		// No widget interactivity while dragging or resizing.
-
-		.dashboard-grid-widget-mask {
-			display: block;
-		}
-
-		.dashboard-grid-iterator-mask {
-			display: block;
-		}
-	}
-
 	.dashboard-grid-widget {
 		.ui-resizable-handle {
 			visibility: hidden;
@@ -861,6 +857,10 @@
 			&:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
 				transition-property: height, top;
 				transition-duration: 0.15s;
+			}
+
+			.dashboard-grid-widget-container {
+				transition: opacity $ui-transition-duration ease-out;
 			}
 		}
 	}
@@ -951,6 +951,10 @@
 				transition-duration: 0.15s;
 			}
 
+			.dashboard-grid-iterator-container {
+				transition: opacity $ui-transition-duration ease-out;
+			}
+
 			.dashboard-grid-widget {
 				&:not(.dashboard-grid-widget-focus) {
 					transition-property: height, top;
@@ -971,6 +975,60 @@
 			right: .25rem;
 			bottom: .25rem;
 			background-color: darken($body-bg-color, 6%);
+		}
+	}
+
+	.highlight {
+		position: absolute;
+		z-index: 10;
+
+		&.highlight-n {
+			border-bottom: 3px solid $form-focus-border-color;
+			top: calc(.25rem - 1px);
+			right: calc(.25rem - 1px);
+			left: calc(.25rem - 1px);
+			height: 0;
+			z-index: 11;
+		}
+
+		&.highlight-e {
+			border-left: 3px solid $form-focus-border-color;
+			top: calc(.25rem - 1px);
+			right: calc(.25rem - 1px);
+			bottom: calc(.25rem - 1px);
+			width: 0;
+		}
+
+		&.highlight-s {
+			border-top: 3px solid $form-focus-border-color;
+			right: calc(.25rem - 1px);
+			bottom: calc(.25rem - 1px);
+			left: calc(.25rem - 1px);
+			height: 0;
+		}
+
+		&.highlight-w {
+			border-right: 3px solid $form-focus-border-color;
+			top: calc(.25rem - 1px);
+			bottom: calc(.25rem - 1px);
+			left: calc(.25rem - 1px);
+			width: 0;
+		}
+	}
+
+	.ui-resizable-handle {
+		&,
+		.ui-resizable-dot {
+			z-index: 10;
+		}
+
+		&.ui-resizable-n,
+		&.ui-resizable-nw,
+		&.ui-resizable-ne {
+			&,
+			.ui-resizable-dot {
+				z-index: 11;
+			}
 		}
 	}
 }
@@ -1032,8 +1090,9 @@
 
 .overlay-dialogue {
 	&.modal-popup.modal-widget-configuration {
-		max-width: calc(100vw - 40px);
+		max-width: calc(100vw - 20px);
 		min-width: 650px;
+		box-sizing: border-box;
 
 		.overlay-dialogue-body {
 			overflow-x: auto;

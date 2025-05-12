@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup settings
@@ -36,7 +36,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 		'id:hk_services' => '365d',
 		// User sessions.
 		'id:hk_sessions_mode' => true,
-		'id:hk_sessions' => '365d',
+		'id:hk_sessions' => '31d',
 		// History.
 		'id:hk_history_mode' => true,
 		'id:hk_history_global' => false,
@@ -56,7 +56,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 		'hk_services_mode' => 1,
 		'hk_services' => '365d',
 		'hk_sessions_mode' => 1,
-		'hk_sessions' => '365d',
+		'hk_sessions' => '31d',
 		'hk_history_mode' => 1,
 		'hk_history_global' => 0,
 		'hk_history' => '31d',

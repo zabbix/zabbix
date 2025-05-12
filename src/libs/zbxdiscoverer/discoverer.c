@@ -625,7 +625,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_discoverer_drule_error_t *drule_errors,
 		zbx_hashset_t *incomplete_druleids, zbx_discovery_open_func_t discovery_open_cb,
 		zbx_discovery_close_func_t discovery_close_cb,
-		zbx_discovery_update_drule_func_t discovery_udpate_drule_cb)
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb)
 {
 	void	*handle;
 	int	i;
@@ -657,7 +657,7 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 			zbx_vector_discoverer_drule_error_remove(drule_errors, j);
 		}
 
-		discovery_udpate_drule_cb(handle, derror.druleid, err, now);
+		discovery_update_drule_cb(handle, derror.druleid, err, now);
 		zbx_free(err);
 		zbx_vector_uint64_remove(del_jobs, i - 1);
 	}
@@ -706,7 +706,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_discoverer_task_t			*task, *task_out;
 		zbx_discoverer_job_t			*job, cmp;
 		zbx_dc_drule_t				*drule = drules.values[k];
-		zbx_vector_ds_dcheck_ptr_t	*ds_dchecks_common;
+		zbx_vector_ds_dcheck_ptr_t		*ds_dchecks_common;
 		zbx_vector_iprange_t			*ipranges;
 		char					error[MAX_STRING_LEN];
 
@@ -1325,8 +1325,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				zbx_free(error);
 			}
 
-			if (SVC_SNMPv3 == dcheck_type)
-				queue->snmpv3_allowed_workers++;
+			if (SVC_SNMPv3 == dcheck_type || SVC_SNMPv2c == dcheck_type || SVC_SNMPv1 == dcheck_type)
+				queue->snmp_allowed_workers++;
 
 			if (DISCOVERER_JOB_STATUS_WAITING == job->status)
 			{
@@ -1434,7 +1434,7 @@ static void	discoverer_libs_destroy(void)
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread_discoverer_args *args_in,
 		const zbx_thread_info_t *info, char **error)
 {
-#	define SNMPV3_WORKERS_MAX	1
+#	define SNMP_WORKERS_MAX	1
 
 	int		i, err, ret = FAIL, started_num = 0, checks_per_worker_max;
 	time_t		time_start;
@@ -1482,7 +1482,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 		return FAIL;
 	}
 
-	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMPV3_WORKERS_MAX, checks_per_worker_max, error))
+	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMP_WORKERS_MAX, checks_per_worker_max, error))
 	{
 		pthread_mutex_destroy(&manager->results_lock);
 		return FAIL;
@@ -1549,7 +1549,7 @@ out:
 
 	return ret;
 
-#	undef SNMPV3_WORKERS_MAX
+#	undef SNMP_WORKERS_MAX
 }
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)

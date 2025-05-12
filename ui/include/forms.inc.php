@@ -358,7 +358,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			(new CListItem([
 				(new CDiv(_('Name')))->addClass('step-name'),
 				(new CDiv(_('Parameters')))->addClass('step-parameters'),
-				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
+				(new CDiv(_('Custom on fail')))
+					->addClass('step-on-fail')
+					->setTitle(_('Custom on fail')),
 				(new CDiv(_('Actions')))->addClass('step-action')
 			]))
 				->addClass('preprocessing-list-head')
@@ -690,23 +692,23 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				break;
 		}
 
-		$error_handler = (new CRadioButtonList('preprocessing['.$i.'][error_handler]',
-			($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT)
+		$error_handler = (new CSelect('preprocessing['.$i.'][error_handler]'))
+			->setId('preprocessing-'.$i.'-error-handler')
+			->setFocusableElementId('label-preprocessing-'.$i.'-error-handler')
+			->setValue($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
 				? ZBX_PREPROC_FAIL_DISCARD_VALUE
 				: (int) $step['error_handler']
-		))
-			->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
-			->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
-			->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
-			->setModern(true);
+			)
+			->addOptions(CSelect::createOptionsFromArray([
+				ZBX_PREPROC_FAIL_DISCARD_VALUE => _('Discard value'),
+				ZBX_PREPROC_FAIL_SET_VALUE => _('Set value to'),
+				ZBX_PREPROC_FAIL_SET_ERROR => _('Set error to')
+			]))
+			->setDisabled($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT);
 
 		$error_handler_params = (new CTextBox('preprocessing['.$i.'][error_handler_params]',
 			$step['error_handler_params'])
 		)->setTitle($step['error_handler_params']);
-
-		if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT) {
-			$error_handler->setEnabled(false);
-		}
 
 		if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
 				|| $step['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE) {
@@ -716,7 +718,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 		}
 
 		$on_fail_options = (new CDiv([
-			new CLabel(_('Custom on fail')),
+			new CLabel(_('Custom on fail'), 'label-preprocessing-'.$i.'-error-handler'),
 			$error_handler->setReadonly($readonly),
 			$error_handler_params->setReadonly($readonly)
 		]))->addClass('on-fail-options');

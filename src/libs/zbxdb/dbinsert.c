@@ -65,6 +65,8 @@ static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
 {
+	zbx_free(db_insert->clause);
+
 	db_insert_clear_rows(db_insert);
 	zbx_vector_db_value_ptr_destroy(&db_insert->rows);
 
@@ -107,6 +109,7 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
 	db_insert->autoincrement = -1;
 	db_insert->lastid = 0;
 	db_insert->batch_size = 0;
+	db_insert->clause = NULL;
 
 	zbx_vector_const_db_field_ptr_create(&db_insert->fields);
 	zbx_vector_db_value_ptr_create(&db_insert->rows);
@@ -521,8 +524,11 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db_insert->db, &sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db_insert->db, &sql, &sql_alloc, &sql_offset,
+				db_insert->clause)))
+		{
 			goto out;
+		}
 	}
 
 	if (0 != sql_offset)
@@ -531,6 +537,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 		if (',' == sql[sql_offset - 1])
 		{
 			sql_offset--;
+			if (NULL != db_insert->clause)
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, db_insert->clause);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #endif
@@ -572,6 +581,18 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_n
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: adds clause to insert statement                                   *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause)
+{
+	self->clause = zbx_strdup(self->clause, clause);
 }
 
 /******************************************************************************

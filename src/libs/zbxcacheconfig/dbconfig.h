@@ -543,6 +543,7 @@ zbx_dc_kv_t;
 typedef struct
 {
 	const char	*path;
+	const char	*last_error;
 	zbx_hashset_t	kvs;
 }
 zbx_dc_kvs_path_t;
@@ -1068,6 +1069,7 @@ typedef struct
 								/* until it is parsed/converted to integer    */
 								/* value during next configuration sync	      */
 	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
+	zbx_uint32_t		sync_status;
 }
 zbx_dc_config_t;
 

@@ -103,7 +103,7 @@ foreach ($data['roles'] as $role) {
 
 	$table->addRow([
 		(new CCheckBox('roleids['.$role['roleid'].']', $role['roleid']))->setEnabled($role['readonly'] ? false : true),
-		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			$data['allowed_ui_users']
 				? new CLink(_('Users'), (new CUrl('zabbix.php'))

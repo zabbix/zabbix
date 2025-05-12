@@ -8,4 +8,5 @@ libzbxtaskmanager_proxy_a_SOURCES = \
 	taskmanager_proxy.h
 
 libzbxtaskmanager_proxy_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

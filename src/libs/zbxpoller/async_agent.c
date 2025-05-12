@@ -22,7 +22,6 @@
 #include "zbxself.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
-#include "zbxstr.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	include "zbxip.h"
@@ -49,8 +48,8 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	}
 }
 
-static int	async_task_process_task_agent_cb(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
-		const char *addr, char *dnserr, struct event *timeout_event)
+static int	async_task_process_task_agent_cb(short event, void *data, int *fd, zbx_vector_address_t *addresses,
+		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	short			event_new = 0;
@@ -62,9 +61,9 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, st
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(timeout_event);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
-				get_agent_step_string(agent_context->step), event, agent_context->item.itemid,
-				ZBX_NULL2EMPTY_STR(addr));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
+				get_agent_step_string(agent_context->step), zbx_get_event_string(event), event,
+				agent_context->item.itemid, 0 != addresses->values_num ? addresses->values[0].ip : "");
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
@@ -74,8 +73,8 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, st
 
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == agent_context->rdns_step)
 	{
-		if (NULL != addr)
-			agent_context->reverse_dns = zbx_strdup(NULL, addr);
+		if (NULL != reverse_dns)
+			agent_context->reverse_dns = zbx_strdup(NULL, reverse_dns);
 
 		goto stop;
 	}
@@ -100,15 +99,16 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, st
 						agent_context->item.interface.port));
 				return ZBX_ASYNC_TASK_STOP;
 			case ZABBIX_AGENT_STEP_CONNECT_WAIT:
-				if (NULL != (*current_ai)->ai_next)
+				if (1 < addresses->values_num)
 				{
 					/* reset timeout and retry with next address */
 					struct timeval	tv = {agent_context->config_timeout, 0};
 
 					evtimer_add(timeout_event, &tv);
 
+					zbx_vector_address_remove(addresses, 0);
+
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
-					*current_ai = (*current_ai)->ai_next;
 					break;
 				}
 
@@ -158,25 +158,22 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, st
 					ZBX_TCP_PROTOCOL, &agent_context->tcp_send_context);
 			}
 
-			char	ip[65];
-
-			if (FAIL == zbx_inet_ntop(*current_ai, ip, (socklen_t)sizeof(ip)))
-			{
-				agent_context->item.ret = NETWORK_ERROR;
-				SET_MSG_RESULT(&agent_context->item.result,
-						zbx_dsprintf(NULL, "Get value from agent failed during %s: invalid"
-						" address", get_agent_step_string(agent_context->step)));
-				goto out;
-			}
-
 			if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM,
-					agent_context->config_source_ip, ip, agent_context->item.interface.port,
-					agent_context->config_timeout))
+					agent_context->config_source_ip, addresses->values[0].ip,
+					agent_context->item.interface.port, agent_context->config_timeout))
 			{
+				if (1 < addresses->values_num)
+				{
+					zbx_vector_address_remove(addresses, 0);
+
+					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
+					break;
+				}
+
 				agent_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&agent_context->item.result,
-						zbx_dsprintf(NULL, "Get value from agent failed during %s",
-						get_agent_step_string(agent_context->step)));
+						zbx_dsprintf(NULL, "Get value from agent failed during %s: %s",
+						get_agent_step_string(agent_context->step), zbx_socket_strerror()));
 				goto out;
 			}
 
@@ -187,10 +184,11 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, st
 			if (0 == getsockopt(agent_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
 			{
-				if (NULL != (*current_ai)->ai_next)
+				if (1 < addresses->values_num)
 				{
+					zbx_vector_address_remove(addresses, 0);
+
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
-					*current_ai =(*current_ai)->ai_next;
 					break;
 				}
 
@@ -319,7 +317,7 @@ stop:
 out:
 	zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	if (ZABBIX_AGENT_STEP_CONNECT_INIT == agent_context->step)
-		return async_task_process_task_agent_cb(0, data, fd, current_ai, addr, dnserr, NULL);
+		return async_task_process_task_agent_cb(0, data, fd, addresses, reverse_dns, dnserr, NULL);
 
 	return ZBX_ASYNC_TASK_STOP;
 }
@@ -337,14 +335,16 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
+		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
+		struct evdns_base *dnsbase, const char *config_source_ip,
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'  conn:'%s'", __func__, item->key,
-			item->host.host, item->interface.addr, zbx_tcp_connection_type_name(item->host.tls_connect));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__,
+			item->itemid, item->key, item->host.host, item->interface.addr,
+			zbx_tcp_connection_type_name(item->host.tls_connect));
 
 	zbx_json_init(&agent_context->j, ZBX_JSON_STAT_BUF_LEN);
 	agent_context->arg = arg;
@@ -426,8 +426,8 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
 
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
-	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, item->timeout + 1,
-			async_task_process_task_agent_cb, async_task_process_result_agent_cb);
+	zbx_async_poller_add_task(base, channel, dnsbase, agent_context->item.interface.addr,
+		agent_context, item->timeout + 1, async_task_process_task_agent_cb, async_task_process_result_agent_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
 

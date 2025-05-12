@@ -294,8 +294,20 @@ func (c *Connection) Read() (data []byte, err error) {
 }
 
 func (c *Connection) RemoteIP() string {
-	addr, _, _ := net.SplitHostPort(c.conn.RemoteAddr().String())
-	return addr
+	tcpAddr, ok := c.conn.RemoteAddr().(*net.TCPAddr)
+	if !ok {
+		// This should never happen. RemoteAddr() should always return *net.TCPAddr as long as the connection is
+		// opened only with net.Dial("tcp", ...).
+		log.Warningf(
+			"remote address %q has unexpected type %T in RemoteIP()",
+			c.conn.RemoteAddr().String(),
+			c.conn.RemoteAddr(),
+		)
+
+		return c.conn.RemoteAddr().String()
+	}
+
+	return tcpAddr.IP.String()
 }
 
 func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection, err error) {

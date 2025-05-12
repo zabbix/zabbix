@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
+require_once __DIR__ . '/../include/CWebTest.php';
+require_once __DIR__.'/common/testFormPreprocessing.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/behaviors/CPreprocessingBehavior.php';
 
 /**
  * @dataSource Services, EntitiesTags
@@ -583,7 +583,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
-					'form' => 'id:widget-dialogue-form',
+					'form' => 'id:widget-form',
 					'widget_type' => 'Graph',
 					'close_dialog' => true,
 					'tabs' => [
@@ -646,7 +646,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
-					'form' => 'id:widget-dialogue-form',
+					'form' => 'id:widget-form',
 					'widget_type' => 'Pie chart',
 					'close_dialog' => true,
 					'tabs' => [
@@ -745,6 +745,9 @@ class testFormTabIndicators extends CWebTest {
 
 	/**
 	 * @dataProvider getTabData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTabIndicators_CheckGeneralForms($data) {
 		$this->page->login()->open($data['url'])->waitUntilReady();
@@ -803,7 +806,12 @@ class testFormTabIndicators extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'close_dialog')) {
-			COverlayDialogElement::find()->one()->waitUntilReady()->close();
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$dialog->query('class:btn-overlay-close')->one()->click();
+			if (CTestArrayHelper::get($data, 'widget_type', false)) {
+				$this->page->acceptAlert();
+			}
+			$dialog->ensureNotPresent();
 		}
 	}
 

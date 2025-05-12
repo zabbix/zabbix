@@ -40,7 +40,6 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxjson/libzbxjson.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/osx/libspechostnamesysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/osx/libspecsysinfo.a
-#cgo pcre  LDFLAGS: -lz -lpcre -lresolv
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -lz -lresolv
 

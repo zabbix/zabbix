@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup dashboard
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
  *
  * @dataSource UserPermissions
  */
-class testDashboardTopTriggersWidget extends CWebTest {
+class testDashboardTopTriggersWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
@@ -1441,7 +1441,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid=10084',
 					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
-					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host'
 				],

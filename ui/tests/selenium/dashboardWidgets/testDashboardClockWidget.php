@@ -14,11 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
@@ -349,16 +349,15 @@ class testDashboardClockWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('LayoutClock')->edit();
-		$form->fill(['Name' => '']);
-		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		$dashboard->getWidget('LayoutClock')->edit()->fill(['Name' => '']);
+		COverlayDialogElement::get('Edit widget')->waitUntilReady()->asForm()->submit();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$dashboard->waitUntilReady();
 		$this->assertTrue($dashboard->getWidget('Host for clock widget')->isValid());
 		$dashboard->getWidget('Host for clock widget')->edit()->fill(['Name' => 'LayoutClock']);
-		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		COverlayDialogElement::get('Edit widget')->waitUntilReady()->asForm()->submit();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');

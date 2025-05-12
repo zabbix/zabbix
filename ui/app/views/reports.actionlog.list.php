@@ -162,14 +162,12 @@ foreach ($data['alerts'] as $alert) {
 
 	$actionlog_list->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-		(new CCol($data['actions'][$alert['actionid']]['name']))->addClass(ZBX_STYLE_WORDBREAK),
-		$mediatype ? (new CCol($mediatype['name']))->addClass(ZBX_STYLE_WORDBREAK) : '',
+		$data['actions'][$alert['actionid']]['name'],
+		$mediatype ? $mediatype['name'] : '',
 		array_key_exists('userid', $alert) && $alert['userid']
-			? (new CCol(
-				makeEventDetailsTableUser($alert + ['action_type' => ZBX_EVENT_HISTORY_ALERT], $data['users'])
-			))->addClass(ZBX_STYLE_WORDBREAK)
-			: (new CCol(zbx_nl2br($alert['sendto'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($message))->addClass(ZBX_STYLE_WORDBREAK),
+			? makeEventDetailsTableUser($alert + ['action_type' => ZBX_EVENT_HISTORY_ALERT], $data['users'])
+			: zbx_nl2br($alert['sendto']),
+		$message,
 		$status,
 		makeInformationList($info_icons)
 	]);

@@ -629,7 +629,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: When allocating shared memory with default zbx_shmem_create()    *
- *           function the available memory will reduced by the allocator      *
+ *           function the available memory will be reduced by the allocator   *
  *           overhead. This function estimates the overhead and requests      *
  *           enough memory so the available memory is greater or equal to the *
  *           requested size.                                                  *
@@ -638,12 +638,11 @@ out:
 int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
-	void	*base = NULL;
+	void	*base = (void *)sizeof(zbx_shmem_info_t);
 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	base = (void *)((zbx_shmem_info_t *)(base) + 1);
 	base = ALIGNPTR(base);
 	base = (void *)((void **)base + ZBX_SHMEM_BUCKET_COUNT);
 	base = (void *)((char *)base + strlen(descr) + 1);

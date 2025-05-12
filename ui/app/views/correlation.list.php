@@ -121,8 +121,8 @@ foreach ($data['correlations'] as $correlation) {
 
 	$table->addRow([
 		new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
-		(new CCol((new CLink($correlation['name'], $correlation_url))))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+		new CLink($correlation['name'], $correlation_url),
+		$conditions,
 		$operations,
 		$status
 	]);

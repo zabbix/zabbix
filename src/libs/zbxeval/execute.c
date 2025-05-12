@@ -2411,26 +2411,26 @@ out:
  *                                                                            *
  * Purpose: evaluates function by calling custom callback (if configured)     *
  *                                                                            *
- * Parameters: ctx         - [IN] evaluation context                          *
- *             token       - [IN] function token                              *
- *             function_cb - [IN] callback function                           *
- *             output      - [IN/OUT] output value stack                      *
- *             error       - [OUT] error message in case of failure           *
+ * Parameters: ctx              - [IN] evaluation context                     *
+ *             token            - [IN] function token                         *
+ *             eval_function_cb - [IN]                                        *
+ *             output           - [IN/OUT] output value stack                 *
+ *             error            - [OUT] error message in case of failure      *
  *                                                                            *
  * Return value: SUCCEED - function was executed successfully                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_eval_function_cb_t function_cb, zbx_vector_var_t *output, char **error)
+		zbx_eval_function_cb_t eval_function_cb, zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	value, *args;
 	char		*errmsg = NULL;
 
 	args = (0 == token->opt ? NULL : &output->values[output->values_num - token->opt]);
 
-	if (SUCCEED != function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
-			token->opt, args, ctx->data_cb, &ctx->ts, &value, &errmsg))
+	if (SUCCEED != eval_function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
+			token->opt, args, ctx->eval_function_data_cb, &ctx->ts, &value, &errmsg))
 	{
 		char	*composed_expr = NULL;
 
@@ -3329,17 +3329,17 @@ out:
  *             ts                         - [IN] timestamp of execution time             *
  *             eval_function_common_func  - [IN] common function callback (optional)     *
  *             eval_function_history_func - [IN] history function callback (optional)    *
- *             data_cb                    - [IN] caller data to be passed to callback    *
+ *             eval_function_data_cb      - [IN] caller data to be passed to callback    *
  *                                               functions                               *
  *                                                                                       *
  *****************************************************************************************/
 static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespec_t *ts,
 		zbx_eval_function_cb_t eval_function_common_func, zbx_eval_function_cb_t eval_function_history_func,
-		void *data_cb)
+		void *eval_function_data_cb)
 {
 	ctx->eval_function_common_cb = eval_function_common_func;
 	ctx->eval_function_history_cb = eval_function_history_func;
-	ctx->data_cb = data_cb;
+	ctx->eval_function_data_cb = eval_function_data_cb;
 
 	if (NULL == ts)
 		ctx->ts.sec = ctx->ts.ns = 0;
