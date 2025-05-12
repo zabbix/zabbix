@@ -684,7 +684,6 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 	zbx_timespec_t		ts;
 	double			speed_download = 0;
 	int			speed_download_num = 0, lastfailedstep = 0;
-	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 #ifdef HAVE_LIBCURL
 	zbx_db_row_t		row;
 	zbx_httpstat_t		stat;
@@ -706,7 +705,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 			httptest->httptest.httptestid);
 
 	buffer = zbx_strdup(buffer, httptest->httptest.delay);
-	um_handle = zbx_dc_open_user_macros_masked();
+
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 	zbx_dc_expand_user_and_func_macros(um_handle, &buffer, &host->hostid, 1, NULL);
 	zbx_dc_close_user_macros(um_handle);
 
@@ -758,6 +758,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		struct curl_slist	*headers_slist = NULL;
 		char			*header_cookie = NULL;
 		zbx_curl_cb_t		curl_body_cb, curl_header_cb;
+		zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -769,7 +770,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
 
-		um_handle = zbx_dc_open_user_macros_masked();
+		um_handle_masked = zbx_dc_open_user_macros_masked();
 		um_handle_secure = zbx_dc_open_user_macros_secure();
 
 		zbx_substitute_macros(&db_httpstep.url, NULL, 0, &macro_httptest_field_resolv, um_handle_secure, host);
@@ -778,10 +779,11 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 		db_httpstep.required = zbx_strdup(NULL, row[6]);
 
-		zbx_substitute_macros(&db_httpstep.required, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
+		zbx_substitute_macros(&db_httpstep.required, NULL, 0, &macro_httptest_field_resolv, um_handle_masked,
+				host);
 
 		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
-		zbx_dc_expand_user_and_func_macros(um_handle, &db_httpstep.status_codes, &host->hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle_masked, &db_httpstep.status_codes, &host->hostid, 1, NULL);
 
 		db_httpstep.post_type = atoi(row[8]);
 
@@ -798,10 +800,10 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 			db_httpstep.posts = NULL;
 
 		buffer = zbx_strdup(buffer, row[4]);
-		zbx_dc_expand_user_and_func_macros(um_handle, &buffer, &host->hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle_masked, &buffer, &host->hostid, 1, NULL);
 
 		zbx_dc_close_user_macros(um_handle_secure);
-		zbx_dc_close_user_macros(um_handle);
+		zbx_dc_close_user_macros(um_handle_masked);
 
 		if (SUCCEED != httpstep_load_pairs(host, &httpstep))
 		{
