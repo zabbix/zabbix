@@ -702,7 +702,7 @@ out:
 
 static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char *errbuf, char **error)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%d", __FILE__, err);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%d", __func__, err);
 
 	if (CURLE_LOGIN_DENIED == err && SMTP_AUTHENTICATION_OAUTH == auth_type)
 	{
