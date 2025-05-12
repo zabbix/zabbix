@@ -700,6 +700,7 @@ out:
 #undef OK_354
 }
 
+#ifdef HAVE_LIBCURL
 static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char *errbuf, char **error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%u", __func__, err);
@@ -717,6 +718,7 @@ static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): error:%s", __func__, *error);
 }
+#endif
 
 /* SMTP security options */
 #define SMTP_SECURITY_NONE	0
