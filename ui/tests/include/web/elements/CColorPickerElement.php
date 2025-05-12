@@ -130,8 +130,9 @@ class CColorPickerElement extends CElement {
 			$button->click()->waitUntilNotVisible();
 		}
 		else {
+			$dialog = (new CElementQuery('id:color_picker'))->one();
 			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
-			$this->waitUntilNotPresent();
+			$dialog->waitUntilNotPresent();
 		}
 	}
 
@@ -142,5 +143,22 @@ class CColorPickerElement extends CElement {
 	 */
 	public function fill($color) {
 		$this->overwrite($color);
+	}
+
+	/**
+	 * Check if color-picker dialog can be submitted
+	 *
+	 * @param boolean	$submitable		should dialog submission be disabled or not
+	 *
+	 * @return type
+	 */
+	public function isSubmittionDisabled($submitable = false) {
+		$dialog = (new CElementQuery('id:color_picker'))->one();
+		$clickable = $dialog->query('button:Apply')->one()->isClickable();
+
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+		$displayed = $dialog->isDisplayed();
+
+		return ($clickable === $submitable && $displayed === !$submitable);
 	}
 }
