@@ -26,6 +26,8 @@ abstract class CHostBase extends CApiService {
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	protected function checkTemplates(array &$hosts, ?array &$db_hosts = null, ?string $path = null,
 			?array $template_indexes = null, ?string $path_clear = null, ?array $template_clear_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
@@ -1982,20 +1984,26 @@ abstract class CHostBase extends CApiService {
 		}
 		unset($row);
 
+		$output = ['htc.hostid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
+				'objectid' => 'htc.link_hostid AS '.$field
+			};
+		}
+
 		$resource = DBselect(
-			'SELECT DISTINCT htc.hostid,ht.tag,ht.value'.
+			'SELECT '.implode(',', $output).
 			' FROM host_template_cache htc'.
 			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
 			' WHERE htc.hostid!=htc.link_hostid'.
 				' AND '.dbConditionId('htc.hostid', array_keys($result))
 		);
 
-		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
-			? ['tag', 'value']
-			: $options['selectInheritedTags'];
-
 		while ($row = DBfetch($resource)) {
-			$result[$row['hostid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+			$result[$row['hostid']]['inheritedTags'][] = array_diff_key($row, array_flip(['hostid']));
 		}
 	}
 }

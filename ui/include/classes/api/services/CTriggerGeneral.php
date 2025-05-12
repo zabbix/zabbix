@@ -21,6 +21,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 	protected const FLAGS = null;
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	/**
 	 * @abstract
 	 *
@@ -898,21 +900,120 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		unset($row);
 
-		$resource = DBselect(
-			'SELECT DISTINCT t.triggerid,ht.tag,ht.value'.
-			' FROM item_template_cache itc'.
-			' JOIN functions f ON itc.itemid=f.itemid'.
-			' JOIN triggers t ON f.triggerid=t.triggerid'.
-			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-			' WHERE '.dbConditionId('t.triggerid', array_keys($result))
-		);
+		$triggerids = array_keys($result);
 
-		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
-			? ['tag', 'value']
-			: $options['selectInheritedTags'];
+		$db_functions = DB::select('functions', [
+			'output' => [],
+			'filter' => ['triggerid' => $triggerids],
+			'preservekeys' => true
+		]);
 
-		while ($row = DBfetch($resource)) {
-			$result[$row['triggerid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		$db_triggers = DB::select('triggers', [
+			'output' => ['expression', 'recovery_expression'],
+			'filter' => [
+				'triggerid' => $triggerids,
+				'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
+			],
+			'preservekeys' => true
+		]);
+
+		if ($db_triggers) {
+			// Exclude functionids used only in recovery expressions to not collect related inherited tags later.
+
+			$exclude_functionids = [];
+
+			foreach ($db_triggers as $trigger) {
+				preg_match_all('/\{(\d+)\}/', $trigger['expression'], $matches);
+				preg_match_all('/\{(\d+)\}/', $trigger['recovery_expression'], $r_matches);
+
+				// Find functionids used only in recovery expression.
+				$diff_functionids = array_diff_key(array_flip($r_matches[1]), array_flip($matches[1]));
+
+				foreach ($diff_functionids as $functionid => $foo) {
+					$exclude_functionids[$functionid] = true;
+				}
+			}
+
+			$db_functions = array_diff_key($db_functions, $exclude_functionids);
+		}
+
+		$output_item_tags = ['f.triggerid', 'it.tag', 'it.value', ZBX_TAG_OBJECT_ITEM.' AS object',
+			'f.itemid AS objectid'
+		];
+		$output_template_tags = ['f.triggerid', 'ht.tag', 'ht.value', ZBX_TAG_OBJECT_TEMPLATE.' AS object',
+			'ht.hostid AS objectid'
+		];
+
+		$functionids = array_keys($db_functions);
+
+		if (in_array('object', $options['selectInheritedTags'])) {
+			$output_item_tags[] = '"item_tag" AS tag_table';
+			$output_item_tags[] = 'i.flags';
+			$output_item_tags[] = 'i.type AS item_type';
+			$output_template_tags[] = '"host_tag" AS tag_table';
+			$output_template_tags[] = 'h.flags';
+			$output_template_tags[] = '-1 AS item_type';
+
+			$resource = DBselect(
+				'SELECT '.implode(',', $output_item_tags).
+				' FROM functions f'.
+				' JOIN items i ON f.itemid=i.itemid'.
+				' JOIN item_tag it ON i.itemid=it.itemid'.
+				' WHERE '.dbConditionId('f.functionid', $functionids).
+				' UNION ALL '.
+				'SELECT DISTINCT '.implode(',', $output_template_tags).
+				' FROM functions f'.
+				' JOIN item_template_cache itc ON f.itemid=itc.itemid'.
+				' JOIN hosts h ON itc.link_hostid=h.hostid'.
+				' JOIN host_tag ht ON h.hostid=ht.hostid'.
+				' WHERE '.dbConditionId('f.functionid', $functionids)
+			);
+
+			while ($row = DBfetch($resource)) {
+				if ($row['tag_table'] === 'item_tag') {
+					if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$row['object'] = ZBX_TAG_OBJECT_ITEM_PROTOTYPE;
+					}
+					elseif ($row['item_type'] == ITEM_TYPE_HTTPTEST) {
+						$row['object'] = ZBX_TAG_OBJECT_HTTPTEST_ITEM;
+					}
+				}
+				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					$row['object'] = ZBX_TAG_OBJECT_HOST;
+				}
+
+				$tag = [];
+
+				foreach ($options['selectInheritedTags'] as $field) {
+					$tag[$field] = $row[$field];
+				}
+
+				$result[$row['triggerid']]['inheritedTags'][] = $tag;
+			}
+		}
+		else {
+			$resource = DBselect(
+				'SELECT '.implode(',', $output_item_tags).
+				' FROM functions f'.
+				' JOIN item_tag it ON f.itemid=it.itemid'.
+				' WHERE '.dbConditionId('f.functionid', $functionids).
+				' UNION ALL '.
+				'SELECT DISTINCT '.implode(',', $output_template_tags).
+				' FROM functions f'.
+				' JOIN item_template_cache itc ON f.itemid=itc.itemid'.
+				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+				' WHERE '.dbConditionId('f.functionid', $functionids)
+			);
+
+			while ($row = DBfetch($resource)) {
+				$tag = [];
+
+				foreach ($options['selectInheritedTags'] as $field) {
+					$tag[$field] = $row[$field];
+				}
+
+				$result[$row['triggerid']]['inheritedTags'][] = $tag;
+			}
 		}
 	}
 

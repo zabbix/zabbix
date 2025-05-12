@@ -320,7 +320,7 @@ class CItemPrototype extends CItemGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid'])],
 			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])]
 		]];
 
@@ -1562,19 +1562,46 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($row);
 
-		$resource = DBselect(
-			'SELECT DISTINCT itc.itemid,ht.tag,ht.value'.
-			' FROM item_template_cache itc'.
-			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-			' WHERE '.dbConditionId('itc.itemid', array_keys($result))
-		);
+		$output = ['itc.itemid'];
 
-		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
-			? ['tag', 'value']
-			: $options['selectInheritedTags'];
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
+				'objectid' => 'itc.link_hostid AS '.$field
+			};
+		}
 
-		while ($row = DBfetch($resource)) {
-			$result[$row['itemid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		if (in_array('object', $options['selectInheritedTags'])) {
+			$output[] = 'h.flags';
+
+			$resource = DBselect(
+				'SELECT '.implode(',', $output).
+				' FROM item_template_cache itc'.
+				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+				' JOIN hosts h ON itc.link_hostid=h.hostid'.
+				' WHERE '.dbConditionId('itc.itemid', array_keys($result))
+			);
+
+			while ($row = DBfetch($resource)) {
+				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					$row['object'] = ZBX_TAG_OBJECT_HOST;
+				}
+
+				$result[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid', 'flags']));
+			}
+		}
+		else {
+			$resource = DBselect(
+				'SELECT '.implode(',', $output).
+				' FROM item_template_cache itc'.
+				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+				' WHERE '.dbConditionId('itc.itemid', array_keys($result))
+			);
+
+			while ($row = DBfetch($resource)) {
+				$result[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid']));
+			}
 		}
 	}
 

@@ -87,7 +87,7 @@ class CHttpTest extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'inheritedTags' =>			['type' => API_BOOLEAN],
-			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])]
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid'])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1124,19 +1124,47 @@ class CHttpTest extends CApiService {
 		}
 		unset($row);
 
-		$resource = DBselect(
-			'SELECT DISTINCT htc.httptestid,ht.tag,ht.value'.
-			' FROM httptest_template_cache htc'.
-			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
-			' WHERE '.dbConditionId('htc.httptestid', array_keys($result))
-		);
+		$output = ['htc.httptestid'];
 
-		$output = $options['selectInheritedTags'] === API_OUTPUT_EXTEND
-			? ['tag', 'value']
-			: $options['selectInheritedTags'];
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
+				'objectid' => 'htc.link_hostid AS '.$field
+			};
+		}
 
-		while ($row = DBfetch($resource)) {
-			$result[$row['httptestid']]['inheritedTags'][] = array_intersect_key($row, array_flip($output));
+		if (in_array('object', $options['selectInheritedTags'])) {
+			$output[] = 'h.flags';
+
+			$resource = DBselect(
+				'SELECT '.implode(',', $output).
+				' FROM httptest_template_cache htc'.
+				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+				' JOIN hosts h ON htc.link_hostid=h.hostid'.
+				' WHERE '.dbConditionId('htc.httptestid', array_keys($result))
+			);
+
+			while ($row = DBfetch($resource)) {
+				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					$row['object'] = ZBX_TAG_OBJECT_HOST;
+				}
+
+				$result[$row['httptestid']]['inheritedTags'][] =
+					array_diff_key($row, array_flip(['httptestid', 'flags']));
+			}
+		}
+		else {
+			$resource = DBselect(
+				'SELECT '.implode(',', $output).
+				' FROM httptest_template_cache htc'.
+				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+				' WHERE '.dbConditionId('htc.httptestid', array_keys($result))
+			);
+
+			while ($row = DBfetch($resource)) {
+				$result[$row['httptestid']]['inheritedTags'][] = array_diff_key($row, array_flip(['httptestid']));
+			}
 		}
 	}
 
