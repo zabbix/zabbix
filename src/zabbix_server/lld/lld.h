@@ -17,9 +17,7 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
-#include "zbxregexp.h"
 #include "zbxdbhigh.h"
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
@@ -402,6 +400,7 @@ struct zbx_lld_item_full_s
 	int					lifetime_type_orig;
 	int					enabled_lifetime_type_orig;
 	int					evaltype_orig;
+	int					item_flags;		/* discovery flag - lld rule/prototype */
 
 	zbx_sync_rowset_t			macro_paths;
 	zbx_sync_rowset_t			filters;

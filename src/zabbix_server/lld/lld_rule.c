@@ -14,13 +14,19 @@
 
 #include "lld.h"
 #include "zbxalgo.h"
-#include "zbxexpression.h"
 #include "lld_audit.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0
@@ -2896,14 +2902,14 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_create_ext(&prototype_rules, item_prototypes->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create_ext(&prototype_rules, (size_t)item_prototypes->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, lld_prototype_items_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	/* create copy of lld_rows to leave original item_links untouched */
 
 	zbx_vector_lld_row_ptr_create(&lld_rows_copy);
-	zbx_vector_lld_row_ptr_reserve(&lld_rows_copy, lld_rows->values_num);
+	zbx_vector_lld_row_ptr_reserve(&lld_rows_copy, (size_t)lld_rows->values_num);
 
 	for (int i = 0; i < lld_rows->values_num; i++)
 	{

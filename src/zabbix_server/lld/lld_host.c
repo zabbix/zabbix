@@ -333,8 +333,8 @@ ZBX_PTR_VECTOR_IMPL(lld_host_ptr, zbx_lld_host_t*)
 
 static int	lld_host_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_host_t	*host_1 = *(const zbx_lld_host_t **)d1;
-	const zbx_lld_host_t	*host_2 = *(const zbx_lld_host_t **)d2;
+	const zbx_lld_host_t	*host_1 = *(const zbx_lld_host_t * const *)d1;
+	const zbx_lld_host_t	*host_2 = *(const zbx_lld_host_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(host_1->hostid, host_2->hostid);
 
@@ -381,8 +381,8 @@ ZBX_PTR_VECTOR_IMPL(lld_group_prototype_ptr, zbx_lld_group_prototype_t*)
 
 static int	lld_group_prototype_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_group_prototype_t	*group_prototype_1 = *(const zbx_lld_group_prototype_t **)d1;
-	const zbx_lld_group_prototype_t	*group_prototype_2 = *(const zbx_lld_group_prototype_t **)d2;
+	const zbx_lld_group_prototype_t	*group_prototype_1 = *(const zbx_lld_group_prototype_t * const *)d1;
+	const zbx_lld_group_prototype_t	*group_prototype_2 = *(const zbx_lld_group_prototype_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(group_prototype_1->group_prototypeid, group_prototype_2->group_prototypeid);
 
@@ -791,8 +791,8 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_create(&host_hosts, hosts->values_num, lld_host_host_hash, lld_host_host_compare);
-	zbx_hashset_create(&host_names, hosts->values_num, lld_host_name_hash, lld_host_name_compare);
+	zbx_hashset_create(&host_hosts, (size_t)hosts->values_num, lld_host_host_hash, lld_host_host_compare);
+	zbx_hashset_create(&host_names, (size_t)hosts->values_num, lld_host_name_hash, lld_host_name_compare);
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_str_create(&tnames);		/* list of technical host names */
@@ -3883,7 +3883,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto,
 					lldruleid);
-			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
+
+			if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			{
+				zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid,
+						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
+			}
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
@@ -4239,7 +4244,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 							interface->lld_row.snmp->authprotocol,
 							interface->lld_row.snmp->privprotocol,
 							interface->lld_row.snmp->contextname,
-							interface->lld_row.snmp->max_repetitions,
+							(int)interface->lld_row.snmp->max_repetitions,
 							interface->interfaceid);
 				}
 				else if (0 != (interface->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))

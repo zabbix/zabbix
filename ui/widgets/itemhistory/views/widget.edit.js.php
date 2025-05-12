@@ -16,7 +16,7 @@
 
 ?>
 
-window.widget_itemhistory_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * Widget form.
@@ -47,7 +47,7 @@ window.widget_itemhistory_form = new class {
 	#column_index;
 
 	init({templateid}) {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 		this.#templateid = templateid;
 
 		this.#list_columns = document.getElementById('list_columns');
@@ -55,9 +55,12 @@ window.widget_itemhistory_form = new class {
 		new CSortable(this.#list_columns.querySelector('tbody'), {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			freeze_end: 1
-		});
+		})
+			.on(CSortable.EVENT_SORT, () => this.registerUpdateEvent());
 
 		this.#list_columns.addEventListener('click', (e) => this.#processColumnsAction(e));
+
+		this.ready();
 	}
 
 	#processColumnsAction(e) {
@@ -105,7 +108,7 @@ window.widget_itemhistory_form = new class {
 
 			case 'remove':
 				target.closest('tr').remove();
-				ZABBIX.Dashboard.reloadWidgetProperties();
+				this.reload();
 				break;
 		}
 	}
@@ -148,7 +151,7 @@ window.widget_itemhistory_form = new class {
 			}
 		}
 
-		ZABBIX.Dashboard.reloadWidgetProperties();
+		this.reload();
 	}
 
 	#addVar(name, value) {

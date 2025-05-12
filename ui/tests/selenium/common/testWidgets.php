@@ -48,6 +48,16 @@ class testWidgets extends CWebTest {
 			' wf.value_graphid, wf.value_hostid';
 
 	/**
+	 * Callback executed before every test case. Automatically accept the alert.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		parent::onBeforeTestCase();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
+	}
+
+	/**
 	 * Function which checks that only permitted item types are accessible for widgets.
 	 *
 	 * @param string    $url       url provided which needs to be opened
@@ -115,17 +125,14 @@ class testWidgets extends CWebTest {
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
-		$items_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$this->assertEquals($widget === 'Graph prototype' ? 'Item prototypes' : 'Items', $items_dialog->getTitle());
+		$items_dialog = COverlayDialogElement::get($widget === 'Graph prototype' ? 'Item prototypes' : 'Items');
 
 		// Find the table where items will be expected.
 		$table = $items_dialog->query(self::TABLE_SELECTOR)->asTable()->one()->waitUntilVisible();
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
-		$items_dialog->query('button:Select')->waitUntilClickable();
 		$table->waitUntilReloaded();
-		$items_dialog->waitUntilReady();
 		$items_dialog->query('button:Select')->waitUntilClickable();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 

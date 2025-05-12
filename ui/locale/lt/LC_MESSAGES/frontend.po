@@ -7307,6 +7307,10 @@ msgstr ""
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
@@ -7730,6 +7734,10 @@ msgstr ""
 #: app/controllers/CControllerDashboardWidgetEdit.php:68
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
+msgstr ""
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
 msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
@@ -23773,6 +23781,10 @@ msgstr ""
 #: include/classes/api/services/CDashboardGeneral.php:352
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
+msgstr ""
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
 msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234

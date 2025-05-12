@@ -20,20 +20,39 @@ use Zabbix\Widgets\Fields\CWidgetFieldReference;
 
 class CWidgetFormView {
 
+	public const FORM_ID_PRIMARY = 'widget-form';
+	public const FORM_NAME_PRIMARY = 'widget_form';
+
 	private array $data;
+
+	private string $id;
 	private string $name;
+
+	private ?string $tab_indicators_tabs_id;
 
 	private array $vars = [];
 	private array $javascript = [];
 	private array $templates = [];
 
+	private ?string $init_dialogue_js = null;
+
 	private CFormGrid $form_grid;
 
 	private array $registered_fields = [];
 
-	public function __construct(array $data, string $name = 'widget_dialogue_form') {
+	public function __construct(array $data, $options = []) {
+		$options += [
+			'id' => self::FORM_ID_PRIMARY,
+			'name' => self::FORM_NAME_PRIMARY,
+			'tab_indicators_tabs_id' => null
+		];
+
 		$this->data = $data;
-		$this->name = $name;
+
+		$this->id = $options['id'];
+		$this->name = $options['name'];
+
+		$this->tab_indicators_tabs_id = $options['tab_indicators_tabs_id'];
 
 		if (array_key_exists(CWidgetFieldReference::FIELD_NAME, $data['fields'])) {
 			$this->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
@@ -129,6 +148,46 @@ class CWidgetFormView {
 		return $field;
 	}
 
+	/**
+	 * Set JavaScript initialization code of the form (descendant of CWidgetForm class).
+	 *
+	 * Will use default implementation if not set using this method.
+	 *
+	 * @param string $javascript
+	 *
+	 * @return $this
+	 */
+	public function initFormJs(string $javascript): self {
+		$this->init_dialogue_js = $javascript;
+
+		return $this;
+	}
+
+	/**
+	 * Get JavaScript initialization code of the form (descendant of CWidgetForm class).
+	 *
+	 * Will return default implementation if wasn't set using "initFormJs" method.
+	 *
+	 * @see initFormJs
+	 *
+	 * @return string
+	 */
+	private function getInitFormJs(): string {
+		if ($this->init_dialogue_js !== null) {
+			return $this->init_dialogue_js;
+		}
+
+		$parameters = ['form_name' => $this->name];
+
+		if ($this->tab_indicators_tabs_id !== null) {
+			$parameters['tab_indicators_tabs_id'] = $this->tab_indicators_tabs_id;
+		}
+
+		return '
+			new CWidgetForm('.json_encode($parameters, JSON_THROW_ON_ERROR).').ready();
+		';
+	}
+
 	public function addJavaScript(string $javascript): self {
 		$this->javascript[] = $javascript;
 
@@ -161,33 +220,36 @@ class CWidgetFormView {
 		$message_box = $messages ? makeMessageBox(ZBX_STYLE_MSG_BAD, $messages) : '';
 
 		$output = [
-			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
+			'header' => $this->data['is_new'] ? _('Add widget') : _('Edit widget'),
 			'body' => implode('', [
 				$message_box,
 				(new CForm())
-					->setId('widget-dialogue-form')
+					->setId($this->id)
 					->setName($this->name)
 					->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM)
 					->addClass('dashboard-widget-'.$this->data['type'])
 					->addItem($this->vars)
 					->addItem($this->form_grid)
-					// Submit button is needed to enable submit event on Enter on inputs.
+					// Enable form submitting on Enter.
 					->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)),
-				implode('', $this->templates),
-				(new CScriptTag('ZABBIX.Dashboard.initWidgetPropertiesForm();'))->addItem($this->javascript)
+				implode('', $this->templates)
 			]),
 			'buttons' => [
 				[
-					'title' => $this->data['unique_id'] !== null ? _('Apply') : _('Add'),
-					'class' => 'dialogue-widget-save',
+					'title' => $this->data['is_new'] ? _('Add') : _('Apply'),
+					'class' => 'js-button-submit',
 					'keepOpen' => true,
-					'isSubmit' => true,
-					'action' => 'ZABBIX.Dashboard.applyWidgetProperties();'
+					'isSubmit' => true
 				]
 			],
 			'doc_url' => $this->data['url'] === ''
 				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
-				: $this->data['url']
+				: $this->data['url'],
+			'script_inline' =>
+				// First, initialize widget fields.
+				implode('', $this->javascript).
+				// Second, initialize form dialogue.
+				$this->getInitFormJs()
 		];
 
 		if ($this->data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

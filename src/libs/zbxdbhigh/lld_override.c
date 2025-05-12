@@ -20,6 +20,7 @@
 #include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxregexp.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t *)
 ZBX_PTR_VECTOR_IMPL(lld_condition_ptr, zbx_lld_condition_t *)
@@ -342,8 +343,8 @@ void	zbx_lld_override_free(zbx_lld_override_t *override)
 
 int	zbx_lld_override_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_override_t	*override_1 = *(const zbx_lld_override_t **)d1;
-	const zbx_lld_override_t	*override_2 = *(const zbx_lld_override_t **)d2;
+	const zbx_lld_override_t	*override_1 = *(const zbx_lld_override_t * const *)d1;
+	const zbx_lld_override_t	*override_2 = *(const zbx_lld_override_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(override_1->overrideid, override_2->overrideid);
 
