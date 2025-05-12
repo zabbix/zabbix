@@ -66,13 +66,13 @@ class CControllerHostWizardEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$vendor_template_count = API::template()->get([
+		$vendor_template_count = API::Template()->get([
 			'output' => [],
 			'search' => ['vendor_version' => '-'],
 			'countOutput' => true
 		]);
 
-		$wizard_ready_templates = API::template()->get([
+		$wizard_ready_templates = API::Template()->get([
 			'output' => ['templateid', 'name', 'description', 'vendor_version'],
 			'selectTemplateGroups' => ['name'],
 			'selectTags' => ['tag', 'value'],
@@ -82,6 +82,19 @@ class CControllerHostWizardEdit extends CController {
 			'sortfield' => 'name'
 		]);
 
+		$item_prototypes = API::ItemPrototype()->get([
+			'output' => ['type'],
+			'selectHosts' => ['hostid'],
+			'hostids' => array_column($wizard_ready_templates, 'templateid'),
+		]);
+
+		$item_prototypes_by_templateid = [];
+
+		foreach ($item_prototypes as $item_prototype) {
+			$templateid = $item_prototype['hosts'][0]['hostid'];
+			$item_prototypes_by_templateid[$templateid][] = $item_prototype;
+		}
+
 		$wizard_vendor_template_count = 0;
 
 		foreach ($wizard_ready_templates as &$template) {
@@ -89,14 +102,13 @@ class CControllerHostWizardEdit extends CController {
 				$wizard_vendor_template_count ++;
 			}
 
-			$item_prototypes = API::itemprototype()->get([
-				'output' => ['type'],
-				'hostids' => $template['templateid']
-			]);
+			$items = array_merge(
+				$template['items'],
+				$template['discoveries'],
+				$item_prototypes_by_templateid[$template['templateid']] ?? []
+			);
 
-			$unique_types = array_keys(array_column(
-				array_merge($template['items'], $template['discoveries'], $item_prototypes), null, 'type'
-			));
+			$unique_types = array_keys(array_column($items, null, 'type'));
 
 			// Remove unnecessary template data.
 			unset($template['items'], $template['discoveries'], $template['vendor_version']);
@@ -123,7 +135,7 @@ class CControllerHostWizardEdit extends CController {
 		unset($template);
 
 		$linked_templates = $this->host !== null
-			? API::template()->get([
+			? API::Template()->get([
 				'output' => ['templateid'],
 				'hostids' => $this->host['hostid'],
 				'preservekeys' => true

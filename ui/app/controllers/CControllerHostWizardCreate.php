@@ -84,7 +84,8 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 				if ($interface['useip'] == INTERFACE_USE_DNS) {
 					$interface['dns'] = $interface['address'];
 					$interface['ip'] = '';
-				} elseif ($interface['useip'] == INTERFACE_USE_IP) {
+				}
+				elseif ($interface['useip'] == INTERFACE_USE_IP) {
 					$interface['ip'] = $interface['address'];
 					$interface['dns'] = '';
 				}
@@ -118,6 +119,8 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 		$output = [];
 
 		if ($result) {
+			$output['hostid'] = $result['hostids'][0];
+
 			$success = ['title' => _('Host added successfully')];
 
 			if ($messages = get_and_clear_messages()) {

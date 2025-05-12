@@ -264,8 +264,28 @@ window.host_wizard_edit = new class {
 		return_url.searchParams.set('action', 'host.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
+		this.initPopupListeners();
+
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
+	}
+
+	initPopupListeners() {
+		ZABBIX.EventHub.subscribe({
+			require: {
+				context: CPopupManager.EVENT_CONTEXT,
+				event: CPopupManagerEvent.EVENT_SUBMIT
+			},
+			callback: ({data, event}) => {
+				const url = new URL('zabbix.php', location.href);
+
+				url.searchParams.set('action', 'latest.view');
+				url.searchParams.set('hostids[]', this.#data.host.id);
+				url.searchParams.set('filter_set', '1');
+
+				event.setRedirectUrl(url.href);
+			}
+		});
 	}
 
 	#initViewTemplates() {
@@ -540,7 +560,7 @@ window.host_wizard_edit = new class {
 
 	#renderComplete() {
 		const view = this.#view_templates.step_complete.evaluateToElement({
-			host_name: this.#data.host.isNew ? this.#data.host.id : this.#data.host.name
+			host_name: this.#data.host.name
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -712,6 +732,11 @@ window.host_wizard_edit = new class {
 			.then((response) => {
 				if ('error' in response) {
 					throw {error: response.error};
+				}
+
+				if (this.#data.host.isNew) {
+					this.#data.host.name = this.#data.host.id
+					this.#data.host.id = response.hostid;
 				}
 
 				this.#ajaxSuccessHandler(response);
