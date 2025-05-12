@@ -59,20 +59,7 @@ elseif ($data['item']) {
 				break;
 
 			case CWidgetFieldItemSections::SECTION_HOST_INTERFACE:
-				$interface_data = _('No data');
-
-				if ($item['interfaces']) {
-					$interface_data = getHostInterface(reset($item['interfaces']));
-				}
-				elseif ($data['context'] === 'template') {
-					$interface_dependent_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX,
-						ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP
-					];
-
-					if (in_array($item['type'], $interface_dependent_item_types)) {
-						$interface_data = _('Awaiting data');
-					}
-				}
+				$interface_data = $item['interfaces'] ? getHostInterface(reset($item['interfaces'])) : _('No data');
 
 				$sections[] = makeSectionSingleParameter(_('Host interface'), $interface_data);
 				break;
@@ -95,7 +82,7 @@ elseif ($data['item']) {
 				break;
 
 			case CWidgetFieldItemSections::SECTION_LATEST_DATA:
-				$sections[] = makeSectionLatestData($item);
+				$sections[] = makeSectionLatestData($item, $data['context']);
 				break;
 
 			case CWidgetFieldItemSections::SECTION_TAGS:
@@ -430,24 +417,23 @@ function makeSectionMetrics(array $item): CDiv {
 		->addClass('section-metrics');
 }
 
-function makeSectionLatestData(array $item): CDiv {
-	$value = $item['last_value'];
+function makeSectionLatestData(array $item, string $context): CDiv {
 	$last_check_value = '';
-	$item_value = '';
+	$item_value = $context === 'template' ?  _('No data') : '';
 
-	if ($value !== null) {
-		$last_check_value = (new CSpan(zbx_date2age($value['clock'])))
+	if ($item['last_value'] !== null) {
+		$last_check_value = (new CSpan(zbx_date2age($item['last_value']['clock'])))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value['clock']), '', true, '', 0);
+			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item['last_value']['clock']), '', true, '', 0);
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 			$item_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$item_value = (new CSpan(formatHistoryValue($value['value'], $item, false)))
+			$item_value = (new CSpan(formatHistoryValue($item['last_value']['value'], $item, false)))
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint(
-					(new CDiv(mb_substr($value['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+					(new CDiv(mb_substr($item['last_value']['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
 						->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 						->addClass(ZBX_STYLE_HINTBOX_WRAP),
 					'', true, '', 0
@@ -458,42 +444,44 @@ function makeSectionLatestData(array $item): CDiv {
 	$action_column = (new CDiv())->addClass('right-column');
 	$column_value = (new CDiv())->addClass('column-value');
 
-	if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-		if ($value !== null) {
-			$column_value = (new CButton(null, _('Show')))
-				->addClass('btn-thumbnail')
-				->addClass('js-show-binary');
+	if ($context === 'host') {
+		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			if ($item['last_value'] !== null) {
+				$column_value = (new CButton(null, _('Show')))
+					->addClass('btn-thumbnail')
+					->addClass('js-show-binary');
 
-			$action_column
-				->setAttribute('data-itemid', $item['itemid'])
-				->setAttribute('data-key_', $item['key_'])
-				->setAttribute('data-clock', $value['clock'].'.'.$value['ns']);
+				$action_column
+					->setAttribute('data-itemid', $item['itemid'])
+					->setAttribute('data-key_', $item['key_'])
+					->setAttribute('data-clock', $item['last_value']['clock'].'.'.$item['last_value']['ns']);
+			}
 		}
-	}
-	else {
-		$is_numeric = $item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64;
+		else {
+			$is_numeric = $item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64;
 
-		if ($item['keep_history'] != 0 || $item['keep_trends'] != 0) {
-			$action_column->addItem(
-				(new CDiv(
-					(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
-						->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
-						->setArgument('itemids[]', $item['itemid'])
-					))
-				))->addClass('column-header')
-			);
-		}
+			if ($item['keep_history'] != 0 || $item['keep_trends'] != 0) {
+				$action_column->addItem(
+					(new CDiv(
+						(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))
+							->setArgument('action', $is_numeric ? HISTORY_GRAPH : HISTORY_VALUES)
+							->setArgument('itemids[]', $item['itemid'])
+						))
+					))->addClass('column-header')
+				);
+			}
 
-		if ($is_numeric) {
-			$column_value->addItem(
-				(new CSparkline())
-					->setColor('#'.$item['sparkline']['color'])
-					->setLineWidth($item['sparkline']['width'])
-					->setFill($item['sparkline']['fill'])
-					->setValue($item['sparkline']['value'])
-					->setTimePeriodFrom($item['sparkline']['from'])
-					->setTimePeriodTo($item['sparkline']['to'])
-			);
+			if ($is_numeric) {
+				$column_value->addItem(
+					(new CSparkline())
+						->setColor('#'.$item['sparkline']['color'])
+						->setLineWidth($item['sparkline']['width'])
+						->setFill($item['sparkline']['fill'])
+						->setValue($item['sparkline']['value'])
+						->setTimePeriodFrom($item['sparkline']['from'])
+						->setTimePeriodTo($item['sparkline']['to'])
+				);
+			}
 		}
 	}
 
