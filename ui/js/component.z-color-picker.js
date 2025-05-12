@@ -308,21 +308,9 @@ class ZColorPicker extends HTMLElement {
 			icon_parts[2].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][17]}`);
 		}
 
-		if (this.#disabled) {
-			this.#hidden_input.setAttribute('disabled', '');
-			this.#box.setAttribute('disabled', '');
-		}
-		else {
-			this.#hidden_input.removeAttribute('disabled');
-			this.#box.removeAttribute('disabled');
-		}
-
-		if (this.#readonly) {
-			this.#hidden_input.setAttribute('readonly', '');
-		}
-		else {
-			this.#hidden_input.removeAttribute('readonly');
-		}
+		this.#hidden_input.toggleAttribute('readonly', this.#readonly);
+		this.#hidden_input.toggleAttribute('disabled', this.#disabled);
+		this.#box.toggleAttribute('disabled', this.#disabled);
 	}
 
 	#registerEvents() {
@@ -887,12 +875,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set hasDefault(has_default) {
-		if (has_default) {
-			this.setAttribute('has-default', '');
-		}
-		else {
-			this.removeAttribute('has-default');
-		}
+		this.toggleAttribute('has-default', has_default);
 	}
 
 	get disabled() {
@@ -900,12 +883,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set disabled(disabled) {
-		if (disabled) {
-			this.setAttribute('disabled', '');
-		}
-		else {
-			this.removeAttribute('disabled');
-		}
+		this.toggleAttribute('disabled', disabled);
 	}
 
 	get readonly() {
@@ -913,12 +891,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set readonly(readonly) {
-		if (readonly) {
-			this.setAttribute('readonly', '');
-		}
-		else {
-			this.removeAttribute('readonly');
-		}
+		this.toggleAttribute('readonly', readonly);
 	}
 
 	get allowEmpty() {
@@ -926,12 +899,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set allowEmpty(allow_empty) {
-		if (allow_empty) {
-			this.setAttribute('allow-empty', '');
-		}
-		else {
-			this.removeAttribute('allow-empty');
-		}
+		this.toggleAttribute('allow-empty', allow_empty);
 	}
 }
 
