@@ -17,9 +17,7 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
-#include "zbxregexp.h"
 #include "zbxdbhigh.h"
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;

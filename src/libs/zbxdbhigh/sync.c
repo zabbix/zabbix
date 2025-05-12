@@ -14,6 +14,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxdb.h"
 
 ZBX_PTR_VECTOR_IMPL(sync_row_ptr, zbx_sync_row_t *)
 

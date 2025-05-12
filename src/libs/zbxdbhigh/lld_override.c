@@ -20,6 +20,7 @@
 #include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxregexp.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t *)
 ZBX_PTR_VECTOR_IMPL(lld_condition_ptr, zbx_lld_condition_t *)
