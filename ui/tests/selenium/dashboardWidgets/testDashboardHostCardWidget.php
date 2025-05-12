@@ -807,7 +807,6 @@ class testDashboardHostCardWidget extends testWidgets {
 			}
 		}
 	}
-	
 
 	public static function getCreateData() {
 		return [
