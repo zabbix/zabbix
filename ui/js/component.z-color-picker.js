@@ -193,6 +193,10 @@ class ZColorPicker extends HTMLElement {
 			this.#disabled = this.hasAttribute('disabled');
 			this.#allow_empty = this.hasAttribute('allow-empty') || this.#has_default;
 
+			if (this.#color === null && this.#palette === null) {
+				this.#color = '';
+			}
+
 			this.#hidden_input = new Template(ZColorPicker.#hidden_input_template).evaluateToElement();
 			this.#box = new Template(ZColorPicker.#box_template).evaluateToElement();
 
@@ -284,7 +288,7 @@ class ZColorPicker extends HTMLElement {
 		if (isColorHex(`#${this.#color}`)) {
 			this.#box.style.background = `#${this.#color}`;
 		}
-		else if (this.#color === '') {
+		else if (this.#color === '' || this.#color === null) {
 			this.#box.style.background = '';
 		}
 
@@ -547,18 +551,7 @@ class ZColorPicker extends HTMLElement {
 				input.setAttribute('tabindex', '-1');
 			});
 
-		if (isColorHex(`#${this.#color}`) || this.#color === '') {
-			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
-
-			if (tab !== null) {
-				this.#selectTab(tab);
-			}
-
-			this.#input.value = this.#color;
-
-			this.#input.focus();
-		}
-		else if (this.#palette !== null) {
+		if (this.#palette !== null) {
 			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_PALETTE}`);
 
 			if (tab !== null) {
@@ -576,6 +569,17 @@ class ZColorPicker extends HTMLElement {
 				input.setAttribute('tabindex', '0');
 				input.focus();
 			}
+		}
+		else if (isColorHex(`#${this.#color}`) || this.#color === '' || this.#color === null) {
+			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
+
+			if (tab !== null) {
+				this.#selectTab(tab);
+			}
+
+			this.#input.value = this.#color || '';
+
+			this.#input.focus();
 		}
 
 		if (this.#dialog.querySelector(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]:checked`) === null) {
