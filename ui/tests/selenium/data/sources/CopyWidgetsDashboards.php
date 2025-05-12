@@ -1902,7 +1902,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2343,7 +2343,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 3,
 										'name' => 'hostids.0',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									],
 									[
 										'type' => 1,
@@ -2468,7 +2468,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									]
 								]
 							]
@@ -3227,7 +3227,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									]
 								]
 							]

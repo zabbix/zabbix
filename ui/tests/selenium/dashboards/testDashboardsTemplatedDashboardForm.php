@@ -571,7 +571,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									]
 								]
 							]

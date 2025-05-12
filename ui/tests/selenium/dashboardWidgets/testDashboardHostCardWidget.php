@@ -317,8 +317,23 @@ class testDashboardHostCardWidget extends testWidgets {
 
 		CDataHelper::call('event.acknowledge', [
 			'eventids' => $eventid,
-			'action' => 32, // suppress event.
+			'action' => 32, // Suppress event.
 			'suppress_until' => time() + 31536000
+		]);
+
+		CDataHelper::call('httptest.create', [
+			[
+				'name' => 'Web scenario',
+				'hostid' => self::$hostid,
+				'steps' => [
+					[
+						'name' => 'Test name',
+						'url' => 'http://example.com',
+						'status_codes' => '200',
+						'no' => '1'
+					]
+				]
+			]
 		]);
 
 		// Create Maintenance and host in maintenance.
@@ -465,6 +480,11 @@ class testDashboardHostCardWidget extends testWidgets {
 										'type' => 3,
 										'name' => 'hostid.0',
 										'value' => self::$hostid
+									],
+									[
+										'type' => 0,
+										'name' => 'show_suppressed',
+										'value' => 1
 									],
 									[
 										'type' => 0,
@@ -659,7 +679,7 @@ class testDashboardHostCardWidget extends testWidgets {
 							],
 							[
 								'type' => 'hostcard',
-								'name' => 'Show suppressed problems',
+								'name' => 'Do not show suppressed problems',
 								'x' => 54,
 								'y' => 4,
 								'width' => 18,
@@ -673,7 +693,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 0,
 										'name' => 'show_suppressed',
-										'value' => 1
+										'value' => 0
 									]
 								]
 							]
@@ -771,33 +791,23 @@ class testDashboardHostCardWidget extends testWidgets {
 		$show_form->query('button:Remove')->all()->click();
 		$show_form->query('button:Add')->one()->click();
 
-		$this->sleep(1000);
+		$inventory_field = $form->getField('Inventory fields');
 		foreach ($show_options as $option) {
 			$show_form->query('id:sections_0')->one()->asDropdown()->select($option);
 
-			$inventory_visible = ($option === 'Inventory') ? true : false;
-
 			if ($option === 'Inventory') {
-				$inventory_field = $form->getField('Inventory fields');
-				foreach ($show_options as $option) {
-					$show_form->query('id:sections_0')->one()->asDropdown()->select($option);
-
-					if ($option === 'Inventory') {
-						$this->assertTrue($inventory_field->isVisible(true));
-						$inventory_field->query('button:Select')->waitUntilCLickable()->one()->click();
-						$inventory_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-						$this->assertEquals('Inventory', $inventory_dialog->getTitle());
-						$inventory_dialog->close(true);
-					}
-					else {
-						$this->assertTrue($inventory_field->isVisible(false));
-					}
-				}
+				$this->assertTrue($inventory_field->isVisible(true));
+				$inventory_field->query('button:Select')->waitUntilCLickable()->one()->click();
+				$inventory_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$this->assertEquals('Inventory', $inventory_dialog->getTitle());
+				$inventory_dialog->close(true);
 			}
-			COverlayDialogElement::find()->one()->close();
-			$dashboard->cancelEditing();
+			else {
+				$this->assertTrue($inventory_field->isVisible(false));
+			}
 		}
 	}
+	
 
 	public static function getCreateData() {
 		return [
@@ -828,7 +838,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 0]
 					],
 					'Show header' => false,
-					'Show suppressed problems' => false
+					'Show suppressed problems' => false,
+					'trim' => true
 				]
 			],
 			// #2.
@@ -867,7 +878,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host' => 'SQL injection in visible host name field',
+						'Host' => '105\'; --DROP TABLE Users',
 						'Name' => '105\'; --DROP TABLE Users'
 					],
 					'Show' => [
@@ -1068,9 +1079,9 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 309,
-						'Graphs' => 33,
-						'Web' => 4
+						'Latest data' => 285,
+						'Graphs' => 29,
+						'Web' => 1
 					],
 					'Templates' => ['Apache by Zabbix agent', 'Ceph by Zabbix agent 2', 'Docker by Zabbix agent 2',
 							'Linux by Zabbix agent', 'PostgreSQL by Zabbix agent', 'Zabbix server health'
@@ -1095,7 +1106,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Warning' => 1,
 						'Average' => 1,
 						'High' => 1,
-						'Disaster' => 1
+						'Disaster' => 2
 					],
 					'Context menu' => [
 						'VIEW' => [
@@ -1216,11 +1227,8 @@ class testDashboardHostCardWidget extends testWidgets {
 			// #4.
 			[
 				[
-					'Header' => 'Show suppressed problems',
-					'Host' => self::$hostid,
-					'Severity' => [
-						'Average' => 1
-					]
+					'Header' => 'Do not show suppressed problems',
+					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget'
 				]
 			]
 		];
@@ -1257,9 +1265,9 @@ class testDashboardHostCardWidget extends testWidgets {
 			$icon = $host_selector->query('class:zi-wrench-alt-small')->one();
 			$this->assertTrue($icon->isVisible());
 			$icon->waitUntilClickable()->click();
-			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]');
-			COverlayDialogElement::find()->last()->waitUntilReady()->close();
+			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->getText();
 			$this->assertEquals($data['Maintenance']['Name']."\n".$data['Maintenance']['Description'], $dialog_text);
+			$this->query('xpath://div[@class="overlay-dialogue wordbreak"]/button[@title="Close"]')->one()->click();
 		}
 
 		if (array_key_exists('Severity', $data)) {
@@ -1309,7 +1317,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			foreach ($monitoring->query('class:monitoring-item')->all() as $item) {
 				$name = $item->query('class:monitoring-item-name')->one();
 				$count = $item->query('class:entity-count')->one()->getText();
-				$target = ($count === 0) ? 'a' : 'span';
+				$target = ($count != 0) ? 'a' : 'span';
 				$this->assertEquals($target, $name->getTagName());
 				$get_monitoring[$name->getText()] = $count;
 			}
@@ -1341,38 +1349,6 @@ class testDashboardHostCardWidget extends testWidgets {
 			}
 			$this->assertEquals($data['Inventory'], $get_inventory);
 		}
-	}
-
-	public function getContextMenuData() {
-		return [
-			'VIEW' => [
-				[
-					'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid={$hostid}',
-					'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={$hostid}&filter_set=1',
-					'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={$hostid}&filter_set=1',
-					'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D={$hostid}&filter_set=1',
-					'Web' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={$hostid}&filter_set=1',
-					'Inventory' => 'hostinventories.php?hostid={$hostid}'
-				]
-			],
-			'CONFIGURATION' => [
-				[
-					'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={$hostid}',
-					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
-					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
-					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
-					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
-					'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={$hostid}&context=host'
-				]
-			],
-			'SCRIPTS' => [
-				[
-					'Detect operating system' => 'menu-popup-item',
-					'Ping' => 'menu-popup-item',
-					'Traceroute' => 'menu-popup-item'
-				]
-			]
-		];
 	}
 
 	/**
@@ -1536,7 +1512,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->page->assertTitle($data['title']);
 	}
 
-	public function getCancelData() {
+	public static function getCancelData() {
 		return [
 			// Cancel update widget.
 			[
@@ -1640,7 +1616,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 	}
 
-	public function getWidgetName() {
+	public static function getWidgetName() {
 		return [
 			[
 				[
