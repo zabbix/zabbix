@@ -821,7 +821,7 @@ function stepReadme(): CTemplateTag {
 							_('Configure host'),
 							(new CSpan('(1/2)'))->addClass('sub-step-counter')
 						]),
-						new CTag('p', true, _('The template you selected (Apache by HTTP) requires additional configuration.'))
+						new CTag('p', true, _s('The template you selected (%1$s) requires additional configuration.', '#{template_name}'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)

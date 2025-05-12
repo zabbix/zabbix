@@ -484,7 +484,9 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderReadme() {
-		const view = this.#view_templates.step_readme.evaluateToElement();
+		const view = this.#view_templates.step_readme.evaluateToElement({
+			template_name: this.#getSelectedTemplate()?.name
+		});
 		const substep_counter = this.#steps_queue.includes(this.STEP_README)
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
 
