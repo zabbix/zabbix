@@ -907,6 +907,7 @@ class CMediatype extends CApiService {
 				if (array_key_exists('access_token', $mediatype)) {
 					$mediatype += ['access_token_updated' => time()];
 				}
+
 				if ($db_mediatype !== null && $db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
