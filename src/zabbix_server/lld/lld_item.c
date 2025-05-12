@@ -667,7 +667,8 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 				item->evaltype_orig = atoi(row[48]);
 			}
 
-			if (0 != (atoi(row[49]) & ZBX_FLAG_DISCOVERY_RULE))
+			item->item_flags = atoi(row[49]);
+			if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 				zbx_vector_uint64_append(&lldruleids, item->itemid);
 			else
 				zbx_vector_uint64_append(&tag_itemids, item->itemid);
@@ -1006,6 +1007,43 @@ static int	is_user_macro(const char *str)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add error message about an item to the error buffer               *
+ *                                                                            *
+ * Parameters: item   - [IN] discovered item                                  *
+ *             error  - [OUT] error message buffer                            *
+ *             format - [IN] format string for error message                  *
+ *             ...    - [IN] variable arguments for format string             *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, const char *format, ...)
+{
+	char		*message, key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	const char	*pkey, *entity, *proto;
+	va_list	args;
+
+	va_start(args, format);
+	message = zbx_dvsprintf(NULL, format, args);
+	va_end(args);
+
+	if (ZBX_ITEM_NAME_LEN < zbx_strlen_utf8(item->name))
+	{
+		zbx_truncate_value(item->key_, ZBX_ITEM_KEY_LEN, key, sizeof(key));
+		pkey = key;
+	}
+	else
+		pkey = item->key_;
+
+	entity = (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_RULE) ? "discovery rule" : "item");
+	proto = (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ? " prototype" : "");
+
+	*error = zbx_strdcatf(*error, "Cannot %s %s%s \"%s\": %s.\n", (0 != item->itemid ? "update" : "create"),
+			entity, proto, pkey, message);
+
+	zbx_free(message);
+}
+
 static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
@@ -1019,8 +1057,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 	if (SUCCEED != zbx_is_utf8(*field))
 	{
 		zbx_replace_invalid_utf8(*field);
-		*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": value \"%s\" has invalid UTF-8 sequence.\n",
-				(0 != item->itemid ? "update" : "create"), item->name, *field);
+		lld_item_add_error(item, error, "value \"%s\" has invalid UTF-8 sequence", *field);
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
@@ -1029,15 +1066,12 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 		if (0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 		{
 			zbx_truncate_itemkey(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
-			*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": key is too long.\n",
-					(0 != item->itemid ? "update" : "create"), value_short);
+			lld_item_add_error(item, error, "value \"%s\" key \"%s\" is too long", value_short);
 		}
 		else
 		{
 			zbx_truncate_value(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
-
-			*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": value \"%s\" is too long.\n",
-					(0 != item->itemid ? "update" : "create"), item->key_, value_short);
+			lld_item_add_error(item, error, "value \"%s\" is too long", value_short);
 		}
 	}
 	else
@@ -1051,8 +1085,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				if ('\0' != **field)
 					return;
 
-				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": name is empty.\n",
-						(0 != item->itemid ? "update" : "create"), item->key_);
+				lld_item_add_error(item, error, "name is empty");
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
 				switch (item->type)
@@ -1073,8 +1106,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
 					return;
 
-				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": %s\n",
-						(0 != item->itemid ? "update" : "create"), item->key_, errmsg);
+				lld_item_add_error(item, error, "%s", errmsg);
 				zbx_free(errmsg);
 
 				/* delay alone cannot be rolled back as it depends on item type, revert all updates */
@@ -1094,8 +1126,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					return;
 				}
 
-				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid history storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key_, *field);
+				lld_item_add_error(item, error, "invalid history storage period  \"%s\"", *field);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
 				if (SUCCEED == is_user_macro(*field))
@@ -1107,8 +1138,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					return;
 				}
 
-				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid trends storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key_, *field);
+				lld_item_add_error(item, error, "invalid trends storage period \"%s\"", *field);
 				break;
 			default:
 				return;
@@ -1127,16 +1157,15 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
  *          process.                                                          *
  *                                                                            *
  * Parameters: pp       - [IN] item preprocessing step                        *
- *             itemid   - [IN] item id for logging                            *
- *             key      - [IN] item key for error message                     *
+ *             item     - [IN] item being validated                           *
  *             error    - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing step is valid                     *
  *               FAIL    - if preprocessing step is not valid                 *
  *                                                                            *
  ******************************************************************************/
-static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zbx_uint64_t itemid,
-		const char *key, char **error)
+static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zbx_lld_item_full_t *item,
+		char **error)
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
@@ -1330,8 +1359,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 out:
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid value for preprocessing step #%d: %s.\n",
-				(0 != itemid ? "update" : "create"), key, pp->step, err);
+		lld_item_add_error(item, error, "invalid value for preprocessing step #%d: %s", pp->step, err);
 	}
 
 	return ret;
@@ -1355,6 +1383,8 @@ static void	lld_item_update_dep_discovery(zbx_lld_item_full_t *item, zbx_uint64_
 		lld_item_update_dep_discovery(item->dependent_items.values[i], ZBX_FLAG_LLD_ITEM_DISCOVERED);
 	}
 }
+
+
 
 /******************************************************************************
  *                                                                            *
@@ -1431,11 +1461,7 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 
 			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-			*error = zbx_strdcatf(*error, "Cannot %s item:"
-					" item with the same key \"%s\" already exists.\n",
-					(0 != item->itemid ? "update" : "create"),
-					zbx_truncate_itemkey(item->key_, VALUE_ERRMSG_MAX,
-					key_short, sizeof(key_short)));
+			lld_item_add_error(item, error, "item with the same key \"%s\" already exists");
 
 			if (0 != item->itemid)
 			{
@@ -1562,8 +1588,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 		{
 			char key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-			*error = zbx_strdcatf(*error, "Cannot %s item: item with the same key \"%s\" already exists.\n",
-						(0 != item->itemid ? "update" : "create"),
+			lld_item_add_error(item, error, "item with the same key \"%s\" already exists",
 						zbx_truncate_itemkey(item->key_, VALUE_ERRMSG_MAX,
 						key_short, sizeof(key_short)));
 
@@ -1587,8 +1612,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 		for (int j = 0; j < item->preproc_ops.values_num; j++)
 		{
-			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item->itemid,
-					item->key_, error))
+			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item, error))
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;
@@ -1679,6 +1703,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
+	item->item_flags = item_prototype->item_flags;
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
