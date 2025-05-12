@@ -420,20 +420,21 @@ function makeSectionMetrics(array $item): CDiv {
 function makeSectionLatestData(array $item, string $context): CDiv {
 	$last_check_value = '';
 	$item_value = $context === 'template' ?  _('No data') : '';
+	$last_value = $item['last_value'];
 
-	if ($item['last_value'] !== null) {
-		$last_check_value = (new CSpan(zbx_date2age($item['last_value']['clock'])))
+	if ($last_value !== null) {
+		$last_check_value = (new CSpan(zbx_date2age($last_value['clock'])))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item['last_value']['clock']), '', true, '', 0);
+			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock']), '', true, '', 0);
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 			$item_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$item_value = (new CSpan(formatHistoryValue($item['last_value']['value'], $item, false)))
+			$item_value = (new CSpan(formatHistoryValue($last_value['value'], $item, false)))
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint(
-					(new CDiv(mb_substr($item['last_value']['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+					(new CDiv(mb_substr($last_value['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
 						->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 						->addClass(ZBX_STYLE_HINTBOX_WRAP),
 					'', true, '', 0
@@ -446,7 +447,7 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 
 	if ($context === 'host') {
 		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-			if ($item['last_value'] !== null) {
+			if ($last_value !== null) {
 				$column_value = (new CButton(null, _('Show')))
 					->addClass('btn-thumbnail')
 					->addClass('js-show-binary');
@@ -454,7 +455,7 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 				$action_column
 					->setAttribute('data-itemid', $item['itemid'])
 					->setAttribute('data-key_', $item['key_'])
-					->setAttribute('data-clock', $item['last_value']['clock'].'.'.$item['last_value']['ns']);
+					->setAttribute('data-clock', $last_value['clock'].'.'.$last_value['ns']);
 			}
 		}
 		else {
