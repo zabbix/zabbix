@@ -1852,16 +1852,21 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 				zbx_free(error);
 				continue;
 			}
-
 		}
 		else if (FAIL == zbx_vault_get_kvs(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
-					error);
+			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+						dc_kvs_path->path, error);
+			}
+			dc_strpool_replace(NULL != dc_kvs_path->last_error ? 1 : 0, &dc_kvs_path->last_error, error);
 			zbx_free(error);
 			continue;
 		}
+		else if (NULL != dc_kvs_path->last_error)
+			dc_strpool_release(dc_kvs_path->last_error);
 
 		zbx_hashset_iter_reset(&dc_kvs_path->kvs, &iter);
 		while (NULL != (dc_kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
@@ -3306,19 +3311,26 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			continue;
 		}
 
+		item_flags = (unsigned char)atoi(row[18]);
+
+		/* item prototype does not have item_rtdata and shouldn't be present in sync */
+		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			template_item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid,
+					sizeof(ZBX_DC_TEMPLATE_ITEM), &found);
+
+			template_item->hostid = hostid;
+			template_item->templateid = templateid;
+
+			THIS_SHOULD_NEVER_HAPPEN_MSG("item_rtdata entry unexpectedly is present for item "
+					"prototype: " ZBX_FS_UI64 " on hostid: " ZBX_FS_UI64, itemid, hostid);
+			continue;
+		}
+
 		if (NULL == host || host->hostid != hostid)
 		{
 			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 				continue;
-		}
-
-		item_flags = (unsigned char)atoi(row[18]);
-
-		/* item prototype does not have item_rtdata and shouldn't be present in sync */
-		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
-				item_flags != ZBX_FLAG_DISCOVERY_RULE)
-		{
-			continue;
 		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);

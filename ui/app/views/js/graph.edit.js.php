@@ -450,7 +450,7 @@ window.graph_edit_popup = new class {
 		const $row = $(template.evaluate(item));
 
 		$('#item-buttons-row').before($row);
-		$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
+		$row.find(`.${ZBX_STYLE_COLOR_PICKER} input`).colorpicker();
 
 		if (this.readonly) {
 			this.#toggleColorPickerStatus();
@@ -533,7 +533,7 @@ window.graph_edit_popup = new class {
 		for (let i = 0; i < list.length; i++) {
 			const used_colors = [];
 
-			for (const color of this.form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+			for (const color of this.form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
 				if (color.value !== '') {
 					used_colors.push(color.value);
 				}
