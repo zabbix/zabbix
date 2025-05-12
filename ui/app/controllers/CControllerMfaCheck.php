@@ -103,9 +103,13 @@ class CControllerMfaCheck extends CController {
 	private function validateTypeDuoFields(): bool {
 		$data = [
 			'api_hostname' => '',
-			'clientid' => '',
-			'client_secret' => ''
+			'clientid' => ''
 		];
+
+		if ($this->getInput("client_secret") !== null) {
+			$data['client_secret'] = $this->getInput('client_secret', '');
+		}
+
 		$this->getInputs($data, array_keys($data));
 
 		foreach ($data as $key => $field) {
