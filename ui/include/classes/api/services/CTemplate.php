@@ -26,7 +26,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @param array $options
 	 *
-	 * @return array
+	 * @return array|int
 	 */
 	public function get($options = []) {
 		$result = [];
