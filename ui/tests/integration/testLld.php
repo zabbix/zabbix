@@ -569,6 +569,7 @@ class testLld extends CIntegrationTest
 				]
 			]
 		]);
+		$this->assertCount(1, $response['result']);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -1698,6 +1699,13 @@ class testLld extends CIntegrationTest
 		}
 	}
 
+	private function sendRuleData($hostname, $rule, $data) {
+		$this->sendSenderValue($hostname, $rule, $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue($hostname, $rule, $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+	}
+
 	/*
 	 * @backup hosts,items,item_rtdata,triggers
 	 */
@@ -1706,10 +1714,7 @@ class testLld extends CIntegrationTest
 		$this->importData("lld_test_server_dbs");
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendRuleData(self::HOSTNAME_NESTED_2, 'main_drule', self::$trapper_data_nested1);
 
 		$this->checkDbServerDiscovery();
 	}
@@ -1781,10 +1786,7 @@ class testLld extends CIntegrationTest
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue(self::AGENT_AUTOREG_NAME, 'main_drule', self::$trapper_data_nested1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue(self::AGENT_AUTOREG_NAME, 'main_drule', self::$trapper_data_nested1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendRuleData(self::AGENT_AUTOREG_NAME, 'main_drule', self::$trapper_data_nested1);
 
 		$this->checkDbServerDiscovery();
 	}
@@ -1799,12 +1801,7 @@ class testLld extends CIntegrationTest
 	private function checkResourceRemoval($hostname, $hostid, $testcases)
 	{
 		foreach ($testcases as $tc) {
-			$this->sendSenderValue($hostname, 'main_drule', $tc['data']);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-			$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-			$this->sendSenderValue($hostname, 'main_drule', $tc['data']);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-			$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+			$this->sendRuleData($hostname, 'main_drule', $tc['data']);
 
 			$response = $this->call('host.get', [
 				'hostids' => [$hostid],
@@ -1832,6 +1829,7 @@ class testLld extends CIntegrationTest
 		}
 	}
 
+	// Test normal and nested element removal (items / triggers / graphs / hosts etc).
 	public function testLld_testResourceRemoval()
 	{
 		$hostname = "lld_test_lost_resources";
@@ -1895,6 +1893,7 @@ class testLld extends CIntegrationTest
 		$this->checkResourceRemoval($hostname, $hostid, $testcases);
 	}
 
+	// Import host / template.
 	private function importData($name)
 	{
 		$data = file_get_contents('integration/data/' . $name . '.yaml');
@@ -1959,7 +1958,7 @@ class testLld extends CIntegrationTest
 		$this->assertEquals(true, $response['result']);
 	}
 
-	// Test removal of nested LLD rules
+	// Test removal of multiple level nested LLD rules.
 	public function testLld_testRemovalOfMultilevelNestedRules()
 	{
 		$hostname = "lld_test_multilevel";
@@ -2024,10 +2023,7 @@ class testLld extends CIntegrationTest
 				]
 			],
 		];
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendRuleData($hostname, 'main_drule', $data);
 
 		$response = $this->call('discoveryrule.get', [
 			'hostids' => [$hostid],
@@ -2123,10 +2119,8 @@ class testLld extends CIntegrationTest
 				]
 			],
 		];
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$this->sendRuleData($hostname, 'main_drule', $data);
 
 		$response = $this->call('discoveryrule.get', [
 			'hostids' => [$hostid],
@@ -2175,12 +2169,11 @@ class testLld extends CIntegrationTest
 				]
 			],
 		];
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$this->sendRuleData($hostname, 'main_drule', $data);
 	}
 
+	// Test discovery rule prototype having item prototype as a master item.
 	public function testLld_discoveryRuleProtoWithMasterItem()
 	{
 		$hostname = "lld_dep_proto";
@@ -2195,10 +2188,8 @@ class testLld extends CIntegrationTest
 				"{#NAME}" => "dep_second",
 			],
 		];
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
+		$this->sendRuleData($hostname, 'main_drule', $data);
 
 		foreach (["dep_first", "dep_second"] as $elem) {
 			$response = $this->call('discoveryrule.get', [
@@ -2219,10 +2210,10 @@ class testLld extends CIntegrationTest
 		}
 	}
 
+	// Test updates of prototypes that are owned by second level lld rule prototype.
 	public function testLld_checkUpdatesOfSecondLevelProtos()
 	{
 		$hostname = "lld_drule_proto_elem_update";
-
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -2245,10 +2236,7 @@ class testLld extends CIntegrationTest
 			]
 		];
 
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendRuleData($hostname, 'main_drule', $data);
 
 		$response = $this->call('discoveryruleprototype.get', [
 			'hostids' => [$hostid],
@@ -2304,10 +2292,7 @@ class testLld extends CIntegrationTest
 			]
 		];
 
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendRuleData($hostname, 'main_drule', $data);
 
 		$response = $this->call('item.get', [
 			'hostid' => $hostid,
@@ -2358,10 +2343,10 @@ class testLld extends CIntegrationTest
 		$this->assertEquals(111, $response['result'][0]['height']);
 	}
 
+	// Test template tag propagation to the problem that was generated by trigger prototype from nested rule.
 	public function testLld_testTmplTagPropagation()
 	{
 		$hostname = 'lld_template_tags_host';
-
 		$this->importData('lld_test_template_tags');
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -2375,10 +2360,7 @@ class testLld extends CIntegrationTest
 			]
 		];
 
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendRuleData($hostname, 'main_drule', $data);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue($hostname, 'item[A,B]', 100);
