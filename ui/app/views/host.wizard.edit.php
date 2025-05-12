@@ -930,7 +930,7 @@ function stepConfigurationFinish(): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Configure host')),
-						new CTag('p', true, _('Click Create to complete the setup.'))
+						new CTag('p', true, _s('Click %1$s to complete the setup.', '#{button_label}'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)

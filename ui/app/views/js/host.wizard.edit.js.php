@@ -531,7 +531,9 @@ window.host_wizard_edit = new class {
 	}
 
 	#renderConfigurationFinish() {
-		const view = this.#view_templates.step_configuration_finish.evaluateToElement();
+		const view = this.#view_templates.step_configuration_finish.evaluateToElement({
+			button_label: this.#data.host.isNew ? <?= json_encode(_('Create')) ?> : <?= json_encode(_('Update')) ?>
+		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
@@ -1043,13 +1045,13 @@ window.host_wizard_edit = new class {
 	#updateNextButton() {
 		switch (this.#steps_queue[this.#current_step]) {
 			case this.STEP_CONFIGURATION_FINISH:
-				this.#next_button.innerText = this.#source_host !== null
-					? <?= json_encode(_('Update')) ?>
-					: <?= json_encode(_('Create')) ?>;
+				this.#next_button.innerText = this.#data.host.isNew
+					? <?= json_encode(_('Create')) ?>
+					: <?= json_encode(_('Update')) ?>;
 				break;
 
 			case this.STEP_COMPLETE:
-				this.#next_button.innerText = <?= json_encode(_('Complete')) ?>;
+				this.#next_button.innerText = <?= json_encode(_('Finish')) ?>;
 				break;
 
 			default:
