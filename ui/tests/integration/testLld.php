@@ -34,8 +34,8 @@ class testLld extends CIntegrationTest
 	const LLDRULE_ITEMTYPES = 'lld.test.itemtypes.rule';
 	const AUTOREG_ACTION_NAME = 'lld.action.autoreg';
 	const AGENT_AUTOREG_NAME = 'agent.autoreg';
+	const HOST_METADATA = 'host_lld_autoreg';
 
-	private static $hostid_main;
 	private static $hostid_item_types;
 	private static $lld_ruleid_main;
 	private static $lld_ruleid_item_types;
@@ -77,8 +77,6 @@ class testLld extends CIntegrationTest
 		]
 	];
 
-	public static $HOST_METADATA = 'host_lld_autoreg';
-
 	/**
 	 * Component configuration provider for agent related tests.
 	 *
@@ -90,7 +88,7 @@ class testLld extends CIntegrationTest
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::AGENT_AUTOREG_NAME,
 				'ServerActive' => '127.0.0.1:' . self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'HostMetadata' => self::$HOST_METADATA
+				'HostMetadata' => self::HOST_METADATA
 			]
 		];
 	}
@@ -341,7 +339,6 @@ class testLld extends CIntegrationTest
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		self::$hostid_main = $response['result']['hostids'][0];
 
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME_ITEMTYPES,
@@ -1749,7 +1746,7 @@ class testLld extends CIntegrationTest
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_METADATA,
 							'operator' => CONDITION_OPERATOR_LIKE,
-							'value' => self::$HOST_METADATA
+							'value' => self::HOST_METADATA
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR
@@ -2359,5 +2356,46 @@ class testLld extends CIntegrationTest
 		$this->assertCount(1, $response['result']);
 		$this->assertEquals(222, $response['result'][0]['width']);
 		$this->assertEquals(111, $response['result'][0]['height']);
+	}
+
+	public function testLld_testTmplTagPropagation()
+	{
+		$hostname = 'lld_template_tags_host';
+
+		$this->importData('lld_test_template_tags');
+		$this->importData($hostname);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$data = [
+			[
+				"{#PARENTNAME}" => "A",
+				"nested" => [
+					["{#NAME}" => "B"]
+				]
+			]
+		];
+
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue($hostname, 'item[A,B]', 100);
+
+		$expected_tag = [
+			"tag" => "xxx",
+			"value" => "yyy"
+		];
+
+		$response = $this->callUntilDataIsPresent('problem.get', [
+			"search" => [
+				"name" => "tagtrig[A,B]"
+			],
+			"selectTags" => "extend"
+		], 30, 2);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey(0, $response['result'][0]['tags']);
+		$this->assertEquals($expected_tag, $response['result'][0]['tags'][0]);
 	}
 }
