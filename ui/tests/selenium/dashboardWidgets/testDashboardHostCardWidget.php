@@ -312,7 +312,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 			'High trigger', 'Disaster trigger', 'Disaster trigger'];
 		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
-		
+
 		$eventid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Disaster trigger'));
 
 		CDataHelper::call('event.acknowledge', [
