@@ -165,6 +165,7 @@ class ZColorPicker extends HTMLElement {
 	#has_default;
 	#has_palette;
 	#disabled;
+	#readonly;
 	#allow_empty;
 
 	#events;
@@ -191,6 +192,7 @@ class ZColorPicker extends HTMLElement {
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('palette-field-name');
 			this.#disabled = this.hasAttribute('disabled');
+			this.#readonly = this.hasAttribute('readonly');
 			this.#allow_empty = this.hasAttribute('allow-empty') || this.#has_default;
 
 			if (this.#color === null && this.#palette === null) {
@@ -217,7 +219,9 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'allow-empty'];
+		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'readonly',
+			'allow-empty'
+		];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -253,6 +257,10 @@ class ZColorPicker extends HTMLElement {
 
 			case 'disabled':
 				this.#disabled = new_value !== null;
+				break;
+
+			case 'readonly':
+				this.#readonly = new_value !== null;
 				break;
 
 			case 'allow-empty':
@@ -307,6 +315,13 @@ class ZColorPicker extends HTMLElement {
 		else {
 			this.#hidden_input.removeAttribute('disabled');
 			this.#box.removeAttribute('disabled');
+		}
+
+		if (this.#readonly) {
+			this.#hidden_input.setAttribute('readonly', '');
+		}
+		else {
+			this.#hidden_input.removeAttribute('readonly');
 		}
 	}
 
@@ -443,7 +458,7 @@ class ZColorPicker extends HTMLElement {
 						if (this.#is_dialog_open) {
 							this.#closeDialog();
 						}
-						else {
+						else if (!this.#readonly) {
 							this.#openDialog();
 						}
 					}
@@ -890,6 +905,19 @@ class ZColorPicker extends HTMLElement {
 		}
 		else {
 			this.removeAttribute('disabled');
+		}
+	}
+
+	get readonly() {
+		return this.hasAttribute('readonly');
+	}
+
+	set readonly(readonly) {
+		if (readonly) {
+			this.setAttribute('readonly', '');
+		}
+		else {
+			this.removeAttribute('readonly');
 		}
 	}
 
