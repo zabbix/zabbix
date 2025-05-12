@@ -38,6 +38,8 @@ const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
 
+const ZBX_STYLE_COLOR_PICKER = 'color-picker';
+
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
 
 const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
@@ -82,6 +84,7 @@ const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
 const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
+const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
 const ITEM_VALUE_TYPE_FLOAT = 0;

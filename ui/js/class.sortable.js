@@ -1146,6 +1146,8 @@ class CSortable {
 		},
 
 		resize: () => {
+			this.#update();
+
 			this.#scrollTo(Math.min(this.#scroll_pos, this.#getScrollMax()));
 		},
 

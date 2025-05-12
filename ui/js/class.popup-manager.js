@@ -56,11 +56,11 @@ class CPopupManager {
 	static #on_submit = null;
 
 	/**
-	 * Update event handler for currently open dialogue overlay.
+	 * Reload event handler for currently open dialogue overlay.
 	 *
 	 * @type {function|null}
 	 */
-	static #on_update = null;
+	static #on_reload = null;
 
 	/**
 	 * Non-standalone origin URL from where the first popup was opened.
@@ -115,6 +115,7 @@ class CPopupManager {
 	 * @param {Object}  popup_options        Popup options ("prevent_navigation", etc.)
 	 * @param {boolean} reuse_existing       Whether to reuse the existing popup for the same action.
 	 * @param {boolean} supports_standalone  Whether the popup dialogue supports opening on standalone page.
+	 *
 	 * @returns {Overlay|null}
 	 */
 	static open(
@@ -126,11 +127,14 @@ class CPopupManager {
 			supports_standalone = false
 		} = {}
 	) {
+		const dialogueid = popup_options.dialogueid ?? action;
+
 		const open_event = new CPopupManagerEvent({
 			data: {action_parameters, popup_options, reuse_existing, supports_standalone},
 			descriptor: {
 				context: CPopupManager.EVENT_CONTEXT,
 				event: CPopupManagerEvent.EVENT_OPEN,
+				dialogueid,
 				action
 			}
 		});
@@ -160,17 +164,24 @@ class CPopupManager {
 		if (CPopupManager.#overlay !== null) {
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.close', CPopupManager.#on_close);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
-			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.update', CPopupManager.#on_update);
+			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.reload', CPopupManager.#on_reload);
 
-			if (action !== CPopupManager.#overlay.dialogueid || !reuse_existing) {
+			if (dialogueid !== CPopupManager.#overlay.dialogueid || !reuse_existing) {
 				overlayDialogueDestroy(CPopupManager.#overlay.dialogueid);
 			}
 
 			const end_scripting_event = new CPopupManagerEvent({
+				data: {
+					overlay: {
+						position: CPopupManager.#overlay.getPosition(),
+						position_fix: CPopupManager.#overlay.getPositionFix()
+					}
+				},
 				descriptor: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
-					action: CPopupManager.#overlay.dialogueid
+					dialogueid,
+					action
 				}
 			});
 
@@ -187,8 +198,6 @@ class CPopupManager {
 			CPopupManager.#overlay = overlay;
 
 			CPopupManager.#on_close = e => {
-				CPopupManager.#overlay = null;
-
 				if (e.detail.close_by !== Overlay.prototype.CLOSE_BY_USER) {
 					return;
 				}
@@ -202,17 +211,27 @@ class CPopupManager {
 					descriptor: {
 						context: CPopupManager.EVENT_CONTEXT,
 						event: CPopupManagerEvent.EVENT_CANCEL,
+						dialogueid,
 						action
 					}
 				});
 
 				const end_scripting_event = new CPopupManagerEvent({
+					data: {
+						overlay: {
+							position: CPopupManager.#overlay.getPosition(),
+							position_fix: CPopupManager.#overlay.getPositionFix()
+						}
+					},
 					descriptor: {
 						context: CPopupManager.EVENT_CONTEXT,
 						event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+						dialogueid,
 						action
 					}
 				});
+
+				CPopupManager.#overlay = null;
 
 				ZABBIX.EventHub.publish(cancel_event);
 				ZABBIX.EventHub.publish(end_scripting_event);
@@ -249,17 +268,27 @@ class CPopupManager {
 					descriptor: {
 						context: CPopupManager.EVENT_CONTEXT,
 						event: CPopupManagerEvent.EVENT_SUBMIT,
+						dialogueid,
 						action
 					}
 				});
 
 				const end_scripting_event = new CPopupManagerEvent({
+					data: {
+						overlay: {
+							position: CPopupManager.#overlay.getPosition(),
+							position_fix: CPopupManager.#overlay.getPositionFix()
+						}
+					},
 					descriptor: {
 						context: CPopupManager.EVENT_CONTEXT,
 						event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+						dialogueid,
 						action
 					}
 				});
+
+				CPopupManager.#overlay = null;
 
 				ZABBIX.EventHub.publish(submit_event);
 				ZABBIX.EventHub.publish(end_scripting_event);
@@ -290,15 +319,18 @@ class CPopupManager {
 				}
 			};
 
-			CPopupManager.#on_update = e => {
-				if (!e.detail.properties.includes('script_inline')) {
-					return;
-				}
-
+			CPopupManager.#on_reload = () => {
 				const end_scripting_event = new CPopupManagerEvent({
+					data: {
+						overlay: {
+							position: CPopupManager.#overlay.getPosition(),
+							position_fix: CPopupManager.#overlay.getPositionFix()
+						}
+					},
 					descriptor: {
 						context: CPopupManager.EVENT_CONTEXT,
 						event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+						dialogueid,
 						action
 					}
 				});
@@ -308,7 +340,7 @@ class CPopupManager {
 
 			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.close', CPopupManager.#on_close);
 			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit);
-			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.update', CPopupManager.#on_update);
+			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.reload', CPopupManager.#on_reload);
 		});
 
 		return overlay;

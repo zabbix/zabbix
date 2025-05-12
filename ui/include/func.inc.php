@@ -1340,21 +1340,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
- * Get decimal point and thousands separator for number formatting according to the current locale.
- *
- * @return array  'decimal_point' and 'thousands_sep' values.
- */
-function getNumericFormatting(): array {
-	static $numeric_formatting = null;
-
-	if ($numeric_formatting === null) {
-		$numeric_formatting = array_intersect_key(localeconv(), array_flip(['decimal_point', 'thousands_sep']));
-	}
-
-	return $numeric_formatting;
-}
-
-/**
  * Format floating-point number in the best possible way for displaying.
  *
  * @param float $number   Valid number in decimal or scientific notation.
@@ -1449,36 +1434,23 @@ function formatFloat(float $number, array $options = []): string {
 		return '0';
 	}
 
-	[
-		'decimal_point' => $decimal_point,
-		'thousands_sep' => $thousands_sep
-	] = getNumericFormatting();
-
 	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
 
 	if ($exponent < 0) {
 		if (!$small_scientific
 				|| $digits - $exponent <= ($decimals_exact ? min($decimals + 1, $precision) : $precision)) {
-			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, $decimal_point,
-				$thousands_sep
-			);
+			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, '.', '');
 		}
 		else {
-			return str_replace('.', $decimal_point,
-				sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
-			);
+			return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 		}
 	}
 	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
 			|| ($exponent >= $precision && $number != $number_original)) {
-		return str_replace('.', $decimal_point,
-			sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
-		);
+		return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
-		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
-			$decimal_point, $thousands_sep
-		);
+		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)), '.', '');
 	}
 }
 

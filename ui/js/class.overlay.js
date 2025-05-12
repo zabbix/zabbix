@@ -14,24 +14,44 @@
 
 
 /**
- * Overlay object DOM node to be mounted before document body closing tag.
+ * Create overlay dialogue.
  *
- * @param {string} type
- * @param {string} (optional) dialogueid
+ * This class is for internal use only.
+ * @see overlayDialogue
  *
- * @prop {jQuery} $dialogue
- * @prop {jQuery} $backdrop
- * @prop {string} type
- * @prop {string} headerid
+ * @param {string}      type             Dialogue type (currently supported: "popup").
+ * @param {string|null} dialogueid       Dialogue ID.
+ * @param {boolean}     is_modal         Whether to prevent interaction with background objects.
+ * @param {boolean}     is_draggable     Whether to allow dragging the form around.
+ * @param {string}      position         Positioning strategy (Overlay.prototype.POSITION_*).
+ * @param {Object|null} position_fix     Specific position, if not null (same as returned by "this.getPositionFix").
+ * @param {*}           trigger_element  Focusable element to focus back when overlay is closed.
  */
-function Overlay(type, dialogueid) {
+function Overlay({
+	type,
+	dialogueid = null,
+	is_modal = true,
+	is_draggable = false,
+	position = this.POSITION_CENTER_TOP,
+	position_fix = null,
+	trigger_element = undefined
+} = {}) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
-	this.headerid =  'overlay-dialogue-header-title-' + this.dialogueid;
-	this.$backdrop = jQuery('<div>', {
-		'class': 'overlay-bg',
-		'data-dialogueid': this.dialogueid
-	});
+	this._is_modal = is_modal;
+	this._is_draggable = is_draggable;
+	this._position = position;
+	this._position_fix = position_fix;
+	this.element = trigger_element;
+
+	this.headerid = `overlay-dialogue-header-title-${this.dialogueid}`;
+
+	if (this._is_modal) {
+		this.$backdrop = jQuery('<div>', {
+			'class': 'overlay-bg',
+			'data-dialogueid': this.dialogueid
+		});
+	}
 
 	this.$dialogue = jQuery('<div>', {
 		'class': 'overlay-dialogue modal',
@@ -41,60 +61,50 @@ function Overlay(type, dialogueid) {
 		'aria-labelledby': this.headerid
 	});
 
-	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
-
-	const $close_btn = jQuery('<button>', {
-		class: 'btn-overlay-close',
-		title: t('S_CLOSE')
-	}).click(function(e) {
-		e.preventDefault();
-		overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
-	}.bind(this));
-
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
+	this.$dialogue.$head.$header = jQuery('<h4>', {id: this.headerid});
+	this.$dialogue.$head.$close_button = jQuery('<button>', {class: 'btn-overlay-close', title: t('S_CLOSE')});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
-	this.$dialogue.$head.append(this.$dialogue.$header, $close_btn);
+	this.$dialogue.$head.append(this.$dialogue.$head.$header, this.$dialogue.$head.$close_button);
 
 	this.$dialogue.append(this.$dialogue.$head);
 	this.$dialogue.append(this.$dialogue.$body);
 	this.$dialogue.append(this.$dialogue.$footer);
 
-	this.$dialogue.$body.on('submit', 'form', function(e) {
-		e.preventDefault();
-
-		if (this.$btn_submit && this.$btn_submit.prop('disabled') === false) {
-			this.$btn_submit.trigger('click');
-		}
-	}.bind(this));
-
-	this.center_dialog_animation_frame = null;
-	this.center_dialog_function = () => {
-		if (this.center_dialog_animation_frame !== null) {
-			cancelAnimationFrame(this.center_dialog_animation_frame);
-		}
-
-		this.center_dialog_animation_frame = requestAnimationFrame(() => {
-			this.center_dialog_animation_frame = null;
-			this.centerDialog();
-		});
-	};
-
-	var body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver;
-	this.body_mutation_observer = new body_mutation_observer(this.center_dialog_function);
-
-	jQuery(window).resize(function() {
-		this.$dialogue.is(':visible') && this.centerDialog();
-	}.bind(this));
-
 	this.setProperties({
 		content: jQuery('<div>', {'height': '68px', class: 'is-loading'})
 	});
+
+	this._initListeners();
 }
+
+/**
+ * Centered positioning of overlay.
+ *
+ * @type {string}
+ */
+Overlay.prototype.POSITION_CENTER = 'center';
+
+/**
+ * Top-centered positioning of overlay.
+ *
+ * @type {string}
+ */
+Overlay.prototype.POSITION_CENTER_TOP = 'center-top';
+
+/**
+ * Required visibility of the overlay, in pixels.
+ *
+ * Visibility will be restored if overlay is visible less than this number of pixels from any side, except top.
+ *
+ * @type {number}
+ */
+Overlay.prototype.MIN_VISIBLE_PX = 100;
 
 /**
  * Indication of overlay dialog being closed by user intent.
@@ -111,44 +121,191 @@ Overlay.prototype.CLOSE_BY_USER = 'close-by-user';
 Overlay.prototype.CLOSE_BY_SCRIPT = 'close-by-script';
 
 /**
- * Centers the $dialog.
+ * Create listeners (will be connected on mount, disconnected on unmount).
+ *
+ * @private
  */
-Overlay.prototype.centerDialog = function() {
-	var body_scroll_height = this.$dialogue.$body[0].scrollHeight,
-		body_height = this.$dialogue.$body.innerHeight();
-
-	if (body_height != Math.floor(body_height)) {
-		// The body height is often about a half pixel less than the height.
-		body_height = Math.floor(body_height) + 1;
-	}
-
-	// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
-	this.$dialogue.$body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
-
-	// Allow full width to determine actual width taken by the contents.
-	this.$dialogue.css({
-		'left': 0,
-		'top': 0
-	});
-
-	this.$dialogue.css({
-		'left': Math.max(0, Math.floor((jQuery(window).width() - this.$dialogue.outerWidth(true)) / 2)) + 'px',
-		'top': this.$dialogue.hasClass('position-middle')
-			? Math.max(0, Math.floor((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
-			: ''
-	});
-
-	var size = {
-			width: this.$dialogue.$body[0].scrollWidth,
-			height: this.$dialogue.$body[0].scrollHeight
+Overlay.prototype._initListeners = function() {
+	this._listeners = {
+		close_button_click: e => {
+			e.preventDefault();
+			overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 		},
-		size_saved = this.$dialogue.data('size') || size;
+		form_submit: e => {
+			e.preventDefault();
 
-	if (JSON.stringify(size) !== JSON.stringify(size_saved)) {
-		this.$dialogue.trigger('overlay-dialogue-resize', [size, size_saved]);
+			if (this.$btn_submit !== null && !this.$btn_submit[0].disabled) {
+				this.$btn_submit[0].click();
+			}
+		},
+		head_double_click: e => {
+			if (e.target.matches('a, button')) {
+				return;
+			}
+
+			// Restore centering on double click.
+			this._position_fix = null;
+
+			this.fixPosition();
+		},
+		window_resize: () => {
+			if (isVisible(this.$dialogue[0])) {
+				this.fixPosition();
+			}
+		},
+		debug_click: () => {
+			this._fixPositionOnAnimationFrame();
+		},
+		drag_start: () => {
+			this._is_dragging = true;
+		},
+		drag_stop: () => {
+			const client_rect = this.$dialogue[0].getBoundingClientRect();
+
+			this._position_fix = {
+				x: client_rect.x + client_rect.width / 2,
+				y: this._position === this.POSITION_CENTER_TOP ? client_rect.y : client_rect.y + client_rect.height / 2
+			}
+
+			this._force_visible_x = false;
+			this._force_visible_y = false;
+			this._is_dragging = false;
+
+			this.fixPosition();
+		}
+	};
+};
+
+/**
+ * Fix overlay position according to overlay's settings.
+ */
+Overlay.prototype.fixPosition = function() {
+	if (this._is_dragging) {
+		return;
 	}
 
-	this.$dialogue.data('size', size);
+	const dialogue = this.$dialogue[0];
+
+	const width_original = dialogue.style.width;
+
+	dialogue.style.width = '';
+	dialogue.style.height = '';
+	dialogue.style.left = '0';
+	dialogue.style.top = '0';
+
+	const client_rect = dialogue.getBoundingClientRect();
+	const style = getComputedStyle(dialogue);
+
+	const width_delta = width_original !== '' ? parseFloat(style.width) - parseFloat(width_original) : 0;
+
+	// Fix overlay size to prevent shrinking when dragged beyond screen border.
+	dialogue.style.width = style.width;
+	dialogue.style.height = style.height;
+
+	if (this._position_fix !== null) {
+		const visible_x_min = client_rect.width / 2 + this._dialogue_margin_left;
+		const visible_x_max = window.innerWidth - client_rect.width / 2 - this._dialogue_margin_right;
+
+		if (this._position_fix.x >= visible_x_min && this._position_fix.x <= visible_x_max) {
+			// Overlay is fully visible on X axis - ensure it's fully visible on next updates.
+			this._force_visible_x = true;
+		}
+		else if (this._force_visible_x) {
+			// Overlay is not fully visible on X axis, although required, - bring it into full visibility.
+			this._position_fix.x = Math.max(Math.min(this._position_fix.x, visible_x_max), visible_x_min);
+		}
+		else {
+			// Overlay is not fully visible on X axis, and not required - ensure minimum visibility.
+			const min_visible_x_min = visible_x_min - client_rect.width + this.MIN_VISIBLE_PX;
+			const min_visible_x_max = visible_x_max + client_rect.width - this.MIN_VISIBLE_PX;
+
+			this._position_fix.x = Math.max(Math.min(this._position_fix.x, min_visible_x_max), min_visible_x_min);
+
+			// Overlay has resized on X axis - compensate position to persist the visual part of the overlay.
+			if (this._position_fix.x > (visible_x_min + visible_x_max) / 2) {
+				this._position_fix.x += width_delta / 2;
+			}
+			else {
+				this._position_fix.x -= width_delta / 2;
+			}
+
+			// Overlay became fully visible on X axis - ensure it's fully visible on next updates.
+			this._force_visible_x = this._position_fix.x >= visible_x_min && this._position_fix.x <= visible_x_max;
+		}
+
+		const visible_y_min = this._position === this.POSITION_CENTER_TOP
+			? this._dialogue_offset_top
+			: client_rect.height / 2 + this._dialogue_offset_top;
+
+		const visible_y_max = this._position === this.POSITION_CENTER_TOP
+			? window.innerHeight - client_rect.height
+			: window.innerHeight - client_rect.height / 2;
+
+		if (this._position_fix.y >= visible_y_min && this._position_fix.y <= visible_y_max) {
+			// Overlay is fully visible on Y axis - ensure it's fully visible on next updates.
+			this._force_visible_y = true;
+		}
+		else if (this._force_visible_y) {
+			// Overlay is not fully visible on Y axis, although required, - bring it into full visibility.
+			this._position_fix.y = Math.max(Math.min(this._position_fix.y, visible_y_max), visible_y_min);
+		}
+		else {
+			// Overlay is not fully visible on Y axis, and not required - ensure minimum visibility.
+			const min_visible_y_min = visible_y_min;
+			const min_visible_y_max = visible_y_max + client_rect.height - this.MIN_VISIBLE_PX;
+
+			this._position_fix.y = Math.max(Math.min(this._position_fix.y, min_visible_y_max), min_visible_y_min);
+		}
+
+		dialogue.style.left = `${
+			Math.floor(this._position_fix.x - client_rect.width / 2 - this._dialogue_margin_left)
+		}px`;
+		dialogue.style.top = this._position === this.POSITION_CENTER_TOP
+			? `${Math.floor(this._position_fix.y)}px`
+			: `${Math.floor(this._position_fix.y - client_rect.height / 2)}px`;
+	}
+	else {
+		dialogue.style.left = `${
+			Math.max(0, Math.floor((window.innerWidth - client_rect.width) / 2 - this._dialogue_margin_left))
+		}px`;
+		dialogue.style.top = this._position === this.POSITION_CENTER_TOP
+			? ''
+			: `${Math.max(0, Math.floor((window.innerHeight - client_rect.height) / 2))}px`;
+	}
+};
+
+/**
+ * Get positioning strategy of the overlay.
+ *
+ * @returns {string}
+ */
+Overlay.prototype.getPosition = function() {
+	return this._position;
+};
+
+/**
+ * Get current specific position of the overlay. Position fix object can be reused when creating new overlays.
+ *
+ * @returns {Object|null}
+ */
+Overlay.prototype.getPositionFix = function() {
+	return this._position_fix !== null ? {...this._position_fix} : null;
+};
+
+Overlay.prototype._fixPositionOnAnimationFrame = function() {
+	if (this._fix_position_animation_frame === undefined) {
+		this._fix_position_animation_frame = requestAnimationFrame(() => {
+			delete this._fix_position_animation_frame;
+			this.fixPosition();
+		});
+	}
+};
+
+Overlay.prototype._cancelFixPositionOnAnimationFrame = function() {
+	if (this._fix_position_animation_frame !== undefined) {
+		cancelAnimationFrame(this._fix_position_animation_frame);
+		this._fix_position_animation_frame = undefined;
+	}
 };
 
 /**
@@ -269,65 +426,106 @@ Overlay.prototype.load = function(action, options) {
 };
 
 /**
- * Removes associated nodes from DOM.
+ * Unmount the overlay. Will remove DOM container and disconnect all event listeners.
  */
 Overlay.prototype.unmount = function() {
-	this.cancel_action && this.cancel_action();
-
-	jQuery.unsubscribe('debug.click', this.center_dialog_function);
-
 	this.unsetProperty('prevent_navigation');
 
-	this.$backdrop.remove();
-	this.$dialogue.remove();
-
-	this.body_mutation_observer.disconnect();
-
-	if (this.center_dialog_animation_frame !== null) {
-		cancelAnimationFrame(this.center_dialog_animation_frame);
+	if (this.cancel_action !== null && !this._block_cancel_action) {
+		this.cancel_action();
 	}
 
-	const $wrapper = jQuery('.wrapper');
+	this.$dialogue.$head.$close_button[0].removeEventListener('click', this._listeners.close_button_click);
+	this.$dialogue.$body[0].removeEventListener('submit', this._listeners.form_submit);
+	this.$dialogue.$head[0].removeEventListener('dblclick', this._listeners.head_double_click);
+	window.removeEventListener('resize', this._listeners.window_resize);
+	document.removeEventListener('debug.click', this._listeners.debug_click);
 
-	if (!jQuery('[data-dialogueid]').length) {
-		$wrapper.css('overflow', $wrapper.data('overflow'));
-		$wrapper.removeData('overflow');
+	this._body_mutation_observer.disconnect();
+	this._cancelFixPositionOnAnimationFrame();
 
-		$wrapper[0].scrollTo($wrapper[0].dataset.scroll_x, $wrapper[0].dataset.scroll_y);
+	if (this._is_draggable) {
+		this.$dialogue.draggable('destroy');
+	}
 
-		delete $wrapper[0].dataset.scroll_x;
-		delete $wrapper[0].dataset.scroll_y;
+	const wrapper = document.querySelector('.wrapper');
+
+	this.$dialogue[0].remove();
+
+	if (this._is_modal) {
+		this.$backdrop[0].remove();
+
+		wrapper.style.overflow = this._wrapper_overflow;
+
+		wrapper.scrollTo(this._wrapper_scroll_x, this._wrapper_scroll_y);
 	}
 };
 
 /**
- * Appends associated nodes to document body.
+ * Mount and position the overlay according to settings.
  */
 Overlay.prototype.mount = function() {
-	const $wrapper = jQuery('.wrapper');
+	const wrapper = document.querySelector('.wrapper');
 
-	$wrapper[0].dataset.scroll_x = $wrapper[0].scrollLeft;
-	$wrapper[0].dataset.scroll_y = $wrapper[0].scrollTop;
+	if (this._is_modal) {
+		this._wrapper_scroll_x = wrapper.scrollLeft;
+		this._wrapper_scroll_y = wrapper.scrollTop;
 
-	if (!jQuery('[data-dialogueid]').length) {
-		$wrapper.data('overflow', $wrapper.css('overflow'));
-		$wrapper.css('overflow', 'hidden');
+		this._wrapper_overflow = wrapper.style.overflow;
+		wrapper.style.overflow = 'hidden';
+
+		wrapper.appendChild(this.$backdrop[0]);
 	}
 
-	this.$backdrop.appendTo($wrapper);
-	this.$dialogue.appendTo($wrapper);
+	wrapper.appendChild(this.$dialogue[0]);
 
-	for (const dialog_part of ['$header', '$controls', '$body', '$footer']) {
-		this.body_mutation_observer.observe(this.$dialogue[dialog_part][0], {
+	if (this._is_draggable) {
+		this.$dialogue.draggable({
+			handle: '.overlay-dialogue-header',
+			cancel: 'a, button',
+			start: this._listeners.drag_start,
+			stop: this._listeners.drag_stop
+		});
+	}
+
+	this._body_mutation_observer = new MutationObserver(() => this._fixPositionOnAnimationFrame());
+
+	const observable_elements = [this.$dialogue.$controls[0], this.$dialogue.$head[0], this.$dialogue.$body[0],
+		this.$dialogue.$footer[0]
+	];
+
+	for (const observable_element of observable_elements) {
+		this._body_mutation_observer.observe(observable_element, {
 			childList: true,
 			subtree: true,
 			attributeFilter: ['style', 'class']
 		});
 	}
 
-	this.centerDialog();
+	this.$dialogue.$head.$close_button[0].addEventListener('click', this._listeners.close_button_click);
+	this.$dialogue.$body[0].addEventListener('submit', this._listeners.form_submit);
+	this.$dialogue.$head[0].addEventListener('dblclick', this._listeners.head_double_click);
+	window.addEventListener('resize', this._listeners.window_resize);
+	document.addEventListener('debug.click', this._listeners.debug_click);
 
-	jQuery.subscribe('debug.click', this.center_dialog_function);
+	this.$dialogue[0].style.width = '';
+	this.$dialogue[0].style.height = '';
+	this.$dialogue[0].style.left = '';
+	this.$dialogue[0].style.top = '';
+
+	const default_style = getComputedStyle(this.$dialogue[0]);
+
+	this._dialogue_offset_top = parseFloat(default_style.top);
+	this._dialogue_margin_left = parseFloat(default_style.marginLeft);
+	this._dialogue_margin_right = parseFloat(default_style.marginRight);
+
+	this._force_visible_x = true;
+	this._force_visible_y = true;
+	this._is_dragging = false;
+
+	this.fixPosition();
+
+	this._block_cancel_action = false;
 };
 
 /**
@@ -357,7 +555,7 @@ Overlay.prototype.makeButton = function(obj) {
 		}
 
 		if (obj.action && obj.action(this) !== false) {
-			this.cancel_action = null;
+			this._block_cancel_action = true;
 
 			if (!obj.keepOpen) {
 				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
@@ -388,6 +586,7 @@ Overlay.prototype.makeButton = function(obj) {
 Overlay.prototype.makeButtons = function(arr) {
 	var buttons = [];
 
+	this.cancel_action = null;
 	this.$btn_submit = null;
 	this.$btn_focus = null;
 
@@ -427,7 +626,7 @@ Overlay.prototype.preventNavigation = function(event) {
 Overlay.prototype.unsetProperty = function(key) {
 	switch (key) {
 		case 'title':
-			this.$dialogue.$header.text('');
+			this.$dialogue.$head.$header.text('');
 			break;
 
 		case 'doc_url':
@@ -500,83 +699,98 @@ Overlay.prototype.unsetProperty = function(key) {
 };
 
 /**
- * Evaluates and applies properties.
+ * Set overlay properties.
  *
- * @param {object} obj
+ * Whenever setting multiple properties at once, the "script_inline" will execute in the end.
+ *
+ * @param {Object} properties
  */
-Overlay.prototype.setProperties = function(obj) {
-	for (var key in obj) {
-		if (!obj[key]) {
-			this.unsetProperty(key);
+Overlay.prototype.setProperties = function(properties) {
+	const names_ordered = ['class', 'title', 'doc_url', 'buttons', 'footer', 'content', 'controls', 'debug',
+		'prevent_navigation', 'data', 'script_inline'
+	];
+
+	for (const name of names_ordered) {
+		if (!(name in properties)) {
 			continue;
 		}
 
-		switch (key) {
+		const value = properties[name];
+
+		if (!value) {
+			this.unsetProperty(name);
+			continue;
+		}
+
+		switch (name) {
 			case 'class':
-				this.$dialogue.addClass(obj[key]);
+				this.$dialogue.addClass(value);
 				break;
 
 			case 'title':
-				this.$dialogue.$header.text(obj[key]);
+				this.$dialogue.$head.$header.text(value);
 				break;
 
 			case 'doc_url':
-				this.unsetProperty(key);
-				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+				this.unsetProperty(name);
+				this.$dialogue.$head.$header[0].insertAdjacentHTML('afterend', `
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${value}"></a>
 				`);
 				break;
 
 			case 'buttons':
-				this.unsetProperty(key);
-				this.$dialogue.$footer.append(this.makeButtons(obj[key]));
+				this.unsetProperty(name);
+				this.$dialogue.$footer.append(this.makeButtons(value));
 				break;
 
 			case 'footer':
-				this.unsetProperty(key);
-				this.$dialogue.$footer.append(obj[key]);
+				this.unsetProperty(name);
+				this.$dialogue.$footer.append(value);
 				break;
 
 			case 'content':
-				this.$dialogue.$body.html(obj[key]);
+				if (typeof value === 'string') {
+					// Preserve inline script execution.
+					this.$dialogue.$body[0].innerHTML = '';
+					this.$dialogue.$body[0].appendChild(
+						document.createRange().createContextualFragment(value)
+					);
+				}
+				else {
+					this.$dialogue.$body.html(value);
+				}
 				if (this.$dialogue.$debug.html().length) {
 					this.$dialogue.$body.append(this.$dialogue.$debug);
 				}
 				break;
 
 			case 'controls':
-				this.$dialogue.$controls.html(obj[key]);
+				this.$dialogue.$controls.html(value);
 				this.$dialogue.$body.before(this.$dialogue.$controls);
 				break;
 
 			case 'debug':
-				this.$dialogue.$debug.html(jQuery(obj[key]).html());
+				this.$dialogue.$debug.html(jQuery(value).html());
 				this.$dialogue.$body.append(this.$dialogue.$debug);
 				break;
 
 			case 'script_inline':
-				this.unsetProperty(key);
+				this.unsetProperty(name);
 				// See: jQuery.html() rnoInnerhtml = /<script|<style|<link/i
 				// If content matches this regex it will be parsed in jQuery.buildFragment as HTML, but here we have JS.
-				this.$dialogue.$script.get(0).innerHTML = obj[key];
+				this.$dialogue.$script.get(0).innerHTML = value;
 				this.$dialogue.$footer.prepend(this.$dialogue.$script);
 				break;
 
 			case 'prevent_navigation':
-				this.$dialogue[0].dataset.preventNavigation = obj[key];
-				this.unsetProperty(key);
+				this.$dialogue[0].dataset.preventNavigation = value;
+				this.unsetProperty(name);
 				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
 				break;
 
-			case 'element':
-				this.element = obj[key];
-				break;
-
 			case 'data':
-				this.data = obj[key];
+				this.data = value;
 				break;
 		}
 	}
-
-	this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.update', {detail: {properties: Object.keys(obj)}}));
 };

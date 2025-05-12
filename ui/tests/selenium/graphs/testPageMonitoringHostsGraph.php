@@ -855,7 +855,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Filter using tags.
 		if (array_key_exists('subfilter', $data)) {
+			$table = $this->getTable();
 			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
+			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 
 			// Click on subfilter.
