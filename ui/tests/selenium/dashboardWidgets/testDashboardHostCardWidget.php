@@ -679,11 +679,11 @@ class testDashboardHostCardWidget extends testWidgets {
 							],
 							[
 								'type' => 'hostcard',
-								'name' => 'Do not show suppressed problems',
+								'name' => 'Do not show suppressed problems and incomplete inventory list',
 								'x' => 54,
 								'y' => 4,
 								'width' => 18,
-								'height' => 2,
+								'height' => 4,
 								'fields' => [
 									[
 										'type' => 3,
@@ -694,6 +694,31 @@ class testDashboardHostCardWidget extends testWidgets {
 										'type' => 0,
 										'name' => 'show_suppressed',
 										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 6
+									],
+									[
+										'type' => 0,
+										'name' => 'inventory.0',
+										'value' => 10
+									],
+									[
+										'type' => 0,
+										'name' => 'inventory.1',
+										'value' => 25
+									],
+									[
+										'type' => 0,
+										'name' => 'inventory.2',
+										'value' => 26
+									],
+									[
+										'type' => 0,
+										'name' => 'inventory.3',
+										'value' => 1
 									]
 								]
 							]
@@ -1078,7 +1103,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 285,
+						'Latest data' => 286,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1120,7 +1145,7 @@ class testDashboardHostCardWidget extends testWidgets {
 							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
 							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
 							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
-							'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
 							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
 							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
 						],
@@ -1190,7 +1215,7 @@ class testDashboardHostCardWidget extends testWidgets {
 							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
 							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
 							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
-							'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
 							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
 							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
 						],
@@ -1213,7 +1238,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 115,
+						'Latest data' => 116,
 						'Graphs' => 8,
 						'Web' => 0
 					],
@@ -1226,8 +1251,14 @@ class testDashboardHostCardWidget extends testWidgets {
 			// #4.
 			[
 				[
-					'Header' => 'Do not show suppressed problems',
-					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget'
+					'Header' => 'Do not show suppressed problems and incomplete inventory list',
+					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget',
+					'Inventory' => [
+						'Type' => '',
+						'Tag' => 'Critical',
+						'Location latitude' => '37.7749',
+						'Location longitude' => '-122.4194'
+					]
 				]
 			]
 		];
@@ -1244,14 +1275,13 @@ class testDashboardHostCardWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard::find()->one()->getWidget($data['Header']);
 
-		$host = CTestArrayHelper::get($data, 'Disabled') ? $data['Host']."\n".'(Disabled)' : $data['Host'];
+		$host = CTestArrayHelper::get($data, 'Disabled') ? $data['Host']."\n".'Disabled' : $data['Host'];
 		$host_selector = $widget->query('class:host-name')->one();
 		$this->assertEquals($host, $host_selector->getText());
 		if (array_key_exists('Disabled', $data)) {
-			$status = $widget->query('class:red')->one();
+			$status = $widget->query('class:color-negative')->one();
 			$this->assertTrue($status->isVisible());
-			$this->assertEquals('rgba(227, 55, 52, 1)', $status->getCSSValue('color'));
-			$this->assertEquals(trim($status->getText()), '(Disabled)');
+			$this->assertEquals(trim($status->getText()), 'Disabled');
 		}
 
 		if (array_key_exists('Context menu', $data)) {
@@ -1271,7 +1301,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 		if (array_key_exists('Severity', $data)) {
 			$section = $widget->query('class:problem-icon-link')->waitUntilvisible();
-			foreach($data['Severity'] as $severity => $value){
+			foreach($data['Severity'] as $severity => $value) {
 				$this->assertEquals($value, $widget
 						->query('xpath:.//span[@title='.CXPathHelper::escapeQuotes($severity).']')->one()->getText()
 				);
@@ -1339,7 +1369,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			$this->assertEquals($data['Host groups'], $host_groups_elements->asText());
 		}
 
-		if (array_key_exists('Inventory', $data)){
+		if (array_key_exists('Inventory', $data)) {
 			$inventory = $widget->query('class:section-inventory')->query('class:section-body')->one();
 			$get_inventory = [];
 			foreach ($inventory->query('class:inventory-field-name')->all() as $inventory_field) {
