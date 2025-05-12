@@ -277,13 +277,15 @@ window.host_wizard_edit = new class {
 				event: CPopupManagerEvent.EVENT_SUBMIT
 			},
 			callback: ({data, event}) => {
-				const url = new URL('zabbix.php', location.href);
+				if (this.#data.host.isNew) {
+					const url = new URL('zabbix.php', location.href);
 
-				url.searchParams.set('action', 'latest.view');
-				url.searchParams.set('hostids[]', this.#data.host.id);
-				url.searchParams.set('filter_set', '1');
+					url.searchParams.set('action', 'latest.view');
+					url.searchParams.set('hostids[]', this.#data.host.id);
+					url.searchParams.set('filter_set', '1');
 
-				event.setRedirectUrl(url.href);
+					event.setRedirectUrl(url.href);
+				}
 			}
 		});
 	}
@@ -979,7 +981,7 @@ window.host_wizard_edit = new class {
 
 					const option_prefix = this.#data.monitoring_os === 'linux' ? '--' : '-';
 					let psk = this.#data.tls_psk_identity !== ''
-						? option_prefix + 'psk-identity ' + this.#data.tls_psk_identity
+						? option_prefix + 'psk-identity \'' + this.#data.tls_psk_identity.replace(/'/g, `\\'`) + '\''
 						: option_prefix + 'psk-identity-stdin';
 
 					psk += ' ';
