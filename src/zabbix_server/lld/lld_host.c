@@ -3883,7 +3883,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto,
 					lldruleid);
-			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
+
+			if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			{
+				zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid,
+						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
+			}
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
