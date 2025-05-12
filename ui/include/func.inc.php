@@ -2645,20 +2645,35 @@ function zbx_mb_check_encoding(string $string, string $encoding): bool {
 	return $decoded_string === $string;
 }
 
-function mergeRegularAndInheritedTags(array $objects, bool $mark_inherited = false): array {
+function mergeRegularAndInheritedTags(array $objects, int $inherited_for = -1): array {
 	foreach ($objects as &$object) {
-		if ($mark_inherited) {
-			foreach ($object['tags'] as &$tag) {
-				$tag['is_inherited'] = false;
-			}
-			unset($tag);
+		if ($inherited_for != -1) {
+			$unique_tags = [];
 
-			foreach ($object['inheritedTags'] as &$tag) {
-				$tag['is_inherited'] = true;
+			foreach ($object['inheritedTags'] as $tag) {
+				$unique_tags[$tag['tag']][$tag['value']] = $tag + [
+					'type' => ZBX_PROPERTY_INHERITED
+				];
 			}
-			unset($tag);
 
-			$object['tags'] = array_merge($object['tags'], $object['inheritedTags']);
+			foreach ($object['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $unique_tags)
+						&& array_key_exists($tag['value'], $unique_tags[$tag['tag']])) {
+					$unique_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+					$unique_tags[$tag['tag']][$tag['value']]['inherited_for'] = $inherited_for;
+				}
+				else {
+					$unique_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+			}
+
+			$tags = [];
+
+			foreach ($unique_tags as $tags_by_value) {
+				foreach ($tags_by_value as $tag) {
+					$tags[] = $tag;
+				}
+			}
 		}
 		else {
 			// Merge regular tags with inherited ones, removing duplicate tags and values.
@@ -2682,11 +2697,11 @@ function mergeRegularAndInheritedTags(array $objects, bool $mark_inherited = fal
 					$tags[] = $inherited_tag;
 				}
 			}
-
-			$object['tags'] = $tags;
 		}
 
 		unset($object['inheritedTags']);
+
+		$object['tags'] = $tags;
 	}
 	unset($object);
 

@@ -187,7 +187,7 @@ class CControllerTemplateList extends CController {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
 
-		$templates = mergeRegularAndInheritedTags($templates, true);
+		$templates = mergeRegularAndInheritedTags($templates, ZBX_TAG_OBJECT_TEMPLATE);
 
 		$data = [
 			'action' => $this->getAction(),

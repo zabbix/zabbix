@@ -393,7 +393,7 @@ class CControllerHostList extends CController {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
 
-		$hosts = mergeRegularAndInheritedTags($hosts, true);
+		$hosts = mergeRegularAndInheritedTags($hosts, ZBX_TAG_OBJECT_HOST);
 
 		$data = [
 			'action' => $this->getAction(),

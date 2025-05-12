@@ -396,6 +396,7 @@ $ipmi_tab = (new CFormGrid())
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'host',
 	'tags' => $data['host']['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
 	'with_automatic' => true,
 	'tabs_id' => 'host-tabs',
 	'tags_tab_id' => 'host-tags-tab'

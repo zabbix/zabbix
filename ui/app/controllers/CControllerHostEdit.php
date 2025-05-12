@@ -49,7 +49,6 @@ class CControllerHostEdit extends CController {
 			'interfaces'			=> 'array',
 			'mainInterfaces'		=> 'array',
 			'groups'				=> 'array',
-			'tags'					=> 'array',
 			'templates'				=> 'array_db hosts.hostid',
 			'add_templates'			=> 'array_db hosts.hostid',
 			'ipmi_authtype'			=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
@@ -61,7 +60,10 @@ class CControllerHostEdit extends CController {
 										]),
 			'ipmi_username'			=> 'db hosts.ipmi_username',
 			'ipmi_password'			=> 'db hosts.ipmi_password',
+			'show_inherited_tags'	=> 'in 0,1',
+			'tags'					=> 'array',
 			'show_inherited_macros' => 'in 0,1',
+			'macros'				=> 'array',
 			'tls_connect'			=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE,
 											HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE
 										]),
@@ -75,7 +77,6 @@ class CControllerHostEdit extends CController {
 											HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
 										]),
 			'host_inventory'		=> 'array',
-			'macros'				=> 'array',
 			'valuemaps'				=> 'array'
 		];
 
@@ -184,6 +185,7 @@ class CControllerHostEdit extends CController {
 			'clone_hostid' => $clone_hostid,
 			'host' => $this->host,
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
+			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 			'warnings' => [],
 			'user' => [

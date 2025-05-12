@@ -19,7 +19,6 @@
  * @var array    $data
  */
 
-$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 $data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
 
@@ -29,7 +28,7 @@ $header_columns = [
 	new CTableColumn('')
 ];
 
-if ($show_inherited_tags) {
+if ($data['show_inherited_tags']) {
 	$header_columns[] = new CTableColumn(_('Parent templates'));
 }
 
@@ -40,22 +39,22 @@ $table = (new CTable())
 
 $options = [
 	'with_automatic' => $with_automatic,
-	'show_inherited_tags' => $show_inherited_tags,
+	'show_inherited_tags' => $data['show_inherited_tags'],
 	'source' => $data['source']
 ];
 
 // fields
-foreach (array_values($data['tags']) as $index  => $tag) {
+foreach (array_values($data['tags']) as $index => $tag) {
 	if ($with_automatic) {
 		$tag += ['automatic' => ZBX_TAG_MANUAL];
 	}
 
-	if ($show_inherited_tags) {
+	if ($data['show_inherited_tags']) {
 		$tag += ['type' => ZBX_PROPERTY_OWN];
 	}
 
 	$options['readonly'] = $data['readonly']
-		|| ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
+		|| ($data['show_inherited_tags'] && $tag['type'] == ZBX_PROPERTY_INHERITED)
 		|| ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC);
 
 	$table->addItem(renderTagTableRow($index, $tag, $options));

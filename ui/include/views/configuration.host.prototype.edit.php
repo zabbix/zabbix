@@ -403,6 +403,7 @@ $tabs->addTab('tags-tab', _('Tags'),
 	new CPartial('configuration.tags.tab', [
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
+		'show_inherited_tags' => $data['show_inherited_tags'],
 		'readonly' => $data['readonly'],
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab'

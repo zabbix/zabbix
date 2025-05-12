@@ -132,7 +132,7 @@ class CControllerTriggerPrototypeList extends CController {
 
 		order_result($data['triggers'], $sort_field, $sort_order);
 
-		$data['triggers'] = mergeRegularAndInheritedTags($data['triggers'], true);
+		$data['triggers'] = mergeRegularAndInheritedTags($data['triggers'], ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE);
 		$data['tags'] = makeTags($data['triggers'], true, 'triggerid');
 
 		$dep_trigger_ids = [];

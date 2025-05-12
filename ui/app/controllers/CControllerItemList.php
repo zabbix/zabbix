@@ -655,7 +655,7 @@ class CControllerItemList extends CControllerItem {
 
 		$items = API::Item()->get($options);
 
-		$items = mergeRegularAndInheritedTags($items, true);
+		$items = mergeRegularAndInheritedTags($items, ZBX_TAG_OBJECT_ITEM);
 
 		return expandItemNamesWithMasterItems($items, 'items');
 	}

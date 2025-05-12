@@ -163,6 +163,7 @@ if ($data['vendor']) {
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
 	'tags_tab_id' => 'template-tags-tab'

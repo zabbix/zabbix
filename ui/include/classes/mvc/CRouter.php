@@ -135,6 +135,7 @@ class CRouter {
 		'host.enable'								=> [CControllerHostEnable::class,									'layout.json',			null],
 		'host.list'									=> [CControllerHostList::class,										'layout.htmlpage',		'configuration.host.list'],
 		'host.massdelete'							=> [CControllerHostMassDelete::class,								'layout.json',			null],
+		'host.tags.list'							=> [CControllerHostTagsList::class,									'layout.json',			'host.tags.list'],
 		'host.update'								=> [CControllerHostUpdate::class,									'layout.json',			null],
 		'host.view'									=> [CControllerHostView::class,										'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'							=> [CControllerHostViewRefresh::class,								'layout.json',			'monitoring.host.view.refresh'],

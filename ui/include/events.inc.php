@@ -718,9 +718,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							->setHint(getTagString($tag), '', false);
 					}
 					else {
-						$tags[$element[$key]][] = (new CSpan($value))
-							->addClass(ZBX_STYLE_TAG)
-							->setHint(getTagString($tag));
+						$tags[$element[$key]][] = makeTagHtml($tag, $value, getTagString($tag));
 					}
 
 					$tags_shown++;
@@ -755,9 +753,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							->setHint(getTagString($tag), '', false);
 					}
 					else {
-						$hint_content[$element[$key]][] = (new CSpan($value))
-							->addClass(ZBX_STYLE_TAG)
-							->setHint($value);
+						$hint_content[$element[$key]][] = makeTagHtml($tag, $value, $value);
 					}
 				}
 
@@ -775,6 +771,40 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 	}
 
 	return $tags;
+}
+
+function makeTagHtml(array $tag, string $value, string $hint_value): CSpan {
+	if (!array_key_exists('type', $tag) || $tag['type'] == ZBX_PROPERTY_OWN) {
+		return (new CSpan($value))
+			->addClass(ZBX_STYLE_TAG)
+			->setHint($hint_value);
+	}
+
+	if ($tag['type'] == ZBX_PROPERTY_INHERITED) {
+		return (new CSpan($value))
+			->addClass(ZBX_STYLE_TAG)
+			->addClass(ZBX_STYLE_TAG_INHERITED)
+			->setHint(new CDiv([
+				(new CDiv(_('Inherited tag')))->addClass(ZBX_STYLE_TAG_INHERITED_TITLE),
+				$hint_value
+			]));
+	}
+
+	$hint_title = match ($tag['inherited_for']) {
+		ZBX_TAG_OBJECT_TEMPLATE => _('Inherited and template tag'),
+		ZBX_TAG_OBJECT_HOST, ZBX_TAG_OBJECT_HOST_PROTOTYPE => _('Inherited and host tag'),
+		ZBX_TAG_OBJECT_ITEM, ZBX_TAG_OBJECT_ITEM_PROTOTYPE => _('Inherited and item tag'),
+		ZBX_TAG_OBJECT_TRIGGER, ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE => _('Inherited and trigger tag'),
+		ZBX_TAG_OBJECT_HTTPTEST => _('Inherited and scenario tag')
+	};
+
+	return (new CSpan($value))
+		->addClass(ZBX_STYLE_TAG)
+		->addClass(ZBX_STYLE_TAG_INHERITED_DUPLICATE)
+		->setHint(new CDiv([
+			(new CDiv(_($hint_title)))->addClass(ZBX_STYLE_TAG_INHERITED_TITLE),
+			$hint_value
+		]));
 }
 
 /**

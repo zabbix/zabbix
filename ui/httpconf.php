@@ -750,7 +750,7 @@ else {
 
 	$httpTests = API::HttpTest()->get($options);
 
-	$httpTests = mergeRegularAndInheritedTags($httpTests, true);
+	$httpTests = mergeRegularAndInheritedTags($httpTests, ZBX_TAG_OBJECT_HTTPTEST);
 
 	$dbHttpTests = DBselect(
 		'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.

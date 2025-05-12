@@ -40,8 +40,9 @@ $fields = [
 	'group_prototypes' =>		[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY, NOT_EMPTY,	null],
 	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
 	'group_hostid' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'show_inherited_tags' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
+	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'macros' =>					[null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
@@ -375,6 +376,7 @@ if (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
 		'context' => getRequest('context'),
 		// Parent discovery rules.
@@ -657,7 +659,7 @@ else {
 		]);
 	}
 
-	$data['hostPrototypes'] = mergeRegularAndInheritedTags($data['hostPrototypes'], true);
+	$data['hostPrototypes'] = mergeRegularAndInheritedTags($data['hostPrototypes'], ZBX_TAG_OBJECT_HOST_PROTOTYPE);
 	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 

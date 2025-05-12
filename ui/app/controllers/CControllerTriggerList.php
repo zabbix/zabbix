@@ -251,7 +251,7 @@ class CControllerTriggerList extends CController {
 				'nopermissions' => true
 			]);
 
-			$triggers = mergeRegularAndInheritedTags($triggers, true);
+			$triggers = mergeRegularAndInheritedTags($triggers, ZBX_TAG_OBJECT_TRIGGER);
 
 			foreach ($triggers as &$trigger) {
 				CArrayHelper::sort($trigger['hosts'], ['name']);
