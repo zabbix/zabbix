@@ -2416,7 +2416,7 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 		if (ZBX_ISSET_TEXT(&result) && ZBX_SNMP_STR_HEX == val_type)
 			zbx_remove_chars(result.text, "\r\n");
 
-		str_res = ZBX_GET_STR_RESULT(&result);
+		str_res = ZBX_GET_TEXT_RESULT(&result);
 	}
 
 	if (NULL == str_res)
