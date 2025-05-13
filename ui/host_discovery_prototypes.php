@@ -820,7 +820,7 @@ else {
 	$data = [
 		'hostid' => $hosts[0]['hostid'],
 		'parent_discoveryid' => $db_parent_discovery['itemid'],
-		'parent_discovered' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
+		'is_parent_discovered' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
 		'active_tab' => CProfile::get($prefix.'discovery_prototypes.filter.active', 1),

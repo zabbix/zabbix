@@ -37,7 +37,7 @@ $html_page = (new CHtmlPage())
 							->setArgument('hostid', $data['hostid'])
 							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 							->setArgument('context', $data['context'])
-					))->setEnabled(!$data['parent_discovered'])
+					))->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -140,7 +140,7 @@ foreach ($data['discoveries'] as $discovery) {
 	);
 
 	$status_disabled = $discovery['status'] == ITEM_STATUS_DISABLED;
-	$status_toggle = $data['parent_discovered']
+	$status_toggle = $data['is_parent_discovered']
 		? (new CSpan($status_disabled ? _('No') : _('Yes')))
 		: (new CLink($status_disabled ? _('No') : _('Yes'),
 			(new CUrl('host_discovery_prototypes.php'))
@@ -159,7 +159,7 @@ foreach ($data['discoveries'] as $discovery) {
 				->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$no_discover = $discovery['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
-	$discover_toggle = $data['parent_discovered']
+	$discover_toggle = $data['is_parent_discovered']
 		? (new CSpan($no_discover ? _('No') : _('Yes')))
 		: (new CLink($no_discover ? _('No') : _('Yes'),
 			(new CUrl('host_discovery_prototypes.php'))
@@ -259,14 +259,14 @@ $button_list = [
 		'confirm_singular' => _('Enable selected discovery prototype?'),
 		'confirm_plural' => _('Enable selected discovery prototypes?'),
 		'csrf_token' => $csrf_token,
-		'disabled' => $data['parent_discovered']
+		'disabled' => $data['is_parent_discovered']
 	],
 	'discoveryprototype.massdisable' => [
 		'name' => _('Create disabled'),
 		'confirm_singular' => _('Disable selected discovery prototype?'),
 		'confirm_plural' => _('Disable selected discovery prototypes?'),
 		'csrf_token' => $csrf_token,
-		'disabled' => $data['parent_discovered']
+		'disabled' => $data['is_parent_discovered']
 	]
 ];
 

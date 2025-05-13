@@ -34,7 +34,7 @@ $html_page = (new CHtmlPage())
 					(new CSimpleButton(_('Create graph prototype')))
 						->setId('js-create')
 						->setAttribute('data-parent_discoveryid',$data['parent_discoveryid'])
-						->setEnabled(!$data['parent_discovered'])
+						->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -126,7 +126,7 @@ foreach ($data['graphs'] as $graph) {
 		->setArgument('graphid', $graphid));
 
 	$no_discover = $graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
-	$discover_toggle = $data['parent_discovered']
+	$discover_toggle = $data['is_parent_discovered']
 		? (new CSpan($no_discover ? _('No') : _('Yes')))
 		: (new CLink($no_discover ? _('No') : _('Yes')))
 			->setAttribute('data-graphid', $graphid)

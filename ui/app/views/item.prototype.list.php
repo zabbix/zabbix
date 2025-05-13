@@ -117,7 +117,7 @@ foreach ($data['items'] as $item) {
 	$name[] = new CLink($item['name'], $item_prototype_url);
 
 	$status_disabled = $item['status'] == ITEM_STATUS_DISABLED;
-	$status_toggle = $data['parent_discovered']
+	$status_toggle = $data['is_parent_discovered']
 		? (new CSpan($status_disabled ? _('No') : _('Yes')))
 		: (new CLink($status_disabled ? _('No') : _('Yes')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -127,7 +127,7 @@ foreach ($data['items'] as $item) {
 			->setAttribute('data-context', $data['context']);
 
 	$no_discover = $item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
-	$discover_toggle = $data['parent_discovered']
+	$discover_toggle = $data['is_parent_discovered']
 		? (new CSpan($no_discover ? _('No') : _('Yes')))
 		: (new CLink($no_discover ? _('No') : _('Yes')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -166,24 +166,24 @@ $buttons = [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massenable-itemprototype')
 			->addClass('js-no-chkbxrange')
-			->setEnabled(!$data['parent_discovered'])
-			->setAttribute('data-disabled', $data['parent_discovered'])
+			->setEnabled(!$data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Create disabled')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdisable-itemprototype')
 			->addClass('js-no-chkbxrange')
-			->setEnabled(!$data['parent_discovered'])
-			->setAttribute('data-disabled', $data['parent_discovered'])
+			->setEnabled(!$data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-itemprototype')
 			->addClass('js-no-chkbxrange')
-			->setEnabled(!$data['parent_discovered'])
-			->setAttribute('data-disabled', $data['parent_discovered'])
+			->setEnabled(!$data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Delete')))
@@ -209,7 +209,7 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_protot
 						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 						->setAttribute('data-context', $data['context'])
 						->addClass('js-create-item-prototype')
-						->setEnabled(!$data['parent_discovered'])
+						->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

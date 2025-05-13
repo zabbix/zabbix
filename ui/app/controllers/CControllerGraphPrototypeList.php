@@ -95,7 +95,7 @@ class CControllerGraphPrototypeList extends CController {
 		$data = [
 			'graphs' => $graphs,
 			'hostid' => $hostid,
-			'parent_discovered' => $this->discovery_rule['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			'is_parent_discovered' => $this->discovery_rule['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 		];
 
 		if ($context === 'host') {
@@ -109,9 +109,10 @@ class CControllerGraphPrototypeList extends CController {
 		}
 
 		if ($sort_field === 'graphtype') {
-			foreach ($data['graphs'] as $gnum => $graph) {
-				$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+			foreach ($data['graphs'] as &$graph) {
+				$graph['graphtype'] = graphType($graph['graphtype']);
 			}
+			unset($graph);
 		}
 
 		order_result($data['graphs'], $sort_field, $sort_order);
@@ -184,6 +185,11 @@ class CControllerGraphPrototypeList extends CController {
 				}
 			}
 		}
+
+		foreach ($data['graphs'] as &$graph) {
+			$graph['graphtype'] = graphType($graph['graphtype']);
+		}
+		unset($graph);
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 

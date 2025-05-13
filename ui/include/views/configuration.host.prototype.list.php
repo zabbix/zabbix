@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 							->setArgument('form', 'create')
 							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 							->setArgument('context', $data['context'])
-					))->setEnabled(!$data['parent_discovered'])
+					))->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -164,7 +164,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	}
 
 	$status_disabled = $hostPrototype['status'] == HOST_STATUS_NOT_MONITORED;
-	$status_toggle = $data['parent_discovered']
+	$status_toggle = $data['is_parent_discovered']
 		? (new CSpan($status_disabled ? _('No') : _('Yes')))
 		: (new CLink($status_disabled ? _('No') : _('Yes'),
 			(new CUrl('host_prototypes.php'))
@@ -179,7 +179,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$no_discover = $hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
-	$discover_toggle = $data['parent_discovered']
+	$discover_toggle = $data['is_parent_discovered']
 		? (new CSpan($no_discover ? _('No') : _('Yes')))
 		: (new CLink($no_discover ? _('No') : _('Yes'),
 			(new CUrl('host_prototypes.php'))
@@ -214,14 +214,14 @@ $itemForm->addItem([
 				'confirm_singular' => _('Create hosts from selected prototype as enabled?'),
 				'confirm_plural' => _('Create hosts from selected prototypes as enabled?'),
 				'csrf_token' => $csrf_token,
-				'disabled' => $data['parent_discovered']
+				'disabled' => $data['is_parent_discovered']
 			],
 			'hostprototype.massdisable' => [
 				'name' => _('Create disabled'),
 				'confirm_singular' => _('Create hosts from selected prototype as disabled?'),
 				'confirm_plural' => _('Create hosts from selected prototypes as disabled?'),
 				'csrf_token' => $csrf_token,
-				'disabled' => $data['parent_discovered']
+				'disabled' => $data['is_parent_discovered']
 			],
 			'hostprototype.massdelete' => [
 				'name' => _('Delete'),

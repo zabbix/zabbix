@@ -601,7 +601,7 @@ else {
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'discovery_rule' => $discoveryRule,
-		'parent_discovered' => $discoveryRule['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
+		'is_parent_discovered' => $discoveryRule['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'context' => getRequest('context')

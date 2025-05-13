@@ -116,12 +116,9 @@ JAVASCRIPT;
 	public static function addInheritedTags(array $item, array $item_tags): array {
 		$tags = [];
 
-		if (array_key_exists('parent_lld', $item)) {
-			$parent_templates = getItemParentTemplates([$item['parent_lld']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
-		}
-		else {
-			$parent_templates = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
-		}
+		$parent_templates = array_key_exists('parent_lld', $item)
+			? getItemParentTemplates([$item['parent_lld']], ZBX_FLAG_DISCOVERY_RULE)['templates']
+			: getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		unset($parent_templates[0]);
 
 		$db_templates = $parent_templates

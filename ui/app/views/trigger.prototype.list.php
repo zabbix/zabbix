@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 			(new CList())->addItem(
 				(new CButton('create_trigger', _('Create trigger prototype')))
 					->setId('js-create')
-					->setEnabled(!$data['parent_discovered'])
+					->setEnabled(!$data['is_parent_discovered'])
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -154,7 +154,7 @@ foreach ($data['triggers'] as $trigger) {
 	}
 
 	$status_disabled = $trigger['status'] == TRIGGER_STATUS_DISABLED;
-	$status_toggle = $data['parent_discovered']
+	$status_toggle = $data['is_parent_discovered']
 		? (new CSpan($status_disabled ? _('No') : _('Yes')))
 		: (new CLink($status_disabled ? _('No') : _('Yes')))
 			->setAttribute('data-triggerid', $triggerid)
@@ -163,7 +163,7 @@ foreach ($data['triggers'] as $trigger) {
 			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$no_discover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover_toggle = $data['parent_discovered']
+	$discover_toggle = $data['is_parent_discovered']
 		? (new CSpan($no_discover ? _('No') : _('Yes')))
 		: (new CLink($no_discover ? _('No') : _('Yes')))
 			->setAttribute('data-triggerid', $triggerid)
@@ -206,8 +206,8 @@ $trigger_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-no-chkbxrange')
 					->setId('js-massenable-trigger')
-					->setEnabled(!$data['parent_discovered'])
-					->setAttribute('data-disabled', $data['parent_discovered'])
+					->setEnabled(!$data['is_parent_discovered'])
+					->setAttribute('data-disabled', $data['is_parent_discovered'])
 			],
 			'trigger.prototype.massdisable' => [
 				'content' => (new CSimpleButton(_('Create disabled')))
@@ -215,15 +215,15 @@ $trigger_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-no-chkbxrange')
 					->setId('js-massdisable-trigger')
-					->setEnabled(!$data['parent_discovered'])
-					->setAttribute('data-disabled', $data['parent_discovered'])
+					->setEnabled(!$data['is_parent_discovered'])
+					->setAttribute('data-disabled', $data['is_parent_discovered'])
 			],
 			'trigger.prototype.massupdate' => [
 				'content' => (new CSimpleButton(_('Mass update')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('js-massupdate-trigger')
-					->setEnabled(!$data['parent_discovered'])
-					->setAttribute('data-disabled', $data['parent_discovered'])
+					->setEnabled(!$data['is_parent_discovered'])
+					->setAttribute('data-disabled', $data['is_parent_discovered'])
 			],
 			'trigger.prototype.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))

@@ -92,7 +92,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			'hostid' => $parent_lld['hostid'],
 			'items' => [],
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
-			'parent_discovered' => $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
+			'is_parent_discovered' => $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 			'sort' => $profile['sort'],
 			'sortorder' => $profile['sortorder']
 		];

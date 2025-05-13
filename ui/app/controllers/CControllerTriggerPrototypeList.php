@@ -114,7 +114,7 @@ class CControllerTriggerPrototypeList extends CController {
 
 		$parent_lld = reset($parent_lld);
 
-		$data['parent_discovered'] = $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+		$data['is_parent_discovered'] = $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 
 		$context = $this->getInput('context');
 		$is_template_lld = $parent_lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
