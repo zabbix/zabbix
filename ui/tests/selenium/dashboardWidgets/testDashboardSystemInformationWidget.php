@@ -260,6 +260,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
+		// TODO: Without scrollDown on Jenkins error - requested image region is invalid. Remove after ZBXNEXT-9319 (13)
+		if ($action === 'create') {
+			$this->page->scrollDown();
+		}
 		$this->assertScreenshot(CDashboardElement::find()->one()->waitUntilReady(), $action.'_widgets');
 
 		foreach ($widgets as $widget_data) {
@@ -292,6 +296,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			if ($action === 'update' && CTestArrayHelper::get($widget_data, 'not_last')) {
 				$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->waitUntilClickable()->one()->click();
 			}
+			$dashboard->waitUntilReady();
 		}
 	}
 }

@@ -455,6 +455,20 @@ static int	DBpatch_7030032(void)
 
 static int	DBpatch_7030033(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i where item_rtdata.itemid=i.itemid and i.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030034(void)
+{
 	const zbx_db_table_t	table =
 			{"media_type_oauth", "mediatypeid", 0,
 				{
@@ -477,14 +491,13 @@ static int	DBpatch_7030033(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030034(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0,
 						ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("media_type_oauth", 1, &field);
 }
-
 #endif
 
 DBPATCH_START(7030)
@@ -526,5 +539,6 @@ DBPATCH_ADD(7030031, 0, 1)
 DBPATCH_ADD(7030032, 0, 1)
 DBPATCH_ADD(7030033, 0, 1)
 DBPATCH_ADD(7030034, 0, 1)
+DBPATCH_ADD(7030035, 0, 1)
 
 DBPATCH_END()
