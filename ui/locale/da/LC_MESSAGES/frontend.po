@@ -7205,6 +7205,10 @@ msgstr "Opdagelsesobjekt"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Opdagelse af VMware clusters, \"url\" - VMware-tjenestens URL. Returnerer JSON"
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Opdagelse af VMware datastores, \"url\" - VMware service URL. Returnerer JSON"
@@ -7626,6 +7630,10 @@ msgstr "Rediger træelement"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Rediger widget"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8062,6 +8070,10 @@ msgstr "Fejl i søgeanmodning for tabellen \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Fejl besked"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -12030,6 +12042,10 @@ msgstr "Datapunkt"
 msgid "Item added"
 msgstr "Datapunkt tilføjet"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Datapunktet indeholder brugerdefinerede makroer med hemmelige værdier. Værdierne for disse makroer skal indtastes manuelt."
@@ -13701,6 +13717,10 @@ msgstr "Metoden blev ikke fundet."
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "Metoder"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -23582,6 +23602,10 @@ msgstr "Widget"
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "Widget på X:%3$d, Y:%4$d på side #%2$d på dashboardet \"%1$s\" er uden for grænserne."
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
