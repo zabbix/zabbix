@@ -359,6 +359,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		);
 
 		$zabbix_server = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
+		$default_server = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Host ZBX6663'));
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -652,7 +653,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => $zabbix_server
+										'value' => $default_server
 									],
 									[
 										'type' => 0,
@@ -683,7 +684,7 @@ class testDashboardHostCardWidget extends testWidgets {
 							],
 							[
 								'type' => 'hostcard',
-								'name' => 'Do not show suppressed problems and incomplete inventory list',
+								'name' => 'Do not show suppressed problems + incomplete inventory list',
 								'x' => 54,
 								'y' => 4,
 								'width' => 18,
@@ -1235,27 +1236,23 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'Header' => 'Default host card widget',
-					'Host' => 'ЗАББИКС Сервер',
+					'Host' => 'Host ZBX6663',
 					'Availability' => ['ZBX'],
 					'Monitored by' => [
 						'Server' => 'Zabbix server'
 					],
 					'Monitoring' => [
-						'Dashboards' => 4,
-						'Latest data' => 120,
-						'Graphs' => 8,
-						'Web' => 0
-					],
-					'Severity' => [
-						'Average' => 1,
-						'Warning' => 5
+						'Dashboards' => 0,
+						'Latest data' => 14,
+						'Graphs' => 2,
+						'Web' => 2
 					]
 				]
 			],
 			// #4.
 			[
 				[
-					'Header' => 'Do not show suppressed problems and incomplete inventory list',
+					'Header' => 'Do not show suppressed problems + incomplete inventory list',
 					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget',
 					'Inventory' => [
 						'Type' => '',
