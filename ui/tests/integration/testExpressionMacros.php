@@ -68,10 +68,6 @@ class testExpressionMacros extends CIntegrationTest {
 	const TRIGGER_OPDATA = 'strata_trigger_opdata' . ALL_PRINTABLE_ASCII;
 	const TRIGGER_EVENT_NAME = 'strata_trigger_event_name' . ALL_PRINTABLE_ASCII;
 
-	const USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE = "
-EVENT.AGE -> {EVENT.AGE} <-
-EVENT.DURATION -> {EVENT.DURATION} <-
-";
 
 	// COMMON means common between main, recovery and update
 	const USER_MACROS_CONSISTENT_RESOLVE_COMMON = "ACTION.NAME -> {ACTION.NAME} <-
@@ -125,6 +121,16 @@ TRIGGER.URL -> {TRIGGER.URL} <-
 TRIGGER.URL.NAME -> {TRIGGER.URL.NAME} <-
 TRIGGER.VALUE -> {TRIGGER.VALUE} <-";
 
+	const USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE = "EVENT.AGE -> {EVENT.AGE} <-
+EVENT.DURATION -> {EVENT.DURATION} <-";
+
+	const USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
+EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
+EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
+EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
+EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
+EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
+
 
 
 			const USER_MACROS_INCONSISTENT_RESOLVE = "ACTION.ID -> {ACTION.ID} <-
@@ -138,7 +144,11 @@ HOST.ID -> {HOST.ID} <-
 {ITEM.ID} -> {ITEM.ID} <-
 TRIGGER.ID -> {TRIGGER.ID} <-";
 
-		const USER_MACROS_UNKNOWN = "EVENT.CAUSE.ACK.STATUS -> {EVENT.CAUSE.ACK.STATUS} <-
+	const USER_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY = "
+EVENT.RECOVERY.ID -> {EVENT.RECOVERY.ID} <-
+EVENT.RECOVERY.TIME -> {EVENT.RECOVERY.TIME} <-";
+
+	const USER_MACROS_UNKNOWN = "EVENT.CAUSE.ACK.STATUS -> {EVENT.CAUSE.ACK.STATUS} <-
 EVENT.CAUSE.AGE -> {EVENT.CAUSE.AGE} <-
 EVENT.CAUSE.DATE -> {EVENT.CAUSE.DATE} <-
 EVENT.CAUSE.DURATION -> {EVENT.CAUSE.DURATION} <-
@@ -226,7 +236,6 @@ INVENTORY.URL.A -> {INVENTORY.URL.A} <-
 INVENTORY.URL.B -> {INVENTORY.URL.B} <-
 INVENTORY.URL.C} -> {INVENTORY.URL.C} <-
 INVENTORY.VENDOR -> {INVENTORY.VENDOR} <-
-ITEM.LASTVALUE -> {ITEM.LASTVALUE} <-
 ITEM.LOG.AGE -> {ITEM.LOG.AGE} <-
 ITEM.LOG.DATE -> {ITEM.LOG.DATE} <-
 ITEM.LOG.EVENTID -> {ITEM.LOG.EVENTID} <-
@@ -324,7 +333,6 @@ INVENTORY.URL.A -> *UNKNOWN* <-
 INVENTORY.URL.B -> *UNKNOWN* <-
 INVENTORY.URL.C} -> *UNKNOWN* <-
 INVENTORY.VENDOR -> *UNKNOWN* <-
-ITEM.LASTVALUE -> *UNKNOWN* <-
 ITEM.LOG.AGE -> *UNKNOWN* <-
 ITEM.LOG.DATE -> *UNKNOWN* <-
 ITEM.LOG.EVENTID -> *UNKNOWN* <-
@@ -348,14 +356,6 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 {DISCOVERY.SERVICE.PORT}
 {DISCOVERY.SERVICE.STATUS}
 {DISCOVERY.SERVICE.UPTIME}
-{EVENT.RECOVERY.DATE}
-{EVENT.RECOVERY.ID}
-{EVENT.RECOVERY.NAME}
-{EVENT.RECOVERY.STATUS}
-{EVENT.RECOVERY.TAGS}
-{EVENT.RECOVERY.TAGSJSON}
-{EVENT.RECOVERY.TIME}
-{EVENT.RECOVERY.VALUE}
 {EVENT.UPDATE.ACTION}
 {EVENT.UPDATE.DATE}
 {EVENT.UPDATE.MESSAGE}
@@ -409,9 +409,9 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 		self::$event_tags_json = json_encode(array(['tag' => self::TAG_NAME, 'value' => self::TAG_VALUE]), JSON_UNESCAPED_SLASHES);
 
 		self::$trigger_expression_explain = self::VALUE_TO_FIRE_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
-				'or' .
+				' or ' .
 				self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER;
-		self::$trigger_recovery_expression_explain = self::VALUE_TO_FIRE_TRIGGER . self::VALUE_TO_RECOVER_TRIGGER;
+		self::$trigger_recovery_expression_explain = self::VALUE_TO_FIRE_TRIGGER . '=' . self::VALUE_TO_RECOVER_TRIGGER;
 
 		self::$trigger_expression = 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'1)='.self::VALUE_TO_FIRE_TRIGGER.' or '.
 				'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'2)='.self::VALUE_TO_FIRE_TRIGGER;
@@ -537,12 +537,14 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 						'subject' => self::SUBJECT_PREFIX.'{?last(//'.self::TRAPPER_ITEM_KEY.'1)}',
 						'message' => self::MESSAGE_PREFIX.'{?last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'1)}' . "\n" .
 							'===1===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON .
+							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
 							'===2===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE .
+							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE . "\n" .
 							'===3===' . "\n" .
-							self::USER_MACROS_UNKNOWN .
+							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===4===' . "\n" .
+							self::USER_MACROS_UNKNOWN . "\n" .
+							'===5===' . "\n" .
 							self::USER_MACROS_NON_REPLACEABLE
 					],
 					'opmessage_grp' => [
@@ -565,7 +567,7 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 								'/macro/macro:{?last(/{HOST.HOST}/{ITEM.KEY})}'.
 								'/macroN/macro:{?last(/{HOST.HOST1}/{ITEM.KEY})}'.
 								'/macro/macroN:{?last(/{HOST.HOST}/{ITEM.KEY2})}'.
-								'/empty/macroN:{?last(//{ITEM.KEY2})}'.
+								'/empty/macroN:{?last(//{ITEM.KEY2})}'. "\n" .
 							'===2===' . "\n" .
 							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON .
 							'===3===' . "\n" .
@@ -587,12 +589,14 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 						'default_msg' => 0,
 						'mediatypeid' => 0,
 						'subject' => self::SUBJECT_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_KEY.'1)}',
-						'message' => self::MESSAGE_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_KEY.'1,#2)}' .
-							"===1===\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON .
-							"===2===\n" .
-							self::USER_MACROS_UNKNOWN .
-							"===3===\n" .
+						'message' => self::MESSAGE_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_KEY.'1,#2)}' . "\n" .
+							'===1===' . "\n" .
+							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
+							'===2===' . "\n" .
+							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+							'===3===' . "\n" .
+							self::USER_MACROS_UNKNOWN . "\n" .
+							'===4===' . "\n" .
 							self::USER_MACROS_NON_REPLACEABLE
 					],
 					'opmessage_grp' => [
@@ -661,9 +665,9 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 	 */
 	public function testExpressionMacros_checkProblemMessage() {
 		self::$event_name_resolved = self::EVENT_PREFIX . self::VALUE_TO_FIRE_TRIGGER;
+		//			self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER	. "\n" .
 
 		$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-		self::MESSAGE_PREFIX . "\n" . self::VALUE_TO_FIRE_TRIGGER	. "\n" .
 			"ACTION.NAME -> "							. self::ACTION_NAME									. " <-\n" .
 			"EVENT.ACK.STATUS -> "						. 'No'												. " <-\n" .
 			"EVENT.NAME -> "							. self::$event_name_resolved						. " <-\n" .
@@ -677,7 +681,7 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 			"EVENT.TAGSJSON -> "						. self::$event_tags_json							. " <-\n" .
 			"EVENT.UPDATE.HISTORY -> "					. ''												. " <-\n" .
 			"EVENT.UPDATE.STATUS -> "					. '0'												. " <-\n" .
-			"EVENT.VALUE -> "							. '1'												. " <-\n" . // 1 -> Problem
+			"EVENT.VALUE -> "							. '1'												. " <-\n" . // 0 -> Problem
 			"HOST.CONN -> "								. '127.0.0.1'										. " <-\n" .
 			"HOST.DESCRIPTION -> "						. ''												. " <-\n" .
 			"HOST.DNS -> "								. ''												. " <-\n" .
@@ -687,11 +691,11 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 			"HOST.PORT -> "								. '10050'											. " <-\n" .
 			"ITEM.DESCRIPTION -> "						. ''												. " <-\n" .
 			"ITEM.DESCRIPTION.ORIG -> "					. ''												. " <-\n" .
-			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY							. " <-\n" .
-			"ITEM.KEY.ORIG -> "							. self::TRAPPER_ITEM_KEY							. " <-\n" .
-			"ITEM.LASTVALUE ->"							. self::VALUE_TO_FIRE_TRIGGER						. " <-\n" .
-			"ITEM.NAME -> "								. self::TRAPPER_ITEM_NAME							. " <-\n" .
-			"ITEM.NAME.ORIG -> "						. self::TRAPPER_ITEM_NAME							. " <-\n" .
+			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY . '1'						. " <-\n" .
+			"ITEM.KEY.ORIG -> "							. self::TRAPPER_ITEM_KEY . '1'						. " <-\n" .
+			"ITEM.LASTVALUE -> "						. self::VALUE_TO_FIRE_TRIGGER						. " <-\n" .
+			"ITEM.NAME -> "								. self::TRAPPER_ITEM_NAME . '1'						. " <-\n" .
+			"ITEM.NAME.ORIG -> "						. self::TRAPPER_ITEM_NAME . '1'						. " <-\n" .
 			"ITEM.VALUE -> "							. self::VALUE_TO_FIRE_TRIGGER						. " <-\n" .
 			"ITEM.VALUETYPE -> "						. ITEM_VALUE_TYPE_UINT64							. " <-\n" .
 			"PROXY.DESCRIPTION -> "						. ''												. " <-\n" .
@@ -705,7 +709,7 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 			"TRIGGER.EVENTS.UNACK -> "					. '1'												. " <-\n" .
 			"TRIGGER.HOSTGROUP.NAME -> "				. 'Zabbix servers'									. " <-\n" . // 4 -> 'Zabbix servers'
 			"TRIGGER.EXPRESSION -> "					. self::$trigger_expression							. " <-\n" .
-			"TRIGGER.EXPRESSION -> "					. self::$trigger_recovery_expression				. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY -> "			. self::$trigger_recovery_expression				. " <-\n" .
 			"TRIGGER.NAME -> "							. 'trigger_trap'									. " <-\n" .
 			"TRIGGER.NAME.ORIG -> "						. 'trigger_trap'									. " <-\n" .
 			"TRIGGER.NSEVERITY -> "						. self::TRIGGER_PRIORITY							. " <-\n" .
@@ -716,8 +720,16 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 			"TRIGGER.VALUE -> "							. '1' . " <-";													// 1 -> Problem
 
 		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE_RESOLVED =
-			"EVENT.AGE -> "								. '0s' 												. "<-\n" .
-			"EVENT.DURATION -> "						. '0s'												. "<-\n" ;
+			"EVENT.AGE -> "								. '0s' 												. " <-\n" .
+			"EVENT.DURATION -> "						. '0s'												. " <-" ;
+
+
+		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
+EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
+EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
+EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
+EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
+EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
 		$message_expect = self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
@@ -725,8 +737,10 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 			'===2===' . "\n" .
 			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE_RESOLVED . "\n" .
 			'===3===' . "\n" .
-			self::USER_MACROS_UNKNOWN_RESOLVED . "\n" .
+			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
 			'===4===' . "\n" .
+			self::USER_MACROS_UNKNOWN_RESOLVED . "\n" .
+			'===5===' . "\n" .
 			self::USER_MACROS_NON_REPLACEABLE;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][0]['message']);
@@ -764,65 +778,88 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 	 * Test expression macro in recovery message
 	 */
 	public function testExpressionMacros_checkRecoveryMessage() {
-		$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			self::MESSAGE_PREFIX /*. self::VALUE_TO_FIRE_TRIGGER */	. "\n" .
-		self::ACTION_NAME									. "\n" . // {ACTION.NAME}
-		'No'												. "\n" . // {EVENT.ACK.STATUS}
-		self::$event_name									. "\n" . // {EVENT.NAME}
-		self::TRIGGER_PRIORITY								. "\n" . // {EVENT.NSEVERITY}
-		'0'													. "\n" . // {EVENT.OBJECT}  0 -> Trigger
-		self::TRIGGER_OPDATA								. "\n" . // {EVENT.OPDATA}
-		'Average'											. "\n" . // {EVENT.SEVERITY}  self::TRIGGER_PRIORITY
-		'0'													. "\n" . // {EVENT.SOURCE}  0 -> Trigger
-		'PROBLEM'											. "\n" . // {EVENT.STATUS}  1 -> PROBLEM
-		self::TAG_NAME . ':' . self::TAG_VALUE				. "\n" . // {EVENT.TAGS}
-		self::$event_tags_json								. "\n" . // {EVENT.TAGSJSON}
-		''													. "\n" . // {EVENT.UPDATE.HISTORY}
-		'0'													. "\n" . // {EVENT.UPDATE.STATUS}
-		'1'													. "\n" . // {EVENT.VALUE}  1 -> Problem
-		'127.0.0.1'											. "\n" . // {HOST.CONN}
-		''													. "\n" . // {HOST.DESCRIPTION}
-		''													. "\n" . // {HOST.DNS}
-		self::HOST_NAME										. "\n" . // {HOST.HOST}
-		'127.0.0.1'											. "\n" . // {HOST.IP}
-		self::HOST_NAME										. "\n" . // {HOST.NAME}
-		'10050'												. "\n" . // {HOST.PORT}
-		''													. "\n" . // {ITEM.DESCRIPTION}
-		''													. "\n" . // {ITEM.DESCRIPTION.ORIG}
-		self::TRAPPER_ITEM_KEY								. "\n" . // {ITEM.KEY}
-		self::TRAPPER_ITEM_KEY								. "\n" . // {ITEM.KEY.ORIG}
-		self::VALUE_TO_FIRE_TRIGGER							. "\n" . // {ITEM.LASTVALUE}
-		self::TRAPPER_ITEM_NAME								. "\n" . // {ITEM.NAME}
-		self::TRAPPER_ITEM_NAME								. "\n" . // {ITEM.NAME.ORIG}
-		self::VALUE_TO_FIRE_TRIGGER							. "\n" . // {ITEM.VALUE}
-		ITEM_VALUE_TYPE_UINT64								. "\n" . // {ITEM.VALUETYPE}
-		''													. "\n" . // {PROXY.DESCRIPTION}
-		''													. "\n" . // {PROXY.NAME}
-		self::TRIGGER_COMMENTS								. "\n" . // {TRIGGER.DESCRIPTION}
-		self::$trigger_expression_explain					. "\n" . // {TRIGGER.EXPRESSION.EXPLAIN}
-		self::$trigger_recovery_expression_explain			. "\n" . // {TRIGGER.EXPRESSION.RECOVERY.EXPLAIN}
-		'0'													. "\n" . // {TRIGGER.EVENTS.ACK}
-		'0'													. "\n" . // {TRIGGER.EVENTS.PROBLEM.ACK}
-		'1'													. "\n" . // {TRIGGER.EVENTS.PROBLEM.UNACK}
-		'1'													. "\n" . // {TRIGGER.EVENTS.UNACK}
-		'Zabbix servers'									. "\n" . // {TRIGGER.HOSTGROUP.NAME}  4 -> 'Zabbix servers'
-		self::$trigger_expression							. "\n" . // {TRIGGER.EXPRESSION}
-		self::$trigger_recovery_expression					. "\n" . // {TRIGGER.EXPRESSION.RECOVERY}
-		'trigger_trap'										. "\n" . // {TRIGGER.NAME}
-		'trigger_trap'										. "\n" . // {TRIGGER.NAME.ORIG}
-		self::TRIGGER_PRIORITY								. "\n" . // {TRIGGER.NSEVERITY}
-		'Average'											. "\n" . // {TRIGGER.SEVERITY} 3 -> Average
-		'PROBLEM'											. "\n" . // {TRIGGER.STATUS}
-		self::TRIGGER_URL									. "\n" . // {TRIGGER.URL}
-		self::TRIGGER_URL_NAME								. "\n" . // {TRIGGER.URL.NAME}
-		'1';														 // {TRIGGER.VALUE} 1 -> Problem
 
-		$recovery_message_expect = self::MESSAGE_PREFIX_RECOVERY . self::VALUE_TO_FIRE_TRIGGER .
-			"===1===\n" .
-			$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED .
-			"===2===\n" .
-			self::USER_MACROS_UNKNOWN_RESOLVED .
-			"===3===\n" .
+		$trigger_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
+				' or ' .
+				self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER;
+
+		$trigger_recovery_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_RECOVER_TRIGGER;
+
+
+
+
+		$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
+			"ACTION.NAME -> "							. self::ACTION_NAME									. " <-\n" .
+			"EVENT.ACK.STATUS -> "						. 'No'												. " <-\n" .
+			"EVENT.NAME -> "							. self::$event_name_resolved						. " <-\n" .
+			"EVENT.NSEVERITY -> "						. self::TRIGGER_PRIORITY							. " <-\n" .
+			"EVENT.OBJECT -> "							. '0'												. " <-\n" . // 0 -> Trigger
+			"EVENT.OPDATA -> "							. self::TRIGGER_OPDATA								. " <-\n" .
+			"EVENT.SEVERITY -> "						. 'Average'											. " <-\n" . // self::TRIGGER_PRIORITY
+			"EVENT.SOURCE -> "							. '0'												. " <-\n" . // 0 -> Trigger
+			"EVENT.STATUS -> "							. 'RESOLVED'										. " <-\n" . //  0 -> RESOLVED
+			"EVENT.TAGS -> "							. self::TAG_NAME . ':' . self::TAG_VALUE			. " <-\n" .
+			"EVENT.TAGSJSON -> "						. self::$event_tags_json							. " <-\n" .
+			"EVENT.UPDATE.HISTORY -> "					. ''												. " <-\n" .
+			"EVENT.UPDATE.STATUS -> "					. '0'												. " <-\n" .
+			"EVENT.VALUE -> "							. '0'												. " <-\n" . // 0 -> Resolved
+			"HOST.CONN -> "								. '127.0.0.1'										. " <-\n" .
+			"HOST.DESCRIPTION -> "						. ''												. " <-\n" .
+			"HOST.DNS -> "								. ''												. " <-\n" .
+			"HOST.HOST -> "								. self::HOST_NAME									. " <-\n" .
+			"HOST.IP -> "								. '127.0.0.1'										. " <-\n" .
+			"HOST.NAME -> "								. self::HOST_NAME									. " <-\n" .
+			"HOST.PORT -> "								. '10050'											. " <-\n" .
+			"ITEM.DESCRIPTION -> "						. ''												. " <-\n" .
+			"ITEM.DESCRIPTION.ORIG -> "					. ''												. " <-\n" .
+			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY . '1'						. " <-\n" .
+			"ITEM.KEY.ORIG -> "							. self::TRAPPER_ITEM_KEY . '1'						. " <-\n" .
+			"ITEM.LASTVALUE -> "						. self::VALUE_TO_RECOVER_TRIGGER					. " <-\n" .
+			"ITEM.NAME -> "								. self::TRAPPER_ITEM_NAME . '1'						. " <-\n" .
+			"ITEM.NAME.ORIG -> "						. self::TRAPPER_ITEM_NAME . '1'						. " <-\n" .
+			"ITEM.VALUE -> "							. self::VALUE_TO_RECOVER_TRIGGER					. " <-\n" .
+			"ITEM.VALUETYPE -> "						. ITEM_VALUE_TYPE_UINT64							. " <-\n" .
+			"PROXY.DESCRIPTION -> "						. ''												. " <-\n" .
+			"PROXY.NAME -> "							. ''												. " <-\n" .
+			"TRIGGER.DESCRIPTION -> "					. self::TRIGGER_COMMENTS							. " <-\n" .
+			"TRIGGER.EXPRESSION.EXPLAIN -> "			. $trigger_expression_explain						. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY.EXPLAIN -> "	. $trigger_recovery_expression_explain				. " <-\n" .
+			"TRIGGER.EVENTS.ACK -> "					. '0'												. " <-\n" .
+			"TRIGGER.EVENTS.PROBLEM.ACK -> "			. '0'												. " <-\n" .
+			"TRIGGER.EVENTS.PROBLEM.UNACK -> "			. '1'												. " <-\n" .
+			"TRIGGER.EVENTS.UNACK -> "					. '2'												. " <-\n" .
+			"TRIGGER.HOSTGROUP.NAME -> "				. 'Zabbix servers'									. " <-\n" . // 4 -> 'Zabbix servers'
+			"TRIGGER.EXPRESSION -> "					. self::$trigger_expression							. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY -> "			. self::$trigger_recovery_expression				. " <-\n" .
+			"TRIGGER.NAME -> "							. 'trigger_trap'									. " <-\n" .
+			"TRIGGER.NAME.ORIG -> "						. 'trigger_trap'									. " <-\n" .
+			"TRIGGER.NSEVERITY -> "						. self::TRIGGER_PRIORITY							. " <-\n" .
+			"TRIGGER.SEVERITY -> "						. 'Average'											. " <-\n" . // 3 -> Average
+			"TRIGGER.STATUS -> "						. 'OK'												. " <-\n" .
+			"TRIGGER.URL -> "							. self::TRIGGER_URL									. " <-\n" .
+			"TRIGGER.URL.NAME -> "						. self::TRIGGER_URL_NAME							. " <-\n" .
+			"TRIGGER.VALUE -> "							. '0' . " <-";													// 0 -> No problem
+
+		$recovery_event_name_resolved = self::EVENT_PREFIX . self::VALUE_TO_RECOVER_TRIGGER;
+
+		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED =
+			"EVENT.RECOVERY.DATE -> "					. date('Y.m.d')										. " <-\n" .
+			"EVENT.RECOVERY.NAME -> "					. $recovery_event_name_resolved						. " <-\n" .
+			"EVENT.RECOVERY.STATUS -> "					. 'RESOLVED'										. " <-\n" .
+			"EVENT.RECOVERY.TAGS -> "					. self::TAG_NAME . ':' . self::TAG_VALUE			. " <-\n" .
+			"EVENT.RECOVERY.TAGSJSON -> "				. self::$event_tags_json							. " <-\n" .
+			"EVENT.RECOVERY.VALUE -> "					. '0'												. " <-";
+
+		//$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED_SOMETHING = "EVENT.RECOVERY.ID -> {EVENT.RECOVEVERY.ID} <- EVENT.RECOVERY.TIME -> {EVENT.RECOVERY.TIME} <-"
+
+		$recovery_message_expect = self::MESSAGE_PREFIX_RECOVERY . self::VALUE_TO_FIRE_TRIGGER . "\n" .
+			'===1===' . "\n" .
+			$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
+			'===2===' . "\n" .
+			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			'===3===' . "\n" .
+			self::USER_MACROS_UNKNOWN_RESOLVED . "\n" .
+			'===4===' . "\n" .
 			self::USER_MACROS_NON_REPLACEABLE;
 
 
