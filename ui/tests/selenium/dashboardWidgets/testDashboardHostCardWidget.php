@@ -17,7 +17,7 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @backup dashboard, globalmacro
+ * @backup dashboard, globalmacro, event_suppress
  *
  * @dataSource AllItemValueTypes
  *
@@ -311,15 +311,19 @@ class testDashboardHostCardWidget extends testWidgets {
 
 		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 			'High trigger', 'Disaster trigger', 'Disaster trigger'];
-		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE, ['clock' => time() - 10000]);
 
 		$eventid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Disaster trigger'));
-
 		CDataHelper::call('event.acknowledge', [
 			'eventids' => $eventid,
-			'action' => 32, // Suppress event.
+			'action' => ZBX_PROBLEM_UPDATE_SUPPRESS,
 			'suppress_until' => time() + 31536000
 		]);
+
+		$suppress_event = CDBHelper::getValue('SELECT COUNT(*) FROM event_suppress') + 1;
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)
+				VALUES ('.zbx_dbstr($suppress_event).', '.zbx_dbstr($eventid).', NULL, 0)'
+		);
 
 		CDataHelper::call('httptest.create', [
 			[
@@ -339,16 +343,15 @@ class testDashboardHostCardWidget extends testWidgets {
 		// Create Maintenance and host in maintenance.
 		$maintenances = CDataHelper::call('maintenance.create', [
 			[
-				'name' => 'HostCard host maintenance',
+				'name' => 'Maintenance for Host Card widget',
 				'active_since' => time() - 1000,
 				'active_till' => time() + 31536000,
 				'hosts' => [['hostid' => self::$hostid]],
 				'timeperiods' => [[]],
 				'description' => 'Maintenance for checking Icon and maintenance status in Host Card widget',
-				'maintenance_type' => 1
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL
 			]
 		]);
-
 		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenances['maintenanceids'][0]).
 				', maintenance_status='.HOST_MAINTENANCE_STATUS_ON.', maintenance_type='.MAINTENANCE_TYPE_NORMAL.
 				', maintenance_from='.zbx_dbstr(time()-1000).' WHERE hostid='.zbx_dbstr(self::$hostid)
@@ -1094,7 +1097,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Header' => 'Fully filled host card widget',
 					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget',
 					'Maintenance' => [
-						'Name' => 'HostCard host maintenance [Maintenance with data collection]',
+						'Name' => 'Maintenance for Host Card widget [Maintenance with data collection]',
 						'Description' => 'Maintenance for checking Icon and maintenance status in Host Card widget'
 					],
 					'Availability' => ['ZBX', 'SNMP', 'IPMI', 'JMX'],
@@ -1238,7 +1241,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 116,
+						'Latest data' => 120,
 						'Graphs' => 8,
 						'Web' => 0
 					],
@@ -1258,6 +1261,14 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Tag' => 'Critical',
 						'Location latitude' => '37.7749',
 						'Location longitude' => '-122.4194'
+					],
+					'Severity' => [
+						'Not classified' => 1,
+						'Information' => 1,
+						'Warning' => 1,
+						'Average' => 1,
+						'High' => 1,
+						'Disaster' => 1
 					]
 				]
 			]
