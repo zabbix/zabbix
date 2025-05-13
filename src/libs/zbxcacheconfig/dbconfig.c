@@ -3748,6 +3748,9 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			continue;
+
 		ZBX_STR2UINT64(itemid, row[0]);
 		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id_ext(&config->item_discovery, itemid,
 				sizeof(ZBX_DC_ITEM_DISCOVERY), &found, uniq);
