@@ -241,7 +241,8 @@ class testDashboardHostCardWidget extends testWidgets {
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'proxyid' => $proxies['Proxy for host card widget'],
 				'inventory' => [
-					'tag' => 'Host card tag'
+					'tag' => 'Host card tag',
+					'type' => ''
 				]
 			],
 			[
