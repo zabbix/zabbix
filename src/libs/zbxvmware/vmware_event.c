@@ -1107,12 +1107,6 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 				(int)(LAST_KEY(events) - (last_key + 1)));
 	}
 
-	if (0 != mem_free)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Not enough memory or time to collect vmware events:" ZBX_FS_UI64
-				" bytes.", mem_free);
-	}
-
 	ret = SUCCEED;
 end_session:
 	if (SUCCEED != vmware_service_destroy_event_session(easyhandle, event_session, &err))
@@ -1128,9 +1122,9 @@ out:
 	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old && 0 == evt_severity)
 		zabbix_log(LOG_LEVEL_WARNING, "vmware events collector returned empty result");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d skip_old:%hhu memory:" ZBX_FS_UI64, __func__,
-			zbx_result_string(ret), events->values_num, *skip_old,
-			*strpool_sz + vmware_service_evt_vector_memsize(events));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d skip_old:%hhu memory:" ZBX_FS_UI64 " mem_free:"
+			ZBX_FS_UI64, __func__, zbx_result_string(ret), events->values_num, *skip_old,
+			*strpool_sz + vmware_service_evt_vector_memsize(events), mem_free);
 
 	return ret;
 
@@ -1318,9 +1312,6 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 
 			if (SUCCEED == vmware_shared_is_ready())
 			{
-				if (evt_query_interval > ZBX_EVT_QUERY_LIMIT)
-					evt_query_interval = ZBX_EVT_QUERY_LIMIT;
-
 				if (evt_query_interval < service->eventlog.interval)
 					evt_query_interval = service->eventlog.interval;
 
@@ -1420,9 +1411,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		}
 		else
 		{
-			if (0 != evt_skip_old)
-				service->eventlog.end_time = now;
-
+			service->eventlog.end_time = now;
 			evt_skip_old = 0;
 		}
 	}
