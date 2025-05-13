@@ -4039,6 +4039,8 @@ z-bar-gauge {
 z-color-picker {
   display: inline-block;
   line-height: 24px; }
+  z-color-picker[readonly] .color-picker-box {
+    cursor: default; }
   z-color-picker .color-picker-box {
     position: relative;
     vertical-align: top;
@@ -4181,6 +4183,9 @@ z-color-picker {
       .color-picker-is-palette .color-picker-palette-icon .color-picker-palette-icon-part:last-of-type {
         border-top-right-radius: 1px;
         border-bottom-right-radius: 1px; }
+
+z-color-picker[readonly] .color-picker-box:focus {
+  box-shadow: none; }
 
 .z-select,
 z-select {

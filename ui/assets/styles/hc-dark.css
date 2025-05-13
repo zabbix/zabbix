@@ -3955,6 +3955,8 @@ z-bar-gauge {
 z-color-picker {
   display: inline-block;
   line-height: 24px; }
+  z-color-picker[readonly] .color-picker-box {
+    cursor: default; }
   z-color-picker .color-picker-box {
     position: relative;
     vertical-align: top;
