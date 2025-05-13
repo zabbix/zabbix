@@ -152,8 +152,12 @@ class CHostPrototype extends CHostBase {
 				$sql_parts['where'][] = '1=0';
 			}
 			else {
+				$sqlParts['from']['hd'] = 'host_discovery hd';
+				$sqlParts['from'][] = 'items i';
 				$sqlParts['from'][] = 'host_hgset hh';
 				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
+				$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
 				$sqlParts['where'][] = 'i.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
@@ -166,9 +170,9 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['from'][] = 'host_discovery hd';
-			$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
-			$sqlParts['where'][] = dbConditionInt('hd.parent_itemid', (array) $options['discoveryids']);
+			$sqlParts['from']['hd'] = 'host_discovery hd';
+			$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
+			$sqlParts['where'][] = dbConditionId('hd.parent_itemid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hd'] = 'hd.parent_itemid';

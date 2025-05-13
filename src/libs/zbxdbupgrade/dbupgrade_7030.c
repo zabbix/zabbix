@@ -455,6 +455,20 @@ static int	DBpatch_7030032(void)
 
 static int	DBpatch_7030033(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i where item_rtdata.itemid=i.itemid and i.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030034(void)
+{
 	const zbx_db_table_t	table =
 			{"host_template_cache", "hostid,link_hostid", 0,
 				{
@@ -468,7 +482,7 @@ static int	DBpatch_7030033(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030034(void)
+static int	DBpatch_7030035(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -476,7 +490,7 @@ static int	DBpatch_7030034(void)
 	return DBadd_foreign_key("host_template_cache", 1, &field);
 }
 
-static int	DBpatch_7030035(void)
+static int	DBpatch_7030036(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -484,12 +498,12 @@ static int	DBpatch_7030035(void)
 	return DBadd_foreign_key("host_template_cache", 2, &field);
 }
 
-static int	DBpatch_7030036(void)
+static int	DBpatch_7030037(void)
 {
 	return DBcreate_index("host_template_cache", "host_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7030037(void)
+static int	DBpatch_7030038(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			"insert into host_template_cache ("
@@ -511,7 +525,7 @@ static int	DBpatch_7030037(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030038(void)
+static int	DBpatch_7030039(void)
 {
 	const zbx_db_table_t	table =
 			{"item_template_cache", "itemid,link_hostid", 0,
@@ -526,7 +540,7 @@ static int	DBpatch_7030038(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030039(void)
+static int	DBpatch_7030040(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -534,7 +548,7 @@ static int	DBpatch_7030039(void)
 	return DBadd_foreign_key("item_template_cache", 1, &field);
 }
 
-static int	DBpatch_7030040(void)
+static int	DBpatch_7030041(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -542,12 +556,12 @@ static int	DBpatch_7030040(void)
 	return DBadd_foreign_key("item_template_cache", 2, &field);
 }
 
-static int	DBpatch_7030041(void)
+static int	DBpatch_7030042(void)
 {
 	return DBcreate_index("item_template_cache", "item_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7030042(void)
+static int	DBpatch_7030043(void)
 {
 	/* 0 - ZBX_FLAG_DISCOVERY_NORMAL */
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
@@ -583,7 +597,7 @@ static int	DBpatch_7030042(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030043(void)
+static int	DBpatch_7030044(void)
 {
 	const zbx_db_table_t	table =
 			{"httptest_template_cache", "httptestid,link_hostid", 0,
@@ -598,7 +612,7 @@ static int	DBpatch_7030043(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030044(void)
+static int	DBpatch_7030045(void)
 {
 	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -606,7 +620,7 @@ static int	DBpatch_7030044(void)
 	return DBadd_foreign_key("httptest_template_cache", 1, &field);
 }
 
-static int	DBpatch_7030045(void)
+static int	DBpatch_7030046(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -614,12 +628,12 @@ static int	DBpatch_7030045(void)
 	return DBadd_foreign_key("httptest_template_cache", 2, &field);
 }
 
-static int  DBpatch_7030046(void)
+static int  DBpatch_7030047(void)
 {
 	return DBcreate_index("httptest_template_cache", "httptest_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7030047(void)
+static int	DBpatch_7030048(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			"insert into httptest_template_cache ("
@@ -703,5 +717,6 @@ DBPATCH_ADD(7030044, 0, 1)
 DBPATCH_ADD(7030045, 0, 1)
 DBPATCH_ADD(7030046, 0, 1)
 DBPATCH_ADD(7030047, 0, 1)
+DBPATCH_ADD(7030048, 0, 1)
 
 DBPATCH_END()

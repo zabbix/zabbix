@@ -81,6 +81,12 @@ static void	zbx_flags128_clear(zbx_flags128_t *flags, int bit)
 	flags->blocks[bit >> 6] &= ~(__UINT64_C(1) << (bit & 0x3f));
 }
 
+static void	zbx_flags128_or(zbx_flags128_t *flags, zbx_flags128_t *with)
+{
+	for (zbx_uint64_t i = 0; i < sizeof(flags->blocks) / sizeof(zbx_uint64_t); i++)
+		flags->blocks[i] |= with->blocks[i];
+}
+
 static void	zbx_flags128_init(zbx_flags128_t *flags)
 {
 	memset(flags->blocks, 0, sizeof(zbx_uint64_t) * (128 / 64));
@@ -135,10 +141,10 @@ typedef struct
 	const char			*rename_field;
 
 	/* To avoid self referencing foreign key conflicts when */
-	/* syncing rows the reset field will be set to NULL for */
+	/* syncing rows the reset fields will be set to NULL for */
 	/* all update and delete rows and marked for update.    */
-	/* As such only ID fields can be set as reset_field.    */
-	const char			*reset_field;
+	/* As such only ID fields can be set as reset_fields.    */
+	zbx_vector_str_t		reset_fields;
 
 	/* optional sql filter to limit managed object scope (exclude templates from hosts) */
 	char				*sql_filter;
@@ -156,6 +162,7 @@ static void	table_data_free(zbx_table_data_t *td)
 	zbx_vector_const_field_destroy(&td->fields);
 	zbx_vector_uint64_destroy(&td->del_ids);
 	zbx_vector_table_row_ptr_destroy(&td->updates);
+	zbx_vector_str_destroy(&td->reset_fields);
 	zbx_hashset_destroy(&td->rows);
 	zbx_free(td->sql_filter);
 	zbx_free(td);
@@ -329,9 +336,8 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 
 	td->table = table;
 	td->rename_field = NULL;
-	td->reset_field = NULL;
 	td->sql_filter = NULL;
-
+	zbx_vector_str_create(&td->reset_fields);
 	zbx_vector_const_field_create(&td->fields);
 	zbx_hashset_create(&td->rows, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&td->del_ids);
@@ -365,7 +371,8 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	}
 	else if (0 == strcmp(table->table, "items"))
 	{
-		td->reset_field = "master_itemid";
+		zbx_vector_str_append(&td->reset_fields, "master_itemid");
+		zbx_vector_str_append(&td->reset_fields, "interfaceid");
 	}
 	else if (0 == strcmp(table->table, "proxy"))
 	{
@@ -373,7 +380,7 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	}
 	else if (0 == strcmp(table->table, "host_proxy"))
 	{
-		td->reset_field = "proxyid";
+		zbx_vector_str_append(&td->reset_fields, "proxyid");
 	}
 
 	/* get table fields from database schema */
@@ -723,8 +730,9 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 {
 	char			*sql = NULL, delim = ' ';
 	size_t			sql_alloc = 0, sql_offset = 0;
-	int			ret, rename_index = -1, reset_index = -1;
+	int			ret, rename_index = -1;
 	zbx_vector_uint64_t	updateids;
+	zbx_flags128_t		reset_flags;
 
 	zbx_db_field_t		recid_field = td->table->fields[0];
 
@@ -734,7 +742,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 		return FAIL;
 	}
 
-	if (NULL == td->rename_field && NULL == td->reset_field)
+	if (NULL == td->rename_field && 0 == td->reset_fields.values_num)
 		return SUCCEED;
 
 	if (NULL != td->rename_field && -1 == (rename_index = table_data_get_field_index(td, td->rename_field)))
@@ -744,12 +752,15 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 		return FAIL;
 	}
 
-	if (NULL != td->reset_field)
+	memset (&reset_flags, 0, sizeof(reset_flags));
+	for (int i = 0; i < td->reset_fields.values_num; i++)
 	{
-		if (-1 == (reset_index = table_data_get_field_index(td, td->reset_field)))
+		int reset_index;
+
+		if (-1 == (reset_index = table_data_get_field_index(td, td->reset_fields.values[i])))
 		{
-			*error = zbx_dsprintf(NULL, "unknown reset field \"%s\" for table \"%s\"", td->reset_field,
-					td->table->table);
+			*error = zbx_dsprintf(NULL, "unknown reset field \"%s\" for table \"%s\"",
+					td->reset_fields.values[i], td->table->table);
 			return FAIL;
 		}
 
@@ -758,6 +769,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 			*error = zbx_dsprintf(NULL, "only ID fields can be reset");
 			return FAIL;
 		}
+		zbx_flags128_set(&reset_flags, reset_index);
 	}
 
 	zbx_vector_uint64_create(&updateids);
@@ -772,11 +784,10 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 		if (-1 != rename_index)
 			zbx_flags128_set(&td->updates.values[i]->flags, rename_index);
 
-		if (-1 != reset_index)
-			zbx_flags128_set(&td->updates.values[i]->flags, reset_index);
+		zbx_flags128_or(&td->updates.values[i]->flags, &reset_flags);
 	}
 
-	if (-1 != reset_index)
+	if (0 != td->reset_fields.values_num)
 		zbx_vector_uint64_append_array(&updateids, td->del_ids.values, td->del_ids.values_num);
 
 	if (0 == updateids.values_num)
@@ -796,8 +807,11 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 		delim = ',';
 	}
 
-	if (-1 != reset_index)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=null", delim, td->reset_field);
+	for (int i = 0; i < td->reset_fields.values_num; i++)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=null", delim, td->reset_fields.values[i]);
+		delim = ',';
+	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
 
@@ -1042,14 +1056,21 @@ out:
  ******************************************************************************/
 static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 {
-	int				ret = SUCCEED, reset_index = -1;
+	int				ret = SUCCEED;
 	zbx_hashset_iter_t		iter;
 	zbx_vector_table_row_ptr_t	rows;
 	zbx_table_row_t			*row;
+	zbx_flags128_t			reset_flags;
 
-	/* invalid reset_index would have generated error during row preparation */
-	if (NULL != td->reset_field)
-		reset_index = table_data_get_field_index(td, td->reset_field);
+	zbx_flags128_init(&reset_flags);
+
+	for (int i = 0; i < td->reset_fields.values_num; i++)
+	{
+		int reset_index;
+
+		if (-1 != (reset_index = table_data_get_field_index(td, td->reset_fields.values[i])))
+			zbx_flags128_set(&reset_flags, reset_index);
+	}
 
 	zbx_vector_table_row_ptr_create(&rows);
 
@@ -1082,6 +1103,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 		{
 			const char	*pf = NULL;
 			zbx_json_type_t	type;
+			zbx_table_row_t	*update_row = NULL;
 
 			row = rows.values[i];
 
@@ -1090,7 +1112,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 			{
 				zbx_db_value_t	*value;
 
-				if (j == reset_index)
+				if (SUCCEED == zbx_flags128_isset(&reset_flags, j))
 				{
 					if (ZBX_TYPE_ID != fields[j]->type)
 					{
@@ -1111,7 +1133,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 					/* so the correct ID will be updated later     */
 					zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_EXISTS);
 					zbx_flags128_set(&row->flags, j);
-					zbx_vector_table_row_ptr_append(&td->updates, row);
+					update_row = row;
 
 					value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 					value->ui64 = 0;
@@ -1127,6 +1149,9 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 
 				zbx_vector_db_value_ptr_append(&values, value);
 			}
+
+			if (NULL != update_row)
+				zbx_vector_table_row_ptr_append(&td->updates, update_row);
 
 			zbx_db_insert_add_values_dyn(&db_insert, values.values, values.values_num);
 clean:
@@ -2276,7 +2301,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, zbx_pro
 		loglevel = LOG_LEVEL_WARNING;
 
 	zabbix_log(loglevel, "received configuration data from server at \"%s\", datalen " ZBX_FS_SSIZE_T,
-			addr, jp->end - jp->start + 1);
+			addr, (zbx_fs_ssize_t)(jp->end - jp->start + 1));
 
 	if (1 == jp->end - jp->start)
 	{

@@ -36,7 +36,7 @@ AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 	min_ssh2_rev=`expr $2 : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
 
 	found_ssh2_version_num=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_NUM | $AWK '{print @S|@3;}'`
-	min_ssh2_version_num=$(( "$min_ssh2_maj << 16 | $min_ssh2_min << 8 | $min_ssh2_rev" ))
+	min_ssh2_version_num=$(( $min_ssh2_maj << 16 | $min_ssh2_min << 8 | $min_ssh2_rev ))
 
 	if test $((found_ssh2_version_num)) -ge $((min_ssh2_version_num)); then
 		accept_ssh2_version="yes"

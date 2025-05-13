@@ -46,6 +46,8 @@ class CFilter extends CDiv {
 	// Time period Div element.
 	private $time_period;
 
+	private $is_hidden = false;
+
 	/**
 	 * List of predefined time ranges.
 	 */
@@ -332,12 +334,36 @@ class CFilter extends CDiv {
 	}
 
 	/**
+	 * Disable initial check of time selector parameters. All controls will be initially enabled.
+	 *
+	 * Required to invoke jQuery.publish('timeselector.update-ui') to update controls according to the time selected.
+	 *
+	 * @return CFilter
+	 */
+	public function setManualSetup(): CFilter {
+		$this->setAttribute('data-manual-setup', 1);
+
+		return $this;
+	}
+
+	/**
 	 * Prevent modifying history URL with time selector parameters.
 	 *
 	 * @return CFilter
 	 */
 	public function preventHistoryUpdates(): CFilter {
 		$this->setAttribute('data-prevent-history-updates', 1);
+
+		return $this;
+	}
+
+	/**
+	 * Prevent displaying tabs automatically.
+	 *
+	 * @return CFilter
+	 */
+	public function setHidden(): CFilter {
+		$this->is_hidden = true;
 
 		return $this;
 	}
@@ -365,7 +391,11 @@ class CFilter extends CDiv {
 	private function getJS() {
 		$id = '#'.$this->getId();
 
-		$js = 'jQuery("'.$id.'").tabs('.json_encode($this->tabs_options).').show();';
+		$js = 'const tabs = jQuery("'.$id.'").tabs('.json_encode($this->tabs_options).');';
+
+		if (!$this->is_hidden) {
+			$js .= 'tabs.show();';
+		}
 
 		// Set the focus to a field with autofocus after the filter becomes visible.
 		$js .= 'jQuery("[autofocus=autofocus]", jQuery("'.$id.'")).filter(":visible").focus();';

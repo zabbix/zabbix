@@ -975,7 +975,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
 				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
-		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
+
+		if (0 == (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);

@@ -38,5 +38,5 @@ use Widgets\ItemCard\Includes\CWidgetFieldItemSectionsView;
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_itemcard_form.init();')
+	->initFormJs('widget_form.init();')
 	->show();
