@@ -285,7 +285,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
 			$prev_time = $this->getPrevTime();
 
-			if ($prev_value !== '' || $prev_time !== '') {
+			if ($prev_value !== '' && $prev_time !== '') {
 				$data['options']['history'] = [
 					'value' => $prev_value,
 					'timestamp' => $prev_time
