@@ -186,7 +186,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation item create',
+						'id:key' => 'csrf.test.key'
+					]
 				]
 			],
 			// #12 Trigger update.

@@ -255,6 +255,7 @@ class CForm {
 	}
 
 	extendValidation(callback) {
+		throw new Error('Missing implementation.');
 		this.#custom_validation.push(callback);
 	}
 
@@ -318,11 +319,12 @@ class CForm {
 	 * is completed so that popup can be opened only when validation succeeds.
 	 *
 	 * @param {Array} fields
+	 * @param {?Object} rules
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields) {
-		const validator = new CFormValidator(this.#rules);
+	validateFieldsForAction(fields, rules) {
+		const validator = new CFormValidator(rules ? rules : this.#rules);
 
 		return validator.validateChanges(this.getAllValues(), fields)
 			.then((result) => {

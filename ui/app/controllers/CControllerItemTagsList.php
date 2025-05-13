@@ -61,7 +61,7 @@ class CControllerItemTagsList extends CController {
 			'tags' => [],
 			'show_inherited_tags' => 0,
 			'source' => 'item',
-			'has_inline_validation' => false
+			'has_inline_validation' => true
 		];
 		$this->getInputs($data, array_keys($data));
 
@@ -69,7 +69,7 @@ class CControllerItemTagsList extends CController {
 			return $tag['tag'] !== '' || $tag['value'] !== '';
 		});
 
-		if ($this->hasInput('itemid')) {
+		if ($this->hasInput('itemid') && $this->getInput('itemid')) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'templateid', 'hostid', 'flags'],
 				'selectDiscoveryRule' => ['name', 'templateid'],

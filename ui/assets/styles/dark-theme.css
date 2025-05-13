@@ -2406,6 +2406,9 @@ textarea.has-error {
 .multiselect-control.has-error:focus-within .multiselect {
   border-color: #ff9b9b; }
 
+.multilineinput-control.has-error > input[readonly][type="text"] {
+  border: 1px solid #ff5555; }
+
 div[data-field-type="set"].has-error {
   padding-left: 5px;
   width: min-content;
