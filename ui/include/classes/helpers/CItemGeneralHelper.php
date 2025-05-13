@@ -114,6 +114,27 @@ JAVASCRIPT;
 	 * @return array of tags with inherited and additional property 'type' set for each tag.
 	 */
 	public static function addInheritedTags(array $item, array $item_tags): array {
+		if (array_key_exists('parent_lld', $item) && $item['parent_lld']['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$lldruleid = $item['parent_lld']['itemid'];
+
+			while ($item['parent_lld']['templateid'] == 0) {
+				$db_source = API::DiscoveryRule()->get([
+					'output' => ['itemid', 'templateid'],
+					'selectDiscoveryRule' => ['itemid'],
+					'itemids' => $lldruleid,
+					'nopermissions' => true
+				]);
+
+				$item['parent_lld'] = reset($db_source);
+
+				if (!$item['parent_lld']['discoveryRule']) {
+					break;
+				}
+
+				$lldruleid = $item['parent_lld']['discoveryRule']['itemid'];
+			}
+		}
+
 		$tags = [];
 
 		$parent_templates = array_key_exists('parent_lld', $item)

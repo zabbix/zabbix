@@ -95,27 +95,6 @@ class CControllerItemTagsList extends CController {
 			if ($data['show_inherited_tags'] == 1) {
 				$this->item['parent_lld'] = $this->item['discoveryRule'];
 
-				if ($this->item['parent_lld']['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-					$lldruleid = $this->item['parent_lld']['itemid'];
-
-					while ($this->item['parent_lld']['templateid'] == 0) {
-						$db_source = API::DiscoveryRule()->get([
-							'output' => ['itemid', 'templateid'],
-							'selectDiscoveryRule' => ['itemid'],
-							'itemids' => $lldruleid,
-							'nopermissions' => true
-						]);
-
-						$this->item['parent_lld'] = reset($db_source);
-
-						if (!$this->item['parent_lld']['discoveryRule']) {
-							break;
-						}
-
-						$lldruleid = $this->item['parent_lld']['discoveryRule']['itemid'];
-					}
-				}
-
 				$data['tags'] = CItemHelper::addInheritedTags($this->item, $data['tags']);
 			}
 		}

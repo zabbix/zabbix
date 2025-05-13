@@ -84,7 +84,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'selectHosts' => ['hostid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
-			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
+			'selectDiscoveryRule' => ['itemid', 'name', 'templateid', 'flags'],
 			'selectDiscoveryData' => ['parent_itemid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTriggers' => ['triggerid'],
 			'webitems' => true
