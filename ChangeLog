@@ -8,6 +8,7 @@ New features:
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
 .......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
 .......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
 .......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
