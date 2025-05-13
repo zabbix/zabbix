@@ -1,3 +1,14 @@
+Changes for 7.4.0rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
+
+--------------------------------------------------------------------------------
 Changes for 7.4.0beta2
 
 New features:
@@ -153,6 +164,10 @@ New features:
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
+.......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
 .........T [ZBX-26050] updated dashboards in Zabbix server/proxy health templates (aiantsen)
 ..F....... [ZBX-26390] updated templated dashboard help icon link (Sasha)
 ..F....... [ZBX-25691] fixed the Problems by severity widget to display all existing problems (wczerneha)
@@ -600,6 +615,10 @@ New features:
 .........T [ZBXNEXT-9937] updated PostgreSQL templates to support versions 17 and above (drasikhov)
 
 Bug fixes:
+........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
+.......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
 .........T [ZBX-26050] updated dashboards in Zabbix server/proxy health templates (aiantsen)
 ..F....... [ZBX-26390] updated templated dashboard help icon link (Sasha)
 ..F....... [ZBX-25691] fixed the Problems by severity widget to display all existing problems (wczerneha)

@@ -115,17 +115,14 @@ class testWidgets extends CWebTest {
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
-		$items_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$this->assertEquals($widget === 'Graph prototype' ? 'Item prototypes' : 'Items', $items_dialog->getTitle());
+		$items_dialog = COverlayDialogElement::get($widget === 'Graph prototype' ? 'Item prototypes' : 'Items');
 
 		// Find the table where items will be expected.
 		$table = $items_dialog->query(self::TABLE_SELECTOR)->asTable()->one()->waitUntilVisible();
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
-		$items_dialog->query('button:Select')->waitUntilClickable();
 		$table->waitUntilReloaded();
-		$items_dialog->waitUntilReady();
 		$items_dialog->query('button:Select')->waitUntilClickable();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
