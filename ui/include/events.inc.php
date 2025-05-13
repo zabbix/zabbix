@@ -709,6 +709,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->addClass(ZBX_STYLE_TAG)
+							->addClass(ZBX_STYLE_BOX_SIZING_CONTEXT_BOX)
 							->setHint(getTagString($tag), '', false);
 					}
 					else {
