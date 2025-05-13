@@ -688,7 +688,7 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 			"HOST.HOST -> "								. self::HOST_NAME									. " <-\n" .
 			"HOST.IP -> "								. '127.0.0.1'										. " <-\n" .
 			"HOST.NAME -> "								. self::HOST_NAME									. " <-\n" .
-			"HOST.PORT -> "								. '10050'											. " <-\n" .
+			"HOST.PORT -> "								. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX		. " <-\n" .
 			"ITEM.DESCRIPTION -> "						. ''												. " <-\n" .
 			"ITEM.DESCRIPTION.ORIG -> "					. ''												. " <-\n" .
 			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY . '1'						. " <-\n" .
@@ -809,7 +809,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 			"HOST.HOST -> "								. self::HOST_NAME									. " <-\n" .
 			"HOST.IP -> "								. '127.0.0.1'										. " <-\n" .
 			"HOST.NAME -> "								. self::HOST_NAME									. " <-\n" .
-			"HOST.PORT -> "								. '10050'											. " <-\n" .
+			"HOST.PORT -> "								. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX		. " <-\n" .
 			"ITEM.DESCRIPTION -> "						. ''												. " <-\n" .
 			"ITEM.DESCRIPTION.ORIG -> "					. ''												. " <-\n" .
 			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY . '1'						. " <-\n" .
