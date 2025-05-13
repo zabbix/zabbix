@@ -359,11 +359,9 @@ class CZabbixServer {
 	/**
 	 * Returns true if the Zabbix server is running and false otherwise.
 	 *
-	 * @param $sid
-	 *
 	 * @return bool
 	 */
-	public function isRunning($sid) {
+	public function isRunning() {
 		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port', 'lastaccess'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
@@ -379,6 +377,17 @@ class CZabbixServer {
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Returns true if UI can connect to the Zabbix server
+	 *
+	 * @param $sid
+	 *
+	 * @return bool
+	 */
+	public function canConnect($sid) {
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'ping',
@@ -392,14 +401,6 @@ class CZabbixServer {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 
 		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
-	}
-
-	public function isConnectAvailable() {
-		if ($this->connect() === false) {
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -597,29 +598,16 @@ class CZabbixServer {
 				return false;
 			}
 
-			$protocol = '';
-			$context = stream_context_create([]);
+			$transport_context = $this->createTransportContext();
 
-			if ($ZBX_SERVER_TLS['ACTIVE'] == 1) {
-				$protocol = 'tls://';
-
-				if (!$this->checkTLSFiles($ZBX_SERVER_TLS['CA_FILE'])
-						|| !$this->checkTLSFiles($ZBX_SERVER_TLS['KEY_FILE'])
-						|| !$this->checkTLSFiles($ZBX_SERVER_TLS['CERT_FILE'])) {
-					$this->error = _('TLS fields are misconfigured or the files are not accessible.');
-					return false;
-				}
-
-				stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
-				stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
-				stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
-				stream_context_set_option($context, 'ssl', 'capture_peer_cert', $ZBX_SERVER_TLS['CERTIFICATE_CHECK']);
-				stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
+			if ($transport_context === null) {
+				$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+				return false;
 			}
 
-			if (!$socket = @stream_socket_client($protocol . $this->host . ':' . $this->port, $errorCode, $errorMsg,
-				$this->connect_timeout, STREAM_CLIENT_CONNECT, $context)) {
-				$host_port = $this->host . ':' . $this->port;
+			if (!$socket = @stream_socket_client($transport_context['protocol'].$this->host.':'.$this->port,
+				$errorCode, $errorMsg, $this->connect_timeout, STREAM_CLIENT_CONNECT, $transport_context['context'])) {
+				$host_port = $this->host.':'.$this->port;
 				switch ($errorMsg) {
 					case 'Connection refused':
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $host_port);
@@ -645,25 +633,21 @@ class CZabbixServer {
 				return false;
 			}
 
-			if ($ZBX_SERVER_TLS['CERTIFICATE_CHECK'] == 1) {
+			if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== '' || $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== '') {
 				$params = stream_context_get_params($socket);
 				$info = openssl_x509_parse($params['options']['ssl']['peer_certificate']);
-				$subject = $info['subject'] ?? [];
-				$issuer = $info['issuer'] ?? [];
 
-				$subject_string = implode(', ', array_map(static fn($k, $v) => "$k = $v", array_keys($subject),
-					$subject));
-				$issuer_string = implode(', ', array_map(static fn($k, $v) => "$k = $v", array_keys($issuer),
-					$issuer));
+				$subject = $this->normalizeDn($info['subject'] ?? []);
+				$issuer = $this->normalizeDn($info['issuer'] ?? []);
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
-						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer_string) {
+						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer) {
 					$this->error = _('TLS certificate issuer is incorrect. Possible cause: UI misconfiguration.');
 					return false;
 				}
 
 				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
-						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject_string) {
+						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject) {
 					$this->error = _('TLS certificate subject is incorrect. Possible cause: UI misconfiguration.');
 					return false;
 				}
@@ -695,11 +679,53 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	protected function checkTLSFiles(string $file_path): bool {
+	protected function checkTLSFile(string $file_path) {
 		if ($file_path === '' || !file_exists($file_path) || !is_readable($file_path)) {
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Sort and normalize elements
+	 *
+	 * @param array $dn
+	 *
+	 * @return string
+	 */
+	protected function normalizeDn(array $dn) {
+		ksort($dn);
+		return implode(', ', array_map(static fn($k, $v) => "$k = $v", array_keys($dn), $dn));
+	}
+
+	/**
+	 * Returns protocol and context for connection
+	 *
+	 * @return array<string, resource>|null
+	 */
+	protected function createTransportContext() {
+		global $ZBX_SERVER_TLS;
+
+		$protocol = '';
+		$context = stream_context_create([]);
+
+		if ($ZBX_SERVER_TLS['ACTIVE'] == 1) {
+			$protocol = 'tls://';
+
+			if (!$this->checkTLSFile($ZBX_SERVER_TLS['CA_FILE'])
+				|| !$this->checkTLSFile($ZBX_SERVER_TLS['KEY_FILE'])
+				|| !$this->checkTLSFile($ZBX_SERVER_TLS['CERT_FILE'])) {
+				return null;
+			}
+
+			stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
+			stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
+			stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
+			stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
+			stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
+		}
+
+		return ['protocol' => $protocol, 'context' => $context];
 	}
 }

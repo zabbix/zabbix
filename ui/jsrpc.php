@@ -73,10 +73,10 @@ switch ($data['method']) {
 					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
 				);
 
-				$is_running = $zabbix_server->isRunning(CSessionHelper::getId());
+				$is_running = $zabbix_server->isRunning();
 
 				if ($is_running) {
-					$is_connect_available = $zabbix_server->isConnectAvailable();
+					$is_connect_available = $zabbix_server->canConnect(CSessionHelper::getId());
 				}
 				else {
 					$is_connect_available = false;

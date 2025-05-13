@@ -58,11 +58,13 @@ const view = new class {
 				break;
 
 			case STEP_SETTINGS:
-				document.getElementById('default-theme').addEventListener('change', () => form.submit())
+				document.getElementById('default-theme').addEventListener('change', () => form.submit());
 				document.getElementById('zbx_server_tls').addEventListener('change', () =>
-					this._updateEncryptionFields());
+					this._updateEncryptionFields()
+				);
 				document.getElementById('zbx_server_tls_certificate_check').addEventListener('change', () =>
-					this._updateEncryptionFields());
+					this._updateEncryptionFields()
+				);
 
 				this._updateEncryptionFields();
 				break;
@@ -179,10 +181,6 @@ const view = new class {
 
 			input.parentElement.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
 			input.parentElement.previousElementSibling.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
-
-			if (!rows[id]) {
-				input.value = null;
-			}
 		}
 	}
 };

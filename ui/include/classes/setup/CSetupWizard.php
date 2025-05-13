@@ -365,7 +365,6 @@ class CSetupWizard extends CForm {
 						'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
 						'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 						'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
-						'CERTIFICATE_CHECK' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0'),
 						'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
 						'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
 					];
@@ -376,7 +375,6 @@ class CSetupWizard extends CForm {
 						'CA_FILE' => '',
 						'KEY_FILE' => '',
 						'CERT_FILE' => '',
-						'CERTIFICATE_CHECK' => '0',
 						'CERTIFICATE_ISSUER' => '',
 						'CERTIFICATE_SUBJECT' => ''
 					];
@@ -1212,7 +1210,6 @@ class CSetupWizard extends CForm {
 				'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
 				'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 				'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
-				'CERTIFICATE_CHECK' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0'),
 				'CERTIFICATE_ISSUER' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', ''),
 				'CERTIFICATE_SUBJECT' => $this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
 			];
@@ -1223,7 +1220,6 @@ class CSetupWizard extends CForm {
 				'CA_FILE' => '',
 				'KEY_FILE' => '',
 				'CERT_FILE' => '',
-				'CERTIFICATE_CHECK' => '0',
 				'CERTIFICATE_ISSUER' => '',
 				'CERTIFICATE_SUBJECT' => ''
 			];
@@ -1441,7 +1437,7 @@ class CSetupWizard extends CForm {
 	}
 
 	private function checkServerTLSConfiguration() {
-		if ((int) $this->getConfig('ZBX_SERVER_TLS') === 0) {
+		if ($this->getConfig('ZBX_SERVER_TLS') == 0) {
 			return true;
 		}
 
