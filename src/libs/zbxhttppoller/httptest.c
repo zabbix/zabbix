@@ -758,7 +758,6 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		struct curl_slist	*headers_slist = NULL;
 		char			*header_cookie = NULL;
 		zbx_curl_cb_t		curl_body_cb, curl_header_cb;
-		zbx_dc_um_handle_t	*um_handle_masked, *um_handle_secure;
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -770,8 +769,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
 
-		um_handle_masked = zbx_dc_open_user_macros_masked();
-		um_handle_secure = zbx_dc_open_user_macros_secure();
+		zbx_dc_um_handle_t	*um_handle_masked = zbx_dc_open_user_macros_masked();
+		zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
 
 		zbx_substitute_macros(&db_httpstep.url, NULL, 0, &macro_httptest_field_resolv, um_handle_secure, host);
 
