@@ -740,13 +740,13 @@ class CZabbixServer {
 		}
 
 		if ($tls_config['CERTIFICATE_ISSUER'] !== ''
-			&& $tls_config['CERTIFICATE_ISSUER'] !== $this->normalizeDn($info['issuer'] ?? [])) {
+				&& $tls_config['CERTIFICATE_ISSUER'] !== $this->normalizeDn($info['issuer'] ?? [])) {
 			$this->error = _('TLS certificate issuer is incorrect. Possible cause: UI misconfiguration.');
 			return false;
 		}
 
 		if ($tls_config['CERTIFICATE_SUBJECT'] !== ''
-			&& $tls_config['CERTIFICATE_SUBJECT'] !== $this->normalizeDn($info['subject'] ?? [])) {
+				&& $tls_config['CERTIFICATE_SUBJECT'] !== $this->normalizeDn($info['subject'] ?? [])) {
 			$this->error = _('TLS certificate subject is incorrect. Possible cause: UI misconfiguration.');
 			return false;
 		}
