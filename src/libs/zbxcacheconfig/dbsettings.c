@@ -331,7 +331,8 @@ static int	setting_get_str(const zbx_setting_value_t *values, const char *name, 
 		else
 		{
 			*value = e->default_value;
-			zabbix_log(defaults_log_level, "string setting '%s' uses default value: %s", name, ZBX_NULL2STR(*value));
+			zabbix_log(defaults_log_level, "string setting '%s' uses default value: %s", name,
+					ZBX_NULL2STR(*value));
 		}
 
 		return SUCCEED;
