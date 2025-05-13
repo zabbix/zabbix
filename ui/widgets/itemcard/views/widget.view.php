@@ -434,6 +434,15 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 
 			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 				$last_value_column_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+
+				$action_column_value = (new CButton(null, _('Show')))
+					->addClass('btn-thumbnail')
+					->addClass('js-show-binary');
+
+				$action_column
+					->setAttribute('data-itemid', $item['itemid'])
+					->setAttribute('data-key_', $item['key_'])
+					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 			}
 			else {
 				$last_value_column_value = (new CSpan(formatHistoryValue($item_value['value'], $item, false)))
@@ -444,17 +453,6 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 							->addClass(ZBX_STYLE_HINTBOX_WRAP),
 						'', true, '', 0
 					);
-			}
-
-			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				$action_column_value = (new CButton(null, _('Show')))
-					->addClass('btn-thumbnail')
-					->addClass('js-show-binary');
-
-				$action_column
-					->setAttribute('data-itemid', $item['itemid'])
-					->setAttribute('data-key_', $item['key_'])
-					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 			}
 		}
 
