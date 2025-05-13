@@ -834,6 +834,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 					['userdirectoryid' => 'API SAML', 'sp_private_key' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
 				],
 				'expected_error' => 'Invalid parameter "/1/sp_private_key": value is not PEM encoded private key.'
+			],
+			'Test invalid SAML IdP certificate length' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'idp_certificate' => str_repeat('abc123 ', 1429)]
+				],
+				'expected_error' => 'Invalid parameter "/1/idp_certificate": value is too long.'
+			],
+			'Test invalid SAML SP certificate length' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_certificate' => str_repeat('abc123 ', 1429)]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": value is too long.'
+			],
+			'Test invalid SAML SP private key length' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_private_key' => str_repeat('abc123 ', 1429)]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": value is too long.'
 			]
 		];
 	}
