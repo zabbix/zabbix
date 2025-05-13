@@ -309,13 +309,14 @@ class CSetupWizard extends CForm {
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', getRequest('zbx_server_tls_certificate_subject',
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')));
 
-			if (!$this->checkServerTLSConfiguration()) {
-				$this->step_failed = true;
-				unset($_REQUEST['next']);
-			}
-
 			if (hasRequest('next') && array_key_exists(self::STAGE_SETTINGS, getRequest('next'))) {
-				$this->doNext();
+				if (!$this->checkServerTLSConfiguration()) {
+					$this->step_failed = true;
+					unset($_REQUEST['next']);
+				}
+				else {
+					$this->doNext();
+				}
 			}
 		}
 		elseif ($this->getStep() == self::STAGE_INSTALL) {
