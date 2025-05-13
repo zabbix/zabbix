@@ -18,6 +18,8 @@ require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup dashboard, globalmacro
  *
@@ -669,9 +671,9 @@ class testDashboardGaugeWidget extends testWidgets {
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
-						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
+						'Invalid parameter "Max": a number is expected.'
+					],
+					'invalid_color' => true
 				]
 			],
 			// #8 2-bytes special characters.
@@ -798,28 +800,28 @@ class testDashboardGaugeWidget extends testWidgets {
 						'Item' => self::GAUGE_ITEM,
 						'Min' => 99,
 						'Max' => 88888,
-						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
-						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
-						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
+						'xpath:.//z-color-picker[@color-field-name="value_arc_color"]' => '64B5F6',
+						'xpath:.//z-color-picker[@color-field-name="empty_color"]' => 'FFBF00',
+						'xpath:.//z-color-picker[@color-field-name="bg_color"]' => 'BA68C8',
 						'Angle' => '270°',
 						'id:description' => '𒀐 New test Description 😁🙂😁🙂',
 						'id:desc_size' => 30,
 						'id:desc_bold' => true,
 						'id:desc_v_pos' => 'Top',
-						'xpath:.//input[@id="desc_color"]/..' => 'FFB300',
+						'xpath:.//z-color-picker[@color-field-name="desc_color"]' => 'FFB300',
 						'id:decimal_places' => 10,
 						'id:value_size' => 50,
 						'id:value_bold' => true,
-						'xpath:.//input[@id="value_color"]/..' => '283593',
+						'xpath:.//z-color-picker[@color-field-name="value_color"]' => '283593',
 						'id:show_5' => true, // Show Value arc.
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Above value',
-						'xpath:.//input[@id="units_color"]/..' => '4E342E',
+						'xpath:.//z-color-picker[@color-field-name="units_color"]' => '4E342E',
 						'id:show_3' => true, // Show Needle.
-						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
+						'xpath:.//z-color-picker[@color-field-name="needle_color"]' => '4DD0E1',
 						'id:scale_size' => 33,
 						'id:scale_decimal_places' => 8,
 						'id:th_show_arc' => true,
@@ -964,6 +966,13 @@ class testDashboardGaugeWidget extends testWidgets {
 			}
 
 			$this->getThresholdsTable()->fill($data['Thresholds']);
+
+			// Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
+			if (CTestArrayHelper::get($data, 'invalid_color')) {
+				$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
+				$this->assertTrue($color_picker->isSubmittionDisabled());
+				$color_picker->close();
+			}
 		}
 
 		$form->fill($data['fields']);

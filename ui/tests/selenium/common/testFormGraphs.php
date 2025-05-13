@@ -898,7 +898,7 @@ class testFormGraphs extends CWebTest {
 
 				// Add line color.
 				if (array_key_exists('color', $item)) {
-					$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($item['color']);
+					$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->fill($item['color']);
 				}
 			}
 		}
