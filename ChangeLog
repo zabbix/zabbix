@@ -4,9 +4,9 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
-.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout instead of 60 s (askolmeisters)
 .......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
-.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in macro function (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0beta2
