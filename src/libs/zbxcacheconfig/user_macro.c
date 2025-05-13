@@ -1003,7 +1003,10 @@ static int	um_cache_get_host_macro(const zbx_um_cache_t *cache, const zbx_uint64
 	}
 
 	if (0 != templateids.values_num)
+	{
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		ret = um_cache_get_host_macro(cache, templateids.values, templateids.values_num, name, context, macro);
+	}
 	else
 		ret = FAIL;
 out:
