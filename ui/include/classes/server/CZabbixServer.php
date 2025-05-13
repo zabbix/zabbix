@@ -696,7 +696,7 @@ class CZabbixServer {
 	 */
 	protected function normalizeDn(array $dn) {
 		ksort($dn);
-		return implode(', ', array_map(static fn($k, $v) => "$k = $v", array_keys($dn), $dn));
+		return implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($dn), $dn));
 	}
 
 	/**
