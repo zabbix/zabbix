@@ -7570,8 +7570,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.47rc1
 
-New features:
-
 Bug fixes:
 ...G...PS. [ZBX-26080] fixed old file descriptors being held when external log rotation is used (dgoloscapov)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
