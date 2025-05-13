@@ -453,6 +453,19 @@ static int	DBpatch_7030032(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030033(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i where item_rtdata.itemid=i.itemid and i.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(7030)
@@ -492,5 +505,6 @@ DBPATCH_ADD(7030029, 0, 1)
 DBPATCH_ADD(7030030, 0, 1)
 DBPATCH_ADD(7030031, 0, 1)
 DBPATCH_ADD(7030032, 0, 1)
+DBPATCH_ADD(7030033, 0, 1)
 
 DBPATCH_END()
