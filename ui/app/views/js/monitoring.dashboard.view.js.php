@@ -158,7 +158,9 @@
 
 				jQuery('#dashboard_hostid').on('change', () => this.#onDashboardHostChange());
 
-				window.addEventListener('popstate', e => this.#onPopState(e));
+				if (dashboard.dashboardid !== null && !clone) {
+					window.addEventListener('popstate', e => this.#onPopState(e));
+				}
 
 				jQuery.subscribe('timeselector.rangeupdate', (e, data) => this.#onTimeSelectorRangeUpdate(e, data));
 
@@ -502,7 +504,9 @@
 		}
 
 		#onDashboardHostChange() {
-			this.#updateHistory({add_new: !ZABBIX.Dashboard.isEditMode()});
+			if (this.#dashboard.dashboardid !== null && !this.#clone) {
+				this.#updateHistory({add_new: !ZABBIX.Dashboard.isEditMode()});
+			}
 
 			const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
 			const host = hosts.length > 0 ? hosts[0] : null;
@@ -573,7 +577,10 @@
 					this.#time_selector_toggle_timeout = setTimeout(() => {
 						this.#time_selector_toggle_timeout = null;
 
-						this.#updateHistory({add_new: false});
+						if (this.#dashboard.dashboardid !== null && !this.#clone) {
+							this.#updateHistory({add_new: false});
+						}
+
 						this.#toggleTimeSelector(e.detail.is_referred);
 					});
 
@@ -588,7 +595,10 @@
 					this.#host_override_toggle_timeout = setTimeout(() => {
 						this.#host_override_toggle_timeout = null;
 
-						this.#updateHistory({add_new: !ZABBIX.Dashboard.isEditMode()});
+						if (this.#dashboard.dashboardid !== null && !this.#clone) {
+							this.#updateHistory({add_new: !ZABBIX.Dashboard.isEditMode()});
+						}
+
 						this.#toggleHostOverride(
 							ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_ID)
 								|| ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_IDS)
