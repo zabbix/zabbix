@@ -1,1 +1,1 @@
-........S. [ZBX-26256] fixed report activity checks (askolmeisters)
+........S. [ZBX-26256] fixed scheduled report not being created when start date is set in the future and beyond the current cycle (askolmeisters)
