@@ -179,6 +179,7 @@ typedef struct
 {
 	char				*name;
 	char				*uuid;
+	char				*id;
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
@@ -293,6 +294,7 @@ typedef struct
 	unsigned int				snapshot_count;
 	zbx_vector_vmware_custom_attr_ptr_t	custom_attrs;
 	zbx_vector_str_t			alarm_ids;
+	zbx_vector_str_t			ds_ids;
 }
 zbx_vmware_vm_t;
 
@@ -693,14 +695,13 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 #define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
 #define ZBX_VMWARE_VMPROP_FOLDER			20
 #define ZBX_VMWARE_VMPROP_SNAPSHOT			21
-#define ZBX_VMWARE_VMPROP_DATASTOREID			22
-#define ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED		23
-#define ZBX_VMWARE_VMPROP_RESOURCEPOOL			24
-#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			25
-#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		26
-#define ZBX_VMWARE_VMPROP_STATE				27
+#define ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED		22
+#define ZBX_VMWARE_VMPROP_RESOURCEPOOL			23
+#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			24
+#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		25
+#define ZBX_VMWARE_VMPROP_STATE				26
 
-#define ZBX_VMWARE_VMPROPS_NUM				28
+#define ZBX_VMWARE_VMPROPS_NUM				27
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0

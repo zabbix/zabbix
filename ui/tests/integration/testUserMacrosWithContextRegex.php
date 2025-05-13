@@ -344,24 +344,20 @@ class testUserMacrosWithContextRegex extends CIntegrationTest {
 	}
 
 	/**
-	 * Test macro expansion in event names
+	 * Test macro expansion in event name
 	 */
-	private function testEventNames(string $trapperItemKey, int $trigggerId, string $expectedEvtName) {
-		foreach ([17, 34] as $item_value) {
-			$this->sendSenderValue(self::HOSTNAME, $trapperItemKey, $item_value);
-
-			$response = $this->callUntilDataIsPresent('problem.get', [
-				'output' => ['name'],
-				'objectids' => $trigggerId,
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER
-			]);
-			$this->assertArrayHasKey('result', $response);
-			$this->assertArrayHasKey(0, $response['result']);
-			$event = $response['result'][0];
-			$this->assertArrayHasKey('name', $event, 'Failed to get event name');
-			$this->assertEquals($expectedEvtName, $event['name'], 'Unexpected event name');
-		}
+	private function testEventName(int $trigggerId, string $expectedEvtName) {
+		$response = $this->callUntilDataIsPresent('problem.get', [
+			'output' => ['name'],
+			'objectids' => $trigggerId,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey(0, $response['result']);
+		$event = $response['result'][0];
+		$this->assertArrayHasKey('name', $event, 'Failed to get event name');
+		$this->assertEquals($expectedEvtName, $event['name'], 'Unexpected event name');
 	}
 
 	/**
@@ -448,9 +444,30 @@ class testUserMacrosWithContextRegex extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		// Perform test
-		$this->testEventNames(self::TRAPPER_ITEM_KEY_H, self::$triggerIdH, 'event name|33|15|15|');
-		$this->testEventNames(self::TRAPPER_ITEM_KEY_T1, self::$triggerIdT1, 'event name|33|15|15|');
-		$this->testEventNames(self::TRAPPER_ITEM_KEY_G, self::$triggerIdG, 'event name|33|15|15|');
+		$senderValues = [
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_H, 'value' => 17],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_T1, 'value' => 17],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_G, 'value' => 17]
+		];
+
+		$this->sendSenderValues($senderValues);
+
+		$this->testEventName(self::$triggerIdH, 'event name|33|15|15|');
+		$this->testEventName(self::$triggerIdT1, 'event name|33|15|15|');
+		$this->testEventName(self::$triggerIdG, 'event name|33|15|15|');
+
+		$senderValues = [
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_H, 'value' => 34],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_T1, 'value' => 34],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_G, 'value' => 34]
+		];
+
+		$this->sendSenderValues($senderValues);
+
+		$this->testEventName(self::$triggerIdH, 'event name|33|15|15|');
+		$this->testEventName(self::$triggerIdT1, 'event name|33|15|15|');
+		$this->testEventName(self::$triggerIdG, 'event name|33|15|15|');
+
 		$this->testAgentItemKey('33 15 15 15');
 	}
 
@@ -471,9 +488,13 @@ class testUserMacrosWithContextRegex extends CIntegrationTest {
 		// Cleanup for the previous test is done here to make sure it runs even if the previous test failed.
 
 		// Recover from problems started during the previous test
-		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_ITEM_KEY_H, 1);
-		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_ITEM_KEY_T1, 1);
-		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_ITEM_KEY_G, 1);
+		$senderValues = [
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_H, 'value' => 1],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_T1, 'value' => 1],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_G, 'value' => 1]
+		];
+
+		$this->sendSenderValues($senderValues);
 
 		// Cleanup macros
 		$this->usermacroCleanup();
@@ -497,9 +518,30 @@ class testUserMacrosWithContextRegex extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		// Perform test
-		$this->testEventNames(self::TRAPPER_ITEM_KEY_H, self::$triggerIdH, 'event name|15|15|15|');
-		$this->testEventNames(self::TRAPPER_ITEM_KEY_T1, self::$triggerIdT1, 'event name|15|15|15|');
-		$this->testEventNames(self::TRAPPER_ITEM_KEY_G, self::$triggerIdG, 'event name|15|15|15|');
+		$senderValues = [
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_H, 'value' => 17],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_T1, 'value' => 17],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_G, 'value' => 17]
+		];
+
+		$this->sendSenderValues($senderValues);
+
+		$this->testEventName(self::$triggerIdH, 'event name|15|15|15|');
+		$this->testEventName(self::$triggerIdT1, 'event name|15|15|15|');
+		$this->testEventName(self::$triggerIdG, 'event name|15|15|15|');
+
+		$senderValues = [
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_H, 'value' => 34],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_T1, 'value' => 34],
+			['host' => self::HOSTNAME, 'key' => self::TRAPPER_ITEM_KEY_G, 'value' => 34]
+		];
+
+		$this->sendSenderValues($senderValues);
+
+		$this->testEventName(self::$triggerIdH, 'event name|15|15|15|');
+		$this->testEventName(self::$triggerIdT1, 'event name|15|15|15|');
+		$this->testEventName(self::$triggerIdG, 'event name|15|15|15|');
+
 		$this->testAgentItemKey('15 15 15 33');
 	}
 

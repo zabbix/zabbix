@@ -3635,19 +3635,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			continue;
 		}
 
+		item_flags = (unsigned char)atoi(row[18]);
+
+		/* item prototype does not have item_rtdata and shouldn't be present in sync */
+		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			template_item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid,
+					sizeof(ZBX_DC_TEMPLATE_ITEM), &found);
+
+			template_item->hostid = hostid;
+			template_item->templateid = templateid;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "item_rtdata entry unexpectedly is present for item "
+					"prototype: " ZBX_FS_UI64 " on hostid: " ZBX_FS_UI64, itemid, hostid);
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
 		if (NULL == host || host->hostid != hostid)
 		{
 			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 				continue;
-		}
-
-		item_flags = (unsigned char)atoi(row[18]);
-
-		/* item prototype does not have item_rtdata and shouldn't be present in sync */
-		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
-				item_flags != ZBX_FLAG_DISCOVERY_RULE)
-		{
-			continue;
 		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
@@ -16342,16 +16350,15 @@ out:
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
  *             env         - [IN] security environment                        *
- *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
-		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error)
+void	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env)
 {
 	/* wrap the passed user macro and func macro cache into user macro handle structure */
 	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = env, .prev = NULL};
 
-	return zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, error);
+	(void)zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, NULL);
 }
 
 typedef struct
