@@ -590,7 +590,7 @@ class CZabbixServer {
 	 * @return bool|resource
 	 */
 	protected function connect() {
-		global $ZBX_SERVER_TLS;
+		$tls_config = ZBase::getConfig('ZBX_SERVER_TLS');
 
 		if (!$this->socket) {
 			if ($this->host === null || $this->port === null) {
@@ -598,7 +598,7 @@ class CZabbixServer {
 				return false;
 			}
 
-			$transport_context = $this->createTransportContext();
+			$transport_context = $this->createTransportContext($tls_config);
 
 			if ($transport_context === null) {
 				$this->error = _('TLS fields are misconfigured or the files are not accessible.');
@@ -622,7 +622,7 @@ class CZabbixServer {
 						break;
 
 					default:
-						if ($ZBX_SERVER_TLS['ACTIVE']) {
+						if ($tls_config['ACTIVE'] == 1) {
 							$dErrorMsg = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
 						} else {
 							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
@@ -633,24 +633,10 @@ class CZabbixServer {
 				return false;
 			}
 
-			if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== '' || $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== '') {
-				$params = stream_context_get_params($socket);
-				$info = openssl_x509_parse($params['options']['ssl']['peer_certificate']);
+			$check_result = $this->checkCertificates($socket, $tls_config);
 
-				$subject = $this->normalizeDn($info['subject'] ?? []);
-				$issuer = $this->normalizeDn($info['issuer'] ?? []);
-
-				if ($ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== ''
-						&& $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'] !== $issuer) {
-					$this->error = _('TLS certificate issuer is incorrect. Possible cause: UI misconfiguration.');
-					return false;
-				}
-
-				if ($ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== ''
-						&& $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] !== $subject) {
-					$this->error = _('TLS certificate subject is incorrect. Possible cause: UI misconfiguration.');
-					return false;
-				}
+			if (!$check_result) {
+				return false;
 			}
 
 			$this->socket = $socket;
@@ -688,7 +674,7 @@ class CZabbixServer {
 	}
 
 	/**
-	 * Sort and normalize elements
+	 * Sort and normalize elements from certificate
 	 *
 	 * @param array $dn
 	 *
@@ -704,28 +690,67 @@ class CZabbixServer {
 	 *
 	 * @return array<string, resource>|null
 	 */
-	protected function createTransportContext() {
-		global $ZBX_SERVER_TLS;
-
+	protected function createTransportContext(array $tls_config) {
 		$protocol = '';
 		$context = stream_context_create([]);
 
-		if ($ZBX_SERVER_TLS['ACTIVE'] == 1) {
+		if ($tls_config['ACTIVE'] == 1) {
 			$protocol = 'tls://';
 
-			if (!$this->checkTLSFile($ZBX_SERVER_TLS['CA_FILE'])
-				|| !$this->checkTLSFile($ZBX_SERVER_TLS['KEY_FILE'])
-				|| !$this->checkTLSFile($ZBX_SERVER_TLS['CERT_FILE'])) {
+			if (!$this->checkTLSFile($tls_config['CA_FILE'])
+				|| !$this->checkTLSFile($tls_config['KEY_FILE'])
+				|| !$this->checkTLSFile($tls_config['CERT_FILE'])) {
 				return null;
 			}
 
-			stream_context_set_option($context, 'ssl', 'cafile', $ZBX_SERVER_TLS['CA_FILE']);
-			stream_context_set_option($context, 'ssl', 'local_pk', $ZBX_SERVER_TLS['KEY_FILE']);
-			stream_context_set_option($context, 'ssl', 'local_cert', $ZBX_SERVER_TLS['CERT_FILE']);
+			stream_context_set_option($context, 'ssl', 'cafile', $tls_config['CA_FILE']);
+			stream_context_set_option($context, 'ssl', 'local_pk', $tls_config['KEY_FILE']);
+			stream_context_set_option($context, 'ssl', 'local_cert', $tls_config['CERT_FILE']);
 			stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
 			stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 		}
 
 		return ['protocol' => $protocol, 'context' => $context];
+	}
+
+	/**
+	 * Validates the TLS certificate of a given socket against expected issuer and subject from configuration.
+	 *
+	 * @param resource $socket
+	 * @param array $tls_config
+	 *
+	 * @return bool
+	 */
+	protected function checkCertificates($socket, array $tls_config) {
+		if ($tls_config['CERTIFICATE_ISSUER'] === '' && $tls_config['CERTIFICATE_SUBJECT'] === '') {
+			return true;
+		}
+
+		if (!extension_loaded('openssl')) {
+			$this->error = _('OpenSSL extension is not available. Cannot parse TLS certificate.');
+			return false;
+		}
+
+		$params = stream_context_get_params($socket);
+		$info = @openssl_x509_parse($params['options']['ssl']['peer_certificate']);
+
+		if ($info === false) {
+			$this->error = _('Failed to parse TLS certificate.');
+			return false;
+		}
+
+		if ($tls_config['CERTIFICATE_ISSUER'] !== ''
+			&& $tls_config['CERTIFICATE_ISSUER'] !== $this->normalizeDn($info['issuer'] ?? [])) {
+			$this->error = _('TLS certificate issuer is incorrect. Possible cause: UI misconfiguration.');
+			return false;
+		}
+
+		if ($tls_config['CERTIFICATE_SUBJECT'] !== ''
+			&& $tls_config['CERTIFICATE_SUBJECT'] !== $this->normalizeDn($info['subject'] ?? [])) {
+			$this->error = _('TLS certificate subject is incorrect. Possible cause: UI misconfiguration.');
+			return false;
+		}
+
+		return true;
 	}
 }

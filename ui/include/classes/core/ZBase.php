@@ -386,6 +386,15 @@ class ZBase {
 		};
 	}
 
+	public static function getConfig(?string $key = null): mixed
+	{
+		if ($key === null) {
+			return self::$instance->config;
+		}
+
+		return self::$instance->config[$key];
+	}
+
 	/**
 	 * Check if maintenance mode is enabled.
 	 *
