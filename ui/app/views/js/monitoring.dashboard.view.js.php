@@ -156,8 +156,7 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.#edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, () => this.#applyProperties());
 
-				document.getElementById('dashboard_hostid')
-					.addEventListener('change', () => this.#onDashboardHostChange());
+				jQuery('#dashboard_hostid').on('change', () => this.#onDashboardHostChange());
 
 				window.addEventListener('popstate', e => this.#onPopState(e));
 
