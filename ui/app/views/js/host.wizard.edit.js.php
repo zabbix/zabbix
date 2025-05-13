@@ -833,40 +833,40 @@ window.host_wizard_edit = new class {
 
 		const progress_labels = [
 			{
-				label: t('Selected host'),
+				label: <?= json_encode(_('Selected host')) ?>,
 				info: this.#source_host?.name,
 				visible: this.#source_host !== null,
 				steps: [this.STEP_WELCOME]
 			},
 			{
-				label: t('Select a template'),
+				label: <?= json_encode(_('Select a template')) ?>,
 				info: this.#getSelectedTemplate()?.name,
 				visible: true,
 				steps: [this.STEP_SELECT_TEMPLATE]
 			},
 			{
-				label: t('Create or select a host'),
+				label: <?= json_encode(_('Create or select a host')) ?>,
 				info: this.#data.host?.name,
 				visible: this.#source_host === null,
 				steps: [this.STEP_CREATE_HOST]
 			},
 			{
-				label: t('Install Zabbix agent'),
+				label: <?= json_encode(_('Install Zabbix agent')) ?>,
 				visible: template_loaded && this.#isRequiredInstallAgent(),
 				steps: [this.STEP_INSTALL_AGENT]
 			},
 			{
-				label: t('Add host interface'),
+				label: <?= json_encode(_('Add host interface')) ?>,
 				visible: template_loaded && this.#isRequiredAddHostInterface(),
 				steps: [this.STEP_ADD_HOST_INTERFACE]
 			},
 			{
-				label: t('Configure host'),
+				label: <?= json_encode(_('Configure host')) ?>,
 				visible: template_loaded,
 				steps: [this.STEP_README, this.STEP_CONFIGURE_HOST, this.STEP_CONFIGURATION_FINISH]
 			},
 			{
-				label: t('A few more steps'),
+				label: <?= json_encode(_('A few more steps')) ?>,
 				visible: !template_loaded,
 				steps: []
 			}
