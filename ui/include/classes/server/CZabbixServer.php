@@ -590,7 +590,7 @@ class CZabbixServer {
 	 * @return bool|resource
 	 */
 	protected function connect() {
-		$tls_config = ZBase::getConfig('ZBX_SERVER_TLS');
+		$tls_config = ZBase::getConfig()['ZBX_SERVER_TLS'];
 
 		if (!$this->socket) {
 			if ($this->host === null || $this->port === null) {

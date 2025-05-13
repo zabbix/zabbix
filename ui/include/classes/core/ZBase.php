@@ -386,13 +386,9 @@ class ZBase {
 		};
 	}
 
-	public static function getConfig(?string $key = null): mixed
+	public static function getConfig(): array
 	{
-		if ($key === null) {
-			return self::$instance->config;
-		}
-
-		return self::$instance->config[$key];
+		return self::$instance->config;
 	}
 
 	/**
