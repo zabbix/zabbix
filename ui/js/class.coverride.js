@@ -31,13 +31,21 @@ jQuery(function ($) {
 			opt = $override.data('options'),
 			field_name = opt.makeName(option, opt.getId($override));
 
-		if (option === 'color') {
-			const id = field_name.replace(/\]/g, '_').replace(/\[/g, '_');
-			const input = $('<input>', {'name': field_name, 'type': 'hidden', 'id': id}).val(value);
+		if (option === 'color' || option === 'color_palette') {
+			const color_picker = new ZColorPicker();
+
+			color_picker.colorFieldName = opt.makeName('color', opt.getId($override));
+			color_picker.paletteFieldName = opt.makeName('color_palette', opt.getId($override));
+
+			if (option === 'color') {
+				color_picker.color = value;
+			}
+			else if (option === 'color_palette') {
+				color_picker.palette = value;
+			}
 
 			return $('<div>')
-				.addClass('color-picker')
-				.append(input)
+				.append(color_picker)
 				.append(close);
 		}
 		else if (option === 'timeshift') {
@@ -217,10 +225,6 @@ jQuery(function ($) {
 
 					$(elmnt).insertBefore($(this));
 					$(this).remove();
-
-					if (opt === 'color') {
-						$(elmnt).find('input').colorpicker();
-					}
 				});
 
 				$override.on('click', '[data-option]', function(e) {
@@ -257,8 +261,20 @@ jQuery(function ($) {
 		 * @param string value           Value of option. Can be NULL for options 'color' and 'timeshift'.
 		 */
 		addOverride: function($override, option, value) {
-			var opt = $override.data('options');
-			if ($('[name="' + opt['makeName'](option, opt.getId($override)) + '"]', $override).length > 0) {
+			const opt = $override.data('options');
+
+			let override_exists;
+
+			if (option === 'color') {
+				override_exists = $override[0].querySelector(`.${ZBX_STYLE_COLOR_PICKER}`) !== null;
+			}
+			else {
+				const field_name = opt['makeName'](option, opt.getId($override));
+
+				override_exists = $override[0].querySelector(`[name="${field_name}"]`) !== null;
+			}
+
+			if (override_exists) {
 				methods.updateOverride($override, option, value);
 			}
 			else {
@@ -266,10 +282,6 @@ jQuery(function ($) {
 				$('<li>')
 					.append(elmnt)
 					.insertBefore($('li:last', $override));
-
-				if (option === 'color') {
-					$(elmnt).find('input').colorpicker();
-				}
 			}
 
 			// Call on-select callback.
@@ -284,14 +296,23 @@ jQuery(function ($) {
 		updateOverride: function($override, option, value) {
 			var opt = $override.data('options'),
 				field_name = opt['makeName'](option, opt.getId($override));
-			$('[name="' + field_name + '"]', $override).val(value);
 
 			switch (option) {
-				case 'timeshift':
 				case 'color':
+					const color_picker = $override[0].querySelector(`.${ZBX_STYLE_COLOR_PICKER}`);
+
+					if (color_picker !== null) {
+						color_picker.color = value;
+					}
+					break;
+
+				case 'timeshift':
+					$('[name="' + field_name + '"]', $override).val(value);
 					break;
 
 				default:
+					$('[name="' + field_name + '"]', $override).val(value);
+
 					var visible_name = (typeof opt.captions[option] !== 'undefined') ? opt.captions[option] : option,
 						visible_value = (typeof opt.captions[option + value] !== 'undefined')
 							? opt.captions[option + value]
