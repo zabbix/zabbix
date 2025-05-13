@@ -590,7 +590,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 
 func (p *PluginExport) exportProcMem(params []string) (result interface{}, err error) {
 	var name, mode, cmdline, memtype string
-	var usr *user.User
+	var uid *uid
 
 	switch len(params) {
 	case 5:
@@ -604,7 +604,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		fallthrough
 	case 2:
 		if username := params[1]; username != "" {
-			_, err = getUIDByName(username)
+			uid, err = getUIDByName(username)
 
 			if err != nil {
 				return nil, err
@@ -656,11 +656,8 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	}
 
 	userID := int64(-1)
-	if usr != nil {
-		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to parse userid '%s' for user '%s", usr.Uid, usr.Username)
-		}
+	if uid != nil {
+		userID = int64(uid.UID)
 	}
 
 	processes, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser)
