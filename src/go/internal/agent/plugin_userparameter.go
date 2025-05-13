@@ -107,7 +107,7 @@ func (p *UserParameterPlugin) Export(
 	key string,
 	params []string,
 	ctx plugin.ContextProvider,
-) (result any, err error) {
+) (any, error) {
 	s, err := p.cmd(key, params)
 	if err != nil {
 		return nil, err
@@ -116,10 +116,8 @@ func (p *UserParameterPlugin) Export(
 	p.Debugf("executing command:'%s'", s)
 
 	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
-	// will not start if there are issues with finding cmd.exe, and that will break backwards compatibility.
+	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
 	if p.executor == nil {
-		var err error
-
 		p.executor, err = zbxcmd.InitExecutor()
 		if err != nil {
 			return nil, errs.Wrap(err, "command init failed")

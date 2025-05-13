@@ -30,6 +30,11 @@ import (
 
 const cmd = "cmd.exe"
 
+// ZBXExec holds wrapper for os.exec.
+type ZBXExec struct {
+	shellPath string
+}
+
 func InitExecutor() (Executor, error) {
 	cmdPath, err := exec.LookPath(cmd)
 	if err != nil && !errors.Is(err, exec.ErrDot) {
@@ -92,7 +97,7 @@ func (e *ZBXExec) executeBackground(s string) (err error) {
 		return errs.Wrapf(err, "cannot execute command (%s)", s)
 	}
 
-	go func() { _ = cmd.Wait() }()
+	go cmd.Wait()
 
 	return nil
 }

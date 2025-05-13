@@ -47,6 +47,7 @@ func init() {
 	impl.SetHandleTimeout(true)
 }
 
+// Configure configures plugin based on options and other required initilization.
 func (p *Plugin) Configure(_ *plugin.GlobalOptions, options any) {
 	p.executorInitFunc = zbxcmd.InitExecutor
 
@@ -56,6 +57,7 @@ func (p *Plugin) Configure(_ *plugin.GlobalOptions, options any) {
 	}
 }
 
+// Validate validates plugin options.
 func (*Plugin) Validate(options any) error {
 	var o Options
 
@@ -81,7 +83,7 @@ func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (
 	}
 
 	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
-	// will not start if there are issues with finding cmd.exe, and that will break backwards compatibility.
+	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
 	if p.executor == nil {
 		var err error
 
@@ -91,8 +93,12 @@ func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (
 		}
 	}
 
+	return p.runCommand(command, wait, ctx.Timeout())
+}
+
+func (p *Plugin) runCommand(command string, wait bool, timeout int) (any, error) {
 	if wait {
-		stdoutStderr, err := p.executor.Execute(command, time.Second*time.Duration(ctx.Timeout()), "")
+		stdoutStderr, err := p.executor.Execute(command, time.Second*time.Duration(timeout), "")
 		if err != nil {
 			return nil, errs.Wrap(err, "execute failed")
 		}
@@ -102,7 +108,7 @@ func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (
 		return stdoutStderr, nil
 	}
 
-	err = p.executor.ExecuteBackground(command)
+	err := p.executor.ExecuteBackground(command)
 	if err != nil {
 		return nil, errs.Wrap(err, "background execute failed")
 	}
@@ -115,7 +121,7 @@ func parseParameters(params []string) (string, bool, error) {
 	case 0:
 		return "", false, errs.New("invalid first parameter")
 	case 1:
-		if len(params[0]) == 0 {
+		if params[0] == "" {
 			return "", false, errs.New("invalid first parameter")
 		}
 

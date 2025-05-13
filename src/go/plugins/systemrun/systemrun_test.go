@@ -35,53 +35,65 @@ type mockLogger struct {
 	debugCount   int
 }
 
-// Infof empty mock function
-func (ml *mockLogger) Infof(_ string, _ ...any) {}
-
-// Critf empty mock function
-func (ml *mockLogger) Critf(_ string, _ ...any) {}
-
-// Errf empty mock function
-func (ml *mockLogger) Errf(_ string, _ ...any) {}
-
-// Warningf mock function
-func (ml *mockLogger) Warningf(_ string, _ ...any) {
-	ml.warningCount++
-}
-
-// Debugf mock function
-func (ml *mockLogger) Debugf(_ string, _ ...any) {
-	ml.debugCount++
-}
-
-// Tracef empty mock function
-func (ml *mockLogger) Tracef(_ string, _ ...any) {}
-
 type contextMock struct {
 	clientID uint64
 }
 
-// ClientID mock function
+// Infof empty mock function.
+func (ml *mockLogger) Infof(_ string, _ ...any) {}
+
+// Critf empty mock function.
+func (ml *mockLogger) Critf(_ string, _ ...any) {}
+
+// Errf empty mock function.
+func (ml *mockLogger) Errf(_ string, _ ...any) {}
+
+// Warningf mock function.
+func (ml *mockLogger) Warningf(_ string, _ ...any) {
+	ml.warningCount++
+}
+
+// Debugf mock function.
+func (ml *mockLogger) Debugf(_ string, _ ...any) {
+	ml.debugCount++
+}
+
+// Tracef empty mock function.
+func (ml *mockLogger) Tracef(_ string, _ ...any) {}
+
+// ClientID mock function.
 func (cm *contextMock) ClientID() uint64 {
 	return cm.clientID
 }
 
-// ItemID empty mock function
+// ItemID empty mock function.
 func (cm *contextMock) ItemID() uint64 { return 0 }
 
-// Output empty mock function
-func (cm *contextMock) Output() plugin.ResultWriter { return nil }
+// Output empty mock function.
+//
+//nolint:ireturn
+func (cm *contextMock) Output() plugin.ResultWriter {
+	return nil
+}
 
-// Meta empty mock function
-func (cm *contextMock) Meta() *plugin.Meta { return nil }
+// Meta empty mock function.
+//
+//nolint:ireturn,nolintlint
+func (cm *contextMock) Meta() *plugin.Meta {
+	return nil
+}
 
-// GlobalRegexp empty mock function
-func (cm *contextMock) GlobalRegexp() plugin.RegexpMatcher { return nil }
+// GlobalRegexp empty mock function.
+//
+//nolint:ireturn
+func (cm *contextMock) GlobalRegexp() plugin.RegexpMatcher {
+	return nil
+}
 
-// Timeout empty mock function
+// Timeout empty mock function.
 func (cm *contextMock) Timeout() int { return 0 }
 
-// Delay empty mock function
+// Delay empty mock function.
 func (cm *contextMock) Delay() string { return "" }
 
 func TestPlugin_Configure(t *testing.T) {
@@ -145,6 +157,7 @@ func TestPlugin_Configure(t *testing.T) {
 			tt.p.Base.Logger = ml
 
 			tt.p.Configure(nil, tt.args.options)
+
 			if diff := cmp.Diff(tt.want, tt.p.options); diff != "" {
 				t.Fatalf("Plugin.Configure options() = %s", diff)
 			}
@@ -166,6 +179,7 @@ func TestPlugin_Validate(t *testing.T) {
 	type args struct {
 		options interface{}
 	}
+
 	tests := []struct {
 		name    string
 		p       *Plugin
@@ -197,6 +211,7 @@ func TestPlugin_Validate(t *testing.T) {
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -219,6 +234,7 @@ func TestPlugin_Export(t *testing.T) {
 		params []string
 		ctx    plugin.ContextProvider
 	}
+
 	tests := []struct {
 		name                string
 		p                   *Plugin
@@ -369,6 +385,7 @@ func TestPlugin_Export(t *testing.T) {
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -412,6 +429,7 @@ func Test_parseParameters(t *testing.T) {
 	type args struct {
 		params []string
 	}
+
 	tests := []struct {
 		name     string
 		args     args
@@ -492,6 +510,7 @@ func Test_parseParameters(t *testing.T) {
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {

@@ -24,14 +24,12 @@ var (
 	_ Executor = (*ZBXExecMock)(nil)
 )
 
+// ZBXExecMock mock for ZBX command execution.
 type ZBXExecMock struct {
 	Success bool
 }
 
-// func InitMockExecutor() (Executor, error) {
-// 	return &ZBXExecMock{}, nil
-// }
-
+// Execute mock function.
 func (e *ZBXExecMock) Execute(string, time.Duration, string) (string, error) {
 	if !e.Success {
 		return "", errs.New("fail")
@@ -40,6 +38,7 @@ func (e *ZBXExecMock) Execute(string, time.Duration, string) (string, error) {
 	return "success", nil
 }
 
+// ExecuteStrict mock function.
 func (e *ZBXExecMock) ExecuteStrict(string, time.Duration, string) (string, error) {
 	if !e.Success {
 		return "", errs.New("fail")
@@ -48,6 +47,7 @@ func (e *ZBXExecMock) ExecuteStrict(string, time.Duration, string) (string, erro
 	return "success", nil
 }
 
+// ExecuteBackground mock function.
 func (e *ZBXExecMock) ExecuteBackground(string) error {
 	if !e.Success {
 		return errs.New("fail")

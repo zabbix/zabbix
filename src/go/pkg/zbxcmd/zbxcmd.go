@@ -23,14 +23,11 @@ var (
 	_ Executor = (*ZBXExec)(nil)
 )
 
+// Executor interface required for executing commands.
 type Executor interface {
-	Execute(string, time.Duration, string) (string, error)
-	ExecuteStrict(string, time.Duration, string) (string, error)
-	ExecuteBackground(string) error
-}
-
-type ZBXExec struct {
-	shellPath string
+	Execute(command string, timeout time.Duration, execDir string) (string, error)
+	ExecuteStrict(command string, timeout time.Duration, execDir string) (string, error)
+	ExecuteBackground(command string) error
 }
 
 // Execute runs the 's' command without checking cmd.Wait error.
@@ -51,6 +48,8 @@ func (e *ZBXExec) ExecuteStrict(command string, timeout time.Duration, path stri
 	return e.execute(command, timeout, path, true)
 }
 
-func (e *ZBXExec) ExecuteBackground(command string) (err error) {
+// ExecuteBackground runs the 's' command and waits for cmd.Wait in a go routine
+// This does not check cmd.Wait error.
+func (e *ZBXExec) ExecuteBackground(command string) error {
 	return e.executeBackground(command)
 }

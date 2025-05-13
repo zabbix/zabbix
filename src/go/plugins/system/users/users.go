@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -26,6 +27,7 @@ var impl Plugin
 
 type Plugin struct {
 	plugin.Base
+	executor zbxcmd.Executor
 }
 
 func init() {
