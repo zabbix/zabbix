@@ -697,9 +697,8 @@ class CZabbixServer {
 		if ($tls_config['ACTIVE'] == 1) {
 			$protocol = 'tls://';
 
-			if (!$this->checkTLSFile($tls_config['CA_FILE'])
-				|| !$this->checkTLSFile($tls_config['KEY_FILE'])
-				|| !$this->checkTLSFile($tls_config['CERT_FILE'])) {
+			if (!$this->checkTLSFile($tls_config['CA_FILE']) || !$this->checkTLSFile($tls_config['KEY_FILE'])
+					|| !$this->checkTLSFile($tls_config['CERT_FILE'])) {
 				return null;
 			}
 

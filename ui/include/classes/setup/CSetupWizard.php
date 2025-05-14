@@ -297,17 +297,23 @@ class CSetupWizard extends CForm {
 
 			$this->setConfig('ZBX_SERVER_TLS', getRequest('zbx_server_tls', $this->getConfig('ZBX_SERVER_TLS', '0')));
 			$this->setConfig('ZBX_SERVER_TLS_CA_FILE', getRequest('zbx_server_tls_ca_file',
-				$this->getConfig('ZBX_SERVER_TLS_CA_FILE', '')));
+				$this->getConfig('ZBX_SERVER_TLS_CA_FILE', '')
+			));
 			$this->setConfig('ZBX_SERVER_TLS_KEY_FILE', getRequest('zbx_server_tls_key_file',
-				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE', '')));
+				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE', '')
+			));
 			$this->setConfig('ZBX_SERVER_TLS_CERT_FILE', getRequest('zbx_server_tls_cert_file',
-				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE', '')));
+				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE', '')
+			));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', getRequest('zbx_server_tls_certificate_check',
-				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0')));
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0')
+			));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', getRequest('zbx_server_tls_certificate_issuer',
-				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')));
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')
+			));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', getRequest('zbx_server_tls_certificate_subject',
-				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')));
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')
+			));
 
 			if (hasRequest('next') && array_key_exists(self::STAGE_SETTINGS, getRequest('next'))) {
 				if (!$this->checkServerTLSConfiguration()) {
