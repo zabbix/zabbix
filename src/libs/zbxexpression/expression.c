@@ -672,6 +672,19 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				break;
 			case ZBX_TOKEN_USER_FUNC_MACRO:
+				raw_value = 1;
+				/* user macros are not indexed */
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro, NULL)) ||
+						SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
+						&inner_token, token_search))
+				{
+					/* Ignore functions with macros not supporting them, but do not skip the */
+					/* whole token, nested macro should be resolved in this case. */
+					pos++;
+					ret = FAIL;
+				}
+				m = m_ptr;
+				break;
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = zbx_is_indexed_macro(*data, &token);
