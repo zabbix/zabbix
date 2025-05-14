@@ -192,28 +192,30 @@ class CConfigFile {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
-		if (array_key_exists('ACTIVE', $ZBX_SERVER_TLS)) {
-			$this->config['ZBX_SERVER_TLS']['ACTIVE'] = $ZBX_SERVER_TLS['ACTIVE'];
-		}
+		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
+			if (array_key_exists('ACTIVE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['ACTIVE'] = $ZBX_SERVER_TLS['ACTIVE'];
+			}
 
-		if (array_key_exists('CA_FILE', $ZBX_SERVER_TLS)) {
-			$this->config['ZBX_SERVER_TLS']['CA_FILE'] = $ZBX_SERVER_TLS['CA_FILE'];
-		}
+			if (array_key_exists('CA_FILE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CA_FILE'] = $ZBX_SERVER_TLS['CA_FILE'];
+			}
 
-		if (array_key_exists('KEY_FILE', $ZBX_SERVER_TLS)) {
-			$this->config['ZBX_SERVER_TLS']['KEY_FILE'] = $ZBX_SERVER_TLS['KEY_FILE'];
-		}
+			if (array_key_exists('KEY_FILE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['KEY_FILE'] = $ZBX_SERVER_TLS['KEY_FILE'];
+			}
 
-		if (array_key_exists('CERT_FILE', $ZBX_SERVER_TLS)) {
-			$this->config['ZBX_SERVER_TLS']['CERT_FILE'] = $ZBX_SERVER_TLS['CERT_FILE'];
-		}
+			if (array_key_exists('CERT_FILE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CERT_FILE'] = $ZBX_SERVER_TLS['CERT_FILE'];
+			}
 
-		if (array_key_exists('CERTIFICATE_ISSUER', $ZBX_SERVER_TLS)) {
-			$this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'] = $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'];
-		}
+			if (array_key_exists('CERTIFICATE_ISSUER', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'] = $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'];
+			}
 
-		if (array_key_exists('CERTIFICATE_SUBJECT', $ZBX_SERVER_TLS)) {
-			$this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'] = $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'];
+			if (array_key_exists('CERTIFICATE_SUBJECT', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'] = $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'];
+			}
 		}
 
 		$this->makeGlobal();
