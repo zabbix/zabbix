@@ -606,8 +606,11 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		if username := params[1]; username != "" {
 			uid, err = getUIDByName(username)
 
-			if err != nil {
-				return nil, err
+			if uid == nil {
+				if err != nil {
+					return nil, err
+				}
+				return 0, nil
 			}
 		}
 		fallthrough
