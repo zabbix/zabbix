@@ -610,6 +610,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 				if err != nil {
 					return nil, err
 				}
+
 				return 0, nil
 			}
 		}
