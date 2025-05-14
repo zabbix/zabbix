@@ -102,7 +102,7 @@ zabbix_export:
             		for (i in organizations) {
             			if ('id' in organizations[i] && 'name' in organizations[i]) {
             				try {
-            					organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
+            					organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/availabilities');
             
             					if (Array.isArray(organization_devices) && organization_devices.length > 0) {
             						for (j in organization_devices) {
@@ -344,7 +344,7 @@ zabbix_export:
               parameters:
                 - '$[0]'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
-          url: 'https://{$MERAKI.API.URL}/organizations/{$ORGANIZATION_ID}/devices/statuses?serials[]={$SERIAL}'
+          url: 'https://{$MERAKI.API.URL}/organizations/{$ORGANIZATION_ID}/devices/availabilities?serials[]={$SERIAL}'
           http_proxy: '{$MERAKI.HTTP_PROXY}'
           headers:
             - name: X-Cisco-Meraki-API-Key
@@ -354,24 +354,6 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: 2280b9212c474d99835ec1334ff780eb
-          name: 'public IP'
-          type: DEPENDENT
-          key: meraki.device.public.ip
-          value_type: CHAR
-          description: |
-            Device public IP
-            Network: {$NETWORK.ID}
-            MAC: {$MAC}
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.publicIp
-          master_item:
-            key: meraki.device.get.status
-          tags:
-            - tag: component
-              value: network
         - uuid: 324b748bfe2e4383927176046e246acb
           name: status
           type: DEPENDENT
@@ -968,7 +950,7 @@ zabbix_export:
             
             	licenses = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/licenses');
             
-            	organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses');
+            	organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/availabilities');
             
             	licenses.forEach(function (license) {
             
