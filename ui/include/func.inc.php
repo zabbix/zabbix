@@ -2583,9 +2583,9 @@ function zbx_mb_check_encoding(string $string, string $encoding): bool {
 	return $decoded_string === $string;
 }
 
-function mergeRegularAndInheritedTags(array $objects, int $inherited_for = -1): array {
+function mergeRegularAndInheritedTags(array $objects, ?int $object_type = null): array {
 	foreach ($objects as &$object) {
-		if ($inherited_for != -1) {
+		if ($object_type !== null) {
 			$unique_tags = [];
 
 			foreach ($object['inheritedTags'] as $tag) {
@@ -2598,7 +2598,7 @@ function mergeRegularAndInheritedTags(array $objects, int $inherited_for = -1): 
 				if (array_key_exists($tag['tag'], $unique_tags)
 						&& array_key_exists($tag['value'], $unique_tags[$tag['tag']])) {
 					$unique_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-					$unique_tags[$tag['tag']][$tag['value']]['inherited_for'] = $inherited_for;
+					$unique_tags[$tag['tag']][$tag['value']]['object_type'] = $object_type;
 				}
 				else {
 					$unique_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];

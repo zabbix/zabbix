@@ -773,24 +773,24 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 	return $tags;
 }
 
-function makeTagHtml(array $tag, string $value, string $hint_value): CSpan {
+function makeTagHtml(array $tag, string $tag_value, string $hint_text): CSpan {
 	if (!array_key_exists('type', $tag) || $tag['type'] == ZBX_PROPERTY_OWN) {
-		return (new CSpan($value))
+		return (new CSpan($tag_value))
 			->addClass(ZBX_STYLE_TAG)
-			->setHint($hint_value);
+			->setHint($hint_text);
 	}
 
 	if ($tag['type'] == ZBX_PROPERTY_INHERITED) {
-		return (new CSpan($value))
+		return (new CSpan($tag_value))
 			->addClass(ZBX_STYLE_TAG)
 			->addClass(ZBX_STYLE_TAG_INHERITED)
 			->setHint(new CDiv([
 				(new CDiv(_('Inherited tag')))->addClass(ZBX_STYLE_TAG_INHERITED_TITLE),
-				$hint_value
+				$hint_text
 			]));
 	}
 
-	$hint_title = match ($tag['inherited_for']) {
+	$hint_title = match ($tag['object_type']) {
 		ZBX_TAG_OBJECT_TEMPLATE => _('Inherited and template tag'),
 		ZBX_TAG_OBJECT_HOST, ZBX_TAG_OBJECT_HOST_PROTOTYPE => _('Inherited and host tag'),
 		ZBX_TAG_OBJECT_ITEM, ZBX_TAG_OBJECT_ITEM_PROTOTYPE => _('Inherited and item tag'),
@@ -798,12 +798,12 @@ function makeTagHtml(array $tag, string $value, string $hint_value): CSpan {
 		ZBX_TAG_OBJECT_HTTPTEST => _('Inherited and scenario tag')
 	};
 
-	return (new CSpan($value))
+	return (new CSpan($tag_value))
 		->addClass(ZBX_STYLE_TAG)
 		->addClass(ZBX_STYLE_TAG_INHERITED_DUPLICATE)
 		->setHint(new CDiv([
 			(new CDiv(_($hint_title)))->addClass(ZBX_STYLE_TAG_INHERITED_TITLE),
-			$hint_value
+			$hint_text
 		]));
 }
 
