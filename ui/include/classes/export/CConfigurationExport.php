@@ -865,7 +865,7 @@ class CConfigurationExport {
 			}
 		}
 
-		foreach ($discovery_rules as $discovery_rule) {
+		foreach ($discovery_rules as &$discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
 				$master_itemid = $discovery_rule['master_itemid'];
 
@@ -874,6 +874,7 @@ class CConfigurationExport {
 				}
 			}
 		}
+		unset($discovery_rule);
 
 		$this->prepareDiscoveryRules($discovery_rules);
 
