@@ -59,7 +59,13 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'dataset_aggregation'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])],
 				'type'					=> ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [self::ITEM_TYPE_NORMAL, self::ITEM_TYPE_TOTAL])],
-				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255]
+				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255],
+				'item_tags_evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+				'item_tags'				=> ['type' => API_OBJECTS, 'fields' => [
+					'tag'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+					'operator'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+					'value'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+				]]
 			]]);
 	}
 
@@ -83,7 +89,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'aggregate_function' => AGGREGATE_LAST,
 			'dataset_aggregation' => AGGREGATE_NONE,
 			'type' => [],
-			'data_set_label' => ''
+			'data_set_label' => '',
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR,
+			'item_tags' => []
 		];
 	}
 
@@ -204,7 +212,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'dataset_type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'dataset_aggregation' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR
+			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR
 		];
 		$dataset_defaults = self::getDefaults();
 
@@ -241,6 +250,24 @@ class CWidgetFieldDataSet extends CWidgetField {
 						'value' => $item_spec
 					];
 				}
+			}
+
+			foreach ($value['item_tags'] as $tag_index => $tag) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.tag',
+					'value' => $tag['tag']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.operator',
+					'value' => $tag['operator']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.value',
+					'value' => $tag['value']
+				];
 			}
 
 			foreach ($value['type'] as $type_index => $type) {

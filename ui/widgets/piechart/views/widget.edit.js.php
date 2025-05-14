@@ -178,7 +178,7 @@ window.widget_form = new class extends CWidgetForm {
 				this.#editItem(e.target);
 			}
 
-			if (e.target.classList.contains('element-table-remove')) {
+			if (e.target.classList.contains('js-remove-item')) {
 				this.#removeSingleItem(e.target);
 			}
 

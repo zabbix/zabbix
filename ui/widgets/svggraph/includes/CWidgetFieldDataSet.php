@@ -72,7 +72,13 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
 				'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])],
 				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255],
-				'override_hostid'		=> ['type' => API_ANY]
+				'override_hostid'		=> ['type' => API_ANY],
+				'item_tags_evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+				'item_tags'				=> ['type' => API_OBJECTS, 'fields' => [
+					'tag'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+					'operator'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+					'value'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+				]]
 			]]);
 	}
 
@@ -108,7 +114,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM,
 			'approximation' => APPROXIMATION_AVG,
 			'data_set_label' => '',
-			'override_hostid' => []
+			'override_hostid' => [],
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR,
+			'item_tags' => []
 		];
 	}
 
@@ -234,7 +242,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'approximation' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR
+			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR
 		];
 
 		$dataset_defaults = self::getDefaults();
@@ -273,6 +282,24 @@ class CWidgetFieldDataSet extends CWidgetField {
 						'value' => $item_spec
 					];
 				}
+			}
+
+			foreach ($value['item_tags'] as $tag_index => $tag) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.tag',
+					'value' => $tag['tag']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.operator',
+					'value' => $tag['operator']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.value',
+					'value' => $tag['value']
+				];
 			}
 
 			// Field "color" stored as array for dataset type DATASET_TYPE_SINGLE_ITEM (0)

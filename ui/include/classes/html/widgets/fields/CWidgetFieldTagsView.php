@@ -30,7 +30,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		}
 
 		$view = (new CTable())
-			->setId('tags_table_'.$this->field->getName())
+			->setId('tags_table_'.zbx_formatDomId($this->field->getName()))
 			->addClass('table-tags')
 			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
@@ -58,7 +58,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		return '
 			CWidgetForm.addField(
 				new CWidgetFieldTags('.json_encode([
-					'name' => $this->field->getName(),
+					'name' => zbx_formatDomId($this->field->getName()),
 					'form_name' => $this->form_name
 				]).')
 			);
@@ -67,7 +67,9 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 
 	public function getTemplates(): array {
 		return [
-			new CTemplateTag($this->field->getName().'-row-tmpl', $this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG))
+			new CTemplateTag(zbx_formatDomId($this->field->getName()).'-row-tmpl',
+				$this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG)
+			)
 		];
 	}
 
@@ -88,13 +90,13 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
 				->setValue($tag['operator'])
-				->setFocusableElementId($this->field->getName().'-'.$row_num.'-operator-select')
-				->setId($this->field->getName().'_'.$row_num.'_operator')
+				->setFocusableElementId(zbx_formatDomId($this->field->getName()).'-'.$row_num.'-operator-select')
+				->setId(zbx_formatDomId($this->field->getName()).'_'.$row_num.'_operator')
 				->setDisabled($this->isDisabled() && $row_num !== '#{rowNum}'),
 			(new CTextBox($this->field->getName().'['.$row_num.'][value]', $tag['value']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired($this->isRequired())
-				->setId($this->field->getName().'_'.$row_num.'_value')
+				->setId(zbx_formatDomId($this->field->getName()).'_'.$row_num.'_value')
 				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 				->setAttribute('placeholder', _('value')),
 			(new CCol(
