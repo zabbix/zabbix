@@ -918,7 +918,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removing NEW events from "head" of vector                         *
+ * Purpose: removing NEW events from "head" of vector based on memory limit   *
  *                                                                            *
  * Parameters: max_mem    - [IN] available memory size                        *
  *             strpool_sz - [IN/OUT] allocated memory size for events         *
@@ -955,7 +955,7 @@ static zbx_uint64_t	vmware_service_clear_event_data_mem(const zbx_uint64_t max_m
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removing NEW events from "head" of vector                         *
+ * Purpose: removing NEW events from "head" of vector based on time limit     *
  *                                                                            *
  * Parameters: keep_time  - [IN] max time interval for saving events          *
  *             strpool_sz - [IN/OUT] allocated memory size for events         *
@@ -1312,11 +1312,11 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 
 			if (SUCCEED == vmware_shared_is_ready())
 			{
-				if (evt_query_interval < service->eventlog.interval)
+				if (evt_query_interval < service->eventlog.interval &&
+						service->eventlog.interval <= SEC_PER_DAY)
+				{
 					evt_query_interval = service->eventlog.interval;
-
-				if (evt_query_interval > SEC_PER_DAY)
-					evt_query_interval = ZBX_EVT_QUERY_LIMIT;
+				}
 
 				if (0 == service->eventlog.end_time && 0 != evt_last_ts)
 					service->eventlog.end_time = evt_last_ts;
@@ -1500,6 +1500,7 @@ out:
 
 	return ret;
 #undef ZBX_INIT_UPD_XML_SIZE
+#undef ZBX_EVT_QUERY_LIMIT
 }
 
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
