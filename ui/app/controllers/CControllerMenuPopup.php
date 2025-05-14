@@ -374,7 +374,7 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
-				'is_binary_value_type' => (int) $db_item_prototype['value_type'] === ITEM_VALUE_TYPE_BINARY,
+				'is_binary_value_type' => $db_item_prototype['value_type'] == ITEM_VALUE_TYPE_BINARY,
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
