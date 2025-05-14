@@ -321,7 +321,7 @@ int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error)
 	return SUCCEED;
 }
 
-int	zbx_curl_has_bearer(char **error)
+int	zbx_curl_has_http_bearer(char **error)
 {
 	/* added in 7.61.0 (0x073d00) */
 	if (libcurl_version_num() < 0x073d00)
@@ -330,6 +330,23 @@ int	zbx_curl_has_bearer(char **error)
 		{
 			*error = zbx_dsprintf(*error, "cURL library version %s does not support HTTP Bearer token"
 					" authentication, 7.61.0 or newer is required", libcurl_version_str());
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+int	zbx_curl_has_oauth2_bearer(char **error)
+{
+	/* added in 7.33.0 (0x072100) */
+	if (libcurl_version_num() < 0x072100)
+	{
+		if (NULL != error)
+		{
+			*error = zbx_dsprintf(*error, "cURL library version %s does not support OAuth 2.0 Bearer Access"
+					" token authentication, 7.33.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
