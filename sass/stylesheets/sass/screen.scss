@@ -2584,6 +2584,29 @@ div {
 	&.yellow-bg {
 		color: darken($alt-yellow, 45%);
 	}
+
+	@each $class, $icon in (
+		tag-inherited: $zi-file,
+		tag-inherited-duplicate: $zi-file-filled
+	) {
+		&.#{$class} {
+			&::before {
+				@extend %icons-font;
+
+				content: $icon;
+				margin-right: 3px;
+				font-size: $icon-smaller-size;
+				line-height: 12px;
+				vertical-align: top;
+				opacity: .6;
+			}
+		}
+	}
+}
+
+.tag-inherited-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
 }
 
 .green-bg {

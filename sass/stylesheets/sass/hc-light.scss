@@ -526,6 +526,13 @@ a.link-action {
 		background-color: $ui-bg-selected-color;
 		color: $white;
 	}
+
+	&.tag-inherited,
+	&.tag-inherited-duplicate {
+		&::before {
+			opacity: 1;
+		}
+	}
 }
 
 .disabled {
