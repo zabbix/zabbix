@@ -33,7 +33,7 @@ class CTestDataHelper {
 	 */
 	public static function createObjects(array $objects): void {
 		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
-			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions'
+			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions', 'media_type'
 		], []);
 
 		try {
@@ -49,6 +49,7 @@ class CTestDataHelper {
 			self::createScripts($objects['scripts']);
 			self::createDrules($objects['drules']);
 			self::createActions($objects['actions']);
+			self::createMediatypes($objects['media_type']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -894,6 +895,24 @@ class CTestDataHelper {
 		self::convertPropertyReference($actions, 'operations.optemplate.templateid');
 	}
 
+	public static function createMediatypes(array $mediatypes): void {
+		if (!$mediatypes) {
+			return;
+		}
+
+		self::convertUserGroupReferences($mediatypes);
+
+		$result = CDataHelper::call('mediatype.create', $mediatypes);
+
+		foreach ($mediatypes as $mediatype) {
+			self::$objectids['media_type'][$mediatype['name']] = array_shift($result['mediatypeids']);
+		}
+	}
+
+	public static function convertMediatypesReferences(array &$mediatypes): void {
+		self::convertPropertyReference($mediatypes, 'mediatypeid');
+	}
+
 	/**
 	 * Check for, and replace a reference ID in the given object property with the corresponding object's record ID.
 	 *
@@ -1102,6 +1121,10 @@ class CTestDataHelper {
 
 		if (array_key_exists('host_group', self::$objectids)) {
 			CDataHelper::call('hostgroup.delete', array_values(self::$objectids['host_group']));
+		}
+
+		if (array_key_exists('media_type', self::$objectids)) {
+			CDataHelper::call('mediatype.delete', array_values(self::$objectids['media_type']));
 		}
 
 		self::$objectids = [];

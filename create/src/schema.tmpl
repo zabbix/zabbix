@@ -367,6 +367,19 @@ FIELD		|description	|t_text		|''	|NOT NULL	|0
 FIELD		|provider	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|name
 
+TABLE|media_type_oauth|mediatypeid|0
+FIELD		|mediatypeid			|t_id			|	|NOT NULL	|0		|1|media_type
+FIELD		|redirection_url		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|client_id				|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|client_secret			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|authorization_url		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|tokens_status			|t_integer		|'0'|NOT NULL	|0
+FIELD		|access_token			|t_text			|''	|NOT NULL	|0
+FIELD		|access_token_updated	|t_time			|'0'|NOT NULL	|0
+FIELD		|access_expires_in		|t_integer		|'0'|NOT NULL	|0
+FIELD		|refresh_token			|t_text			|''	|NOT NULL	|0
+FIELD		|token_url				|t_varchar(2048)|''	|NOT NULL	|0
+
 TABLE|media_type_param|mediatype_paramid|ZBX_DATA
 FIELD		|mediatype_paramid|t_id		|	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
@@ -2253,4 +2266,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7030048	|7030048
+ROW		|1		|7030050	|7030050
