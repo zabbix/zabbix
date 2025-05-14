@@ -846,17 +846,17 @@ INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90009
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90010, 'Host prototype {#9}', 'Host prototype {#9}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90011, 'Host prototype {#10}', 'Host prototype {#10}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90012, 'Host prototype {#33}', 'Host prototype visible name', 0, '', 2);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90002, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90003, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90004, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90012, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90005, 90002);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90006, 90002);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90007, 90002);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90008, 90003);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90009, 90003);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90010, 90003);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90002, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90003, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90004, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90012, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90005, 90002);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90006, 90002);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90007, 90002);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90008, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90009, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90010, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90011, 90003);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1019, 90003, '{#FSNAME}', NULL, NULL);
@@ -880,8 +880,8 @@ INSERT INTO hstgrp (groupid, name, type) VALUES (50019, 'Inheritance test', 0);
 INSERT INTO hstgrp (groupid, name, type) VALUES (50023, 'Inheritance test', 1);
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, '');
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, '');
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1010, 99000, '', 50019, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 1010);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99006, 'Inheritance test template with host prototype', 'Inheritance test template with host prototype', 3, '');
@@ -889,7 +889,7 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99006, 99006, 50
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers,query_fields, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '','', 1);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99007, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1012, 99007, '', 50019, NULL);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99009, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1013, 99009, '', 50019, NULL);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99009, NULL, 99083, '', 0, 0);
@@ -900,20 +900,20 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15004, 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, templateid,query_fields, flags) VALUES (99084, 99004, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 99083,'', 1);
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99008, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 99007, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1014, 99008, '', 50019, 1002);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99010, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 99009, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1015, 99010, '', 50019, 1004);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99010, NULL, 99084, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99010, NULL, 99084, '', 0, 0);
 
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99060, 'Host prototype for Clone {#TEST}', 'Host prototype for Clone {#TEST}', 1, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1023, 99060, '', 50019, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1024, 99060, '{#GROUP_PROTO}',NULL, NULL);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99060, NULL, 99083, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99060, NULL, 99083, '', 0, 0);
 
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99055, 'Host prototype for Clone {#TEST}', 'Host prototype for Clone {#TEST}', 1, '', 99060, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1025, 99055, '', 50019, 1024);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1026, 99055, '{#GROUP_PROTO}',NULL, 1023);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99055, NULL, 99084, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99055, NULL, 99084, '', 0, 0);
 
 -- testPageProblems_TagPriority
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','','99252');
