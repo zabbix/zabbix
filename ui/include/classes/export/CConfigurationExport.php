@@ -851,6 +851,7 @@ class CConfigurationExport {
 		$options += [
 			'output' => $this->dataFields['drule'],
 			'hostids' => array_keys($hosts),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_RULE],
 			'inherited' => false
 		];
 
