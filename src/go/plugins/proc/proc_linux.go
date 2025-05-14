@@ -851,6 +851,8 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				if err != nil {
 					return nil, err
 				}
+
+				return "[]", nil
 			}
 		}
 		fallthrough
