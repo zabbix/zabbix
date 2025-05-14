@@ -376,18 +376,6 @@ reparse_type:
 	while (' ' == *data)
 		data++;
 
-	if (0 == strncmp(data, "Wrong Type", ZBX_CONST_STRLEN("Wrong Type")))
-	{
-		while (':' != *data && '\0' != *data && '\n' != *data)
-			data++;
-
-		if (':' == *data)
-			data++;
-
-		while (' ' == *data)
-			data++;
-	}
-
 	if (0 != isupper((unsigned char)*data))
 	{
 		len = preproc_snmp_parse_type(data, &type);
@@ -409,6 +397,19 @@ reparse_type:
 				p->type = ZBX_SNMP_TYPE_UNDEFINED;
 
 				goto eol;
+			}
+
+			if (0 == strcmp(type, "Wrong") && 0 == strncmp(data, " Type", ZBX_CONST_STRLEN(" Type")))
+			{
+				while (':' != *data && '\0' != *data && '\n' != *data)
+					data++;
+
+				if (':' == *data)
+				{
+					data++;
+					zbx_free(type);
+					goto reparse_type;
+				}
 			}
 
 			*error = strdup("invalid value type format");
