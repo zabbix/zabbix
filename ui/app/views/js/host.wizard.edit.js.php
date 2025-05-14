@@ -201,6 +201,40 @@ window.host_wizard_edit = new class {
 		macros: {}
 	}
 
+	#validation_rules = {
+		[this.STEP_CREATE_HOST]: {
+			host: {
+				type: 'object',
+				required: true
+			},
+			groups: {
+				type: 'array',
+				required: () => this.#data.host?.isNew
+			}
+		},
+		[this.STEP_INSTALL_AGENT]: {
+			tls_psk: {
+				required: true,
+				minlength: 32,
+				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk') ?>,
+				regex: /^([a-fA-F0-9]{2})+$/
+			},
+			tls_psk_identity: {
+				required: true,
+				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>
+			}
+		},
+		[this.STEP_ADD_HOST_INTERFACE]: {},
+		[this.STEP_CONFIGURE_HOST]: {}
+	}
+
+	#validation_errors = {
+		[this.STEP_CREATE_HOST]: {},
+		[this.STEP_INSTALL_AGENT]: {},
+		[this.STEP_ADD_HOST_INTERFACE]: {},
+		[this.STEP_CONFIGURE_HOST]: {}
+	}
+
 	#macro_reset_list = {};
 
 	#updating_locked = true;
@@ -210,7 +244,7 @@ window.host_wizard_edit = new class {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
-		this.#data.do_not_show_welcome = wizard_show_welcome == 1 ? 0 : 1;
+		this.#data.do_not_show_welcome = wizard_show_welcome === 1 ? 0 : 1;
 		this.#source_host = source_host;
 		this.#csrf_token = csrf_token;
 
@@ -246,7 +280,7 @@ window.host_wizard_edit = new class {
 					this.#updateStepsQueue();
 				})
 				.then(() => {
-					if (this.#steps_queue[this.#current_step] !== this.STEP_COMPLETE) {
+					if (this.#getCurrentStep() !== this.STEP_COMPLETE) {
 						this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
 					}
 					else {
@@ -356,11 +390,11 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#gotoStep(step) {
-		this.#current_step = step;
+	#gotoStep(queue_index) {
+		this.#current_step = queue_index;
 		this.#updating_locked = true;
 
-		switch (this.#steps_queue[step]) {
+		switch (this.#getCurrentStep()) {
 			case this.STEP_WELCOME:
 				this.#renderWelcome();
 				break;
@@ -400,23 +434,28 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
 
-		this.#next_button.removeAttribute('disabled');
 		this.#updating_locked = false;
 
-		this.#updateForm();
+		this.#validateStep();
 		this.#updateFields();
+		this.#updateForm();
+		this.#updateFieldsAsterisk();
 		this.#updateProgress();
 		this.#updateNextButton();
 
-		const next_button_disabled = this.#next_button.hasAttribute('disabled');
-
 		setTimeout(() => {
+			const next_button_disabled = this.#next_button.hasAttribute('disabled');
+
 			this.#overlay.unsetLoading();
 			this.#back_button.style.display = this.#current_step > 0
 				&& this.#steps_queue[this.#current_step] !== this.STEP_COMPLETE ? '' : 'none';
 
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 		});
+	}
+
+	#getCurrentStep() {
+		return this.#steps_queue[this.#current_step];
 	}
 
 	#renderWelcome() {
@@ -464,6 +503,29 @@ window.host_wizard_edit = new class {
 
 		if (this.#data.groups.length) {
 			groups_ms.multiSelect('addData', this.#data.groups)
+		}
+
+		for (const [path, multiselect] of Object.entries({host: host_ms[0], groups: groups_ms[0]})) {
+			const wrapper = multiselect.closest('.<?= CMultiSelect::ZBX_STYLE_CLASS ?>');
+
+			multiselect.setAttribute('data-name', path);
+
+			wrapper.addEventListener('focusout', () => {
+				setTimeout(() => {
+					let overlay = overlays_stack.end()?.element;
+					overlay = overlay instanceof jQuery ? overlay[0] : overlay;
+
+					if (!wrapper.contains(document.activeElement) && !wrapper.contains(overlay)) {
+						this.#activateFieldValidation(path);
+
+						const error = this.#validateField(path);
+
+						if (error !== null) {
+							this.#updateForm(path);
+						}
+					}
+				});
+			});
 		}
 	}
 
@@ -569,7 +631,16 @@ window.host_wizard_edit = new class {
 	}
 
 	#onBeforeNextStep() {
-		switch (this.#steps_queue[this.#current_step]) {
+		const step = this.#getCurrentStep();
+
+		this.#activateStepValidation(step);
+		this.#validateStep();
+
+		if (this.#hasErrors()) {
+			return Promise.reject();
+		}
+
+		switch (step) {
 			case this.STEP_WELCOME:
 				return this.#disableWelcomeStep();
 
@@ -642,6 +713,7 @@ window.host_wizard_edit = new class {
 				].filter(Boolean);
 
 				this.#data.interfaces = [];
+				this.#validation_rules[this.STEP_ADD_HOST_INTERFACE] = {};
 
 				this.#data.interface_required.forEach((interface_type, row_index) => {
 					const host_interface = this.#host?.interfaces.find(
@@ -649,6 +721,29 @@ window.host_wizard_edit = new class {
 					);
 
 					this.#data.interfaces[row_index] = host_interface || this.#data.interface_default[interface_type];
+
+					this.#validation_rules[this.STEP_ADD_HOST_INTERFACE] = {
+						...this.#validation_rules[this.STEP_ADD_HOST_INTERFACE],
+						[`interfaces.${row_index}.address`]: {
+							row_index,
+							required: true
+						},
+						[`interfaces.${row_index}.port`]: {
+							row_index,
+							type: 'number',
+							required: true,
+							min: 1,
+							max: 65536
+						},
+						...(interface_type === this.INTERFACE_TYPE_SNMP && {
+							[`interfaces.${row_index}.details.community`]: {
+								row_index,
+								required: (row_index) => {
+									return Number(this.#data.interfaces[row_index].details.version) !== this.SNMP_V3
+								}
+							}
+						})
+					}
 				});
 
 				this.#data.ipmi_authtype = this.#host?.ipmi_authtype || <?= IPMI_AUTHTYPE_DEFAULT ?>;
@@ -656,9 +751,10 @@ window.host_wizard_edit = new class {
 				this.#data.ipmi_username = this.#host?.ipmi_username || '';
 				this.#data.ipmi_password = this.#host?.ipmi_password || '';
 
+				this.#validation_rules[this.STEP_CONFIGURE_HOST] = {}
 				this.#macro_reset_list = {};
 
-				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, index) => {
+				this.#data.macros = Object.fromEntries(this.#template.macros.map((template_macro, row_index) => {
 					const is_checkbox = Number(template_macro.config.type) === this.WIZARD_FIELD_CHECKBOX;
 					const is_list = Number(template_macro.config.type) === this.WIZARD_FIELD_LIST;
 
@@ -673,7 +769,7 @@ window.host_wizard_edit = new class {
 
 						if (!allowed_values.includes(value)) {
 							if (host_macro?.value !== undefined ) {
-								this.#macro_reset_list[`macros.${index}.value`] = template_macro.macro;
+								this.#macro_reset_list[`macros.${row_index}.value`] = template_macro.macro;
 							}
 
 							value = is_checkbox
@@ -687,10 +783,15 @@ window.host_wizard_edit = new class {
 
 					if (Number(host_macro?.type) === this.MACRO_TYPE_SECRET
 							&& Number(template_macro.type) !== this.MACRO_TYPE_SECRET) {
-						this.#macro_reset_list[`macros.${index}.value`] = template_macro.macro;
+						this.#macro_reset_list[`macros.${row_index}.value`] = template_macro.macro;
 					}
 
-					return [index, {
+					this.#validation_rules[this.STEP_CONFIGURE_HOST][`macros.${row_index}.value`] = {
+						...(Number(template_macro.config.required) === 1 && {required: true}),
+						...(template_macro.config.regex && {regex: new RegExp(template_macro.config.regex)})
+					};
+					console.log(template_macro)
+					return [row_index, {
 						type: template_macro.type,
 						macro: template_macro.macro,
 						value,
@@ -783,7 +884,7 @@ window.host_wizard_edit = new class {
 		const template_loaded = this.#template !== null;
 		this.#steps_queue = [];
 
-		if (this.#data.do_not_show_welcome === 0) {
+		if (Number(this.#data.do_not_show_welcome) !== 1) {
 			this.#steps_queue.push(this.STEP_WELCOME);
 		}
 
@@ -816,7 +917,7 @@ window.host_wizard_edit = new class {
 		const template_loaded = this.#template !== null;
 		let progress = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER} .progress`);
 
-		if (this.#steps_queue[this.#current_step] === this.STEP_WELCOME) {
+		if (this.#getCurrentStep() === this.STEP_WELCOME) {
 			if (progress !== null) {
 				progress.remove();
 			}
@@ -884,10 +985,10 @@ window.host_wizard_edit = new class {
 			}
 
 			progress_step.classList.toggle('progress-step-complete',
-				steps.length && Math.max(...steps) < this.#steps_queue[this.#current_step]
+				steps.length && Math.max(...steps) < this.#getCurrentStep()
 			);
 			progress_step.classList.toggle('progress-step-current',
-				steps.includes(this.#steps_queue[this.#current_step])
+				steps.includes(this.#getCurrentStep())
 			);
 			progress_step.classList.toggle('progress-step-disabled', !steps.length);
 		}
@@ -895,10 +996,11 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`).appendChild(progress);
 	}
 
-	#updateForm(path, new_value, old_value) {
+	#updateForm(path) {
+		const step = this.#getCurrentStep();
 		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
 
-		switch (this.#steps_queue[this.#current_step]) {
+		switch (step) {
 			case this.STEP_WELCOME:
 				break;
 
@@ -907,8 +1009,8 @@ window.host_wizard_edit = new class {
 					|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
 					|| path.startsWith('selected_subclasses')
 				) {
-					this.#dialogue.querySelectorAll('input[name="agent_mode"]').forEach(input => {
-						input.disabled = Number(this.#data.data_collection) == ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
+					this.#dialogue.querySelectorAll('[name="agent_mode"]').forEach(input => {
+						input.disabled = Number(this.#data.data_collection) === ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
 					});
 
 					const step_body = document.querySelector('.js-templates');
@@ -919,40 +1021,19 @@ window.host_wizard_edit = new class {
 					}
 				}
 
-				if (!path || path === 'selected_template') {
-					if (this.#getSelectedTemplate()) {
-						this.#updateProgress();
-					}
-
-					this.#next_button.toggleAttribute('disabled', !this.#getSelectedTemplate());
+				if ((!path || path === 'selected_template') && this.#getSelectedTemplate()) {
+					this.#updateProgress();
 				}
 				break;
 
 			case this.STEP_CREATE_HOST:
-				const is_host_new = this.#data.host?.isNew || false;
-
-				if (!path || path === 'host' || path === 'groups') {
-					if (this.#data.host !== null) {
-						this.#updateProgress();
-					}
-
-					this.#dialogue.querySelector('.js-host-groups-label')
-						.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, is_host_new)
-
-					this.#next_button.toggleAttribute('disabled',
-						this.#data.host === null || (is_host_new && !this.#data.groups.length)
-					);
+				if ((!path || path === 'host' || path === 'groups') && this.#data.host !== null) {
+					this.#updateProgress();
 				}
 
 				break;
 
 			case this.STEP_INSTALL_AGENT:
-				if (!path || path === 'tls_psk_identity' || path === 'tls_psk' || path === 'tls_required') {
-					this.#next_button.toggleAttribute('disabled', this.#data.tls_required
-						&& (this.#data.tls_psk_identity === '' || this.#data.tls_psk === '')
-					);
-				}
-
 				for (const element of this.#dialogue.querySelectorAll('.js-tls-exists')) {
 					element.style.display = !this.#data.tls_required ? '' : 'none';
 				}
@@ -961,38 +1042,35 @@ window.host_wizard_edit = new class {
 					element.style.display = this.#data.tls_required ? '' : 'none';
 				}
 
-				if (!path || path === 'monitoring_os' || path === 'monitoring_os_distribution'
-						|| path === 'tls_psk_identity' || path === 'tls_psk') {
-					const windows_distribution_select = this.#dialogue.querySelector('.js-windows-distribution-select');
-					windows_distribution_select.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
+				this.#dialogue.querySelector('.js-windows-distribution-select')
+					.style.display = this.#data.monitoring_os === 'windows' ? '' : 'none';
 
-					const readme_template = (() => {
-						switch (this.#data.monitoring_os) {
-							case 'linux':
-								return this.#view_templates.install_agent_readme_linux;
-							case 'windows':
-								return this.#data.monitoring_os_distribution === 'windows-new'
-									? this.#view_templates.install_agent_readme_windows_new
-									: this.#view_templates.install_agent_readme_windows_old;
-							default:
-								return this.#view_templates.install_agent_readme_other;
-						}
-					})();
+				const readme_template = (() => {
+					switch (this.#data.monitoring_os) {
+						case 'linux':
+							return this.#view_templates.install_agent_readme_linux;
+						case 'windows':
+							return this.#data.monitoring_os_distribution === 'windows-new'
+								? this.#view_templates.install_agent_readme_windows_new
+								: this.#view_templates.install_agent_readme_windows_old;
+						default:
+							return this.#view_templates.install_agent_readme_other;
+					}
+				})();
 
-					const option_prefix = this.#data.monitoring_os === 'linux' ? '--' : '-';
-					let psk = this.#data.tls_psk_identity !== ''
-						? option_prefix + 'psk-identity \'' + this.#data.tls_psk_identity.replace(/'/g, `\\'`) + '\''
-						: option_prefix + 'psk-identity-stdin';
+				const option_prefix = this.#data.monitoring_os === 'linux' ? '--' : '-';
 
-					psk += ' ';
-					psk += this.#data.tls_psk !== ''
-						? option_prefix + 'psk ' + this.#data.tls_psk
-						: option_prefix + 'psk-stdin';
+				const psk_identity = this.#data.tls_psk_identity !== ''
+					? `${option_prefix}psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+					: `${option_prefix}psk-identity-stdin`;
 
-					this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
-						psk: psk
-					});
-				}
+				const psk = this.#data.tls_psk !== ''
+					? `${option_prefix}psk ${this.#data.tls_psk}`
+					: `${option_prefix}psk-stdin`;
+
+				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
+					psk: `${psk_identity} ${psk}`
+				});
 				break;
 
 			case this.STEP_ADD_HOST_INTERFACE:
@@ -1051,10 +1129,6 @@ window.host_wizard_edit = new class {
 						}
 					}
 				}
-
-				this.#next_button.toggleAttribute('disabled', Object.values(this.#data.interfaces)
-					.some(({address, port}) => address === '' || String(port) === '')
-				);
 				break;
 
 			case this.STEP_CONFIGURE_HOST:
@@ -1066,11 +1140,48 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
+		for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
+			const rule = this.#getValidationRule(path);
+
+			if (!rule?.active) {
+				continue;
+			}
+
+			this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : []);
+
+			if (error === null) {
+				rule.active = false;
+			}
+		}
+
+		this.#next_button.toggleAttribute('disabled', this.#hasErrors());
+
 		requestAnimationFrame(() => this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top);
 	}
 
+	#updateFieldsAsterisk() {
+		const rules = this.#validation_rules[this.#getCurrentStep()] || {};
+
+		for (const [path, rule] of Object.entries(rules)) {
+			const name = this.#pathToInputName(path);
+			const input = this.#dialogue.querySelector(`[name="${name}"], [data-name="${name}"]`);
+
+			if (input === null) {
+				continue;
+			}
+
+			const required = typeof rule.required === 'function'
+				? rule.required(rule.row_index || null)
+				: rule.required;
+
+			input
+				.closest(`.${ZBX_STYLE_FORM_FIELD}`)
+				?.querySelector('label').classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!required);
+		}
+	}
+
 	#updateNextButton() {
-		switch (this.#steps_queue[this.#current_step]) {
+		switch (this.#getCurrentStep()) {
 			case this.STEP_CONFIGURATION_FINISH:
 				this.#next_button.innerText = this.#data.host.isNew
 					? <?= json_encode(_('Create')) ?>
@@ -1387,6 +1498,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeMacroFieldText({type, macro, config}, row_index) {
+		console.log(macro, type)
 		switch (Number(type)) {
 			case this.MACRO_TYPE_SECRET:
 				return this.#view_templates.macro_field_secret.evaluateToElement({
@@ -1460,7 +1572,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#disableWelcomeStep() {
-		if (this.#data.do_not_show_welcome === 0) {
+		if (Number(this.#data.do_not_show_welcome) !== 1) {
 			return Promise.resolve();
 		}
 
@@ -1475,7 +1587,9 @@ window.host_wizard_edit = new class {
 		}
 
 		this.#updateField(this.#pathToInputName(path), new_value);
-		this.#updateForm(path, new_value, old_value);
+		this.#validateStep();
+		this.#updateForm(path);
+		this.#updateFieldsAsterisk();
 	}
 
 	#onInputChange({target}) {
@@ -1491,15 +1605,134 @@ window.host_wizard_edit = new class {
 	}
 
 	#onInputBlur({target}) {
-		if (!target.name || !['number', 'password', 'text'].includes(target.type)) {
+		if (!target.name) {
 			return;
 		}
 
-		target.value = target.value.trim();
+		if (['number', 'password', 'text'].includes(target.type)) {
+			target.value = target.value.trim();
+		}
+
+		const path = this.#inputNameToInputPath(target.name);
+
+		this.#activateFieldValidation(path);
+
+		const error = this.#validateField(path);
+
+		if (error !== null) {
+			this.#updateForm(path);
+		}
+	}
+
+	#activateStepValidation(step) {
+		for (const rule of Object.values(this.#validation_rules[step] || {})) {
+			rule.active = true;
+		}
+	}
+
+	#activateFieldValidation(path) {
+		const rule = this.#getValidationRule(path);
+
+		if (!rule) {
+			return;
+		}
+
+		rule.active = true;
+	}
+
+	#validateStep() {
+		const step = this.#getCurrentStep();
+
+		for (const path of Object.keys(this.#validation_rules[this.#getCurrentStep()] || {})) {
+			this.#validateField(path);
+		}
+
+		switch (step) {
+			case this.STEP_SELECT_TEMPLATE:
+				this.#validation_errors[step] = !this.#getSelectedTemplate();
+				break;
+		}
+	}
+
+	#validateField(path) {
+		const validate = (rule, value) => {
+			rule = {type: 'string', active: false, required: false, ...rule};
+
+			const required = (typeof rule.required === 'function')
+				? rule.required(rule.row_index || null)
+				: rule.required;
+
+			if (!!required && (value === null || value === '' || (rule.type === 'array' && !value.length))) {
+				return <?= json_encode(_('cannot be empty')) ?>;
+			}
+
+			if (rule.type === 'string' && value !== '') {
+				if (rule.minlength > value.length) {
+					return <?= json_encode(_('value is too short')) ?>;
+				}
+
+				if (rule.maxlength < value.length) {
+					return <?= json_encode(_('value is too long')) ?>;
+				}
+
+				if (rule.regex && !rule.regex.test(value)) {
+					return <?= json_encode(_('invalid format')) ?>;
+				}
+			}
+
+			if (rule.type === 'number' && value !== '' ) {
+				if (isNaN(value)) {
+					return <?= json_encode(_('should be a number')) ?>;
+				}
+
+				if (rule.min > value) {
+					return <?= json_encode(_('value is too low')) ?>;
+				}
+
+				if (rule.max < value) {
+					return <?= json_encode(_('value is too high')) ?>;
+				}
+			}
+
+			return null;
+		}
+
+		const rule = this.#getValidationRule(path);
+
+		if (!rule) {
+			return null;
+		}
+
+		const value = this.#getValueByPath(this.#data, path);
+		const error = value !== undefined && validate(rule, value);
+
+		if (this.#getCurrentStep() in this.#validation_errors) {
+			this.#validation_errors[this.#getCurrentStep()][path] = error;
+		}
+
+		return error;
+	}
+
+	#getValidationRule(path) {
+		for (const rules of Object.values(this.#validation_rules)) {
+			if (rules && path in rules) {
+				return rules[path];
+			}
+		}
+	}
+
+	#hasErrors() {
+		const validation_errors = this.#validation_errors[this.#getCurrentStep()];
+
+		return validation_errors !== undefined
+			? (validation_errors === true || Object.entries(validation_errors).some(([path, error]) => {
+				return this.#getValidationRule(path)?.active && error !== null;
+			}))
+			: false;
 	}
 
 	#updateFieldMessages(name, type, messages = []) {
-		const field = this.#dialogue.querySelector(`[name="${name}"]`);
+		const field = this.#dialogue.querySelector(`[name="${name}"], [data-name="${name}"]`);
 
 		if (field === null) {
 			return;
@@ -1587,6 +1820,20 @@ window.host_wizard_edit = new class {
 		}, []);
 	}
 
+	#getValueByPath(data, path) {
+		const keys = path.split('.');
+		let current = data;
+
+		for (const key of keys) {
+			if (current == null || !(key in current)) {
+				return;
+			}
+			current = current[key];
+		}
+
+		return current;
+	}
+
 	#setValueByName(data, name, new_value) {
 		const path = this.#parseInputName(name);
 		let current = data;
@@ -1610,6 +1857,10 @@ window.host_wizard_edit = new class {
 		});
 
 		return parts;
+	}
+
+	#inputNameToInputPath(name) {
+		return this.#parseInputName(name).join('.');
 	}
 
 	#pathToInputName(path) {

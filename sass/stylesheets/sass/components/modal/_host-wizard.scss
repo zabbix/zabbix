@@ -87,7 +87,7 @@
 		}
 
 		&.grid-columns {
-			gap: 8px 48px;
+			gap: 12px 48px;
 
 			.section-head,
 			.section-body {
@@ -271,6 +271,14 @@
 				li:first-child {
 					margin-left: 0;
 				}
+			}
+		}
+
+		.macro-input-group {
+			input,
+			textarea {
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
 			}
 		}
 

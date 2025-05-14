@@ -271,7 +271,7 @@ function stepCreateHost($form): CTemplateTag {
 			(new CSection())
 				->addItem(
 					(new CFormField([
-						(new CLabel(_('Host name')))->setAsteriskMark(),
+						new CLabel(_('Host name')),
 						new CMultiSelect([
 							'name' => 'host',
 							'object_name' => 'hosts',
@@ -295,7 +295,7 @@ function stepCreateHost($form): CTemplateTag {
 				)
 				->addItem(
 					(new CFormField([
-						(new CLabel(_('Host groups')))->addClass('js-host-groups-label'),
+						new CLabel(_('Host groups')),
 						new CMultiSelect([
 							'name' => 'groups[]',
 							'object_name' => 'hostGroup',
@@ -366,7 +366,7 @@ function stepInstallAgent($agent_script_data): array {
 								)
 								->addItem(
 									(new CFormField([
-										(new CLabel(_('Pre-shared key identity')))->setAsteriskMark(),
+										new CLabel(_('Pre-shared key identity')),
 										(new CTextBox('tls_psk_identity', '', false,
 											DB::getFieldLength('hosts', 'tls_psk_identity')
 										))->setAriaRequired(),
@@ -377,7 +377,7 @@ function stepInstallAgent($agent_script_data): array {
 								)
 								->addItem(
 									(new CFormField([
-										(new CLabel(_('Pre-shared key')))->setAsteriskMark(),
+										new CLabel(_('Pre-shared key')),
 										(new CDiv([
 											(new CTextArea('tls_psk'))
 												->setMaxlength(DB::getFieldLength('hosts', 'tls_psk'))
