@@ -71,10 +71,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getData(): array {
 		$db_hosts = $this->getHosts();
 
-		if (!$db_hosts) {
-			return ['error' => _('No data.')];
-		}
-
 		$db_items = [];
 		$column_tables = [];
 
@@ -110,10 +106,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$table = self::concatenateTables($column_tables);
-
-		if (!$table) {
-			return ['error' => _('No data found')];
-		}
 
 		$this->applyHostOrdering($table, $db_hosts);
 		$this->applyHostOrderingLimit($table);

@@ -27,13 +27,12 @@ use Widgets\TopItems\Includes\{
 };
 use Widgets\TopItems\Widget;
 
+$table = new CTableInfo();
+
 if ($data['error'] !== null) {
-	$table = (new CDiv($data['error']))
-		->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
-		->addClass(ZBX_ICON_SEARCH_LARGE);
+	$table->setNoDataMessage($data['error']);
 }
 else {
-	$table = new CTableInfo();
 
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$header = [];
@@ -41,29 +40,33 @@ else {
 		if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
 			$header[] = new CColHeader(_('Items'));
 
-			foreach ($data['rows'][0] as $cell) {
-				$hostid = $cell[Widget::CELL_HOSTID];
-				$title = $data['db_hosts'][$hostid]['name'];
-				['is_view_value_in_row' => $is_view_value] = $cell[Widget::CELL_METADATA];
-				$header[] = (new CColHeader(
-					($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-						? (new CVertical($title))
-						: (new CSpan($title))
-					)->setTitle($title)
-				))->setColSpan($is_view_value ? 2 : 1);
+			if ($data['rows']) {
+				foreach ($data['rows'][0] as $cell) {
+					$hostid = $cell[Widget::CELL_HOSTID];
+					$title = $data['db_hosts'][$hostid]['name'];
+					['is_view_value_in_row' => $is_view_value] = $cell[Widget::CELL_METADATA];
+					$header[] = (new CColHeader(
+						($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+							? (new CVertical($title))
+							: (new CSpan($title))
+						)->setTitle($title)
+					))->setColSpan($is_view_value ? 2 : 1);
+				}
 			}
 		}
 		else {
 			$header[] = new CColHeader(_('Hosts'));
 
-			foreach ($data['rows'][0] as $cell) {
-				['name' => $title, 'is_view_value_in_column' => $is_view_value] = $cell[Widget::CELL_METADATA];
-				$header[] = (new CColHeader(
-					($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-						? (new CVertical($title))
-						: (new CSpan($title))
-					)->setTitle($title)
-				))->setColSpan($is_view_value ? 2 : 1);
+			if ($data['rows']) {
+				foreach ($data['rows'][0] as $cell) {
+					['name' => $title, 'is_view_value_in_column' => $is_view_value] = $cell[Widget::CELL_METADATA];
+					$header[] = (new CColHeader(
+						($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+							? (new CVertical($title))
+							: (new CSpan($title))
+						)->setTitle($title)
+					))->setColSpan($is_view_value ? 2 : 1);
+				}
 			}
 		}
 
