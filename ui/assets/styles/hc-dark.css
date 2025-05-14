@@ -4949,7 +4949,7 @@ div.dashboard-widget-itemcard .item-card {
         div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers.has-ellipsis .trigger-name {
           max-width: 75px; }
       div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter {
-        grid-template-columns: 1fr 2fr; }
+        grid-template-columns: 1fr 1fr; }
       div.dashboard-widget-itemcard .item-card .sections .section.section-tags {
         grid-template-columns: 1fr; }
         div.dashboard-widget-itemcard .item-card .sections .section.section-tags .tags {
