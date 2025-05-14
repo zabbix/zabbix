@@ -1,1 +1,1 @@
-.......PS. [ZBX-26297] changed unclear warning message in log (rtrizna)
+.......PS. [ZBX-26297] improved warning log when there is network issue between Zabbix server and Zabbix proxy (rtrizna)

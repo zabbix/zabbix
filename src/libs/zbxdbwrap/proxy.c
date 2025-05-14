@@ -1285,9 +1285,9 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	{
 		if (session->last_id > last_valueid)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "received id:" ZBX_FS_UI64 " is less than last known id:"
-					ZBX_FS_UI64 " on host:" ZBX_FS_UI64, last_valueid, session->last_id,
-					session->hostid);
+			zabbix_log(LOG_LEVEL_WARNING, "item id " ZBX_FS_UI64 " received from host " ZBX_FS_UI64
+					" is lower than the last known item id " ZBX_FS_UI64, last_valueid,
+					session->hostid , session->last_id);
 		}
 		else
 			session->last_id = last_valueid;
