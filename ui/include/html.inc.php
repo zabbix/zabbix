@@ -358,7 +358,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('templateid', $db_host['templateid'])
 			->getUrl();
 
-		$template = (new CSpan((new CLink($db_host['name'], $template_url))))->setAttribute('title', $db_host['name']);
+		$template = (new CSpan((new CLink($db_host['name'], $template_url))))->setTitle($db_host['name']);
 
 		if ($current_element === '') {
 			$template->addClass(ZBX_STYLE_SELECTED);
@@ -395,7 +395,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('hostid', $db_host['hostid'])
 			->getUrl();
 
-		$host = (new CSpan((new CLink($db_host['name'], $host_url))))->setAttribute('title', $db_host['name']);
+		$host = (new CSpan((new CLink($db_host['name'], $host_url))))->setTitle($db_host['name']);
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
@@ -542,7 +542,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 						->setArgument('context', $context)
 			)
 		);
-		$discovery_rule->setAttribute('title', $db_discovery_rule['name']);
+		$discovery_rule->setTitle($db_discovery_rule['name']);
 
 		if ($db_lld_prototype_parents) {
 			// Create the new breadcrumb's element /.../ contains the all parents of the current discovery prototype
