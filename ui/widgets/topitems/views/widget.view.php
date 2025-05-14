@@ -33,7 +33,6 @@ if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
 }
 else {
-
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$header = [];
 
