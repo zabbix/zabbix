@@ -173,14 +173,17 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 				$lld_rules = API::DiscoveryRulePrototype()->get([
 					'output' => [],
 					'selectDiscoveryRule' => ['name'],
+					'selectDiscoveryRulePrototype' => ['name'],
 					'itemids' => array_keys($parent_lldruleids),
 					'preservekeys' => true
 				]);
 			}
 
 			foreach ($lld_rules as $lldruleid => $lld_rule) {
+				$parent_lld = $lld_rule['discoveryRule'] ?: $lld_rule['discoveryRulePrototype'];
+
 				foreach ($parent_lldruleids[$lldruleid] as $itemid) {
-					$items[$itemid]['parent_lld']['name'] = $lld_rule['discoveryRule']['name'];
+					$items[$itemid]['parent_lld']['name'] = $parent_lld['name'];
 				}
 			}
 		}
