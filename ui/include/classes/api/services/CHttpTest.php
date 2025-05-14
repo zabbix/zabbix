@@ -61,7 +61,7 @@ class CHttpTest extends CApiService {
 			'nopermissions'			=> null,
 			'evaltype'				=> TAG_EVAL_TYPE_AND_OR,
 			'tags'					=> null,
-			'inhertitedTags'		=> false,
+			'inheritedTags'			=> false,
 			// filter
 			'filter'				=> null,
 			'search'				=> null,
