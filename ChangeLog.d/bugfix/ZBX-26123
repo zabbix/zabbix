@@ -1,1 +1,1 @@
-..F....... [ZBX-26123] added error message when URL of a web scenario contains an invalid hostid (msnihach)
+..F....... [ZBX-26123] added hostid parameter validation in web scenario configuration form (msnihach)
