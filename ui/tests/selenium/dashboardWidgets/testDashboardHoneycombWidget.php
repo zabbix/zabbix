@@ -1170,7 +1170,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_size' => 'text', // Secondary label Custom size input field.
 						'id:primary_label' => '', // Primary label text field.
 						'id:secondary_label' => '', // Secondary label text field.
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => 'TESTS1', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => 'TESTS1' // Primary label Color.
 					],
 					'error_message' => [
 						'Invalid parameter "Primary label: Text": cannot be empty.',

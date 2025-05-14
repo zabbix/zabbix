@@ -665,7 +665,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Display OK triggers for' => '!@#$%^&*()_+',
-						'On status change triggers blink for' => '!@#$%^&*()_+',
+						'On status change triggers blink for' => '!@#$%^&*()_+'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": a time unit is expected.',
