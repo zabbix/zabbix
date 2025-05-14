@@ -267,7 +267,7 @@ class HostTemplateGroups {
 					zbx_dbstr('KEY host prototype number '.$i).', 0, 4, \'\')'
 			);
 
-			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid) VALUES ('.zbx_dbstr($discovered_hostids[$i]).
+			DBexecute('INSERT INTO host_discovery (hostid, lldruleid) VALUES ('.zbx_dbstr($discovered_hostids[$i]).
 					', '.zbx_dbstr($host_prototypeid).')'
 			);
 

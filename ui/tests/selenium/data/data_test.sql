@@ -892,7 +892,7 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99009, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1013, 99009, '', 50019, NULL);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99009, NULL, 99083, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99009, NULL, 99083, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99004, 'Host for inheritance host prototype tests', 'Host for inheritance host prototype tests', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10026,99004,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99004, 99004, 50019);
