@@ -13,15 +13,19 @@
 **/
 
 
-class CWidgetPastePlaceholder extends CWidget {
+class CWidgetFieldPatternSelect extends CWidgetField {
 
-	onStart() {
-		for (const button of this._header.querySelectorAll('button')) {
-			button.disabled = true;
-		}
+	#pattern_select;
+
+	constructor({name, form_name, id}) {
+		super({name, form_name});
+
+		this.#pattern_select = jQuery(`#${id}`).multiSelect();
+
+		this.#initField();
 	}
 
-	promiseUpdate() {
-		return Promise.resolve();
+	#initField() {
+		this.#pattern_select.on('change', () => this.dispatchUpdateEvent());
 	}
 }
