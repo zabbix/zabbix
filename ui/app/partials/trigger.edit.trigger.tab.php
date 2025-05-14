@@ -23,7 +23,7 @@ $data += [
 	'discovered_trigger' => false,
 	'is_discovered_prototype' => false
 ];
-$readonly = $data['readonly'] || $data['is_discovered_prototype'];
+$readonly = $data['readonly'] || $data['discovered_trigger'] || $data['is_discovered_prototype'];
 
 $trigger_form_grid = new CFormGrid();
 

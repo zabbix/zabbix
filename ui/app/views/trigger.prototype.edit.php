@@ -138,7 +138,7 @@ $trigger_form
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $popup_parameters,
-			'readonly' => $data['limited'],
+			'readonly' => $readonly,
 			'dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.prototype.edit',
 			'context' => $data['context'],
