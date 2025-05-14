@@ -47,7 +47,7 @@ func init() {
 	impl.SetHandleTimeout(true)
 }
 
-// Configure configures plugin based on options and other required initilization.
+// Configure configures plugin based on options and other required initialization.
 func (p *Plugin) Configure(_ *plugin.GlobalOptions, options any) {
 	p.executorInitFunc = zbxcmd.InitExecutor
 
@@ -76,7 +76,7 @@ func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (
 		return nil, err
 	}
 
-	if p.options.LogRemoteCommands == 1 && (ctx.ClientID() != agent.LocalChecksClientID) {
+	if p.options.LogRemoteCommands == 1 && ctx.ClientID() != agent.LocalChecksClientID {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])
