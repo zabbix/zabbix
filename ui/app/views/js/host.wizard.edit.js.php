@@ -1663,34 +1663,34 @@ window.host_wizard_edit = new class {
 				: rule.required;
 
 			if (!!required && (value === null || value === '' || (rule.type === 'array' && !value.length))) {
-				return <?= json_encode(_('cannot be empty')) ?>;
+				return <?= json_encode(_('This field cannot be empty.')) ?>;
 			}
 
 			if (rule.type === 'string' && value !== '') {
 				if (rule.minlength > value.length) {
-					return <?= json_encode(_('value is too short')) ?>;
+					return <?= json_encode(_('This value is too short.')) ?>;
 				}
 
 				if (rule.maxlength < value.length) {
-					return <?= json_encode(_('value is too long')) ?>;
+					return <?= json_encode(_('This value is too long.')) ?>;
 				}
 
 				if (rule.regex && !rule.regex.test(value)) {
-					return <?= json_encode(_('invalid format')) ?>;
+					return <?= json_encode(_('This value does not match pattern.')) ?>;
 				}
 			}
 
 			if (rule.type === 'number' && value !== '' ) {
 				if (isNaN(value)) {
-					return <?= json_encode(_('should be a number')) ?>;
+					return <?= json_encode(_('This value is not a valid integer.')) ?>;
 				}
 
 				if (rule.min > value) {
-					return <?= json_encode(_('value is too low')) ?>;
+					return sprintf(<?= json_encode(_('This value must be no less than "%1$s".')) ?>, rule.min);
 				}
 
 				if (rule.max < value) {
-					return <?= json_encode(_('value is too high')) ?>;
+					return sprintf(<?= json_encode(_('This value must be no greater than "%1$s".')) ?>, rule.max);
 				}
 			}
 
