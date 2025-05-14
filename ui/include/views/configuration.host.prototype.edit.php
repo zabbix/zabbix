@@ -24,7 +24,7 @@ require_once __DIR__.'/js/configuration.host.prototype.edit.js.php';
 $host_prototype = $data['host_prototype'];
 $parent_host = $data['parent_host'];
 
-$readonly = $host_prototype['templateid'] || $data['discovered_prototype'];
+$readonly = $host_prototype['templateid'] || $data['is_discovered_prototype'];
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Host prototypes'))
@@ -59,7 +59,7 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
-if ($data['discovered_prototype']) {
+if ($data['is_discovered_prototype']) {
 	$parent_lld = $host_prototype['discoveryRule'] ?: $host_prototype['discoveryRulePrototype'];
 
 	$discovered_url = (new CUrl('host_prototypes.php'))
@@ -162,7 +162,7 @@ else {
 						->onClick('
 							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
 						')
-						->setEnabled(!$data['discovered_prototype'])
+						->setEnabled(!$data['is_discovered_prototype'])
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]);
 		}
@@ -174,7 +174,7 @@ else {
 		'name' => 'add_templates[]',
 		'object_name' => 'templates',
 		'data' => $host_prototype['add_templates'],
-		'readonly' => $data['discovered_prototype'],
+		'readonly' => $data['is_discovered_prototype'],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'templates',
@@ -201,7 +201,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'readonly' => $data['discovered_prototype'],
+		'readonly' => $data['is_discovered_prototype'],
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [
@@ -232,7 +232,7 @@ $host_tab->addRow(
 						(new CCol(
 							(new CButton('group_prototype_add', _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->setEnabled(!$data['discovered_prototype'])
+								->setEnabled(!$data['is_discovered_prototype'])
 						))->setAttribute('colspan', 5)
 					)
 			)
@@ -242,7 +242,7 @@ $host_tab->addRow(
 $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 	(new CRow([
 		new CCol([
-			(new CTextBox('group_prototypes[#{i}][name]', '#{name}', $data['discovered_prototype']))
+			(new CTextBox('group_prototypes[#{i}][name]', '#{name}', $data['is_discovered_prototype']))
 				->addStyle('width: 448px')
 				->setAttribute('placeholder', '{#MACRO}'),
 			new CInput('hidden', 'group_prototypes[#{i}][group_prototypeid]', '#{group_prototypeid}')
@@ -251,7 +251,7 @@ $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 			(new CButtonLink(_('Remove')))
 				->setAttribute('name', 'remove')
 				->addClass('group-prototype-remove')
-				->setEnabled(!$data['discovered_prototype'])
+				->setEnabled(!$data['is_discovered_prototype'])
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]))->addClass('form_row')
 );
@@ -373,13 +373,13 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 $host_tab->addRow(_('Create enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))
 		->setChecked(HOST_STATUS_MONITORED == $host_prototype['status'])
-		->setReadonly($data['discovered_prototype'])
+		->setReadonly($data['is_discovered_prototype'])
 );
 $host_tab->addRow(_('Discover'),
 	(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 		->setChecked($host_prototype['discover'] == ZBX_PROTOTYPE_DISCOVER)
 		->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
-		->setReadonly($data['discovered_prototype'])
+		->setReadonly($data['is_discovered_prototype'])
 );
 
 $tabs->addTab('hostTab', _('Host'), $host_tab);
@@ -447,7 +447,7 @@ $macro_tab = (new CFormList('macrosFormList'))
 			[
 				'macros' => $data['macros'],
 				'parent_hostid' => $data['parent_host']['hostid'],
-				'readonly' => $data['templates'] || $data['discovered_prototype']
+				'readonly' => $data['templates'] || $data['is_discovered_prototype']
 			]
 		),
 		'macros_container'
@@ -599,9 +599,9 @@ $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_E
 
 if ($host_prototype['hostid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmit('update', _('Update')))->setEnabled(!$data['discovered_prototype']),
+		(new CSubmit('update', _('Update')))->setEnabled(!$data['is_discovered_prototype']),
 		[
-			new CSubmit('clone', _('Clone')),
+			(new CSubmit('clone', _('Clone')))->setEnabled(!$data['is_discovered_prototype']),
 			(new CButtonDelete(
 				_('Delete selected host prototype?'),
 				url_params(['form', 'hostid', 'parent_discoveryid', 'context']).'&'.CSRF_TOKEN_NAME.

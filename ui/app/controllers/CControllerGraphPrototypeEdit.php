@@ -129,7 +129,7 @@ class CControllerGraphPrototypeEdit extends CController {
 			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => $this->getInput('readonly', 0),
 			'discovered' => false,
-			'discovered_prototype' => false
+			'is_discovered_prototype' => false
 		];
 
 		if ($data['graphid'] != 0) {
@@ -162,7 +162,7 @@ class CControllerGraphPrototypeEdit extends CController {
 			$data += $graph;
 
 			$data['discovered'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
-			$data['discovered_prototype'] = $data['discovered'] && $graph['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
+			$data['is_discovered_prototype'] = $data['discovered'] && $graph['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 
@@ -179,7 +179,7 @@ class CControllerGraphPrototypeEdit extends CController {
 				'sortfield' => 'gitemid'
 			]);
 
-			$data['discovered_prototype'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			$data['is_discovered_prototype'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 				&& $graph['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		else {

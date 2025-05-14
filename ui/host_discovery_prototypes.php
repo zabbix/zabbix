@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery prototypes');
-$page['file'] = 'host_discovery_prototype.php';
+$page['file'] = 'host_discovery_prototypes.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -694,7 +694,7 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
-	$data['discovered_prototype'] = false;
+	$data['is_discovered_prototype'] = false;
 
 	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
 		throw new CAccessDeniedException();
@@ -771,9 +771,9 @@ if (hasRequest('form')) {
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
 
-		$data['discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+		$data['is_discovered_prototype'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 
-		if ($data['discovered_prototype']) {
+		if ($data['is_discovered_prototype']) {
 			$data['parent_lld'] = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
 			$data['discoveryData'] = $item['discoveryData'];
 

@@ -19,7 +19,12 @@
  * @var array $data
  */
 
-$discovered_trigger = array_key_exists('discovered_trigger', $data) ? $data['discovered_trigger'] : false;
+$data += [
+	'discovered_trigger' => false,
+	'is_discovered_prototype' => false
+];
+
+$discovered_trigger = $data['discovered_trigger'] || $data['is_discovered_prototype'];
 
 $dependency_link = (new CLink(['#{name}'], '#{trigger_url}'))
 	->addClass('js-related-trigger-edit')

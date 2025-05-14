@@ -19,16 +19,19 @@
  * @var array $data
  */
 
-$discovered_trigger = array_key_exists('discovered_trigger', $data) ? $data['discovered_trigger'] : false;
-$discovered_prototype = array_key_exists('discovered_prototype', $data) ? $data['discovered_prototype'] : false;
-$readonly = $data['readonly'] || $discovered_prototype;
+$data += [
+	'discovered_trigger' => false,
+	'is_discovered_prototype' => false
+];
+$readonly = $data['readonly'] || $data['is_discovered_prototype'];
 
 $trigger_form_grid = new CFormGrid();
+
 if ($data['templates']) {
 	$trigger_form_grid->addItem([new CLabel(_('Parent triggers')), new CFormField($data['templates'])]);
 }
 
-if ($discovered_trigger || $discovered_prototype) {
+if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
 	$discovered_trigger_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')
@@ -69,7 +72,7 @@ $trigger_form_grid
 		new CFormField((new CTextBox('opdata', $data['opdata'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	]);
 
-if ($discovered_trigger || $discovered_prototype) {
+if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
 	$trigger_form_grid->addItem([(new CVar('priority', (int) $data['priority']))->removeId()]);
 	$severity = (new CSeverity('priority_names', (int) $data['priority']))->setReadonly($readonly);
 }
@@ -271,7 +274,7 @@ $trigger_form_grid
 			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
 		], 'url_name'),
 		new CFormField((new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '',
-			$discovered_trigger || $discovered_prototype, DB::getFieldLength('triggers', 'url_name')
+			$data['discovered_trigger'] || $data['is_discovered_prototype'], DB::getFieldLength('triggers', 'url_name')
 		))
 			->setAttribute('placeholder', _('Trigger URL'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -280,7 +283,7 @@ $trigger_form_grid
 	->addItem([new CLabel(_('Menu entry URL'), 'url'),
 		new CFormField(
 			(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '',
-				$discovered_trigger || $discovered_prototype, DB::getFieldLength('triggers', 'url')
+				$data['discovered_trigger'] || $data['is_discovered_prototype'], DB::getFieldLength('triggers', 'url')
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	])
@@ -288,7 +291,7 @@ $trigger_form_grid
 		new CFormField((new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
-			->setReadonly($discovered_trigger || $discovered_prototype)
+			->setReadonly($data['discovered_trigger'] || $data['is_discovered_prototype'])
 		)
 	]);
 
@@ -302,14 +305,14 @@ if (array_key_exists('parent_discoveryid', $data)) {
 		->addItem([new CLabel(_('Create enabled'), 'status'),
 			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
 				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
-				->setReadonly($discovered_prototype)
+				->setReadonly($data['is_discovered_prototype'])
 			)
 		])
 		->addItem([new CLabel(_('Discover'), 'discover'),
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
-					->setReadonly($discovered_prototype)
+					->setReadonly($data['is_discovered_prototype'])
 			)
 		]);
 } else {

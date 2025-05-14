@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$data += ['is_discovered_prototype' => false];
+
 $graph_tab = new CFormGrid();
 
 if ($data['is_templated']) {
@@ -383,7 +385,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 		new CFormField(
 			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
-				->setReadonly($data['discovered_prototype'])
+				->setReadonly($data['is_discovered_prototype'])
 		)
 	]);
 }

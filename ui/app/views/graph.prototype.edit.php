@@ -32,7 +32,7 @@ $graph_form = (new CForm())
 	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
-$readonly = $is_templated || $data['discovered_prototype'];
+$readonly = $is_templated || $data['is_discovered_prototype'];
 
 // Preview tab.
 $preview_table = (new CTable())
@@ -51,14 +51,15 @@ if ($data['graphid'] != 0) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'graph_edit_popup.submit();',
-			'enabled' => !$data['discovered_prototype']
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'graph_edit_popup.clone();'
+			'action' => 'graph_edit_popup.clone();',
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Delete'),

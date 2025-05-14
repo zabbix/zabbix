@@ -389,7 +389,7 @@ if (hasRequest('form')) {
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
-		'discovered_prototype' => $hostid != 0 && $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+		'is_discovered_prototype' => $hostid != 0 && $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 			&& $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE,
 		'groups' => [],
 		'tags' => getRequest('tags', []),

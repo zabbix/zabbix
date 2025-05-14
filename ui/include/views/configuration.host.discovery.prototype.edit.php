@@ -47,7 +47,7 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if ($data['discovered_prototype']) {
+if ($data['is_discovered_prototype']) {
 	$discovered_url = (new CUrl('host_discovery_prototypes.php'))
 		->setArgument('form', 'update')
 		->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
@@ -1081,7 +1081,7 @@ if (!empty($data['itemid'])) {
 	$buttons[] = (new CButtonDelete(
 		_('Delete discovery prototype?'),
 		url_params(['form', 'itemid', 'hostid', 'parent_discoveryid', 'context']).
-			'&'.CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery_prototype.php'),
+			'&'.CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery_prototypes.php'),
 		'context'
 	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_params(['parent_discoveryid', 'context']));

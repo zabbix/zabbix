@@ -19,7 +19,7 @@
  * @var array $data
  */
 
-$readonly = $data['limited'] || $data['discovered_prototype'];
+$readonly = $data['limited'] || $data['is_discovered_prototype'];
 
 $trigger_form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
@@ -92,14 +92,15 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'trigger_edit_popup.submit();',
-			'enabled' => !$data['discovered_prototype']
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),
 			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'trigger_edit_popup.clone();'
+			'action' => 'trigger_edit_popup.clone();',
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Delete'),

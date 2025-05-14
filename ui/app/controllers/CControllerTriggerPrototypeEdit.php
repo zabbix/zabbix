@@ -165,7 +165,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'discover' => $this->hasInput('form_refresh') ? ZBX_PROTOTYPE_NO_DISCOVER : ZBX_PROTOTYPE_DISCOVER,
 			'url' => '',
 			'url_name' => '',
-			'discovered_prototype' => false
+			'is_discovered_prototype' => false
 		];
 
 		$this->getInputs($data, array_keys($data));
@@ -229,7 +229,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 				$data = $trigger;
 			}
 
-			$data['discovered_prototype'] = $trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			$data['is_discovered_prototype'] = $trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 				&& $trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
