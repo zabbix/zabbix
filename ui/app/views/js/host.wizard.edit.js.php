@@ -790,7 +790,7 @@ window.host_wizard_edit = new class {
 						...(Number(template_macro.config.required) === 1 && {required: true}),
 						...(template_macro.config.regex && {regex: new RegExp(template_macro.config.regex)})
 					};
-					console.log(template_macro)
+
 					return [row_index, {
 						type: template_macro.type,
 						macro: template_macro.macro,
@@ -1498,7 +1498,6 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeMacroFieldText({type, macro, config}, row_index) {
-		console.log(macro, type)
 		switch (Number(type)) {
 			case this.MACRO_TYPE_SECRET:
 				return this.#view_templates.macro_field_secret.evaluateToElement({
