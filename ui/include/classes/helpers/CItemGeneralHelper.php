@@ -103,15 +103,19 @@ JAVASCRIPT;
 		];
 	}
 	/**
-	 * Add inherited from host and template tags to item tags.
+	 * Add tags inherited from host and template to item tags. An additional property 'type' is set for each returned
+	 * tag.
 	 *
-	 * @param int   $item['itemid']
-	 * @param int   $item['hostid']
-	 * @param int   $item['templateid']
-	 * @param array $item['discoveryRule'] (for base objects) | ['parent_lld'] (for prototypes)
-	 * @param array $item_tags
+	 * @param string $item['itemid']
+	 * @param string $item['hostid']
+	 * @param string $item['templateid']
+	 * @param array  $item['parent_lld'] 				(optional) Parent LLD for discovered item prototype.
+	 * @param string $item['parent_lld']['itemid']
+	 * @param string $item['parent_lld']['templateid']
+	 * @param int    $item['parent_lld']['flags']
+	 * @param array  $item_tags
 	 *
-	 * @return array of tags with inherited and additional property 'type' set for each tag.
+	 * @return array
 	 */
 	public static function addInheritedTags(array $item, array $item_tags): array {
 		if (array_key_exists('parent_lld', $item) && $item['parent_lld']['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
