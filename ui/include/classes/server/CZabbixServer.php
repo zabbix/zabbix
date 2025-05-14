@@ -147,7 +147,7 @@ class CZabbixServer {
 	 * @return bool|array
 	 */
 	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null,
-			$manualinput = null) {
+			$manualinput = null): bool|array {
 		$params = [
 			'request' => 'command',
 			'scriptid' => $scriptid,
@@ -180,9 +180,9 @@ class CZabbixServer {
 	 *        string $data['ns']      (optional) Nanoseconds when the value was received.
 	 * @param string $sid             User session ID or user API token.
 	 *
-	 * @return array|bool
+	 * @return bool|array
 	 */
-	public function pushHistory(array $data, string $sid) {
+	public function pushHistory(array $data, string $sid): bool|array {
 		return $this->request([
 			'request' => 'history.push',
 			'data' => $data,
@@ -200,9 +200,9 @@ class CZabbixServer {
 	 * @param array  $data['options']  (optional) Array of test parameters.
 	 * @param string $sid              User session ID.
 	 *
-	 * @return array|bool
+	 * @return bool|array
 	 */
-	public function testItem(array $data, string $sid) {
+	public function testItem(array $data, string $sid): bool|array {
 		return $this->request([
 			'request' => 'item.test',
 			'data' => $data,
@@ -224,7 +224,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function getQueue($type, $sid, $limit = 0) {
+	public function getQueue($type, $sid, $limit = 0): bool|array {
 		$request = [
 			'request' => 'queue.get',
 			'sid' => $sid,
@@ -251,7 +251,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function testMediaType(array $data, $sid) {
+	public function testMediaType(array $data, $sid): bool|array {
 		return $this->request([
 			'request' => 'alert.send',
 			'sid' => $sid,
@@ -279,7 +279,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function testReport(array $data, string $sid) {
+	public function testReport(array $data, string $sid): bool|array {
 		return $this->request([
 			'request' => 'report.test',
 			'sid' => $sid,
@@ -294,7 +294,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function getStatus($sid) {
+	public function getStatus($sid): bool|array {
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'full',
@@ -361,7 +361,7 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	public function isRunning() {
+	public function isRunning(): bool {
 		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port', 'lastaccess'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
@@ -387,7 +387,7 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	public function canConnect($sid) {
+	public function canConnect($sid): bool {
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'ping',
@@ -411,7 +411,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function expressionsEvaluate(array $data, string $sid) {
+	public function expressionsEvaluate(array $data, string $sid): bool|array {
 		$response = $this->request([
 			'request' => 'expressions.evaluate',
 			'sid' => $sid,
@@ -440,7 +440,7 @@ class CZabbixServer {
 	 *
 	 * @return string
 	 */
-	public function getError() {
+	public function getError(): string {
 		return $this->error;
 	}
 
@@ -449,7 +449,7 @@ class CZabbixServer {
 	 *
 	 * @return int|null
 	 */
-	public function getTotalCount() {
+	public function getTotalCount(): ?int {
 		return $this->total;
 	}
 
@@ -458,7 +458,7 @@ class CZabbixServer {
 	 *
 	 * @return array
 	 */
-	public function getDebug() {
+	public function getDebug(): array {
 		return $this->debug;
 	}
 
@@ -469,7 +469,7 @@ class CZabbixServer {
 	 *
 	 * @return mixed    the output of the script if it has been executed successfully or false otherwise
 	 */
-	protected function request(array $params) {
+	protected function request(array $params): mixed {
 		// Reset object state.
 		$this->error = null;
 		$this->total = null;
@@ -652,7 +652,7 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	protected function normalizeResponse(array &$response) {
+	protected function normalizeResponse(array &$response): bool {
 		return (array_key_exists('response', $response) && ($response['response'] == self::RESPONSE_SUCCESS
 				|| $response['response'] == self::RESPONSE_FAILED && array_key_exists('info', $response))
 		);
@@ -665,7 +665,7 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	protected function checkTLSFile(string $file_path) {
+	protected function checkTLSFile(string $file_path): bool {
 		if ($file_path === '' || !file_exists($file_path) || !is_readable($file_path)) {
 			return false;
 		}
@@ -680,7 +680,7 @@ class CZabbixServer {
 	 *
 	 * @return string
 	 */
-	protected function normalizeDn(array $dn) {
+	protected function normalizeDn(array $dn): string {
 		ksort($dn);
 		return implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($dn), $dn));
 	}
@@ -690,7 +690,7 @@ class CZabbixServer {
 	 *
 	 * @return array<string, resource>|null
 	 */
-	protected function createTransportContext(array $tls_config) {
+	protected function createTransportContext(array $tls_config): ?array {
 		$protocol = '';
 		$context = stream_context_create([]);
 
@@ -720,7 +720,7 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	protected function checkCertificates($socket, array $tls_config) {
+	protected function checkCertificates($socket, array $tls_config): bool {
 		if ($tls_config['CERTIFICATE_ISSUER'] === '' && $tls_config['CERTIFICATE_SUBJECT'] === '') {
 			return true;
 		}
