@@ -93,9 +93,9 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
 	{
-		if (SUCCEED == strcmp("ERROR",zbx_mock_get_parameter_string("in.variant")))
+		if (SUCCEED == strcmp("ERROR", zbx_mock_get_parameter_string("in.variant")))
 			set_variant_error(ctx, zbx_mock_get_parameter_string("in.variant_data"));
-		if (SUCCEED == strcmp("UI64",zbx_mock_get_parameter_string("in.variant")))
+		if (SUCCEED == strcmp("UI64", zbx_mock_get_parameter_string("in.variant")))
 			set_variant_ui64(ctx, zbx_mock_get_parameter_uint64("in.variant_data"));
 	}
 

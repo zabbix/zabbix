@@ -49,7 +49,7 @@ static int	compare_ctx_no_rules(zbx_eval_context_t *ctx1, zbx_eval_context_t *ct
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_eval_context_t	ctx1,*ctx2;
+	zbx_eval_context_t	ctx1, *ctx2;
 	unsigned char		*data;
 	char			*error = NULL;
 	zbx_uint64_t		rules;

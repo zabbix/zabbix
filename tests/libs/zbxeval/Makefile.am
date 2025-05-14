@@ -19,8 +19,8 @@ SERVER_tests = \
 	zbx_eval_copy \
 	zbx_eval_format_function_error \
 	zbx_get_serialized_expression_functionids \
-	zbx_eval_deserialize_dyn\
-	zbx_eval_substitute_macros\
+	zbx_eval_deserialize_dyn \
+	zbx_eval_substitute_macros \
 	zbx_eval_query_subtitute_user_macros
 
 endif

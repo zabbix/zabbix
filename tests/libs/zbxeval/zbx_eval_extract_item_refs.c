@@ -28,7 +28,7 @@ static int	compare_vectors_str(zbx_vector_str_t *v1, zbx_vector_str_t *v2)
 
 	for (int i = 0; i < v1->values_num; i++)
 	{
-		if (SUCCEED != strcmp(v1->values[i],v2->values[i]))
+		if (0 != strcmp(v1->values[i],v2->values[i]))
 			return FAIL;
 	}
 
