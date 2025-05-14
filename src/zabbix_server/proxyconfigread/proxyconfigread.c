@@ -1271,10 +1271,10 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 			flags |= ZBX_PROXYCONFIG_SYNC_HOSTS;
 
 		if (SUCCEED == global_macros)
-			flags |= ZBX_PROXYCONFIG_SYNC_GMACROS | ZBX_PROXYCONFIG_SYNC_HMACROS;
+			flags |= ZBX_PROXYCONFIG_SYNC_GMACROS;
 
 		if(0 != macro_hostids.values_num)
-			flags |= ZBX_PROXYCONFIG_SYNC_HMACROS | ZBX_PROXYCONFIG_SYNC_GMACROS;
+			flags |= ZBX_PROXYCONFIG_SYNC_HMACROS;
 
 		/* config sync is required because of possible proxy timeout changes overriding global timeouts */
 		if (proxy_config_revision < proxy->revision)

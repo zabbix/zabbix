@@ -16874,20 +16874,15 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
 		zbx_vector_uint64_t *del_macro_hostids)
 {
-	zbx_vector_uint64_t	hostids_tmp, globalids;
+	zbx_vector_uint64_t	globalids, *full_sync_hostids = hostids;
 	zbx_uint64_t		globalhostid = 0;
+	int			full_sync = FAIL;
 
 	/* force full sync for updated hosts (in the case host was assigned to proxy) */
 	/* and revision based sync for the monitored hosts (except updated hosts that */
 	/* were already synced)                                                       */
 
-	zbx_vector_uint64_create(&hostids_tmp);
-	if (0 != hostids->values_num)
-	{
-		zbx_vector_uint64_append_array(&hostids_tmp, hostids->values, hostids->values_num);
-		zbx_vector_uint64_setdiff(&hostids_tmp, updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-
+	*global = FAIL;
 	zbx_vector_uint64_create(&globalids);
 
 	RDLOCK_CACHE;
@@ -16895,30 +16890,51 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 	/* check revision of global macro 'host' (hostid 0) */
 	um_cache_get_macro_updates(config->um_cache, &globalhostid, 1, revision, &globalids, del_macro_hostids);
 
-	if (0 != hostids_tmp.values_num)
+	/* if no global macro updates or host changes are found, check macro updates for monitored hosts */
+	if (0 == globalids.values_num && 0 == updated_hostids->values_num)
 	{
-		um_cache_get_macro_updates(config->um_cache, hostids_tmp.values, hostids_tmp.values_num, revision,
+		full_sync = um_cache_check_macro_updates(config->um_cache, hostids->values, hostids->values_num,
+				revision);
+
+		um_cache_get_macro_updates(config->um_cache, hostids->values, hostids->values_num, revision,
 				macro_hostids, del_macro_hostids);
+
+		if (0 != macro_hostids->values_num)
+		{
+			/* force full sync if there were macro updates for monitored hosts */
+			full_sync = SUCCEED;
+			zbx_vector_uint64_clear(macro_hostids);
+		}
+	}
+	else
+	{
+		/* force full sync if there were global macro updates or host changes */
+		full_sync = SUCCEED;
 	}
 
-	if (0 != updated_hostids->values_num)
+	if (SUCCEED == full_sync)
 	{
-		um_cache_get_macro_updates(config->um_cache, updated_hostids->values, updated_hostids->values_num, 0,
-				macro_hostids, del_macro_hostids);
+		/* force global sync with full sync */
+		*global = SUCCEED;
+
+		um_cache_get_macro_updates(config->um_cache, hostids->values, hostids->values_num, 0, macro_hostids,
+				del_macro_hostids);
 	}
 
 	UNLOCK_CACHE;
 
-	*global = (0 < globalids.values_num ? SUCCEED : FAIL);
-
 	if (0 != macro_hostids->values_num)
+	{
+		/* force global macro sync if host macros are being synced */
+		*global = SUCCEED;
 		zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
 
 	if (0 != del_macro_hostids->values_num)
 		zbx_vector_uint64_sort(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_destroy(&globalids);
-	zbx_vector_uint64_destroy(&hostids_tmp);
 }
 
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
