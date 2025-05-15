@@ -1,1 +1,1 @@
-.......PS. [ZBX-26297] improved server warning log message for out of order item ID detection between Zabbix server and Zabbix proxy (rtrizna)
+.......PS. [ZBX-26297] improved server warning log message for out of order historical value ID detection between Zabbix server and Zabbix proxy (rtrizna)
