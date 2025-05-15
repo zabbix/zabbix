@@ -5858,15 +5858,21 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       line-height: 16px; }
       .modal-popup-host-wizard .form-field .warning::before {
         color: #ffa20d; }
+    .modal-popup-host-wizard .form-field.field-checkbox {
+      gap: 0; }
+      .modal-popup-host-wizard .form-field.field-checkbox label {
+        line-height: 24px; }
+    .modal-popup-host-wizard .form-field .input-secret .btn-undo {
+      border-color: #666666; }
+    .modal-popup-host-wizard .form-field .input-secret input:focus + .btn-undo {
+      border-color: #bbbbbb; }
+    .modal-popup-host-wizard .form-field.field-has-error .btn-undo {
+      border-color: #ff5050; }
     .modal-popup-host-wizard .form-field .has-error {
       border-color: #ff5050; }
     .modal-popup-host-wizard .form-field .error {
       line-height: 16px;
       color: #ff5050; }
-    .modal-popup-host-wizard .form-field.field-checkbox {
-      gap: 0; }
-      .modal-popup-host-wizard .form-field.field-checkbox label {
-        line-height: 24px; }
   .modal-popup-host-wizard .form-fields-hint {
     font-size: 11px;
     line-height: 16px;

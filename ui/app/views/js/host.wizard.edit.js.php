@@ -596,8 +596,7 @@ window.host_wizard_edit = new class {
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		Object.entries(this.#data.macros).forEach(([row_index, macro]) => {
-			const template_macro = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
-			const {field, description} = this.#makeMacroField({...macro, config: template_macro.config}, row_index);
+			const {field, description} = this.#makeMacroField(macro, row_index);
 
 			if (field !== null) {
 				macros_list.appendChild(field);
@@ -617,8 +616,37 @@ window.host_wizard_edit = new class {
 			);
 		}
 
-		jQuery(".macro-input-group", view).macroValue();
-		jQuery('.input-secret', view).inputSecret();
+		Object.entries(this.#data.macros).forEach(([row_index, macro]) => {
+			const {type: template_macro_type} = this.#template.macros.find(
+				({macro: template_macro}) => template_macro === macro.macro
+			);
+
+			const source_macro = this.#host?.macros.find(({macro: host_macro}) => host_macro === macro.macro);
+
+			const $macro_field = $(`[name="macros[${row_index}][value]"]`)
+				.closest('.<?= CMacroValue::ZBX_STYLE_MACRO_INPUT_GROUP ?>')
+				.macroValue();
+
+			const $secret_input = $('.input-secret', $macro_field).inputSecret();
+
+			const $undo_button = $('.btn-undo', $macro_field);
+
+			if (source_macro === undefined || Number(template_macro_type) !== this.MACRO_TYPE_SECRET) {
+				$undo_button.remove();
+			}
+
+			if (Number(template_macro_type) === this.MACRO_TYPE_SECRET) {
+				if (macro.value !== undefined) {
+					$secret_input.inputSecret('activateInput');
+				}
+
+				$undo_button.on('click', () => this.#data.macros[row_index].value = undefined);
+
+				if (macro.value === undefined) {
+					$undo_button.hide();
+				}
+			}
+		});
 	}
 
 	#renderConfigurationFinish() {
@@ -784,7 +812,7 @@ window.host_wizard_edit = new class {
 								: allowed_values[0];
 						}
 					}
-					else if (this.#host !== null && host_macro && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
+					else if (host_macro && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
 						value = undefined;
 					}
 
@@ -799,7 +827,7 @@ window.host_wizard_edit = new class {
 					};
 
 					return [row_index, {
-						type: template_macro.type,
+						type: Number(template_macro.type),
 						macro: template_macro.macro,
 						value,
 						description: template_macro.description
@@ -1003,7 +1031,7 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`).appendChild(progress);
 	}
 
-	#updateForm(path) {
+	#updateForm(path, new_value, old_value) {
 		const step = this.#getCurrentStep();
 		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
 
@@ -1147,23 +1175,25 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
-		for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
-			const rule = this.#getValidationRule(path);
+		requestAnimationFrame(() => {
+			for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
+				const rule = this.#getValidationRule(path);
 
-			if (!rule?.active) {
-				continue;
+				if (!rule?.active) {
+					continue;
+				}
+
+				this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : []);
+
+				if (error === null) {
+					rule.active = false;
+				}
 			}
 
-			this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : []);
+			this.#next_button.toggleAttribute('disabled', this.#hasErrors());
 
-			if (error === null) {
-				rule.active = false;
-			}
-		}
-
-		this.#next_button.toggleAttribute('disabled', this.#hasErrors());
-
-		requestAnimationFrame(() => this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top);
+			this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top
+		});
 	}
 
 	#updateFieldsAsterisk() {
@@ -1481,56 +1511,45 @@ window.host_wizard_edit = new class {
 	}
 
 	#makeMacroField(macro, row_index) {
+		const {config} = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
+
 		const field_view = (() => {
-			switch (Number(macro.config.type)) {
+			switch (Number(config.type)) {
 				case this.WIZARD_FIELD_TEXT:
-					return this.#makeMacroFieldText(macro, row_index);
+					return this.#makeMacroFieldText(macro, config, row_index);
 
 				case this.WIZARD_FIELD_LIST:
-					return this.#makeMacroFieldList(macro, row_index);
+					return this.#makeMacroFieldList(macro, config, row_index);
 
 				case this.WIZARD_FIELD_CHECKBOX:
-					return this.#makeMacroFieldCheckbox(macro, row_index);
+					return this.#makeMacroFieldCheckbox(macro, config, row_index);
 
 				default:
 					return null;
 			}
 		})();
 
-		const description_view = macro.config.description
-			? this.#view_templates.description.evaluateToElement({description: macro.config.description})
+		const description_view = config.description
+			? this.#view_templates.description.evaluateToElement({description: config.description})
 			: null;
 
 		return {field: field_view, description: description_view};
 	}
 
-	#makeMacroFieldText({type, macro, config}, row_index) {
+	#makeMacroFieldText({type, macro}, {label}, row_index) {
 		switch (Number(type)) {
 			case this.MACRO_TYPE_SECRET:
-				return this.#view_templates.macro_field_secret.evaluateToElement({
-					row_index,
-					label: config.label,
-					macro
-				});
+				return this.#view_templates.macro_field_secret.evaluateToElement({row_index, label, macro});
+
 			case this.MACRO_TYPE_VAULT:
-				return this.#view_templates.macro_field_vault.evaluateToElement({
-					row_index,
-					label: config.label,
-					macro
-				});
+				return this.#view_templates.macro_field_vault.evaluateToElement({row_index, label, macro});
+
 			default:
-				return this.#view_templates.macro_field_text.evaluateToElement({
-					row_index,
-					label: config.label,
-					macro
-				});
+				return this.#view_templates.macro_field_text.evaluateToElement({row_index, label, macro});
 		}
 	}
 
-	#makeMacroFieldList(macro_entry, row_index) {
-		const { label, options } = macro_entry.config;
-		const { macro, value } = macro_entry;
-
+	#makeMacroFieldList({ macro, value }, { label, options }, row_index) {
 		if (options.length > 5) {
 			const field_select = this.#view_templates.macro_field_select.evaluateToElement({
 				row_index,
@@ -1567,13 +1586,13 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#makeMacroFieldCheckbox(macro, row_index) {
+	#makeMacroFieldCheckbox({macro}, {label, options}, row_index) {
 		return this.#view_templates.macro_field_checkbox.evaluateToElement({
 			row_index,
-			label: macro.config.label,
-			macro: macro.macro,
-			value: macro.config.options[0].checked,
-			unchecked_value: macro.config.options[0].unchecked
+			label,
+			macro,
+			value: options[0].checked,
+			unchecked_value: options[0].unchecked
 		});
 	}
 
@@ -1594,7 +1613,7 @@ window.host_wizard_edit = new class {
 
 		this.#updateField(this.#pathToInputName(path), new_value);
 		this.#validateStep();
-		this.#updateForm(path);
+		this.#updateForm(path, new_value, old_value);
 		this.#updateFieldsAsterisk();
 	}
 
@@ -1722,7 +1741,7 @@ window.host_wizard_edit = new class {
 		}
 
 		const value = this.#getValueByPath(this.#data, path);
-		const error = value !== undefined && validate(rule, value);
+		const error = value !== undefined ? validate(rule, value) : null;
 
 		if (this.#getCurrentStep() in this.#validation_errors) {
 			this.#validation_errors[this.#getCurrentStep()][path] = error;
@@ -1762,9 +1781,10 @@ window.host_wizard_edit = new class {
 			return;
 		}
 
+		form_field.classList.toggle(type === 'error' ? 'field-has-error' : 'field-has-warning', !!messages.length);
 		field.classList.toggle(type === 'error' ? 'has-error' : 'has-warning', !!messages.length);
 
-		form_field.querySelectorAll(`.${type === 'error' ? 'error' : 'warning'}`).forEach(element => element.remove());
+		form_field.querySelectorAll(type === 'error' ? '.error' : '.warning').forEach(element => element.remove());
 
 		messages.forEach(message => form_field.appendChild(this.#view_templates[type].evaluateToElement({
 			message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`

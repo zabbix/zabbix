@@ -290,6 +290,30 @@
 			}
 		}
 
+		&.field-checkbox {
+			gap: 0;
+
+			label {
+				line-height: 24px;
+			}
+		}
+
+		.input-secret {
+			.btn-undo {
+				border-color: $form-border-color;
+			}
+
+			input:focus + .btn-undo {
+				border-color: $form-focus-border-color;
+			}
+		}
+
+		&.field-has-error {
+			.btn-undo {
+				border-color: $negative-color;
+			}
+		}
+
 		.has-error {
 			border-color: $negative-color;
 		}
@@ -297,14 +321,6 @@
 		.error {
 			line-height: 16px;
 			color: $negative-color;
-		}
-
-		&.field-checkbox {
-			gap: 0;
-
-			label {
-				line-height: 24px;
-			}
 		}
 	}
 

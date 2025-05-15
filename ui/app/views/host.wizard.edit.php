@@ -898,7 +898,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-text',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{row_index}]', null, false),
+				(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{row_index}]', null, false))->addRevertButton(),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -907,7 +907,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-secret',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{row_index}]', null, false),
+				(new CMacroValue(ZBX_MACRO_TYPE_SECRET, 'macros[#{row_index}]', null, false))->addRevertButton(),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -916,7 +916,7 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-vault',
 			(new CFormField([
 				new CLabel('#{label}'),
-				new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{row_index}]', null, false),
+				(new CMacroValue(ZBX_MACRO_TYPE_VAULT, 'macros[#{row_index}]', null, false))->addRevertButton(),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
