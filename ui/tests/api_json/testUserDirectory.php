@@ -862,7 +862,7 @@ class testUserDirectory extends CAPITest {
 		$this->assertTrue($db_media['Media #2'] !== $db_media_updated['Media #2'], 'Property userdirectory_mediaid should change after update operation if where not passed');
 	}
 
-	public function testGetSamlCertificatesAndVerifyIsHashed() {
+	public function testSamlCertificatesReturnInHashedFormat() {
 		$hashed_certificates = [
 			'idp_certificate_hash' => '37a33c1994ef4e6326ee2a5dd0856ce0',
 			'sp_certificate_hash' => '37a33c1994ef4e6326ee2a5dd0856ce0',
