@@ -1,0 +1,1 @@
+.......PS. [ZBX-26313] fixed newline being truncated in SNMP "get[" check (dgoloscapov)
