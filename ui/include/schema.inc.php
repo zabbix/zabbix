@@ -3064,6 +3064,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
+			'priority' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'label' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

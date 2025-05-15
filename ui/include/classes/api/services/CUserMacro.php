@@ -673,6 +673,10 @@ class CUserMacro extends CApiService {
 		$api_macro_config_rules =
 			['type' => API_OBJECT, 'fields' => [
 				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+				'priority' =>			['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
+					['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'priority')]
+				]],
 				'label' =>				['type' => API_MULTIPLE, 'rules' => [
 					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
@@ -902,7 +906,7 @@ class CUserMacro extends CApiService {
 				$field_names = [];
 
 				if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
-					$field_names = ['label', 'description', 'required', 'regex', 'options'];
+					$field_names = ['priority', 'label', 'description', 'required', 'regex', 'options'];
 				}
 				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_TEXT) {
 					$field_names = ['options'];
@@ -1300,7 +1304,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$resource = DB::select('hostmacro_config', [
-			'output' => ['type', 'label', 'description', 'required', 'regex', 'options'],
+			'output' => ['type', 'priority', 'label', 'description', 'required', 'regex', 'options'],
 			'hostmacroids' => array_keys($result),
 			'preservekeys' => true
 		]);

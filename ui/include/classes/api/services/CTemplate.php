@@ -460,6 +460,10 @@ class CTemplate extends CHostGeneral {
 	private static function checkMacroConfig(array &$templates, ?array &$db_templates = null): void {
 		$api_input_macro_config_rules = ['type' => API_OBJECT, 'fields' => [
 			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+			'priority' =>			['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
+				['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'priority')]
+			]],
 			'label' =>				['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
 				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
@@ -851,7 +855,7 @@ class CTemplate extends CHostGeneral {
 					$field_names = [];
 
 					if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
-						$field_names = ['label', 'description', 'required', 'regex', 'options'];
+						$field_names = ['priority', 'label', 'description', 'required', 'regex', 'options'];
 					}
 					elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_TEXT) {
 						$field_names = ['options'];
@@ -1440,7 +1444,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$options = [
-			'output' => ['hostmacroid', 'type', 'label', 'description', 'required', 'regex', 'options'],
+			'output' => ['hostmacroid', 'type', 'priority', 'label', 'description', 'required', 'regex', 'options'],
 			'filter' => ['hostmacroid' => array_keys($hostmacroids)]
 		];
 		$db_macro_configs = DBfetchArray(DBselect(DB::makeSql('hostmacro_config', $options)));

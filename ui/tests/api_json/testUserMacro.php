@@ -413,7 +413,62 @@ class testUserMacro extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config','required').'.'
-			]
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG7}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_CHECKBOX,
+						'priority' => 0,
+						'label' => 'Config',
+						'options' => [[
+							'checked' => 'option1',
+							'unchecked' => 'option2'
+						]]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG8}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT,
+						'priority' => ZBX_MAX_INT32,
+						'label' => 'Config'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT,
+						'priority' => -1,
+						'label' => 'Config'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/priority": value must be one of 0-2147483647.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG}',
+					'value' => 'invalid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_NOCONF,
+						'priority' => 8
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/priority": value must be 0.'
+			],
 		];
 	}
 
@@ -1564,6 +1619,43 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10008',
+						'config' => [
+							'priority' => 5,
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10008',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
+							'priority' => 5,
+							'label' => 'label_8',
+							'description' => 'description_8',
+							'required' => DB::getDefault('hostmacro_config','required'),
+							'regex' => '',
+							'options' => ''
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10008',
+						'config' => [
+							'priority' => -1,
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/config/priority": value must be one of 0-2147483647.',
+				'expect_db_rows' => []
 			]
 		];
 	}
