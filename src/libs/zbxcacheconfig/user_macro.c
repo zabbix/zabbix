@@ -1351,10 +1351,10 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t 
  * Purpose: check if there are any macro updates for the specified hosts since   *
  *          the given revision                                                   *
  *                                                                               *
- * Parameters: cache       - [IN] the user macro cache                           *
+ * Parameters: cache       - [IN] user macro cache                               *
  *             hostids     - [IN] identifiers of the hosts to check              *
- *             hostids_num - [IN] the number of hosts to check                   *
- *             revision    - [IN] the revision                                   *
+ *             hostids_num - [IN] number of hosts to check                       *
+ *             revision    - [IN]                                                *
  *                                                                               *
  * Return value: SUCCEED - at least one host has updates since the revision      *
  *               FAIL    - no updates found                                      *
