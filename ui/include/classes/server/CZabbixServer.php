@@ -90,7 +90,7 @@ class CZabbixServer {
 	 *
 	 * @var int
 	 */
-	protected $totalBytesLimit;
+	protected $total_bytes_limit;
 
 	/**
 	 * Zabbix server socket resource.
@@ -118,21 +118,22 @@ class CZabbixServer {
 	 */
 	protected $debug = [];
 
+	protected array $tls_config;
+
 	/**
-	 * Class constructor.
-	 *
 	 * @param string|null $host
 	 * @param int|null    $port
 	 * @param int         $connect_timeout
 	 * @param int         $timeout
-	 * @param int         $totalBytesLimit
+	 * @param int         $total_bytes_limit
 	 */
-	public function __construct($host, $port, $connect_timeout, $timeout, $totalBytesLimit) {
+	public function __construct($host, $port, $connect_timeout, $timeout, $total_bytes_limit) {
 		$this->host = $host;
 		$this->port = $port;
 		$this->connect_timeout = $connect_timeout;
 		$this->timeout = $timeout;
-		$this->totalBytesLimit = $totalBytesLimit;
+		$this->total_bytes_limit = $total_bytes_limit;
+		$this->tls_config = ZBase::getConfig()['ZBX_SERVER_TLS'];
 	}
 
 	/**
@@ -356,13 +357,8 @@ class CZabbixServer {
 		return $response;
 	}
 
-	/**
-	 * Returns true if the Zabbix server is running and false otherwise.
-	 *
-	 * @return bool
-	 */
 	public function isRunning(): bool {
-		$active_node = API::getApiService('hanode')->get([
+		$active_node = API::HaNode()->get([
 			'output' => ['address', 'port', 'lastaccess'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
 			'sortfield' => 'lastaccess',
@@ -380,14 +376,7 @@ class CZabbixServer {
 		return false;
 	}
 
-	/**
-	 * Returns true if UI can connect to the Zabbix server
-	 *
-	 * @param $sid
-	 *
-	 * @return bool
-	 */
-	public function canConnect($sid): bool {
+	public function canConnect(string $sid): bool {
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'ping',
@@ -398,9 +387,7 @@ class CZabbixServer {
 			return false;
 		}
 
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
-
-		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
+		return true;
 	}
 
 	/**
@@ -440,7 +427,7 @@ class CZabbixServer {
 	 *
 	 * @return string
 	 */
-	public function getError(): string {
+	public function getError() {
 		return $this->error;
 	}
 
@@ -530,10 +517,10 @@ class CZabbixServer {
 					$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
 					$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
 
-					if ($this->totalBytesLimit != 0 && $expected_len >= $this->totalBytesLimit) {
+					if ($this->total_bytes_limit != 0 && $expected_len >= $this->total_bytes_limit) {
 						$this->error = _s(
 							'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
-							$this->host, $this->totalBytesLimit
+							$this->host, $this->total_bytes_limit
 						);
 						return false;
 					}
@@ -583,66 +570,129 @@ class CZabbixServer {
 		return false;
 	}
 
-	/**
-	 * Opens a socket to the Zabbix server. Returns the socket resource if the connection has been established or
-	 * false otherwise.
-	 *
-	 * @return bool|resource
-	 */
-	protected function connect() {
-		$tls_config = ZBase::getConfig()['ZBX_SERVER_TLS'];
-
-		if (!$this->socket) {
-			if ($this->host === null || $this->port === null) {
-				$this->error = _('Connection to Zabbix server failed. Incorrect configuration.');
-				return false;
-			}
-
-			$transport_context = $this->createTransportContext($tls_config);
-
-			if ($transport_context === null) {
-				$this->error = _('TLS fields are misconfigured or the files are not accessible.');
-				return false;
-			}
-
-			if (!$socket = @stream_socket_client($transport_context['protocol'].$this->host.':'.$this->port,
-				$errorCode, $errorMsg, $this->connect_timeout, STREAM_CLIENT_CONNECT, $transport_context['context'])) {
-				$host_port = $this->host.':'.$this->port;
-				switch ($errorMsg) {
-					case 'Connection refused':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $host_port);
-						break;
-
-					case 'No route to host':
-						$dErrorMsg = _s("Zabbix server \"%1\$s\" cannot be reached. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $host_port);
-						break;
-
-					case 'Connection timed out':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $host_port);
-						break;
-
-					default:
-						if ($tls_config['ACTIVE'] == 1) {
-							$dErrorMsg = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
-						} else {
-							$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
-						}
-				}
-
-				$this->error = rtrim($dErrorMsg . $errorMsg);
-				return false;
-			}
-
-			$check_result = $this->checkCertificates($socket, $tls_config);
-
-			if (!$check_result) {
-				return false;
-			}
-
-			$this->socket = $socket;
+	protected function connect(): bool {
+		if ($this->socket && is_resource($this->socket)) {
+			return true;
 		}
 
-		return $this->socket;
+		if ($this->host === null || $this->port === null) {
+			$this->error = _('Connection to Zabbix server failed. Incorrect configuration.');
+
+			return false;
+		}
+
+		if ($this->tls_config['ACTIVE'] == 1) {
+			$this->socket = $this->connectTLS();
+		}
+		else {
+			$this->socket = $this->connectTCP();
+		}
+
+		return $this->socket !== null;
+	}
+
+	/**
+	 * @return resource|null
+	 */
+	protected function connectTCP() {
+		$address = $this->host.':'.$this->port;
+		$socket = @stream_socket_client($address, $error_code, $error_msg, $this->connect_timeout,
+			STREAM_CLIENT_CONNECT
+		);
+
+		if (!is_resource($socket)) {
+			$this->error = $this->connectionErrorMessage($error_msg);
+
+			return null;
+		}
+
+		return $socket;
+	}
+
+	/**
+	 * @return resource|null
+	 */
+	protected function connectTLS() {
+		if (!extension_loaded('openssl')) {
+			$this->error = _('OpenSSL extension is not available.');
+
+			return null;
+		}
+
+		if (!self::checkTLSFile($this->tls_config['CA_FILE'])) {
+			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+
+			return null;
+		}
+
+		if (!self::checkTLSFile($this->tls_config['KEY_FILE'])) {
+			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+
+			return null;
+		}
+
+		if (!self::checkTLSFile($this->tls_config['CERT_FILE'])) {
+			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+
+			return null;
+		}
+
+		$capture_peer_cert = $this->tls_config['CERTIFICATE_ISSUER'] || $this->tls_config['CERTIFICATE_SUBJECT'];
+		$context = stream_context_create([
+			'ssl' => [
+				'cafile' => $this->tls_config['CA_FILE'],
+				'local_pk' => $this->tls_config['KEY_FILE'],
+				'local_cert' => $this->tls_config['CERT_FILE'],
+				'capture_peer_cert' => $capture_peer_cert,
+				'verify_peer_name' => false
+			]
+		]);
+
+		$address = 'tls://'.$this->host.':'.$this->port;
+		$socket = @stream_socket_client($address, $error_code, $error_msg, $this->connect_timeout,
+			STREAM_CLIENT_CONNECT, $context
+		);
+
+		if (!is_resource($socket)) {
+			$this->error = $this->connectionErrorMessage($error_msg);
+
+			if ($this->connectTCP()) {
+				$this->error = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+			}
+
+			return null;
+		}
+
+		if ($capture_peer_cert && !$this->validatePeerCertificate($socket)) {
+			$this->error = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+
+			return null;
+		}
+
+		return $socket;
+	}
+
+	protected function connectionErrorMessage(string $error_msg): string {
+		$host_port = $this->host.':'.$this->port;
+
+		switch ($error_msg) {
+			case 'Connection refused':
+				$descriptive_error_msg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $host_port);
+				break;
+
+			case 'No route to host':
+				$descriptive_error_msg = _s("Zabbix server \"%1\$s\" cannot be reached. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $host_port);
+				break;
+
+			case 'Connection timed out':
+				$descriptive_error_msg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $host_port);
+				break;
+
+			default:
+				$descriptive_error_msg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
+		}
+
+		return rtrim($descriptive_error_msg.$error_msg);
 	}
 
 	/**
@@ -658,14 +708,7 @@ class CZabbixServer {
 		);
 	}
 
-	/**
-	 * Returns true if file exist and is readable
-	 *
-	 * @param string $file_path
-	 *
-	 * @return bool
-	 */
-	protected function checkTLSFile(string $file_path): bool {
+	protected static function checkTLSFile(string $file_path): bool {
 		if ($file_path === '' || !file_exists($file_path) || !is_readable($file_path)) {
 			return false;
 		}
@@ -673,83 +716,41 @@ class CZabbixServer {
 		return true;
 	}
 
-	/**
-	 * Sort and normalize elements from certificate
-	 *
-	 * @param array $dn
-	 *
-	 * @return string
-	 */
-	protected function normalizeDn(array $dn): string {
-		ksort($dn);
-		return implode(', ', array_map(static fn($k, $v) => "$k=$v", array_keys($dn), $dn));
-	}
+	protected function validatePeerCertificate($socket): bool {
+		$subject_dn = $this->tls_config['CERTIFICATE_SUBJECT'];
+		$issuer_dn = $this->tls_config['CERTIFICATE_ISSUER'];
 
-	/**
-	 * Returns protocol and context for connection
-	 *
-	 * @return array<string, resource>|null
-	 */
-	protected function createTransportContext(array $tls_config): ?array {
-		$protocol = '';
-		$context = stream_context_create([]);
+		$params = stream_context_get_params($socket);
+		$cert = $params['options']['ssl']['peer_certificate'];
 
-		if ($tls_config['ACTIVE'] == 1) {
-			$protocol = 'tls://';
+		if ($info = @openssl_x509_parse($cert)) {
+			$dn_parser = new CDNParser();
 
-			if (!$this->checkTLSFile($tls_config['CA_FILE']) || !$this->checkTLSFile($tls_config['KEY_FILE'])
-					|| !$this->checkTLSFile($tls_config['CERT_FILE'])) {
-				return null;
+			if ($dn_parser->parse($issuer_dn) != CParser::PARSE_SUCCESS) {
+				return false;
 			}
 
-			stream_context_set_option($context, 'ssl', 'cafile', $tls_config['CA_FILE']);
-			stream_context_set_option($context, 'ssl', 'local_pk', $tls_config['KEY_FILE']);
-			stream_context_set_option($context, 'ssl', 'local_cert', $tls_config['CERT_FILE']);
-			stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
-			stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
-		}
+			$peer_issuer = (array) $info['issuer'];
+			foreach ($dn_parser->result as ['name' => $name, 'value' => $value]) {
+				if (!array_key_exists($name, $peer_issuer) || $peer_issuer[$name] !== $value) {
+					return false;
+				}
+			}
 
-		return ['protocol' => $protocol, 'context' => $context];
-	}
+			if ($dn_parser->parse($subject_dn) != CParser::PARSE_SUCCESS) {
+				return false;
+			}
 
-	/**
-	 * Validates the TLS certificate of a given socket against expected issuer and subject from configuration.
-	 *
-	 * @param resource $socket
-	 * @param array $tls_config
-	 *
-	 * @return bool
-	 */
-	protected function checkCertificates($socket, array $tls_config): bool {
-		if ($tls_config['CERTIFICATE_ISSUER'] === '' && $tls_config['CERTIFICATE_SUBJECT'] === '') {
+			$peer_subject = (array) $info['subject'];
+			foreach ($dn_parser->result as ['name' => $name, 'value' => $value]) {
+				if (!array_key_exists($name, $peer_subject) || $peer_subject[$name] !== $value) {
+					return false;
+				}
+			}
+
 			return true;
 		}
 
-		if (!extension_loaded('openssl')) {
-			$this->error = _('OpenSSL extension is not available. Cannot parse TLS certificate.');
-			return false;
-		}
-
-		$params = stream_context_get_params($socket);
-		$info = @openssl_x509_parse($params['options']['ssl']['peer_certificate']);
-
-		if ($info === false) {
-			$this->error = _('Failed to parse TLS certificate.');
-			return false;
-		}
-
-		if ($tls_config['CERTIFICATE_ISSUER'] !== ''
-				&& $tls_config['CERTIFICATE_ISSUER'] !== $this->normalizeDn($info['issuer'] ?? [])) {
-			$this->error = _('TLS certificate issuer is incorrect. Possible cause: UI misconfiguration.');
-			return false;
-		}
-
-		if ($tls_config['CERTIFICATE_SUBJECT'] !== ''
-				&& $tls_config['CERTIFICATE_SUBJECT'] !== $this->normalizeDn($info['subject'] ?? [])) {
-			$this->error = _('TLS certificate subject is incorrect. Possible cause: UI misconfiguration.');
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 }

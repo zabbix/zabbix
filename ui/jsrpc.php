@@ -65,7 +65,6 @@ switch ($data['method']) {
 
 			if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
 				$is_running = false;
-				$is_connect_available = false;
 			}
 			else {
 				$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
@@ -74,18 +73,13 @@ switch ($data['method']) {
 				);
 
 				$is_running = $zabbix_server->isRunning();
+				$can_connect = $zabbix_server->canConnect(CSessionHelper::getId());
 
-				if ($is_running) {
-					$is_connect_available = $zabbix_server->canConnect(CSessionHelper::getId());
-				}
-				else {
-					$is_connect_available = false;
-				}
+				// TODO: obtain the message _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+				CSessionHelper::set('serverConnectResult', $can_connect);
+				CSessionHelper::set('serverCheckResult', $is_running);
+				CSessionHelper::set('serverCheckTime', time());
 			}
-
-			CSessionHelper::set('serverCheckResult', $is_running);
-			CSessionHelper::set('serverConnectResult', $is_connect_available);
-			CSessionHelper::set('serverCheckTime', time());
 		}
 
 		$message = '';
