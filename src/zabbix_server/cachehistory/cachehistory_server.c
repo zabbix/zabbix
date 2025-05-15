@@ -952,10 +952,15 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		}
 		else if (now - h->ts.sec > item->history_sec)
 		{
-			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside history "
 					"storage period", item->host.host, item->key_orig,
 					zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
+
+			if (ITEM_STATE_NOTSUPPORTED != history->state)
+			{
+				zbx_dc_history_clean_value(h);
+				h->flags |= ZBX_DC_FLAG_NOVALUE;
+			}
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
