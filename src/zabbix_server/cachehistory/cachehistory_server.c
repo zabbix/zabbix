@@ -923,12 +923,14 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		{
 			if (SEC_PER_HOUR < (now - last_history_discard)) /* log once per hour */
 			{
-				zabbix_log(LOG_LEVEL_TRACE, "discarding history that is pointing to"
+				zabbix_log(LOG_LEVEL_WARNING, "discarding history that is pointing to"
 							" compressed history period");
 				last_history_discard = now;
 			}
 
-			h->flags |= ZBX_DC_FLAG_UNDEF;
+			zbx_dc_history_clean_value(h);
+			history->state = ITEM_STATE_NORMAL;
+			h->flags |= ZBX_DC_FLAG_NOVALUE;
 			continue;
 		}
 
@@ -956,11 +958,10 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 					"storage period", item->host.host, item->key_orig,
 					zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
 
-			if (ITEM_STATE_NOTSUPPORTED != history->state)
-			{
-				zbx_dc_history_clean_value(h);
-				h->flags |= ZBX_DC_FLAG_NOVALUE;
-			}
+			zbx_dc_history_clean_value(h);
+			history->state = ITEM_STATE_NORMAL;
+			h->flags |= ZBX_DC_FLAG_NOVALUE;
+			continue;
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
@@ -971,10 +972,14 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 			}
 			else if (now - h->ts.sec > item->trends_sec)
 			{
-				h->flags |= ZBX_DC_FLAG_NOTRENDS;
 				zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside "
 						"trends storage period", item->host.host, item->key_orig,
 						zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
+
+				zbx_dc_history_clean_value(h);
+				history->state = ITEM_STATE_NORMAL;
+				h->flags |= ZBX_DC_FLAG_NOVALUE;
+				continue;
 			}
 		}
 		else
