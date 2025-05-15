@@ -1286,7 +1286,7 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, f
 INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid, lastcheck, ts_delete) VALUES (15085, 99096, 99095, 0, 0);
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99097, 2, 99062, 'Discovered item one', '', 'lld[one]', NULL, 4,'', '', '', '');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99097, 'Discovered item one', 'DISCOVERED ITEM ONE');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid, key_) values (15086, 99097, 99096, 'lld[one]');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) values (15086, 99097, 99096, 'lld[one]');
 INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags) VALUES (100068, 'Discovered trigger {#TEST}', '{100069}>0', 0, 0, 5, '', 0, 2);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100069, 99096, 100068, 'last', '$');
 INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags) VALUES (100069, 'Discovered trigger one', '{100070}>0', 0, 0, 5, '', 0, 4);
