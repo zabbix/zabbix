@@ -87,7 +87,7 @@ class CProvisioning {
 		}
 		elseif ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
 			$userdirectory += DB::select('userdirectory_saml', [
-				'output' => ['idp_certificate', 'sp_certificate', 'sp_private_key'],
+				'output' => CUserDirectory::SAML_HASH_FIELDS,
 				'filter' => ['userdirectoryid' => $userdirectoryid]
 			])[0];
 		}
