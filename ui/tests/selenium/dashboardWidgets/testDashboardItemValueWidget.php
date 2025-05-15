@@ -19,6 +19,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Test for checking Item Value Widget.
  *
