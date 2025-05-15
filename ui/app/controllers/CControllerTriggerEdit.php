@@ -177,19 +177,20 @@ class CControllerTriggerEdit extends CController {
 		}
 
 		if ($this->trigger) {
-			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
-
-			if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			if ($this->trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 				$db_parent = API::TriggerPrototype()->get([
-					'triggerids' => $trigger['discoveryData']['parent_triggerid'],
+					'triggerids' => $this->trigger['discoveryData']['parent_triggerid'],
 					'selectDiscoveryRule' => ['itemid'],
 					'selectDiscoveryRulePrototype' => ['itemid']
 				]);
 				$db_parent = reset($db_parent);
 
 				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
-				$trigger['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+				$this->trigger['parent_lld'] = $parent_lld;
+				$this->trigger['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 			}
+
+			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
 
 			if ($data['form_refresh']) {
 				if ($data['show_inherited_tags']) {

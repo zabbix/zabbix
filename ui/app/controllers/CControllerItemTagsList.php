@@ -56,7 +56,7 @@ class CControllerItemTagsList extends CController {
 			];
 
 			if ($this->getInput('show_inherited_tags', 0) == 1) {
-				$options['selectDiscoveryRule'] = ['itemid', 'templateid', 'flags'];
+				$options['selectDiscoveryRule'] = ['itemid', 'templateid'];
 			}
 
 			$items = API::Item()->get($options) ?: API::ItemPrototype()->get($options);
@@ -94,9 +94,11 @@ class CControllerItemTagsList extends CController {
 
 			if ($data['show_inherited_tags'] == 1) {
 				$this->item['parent_lld'] = $this->item['discoveryRule'];
-
-				$data['tags'] = CItemHelper::addInheritedTags($this->item, $data['tags']);
 			}
+		}
+
+		if ($data['show_inherited_tags'] == 1) {
+			$data['tags'] = CItemHelper::addInheritedTags($this->item, $data['tags']);
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];

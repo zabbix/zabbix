@@ -274,17 +274,11 @@ class CTriggerGeneralHelper {
 	 * @param array $input_tags
 	 */
 	public static function getInheritedTags(array $data, array $input_tags): array {
-		if ($data['discoveryRule']) {
-			$parent_templates = getItemParentTemplates([$data['discoveryRule']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
-		}
-		elseif (array_key_exists('discoveryRulePrototype', $data) && $data['discoveryRulePrototype']) {
-			$parent_templates = getItemParentTemplates([$data['discoveryRulePrototype']],
-				ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
-			)['templates'];
-		}
-		else {
-			$parent_templates = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
-		}
+		CItemGeneralHelper::findParentLldTemplateid($data);
+
+		$parent_templates = array_key_exists('parent_lld', $data)
+			? getItemParentTemplates([$data['parent_lld']], ZBX_FLAG_DISCOVERY_RULE)['templates']
+			: getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		unset($parent_templates[0]);
 
 		$db_templates = $parent_templates

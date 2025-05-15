@@ -118,26 +118,7 @@ JAVASCRIPT;
 	 * @return array
 	 */
 	public static function addInheritedTags(array $item, array $item_tags): array {
-		if (array_key_exists('parent_lld', $item) && $item['parent_lld']['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-			$lldruleid = $item['parent_lld']['itemid'];
-
-			while ($item['parent_lld']['templateid'] == 0) {
-				$db_source = API::DiscoveryRule()->get([
-					'output' => ['itemid', 'templateid'],
-					'selectDiscoveryRule' => ['itemid'],
-					'itemids' => $lldruleid,
-					'nopermissions' => true
-				]);
-
-				$item['parent_lld'] = reset($db_source);
-
-				if (!$item['parent_lld']['discoveryRule']) {
-					break;
-				}
-
-				$lldruleid = $item['parent_lld']['discoveryRule']['itemid'];
-			}
-		}
+		self::findParentLldTemplateid($item);
 
 		$tags = [];
 
@@ -789,5 +770,30 @@ JAVASCRIPT;
 		}
 
 		return $dst_master_itemids;
+	}
+
+	public static function findParentLldTemplateid(array &$data): void {
+		if (!array_key_exists('parent_lld', $data)) {
+			return;
+		}
+
+		$lldruleid = $data['parent_lld']['itemid'];
+
+		while ($data['parent_lld']['templateid'] == 0) {
+			$db_source = API::DiscoveryRule()->get([
+				'output' => ['itemid', 'templateid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'itemids' => $lldruleid,
+				'nopermissions' => true
+			]);
+
+			$data['parent_lld'] = reset($db_source);
+
+			if (!$data['parent_lld']['discoveryRule']) {
+				break;
+			}
+
+			$lldruleid = $data['parent_lld']['discoveryRule']['itemid'];
+		}
 	}
 }
