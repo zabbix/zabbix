@@ -468,7 +468,7 @@ class testUserDirectory extends CAPITest {
 
 	public static function updateValidDataProvider() {
 		$saml_certificates = self::samlCertificates();
-		
+
 		return [
 			'Test host update' => [
 				'userdirectories' => [

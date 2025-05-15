@@ -26,7 +26,7 @@ class testUserDirectorySamlCertificates extends CAPITest {
 	private static array $data = [
 		'userdirectoryid' => []
 	];
-	
+
 	private static array $hashed_fields = [
 		'idp_certificate' => 'idp_certificate_hash',
 		'sp_certificate' => 'sp_certificate_hash',
@@ -36,7 +36,7 @@ class testUserDirectorySamlCertificates extends CAPITest {
 	public static function updateValidDataProvider() {
 		$certificates = self::rawCertificates();
 		$hashed_certificates = self::hashedCertificates();
-	
+
 		return [
 			'idp_certificate set empty value' => [
 				'key' => 'idp_certificate', 'value' => '', 'expected result' => '', 'expected_error' => null
@@ -112,17 +112,17 @@ class testUserDirectorySamlCertificates extends CAPITest {
 	public function testOpenSslExtensionIsInstalled(): void {
 		$this->assertTrue(extension_loaded('openssl'), 'PHP OpenSSL extension missing.');
 	}
-	
+
 	public function testGetCertificatesHashedValues() {
 		$hashed_certificates = self::hashedCertificates();
 		$userdirectoryid = self::$data['userdirectoryid']['API SAML'];
-		
+
 		$db_userdirectory = $this->call('userdirectory.get', [
 			'output' => self::$hashed_fields,
 			'filter' => ['idp_type' => IDP_TYPE_SAML],
 			'userdirectoryids' => [$userdirectoryid]
 		]);
-		
+
 		$db_userdirectory = reset($db_userdirectory['result']);
 		$this->assertSame($db_userdirectory, $hashed_certificates);
 	}
@@ -141,12 +141,12 @@ class testUserDirectorySamlCertificates extends CAPITest {
 				'filter' => ['idp_type' => IDP_TYPE_SAML],
 				'userdirectoryids' => [$userdirectoryid]
 			]);
-			
+
 			$db_userdirectory = reset($db_userdirectory['result']);
 			$this->assertSame($db_userdirectory[self::$hashed_fields[$key]], $expected_result);
 		}
 	}
-	
+
 	public function prepareTestData() {
 		$data = [
 			'name' => 'API SAML',
@@ -175,7 +175,7 @@ class testUserDirectorySamlCertificates extends CAPITest {
 			],
 			'scim_status' => 1
 		] + self::rawCertificates();
-		
+
 		$response = $this->call('userdirectory.create', $data);
 		self::$data['userdirectoryid'][$data['name']] = $response['result']['userdirectoryids'][0];
 	}
