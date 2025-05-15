@@ -32,6 +32,8 @@ if ($data['templates']) {
 }
 
 if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
+	$parent_lld = $data['discoveryRule'] ?: $data['discoveryRulePrototype'];
+
 	$discovered_trigger_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')
@@ -42,8 +44,8 @@ if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
 		->getUrl();
 
 	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
-		(new CLink($data['discoveryRule']['name'], $discovered_trigger_url))
-			->setAttribute('data-parent_discoveryid', $data['discoveryRule']['itemid'])
+		(new CLink($parent_lld['name'], $discovered_trigger_url))
+			->setAttribute('data-parent_discoveryid', $parent_lld['itemid'])
 			->setAttribute('data-triggerid', $data['discoveryData']['parent_triggerid'])
 			->setAttribute('data-context', $data['context'])
 			->setAttribute('data-prototype', '1')

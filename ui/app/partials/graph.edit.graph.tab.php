@@ -31,10 +31,12 @@ if ($data['is_templated']) {
 }
 
 if ($data['discovered']) {
+	$parent_lld = $data['discoveryRule'] ?: $data['discoveryRulePrototype'];
+
 	$graph_tab->addItem([
 		new CLabel(_('Discovered by')),
 		new CFormField(
-			new CLink($data['discoveryRule']['name'],
+			new CLink($parent_lld['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'graph.prototype.edit')

@@ -140,6 +140,7 @@ class CControllerGraphPrototypeEdit extends CController {
 				],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
 				'selectDiscoveryData' => ['parent_graphid'],
 				'graphids' => $data['graphid']
 			];
