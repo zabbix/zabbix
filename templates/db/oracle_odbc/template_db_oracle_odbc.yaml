@@ -98,7 +98,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
-          params: 'SELECT name as DBNAME FROM V$PDBS;'
+          params: 'SELECT CON_ID, name as DBNAME FROM V$PDBS;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'Gets the pluggable database (PDB) in DBMS.'
@@ -184,10 +184,13 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
-            SELECT NVL(CON$NAME, 'DB') CON_NAME,
-            TABLESPACE_NAME TABLESPACE,
-            CONTENTS
-            FROM CDB_TABLESPACES;
+            SELECT
+            	CON_ID,
+            	NVL(CON$NAME, 'DB') CON_NAME,
+            	TABLESPACE_NAME TABLESPACE,
+            	CONTENTS
+            FROM
+            	CDB_TABLESPACES;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'Gets tablespaces in DBMS.'
@@ -1834,7 +1837,7 @@ zabbix_export:
             - uuid: cedcebd0b7ce474c9681022fcc75df1c
               name: 'Database ''{#DBNAME}'': Get PDB info'
               type: ODBC
-              key: 'db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              key: 'db.odbc.get[get_pdb_{#CON_ID}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -1842,7 +1845,7 @@ zabbix_export:
                 name as DBNAME,
                 DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode
                 FROM v$pdbs
-                WHERE name = '{#DBNAME}';
+                WHERE CON_ID = '{#CON_ID}';
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'Gets the information about the PDB database on an instance.'
@@ -1859,7 +1862,7 @@ zabbix_export:
             - uuid: 975d302e3e9a4316b6d63256b88b5006
               name: 'Database ''{#DBNAME}'': Open status'
               type: DEPENDENT
-              key: 'oracle.pdb_open_mode["{#DBNAME}"]'
+              key: 'oracle.pdb_open_mode["{#CON_ID}"]'
               description: |
                 1 - MOUNTED;
                 2 - READ WRITE;
@@ -1875,7 +1878,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_pdb_{#CON_ID}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: database
@@ -1885,7 +1888,7 @@ zabbix_export:
                   value: pdb
               trigger_prototypes:
                 - uuid: 3dbb9379f8024924b197037acfbbdac4
-                  expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)'
+                  expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#CON_ID}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#CON_ID}"],#2)'
                   name: 'Oracle: Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle: Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
@@ -1895,7 +1898,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
                 - uuid: 5f8ed69b2c074a29b9975baf10a2a2f8
-                  expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"])=1'
+                  expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#CON_ID}"])=1'
                   name: 'Oracle: Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
                   description: 'The Oracle Database is in a mounted state.'
@@ -1905,6 +1908,8 @@ zabbix_export:
           master_item:
             key: 'db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           lld_macro_paths:
+            - lld_macro: '{#CON_ID}'
+              path: $.CON_ID
             - lld_macro: '{#DBNAME}'
               path: $.DBNAME
         - uuid: c8de553c98f64e59b40bf927f6447ad1
@@ -1929,7 +1934,7 @@ zabbix_export:
             - uuid: 972be2e777e44c539d0ddd7918b79e88
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Get tablespaces stats'
               type: ODBC
-              key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -1970,7 +1975,7 @@ zabbix_export:
                            CDB_TABLESPACES ct
                       WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                         AND cdf.CON_ID = ct.CON_ID
-                        AND ((ct.CON$NAME = '{#CON_NAME}') or (ct.CON$NAME is null and ct.CON_ID = 0))
+                        AND ct.CON_ID = '{#CON_ID}'
                         AND cdf.TABLESPACE_NAME = '{#TABLESPACE}'
                         AND ct.CONTENTS = '{#CONTENTS}') df,
                      (SELECT TRUNC(SUM(BYTES)) AS FREE,
@@ -2043,7 +2048,7 @@ zabbix_export:
                            CDB_TABLESPACES ct
                       WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                         AND ctf.CON_ID = ct.CON_ID
-                        AND ((ct.CON$NAME = '{#CON_NAME}') or (ct.CON$NAME is null and ct.CON_ID = 0))
+                        AND ct.CON_ID = '{#CON_ID}'
                         AND ctf.TABLESPACE_NAME = '{#TABLESPACE}'
                         AND ct.CONTENTS = '{#CONTENTS}') Y
                 GROUP BY Y.CON_NAME,
@@ -2066,7 +2071,7 @@ zabbix_export:
             - uuid: 46956fd7e5d8462798b85cd7b425a794
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace allocated, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_alloc_bytes["{#CON_ID}","{#TABLESPACE}"]'
               units: B
               description: 'Currently allocated bytes for the tablespace (sum of the current size of datafiles).'
               preprocessing:
@@ -2074,7 +2079,7 @@ zabbix_export:
                   parameters:
                     - $.FILE_BYTES
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2087,7 +2092,7 @@ zabbix_export:
             - uuid: 8c3284a21872423499ee15fd7b0038f1
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace free, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_free_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_free_bytes["{#CON_ID}","{#TABLESPACE}"]'
               units: B
               description: 'Free bytes of the allocated space.'
               preprocessing:
@@ -2095,7 +2100,7 @@ zabbix_export:
                   parameters:
                     - $.FREE_BYTES
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2108,7 +2113,7 @@ zabbix_export:
             - uuid: afd8c1a01b64408fbc6f8f95fbb13593
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace MAX size, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_max_bytes["{#CON_ID}","{#TABLESPACE}"]'
               units: B
               description: 'The maximum size of the tablespace.'
               preprocessing:
@@ -2116,7 +2121,7 @@ zabbix_export:
                   parameters:
                     - $.MAX_BYTES
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2129,7 +2134,7 @@ zabbix_export:
             - uuid: 42c7812a75d5433ab8a275498635c81c
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Open status'
               type: DEPENDENT
-              key: 'oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"]'
               description: |
                 The tablespace status where:
                 1 - ONLINE;
@@ -2142,7 +2147,7 @@ zabbix_export:
                   parameters:
                     - $.STATUS
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2154,7 +2159,7 @@ zabbix_export:
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 - uuid: 3c5f54f41f95440aa18ca5316aeb50f6
-                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2'
+                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"])=2'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
                   priority: WARNING
                   description: 'The tablespace is in the offline state.'
@@ -2162,7 +2167,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
                 - uuid: 05c2af5a765842a1a70f2f67355db1b3
-                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)'
+                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"],#2)'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace status has changed'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
@@ -2170,14 +2175,14 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     - name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
-                      expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2'
+                      expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"])=2'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: b9cc0eabdcbc404fb0df2a2a082411f1
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace used, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_bytes["{#CON_ID}","{#TABLESPACE}"]'
               units: B
               description: 'Currently used bytes for the tablespace (current size of datafiles minus the free space).'
               preprocessing:
@@ -2185,7 +2190,7 @@ zabbix_export:
                   parameters:
                     - $.USED_BYTES
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2198,7 +2203,7 @@ zabbix_export:
             - uuid: 877961c286e448238f58cff9c51088c8
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage, percent'
               type: DEPENDENT
-              key: 'oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"]'
               value_type: FLOAT
               units: '%'
               description: 'Used bytes/allocated bytes*100.'
@@ -2207,7 +2212,7 @@ zabbix_export:
                   parameters:
                     - $.USED_FILE_PCT
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2219,7 +2224,7 @@ zabbix_export:
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 - uuid: 78c293ae7ded42b0b05d50af99762017
-                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
@@ -2228,21 +2233,21 @@ zabbix_export:
                     - tag: scope
                       value: capacity
                 - uuid: e6f2cb4ade52464b97f5e0f5e05ab61b
-                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   description: 'The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.WARN}`%'
                   dependencies:
                     - name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
-                      expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                      expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 94ecf43024cd41cf891df319cc615b50
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX, percent'
               type: DEPENDENT
-              key: 'oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"]'
               value_type: FLOAT
               units: '%'
               description: 'Used bytes/max bytes*100.'
@@ -2251,7 +2256,7 @@ zabbix_export:
                   parameters:
                     - $.USED_FROM_MAX_PCT
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2263,7 +2268,7 @@ zabbix_export:
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 - uuid: 1db3eee269ea4554bc363338868c8830
-                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
+                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high (over {$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}% for 5m).'
                   priority: HIGH
@@ -2272,21 +2277,21 @@ zabbix_export:
                     - tag: scope
                       value: capacity
                 - uuid: 062309da61ff407eb96201f530544a02
-                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}'
+                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high (over {$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}% for 5m).'
                   priority: WARNING
                   description: 'The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`%'
                   dependencies:
                     - name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high'
-                      expression: 'min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
+                      expression: 'min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: c3a904455ff244e1a30bf32f0b4ea0d7
               name: '''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
               type: DEPENDENT
-              key: 'oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"]'
               value_type: FLOAT
               units: '%'
               description: 'Allocated bytes/max bytes*100.'
@@ -2295,7 +2300,7 @@ zabbix_export:
                   parameters:
                     - $.USED_PCT_MAX
               master_item:
-                key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 - tag: component
                   value: tablespaces
@@ -2307,7 +2312,7 @@ zabbix_export:
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 - uuid: a8aa7255866d4a5ba71d2f89a1d234fe
-                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
@@ -2316,14 +2321,14 @@ zabbix_export:
                     - tag: scope
                       value: capacity
                 - uuid: 9469e51bd69e4baba82de4fd4e5eb14c
-                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}'
+                  expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}'
                   name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
                   event_name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   description: 'The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.WARN}`%'
                   dependencies:
                     - name: 'Oracle: ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
-                      expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                      expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   tags:
                     - tag: scope
                       value: capacity
@@ -2334,22 +2339,24 @@ zabbix_export:
                 - color: 199C0D
                   item:
                     host: 'Oracle by ODBC'
-                    key: 'oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+                    key: 'oracle.tbs_alloc_bytes["{#CON_ID}","{#TABLESPACE}"]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'Oracle by ODBC'
-                    key: 'oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+                    key: 'oracle.tbs_max_bytes["{#CON_ID}","{#TABLESPACE}"]'
                 - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'Oracle by ODBC'
-                    key: 'oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+                    key: 'oracle.tbs_used_bytes["{#CON_ID}","{#TABLESPACE}"]'
           master_item:
             key: 'db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           lld_macro_paths:
             - lld_macro: '{#CONTENTS}'
               path: $.CONTENTS
+            - lld_macro: '{#CON_ID}'
+              path: $.CON_ID
             - lld_macro: '{#CON_NAME}'
               path: $.CON_NAME
             - lld_macro: '{#TABLESPACE}'
