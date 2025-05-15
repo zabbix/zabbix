@@ -68,15 +68,24 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
+	 * Get text of selected color-picker tab.
+	 *
+	 * @return string
+	 */
+	public function getSelectedTab() {
+		return $this->query('xpath:.//ul[@class="color-picker-tabs"]'.
+			'//li[contains(@class, "color-picker-tab-selected")]/label')->waitUntilPresent()->one()->getText();
+	}
+
+	/**
 	 * Switch color-picker tab by its name.
 	 *
 	 * @return $this
 	 */
 	public function selectTab($name) {
 		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
-		$tab_element = $this->query($selector.'/..')->one();
 
-		if (!$tab_element->hasClass('color-picker-tab-selected')) {
+		if ($this->getSelectedTab() !== $name) {
 			$this->query($selector)->waitUntilPresent()->one()->click();
 			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
 		}

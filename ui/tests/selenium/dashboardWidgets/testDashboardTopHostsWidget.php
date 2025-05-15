@@ -943,29 +943,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #20 Error when colour picker is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Invalid sparkline colour picker is empty'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Display' => 'Sparkline',
-							'Item name' => 'Available memory',
-							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "Colour": cannot be empty.'
-//						'Invalid parameter "/1/sparkline/sparkline_color": cannot be empty.'
-					]
-				]
-			],
-			// #21 Error when incorrect min value added.
+			// #20 Error when incorrect min value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -986,7 +964,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #22 Error when incorrect max value added.
+			// #21 Error when incorrect max value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1007,36 +985,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #23 Color error when incorrect hexadecimal added in second threshold.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column second threshold color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'threshold' => '1',
-									'color' => '4000FF'
-								],
-								[
-									'threshold' => '2',
-									'color' => '!@#$%^'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/2/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #24 Error message when incorrect value added to threshold.
+			// #22 Error message when incorrect value added to threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1061,7 +1010,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #25 Minimum needed values to create and submit widget.
+			// #23 Minimum needed values to create and submit widget.
 			[
 				[
 					'main_fields' => [],
@@ -1074,7 +1023,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #26 All fields filled for main form with all tags.
+			// #24 All fields filled for main form with all tags.
 			[
 				[
 					'main_fields' => [
@@ -1103,7 +1052,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #27 Change order column for several items.
+			// #25 Change order column for several items.
 			[
 				[
 					'main_fields' => [
@@ -1124,7 +1073,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #28 Several item columns with different Aggregation function and custom "From" time period.
+			// #26 Several item columns with different Aggregation function and custom "From" time period.
 			[
 				[
 					'main_fields' => [
@@ -1198,7 +1147,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'screenshot' => true
 				]
 			],
-			// #29 Several item columns with different display, custom "From" time period, min/max and history data.
+			// #27 Several item columns with different display, custom "From" time period, min/max and history data.
 			[
 				[
 					'main_fields' => [
@@ -1291,7 +1240,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #30 Add column with different Base color.
+			// #28 Add column with different Base color.
 			[
 				[
 					'main_fields' => [
@@ -1307,7 +1256,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #31 Add sparkline columns with custom configuration.
+			// #29 Add sparkline columns with custom configuration.
 			[
 				[
 					'main_fields' => [
@@ -1385,7 +1334,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'replace' => true
 				]
 			],
-			// #32 Add column with Threshold without color change.
+			// #30 Add column with Threshold without color change.
 			[
 				[
 					'main_fields' => [
@@ -1405,7 +1354,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #33 Add several columns with Threshold without color change.
+			// #31 Add several columns with Threshold without color change.
 			[
 				[
 					'main_fields' => [
@@ -1431,7 +1380,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #34 Add several columns with Threshold with color change and without color.
+			// #32 Add several columns with Threshold with color change and without color.
 			[
 				[
 					'main_fields' => [
@@ -1457,14 +1406,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 								],
 								[
 									'threshold' => '10000',
-									'color' => ''
+									'color' => 'BBBBBB'
 								]
 							]
 						]
 					]
 				]
 			],
-			// #35 Add Host name columns.
+			// #33 Add Host name columns.
 			[
 				[
 					'main_fields' => [
@@ -1488,7 +1437,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #36 Add Text columns.
+			// #34 Add Text columns.
 			[
 				[
 					'main_fields' => [
@@ -1519,7 +1468,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #37 Spaces in input fields.
+			// #35 Spaces in input fields.
 			[
 				[
 					'trim' => true,
@@ -1576,7 +1525,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #38 User macros in input fields.
+			// #36 User macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -1604,7 +1553,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #39 Global macros in input fields.
+			// #37 Global macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -1632,7 +1581,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #40 Error message when empty highlight is passed.
+			// #38 Error message when empty highlight is passed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1655,7 +1604,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #41 Successfully adding item with highlight.
+			// #39 Successfully adding item with highlight.
 			[
 				[
 					'main_fields' => [
@@ -1673,7 +1622,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #42 Binary item in column.
+			// #40 Binary item in column.
 			[
 				[
 					'main_fields' => [
