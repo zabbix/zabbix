@@ -15,6 +15,8 @@
 package oracle
 
 import (
+	"fmt"
+	"strings"
 	"context"
 
 	"golang.zabbix.com/sdk/errs"
@@ -23,8 +25,17 @@ import (
 
 func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var PDBInfo string
+	connname := params["Database"]
 
-	query, args := getPDBQuery(params["Database"])
+	// Check if first character is numeric
+	var conntype string
+	if len(connname) > 0 && strings.ToUpper(connname)[0] < 65 {
+		conntype = "CON_ID"
+	} else {
+		conntype = "NAME"
+	}
+
+	query, args := getPDBQuery(conntype, connname)
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
@@ -44,7 +55,7 @@ func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 	return PDBInfo, nil
 }
 
-func getPDBQuery(name string) (string, []any) {
+func getPDBQuery(conntype string, name string) (string, []any) {
 	const query = `
 	SELECT
 		JSON_ARRAYAGG(
@@ -71,7 +82,7 @@ func getPDBQuery(name string) (string, []any) {
 			V$PDBS`
 
 	if name != "" {
-		return query + " WHERE NAME = :1", []any{name}
+		return fmt.Sprintf(`%s WHERE %s = :1`, query, conntype), []any{name}
 	}
 
 	return query, nil
