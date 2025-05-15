@@ -44,7 +44,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	const DELETE_WIDGET = 'Widget for delete';
 	const DATA_WIDGET = 'Widget for data check';
 	const SCROLLING_WIDGET = 'Test scrollbar position in Item history';
-	const PATH_TO_COLOR_PICKER = 'xpath://z-color-picker[@color-field-name=';
 
 	protected static $dashboardid;
 	protected static $dashboard_create;

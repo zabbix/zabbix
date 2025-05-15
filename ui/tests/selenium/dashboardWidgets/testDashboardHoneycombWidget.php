@@ -62,7 +62,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
 	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
-	const PATH_TO_COLOR_PICKER = 'xpath:.//z-color-picker[@color-field-name=';
 
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
@@ -2663,19 +2662,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			else {
 				$this->setTags($values);
 			}
-		}
-	}
-
-	/**
-	 * Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
-	 *
-	 * @param array             $data         data provider
-	 */
-	protected function checkColorPickerState($data) {
-		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker->isSubmittionDisabled());
-			$color_picker->close();
 		}
 	}
 }

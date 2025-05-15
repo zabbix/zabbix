@@ -45,7 +45,6 @@ class testDashboardGaugeWidget extends testWidgets {
 	const DELETE_GAUGE = 'Gauge for deleting';
 	const GAUGE_ITEM = 'Float item';
 	const GAUGE_MACROFUNCTIONS = 'Gauge for macrofunctions';
-	const PATH_TO_COLOR_PICKER = 'xpath:.//z-color-picker[@color-field-name=';
 
 	/**
 	 * Id of the dashboard where gauge widget is created and updated.
@@ -967,13 +966,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			}
 
 			$this->getThresholdsTable()->fill($data['Thresholds']);
-
-			// Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
-			if (CTestArrayHelper::get($data, 'invalid_color')) {
-				$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-				$this->assertTrue($color_picker->isSubmittionDisabled());
-				$color_picker->close();
-			}
+			$this->checkColorPickerState($data);
 		}
 
 		$form->fill($data['fields']);
