@@ -929,7 +929,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 			}
 
 			zbx_dc_history_clean_value(h);
-			history->state = ITEM_STATE_NORMAL;
+			h->state = ITEM_STATE_NORMAL;
 			h->flags |= ZBX_DC_FLAG_NOVALUE;
 			continue;
 		}
@@ -959,7 +959,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 					zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
 
 			zbx_dc_history_clean_value(h);
-			history->state = ITEM_STATE_NORMAL;
+			h->state = ITEM_STATE_NORMAL;
 			h->flags |= ZBX_DC_FLAG_NOVALUE;
 			continue;
 		}
@@ -977,7 +977,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 						zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
 
 				zbx_dc_history_clean_value(h);
-				history->state = ITEM_STATE_NORMAL;
+				h->state = ITEM_STATE_NORMAL;
 				h->flags |= ZBX_DC_FLAG_NOVALUE;
 				continue;
 			}
