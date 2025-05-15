@@ -23,7 +23,9 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 {
 	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_LLD_CONTEXT);
 
-#define IT(s) "item."#s
+	int	resource_type = zbx_audit_item_flag_to_resource_type(item->item_flags);
+
+#define IT(s) zbx_audit_get_item_kind(resource_type, #s)
 #define ADD_JSON_S(x, t, f)	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, \
 		IT(x), item->x, t, f)
 #define ADD_JSON_UI(x, t, f)	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, \

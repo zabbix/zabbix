@@ -67,6 +67,26 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	}
 }
 
+const char	*zbx_audit_get_item_kind(int resource_type, const char *property)
+{
+	switch (resource_type)
+	{
+		case ZBX_AUDIT_RESOURCE_ITEM:
+			return "item";
+		case ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE:
+			return "itemprototype";
+		case ZBX_AUDIT_RESOURCE_LLD_RULE:
+			return "discoveryrule";
+		case ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE:
+			return "discoveryruleprototype";
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown resource type: %d", resource_type);
+			exit(EXIT_FAILURE);
+	}
+
+	return NULL;
+}
+
 void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t itemid, const char *name,
 		int flags)
 {
@@ -105,7 +125,8 @@ void	zbx_audit_item_update_json_update_##resource(int audit_context_mode, zbx_ui
 	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
 	resource_type = zbx_audit_item_flag_to_resource_type(flags);						\
-	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID, ZBX_AUDIT_IT_OR_ITP_OR_DR(resource),	\
+	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID,						\
+			zbx_audit_get_item_kind(resource_type, #resource),					\
 			resource##_old,	resource##_new);							\
 }
 
@@ -1123,7 +1144,7 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 	}
 
 	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = ZBX_AUDIT_IT_OR_ITP_OR_DR(query_fields);
+	key = zbx_audit_get_item_kind(resource_type, "query_fields");
 
 	do
 	{
@@ -1181,7 +1202,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 		return;
 
 	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = ZBX_AUDIT_IT_OR_ITP_OR_DR(query_fields);
+	key = zbx_audit_get_item_kind(resource_type, "query_fields");
 
 	if ((0 != strcmp(val_old, "") && SUCCEED != zbx_json_open(val_old, &jp_array_old)) ||
 			(0 != strcmp(val_new, "") && SUCCEED != zbx_json_open(val_new, &jp_array_new)))
@@ -1356,7 +1377,7 @@ void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t
 		return;
 
 	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = ZBX_AUDIT_IT_OR_ITP_OR_DR(headers);
+	key = zbx_audit_get_item_kind(resource_type, "headers");
 
 	val_mut = zbx_strdup(NULL, val);
 
@@ -1424,7 +1445,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 		return;
 
 	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = ZBX_AUDIT_IT_OR_ITP_OR_DR(headers);
+	key = zbx_audit_get_item_kind(resource_type, "headers");
 
 	val_old_mut = zbx_strdup(NULL, val_old);
 	val_new_mut = zbx_strdup(NULL, val_new);

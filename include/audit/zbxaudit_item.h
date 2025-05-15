@@ -24,9 +24,7 @@ int	zbx_audit_item_resource_is_only_lld_rule_or_lld_rule_prototype(int resource_
 
 int	zbx_audit_item_flag_to_resource_type(int flag);
 
-#define ZBX_AUDIT_IT_OR_ITP_OR_DR(s) zbx_audit_item_resource_is_only_item(resource_type) ? "item."#s :	\
-		(zbx_audit_item_resource_is_only_item_prototype(resource_type) ? "itemprototype."#s :	\
-		"discoveryrule."#s)
+const char	*zbx_audit_get_item_kind(int resource_type, const char *property);
 
 void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t itemid, const char *name,
 		int flags);
