@@ -629,6 +629,10 @@ window.host_wizard_edit = new class {
 
 			const $secret_input = $('.input-secret', $macro_field).inputSecret();
 
+			if (macro.value !== undefined) {
+				$secret_input.inputSecret('activateInput');
+			}
+
 			const $undo_button = $('.btn-undo', $macro_field);
 
 			if (source_macro === undefined || Number(template_macro_type) !== this.MACRO_TYPE_SECRET) {
@@ -636,10 +640,6 @@ window.host_wizard_edit = new class {
 			}
 
 			if (Number(template_macro_type) === this.MACRO_TYPE_SECRET) {
-				if (macro.value !== undefined) {
-					$secret_input.inputSecret('activateInput');
-				}
-
 				$undo_button.on('click', () => this.#data.macros[row_index].value = undefined);
 
 				if (macro.value === undefined) {

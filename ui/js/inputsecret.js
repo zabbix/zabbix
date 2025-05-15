@@ -19,7 +19,7 @@
 (function($) {
 	'use strict';
 
-	function enableHandle(make_focus = true) {
+	function enableHandle(on_activate = false) {
 		var $btn_change = $(this),
 			$input = $btn_change.siblings('input[type=password]'),
 			$btn_undo = $btn_change
@@ -31,9 +31,9 @@
 			.attr('placeholder', t('value'))
 			.val('');
 
-		$input[0].dispatchEvent(new Event('input', {bubbles: true}));
+		if (!on_activate) {
+			$input[0].dispatchEvent(new Event('input', {bubbles: true}));
 
-		if (make_focus) {
 			setTimeout(() => {
 				$input.focus();
 			});
@@ -55,7 +55,7 @@
 		},
 		activateInput() {
 			return this.each(function() {
-				enableHandle.call($('.btn-change', $(this)), false);
+				enableHandle.call($('.btn-change', $(this)), true);
 			});
 		}
 	};
