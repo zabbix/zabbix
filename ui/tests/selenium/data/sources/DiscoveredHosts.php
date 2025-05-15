@@ -105,10 +105,10 @@ class DiscoveredHosts {
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).
 				",".zbx_dbstr(self::DISCOVERED_HOST2).",".zbx_dbstr(self::DISCOVERED_HOST2).", 0, 4, '')"
 		);
-		DBexecute("INSERT INTO host_discovery (hostid, lldruleid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).", ".
+		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).", ".
 				zbx_dbstr($host_prototypeid).")"
 		);
-		DBexecute("INSERT INTO host_discovery (hostid, lldruleid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).", ".
+		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).", ".
 				zbx_dbstr($host_prototypeid).")"
 		);
 		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
