@@ -2644,6 +2644,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill($fields);
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::WIDGET_SQL));
