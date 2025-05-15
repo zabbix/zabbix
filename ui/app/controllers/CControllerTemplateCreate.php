@@ -60,7 +60,7 @@ class CControllerTemplateCreate extends CController {
 
 		if ($this->hasInput('clone_templateid') && $this->hasInput('clone')) {
 			$src_templates = API::Template()->get([
-				'output' => ['templateid', 'wizard_ready', 'readme'],
+				'output' => ['templateid', 'readme'],
 				'selectMacros' => ['macro', 'config'],
 				'templateids' => $this->getInput('clone_templateid')
 			]);
@@ -162,7 +162,6 @@ class CControllerTemplateCreate extends CController {
 			];
 
 			if ($this->src_template !== null) {
-				$template['wizard_ready'] = $this->src_template['wizard_ready'];
 				$template['readme'] = $this->src_template['readme'];
 			}
 
