@@ -34,7 +34,6 @@ class testWidgets extends CWebTest {
 	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da%F0%9F%8E%B8';
 	const PATH_TO_COLOR_PICKER = 'xpath:.//z-color-picker[@color-field-name=';
 
-
 	protected static $dashboardid;
 
 	/**
