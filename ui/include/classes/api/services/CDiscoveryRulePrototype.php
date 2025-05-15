@@ -870,7 +870,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		API::TriggerPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::GraphPrototype()->linkTemplateObjects($ruleids, $hostids);
 		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
-		CDiscoveryRulePrototype::linkTemplateObjects($ruleids, $hostids);
+		self::linkTemplateObjects($ruleids, $hostids);
 	}
 
 	/**
@@ -1325,7 +1325,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			), 'itemid');
 
 			if ($db_lld_rule_prototypes) {
-				CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
+				self::deleteForce($db_lld_rule_prototypes);
 			}
 		}
 
@@ -1339,32 +1339,22 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			), 'itemid');
 
 			if ($db_lld_rule_prototypes) {
-				CDiscoveryRulePrototype::deleteForce($db_lld_rule_prototypes);
+				self::deleteForce($db_lld_rule_prototypes);
 			}
 		}
 	}
 
 	private static function deleteDiscoveredLldRulePrototypes(array $db_items): void {
-		$lldruleids = [];
+		$db_lld_rule_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT id.itemid,i.name,i.flags'.
+			' FROM item_discovery id,items i'.
+			' WHERE id.itemid=i.itemid'.
+				' AND '.dbConditionId('id.parent_itemid', array_keys($db_items)).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
+		), 'itemid');
 
-		foreach ($db_items as $db_item) {
-			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
-				$lldruleids[] = $db_item['itemid'];
-			}
-		}
-
-		if ($lldruleids) {
-			$db_lld_rule_prototypes = DBfetchArrayAssoc(DBselect(
-				'SELECT id.itemid,i.name,i.flags'.
-				' FROM item_discovery id,items i'.
-				' WHERE id.itemid=i.itemid'.
-					' AND '.dbConditionId('id.parent_itemid', $lldruleids).
-					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED])
-			), 'itemid');
-
-			if ($db_lld_rule_prototypes) {
-				self::deleteForce($db_lld_rule_prototypes);
-			}
+		if ($db_lld_rule_prototypes) {
+			self::deleteForce($db_lld_rule_prototypes);
 		}
 	}
 
@@ -1425,7 +1415,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 			CItemPrototype::unlinkTemplateObjects($ruleids);
 			API::HostPrototype()->unlinkTemplateObjects($ruleids);
-			CDiscoveryRulePrototype::unlinkTemplateObjects($ruleids);
+			self::unlinkTemplateObjects($ruleids);
 		}
 	}
 }
