@@ -99,6 +99,8 @@
 			return false;
 		}
 
+		this.dispatchEvent(new Event('input', {bubbles: true}));
+
 		if (curr_value_type == ZBX_MACRO_TYPE_SECRET) {
 			$container.removeClass(ZBX_STYLE_MACRO_VALUE_SECRET);
 

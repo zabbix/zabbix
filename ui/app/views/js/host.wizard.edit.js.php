@@ -310,6 +310,7 @@ window.host_wizard_edit = new class {
 	}
 
 	initPopupListeners() {
+		// TODO VM: move to Data Collection -> Host page and to Popup page
 		ZABBIX.EventHub.subscribe({
 			require: {
 				context: CPopupManager.EVENT_CONTEXT,
@@ -594,8 +595,9 @@ window.host_wizard_edit = new class {
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
-		this.#template.macros.forEach((macro, row_index) => {
-			const {field, description} = this.#makeMacroField(macro, row_index);
+		Object.entries(this.#data.macros).forEach(([row_index, macro]) => {
+			const template_macro = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
+			const {field, description} = this.#makeMacroField({...macro, config: template_macro.config}, row_index);
 
 			if (field !== null) {
 				macros_list.appendChild(field);
@@ -782,7 +784,7 @@ window.host_wizard_edit = new class {
 								: allowed_values[0];
 						}
 					}
-					else if (host_macro !== undefined && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
+					else if (this.#host !== null && host_macro && Number(template_macro.type) === this.MACRO_TYPE_SECRET) {
 						value = undefined;
 					}
 
@@ -1531,7 +1533,7 @@ window.host_wizard_edit = new class {
 
 		if (options.length > 5) {
 			const field_select = this.#view_templates.macro_field_select.evaluateToElement({
-				index: row_index,
+				row_index,
 				label,
 				macro,
 				value

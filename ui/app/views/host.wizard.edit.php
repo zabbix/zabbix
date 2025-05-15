@@ -259,7 +259,7 @@ function stepCreateHost($form): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Create or select a host')),
-						new CTag('p', true, _s('The template you selected (%1$s) must be linked to a host – an entity in Zabbix that represents your monitoring target.', '#{template_name}')),
+						new CTag('p', true, _s('The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target.', '#{template_name}')),
 						new CTag('p', true, _('Hosts are organized into host groups for easier management and access control.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -878,7 +878,9 @@ function stepConfigureHost(): array {
 		new CTemplateTag('host-wizard-macro-field-select',
 			(new CFormField([
 				new CLabel('#{label}'),
-				(new CSelect('macros[#{row_index}][value]'))->setWidthAuto(),
+				(new CSelect('macros[#{row_index}][value]'))
+					->setValue('#{value}')
+					->setWidthAuto(),
 				(new CDiv('#{macro}'))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 			]))
 				->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
