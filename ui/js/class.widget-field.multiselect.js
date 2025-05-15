@@ -157,7 +157,9 @@ class CWidgetFieldMultiselect extends CWidgetField {
 
 		this.#multiselect
 			.on('before-add', () => {
-				const name = this.getName();
+				// Do not use this.getName(), since name can be dynamic.
+				let name = this.#multiselect.multiSelect('getOption', 'name')
+					.replace(new RegExp(`(\\[]|\\[${CWidgetBase.FOREIGN_REFERENCE_KEY}\\])$`), '');
 
 				if (this.#is_selecting_typed_reference !== this.#is_selected_typed_reference) {
 					for (const item of this.#multiselect.multiSelect('getData')) {
