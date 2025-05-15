@@ -16874,7 +16874,7 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
 		zbx_vector_uint64_t *del_macro_hostids)
 {
-	zbx_vector_uint64_t	globalids, *full_sync_hostids = hostids;
+	zbx_vector_uint64_t	globalids;
 	zbx_uint64_t		globalhostid = 0;
 	int			full_sync = FAIL;
 
