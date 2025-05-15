@@ -205,7 +205,12 @@ window.host_wizard_edit = new class {
 		[this.STEP_CREATE_HOST]: {
 			host: {
 				type: 'object',
-				required: true
+				required: true,
+				fields: {
+					id: {
+						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/
+					}
+				}
 			},
 			groups: {
 				type: 'array',
@@ -1663,6 +1668,18 @@ window.host_wizard_edit = new class {
 
 			if (!!required && (value === null || value === '' || (rule.type === 'array' && !value.length))) {
 				return <?= json_encode(_('This field cannot be empty.')) ?>;
+			}
+
+			if (rule.type === 'object' && rule.fields !== undefined) {
+				for (const name in rule.fields) {
+					const error = validate(rule.fields[name], value[name]);
+
+					if (error !== null) {
+						return error
+					}
+				}
+
+				return null;
 			}
 
 			if (rule.type === 'string' && value !== '') {
