@@ -862,6 +862,25 @@ class testUserDirectory extends CAPITest {
 		$this->assertTrue($db_media['Media #2'] !== $db_media_updated['Media #2'], 'Property userdirectory_mediaid should change after update operation if where not passed');
 	}
 
+	public function testGetSamlCertificatesAndVerifyIsHashed() {
+		$hashed_certificates = [
+			'idp_certificate_hash' => '37a33c1994ef4e6326ee2a5dd0856ce0',
+			'sp_certificate_hash' => '37a33c1994ef4e6326ee2a5dd0856ce0',
+			'sp_private_key_hash' => '3376914a2891a33f6dc9cb3d7fb518cd'
+		];
+
+		$userdirectoryid = self::$data['userdirectoryid']['API SAML'];
+
+		$db_userdirectory = $this->call('userdirectory.get', [
+			'output' => array_keys($hashed_certificates),
+			'filter' => ['idp_type' => IDP_TYPE_SAML],
+			'userdirectoryids' => [$userdirectoryid]
+		]);
+
+		$db_userdirectory = reset($db_userdirectory['result']);
+		$this->assertSame($db_userdirectory, $hashed_certificates);
+	}
+
 	/**
 	 * Test provision media update only sent fields when userdirectory_mediaid is sent.
 	 */
@@ -1031,6 +1050,7 @@ class testUserDirectory extends CAPITest {
 	 * Create data to be used in tests.
 	 */
 	public function prepareTestData() {
+		$saml_certificates = self::samlCertificates();
 		$data = [
 			[
 				'name' => 'API LDAP #1',
@@ -1100,9 +1120,9 @@ class testUserDirectory extends CAPITest {
 					]
 				],
 				'scim_status' => 1,
-				'idp_certificate' => '',
-				'sp_certificate' => '',
-				'sp_private_key' => ''
+				'idp_certificate' => $saml_certificates['idp_certificate'],
+				'sp_certificate' => $saml_certificates['sp_certificate'],
+				'sp_private_key' => $saml_certificates['sp_private_key']
 			]
 		];
 		$response = CDataHelper::call('userdirectory.create', $data);

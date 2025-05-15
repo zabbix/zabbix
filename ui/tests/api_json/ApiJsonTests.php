@@ -82,7 +82,6 @@ require_once dirname(__FILE__).'/testTriggerValidation.php';
 require_once dirname(__FILE__).'/testTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testUserDirectory.php';
-require_once dirname(__FILE__).'/testUserDirectorySamlCertificates.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
