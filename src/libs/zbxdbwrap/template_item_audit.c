@@ -82,7 +82,7 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t it
 	ADD_JSON_S(ipmi_sensor, AUDIT_TABLE_NAME, "ipmi_sensor");
 	ADD_JSON_S(jmx_endpoint, AUDIT_TABLE_NAME, "jmx_endpoint");
 
-	if (1 == zbx_audit_item_resource_is_only_lld_rule(resource_type))
+	if (1 == zbx_audit_item_resource_is_only_lld_rule_or_lld_rule_prototype(resource_type))
 	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 				"discoveryrule.lifetime", item->lifetime, AUDIT_TABLE_NAME, "lifetime");
@@ -167,7 +167,7 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t it
 				"itemprototype.discover", item->discover, AUDIT_TABLE_NAME, "discover");
 	}
 
-	if (1 == zbx_audit_item_resource_is_only_lld_rule(resource_type))
+	if (1 == zbx_audit_item_resource_is_only_lld_rule_or_lld_rule_prototype(resource_type))
 	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 				"discoveryrule.filter.formula", item->formula, AUDIT_TABLE_NAME, "formula");

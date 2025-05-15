@@ -144,6 +144,7 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 #define ZBX_AUDIT_RESOURCE_HA_NODE			47
 #define ZBX_AUDIT_RESOURCE_LLD_RULE			52
 #define ZBX_AUDIT_RESOURCE_HISTORY			53
+#define ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE		56
 
 zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
 

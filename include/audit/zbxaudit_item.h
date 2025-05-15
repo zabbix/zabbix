@@ -20,7 +20,7 @@
 int	zbx_audit_item_resource_is_only_item(int resource_type);
 int	zbx_audit_item_resource_is_only_item_prototype(int resource_type);
 int	zbx_audit_item_resource_is_only_item_and_item_prototype(int resource_type);
-int	zbx_audit_item_resource_is_only_lld_rule(int resource_type);
+int	zbx_audit_item_resource_is_only_lld_rule_or_lld_rule_prototype(int resource_type);
 
 int	zbx_audit_item_flag_to_resource_type(int flag);
 

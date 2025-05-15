@@ -37,9 +37,9 @@ int	zbx_audit_item_resource_is_only_item_and_item_prototype(int resource_type)
 	return (ZBX_AUDIT_RESOURCE_ITEM == resource_type || ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type);
 }
 
-int	zbx_audit_item_resource_is_only_lld_rule(int resource_type)
+int	zbx_audit_item_resource_is_only_lld_rule_or_lld_rule_prototype(int resource_type)
 {
-	return	ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type;
+	return	ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type || ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE == resource_type;
 }
 
 int	zbx_audit_item_flag_to_resource_type(int flag)
@@ -50,7 +50,10 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	}
 	else if (0 != (flag & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
-		return ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE;
+		if (0 == (flag & ZBX_FLAG_DISCOVERY_RULE))
+			return ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE;
+
+		return ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE;
 	}
 	else if (0 != (flag & ZBX_FLAG_DISCOVERY_RULE))
 	{
@@ -298,6 +301,12 @@ void	zbx_audit_discovery_rule_update_json_delete_filter_conditions(int audit_con
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.preprocessing["	\
 				ZBX_FS_UI64 "]"#nested#resource, preprocid);					\
 	}													\
+	else if (ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE == resource_type)					\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), 				\
+				"discoveryruleprotoype.preprocessing[" ZBX_FS_UI64 "]"#nested#resource, 	\
+				preprocid);									\
+	}													\
 	else													\
 	{													\
 		THIS_SHOULD_NEVER_HAPPEN;									\
@@ -406,6 +415,11 @@ void	zbx_audit_item_delete_preproc(int audit_context_mode, zbx_uint64_t itemid, 
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.tag["		\
 				ZBX_FS_UI64 "]"#resource, tagid);						\
 	}													\
+	else if (ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE == resource_type)					\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryruleprototype.tag["	\
+				ZBX_FS_UI64 "]"#resource, tagid);						\
+	}													\
 	else													\
 	{													\
 		THIS_SHOULD_NEVER_HAPPEN;									\
@@ -498,6 +512,11 @@ void	zbx_audit_item_delete_tag(int audit_context_mode, zbx_uint64_t itemid, int 
 	else if (ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.parameters["	\
+				ZBX_FS_UI64 "]"#resource, item_parameter_id);					\
+	}													\
+	else if (ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE == resource_type)					\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryruleprototype.parameters[" \
 				ZBX_FS_UI64 "]"#resource, item_parameter_id);					\
 	}													\
 	else													\
