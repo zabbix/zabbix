@@ -18,7 +18,6 @@ require_once __DIR__.'/../common/testWidgets.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
-
 /**
  * @backup dashboard, globalmacro
  *

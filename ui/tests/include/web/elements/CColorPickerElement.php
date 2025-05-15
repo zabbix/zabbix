@@ -114,9 +114,8 @@ class CColorPickerElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		$dialog = (new CElementQuery('id:color_picker'))->one();
 		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
-		$dialog->waitUntilNotPresent();
+		(new CElementQuery('id:color_picker'))->waitUntilNotVisible();
 	}
 
 	/**
