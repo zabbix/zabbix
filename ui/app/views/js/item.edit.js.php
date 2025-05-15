@@ -257,11 +257,12 @@ window.item_edit_form = new class {
 
 				case 'parseurl':
 					const url = parseUrlString(this.field.url.value);
-					const has_pairs = url.pairs.length != 0;
 
 					if (url === false) {
 						return this.#showErrorDialog(target.getAttribute('error-message'), target);
 					}
+
+					const has_pairs = url.pairs.length != 0;
 
 					if (has_pairs) {
 						const dynamic_rows = jQuery('#query-fields-table').data('dynamicRows');
