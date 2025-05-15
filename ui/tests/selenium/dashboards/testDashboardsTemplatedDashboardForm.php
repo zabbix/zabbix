@@ -2677,6 +2677,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill($fields);
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::WIDGET_SQL));
@@ -4622,6 +4623,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
+				COverlayDialogElement::ensureNotPresent();
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {

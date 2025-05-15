@@ -83,6 +83,10 @@ const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
 const ZBX_STYLE_TAG = 'tag';
 const ZBX_STYLE_TAGS_LIST = 'tags-list';
 
+const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
+
+const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
+
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';

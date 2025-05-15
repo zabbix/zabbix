@@ -1823,6 +1823,26 @@ msgstr "Autor"
 msgid "Authorization"
 msgstr "Autorització"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2226,6 +2246,10 @@ msgstr "CSV a JSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "S'espera un CUID"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3382,6 +3406,10 @@ msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat per l'element \"%
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'element \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3747,6 +3775,10 @@ msgstr "No es pot pas actualitzar massivament el nom d'equip visible."
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "No es pot obrir la URL"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4559,6 +4591,10 @@ msgstr "No es permet pas l'enllaç a plantilles circulars."
 msgid "Class %1$s not found for action %2$s."
 msgstr "No s'ha trobat la classe %1$s per a l'acció %2$s."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4779,6 +4815,10 @@ msgstr "Comunitat"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "Vista compacta"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5006,6 +5046,10 @@ msgstr "Actualització de la configuració"
 msgid "Configuration updated"
 msgstr "Configuració actualitzada"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -5015,6 +5059,12 @@ msgstr "Configura la connexió de base de dades"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "Configurar el provisionament JIT"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6822,6 +6872,10 @@ msgstr "Descripció"
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
 msgstr "Mida de la descripció"
+
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11568,6 +11622,11 @@ msgstr "Configuració LDAP no vàlida"
 msgid "Invalid MFA configuration"
 msgstr "Configuració MFA no vàlida"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "La configuració de correspondència de tipus de suport d'aprovisionament SAML JIT no és pas vàlid."
@@ -14447,6 +14506,10 @@ msgstr "Nou tipus de suport"
 msgid "New media type mapping"
 msgstr "Nou mapatge del tipus de suport"
 
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
 msgstr "Nova operació"
@@ -14581,6 +14644,10 @@ msgstr "No s'ha donat \"%1$s\" per al mapa."
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "Sense canvis."
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15369,6 +15436,18 @@ msgstr "Numèric (enter)"
 msgid "Numeric (unsigned)"
 msgstr "Numèric (sense signar)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -16123,6 +16202,15 @@ msgstr "La pàgina ha rebut dades incorrectes"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "Paginador"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17288,6 +17376,10 @@ msgstr "Hora de recuperació"
 msgid "Rectangle"
 msgstr "Rectangle"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Atribut de referència"
@@ -17322,6 +17414,10 @@ msgstr "Actualitzar la configuració del servidor intermediari triat?"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "Interval de recàrrega"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18718,6 +18814,10 @@ msgstr "Tria un SLA per mostrar l'informe de l'SLA."
 msgid "Select prototype"
 msgstr "Tria el prototip"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19520,6 +19620,10 @@ msgstr "Informació sobre l'arquitectura del programari. Retorna una cadena"
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
 msgstr "Darrera verificació d'actualització del programari"
+
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20461,6 +20565,10 @@ msgstr "Plantilles \"%1$s\" desenllaçades dels equips \"%2$s\"."
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "Les plantilles enllaçades pel descobriment de l'equip no es poden pas desenllaçar."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20580,6 +20688,10 @@ msgstr "El %1$s ja no es descobreix i %2$s, %3$s."
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "Ja no es descobreix %1$s i %2$s."
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "La plantilla d'URL s'empra per carregar i mostrar la capa de mosaic als mapes geogràfics."
@@ -20596,6 +20708,14 @@ msgstr "El temps mitjà que triga una lectura del disc virtual, \"url\" - URL de
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "El temps mitjà que triga una escriptura a disc virtual, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware, \"instance\" - instància del dispositiu de disc"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21032,6 +21152,14 @@ msgstr "El que duem de dia"
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "Edició del token"
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21820,6 +21948,10 @@ msgstr "Sense canvis"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "Desfer el reconeixement del problema."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24596,6 +24728,14 @@ msgstr "bitxor() - O exclusiu per a bits"
 msgid "blinking"
 msgstr "fent pampallugues"
 
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
 msgstr "tant el nom d'usuari com la contrasenya haurien d'estar presents o buits"
@@ -26313,6 +26453,10 @@ msgstr "ja existeix un grup de plantilles amb el mateix UUID"
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
 msgstr "ja existeix una plantilla amb el mateix UUID"
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831

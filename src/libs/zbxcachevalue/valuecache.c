@@ -757,8 +757,8 @@ static void	vc_warn_alloc(const zbx_vc_item_t *item, size_t requested_bytes)
 	{
 		vc_cache->last_alloc_warning_time = now;
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot allocate " ZBX_FS_UI64 " bytes for itemid:" ZBX_FS_UI64
-				" in value cache", requested_bytes, item->itemid);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot allocate " ZBX_FS_SIZE_T " bytes for itemid:" ZBX_FS_UI64
+				" in value cache", (zbx_fs_size_t)requested_bytes, item->itemid);
 	}
 }
 
