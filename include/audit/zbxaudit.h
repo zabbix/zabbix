@@ -30,6 +30,7 @@
 #define AUDIT_HTTPTEST_ID	6
 #define AUDIT_HA_NODE_ID	7
 #define AUDIT_CONFIG_ID		8
+#define AUDIT_MEDIATYPE_ID	9
 
 #define ZBX_AUDIT_ACTION_ADD		0
 #define ZBX_AUDIT_ACTION_UPDATE		1
@@ -126,7 +127,9 @@ zbx_hashset_t	*zbx_get_audit_hashset(void);
 
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, const char *name, int audit_action,
 		int resource_type);
+void	zbx_audit_entry_clean(zbx_audit_entry_t *entry);
 
+#define ZBX_AUDIT_RESOURCE_MEDIATYPE			3
 #define ZBX_AUDIT_RESOURCE_HOST				4
 #define	ZBX_AUDIT_RESOURCE_GRAPH			6
 #define ZBX_AUDIT_RESOURCE_TRIGGER			13
