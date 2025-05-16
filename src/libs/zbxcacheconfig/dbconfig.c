@@ -370,6 +370,7 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 	switch (type)
 	{
 		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_NESTED_LLD:
 			ret = SUCCEED;
 			break;
 
