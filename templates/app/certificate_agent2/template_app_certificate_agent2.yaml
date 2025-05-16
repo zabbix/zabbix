@@ -75,6 +75,19 @@ zabbix_export:
             			is_empty_ip = ip === '';
             			is_empty_port = port === '' || port === '443';
             
+            			if (!is_empty_port) {
+            
+            				if (!/^\d+$/.test(port)) {
+            					throw 'Invalid parameter "{' + '$CERT.WEBSITE.PORT} [' + i + ']" : error parse value "' + port + '".';
+            				}
+            
+            				port_number = parseInt(port);
+            
+            				if (port_number < 1 || port_number > 65535) {
+            					throw 'Invalid parameter "{' + '$CERT.WEBSITE.PORT} [' + i + ']" : "' + port_number + '" is out of range 1-65535.';
+            				}
+            			}
+            
             			if (!is_empty_ip && is_empty_port) {
             				item_name += ', ' + ip;
             			} else if (is_empty_ip && !is_empty_port) {
