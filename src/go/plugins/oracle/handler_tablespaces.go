@@ -311,7 +311,7 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND cdf.CON_ID = ct.CON_ID
-              AND ct.%s = :1) df,
+              AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))) df,
            (SELECT TRUNC(SUM(BYTES)) AS FREE,
                    FILE_ID
             FROM CDB_FREE_SPACE
@@ -381,7 +381,7 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND ctf.CON_ID = ct.CON_ID
-              AND ct.%s = :2) Y
+              AND (ct.%s = :2 or (ct.CON$NAME is null and ct.CON_ID = 0))) Y
       GROUP BY Y.CON_NAME,
                Y.NAME,
                Y.CONTENTS,
@@ -598,7 +598,7 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND cdf.CON_ID = ct.CON_ID
-              AND ct.%s = :1) df,
+              AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))) df,
            (SELECT TRUNC(SUM(BYTES)) AS FREE,
                    FILE_ID
             FROM CDB_FREE_SPACE
@@ -687,7 +687,7 @@ FROM (SELECT Y.NAME                                   AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND ctf.CON_ID = ct.CON_ID
-              AND ct.%s = :1
+              AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))
               AND ctf.TABLESPACE_NAME = :2) Y
       GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS)`, conntype)
 }
