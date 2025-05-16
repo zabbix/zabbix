@@ -248,30 +248,23 @@ unset($_REQUEST[$paramsFieldName]);
 $itemid = getRequest('itemid');
 
 if (getRequest('parent_discoveryid')) {
-	$db_parent_discovery = API::DiscoveryRule()->get([
+	$options = [
 		'output' => ['itemid', 'flags'],
 		'itemids' => getRequest('parent_discoveryid'),
 		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 		'editable' => true
-	]);
+	];
 
-	if (!$db_parent_discovery) {
-		$db_parent_discovery = API::DiscoveryRulePrototype()->get([
-			'output' => ['itemid', 'flags'],
-			'itemids' => getRequest('parent_discoveryid'),
-			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
-			'editable' => true
-		]);
-	}
-
-	$db_parent_discovery = reset($db_parent_discovery);
+	$db_parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
 	if (!$db_parent_discovery) {
 		access_deny();
 	}
 
-	if (hasRequest('add') || hasRequest('update')) {
-		if ($db_parent_discovery['hosts'][0]['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+	$db_parent_discovery = reset($db_parent_discovery);
+
+	if ($db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		if (hasRequest('add') || hasRequest('update')) {
 			access_deny();
 		}
 	}
@@ -358,7 +351,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'key_' => $key,
 			'description' => getRequest('description', DB::getDefault('items', 'description')),
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
-			'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
+			'discover' => getRequest('discover', ITEM_NO_DISCOVER),
 			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
 			'lld_macro_paths' => prepareLldMacroPaths(getRequest('lld_macro_paths', [])),
 			'filter' => prepareLldFilter([
@@ -366,7 +359,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'formula' => getRequest('formula', DB::getDefault('items', 'formula')),
 				'conditions' => getRequest('conditions', [])
 			]),
-			'overrides' => prepareLldOverrides($overrides, $db_item),
+			'overrides' => prepareLldOverrides($overrides),
 			'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
 			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
 			'enabled_lifetime_type' => getRequest('enabled_lifetime_type',

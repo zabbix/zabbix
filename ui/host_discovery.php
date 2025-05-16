@@ -479,7 +479,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'formula' => getRequest('formula', DB::getDefault('items', 'formula')),
 				'conditions' => getRequest('conditions', [])
 			]),
-			'overrides' => prepareLldOverrides($overrides, $db_item),
+			'overrides' => prepareLldOverrides($overrides),
 			'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
 			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
 			'enabled_lifetime_type' => getRequest('enabled_lifetime_type',
