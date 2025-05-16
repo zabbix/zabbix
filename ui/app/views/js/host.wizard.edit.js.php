@@ -1208,7 +1208,7 @@ window.host_wizard_edit = new class {
 			}
 
 			const required = typeof rule.required === 'function'
-				? rule.required(rule.row_index || null)
+				? rule.required(rule.row_index ?? null)
 				: rule.required;
 
 			input
@@ -1684,7 +1684,7 @@ window.host_wizard_edit = new class {
 			rule = {type: 'string', active: false, required: false, ...rule};
 
 			const required = (typeof rule.required === 'function')
-				? rule.required(rule.row_index || null)
+				? rule.required(rule.row_index ?? null)
 				: rule.required;
 
 			if (!!required && (value === null || value === '' || (rule.type === 'array' && !value.length))) {
