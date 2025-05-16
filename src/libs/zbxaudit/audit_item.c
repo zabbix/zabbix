@@ -67,24 +67,37 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	}
 }
 
-const char	*zbx_audit_get_item_kind(int resource_type, const char *property)
+const char	*lld_audit_item_prop(int flags, const char *field, char *buf, size_t len)
 {
+	int	resource_type = zbx_audit_item_flag_to_resource_type(flags);
+	size_t	offset;
+
 	switch (resource_type)
 	{
 		case ZBX_AUDIT_RESOURCE_ITEM:
-			return "item";
+			offset = zbx_strlcpy(buf, "item", len);
+			break;
 		case ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE:
-			return "itemprototype";
+			offset = zbx_strlcpy(buf, "itemprototype", len);
+			break;
 		case ZBX_AUDIT_RESOURCE_LLD_RULE:
-			return "discoveryrule";
+			offset = zbx_strlcpy(buf, "discoveryrule", len);
+			break;
 		case ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE:
-			return "discoveryruleprototype";
+			offset = zbx_strlcpy(buf, "discoveryruleprototype", len);
+			break;
 		default:
-			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown resource type: %d", resource_type);
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported resource type: %d", resource_type);
 			exit(EXIT_FAILURE);
 	}
 
-	return NULL;
+	if (offset < len - 1)
+	{
+		buf[offset++] = '.';
+		zbx_strlcpy(buf + offset, field, len - offset);
+	}
+
+	return buf;
 }
 
 void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t itemid, const char *name,
@@ -120,13 +133,12 @@ void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_u
 void	zbx_audit_item_update_json_update_##resource(int audit_context_mode, zbx_uint64_t itemid, int flags,	\
 		type1 resource##_old, type1 resource##_new)							\
 {														\
-	int	resource_type;											\
+	char	prop[AUDIT_MAX_PROP_LEN];									\
 														\
 	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
-	resource_type = zbx_audit_item_flag_to_resource_type(flags);						\
 	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID,						\
-			zbx_audit_get_item_kind(resource_type, #resource),					\
+			lld_audit_item_prop(flags, #resource, prop, sizeof(prop)),				\
 			resource##_old,	resource##_new);							\
 }
 
@@ -533,12 +545,12 @@ void	zbx_audit_item_delete_tag(int audit_context_mode, zbx_uint64_t itemid, int 
 	else if (ZBX_AUDIT_RESOURCE_LLD_RULE == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.parameters["	\
-				ZBX_FS_UI64 "]"#resource, item_parameter_id);					\
+				ZBX_FS_UI64 "]"#nested#resource, item_parameter_id);				\
 	}													\
 	else if (ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE == resource_type)					\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryruleprototype.parameters[" \
-				ZBX_FS_UI64 "]"#resource, item_parameter_id);					\
+				ZBX_FS_UI64 "]"#nested#resource, item_parameter_id);				\
 	}													\
 	else													\
 	{													\
@@ -1118,8 +1130,8 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 		const char *val)
 {
 	struct zbx_json_parse	jp_array, jp_object;
-	const char		*key, *element = NULL;
-	int			resource_type;
+	const char		*element = NULL;
+	char			prop[AUDIT_MAX_PROP_LEN];
 	zbx_uint64_t		index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1143,8 +1155,7 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 		return;
 	}
 
-	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = zbx_audit_get_item_kind(resource_type, "query_fields");
+	lld_audit_item_prop(flags, "query_fields", prop, sizeof(prop));
 
 	do
 	{
@@ -1166,13 +1177,13 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 		char	audit_key_op[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 			audit_key_sortorder[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", key, index);
+		zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", prop, index);
 		zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s[" ZBX_FS_UI64 "].name",
-				key, index);
-		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64 "].value", key,
+				prop, index);
+		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64 "].value", prop,
 				index);
 		zbx_snprintf(audit_key_sortorder, sizeof(audit_key_sortorder), "%s[" ZBX_FS_UI64 "].sortorder",
-				key, index);
+				prop, index);
 
 		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_op,
 				"Added", NULL, NULL);
@@ -1192,17 +1203,15 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 {
 	struct zbx_json_parse	jp_array_old, jp_object_old, jp_array_new, jp_object_new;
 	char			name_old[MAX_STRING_LEN], value_old[MAX_STRING_LEN], name_new[MAX_STRING_LEN],
-				value_new[MAX_STRING_LEN];
-	const char		*member_old, *element_old = NULL, *member_new, *key, *element_new = NULL;
-	int			resource_type;
+				value_new[MAX_STRING_LEN], prop[AUDIT_MAX_PROP_LEN];
+	const char		*member_old, *element_old = NULL, *member_new, *element_new = NULL;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	if (0 == strcmp(val_old, val_new))
 		return;
 
-	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = zbx_audit_get_item_kind(resource_type, "query_fields");
+	lld_audit_item_prop(flags, "query_fields", prop, sizeof(prop));
 
 	if ((0 != strcmp(val_old, "") && SUCCEED != zbx_json_open(val_old, &jp_array_old)) ||
 			(0 != strcmp(val_new, "") && SUCCEED != zbx_json_open(val_new, &jp_array_new)))
@@ -1259,7 +1268,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 			{
 				char	audit_key_op[AUDIT_DETAILS_KEY_LEN];
 
-				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", key, index);
+				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", prop, index);
 
 				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 						audit_key_op, "Updated", NULL, NULL);
@@ -1269,7 +1278,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 					char	audit_key_name[AUDIT_DETAILS_KEY_LEN];
 
 					zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s["ZBX_FS_UI64 "].name",
-							key, index);
+							prop, index);
 
 					zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_name,
 							name_old, name_new);
@@ -1280,7 +1289,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 					char	audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
 					zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64
-							"].value", key, index);
+							"].value", prop, index);
 
 					zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_value,
 							value_old, value_new);
@@ -1295,7 +1304,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 				char	audit_key_op[AUDIT_DETAILS_KEY_LEN];
 
 				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]",
-						key, index);
+						prop, index);
 
 				zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID,AUDIT_DETAILS_ACTION_DELETE,
 						audit_key_op);
@@ -1306,13 +1315,13 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 					audit_key_sortorder[AUDIT_DETAILS_KEY_LEN],
 					audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
-				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]",	key, index);
-				zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s[" ZBX_FS_UI64 "].name", key,
+				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]",	prop, index);
+				zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s[" ZBX_FS_UI64 "].name", prop,
 						index);
 				zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64 "].value",
-						key, index);
+						prop, index);
 				zbx_snprintf(audit_key_sortorder, sizeof(audit_key_sortorder), "%s[" ZBX_FS_UI64
-						"].sortorder", key, index);
+						"].sortorder", prop, index);
 
 				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 						audit_key_op, "Added", NULL, NULL);
@@ -1366,9 +1375,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t itemid, int flags,
 		const char *val)
 {
-	char		*val_tmp, *val_mut, *element = NULL;
-	const char	*key;
-	int		resource_type;
+	char		*val_tmp, *val_mut, *element = NULL, prop[AUDIT_MAX_PROP_LEN];
 	zbx_uint64_t	index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1376,8 +1383,7 @@ void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t
 	if (SUCCEED == audit_field_value_matches_db_default("items", "headers", val, 0))
 		return;
 
-	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = zbx_audit_get_item_kind(resource_type, "headers");
+	lld_audit_item_prop(flags, "headers", prop, sizeof(prop));
 
 	val_mut = zbx_strdup(NULL, val);
 
@@ -1407,13 +1413,13 @@ void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t
 		char	audit_key_op[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 			audit_key_sortorder[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", key, index);
+		zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", prop, index);
 		zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s[" ZBX_FS_UI64 "].name",
-				key, index);
-		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64 "].value", key,
+				prop, index);
+		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64 "].value", prop,
 				index);
 		zbx_snprintf(audit_key_sortorder, sizeof(audit_key_sortorder), "%s[" ZBX_FS_UI64 "].sortorder",
-				key, index);
+				prop, index);
 
 		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_op,
 				"Added", NULL, NULL);
@@ -1434,9 +1440,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 		const char *val_old, const char *val_new)
 {
 	char		*val_old_tmp, *val_new_tmp, *val_old_mut, *val_new_mut, *element_old = NULL,
-			*element_new = NULL;
-	const char	*key;
-	int		resource_type;
+			*element_new = NULL, prop[AUDIT_MAX_PROP_LEN];
 	zbx_uint64_t	index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1444,8 +1448,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 	if (0 == strcmp(val_old, val_new))
 		return;
 
-	resource_type = zbx_audit_item_flag_to_resource_type(flags);
-	key = zbx_audit_get_item_kind(resource_type, "headers");
+	lld_audit_item_prop(flags, "headers", prop, sizeof(prop));
 
 	val_old_mut = zbx_strdup(NULL, val_old);
 	val_new_mut = zbx_strdup(NULL, val_new);
@@ -1498,7 +1501,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 			if (0 != strcmp(name_old, name_new) || 0 != strcmp(ZBX_NULL2EMPTY_STR(value_old),
 					ZBX_NULL2EMPTY_STR(value_new)))
 			{
-				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", key, index);
+				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", prop, index);
 
 				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 						audit_key_op, "Updated", NULL, NULL);
@@ -1508,7 +1511,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 					char	audit_key_name[AUDIT_DETAILS_KEY_LEN];
 
 					zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s["ZBX_FS_UI64 "].name",
-							key, index);
+							prop, index);
 
 					zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_name,
 							name_old, name_new);
@@ -1519,7 +1522,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 					char	audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
 					zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64
-							"].value", key, index);
+							"].value", prop, index);
 
 					zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_value,
 							ZBX_NULL2EMPTY_STRTOK_R_VALUE(value_old),
@@ -1534,7 +1537,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 			{
 				char	audit_key_op[AUDIT_DETAILS_KEY_LEN];
 				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]",
-						key, index);
+						prop, index);
 
 				zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE,
 						audit_key_op);
@@ -1545,13 +1548,13 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 					audit_key_sortorder[AUDIT_DETAILS_KEY_LEN],
 					audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
-				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", key, index);
-				zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s[" ZBX_FS_UI64 "].name", key,
+				zbx_snprintf(audit_key_op, sizeof(audit_key_op), "%s[" ZBX_FS_UI64 "]", prop, index);
+				zbx_snprintf(audit_key_name, sizeof(audit_key_name), "%s[" ZBX_FS_UI64 "].name", prop,
 						index);
 				zbx_snprintf(audit_key_value, sizeof(audit_key_value), "%s[" ZBX_FS_UI64 "].value",
-						key, index);
+						prop, index);
 				zbx_snprintf(audit_key_sortorder, sizeof(audit_key_sortorder), "%s[" ZBX_FS_UI64
-						"].sortorder", key, index);
+						"].sortorder", prop, index);
 
 				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 						audit_key_op, "Added", NULL, NULL);

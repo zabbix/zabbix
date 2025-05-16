@@ -954,10 +954,12 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
-		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
-		zbx_audit_item_update_json_add_data(audit_context_mode, *itemid, item, hostid);
-
 		item->itemid = (*itemid)++;
+
+		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, item->itemid, item->name,
+				item->flags);
+		zbx_audit_item_update_json_add_data(audit_context_mode, item, hostid);
+
 	}
 dependent:
 	for (i = 0; i < item->dependent_items.values_num; i++)

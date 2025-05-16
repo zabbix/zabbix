@@ -24,7 +24,7 @@ int	zbx_audit_item_resource_is_only_lld_rule_or_lld_rule_prototype(int resource_
 
 int	zbx_audit_item_flag_to_resource_type(int flag);
 
-const char	*zbx_audit_get_item_kind(int resource_type, const char *property);
+const char	*lld_audit_item_prop(int flags, const char *field, char *buf, size_t len);
 
 void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t itemid, const char *name,
 		int flags);

@@ -17,7 +17,7 @@
 
 #include "lld.h"
 
-void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
 #endif
