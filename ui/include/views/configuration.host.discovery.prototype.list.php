@@ -253,36 +253,39 @@ foreach ($data['discoveries'] as $discovery) {
 	]);
 }
 
-$button_list = [
+$buttons = [
 	'discoveryprototype.massenable' => [
 		'name' => _('Create enabled'),
 		'confirm_singular' => _('Enable selected discovery prototype?'),
 		'confirm_plural' => _('Enable selected discovery prototypes?'),
-		'csrf_token' => $csrf_token,
-		'disabled' => $data['is_parent_discovered']
+		'csrf_token' => $csrf_token
 	],
 	'discoveryprototype.massdisable' => [
 		'name' => _('Create disabled'),
 		'confirm_singular' => _('Disable selected discovery prototype?'),
 		'confirm_plural' => _('Disable selected discovery prototypes?'),
-		'csrf_token' => $csrf_token,
-		'disabled' => $data['is_parent_discovered']
+		'csrf_token' => $csrf_token
 	]
 ];
 
-$button_list += [
-	'discoveryprototype.massdelete' => [
-		'name' => _('Delete'),
-		'confirm_singular' => _('Delete selected discovery prototype?'),
-		'confirm_plural' => _('Delete selected discovery prototypes?'),
-		'csrf_token' => $csrf_token
-	]
+if ($data['is_parent_discovered']) {
+	foreach ($buttons as &$button) {
+		$button['disabled'] = true;
+	}
+	unset($button);
+}
+
+$buttons['discoveryprototype.massdelete'] = [
+	'name' => _('Delete'),
+	'confirm_singular' => _('Delete selected discovery prototype?'),
+	'confirm_plural' => _('Delete selected discovery prototypes?'),
+	'csrf_token' => $csrf_token
 ];
 
 // Append table to form.
 $discoveryForm->addItem([
 	$discoveryTable,
-	new CActionButtonList('action', 'g_hostdruleid', $button_list)
+	new CActionButtonList('action', 'g_hostdruleid', $buttons)
 ]);
 
 $html_page

@@ -195,45 +195,48 @@ foreach ($data['triggers'] as $trigger) {
 	]);
 }
 
+$buttons = [
+	'trigger.prototype.massenable' => [
+		'content' => (new CSimpleButton(_('Create enabled')))
+			->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-no-chkbxrange')
+			->setId('js-massenable-trigger')
+	],
+	'trigger.prototype.massdisable' => [
+		'content' => (new CSimpleButton(_('Create disabled')))
+			->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-no-chkbxrange')
+			->setId('js-massdisable-trigger')
+	],
+	'trigger.prototype.massupdate' => [
+		'content' => (new CSimpleButton(_('Mass update')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->setId('js-massupdate-trigger')
+	],
+];
+
+if ($data['is_parent_discovered']) {
+	foreach ($buttons as &$button) {
+		$button['content']
+			->setEnabled(false)
+			->setAttribute('data-disabled', $data['is_parent_discovered']);
+	}
+	unset($button);
+}
+
+$buttons['trigger.prototype.massdelete'] = [
+	'content' => (new CSimpleButton(_('Delete')))
+		->addClass(ZBX_STYLE_BTN_ALT)
+		->addClass('js-no-chkbxrange')
+		->setId('js-massdelete-trigger')
+];
+
 // append table to form
 $trigger_form->addItem([
 	$trigger_table,
-	new CActionButtonList('action', 'g_triggerid',
-		[
-			'trigger.prototype.massenable' => [
-				'content' => (new CSimpleButton(_('Create enabled')))
-					->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
-					->setId('js-massenable-trigger')
-					->setEnabled(!$data['is_parent_discovered'])
-					->setAttribute('data-disabled', $data['is_parent_discovered'])
-			],
-			'trigger.prototype.massdisable' => [
-				'content' => (new CSimpleButton(_('Create disabled')))
-					->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
-					->setId('js-massdisable-trigger')
-					->setEnabled(!$data['is_parent_discovered'])
-					->setAttribute('data-disabled', $data['is_parent_discovered'])
-			],
-			'trigger.prototype.massupdate' => [
-				'content' => (new CSimpleButton(_('Mass update')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->setId('js-massupdate-trigger')
-					->setEnabled(!$data['is_parent_discovered'])
-					->setAttribute('data-disabled', $data['is_parent_discovered'])
-			],
-			'trigger.prototype.massdelete' => [
-				'content' => (new CSimpleButton(_('Delete')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
-					->setId('js-massdelete-trigger')
-			]
-		],
-		'trigger_prototypes_'.$this->data['parent_discoveryid']
-	)
+	new CActionButtonList('action', 'g_triggerid', $buttons, 'trigger_prototypes_'.$this->data['parent_discoveryid'])
 ]);
 
 $html_page

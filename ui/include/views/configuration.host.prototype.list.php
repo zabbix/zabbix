@@ -204,34 +204,39 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	]);
 }
 
+$buttons = [
+	'hostprototype.massenable' => [
+		'name' => _('Create enabled'),
+		'confirm_singular' => _('Create hosts from selected prototype as enabled?'),
+		'confirm_plural' => _('Create hosts from selected prototypes as enabled?'),
+		'csrf_token' => $csrf_token
+	],
+	'hostprototype.massdisable' => [
+		'name' => _('Create disabled'),
+		'confirm_singular' => _('Create hosts from selected prototype as disabled?'),
+		'confirm_plural' => _('Create hosts from selected prototypes as disabled?'),
+		'csrf_token' => $csrf_token
+	]
+];
+
+if ($data['is_parent_discovered']) {
+	foreach ($buttons as &$button) {
+		$button['disabled'] = true;
+	}
+	unset($button);
+}
+
+$buttons['hostprototype.massdelete'] = [
+	'name' => _('Delete'),
+	'confirm_singular' => _('Delete selected host prototype?'),
+	'confirm_plural' => _('Delete selected host prototypes?'),
+	'csrf_token' => $csrf_token
+];
+
 // append table to form
 $itemForm->addItem([
 	$hostTable,
-	new CActionButtonList('action', 'group_hostid',
-		[
-			'hostprototype.massenable' => [
-				'name' => _('Create enabled'),
-				'confirm_singular' => _('Create hosts from selected prototype as enabled?'),
-				'confirm_plural' => _('Create hosts from selected prototypes as enabled?'),
-				'csrf_token' => $csrf_token,
-				'disabled' => $data['is_parent_discovered']
-			],
-			'hostprototype.massdisable' => [
-				'name' => _('Create disabled'),
-				'confirm_singular' => _('Create hosts from selected prototype as disabled?'),
-				'confirm_plural' => _('Create hosts from selected prototypes as disabled?'),
-				'csrf_token' => $csrf_token,
-				'disabled' => $data['is_parent_discovered']
-			],
-			'hostprototype.massdelete' => [
-				'name' => _('Delete'),
-				'confirm_singular' => _('Delete selected host prototype?'),
-				'confirm_plural' => _('Delete selected host prototypes?'),
-				'csrf_token' => $csrf_token
-			]
-		],
-		$data['discovery_rule']['itemid']
-	)
+	new CActionButtonList('action', 'group_hostid', $buttons, $data['discovery_rule']['itemid'])
 ]);
 
 $html_page

@@ -166,31 +166,35 @@ $buttons = [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massenable-itemprototype')
 			->addClass('js-no-chkbxrange')
-			->setEnabled(!$data['is_parent_discovered'])
-			->setAttribute('data-disabled', $data['is_parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Create disabled')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdisable-itemprototype')
 			->addClass('js-no-chkbxrange')
-			->setEnabled(!$data['is_parent_discovered'])
-			->setAttribute('data-disabled', $data['is_parent_discovered'])
 	],
 	[
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-itemprototype')
 			->addClass('js-no-chkbxrange')
-			->setEnabled(!$data['is_parent_discovered'])
-			->setAttribute('data-disabled', $data['is_parent_discovered'])
-	],
-	[
-		'content' => (new CSimpleButton(_('Delete')))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-itemprototype')
-			->addClass('js-no-chkbxrange')
 	]
+];
+
+if ($data['is_parent_discovered']) {
+	foreach ($buttons as &$button) {
+		$button['content']
+			->setEnabled(false)
+			->setAttribute('data-disabled', $data['is_parent_discovered']);
+	}
+	unset($button);
+}
+
+$buttons[] = [
+	'content' => (new CSimpleButton(_('Delete')))
+		->addClass(ZBX_STYLE_BTN_ALT)
+		->addClass('js-massdelete-itemprototype')
+		->addClass('js-no-chkbxrange')
 ];
 
 $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid']));
