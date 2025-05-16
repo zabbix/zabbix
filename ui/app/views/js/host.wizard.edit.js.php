@@ -1290,12 +1290,13 @@ window.host_wizard_edit = new class {
 
 		let template_classes = Array.from(this.#templates)
 			.filter(([_, template]) => {
-				if (Number(this.#data.data_collection) != ZBX_TEMPLATE_DATA_COLLECTION_ANY
-						&& template.data_collection != Number(this.#data.data_collection)) {
+				if (template.data_collection !== null
+						&& Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_ANY
+						&& template.data_collection !== Number(this.#data.data_collection)) {
 					return false;
 				}
 
-				if (Number(this.#data.data_collection) == ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED
+				if (Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
 						&& Number(this.#data.agent_mode) !== ZBX_TEMPLATE_AGENT_MODE_ANY
 						&& !template.agent_mode.includes(Number(this.#data.agent_mode))) {
 					return false;
