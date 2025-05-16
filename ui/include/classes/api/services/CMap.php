@@ -895,6 +895,18 @@ class CMap extends CMapElement {
 					);
 				}
 
+				if($label_name !== 'label_type') {
+					$max_label_name_length = DB::getFieldLength('sysmaps', $label_data['string']);
+
+					if (mb_strlen($map[$label_data['string']]) > $max_label_name_length) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'%1$s label cannot be longer than %2$s characters.',
+							ucfirst($label_data['typeName']),
+							$max_label_name_length
+						));
+					}
+				}
+
 				if ($label_name === 'label_type' || $label_name === 'label_type_host') {
 					continue;
 				}
