@@ -781,8 +781,8 @@ window.host_wizard_edit = new class {
 					}
 				});
 
-				this.#data.ipmi_authtype = this.#host?.ipmi_authtype || <?= IPMI_AUTHTYPE_DEFAULT ?>;
-				this.#data.ipmi_privilege = this.#host?.ipmi_privilege || <?= IPMI_PRIVILEGE_USER ?>;
+				this.#data.ipmi_authtype = this.#host?.ipmi_authtype ?? <?= IPMI_AUTHTYPE_DEFAULT ?>;
+				this.#data.ipmi_privilege = this.#host?.ipmi_privilege ?? <?= IPMI_PRIVILEGE_USER ?>;
 				this.#data.ipmi_username = this.#host?.ipmi_username || '';
 				this.#data.ipmi_password = this.#host?.ipmi_password || '';
 
