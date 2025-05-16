@@ -18,6 +18,55 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 
+#define AUDIT_TABLE_NAME	"items"
+
+static const char	*lld_audit_item_prop(const zbx_lld_item_full_t *item, const char *field, char *buf, size_t len)
+{
+	int	resource_type = zbx_audit_item_flag_to_resource_type(item->item_flags);
+	size_t	offset;
+
+	switch (resource_type)
+	{
+		case ZBX_AUDIT_RESOURCE_ITEM:
+			offset = zbx_strlcpy(buf, "item", len);
+			break;
+		case ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE:
+			offset = zbx_strlcpy(buf, "itemprototype", len);
+                        break;
+		case ZBX_AUDIT_RESOURCE_LLD_RULE:
+			offset = zbx_strlcpy(buf, "discoveryrule", len);
+                        break;
+		case ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE:
+			offset = zbx_strlcpy(buf, "discoveryruleprototype", len);
+                        break;
+	}
+
+	if (offset < len - 1)
+	{
+		buf[++offset] = '.';
+		zbx_strlcpy(buf + offset, field, len - offset);
+	}
+
+	return buf;
+}
+
+static void	lld_audit_item_add_string(const zbx_lld_item_full_t *item, const char *field, const char *value)
+{
+	char	prop[MAX_STRING_LEN];
+
+	zbx_audit_update_json_append_string(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+			lld_audit_item_prop(item, field), value, AUDIT_TABLE_NAME, field);
+}
+
+static void	lld_audit_item_add_uint64(const zbx_lld_item_full_t *item, const char *field, zbx_uint64_t value)
+{
+	char	prop[MAX_STRING_LEN];
+
+	zbx_audit_update_json_append_uint64(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+			lld_audit_item_prop(item, field), value, AUDIT_TABLE_NAME, field);
+}
+
+
 void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
 		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid)
 {
@@ -35,9 +84,10 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 #define ADD_JSON_P_UI(x, t, f)	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, \
 		IT(x), item_prototype->x, t, f)
 #define AUDIT_TABLE_NAME	"items"
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT(itemid), itemid, \
-			AUDIT_TABLE_NAME, "itemid");
-	ADD_JSON_S(delay, AUDIT_TABLE_NAME, "delay");
+
+	lld_audit_item_add_uint64(item, "itemid", item->itemid);
+
+	lld_audit_item_add_string(item, "delay", item->delay);
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT(hostid), hostid, \
 			AUDIT_TABLE_NAME, "hostid");
 	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
@@ -68,7 +118,7 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_P_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
 	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
 	ADD_JSON_P_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, "item.flags",
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT(s),
 			(zbx_uint64_t)(ZBX_FLAG_DISCOVERY_CREATED | item_prototype->item_flags), AUDIT_TABLE_NAME,
 			"flags");
 	ADD_JSON_S(jmx_endpoint, AUDIT_TABLE_NAME, "jmx_endpoint");
