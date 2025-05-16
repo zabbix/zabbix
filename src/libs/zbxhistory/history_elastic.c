@@ -353,18 +353,13 @@ static void	elastic_writer_init(void)
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_writer_release(void)
-{
+{zabbix_log(LOG_LEVEL_INFORMATION, "ITS WORKING!\n");
 	int	i;
 
 	for (i = 0; i < writer.ifaces.values_num; i++)
 		elastic_close((zbx_history_iface_t *)writer.ifaces.values[i]);
 
-	curl_multi_cleanup(writer.handle);
-	writer.handle = NULL;
-
-	zbx_vector_ptr_destroy(&writer.ifaces);
-
-	writer.initialized = 0;
+	zbx_vector_ptr_clear(&writer.ifaces);
 }
 
 /************************************************************************************
