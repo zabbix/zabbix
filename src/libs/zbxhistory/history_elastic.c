@@ -353,7 +353,7 @@ static void	elastic_writer_init(void)
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_writer_release(void)
-{zabbix_log(LOG_LEVEL_INFORMATION, "ITS WORKING!\n");
+{
 	int	i;
 
 	for (i = 0; i < writer.ifaces.values_num; i++)
