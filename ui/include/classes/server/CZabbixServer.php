@@ -606,9 +606,7 @@ class CZabbixServer {
 	 */
 	protected function connectTCP() {
 		$address = $this->host.':'.$this->port;
-		$socket = @stream_socket_client($address, $error_code, $error_msg, $this->connect_timeout,
-			STREAM_CLIENT_CONNECT
-		);
+		$socket = @stream_socket_client($address, $error_code, $error_msg, $this->connect_timeout);
 
 		if (!is_resource($socket)) {
 			$this->error = $this->connectionErrorMessage($error_msg);
@@ -664,9 +662,7 @@ class CZabbixServer {
 		]);
 
 		$address = 'tls://'.$this->host.':'.$this->port;
-		$socket = @stream_socket_client($address, $error_code, $error_msg, $this->connect_timeout,
-			STREAM_CLIENT_CONNECT, $context
-		);
+		$socket = @stream_socket_client($address, $error_code, $error_msg, $this->connect_timeout, context: $context);
 
 		if (!is_resource($socket)) {
 			$this->error = $this->connectionErrorMessage($error_msg);
