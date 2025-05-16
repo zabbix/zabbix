@@ -18,7 +18,7 @@
  * @var CView $this
  */
 ?>
-<script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
+<script type="text/x-jquery-tmpl" id="lldoverride-row-readonly">
 	<?= (new CRow([
 			'',
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
@@ -89,7 +89,7 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="lldoverride-operation-row-templated">
+<script type="text/x-jquery-tmpl" id="lldoverride-operation-row-readonly">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			(new CCol(
@@ -141,7 +141,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
-			templated:                      <?= $data['limited'] ? 1 : 0 ?>,
+			readonly:                      <?= $data['limited'] || $data['discovered_lld'] ? 1 : 0 ?>,
 			msg: {
 				yes:                        <?= json_encode(_('Yes')) ?>,
 				no:                         <?= json_encode(_('No')) ?>,
@@ -159,13 +159,13 @@
 			}
 		};
 
-		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.templated
-			? '#lldoverride-row-templated'
+		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.readonly
+			? '#lldoverride-row-readonly'
 			: '#lldoverride-row'
 		).html());
 
-		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.templated
-			? '#lldoverride-operation-row-templated'
+		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.readonly
+			? '#lldoverride-operation-row-readonly'
 			: '#lldoverride-operation-row'
 		).html());
 
@@ -433,7 +433,7 @@
 			template: lldoverrides.override_row_template
 		});
 
-		if (!lldoverrides.templated) {
+		if (!lldoverrides.readonly) {
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
 				this.onSortOrderChange();
@@ -660,7 +660,7 @@
 	Override.prototype.open = function(no, trigger_element) {
 		return PopUp('popup.lldoverride', {
 			no:                 no,
-			templated:          lldoverrides.templated,
+			readonly:           lldoverrides.readonly,
 			name:               this.data.name,
 			old_name:           this.data.name,
 			stop:               this.data.stop,
@@ -850,7 +850,7 @@
 			template: lldoverrides.operations_row_template
 		});
 
-		if (!lldoverrides.templated) {
+		if (!lldoverrides.readonly) {
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
 
@@ -976,7 +976,7 @@
 	Operation.prototype.open = function(no, trigger_element) {
 		var parameters = {
 			no:                 no,
-			templated:          lldoverrides.templated,
+			readonly:           lldoverrides.readonly,
 			operationobject:    this.data.operationobject,
 			operator:           this.data.operator,
 			value:              this.data.value
