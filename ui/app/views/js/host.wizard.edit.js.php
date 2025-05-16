@@ -1554,45 +1554,50 @@ window.host_wizard_edit = new class {
 			return this.#view_templates.tag.evaluateToElement({tag_value, hint_tag_value: escapeHtml(tag_value)});
 		}
 
-		const temp_tag_list = tags_list.cloneNode(false);
+		if (template.tags.length) {
+			const temp_tag_list = tags_list.cloneNode(false);
 
-		temp_tag_list.style.visibility = 'hidden';
-		temp_tag_list.style.position = 'absolute';
-		temp_tag_list.style.width = '195px';
-		temp_tag_list.style.maxHeight = '40px';
-		temp_tag_list.style.pointerEvents = 'none';
-		temp_tag_list.style.zIndex = '-1';
+			temp_tag_list.style.visibility = 'hidden';
+			temp_tag_list.style.position = 'absolute';
+			temp_tag_list.style.width = '195px';
+			temp_tag_list.style.maxHeight = '40px';
+			temp_tag_list.style.pointerEvents = 'none';
+			temp_tag_list.style.zIndex = '-1';
 
-		document.body.appendChild(temp_tag_list);
+			document.body.appendChild(temp_tag_list);
 
-		let all_fits = true;
+			let all_fits = true;
 
-		for (let i = 0; i < template.tags.length; i++) {
-			const tag_element = tag(template.tags[i]);
+			for (let i = 0; i < template.tags.length; i++) {
+				const tag_element = tag(template.tags[i]);
 
-			temp_tag_list.appendChild(tag_element);
+				temp_tag_list.appendChild(tag_element);
 
-			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
-				temp_tag_list.removeChild(tag_element);
-				all_fits = false;
-				break;
+				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+					temp_tag_list.removeChild(tag_element);
+					all_fits = false;
+					break;
+				}
 			}
-		}
 
-		if (!all_fits) {
-			temp_tag_list.appendChild(this.#view_templates.tags_more.evaluateToElement({
-				tag_values: template.tags.map(tag_value => tag(tag_value).outerHTML).join('')
-			}));
+			if (!all_fits) {
+				temp_tag_list.appendChild(this.#view_templates.tags_more.evaluateToElement({
+					tag_values: template.tags.map(tag_value => tag(tag_value).outerHTML).join('')
+				}));
 
-			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
-				const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
+				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+					const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
 
-				temp_tag_list.removeChild(tags[tags.length - 1]);
+					temp_tag_list.removeChild(tags[tags.length - 1]);
+				}
 			}
-		}
 
-		tags_list.innerHTML = temp_tag_list.innerHTML;
-		temp_tag_list.remove();
+			tags_list.innerHTML = temp_tag_list.innerHTML;
+			temp_tag_list.remove();
+		}
+		else {
+			card.querySelector('.template-tags').style.display = 'none';
+		}
 
 		const info = card.querySelector('.template-info');
 
