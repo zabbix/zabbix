@@ -298,7 +298,9 @@ window.host_wizard_edit = new class {
 					else {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
-						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
+						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
+							success: true
+						}}));
 					}
 				})
 				.catch(() => {

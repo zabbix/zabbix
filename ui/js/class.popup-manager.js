@@ -297,7 +297,7 @@ class CPopupManager {
 					return;
 				}
 
-				if ('success' in e.detail) {
+				if ('success' in e.detail && typeof e.detail.success === 'object') {
 					postMessageOk(e.detail.success.title);
 
 					if ('messages' in e.detail.success) {
