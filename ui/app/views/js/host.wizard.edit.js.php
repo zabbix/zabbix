@@ -147,7 +147,7 @@ window.host_wizard_edit = new class {
 		template_search_query: '',
 		selected_template: null,
 		selected_subclasses: {},
-		show_info_by_templateid: null,
+		show_info_by_template: null,
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
 		show_templates: ZBX_TEMPLATE_SHOW_ANY,
@@ -273,8 +273,8 @@ window.host_wizard_edit = new class {
 				this.#data.tls_psk = this.#generatePSK();
 			}
 			if (target.classList.contains('js-template-info-toggle')) {
-				this.#data.show_info_by_templateid = this.#data.show_info_by_templateid !== target.templateid
-					? target.templateid
+				this.#data.show_info_by_template = this.#data.show_info_by_template !== target.template
+					? target.template
 					: null;
 			}
 		});
@@ -1049,13 +1049,14 @@ window.host_wizard_edit = new class {
 	#updateForm(path, new_value, old_value) {
 		const step = this.#getCurrentStep();
 		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
+		const step_init = !path;
 
 		switch (step) {
 			case this.STEP_WELCOME:
 				break;
 
 			case this.STEP_SELECT_TEMPLATE:
-				if (!path
+				if (step_init
 					|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
 					|| path.startsWith('selected_subclasses')
 				) {
@@ -1072,11 +1073,11 @@ window.host_wizard_edit = new class {
 					}
 				}
 
-				if ((!path || path === 'selected_template') && this.#getSelectedTemplate()) {
+				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
 				}
 
-				if (path === 'show_info_by_templateid') {
+				if (path === 'show_info_by_template') {
 					if (old_value !== null) {
 						this.#updateCardInfo(old_value, false);
 					}
@@ -1088,7 +1089,7 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_CREATE_HOST:
-				if ((!path || path === 'host' || path === 'groups') && this.#data.host !== null) {
+				if ((step_init || path === 'host' || path === 'groups') && this.#data.host !== null) {
 					this.#updateProgress();
 				}
 
@@ -1204,6 +1205,8 @@ window.host_wizard_edit = new class {
 		}
 
 		requestAnimationFrame(() => {
+			let first_field = true;
+
 			for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
 				const rule = this.#getValidationRule(path);
 
@@ -1211,7 +1214,9 @@ window.host_wizard_edit = new class {
 					continue;
 				}
 
-				this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : []);
+				this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : [],
+					step_init && first_field
+				);
 
 				if (error === null) {
 					rule.active = false;
@@ -1291,8 +1296,8 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#updateCardInfo(templateid, expand) {
-		const card = this.#template_cards.get(templateid);
+	#updateCardInfo(template, expand) {
+		const card = this.#template_cards.get(template);
 
 		if (card === undefined) {
 			return;
@@ -1423,11 +1428,10 @@ window.host_wizard_edit = new class {
 			return a[0].localeCompare(b[0]);
 		}));
 
-		const selected_templateid = this.#getSelectedTemplate()?.templateid;
 		const sections = [];
 
 		this.#template_cards.clear();
-		this.#data.show_info_by_templateid = null;
+		this.#data.show_info_by_template = null;
 
 		if (template_classes.size) {
 			for (const [category, templateids] of template_classes) {
@@ -1483,6 +1487,7 @@ window.host_wizard_edit = new class {
 
 				for (const templateid of templateids) {
 					const template = this.#templates.get(templateid);
+					const template_key = `${category}:${templateid}`;
 
 					if (selected_subclasses.length && !template.tags.find(
 						({tag, value}) => tag === 'subclass' && selected_subclasses.includes(value)
@@ -1490,8 +1495,8 @@ window.host_wizard_edit = new class {
 						continue;
 					}
 
-					const card = this.#makeCard(category, template, templateid === selected_templateid);
-					this.#template_cards.set(templateid, card);
+					const card = this.#makeCard(category, template, template_key === this.#data.selected_template);
+					this.#template_cards.set(template_key, card);
 
 					card_list.appendChild(card);
 
@@ -1505,7 +1510,7 @@ window.host_wizard_edit = new class {
 					this.#updateCardsHeight(section);
 				});
 				section.addEventListener('collapse', () => {
-					this.#data.show_info_by_templateid = null;
+					this.#data.show_info_by_template = null;
 					this.#sections_expanded.set(category, false);
 				});
 
@@ -1626,7 +1631,7 @@ window.host_wizard_edit = new class {
 
 		const info_toggle = card.querySelector('.js-template-info-toggle');
 
-		info_toggle.templateid = template.templateid;
+		info_toggle.template = `${category}:${template.templateid}`;
 
 		card.querySelector('input[type=radio').checked = checked;
 
@@ -1891,7 +1896,7 @@ window.host_wizard_edit = new class {
 			: false;
 	}
 
-	#updateFieldMessages(name, type, messages = []) {
+	#updateFieldMessages(name, type, messages = [], scroll_to_field = false) {
 		const field = this.#dialogue.querySelector(`[name="${name}"], [data-name="${name}"]`);
 
 		if (field === null) {
@@ -1912,6 +1917,10 @@ window.host_wizard_edit = new class {
 		messages.forEach(message => form_field.appendChild(this.#view_templates[type].evaluateToElement({
 			message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
 		})));
+
+		if (type === 'error' && scroll_to_field) {
+			form_field.scrollIntoView({behavior: 'smooth', block: 'center'});
+		}
 	}
 
 	#initReactiveData(target_object, on_change_callback) {
