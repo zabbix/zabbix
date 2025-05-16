@@ -49,13 +49,12 @@ if ($data['limited']) {
 		->addItem((new CVar('manual_close', $data['manual_close']))->removeId());
 }
 
+$data['form_name'] = $trigger_form->getName();
+
 // Append tabs to form.
 $triggers_tab = (new CTabView())
 	->addTab('triggersTab',_('Trigger prototype'),
-		new CPartial('trigger.edit.trigger.tab', $data += [
-			'readonly' => $readonly,
-			'form_name' => $trigger_form->getName()
-		])
+		new CPartial('trigger.edit.trigger.tab', $data + ['readonly' => $readonly])
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
@@ -67,7 +66,8 @@ $triggers_tab = (new CTabView())
 			'readonly' => $readonly
 		]), TAB_INDICATOR_TAGS
 	)
-	->addTab('dependenciesTab', _('Dependencies'), new CPartial('trigger.edit.dependencies.tab', $data),
+	->addTab('dependenciesTab', _('Dependencies'),
+		new CPartial('trigger.edit.dependencies.tab', $data + ['readonly' => $data['is_discovered_prototype']]),
 		TAB_INDICATOR_DEPENDENCY
 	);
 
