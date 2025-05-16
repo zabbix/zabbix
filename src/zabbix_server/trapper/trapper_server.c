@@ -158,7 +158,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	result = zbx_db_select(
 			"select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,smtp_port"
 				",smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions"
-				",maxattempts,attempt_interval,message_format,script,timeout"
+				",maxattempts,attempt_interval,message_format,script,timeout,name"
 			" from media_type"
 			" where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 
@@ -183,8 +183,8 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
-	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4], row[5],
-			row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[19], row[1], row[2], row[3], row[4],
+			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], message_format, row[17], row[18],
 			sendto, subject, message, params);
 

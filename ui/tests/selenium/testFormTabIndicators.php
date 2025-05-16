@@ -583,7 +583,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
-					'form' => 'id:widget-dialogue-form',
+					'form' => 'id:widget-form',
 					'widget_type' => 'Graph',
 					'close_dialog' => true,
 					'tabs' => [
@@ -646,7 +646,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
-					'form' => 'id:widget-dialogue-form',
+					'form' => 'id:widget-form',
 					'widget_type' => 'Pie chart',
 					'close_dialog' => true,
 					'tabs' => [
@@ -806,7 +806,12 @@ class testFormTabIndicators extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'close_dialog')) {
-			COverlayDialogElement::find()->one()->waitUntilReady()->close();
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$dialog->query('class:btn-overlay-close')->one()->click();
+			if (CTestArrayHelper::get($data, 'widget_type', false)) {
+				$this->page->acceptAlert();
+			}
+			$dialog->ensureNotPresent();
 		}
 	}
 

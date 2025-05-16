@@ -1499,7 +1499,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 				"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 					"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
 					"smtp_authentication,maxsessions,maxattempts,attempt_interval,"
-					"message_format,script,timeout"
+					"message_format,script,timeout,name"
 				" from media_type"
 				" where");
 
@@ -1533,6 +1533,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			ZBX_STR2UCHAR(mt.message_format, row[17]);
 			mt.script = zbx_strdup(NULL, row[18]);
 			mt.timeout = zbx_strdup(NULL, row[19]);
+			mt.name = zbx_strdup(NULL, row[20]);
 
 			for (; index < dsts.values_num; index++)
 			{

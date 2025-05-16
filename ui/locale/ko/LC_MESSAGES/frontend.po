@@ -1799,6 +1799,26 @@ msgstr "저자"
 msgid "Authorization"
 msgstr "권한 부여"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2202,6 +2222,10 @@ msgstr "CSV를 JSON으로"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "CUID가 예상됨"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3294,6 +3318,10 @@ msgstr "\"%3$s\"상의 아이템 \"%2$s\"에서 이용되고 있는 값의 매�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타입 \"%2$s\"에서 이용되고 있는 값 매핑 \"%1$s\"를 찾을 수 없습니다."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3657,6 +3685,10 @@ msgstr "호스트의 표시명은 일괄갱신할 수 없습니다."
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "URL을 열 수 없음"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4457,6 +4489,10 @@ msgstr "템플릿의 모순된 링크는 할 수 없습니다."
 msgid "Class %1$s not found for action %2$s."
 msgstr "%2$s 작업에 대한 %1$s 클래스를 찾을 수 없습니다."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4677,6 +4713,10 @@ msgstr "커뮤니티"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "컴팩트 뷰"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -4904,6 +4944,10 @@ msgstr "설정 새로 고침"
 msgid "Configuration updated"
 msgstr "설정을 갱신하였습니다"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -4913,6 +4957,12 @@ msgstr "DB접속 설정"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "JIT 프로비저닝 구성"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6714,6 +6764,10 @@ msgstr "설명"
 msgid "Description size"
 msgstr "설명 크기"
 
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr "설치된 패키지의 자세한 목록입니다. JSON 형식으로 텍스트를 반환함"
@@ -7096,6 +7150,10 @@ msgstr "디스커버리 오브젝트"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 클러스터 검색, \"url\" - VMware 서비스 URL. JSON을 반환함"
+
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -7516,6 +7574,10 @@ msgstr "트리 요소의 변경"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "위젯의 변경"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7952,6 +8014,10 @@ msgstr "테이블 \"%1$s\"의 검색 리퀘스트를 실패하였습니다."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "에러 메세지"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -11428,6 +11494,11 @@ msgstr "잘못된 LDAP 구성"
 msgid "Invalid MFA configuration"
 msgstr "잘못된 MFA 구성"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "SAML JIT 프로비저닝 미디어 타입 매핑 구성이 잘못되었습니다."
@@ -11902,6 +11973,10 @@ msgstr "아이템"
 #: items.php:667
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
+
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -13557,6 +13632,10 @@ msgstr "메소드를 찾을 수 없습니다."
 msgid "Methods"
 msgstr "방법"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "마이크로소프트 엣지"
@@ -14275,6 +14354,10 @@ msgstr "새 미디어 타입"
 msgid "New media type mapping"
 msgstr "새 미디어 타입 매핑"
 
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
 msgstr "새로운 작업"
@@ -14409,6 +14492,10 @@ msgstr "맵에 \"%1$s\"가 정의되어 있지 않습니다."
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "변경 사항 없음."
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15197,6 +15284,18 @@ msgstr "수치 (integer)"
 msgid "Numeric (unsigned)"
 msgstr "수치 (unsigned)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -15950,6 +16049,15 @@ msgstr "잘못된 데이터를 수신하였습니다"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "Pager"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17113,6 +17221,10 @@ msgstr "복구 시간"
 msgid "Rectangle"
 msgstr "직사각형"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "참조 속성"
@@ -17147,6 +17259,10 @@ msgstr "선택한 프록시의 구성을 새로고침하시겠습니까?"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "새로고침 간격"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18535,6 +18651,10 @@ msgstr "SLA 보고서를 표시하려면 SLA를 선택합니다."
 msgid "Select prototype"
 msgstr "프로토타입의 선택"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19336,6 +19456,10 @@ msgstr "소프트웨어의 아키텍쳐 정보. string을 리턴."
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
 msgstr "마지막으로 확인된 소프트웨어 업데이트"
+
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20274,6 +20398,10 @@ msgstr "템플릿 \"%1$s\"와 호스트\"%2$s\"의 링크를 삭제하였습니�
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "호스트 검색으로 연결된 템플릿은 연결을 해제할 수 없습니다."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20393,6 +20521,10 @@ msgstr "%1$s이(가) 더 이상 검색되지 않고 %2$s, %3$s입니다."
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "%1$s이(가) 더 이상 검색되지 않으며 %2$s입니다."
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URL 템플릿은 지리적 맵에 타일 레이어를 로드하고 표시하는 데 사용됩니다."
@@ -20409,6 +20541,14 @@ msgstr "가상 디스크에서 읽는 데 걸리는 평균 시간, \"url\" - VMw
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "가상 디스크에 쓰는 데 걸리는 평균 시간, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 가상 머신 전역 고유 식별자, \"instance\" - 디스크 장치 인스턴스"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -20841,6 +20981,14 @@ msgstr "오늘의 지금까지"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
+msgstr ""
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
@@ -21623,6 +21771,10 @@ msgstr "변경되지 않음"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "장애 인지를 취소."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -23398,6 +23550,10 @@ msgstr "위젯"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "대시보드 \"%1$s\" 의 #%2$d 페이지에 있는 X:%3$d, Y:%4$d 의 위젯이 범위를 벗어났습니다."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "위젯은 더 이상 사용되지 않습니다."
@@ -24385,6 +24541,14 @@ msgstr "bitxor() - 비트 배타적 OR"
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "blinking"
 msgstr "점멸"
+
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -26104,6 +26268,10 @@ msgstr "동일한 UUID를 가진 템플릿 그룹이 이미 존재함"
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
 msgstr "동일한 UUID를 가진 템플릿이 이미 존재함"
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831

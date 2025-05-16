@@ -418,7 +418,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 
 	private $SMTP_AUTHENTICATION = [
 		CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE,
-		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD
+		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD,
+		CXmlConstantValue::SMTP_AUTHENTICATION_OAUTH => CXmlConstantName::SMTP_AUTHENTICATION_OAUTH
 	];
 
 	private $SNMPV3_AUTHPROTOCOL = [
@@ -3171,7 +3172,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 									'value' =>					['type' => XML_STRING],
 									'operator' =>				['type' => XML_STRING]
 								]]
-							]]
+							]],
+							'zindex' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'shapes' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'shape', 'rules' => [
@@ -3280,6 +3282,11 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
 					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
+					'redirection_url' =>		['type' => XML_STRING],
+					'client_id' =>				['type' => XML_STRING],
+					'client_secret' =>			['type' => XML_STRING],
+					'authorization_url' =>		['type' => XML_STRING],
+					'token_url' =>				['type' => XML_STRING],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
 					'attempts' =>				['type' => XML_STRING, 'default' => '3'],

@@ -123,7 +123,7 @@ function makeSectionsHeader(array $host): CDiv {
 		}
 	}
 	else {
-		$host_status = (new CDiv('('._('Disabled').')'))->addClass(ZBX_STYLE_RED);
+		$host_status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_COLOR_NEGATIVE);
 	}
 
 	return (new CDiv([

@@ -349,16 +349,15 @@ class testDashboardClockWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('LayoutClock')->edit();
-		$form->fill(['Name' => '']);
-		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		$dashboard->getWidget('LayoutClock')->edit()->fill(['Name' => '']);
+		COverlayDialogElement::get('Edit widget')->waitUntilReady()->asForm()->submit();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$dashboard->waitUntilReady();
 		$this->assertTrue($dashboard->getWidget('Host for clock widget')->isValid());
 		$dashboard->getWidget('Host for clock widget')->edit()->fill(['Name' => 'LayoutClock']);
-		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		COverlayDialogElement::get('Edit widget')->waitUntilReady()->asForm()->submit();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');

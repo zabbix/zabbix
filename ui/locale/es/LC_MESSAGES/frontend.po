@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-06 14:51+0000\n"
+"PO-Revision-Date: 2025-05-02 18:01+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1824,6 +1824,26 @@ msgstr "Autor"
 msgid "Authorization"
 msgstr "Autorización"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2228,6 +2248,10 @@ msgstr "CSV a JSON"
 msgid "CUID is expected"
 msgstr "Se esperaba CUID"
 
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
+
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
 msgid "Calculated"
@@ -2551,8 +2575,8 @@ msgstr "No se puede copiar el prototipo del gráfico \"%1$s\", porque la métric
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] "No se pudo copiar el monitor"
-msgstr[1] "No se pudo copiar los monitores"
+msgstr[0] "No se pudo copiar la métrica"
+msgstr[1] "No se pudieron copiar las métricas"
 
 #: include/classes/api/services/CDiscoveryRule.php:3643
 #, c-format
@@ -3383,6 +3407,10 @@ msgstr "No se pudo encontrar el mapa de valores \"%1$s\" usado en el ítem \"%2$
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "No se pudo encontrar el mapa de valores \"%1$s\" usado en el prototipo de ítem \"%2$s\" de la regla de descubrimiento \"%3$s\" en \"%4$s\"."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3748,6 +3776,10 @@ msgstr "No se puede actualizar en masa los nombres visibles de los equipos."
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "No se puede abrir la URL"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4560,6 +4592,10 @@ msgstr "No se permite el enlace de plantillas circular."
 msgid "Class %1$s not found for action %2$s."
 msgstr "No se encontró la clase %1$s para la acción %2$s."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4781,6 +4817,10 @@ msgstr "Comunidad"
 msgid "Compact view"
 msgstr "Vista compacta"
 
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
+
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
 msgid "Component %1$s already registered."
@@ -4908,7 +4948,7 @@ msgstr "Configuración de prototipos de ítem"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr "Configuración de monitores"
+msgstr "Configuración de métricas"
 
 #: app/controllers/CControllerMacrosEdit.php:64
 msgid "Configuration of macros"
@@ -5007,6 +5047,10 @@ msgstr "Actualizar la configuración"
 msgid "Configuration updated"
 msgstr "Configuración actualizada"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -5016,6 +5060,12 @@ msgstr "Configurar la conexión de BD"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "Configurar el aprovisionamiento JIT"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6824,6 +6874,10 @@ msgstr "Descripción"
 msgid "Description size"
 msgstr "Tamaño de la descripción"
 
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr "Listado detallado de paquetes instalados. Devuelve texto en formato JSON"
@@ -7206,6 +7260,10 @@ msgstr "Objeto de descubrimiento"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de clústeres de VMware, \"url\": URL del servicio de VMware. Devuelve JSON"
+
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Detección de almacenes de datos de VMware, \"url\": URL del servicio de VMware, \"filter_uuid\": un UUID de hv o de vm (vacío por defecto). Devuelve JSON."
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -7628,6 +7686,10 @@ msgstr "Editar árbol de elementos"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Editar widget"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr "No se permite editar otros objetos en el modo de edición del tablero."
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8064,6 +8126,10 @@ msgstr "Error en la solicitud de búsqueda de la tabla \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Mensaje de error"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr "Texto de error"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -9092,7 +9158,7 @@ msgstr[1] "Gráficos eliminados"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "Edición de gráficos"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -9143,7 +9209,7 @@ msgstr[1] "Prototipos de gráfico eliminados"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "Edición de prototipos de gráficos"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11557,6 +11623,11 @@ msgstr "Configuración LDAP no válida"
 msgid "Invalid MFA configuration"
 msgstr "Configuración de MFA no válida"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Configuración de asignación de tipo de medio de aprovisionamiento SAML JIT no válida."
@@ -12032,6 +12103,10 @@ msgstr "Monitor"
 msgid "Item added"
 msgstr "Monitor añadido"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr "Tarjeta de metrica"
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "La métrica contiene macros definidas por el usuario con valores secretos. Los valores de estas macros deben ingresarse manualmente."
@@ -12235,7 +12310,7 @@ msgstr "La métrica con ID \"%1$s\" no está disponible."
 #: widgets/dataover/partials/table.top.php:31
 #: widgets/plaintext/includes/WidgetForm.php:45
 msgid "Items"
-msgstr "Monitores"
+msgstr "Métricas"
 
 #: include/views/monitoring.history.php:140
 msgid "Items list"
@@ -13704,6 +13779,10 @@ msgstr "Método no encontrado."
 msgid "Methods"
 msgstr "Métodos"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr "Métricas"
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14388,11 +14467,11 @@ msgstr "Nuevo tiempo de inactividad excluido"
 
 #: app/views/graph.edit.php:130
 msgid "New graph"
-msgstr ""
+msgstr "Nuevo gráfico"
 
 #: app/views/graph.prototype.edit.php:131
 msgid "New graph prototype"
-msgstr ""
+msgstr "Nuevo prototipo de gráfico"
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -14427,6 +14506,10 @@ msgstr "Nuevo tipo de medio"
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
 msgstr "Nuevo mapeo de tipos de medio"
+
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14563,6 +14646,10 @@ msgstr "No se proporcionó \"%1$s\" para el mapa."
 msgid "No changes."
 msgstr "Sin cambios."
 
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
+
 #: jsLoader.php:194
 msgid "No compatible widgets."
 msgstr "No hay widgets compatibles."
@@ -14688,7 +14775,7 @@ msgstr "Ninguna métrica seleccionada."
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
-msgstr "Sin monitores definidos."
+msgstr "Sin métricas definidas."
 
 #: app/partials/hostmacros.inherited.list.html.php:28
 #: app/partials/hostmacros.list.html.php:28
@@ -15350,6 +15437,18 @@ msgstr "Numérico (entero)"
 msgid "Numeric (unsigned)"
 msgstr "Numérico (entero de 64 bits)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -15530,7 +15629,7 @@ msgstr "Solo se puede configurar un grupo desactivado para usuarios dados de baj
 
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Sólo cuentan los monitores asignados a equipos habilitados"
+msgstr "Sólo cuentan las métricas asignadas a equipos habilitados"
 
 #: include/classes/api/services/CDRule.php:648
 msgid "Only one check can be unique."
@@ -15565,7 +15664,7 @@ msgstr "Solo los superadministradores pueden definir el propietario del informe.
 
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de monitores habilitados"
+msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de métricas habilitadas"
 
 #: jsLoader.php:439
 msgid "Open URL"
@@ -16104,6 +16203,15 @@ msgstr "La página recibió datos incorrectos"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "Buscapersonas"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17269,6 +17377,10 @@ msgstr "Hora de recuperación"
 msgid "Rectangle"
 msgstr "Rectángulo"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Atributo de referencia"
@@ -17303,6 +17415,10 @@ msgstr "¿Actualizar la configuración del proxy seleccionado?"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "Intervalo de refresco"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18699,6 +18815,10 @@ msgstr "Seleccione SLA para mostrar el informe SLA."
 msgid "Select prototype"
 msgstr "Seleccionar prototipo"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19502,6 +19622,10 @@ msgstr "Información de arquitectura de software. Devuelve una cadena"
 msgid "Software update last checked"
 msgstr "Actualización de software comprobada por última vez"
 
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
+
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr "Es posible que parte del historial de esta métrica esté comprimido; la eliminación no está disponible."
@@ -19674,7 +19798,7 @@ msgstr "Estadísticas y disponibilidad de búfer de memoria del proxy. Modo (mod
 
 #: include/classes/data/CItemData.php:2870
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "Estadísticas de valores recibidos por el gestor de preprocesamiento."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20442,6 +20566,10 @@ msgstr "Plantillas \"%1$s\" desvinculadas de los equipos \"%2$s\"."
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "Las plantillas vinculadas mediante descubrimiento de equipo no se pueden desvincular."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20561,6 +20689,10 @@ msgstr "El %1$s ya no se descubre más y %2$s, %3$s."
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "El %1$s ya no se descubre más y %2$s."
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "La plantilla de URL se utiliza para cargar y mostrar la capa de mosaicos en mapas geográficos."
@@ -20577,6 +20709,14 @@ msgstr "El tiempo promedio que tarda una lectura del disco virtual, \"url\": URL
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "El tiempo promedio que toma una escritura en el disco virtual, \"url\": URL del servicio de VMware, \"uuid\": identificador único global de la máquina virtual de VMware, \"instance\": instancia del dispositivo de disco"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21013,6 +21153,14 @@ msgstr "Hoy hasta ahora"
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "Editar token"
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21801,6 +21949,10 @@ msgstr "Sin cambios"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "Deshacer el reconocimiento del problema."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -23585,6 +23737,10 @@ msgstr "Widget"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "El widget en X:%3$d, Y:%4$d en la página #%2$d del tablero \"%1$s\" está fuera de los límites."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr "Se revertirá la configuración del widget."
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El widget está en desuso."
@@ -24572,6 +24728,14 @@ msgstr "bitxor() - O exclusivo bit a bit"
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "blinking"
 msgstr "parpadear"
+
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -26291,6 +26455,10 @@ msgstr "ya existe un grupo de plantillas con el mismo UUID"
 msgid "template with the same UUID already exists"
 msgstr "ya existe una plantilla con el mismo UUID"
 
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
 #: include/classes/api/services/CItemGeneral.php:1849
@@ -26696,7 +26864,7 @@ msgstr "el valor debe estar entre \"%1$s\" y \"%2$s\""
 #: app/controllers/CControllerGraphUpdate.php:228
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
-msgstr ""
+msgstr "El valor debe estar entre \"%1$s\" y \"%2$s\", y no tener más de \"%3$s\" dígitos después del punto decimal"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

@@ -122,6 +122,19 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 				}
 				break;
 			case ZBX_TOKEN_USER_FUNC_MACRO:
+				p.raw_value = 1;
+				/* user macros are not indexed */
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &p.token.data.func_macro, &p.index))
+						|| SUCCEED != zbx_token_find(*data, p.token.data.func_macro.macro.l,
+						&p.inner_token, p.token_search))
+				{
+					/* Ignore functions with macros not supporting them, but do not skip the */
+					/* whole token, nested macro should be resolved in this case. */
+					p.pos++;
+					ret = FAIL;
+				}
+				p.macro = m_ptr;
+				break;
 			case ZBX_TOKEN_FUNC_MACRO:
 				p.raw_value = 1;
 				p.indexed = zbx_is_indexed_macro(*data, &p.token);
