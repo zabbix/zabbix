@@ -826,8 +826,7 @@ function stepReadme(): CTemplateTag {
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
-				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+				->addClass(ZBX_STYLE_GRID_COLUMNS),
 
 			(new CSection())
 				->addItem(
@@ -836,7 +835,6 @@ function stepReadme(): CTemplateTag {
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
-				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
 	);
 }
