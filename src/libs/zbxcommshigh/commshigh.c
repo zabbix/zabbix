@@ -500,6 +500,14 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 		if (0 == addrs->values[i]->revision && 0 == strcmp(host, addrs->values[i]->ip) &&
 				port == addrs->values[i]->port)
 		{
+			if (0 != i)
+			{
+				/* move the redirected address to the begin of address list */
+				addr = addrs->values[i];
+				addrs->values[i] = addrs->values[0];
+				addrs->values[0] = addr;
+			}
+
 			*retry = ZBX_REDIRECT_RETRY;
 			return SUCCEED;
 		}
