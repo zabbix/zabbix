@@ -1360,7 +1360,7 @@ window.host_wizard_edit = new class {
 					return false;
 				}
 
-				if (Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
+				if (Number(this.#data.data_collection) === ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED
 						&& Number(this.#data.agent_mode) !== ZBX_TEMPLATE_AGENT_MODE_ANY
 						&& !template.agent_mode.includes(Number(this.#data.agent_mode))) {
 					return false;
