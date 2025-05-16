@@ -27,11 +27,8 @@
 #define ZBX_MACRO_TYPE_TRIGGER_URL		0x00000004
 #define ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define ZBX_MACRO_TYPE_TRIGGER_COMMENTS		0x00000020	/* description */
-#define ZBX_MACRO_TYPE_ITEM_KEY			0x00000040
 #define ZBX_MACRO_TYPE_ALERT_EMAIL		0x00000080
-#define ZBX_MACRO_TYPE_COMMON			0x00000100
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400
-#define ZBX_MACRO_TYPE_SNMP_OID			0x00000800
 #define ZBX_MACRO_TYPE_JMX_ENDPOINT		0x00008000
 #define ZBX_MACRO_TYPE_MESSAGE_UPDATE		0x00010000
 #define ZBX_MACRO_TYPE_EVENT_NAME		0x00400000	/* event name in trigger configuration */
@@ -143,14 +140,6 @@ double	zbx_evaluate_string_to_double(const char *in);
 int	zbx_evaluatable_for_notsupported(const char *fn);
 int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
 		const char *parameter, const zbx_timespec_t *ts, char **error);
-
-typedef int	(*zbx_macro_resolver_f)(char **text, const void *cb_data);
-
-int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, int macro_type, char *error,
-		size_t maxerrlen);
-int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item, int macro_type,
-		char *error, size_t maxerrlen);
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
