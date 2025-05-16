@@ -331,7 +331,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#initViewTemplates() {
-		const tmpl = (id) => (new Template(document.getElementById(id).innerHTML));
+		const tmpl = id => new Template(document.getElementById(id).innerHTML);
 
 		this.#view_templates = {
 			step_welcome: tmpl('host-wizard-step-welcome'),
@@ -581,7 +581,6 @@ window.host_wizard_edit = new class {
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
-
 		view.querySelector(`.${ZBX_STYLE_MARKDOWN}`).innerHTML = this.#template.readme;
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -866,8 +865,8 @@ window.host_wizard_edit = new class {
 				[CSRF_TOKEN_NAME]: this.#csrf_token
 			})
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -893,12 +892,14 @@ window.host_wizard_edit = new class {
 	}
 
 	#ajaxExceptionHandler(exception) {
-		let title, messages;
+		let title;
+		let messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
 			messages = exception.error.messages;
-		} else {
+		}
+		else {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
@@ -917,6 +918,7 @@ window.host_wizard_edit = new class {
 
 	#updateStepsQueue() {
 		const template_loaded = this.#template !== null;
+
 		this.#steps_queue = [];
 
 		if (Number(this.#data.do_not_show_welcome) !== 1) {
@@ -1049,6 +1051,7 @@ window.host_wizard_edit = new class {
 					});
 
 					const step_body = document.querySelector('.js-templates');
+
 					step_body.innerHTML = '';
 
 					for (const section of this.#makeCardListSections()) {
@@ -1084,10 +1087,12 @@ window.host_wizard_edit = new class {
 					switch (this.#data.monitoring_os) {
 						case 'linux':
 							return this.#view_templates.install_agent_readme_linux;
+
 						case 'windows':
 							return this.#data.monitoring_os_distribution === 'windows-new'
 								? this.#view_templates.install_agent_readme_windows_new
 								: this.#view_templates.install_agent_readme_windows_old;
+
 						default:
 							return this.#view_templates.install_agent_readme_other;
 					}
@@ -1251,11 +1256,13 @@ window.host_wizard_edit = new class {
 			case 'checkbox':
 				field.checked = field.value == value;
 				break;
+
 			case 'radio':
 				for (const radio of this.#dialogue.querySelectorAll(`[name="${name}"]`)) {
 					radio.checked = radio.value == value;
 				}
 				break;
+
 			default:
 				field.value = value;
 		}
@@ -1280,6 +1287,7 @@ window.host_wizard_edit = new class {
 
 	#generatePSK() {
 		const array = new Uint8Array(32);
+
 		window.crypto.getRandomValues(array);
 
 		return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
@@ -1356,8 +1364,12 @@ window.host_wizard_edit = new class {
 			}, new Map());
 
 		template_classes = new Map([...template_classes.entries()].sort((a, b) => {
-			if (a[0] === 'other') return 1;
-			if (b[0] === 'other') return -1;
+			if (a[0] === 'other') {
+				return 1;
+			}
+			if (b[0] === 'other') {
+				return -1;
+			}
 
 			return a[0].localeCompare(b[0]);
 		}));
@@ -1372,6 +1384,7 @@ window.host_wizard_edit = new class {
 				});
 
 				const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(category);
+
 				this.#sections_expanded.set(category, expanded);
 
 				if (!expanded && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
@@ -1412,7 +1425,6 @@ window.host_wizard_edit = new class {
 				}
 
 				const card_list = section.querySelector('.templates-card-list');
-
 				const selected_subclasses = this.#data.selected_subclasses[category] || [];
 
 				let templates_count = 0;
@@ -1456,7 +1468,6 @@ window.host_wizard_edit = new class {
 		});
 
 		const tags_list = card.querySelector(`.${ZBX_STYLE_TAGS_LIST}`);
-
 		const tag = ({tag, value}) => {
 			const tag_value = [tag, value].filter(val => val !== '').join(': ');
 
@@ -1481,6 +1492,7 @@ window.host_wizard_edit = new class {
 
 		for (let i = 0; i < template.tags.length; i++) {
 			const tag_element = tag(template.tags[i]);
+
 			temp_tag_list.appendChild(tag_element);
 
 			if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
@@ -1550,7 +1562,7 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#makeMacroFieldList({ macro, value }, { label, options }, row_index) {
+	#makeMacroFieldList({macro, value}, {label, options}, row_index) {
 		if (options.length > 5) {
 			const field_select = this.#view_templates.macro_field_select.evaluateToElement({
 				row_index,
