@@ -787,7 +787,9 @@ abstract class CControllerPopupItemTest extends CController {
 				'supported_macros' => array_diff_key($this->macros_by_item_props['key'],
 					['support_user_macros' => true, 'support_lld_macros' => true]
 				),
-				'support_lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+				'support_lldmacros' => in_array($this->test_type,
+					[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+				),
 				'texts_support_macros' => [$inputs['key']],
 				'texts_support_lld_macros' => [$inputs['key']],
 				'texts_support_user_macros' => [$inputs['key']],
@@ -813,7 +815,9 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function resolvePreprocessingStepMacros(array $steps) {
 		// Resolve macros used in parameter fields.
 		$macros_posted = $this->getInput('macros', []);
-		$macros_types = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE)
+		$macros_types = in_array($this->test_type,
+			[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+		)
 			? ['usermacros' => true, 'lldmacros' => true]
 			: ['usermacros' => true];
 
@@ -857,7 +861,9 @@ abstract class CControllerPopupItemTest extends CController {
 
 		$expression_parser = new CExpressionParser([
 			'usermacros' => true,
-			'lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+			'lldmacros' => in_array($this->test_type,
+				[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+			),
 			'calculated' => true,
 			'host_macro' => true,
 			'empty_host' => true
@@ -993,7 +999,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'macros_n' => []
 			];
 
-			if ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE) {
+			if (in_array($this->test_type, [self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE])) {
 				$types += ['lldmacros' => true];
 			}
 

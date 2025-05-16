@@ -58,7 +58,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
 			'status_codes'			=> 'string',
-			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]),
 			'time_change'			=> 'int32',
 			'timeout'				=> 'string',
 			'username'				=> 'string',
@@ -116,7 +116,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			if ($this->item_type == ITEM_TYPE_CALCULATED) {
 				$expression_parser = new CExpressionParser([
 					'usermacros' => true,
-					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'lldmacros' => in_array($this->getInput('test_type'),
+						[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+					),
 					'calculated' => true,
 					'host_macro' => true,
 					'empty_host' => true
@@ -130,7 +132,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 				else {
 					$expression_validator = new CExpressionValidator([
 						'usermacros' => true,
-						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'lldmacros' => in_array($this->getInput('test_type'),
+							[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+						),
 						'calculated' => true
 					]);
 

@@ -201,7 +201,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
-		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);
+		$support_lldmacros = in_array($this->test_type,
+			[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+		);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
 
 		// Collect item texts and macros to later check their usage.

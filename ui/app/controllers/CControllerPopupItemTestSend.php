@@ -95,7 +95,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
 			'status_codes'			=> 'string',
-			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]),
 			'time_change'			=> 'int32',
 			'timeout'				=> 'string',
 			'username'				=> 'string',
@@ -172,6 +172,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					case self::ZBX_TEST_TYPE_LLD:
 						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
 						break;
+
+					case self::ZBX_TEST_TYPE_LLD_PROTOTYPE:
+						$api_input_rules = CDiscoveryRulePrototype::getPreprocessingValidationRules();
+						break;
 				}
 
 				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
@@ -220,7 +224,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			if ($this->item_type == ITEM_TYPE_CALCULATED) {
 				$expression_parser = new CExpressionParser([
 					'usermacros' => true,
-					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'lldmacros' => in_array($this->getInput('test_type'),
+						[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+					),
 					'calculated' => true,
 					'host_macro' => true,
 					'empty_host' => true
@@ -234,7 +240,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				else {
 					$expression_validator = new CExpressionValidator([
 						'usermacros' => true,
-						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'lldmacros' => in_array($this->getInput('test_type'),
+							[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+						),
 						'calculated' => true
 					]);
 
