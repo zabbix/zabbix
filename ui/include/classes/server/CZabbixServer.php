@@ -57,6 +57,10 @@ class CZabbixServer {
 	 */
 	const READ_BYTES_LIMIT = 8192;
 
+	const ERROR_CODE_NONE = 0;
+	const ERROR_CODE_TLS = 1;
+	const ERROR_CODE_TCP = 2;
+
 	/**
 	 * Zabbix server host name.
 	 *
@@ -119,6 +123,7 @@ class CZabbixServer {
 	protected $debug = [];
 
 	protected array $tls_config;
+	protected int $error_code;
 
 	/**
 	 * @param string|null $host
@@ -134,6 +139,7 @@ class CZabbixServer {
 		$this->timeout = $timeout;
 		$this->total_bytes_limit = $total_bytes_limit;
 		$this->tls_config = ZBase::getConfig()['ZBX_SERVER_TLS'];
+		$this->error_code = self::ERROR_CODE_NONE;
 	}
 
 	/**
@@ -431,6 +437,10 @@ class CZabbixServer {
 		return $this->error;
 	}
 
+	public function getErrorCode(): int {
+		return $this->error_code;
+	}
+
 	/**
 	 * Returns the total result count.
 	 *
@@ -602,6 +612,7 @@ class CZabbixServer {
 
 		if (!is_resource($socket)) {
 			$this->error = $this->connectionErrorMessage($error_msg);
+			$this->error_code = self::ERROR_CODE_TCP;
 
 			return null;
 		}
@@ -615,24 +626,28 @@ class CZabbixServer {
 	protected function connectTLS() {
 		if (!extension_loaded('openssl')) {
 			$this->error = _('OpenSSL extension is not available.');
+			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
 
 		if (!self::checkTLSFile($this->tls_config['CA_FILE'])) {
 			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
 
 		if (!self::checkTLSFile($this->tls_config['KEY_FILE'])) {
 			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
 
 		if (!self::checkTLSFile($this->tls_config['CERT_FILE'])) {
 			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
@@ -655,9 +670,11 @@ class CZabbixServer {
 
 		if (!is_resource($socket)) {
 			$this->error = $this->connectionErrorMessage($error_msg);
+			$this->error_code = self::ERROR_CODE_TCP;
 
 			if ($this->connectTCP()) {
 				$this->error = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+				$this->error_code = self::ERROR_CODE_TLS;
 			}
 
 			return null;
@@ -665,6 +682,7 @@ class CZabbixServer {
 
 		if ($capture_peer_cert && !$this->validatePeerCertificate($socket)) {
 			$this->error = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
