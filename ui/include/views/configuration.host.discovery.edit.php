@@ -882,6 +882,10 @@ foreach ($data['conditions'] as $i => $condition) {
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $condition['formulaid']);
 
+	if ($data['discovered_lld']) {
+		$macro->setAttribute('data-discovered', 1);
+	}
+
 	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
 		->setValue($condition['operator'])
 		->addClass('js-operator')
