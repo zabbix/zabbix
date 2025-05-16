@@ -606,6 +606,7 @@ class CTemplate extends CHostGeneral {
 			'output' => ['uuid', 'templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version',
 				'wizard_ready', 'readme'
 			],
+			'selectMacros' => ['hostmacroid'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1208,6 +1209,7 @@ class CTemplate extends CHostGeneral {
 
 		$db_templates = $this->get([
 			'output' => ['templateid', 'host'],
+			'selectMacros' => ['hostmacroid'],
 			'templateids' => array_column($data['templates'], 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1295,6 +1297,7 @@ class CTemplate extends CHostGeneral {
 
 		$db_templates = $this->get([
 			'output' => ['templateid', 'host'],
+			'selectMacros' => ['hostmacroid'],
 			'templateids' => array_column($data['templates'], 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1376,6 +1379,7 @@ class CTemplate extends CHostGeneral {
 
 		$db_templates = $this->get([
 			'output' => ['templateid', 'host'],
+			'selectMacros' => ['hostmacroid'],
 			'templateids' => $data['templateids'],
 			'editable' => true,
 			'preservekeys' => true
