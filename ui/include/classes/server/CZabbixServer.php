@@ -154,7 +154,7 @@ class CZabbixServer {
 	 * @return bool|array
 	 */
 	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null,
-			$manualinput = null): bool|array {
+			$manualinput = null) {
 		$params = [
 			'request' => 'command',
 			'scriptid' => $scriptid,
@@ -187,9 +187,9 @@ class CZabbixServer {
 	 *        string $data['ns']      (optional) Nanoseconds when the value was received.
 	 * @param string $sid             User session ID or user API token.
 	 *
-	 * @return bool|array
+	 * @return array|bool
 	 */
-	public function pushHistory(array $data, string $sid): bool|array {
+	public function pushHistory(array $data, string $sid) {
 		return $this->request([
 			'request' => 'history.push',
 			'data' => $data,
@@ -207,9 +207,9 @@ class CZabbixServer {
 	 * @param array  $data['options']  (optional) Array of test parameters.
 	 * @param string $sid              User session ID.
 	 *
-	 * @return bool|array
+	 * @return array|bool
 	 */
-	public function testItem(array $data, string $sid): bool|array {
+	public function testItem(array $data, string $sid) {
 		return $this->request([
 			'request' => 'item.test',
 			'data' => $data,
@@ -231,7 +231,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function getQueue($type, $sid, $limit = 0): bool|array {
+	public function getQueue($type, $sid, $limit = 0) {
 		$request = [
 			'request' => 'queue.get',
 			'sid' => $sid,
@@ -258,7 +258,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function testMediaType(array $data, $sid): bool|array {
+	public function testMediaType(array $data, $sid) {
 		return $this->request([
 			'request' => 'alert.send',
 			'sid' => $sid,
@@ -286,7 +286,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function testReport(array $data, string $sid): bool|array {
+	public function testReport(array $data, string $sid) {
 		return $this->request([
 			'request' => 'report.test',
 			'sid' => $sid,
@@ -301,7 +301,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function getStatus($sid): bool|array {
+	public function getStatus($sid) {
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'full',
@@ -404,7 +404,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function expressionsEvaluate(array $data, string $sid): bool|array {
+	public function expressionsEvaluate(array $data, string $sid) {
 		$response = $this->request([
 			'request' => 'expressions.evaluate',
 			'sid' => $sid,
@@ -446,7 +446,7 @@ class CZabbixServer {
 	 *
 	 * @return int|null
 	 */
-	public function getTotalCount(): ?int {
+	public function getTotalCount() {
 		return $this->total;
 	}
 
@@ -455,7 +455,7 @@ class CZabbixServer {
 	 *
 	 * @return array
 	 */
-	public function getDebug(): array {
+	public function getDebug() {
 		return $this->debug;
 	}
 
@@ -466,7 +466,7 @@ class CZabbixServer {
 	 *
 	 * @return mixed    the output of the script if it has been executed successfully or false otherwise
 	 */
-	protected function request(array $params): mixed {
+	protected function request(array $params) {
 		// Reset object state.
 		$this->error = null;
 		$this->total = null;
