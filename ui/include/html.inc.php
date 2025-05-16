@@ -420,10 +420,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		// graphs
 		$graphs = new CSpan([
-			new CLink(_('Graphs'), (new CUrl('graphs.php'))
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$db_host['hostid']])
-				->setArgument('context', $context)
+			new CLink(_('Graphs'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['graphs'])
 		]);
@@ -535,7 +537,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// graph prototypes
 		$graph_prototypes = new CSpan([
 			new CLink(_('Graph prototypes'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -547,20 +550,18 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$content_menu->addItem($graph_prototypes);
 
 		// host prototypes
-		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$host_prototypes = new CSpan([
-				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
-						->setArgument('context', $context)
-				),
-				CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
-			]);
-			if ($current_element === 'hosts') {
-				$host_prototypes->addClass(ZBX_STYLE_SELECTED);
-			}
-			$content_menu->addItem($host_prototypes);
+		$host_prototypes = new CSpan([
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
+			CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
+		]);
+		if ($current_element === 'hosts') {
+			$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
+		$content_menu->addItem($host_prototypes);
 	}
 
 	$list->addItem($content_menu);

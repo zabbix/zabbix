@@ -2,7 +2,7 @@
 
 form.dashboard-widget-svggraph {
 	max-width: 1330px;
-	min-width: 1110px;
+	min-width: 1120px;
 	width: 100vw;
 
 	.svg-graph-preview,
@@ -12,7 +12,6 @@ form.dashboard-widget-svggraph {
 
 	.svg-graph-preview {
 		position: relative;
-		min-width: 1110px;
 		height: 300px;
 
 		> div {
@@ -299,6 +298,10 @@ form.dashboard-widget-svggraph {
 					min-height: 22px;
 					border-style: none;
 				}
+			}
+
+			.color-picker {
+				line-height: 22px;
 			}
 
 			&:not(:last-child) {

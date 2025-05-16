@@ -233,6 +233,7 @@ class testPageMaps extends CWebTest {
 		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
+			$this->assertTrue($filter->isExpanded($state));
 
 			// Refresh the page to make sure the filter state is still saved.
 			$this->page->refresh()->waitUntilReady();

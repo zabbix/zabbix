@@ -146,22 +146,17 @@ class CHostPrototype extends CHostBase {
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		// do not return host prototypes from discovered hosts
-		$sqlParts['from'][] = 'host_discovery hd';
-		$sqlParts['from'][] = 'items i';
-		$sqlParts['from'][] = 'hosts ph';
-		$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
-		$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
-		$sqlParts['where'][] = 'i.hostid=ph.hostid';
-		$sqlParts['where'][] = 'ph.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
-
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
 				$sql_parts['where'][] = '1=0';
 			}
 			else {
+				$sqlParts['from']['hd'] = 'host_discovery hd';
+				$sqlParts['from'][] = 'items i';
 				$sqlParts['from'][] = 'host_hgset hh';
 				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
+				$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
 				$sqlParts['where'][] = 'i.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
@@ -174,7 +169,9 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['where'][] = dbConditionInt('hd.parent_itemid', (array) $options['discoveryids']);
+			$sqlParts['from']['hd'] = 'host_discovery hd';
+			$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
+			$sqlParts['where'][] = dbConditionId('hd.parent_itemid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hd'] = 'hd.parent_itemid';
@@ -1265,7 +1262,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$result = DBselect(
-			'SELECT i.itemid,i.hostid,h.status,h.flags'.
+			'SELECT i.itemid,h.status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
 				' AND '.dbConditionId('i.itemid', $ruleids)
@@ -1274,17 +1271,6 @@ class CHostPrototype extends CHostBase {
 		$db_lld_rules = [];
 
 		while ($row = DBfetch($result)) {
-			if ($row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$parent_hosts = DB::select('hosts', [
-					'output' => ['host'],
-					'hostids' => $row['hostid']
-				]);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot create a host prototype on a discovered host "%1$s".', $parent_hosts[0]['host'])
-				);
-			}
-
 			$db_lld_rules[$row['itemid']] = ['host_status' => $row['status']];
 		}
 	}

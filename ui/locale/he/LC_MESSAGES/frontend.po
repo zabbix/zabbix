@@ -1824,6 +1824,26 @@ msgstr "מחבר"
 msgid "Authorization"
 msgstr "הרשאה"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2227,6 +2247,10 @@ msgstr "CSV ל־JSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "אמור להיות CUID"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3386,6 +3410,10 @@ msgstr "לא ניתן למצוא את מפת הערכים „%1$s” שמשמש�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את מפת הערכים „%1$s” שמשמשת את אבטיפוס הפריט „%2$s” של כלל הגילוי „%3$s” תחת „%4$s”."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3751,6 +3779,10 @@ msgstr "לא ניתן לעדכן כמותית את שמות התצוגה למא�
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "לא ניתן לפתוח כתובת"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4563,6 +4595,10 @@ msgstr "קישור תבניות מעגלי אסור."
 msgid "Class %1$s not found for action %2$s."
 msgstr "המחלקה %1$s לא נמצאה לפעולה %2$s."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4783,6 +4819,10 @@ msgstr "קהילה"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "תצוגה מצומצמת"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5010,6 +5050,10 @@ msgstr "רענון הגדרות"
 msgid "Configuration updated"
 msgstr "ההגדרות עודכנו"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -5019,6 +5063,12 @@ msgstr "הגדרת חיבור למסד הנתונים"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "הגדרת הקמת JIT"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -5390,6 +5440,14 @@ msgstr "יצירת ועריכת תחזוקה"
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
 msgstr "יצירת ועריכת מפות"
+
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr ""
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -6819,6 +6877,10 @@ msgstr "תיאור"
 msgid "Description size"
 msgstr "גודל תיאור"
 
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr "מציגה רישום של חבילות מותקנות. מחזירה טקסט בתבנית JSON"
@@ -7201,6 +7263,10 @@ msgstr "פריט גילוי"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "גילוי קלאסטרים של VMware,‏ „url” - כתובת שירות VMWare. מחזירה JSON"
+
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -7623,6 +7689,10 @@ msgstr "עריכת רכיב בעץ"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "עריכת וידג׳ט"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8059,6 +8129,10 @@ msgstr "שגיאה בבקשת החיפוש בטבלה „%1$s“."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "הודעת שגיאה"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr ""
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -9085,6 +9159,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "תרשים נמחק"
 msgstr[1] "תרשימים נמחקו"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9132,6 +9210,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "נמחק אבטיפוס תרשים"
 msgstr[1] "נמחק אבטיפוס תרשים"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -11546,6 +11628,11 @@ msgstr "הגדרות LDAP שגויות"
 msgid "Invalid MFA configuration"
 msgstr ""
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr ""
@@ -12020,6 +12107,10 @@ msgstr "פריט"
 #: items.php:667
 msgid "Item added"
 msgstr "נוסף פריט"
+
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -13696,6 +13787,10 @@ msgstr "השיטה לא נמצאה."
 msgid "Methods"
 msgstr "שיטות"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -14378,6 +14473,14 @@ msgstr "ערך חדש לתגית אירועים"
 msgid "New excluded downtime"
 msgstr "זמן השבתה חדש מוחרג"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "מארח חדש"
@@ -14400,6 +14503,10 @@ msgstr ""
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
+
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
 msgstr "סוג מדיה חדש"
@@ -14407,6 +14514,10 @@ msgstr "סוג מדיה חדש"
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
 msgstr "מיפוי סוגי מדיה חדש"
+
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14542,6 +14653,10 @@ msgstr "לא סופק „%1$s” עבור מפה."
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "אין שינויים."
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15330,6 +15445,18 @@ msgstr "ספרתי (שלם וחיובי)"
 msgid "Numeric (unsigned)"
 msgstr "מספרי (ללא סימן)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "יצרן"
@@ -16084,6 +16211,15 @@ msgstr "העמוד קיבל נתונים שגויים"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "נווט"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17249,6 +17385,10 @@ msgstr "מועד השחזור"
 msgid "Rectangle"
 msgstr "מרובע"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "מאפיין סימוכין"
@@ -17283,6 +17423,10 @@ msgstr "לרענן את הגדרות המתווך הנבחר?"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "תדירות רענון"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18679,6 +18823,10 @@ msgstr "נא לבחור SLA כדי להציג דוח SLA."
 msgid "Select prototype"
 msgstr "בחירת אבטיפוס"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19482,6 +19630,10 @@ msgstr "פרטי אריטקטורת תכנה. מחזירה מחרוזת"
 msgid "Software update last checked"
 msgstr ""
 
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
+
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr "ייתכן שחלק מההיסטוריה לפריט הזה דחוסה, מחיקה אינה זמינה."
@@ -19650,6 +19802,10 @@ msgstr "סטטיסטיקה וזמינות זיכרון מטמון הכתיבה �
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -20420,6 +20576,10 @@ msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "תבניות שמקושרות על ידי גילוי מארחים אינן ניתנות לניתוק."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20539,6 +20699,10 @@ msgstr ""
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr ""
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "תבנית הכתובת משמשת לטעינת והצגת שכבת האריחים במפות הגאוגרפיות."
@@ -20554,6 +20718,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -20990,6 +21162,14 @@ msgstr "היום עד כה"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
+msgstr ""
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
@@ -21782,6 +21962,10 @@ msgstr "ללא שינוי"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "ביטול הכרת בעיה."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -23567,6 +23751,10 @@ msgstr ""
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "הווידג׳ט בנקודה X:%3$d,‏ Y:%4$d בעמוד מס׳ %2$d של לוח המחוונים „%1$s” חורג מגבולות העמוד."
 
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
+
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "השימוש בווידג׳ט הופסק."
@@ -24554,6 +24742,14 @@ msgstr "bitxor()‎ - פעולת או מוציא (XOR) על סיביות"
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "blinking"
 msgstr "מהבהב"
+
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -25803,6 +25999,14 @@ msgstr "אין הרשאות להמיר תקלות גורם לתקלות תסמי
 msgid "no permissions to create and edit maps"
 msgstr "אין הרשאות ליצור ולערוך מפות"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "אין הרשאה להדחיק בעיות"
@@ -26265,6 +26469,10 @@ msgstr ""
 msgid "template with the same UUID already exists"
 msgstr ""
 
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
 #: include/classes/api/services/CItemGeneral.php:1849
@@ -26663,6 +26871,14 @@ msgstr[1] "הערך חייב להיות אחד מבין %1$s"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "הערך חייב להיות בין „%1$s” לבין „%2$s”"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

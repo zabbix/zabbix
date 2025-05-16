@@ -970,7 +970,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
 				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
-		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
+
+		if (0 == (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
@@ -2713,9 +2715,7 @@ static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
 	zbx_template_lld_macro_t	*ip1 = *(zbx_template_lld_macro_t * const *)d1;
 	zbx_template_lld_macro_t	*ip2 = *(zbx_template_lld_macro_t * const *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(ip1->lld_macro, ip2->lld_macro);
-
-	return 0;
+	return strcmp(ip1->lld_macro, ip2->lld_macro);
 }
 /******************************************************************************
  *                                                                            *

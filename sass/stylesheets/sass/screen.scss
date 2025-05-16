@@ -71,6 +71,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/tabs";
 @import "components/toc";
 @import "components/z-bar-gauge";
+@import "components/z-color-picker";
 @import "components/z-select";
 @import "components/z-sparkline";
 
@@ -85,6 +86,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-hostcard";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-itemcard";
 @import "components/dashboard/widget-itemhistory";
 @import "components/dashboard/widget-itemnavigator";
 @import "components/dashboard/widget-map";
@@ -3850,18 +3852,28 @@ svg {
 	}
 }
 
-// Table column styles
-#itemsTable {
-	.table-col-handle { width: 12px; }
-	.table-col-no { width: 20px; }
-	.table-col-name-normal { width: 285px; }
-	.table-col-name { width: 365px; }
-	.table-col-type { width: 85px; }
-	.table-col-function { width: 85px; }
-	.table-col-draw-style { width: 85px; }
-	.table-col-y-axis-side { width: 85px; }
-	.table-col-color { width: 55px; }
-	.table-col-action { width: 55px; }
+#graph-tab {
+	// Table column styles
+	#items-table {
+		.table-col-handle { width: 12px; }
+		.table-col-no { width: 20px; }
+		.table-col-name-normal { width: 285px; }
+		.table-col-name { width: 365px; }
+		.table-col-type { width: 85px; }
+		.table-col-function { width: 85px; }
+		.table-col-draw-style { width: 85px; }
+		.table-col-y-axis-side { width: 85px; }
+		.table-col-color { width: 55px; }
+		.table-col-action { width: 55px; }
+	}
+
+	.yaxis-select {
+		margin-right: 3px;
+	}
+
+	.graph-items {
+		max-width: 750px;
+	}
 }
 
 .z-select,
