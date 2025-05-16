@@ -230,13 +230,8 @@ function stepSelectTemplate($old_template_count): array {
 							new CSpan(_('Show more'))
 						))
 							->addClass(ZBX_ICON_CHEVRON_DOWN)
-							->addClass('js-template-info-expand'),
-						(new CButtonLink(
-							new CSpan(_('Show less'))
-						))
-							->addClass(ZBX_ICON_CHEVRON_UP)
-							->addClass('js-template-info-collapse')
-					]))->addClass('template-info-toggles')
+							->addClass('js-template-info-toggle')
+					]))->addClass('template-info-toggle-container')
 				)
 				->addClass(CRadioCardList::ZBX_STYLE_CLASS_CARD)
 		),

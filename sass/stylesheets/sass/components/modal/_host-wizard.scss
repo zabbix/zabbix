@@ -378,6 +378,7 @@
 		.radio-card {
 			grid-template-rows: repeat(2, max-content) 1fr;
 			gap: 16px;
+			max-height: 360px;
 		}
 
 		.radio-card-label {
@@ -413,16 +414,43 @@
 			}
 		}
 
-		.template-info-toggles {
+		.template-info {
+			@extend %webkit-scrollbar;
+
+			overflow-x: hidden;
+			overflow-y: auto;
+			line-height: 1.5;
+		}
+
+		.template-info-item {
+			.title {
+				color: $font-alt-color;
+			}
+
+			.content {
+				white-space: pre-line;
+				word-break: break-word;
+				overflow-wrap: anywhere;
+				hyphens: auto;
+			}
+
+			&:not(:first-child) {
+				margin-top: 1.5em;
+			}
+		}
+
+		.template-info-toggle-container {
 			align-self: end;
 
 			.btn-link {
 				float: right;
 				color: $font-color;
+
+				span {
+					pointer-events: none;
+				}
 			}
 		}
-
-		.template-info-toggles {}
 
 		.no-data-message {
 			padding-top: 32px;

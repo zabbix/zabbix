@@ -4,6 +4,7 @@
 
 	.radio-card {
 		display: grid;
+		box-sizing: border-box;
 		padding: 16px;
 		border: 1px solid $form-border-color;
 		border-radius: 2px;
