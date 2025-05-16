@@ -139,7 +139,7 @@ class CSystemInfoHelper {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$status['is_running'] = $server->isRunning();
+		$status['is_running'] = $server->isRunning() && $server->canConnect(CSessionHelper::getId());
 
 		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			return $status;

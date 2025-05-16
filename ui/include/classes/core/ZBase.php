@@ -386,8 +386,7 @@ class ZBase {
 		};
 	}
 
-	public static function getConfig(): array
-	{
+	public static function getConfig(): array {
 		return self::$instance->config;
 	}
 
