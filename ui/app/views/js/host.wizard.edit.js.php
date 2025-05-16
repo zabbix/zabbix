@@ -1063,7 +1063,7 @@ window.host_wizard_edit = new class {
 					|| path.startsWith('selected_subclasses')
 				) {
 					this.#dialogue.querySelectorAll('[name="agent_mode"]').forEach(input => {
-						input.disabled = Number(this.#data.data_collection) === ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS
+						input.disabled = Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED
 					});
 
 					const step_body = document.querySelector('.js-templates');
