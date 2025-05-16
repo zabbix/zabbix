@@ -1502,23 +1502,20 @@ window.host_wizard_edit = new class {
 
 				section.addEventListener('expand', () => {
 					this.#sections_expanded.set(category, true);
-
-					setTimeout(() => {
-						for (const card of section.querySelectorAll('.<?= CRadioCardList::ZBX_STYLE_CLASS_CARD ?>')) {
-							const {height} = card.getBoundingClientRect();
-
-							card.style.maxHeight = `${height}px`;
-						}
-					});
+					this.#updateCardsHeight(section);
 				});
 				section.addEventListener('collapse', () => {
+					this.#data.show_info_by_templateid = null;
 					this.#sections_expanded.set(category, false);
-					for (const card of section.querySelectorAll('.<?= CRadioCardList::ZBX_STYLE_CLASS_CARD ?>')) {
-						card.style.maxHeight = '';
-					}
 				});
 
 				sections.push(section);
+
+				setTimeout(() => {
+					if (this.#sections_expanded.get(category)) {
+						this.#updateCardsHeight(section);
+					}
+				});
 			}
 		}
 		else {
@@ -1526,6 +1523,14 @@ window.host_wizard_edit = new class {
 		}
 
 		return sections;
+	}
+
+	#updateCardsHeight(section) {
+		for (const card of section.querySelectorAll('.<?= CRadioCardList::ZBX_STYLE_CLASS_CARD ?>')) {
+			const {height} = card.getBoundingClientRect();
+
+			card.style.maxHeight = `${height}px`;
+		}
 	}
 
 	#makeCard(category, template, checked) {
