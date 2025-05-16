@@ -210,17 +210,23 @@ class CDashboard {
 	}
 
 	isReferred(type = null) {
-		const require = {
-			context: 'dashboard',
-			event_type: 'broadcast',
-			reference: CDashboard.REFERENCE_DASHBOARD
-		};
+		for (const dashboard_page of this._dashboard_pages.keys()) {
+			for (const widget of dashboard_page.getWidgets()) {
+				for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget.getFields()).values()) {
+					if (accessor.getTypedReference() === '') {
+						continue;
+					}
 
-		if (type !== null) {
-			require.type = type;
+					const {reference, type: _type} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+					if (reference === CDashboard.REFERENCE_DASHBOARD && (_type === type || type === null)) {
+						return true;
+					}
+				}
+			}
 		}
 
-		return ZABBIX.EventHub.hasSubscribers(require);
+		return false;
 	}
 
 	isEditMode() {
