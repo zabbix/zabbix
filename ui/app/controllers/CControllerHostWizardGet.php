@@ -129,13 +129,7 @@ class CControllerHostWizardGet extends CController {
 			$template['readme'] = $parsedown->text($template['readme']);
 		}
 
-		foreach ($template['macros'] as $m => $tmpl_macro) {
-			// Skip macros that do no have config set up.
-			if ($tmpl_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
-				unset($template['macros'][$m]);
-			}
-		}
-		$template['macros'] = array_values($template['macros']);
+		$template['macros'] = $this->prepareTemplateMacros($template['macros']);
 
 		$agent_interface_types = [ITEM_TYPE_ZABBIX];
 		$snmp_interface_types = [ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP];
@@ -193,5 +187,34 @@ class CControllerHostWizardGet extends CController {
 
 		$response = new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]);
 		$this->setResponse($response);
+	}
+
+	private function prepareTemplateMacros(array $macros): array {
+		foreach ($macros as $m => $macro) {
+			// Skip macros that do no have config set up.
+			if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+				unset($macros[$m]);
+			}
+		}
+
+		usort($macros, static function (array $macro_a, array $macro_b): int {
+			$priority_a = (int) $macro_a['config']['priority'];
+			$priority_b = (int) $macro_b['config']['priority'];
+
+			if ($priority_a == 0 && $priority_b != 0) {
+				return 1;
+			}
+			if ($priority_a != 0 && $priority_b == 0) {
+				return -1;
+			}
+
+			if ($priority_a != $priority_b) {
+				return $priority_a - $priority_b;
+			}
+
+			return 0;
+		});
+
+		return array_values($macros);
 	}
 }
