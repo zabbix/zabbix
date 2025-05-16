@@ -221,13 +221,13 @@ window.host_wizard_edit = new class {
 		},
 		[this.STEP_INSTALL_AGENT]: {
 			tls_psk: {
-				required: true,
+				required: () => this.#data.tls_required,
 				minlength: 32,
 				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk') ?>,
 				regex: /^([a-fA-F0-9]{2})+$/
 			},
 			tls_psk_identity: {
-				required: true,
+				required: () => this.#data.tls_required,
 				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>
 			}
 		},
@@ -747,19 +747,19 @@ window.host_wizard_edit = new class {
 					}
 				}
 
-				this.#data.tls_required = response.agent_interface_required
-					&& (this.#host === null
-						|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
-
-				this.#data.tls_psk_identity = '';
-				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
-
 				this.#data.interface_required = [
 					response.agent_interface_required && this.INTERFACE_TYPE_AGENT,
 					response.ipmi_interface_required && this.INTERFACE_TYPE_IPMI,
 					response.jmx_interface_required && this.INTERFACE_TYPE_JMX,
 					response.snmp_interface_required && this.INTERFACE_TYPE_SNMP
 				].filter(Boolean);
+
+				this.#data.tls_required = this.#isRequiredInstallAgent()
+					&& (this.#host === null
+						|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
+
+				this.#data.tls_psk_identity = '';
+				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
 				this.#data.interfaces = [];
 				this.#validation_rules[this.STEP_ADD_HOST_INTERFACE] = {};
