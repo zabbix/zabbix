@@ -788,7 +788,7 @@ window.host_wizard_edit = new class {
 							type: 'number',
 							required: true,
 							min: 1,
-							max: 65536
+							max: 65535
 						},
 						...(interface_type === this.INTERFACE_TYPE_SNMP && {
 							[`interfaces.${row_index}.details.community`]: {
