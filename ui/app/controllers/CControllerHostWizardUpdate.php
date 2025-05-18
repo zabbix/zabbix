@@ -82,10 +82,13 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		if (!$this->validateMacrosByConfig()) {
-			$result = false;
-		}
-		else {
+		try {
+			DBstart();
+
+			if (!$this->validateMacrosByConfig()) {
+				throw new Exception();
+			}
+
 			$host = [
 				'hostid' => $this->getInput('hostid'),
 				'templates' => $this->processTemplates([array_keys(
@@ -98,9 +101,9 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			$this->getInputs($host, ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password']);
 
 			if ($this->hasInput('groups')) {
-				$host['groups'] = $this->processHostGroups(array_unique(array_merge(
-					$this->getInput('groups', []), array_column($this->db_host['hostgroups'], 'groupid')
-				)));
+				$host['groups'] = $this->processHostGroups(
+					$this->prepareGroups($this->getInput('groups'), $this->db_host['hostgroups'])
+				);
 			}
 
 			if ($this->hasInput('interfaces')) {
@@ -121,6 +124,16 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			}
 
 			$result = API::Host()->update($host);
+
+			if ($result === false) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			$result = false;
+			DBend(false);
 		}
 
 		$output = [];
@@ -142,6 +155,15 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
+	}
+
+	private function prepareGroups(array $groups, array $db_groups): array {
+		$existing_groups = array_filter($groups, 'is_string');
+		$new_groups = array_filter($groups, 'is_array');
+
+		$result = array_unique(array_merge($existing_groups, array_column($db_groups, 'groupid')));
+
+		return array_merge($result, $new_groups);
 	}
 
 	private function prepareInterfaces(array $interfaces, array $host): array {

@@ -210,13 +210,19 @@ window.host_wizard_edit = new class {
 				required: true,
 				fields: {
 					id: {
-						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/
+						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/,
+						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>
 					}
 				}
 			},
 			groups: {
 				type: 'array',
-				required: () => this.#data.host?.isNew
+				required: () => this.#data.host?.isNew,
+				fields: {
+					id: {
+						maxlength: <?= DB::getFieldLength('hstgrp', 'name') ?>
+					}
+				}
 			}
 		},
 		[this.STEP_INSTALL_AGENT]: {
@@ -1836,6 +1842,20 @@ window.host_wizard_edit = new class {
 
 					if (error !== null) {
 						return error
+					}
+				}
+
+				return null;
+			}
+
+			if (rule.type === 'array' && rule.fields !== undefined) {
+				for (const array_value of value) {
+					for (const name in rule.fields) {
+						const error = validate(rule.fields[name], array_value[name]);
+
+						if (error !== null) {
+							return error
+						}
 					}
 				}
 

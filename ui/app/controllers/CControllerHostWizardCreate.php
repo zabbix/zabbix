@@ -64,10 +64,13 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		if (!$this->validateMacrosByConfig()) {
-			$result = false;
-		}
-		else {
+		try {
+			DBstart();
+
+			if (!$this->validateMacrosByConfig()) {
+				throw new Exception();
+			}
+
 			// Validate and update interfaces.
 			$address_parser = new CAddressParser(['usermacros' => true, 'lldmacros' => true, 'macros' => true]);
 			$interfaces = $this->getInput('interfaces', []);
@@ -114,6 +117,16 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 			}
 
 			$result = API::Host()->create($host);
+
+			if ($result === false) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			$result = false;
+			DBend(false);
 		}
 
 		$output = [];
