@@ -117,6 +117,7 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 			}
 
 			$result = API::Host()->create($host);
+			$hostid = $result ? $result['hostids'][0] : null;
 
 			if ($result === false) {
 				throw new Exception();
@@ -132,7 +133,7 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 		$output = [];
 
 		if ($result) {
-			$output['hostid'] = $result['hostids'][0];
+			$output['hostid'] = $hostid;
 
 			$success = ['title' => _('Host added successfully')];
 
