@@ -864,17 +864,21 @@ window.host_wizard_edit = new class {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				[this.#data.host.isNew ? 'host' : 'hostid']: this.#data.host.id,
-				groups: this.#data.groups.map(ms_group => (ms_group.isNew ? {new: ms_group.id} : ms_group.id)),
+				...(this.#data.groups.length && {
+					groups: this.#data.groups.map(ms_group => (ms_group.isNew ? {new: ms_group.id} : ms_group.id))
+				}),
 				templateid: this.#template.templateid,
 				...(this.#data.tls_required && {
 					tls_psk: this.#data.tls_psk,
 					tls_psk_identity: this.#data.tls_psk_identity
 				}),
-				interfaces: Object.values(this.#data.interfaces),
-				ipmi_authtype: this.#data.ipmi_authtype,
-				ipmi_privilege: this.#data.ipmi_privilege,
-				ipmi_username: this.#data.ipmi_username,
-				ipmi_password: this.#data.ipmi_password,
+				...(this.#isRequiredAddHostInterface() && {
+					interfaces: Object.values(this.#data.interfaces),
+					ipmi_authtype: this.#data.ipmi_authtype,
+					ipmi_privilege: this.#data.ipmi_privilege,
+					ipmi_username: this.#data.ipmi_username,
+					ipmi_password: this.#data.ipmi_password
+				}),
 				macros: Object.values(this.#data.macros),
 
 				[CSRF_TOKEN_NAME]: this.#csrf_token

@@ -66,7 +66,7 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			'output' => ['ipmi_authtype','ipmi_privilege', 'ipmi_username', 'ipmi_password'],
 			'selectHostGroups' => ['groupid'],
 			'selectInterfaces' => ['interfaceid', 'type', 'main', 'ip', 'dns', 'port', 'useip', 'details'],
-			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
+			'selectMacros' => ['hostmacroid', 'macro'],
 			'selectParentTemplates' => ['templateid'],
 			'hostids' => $this->getInput('hostid'),
 			'editable' => true
@@ -86,23 +86,30 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			$result = false;
 		}
 		else {
-			// Validate and update interfaces.
-			$interfaces = $this->prepareInterfaces($this->getInput('interfaces', []), $this->db_host);
-
 			$host = [
 				'hostid' => $this->getInput('hostid'),
-				'groups' => $this->processHostGroups(array_unique(
-					array_merge($this->getInput('groups', []), array_column($this->db_host['hostgroups'], 'groupid'))
-				)),
 				'templates' => $this->processTemplates([array_keys(
 					array_column($this->db_host['parentTemplates'], 'templateid', 'templateid')
 					+ [$this->getInput('templateid') => true]
 				)]),
-				'interfaces' => array_merge($this->db_host['interfaces'], $this->processHostInterfaces($interfaces)),
 				'macros' => $this->prepareMacros($this->getInput('macros', []), $this->db_host['macros'])
 			];
 
 			$this->getInputs($host, ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password']);
+
+			if ($this->hasInput('groups')) {
+				$host['groups'] = $this->processHostGroups(array_unique(array_merge(
+					$this->getInput('groups', []), array_column($this->db_host['hostgroups'], 'groupid')
+				)));
+			}
+
+			if ($this->hasInput('interfaces')) {
+				$interfaces = $this->prepareInterfaces($this->getInput('interfaces'), $this->db_host);
+
+				$host['interfaces'] = array_merge(
+					$this->db_host['interfaces'], $this->processHostInterfaces($interfaces)
+				);
+			}
 
 			if ($this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk')) {
 				$host += [
@@ -205,12 +212,17 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 		$result = [];
 
 		foreach ($host_macros as $host_macro) {
-			$result[$host_macro['macro']] = $host_macro;
+			$result[$host_macro['macro']] = ['hostmacroid' => $host_macro['hostmacroid']];
 		}
 
 		foreach ($macros as $macro) {
-			$result[$macro['macro']] = array_key_exists($macro['macro'], $result)
-				? $macro + ['hostmacroid' => $result[$macro['macro']]['hostmacroid']]
+			$host_macro = array_key_exists($macro['macro'], $result) ? $result[$macro['macro']] : null;
+
+			$result[$macro['macro']] = $host_macro != null
+				? $macro + [
+					'hostmacroid' => $host_macro['hostmacroid'],
+					'automatic' => ZBX_USERMACRO_MANUAL
+				]
 				: $macro;
 		}
 
