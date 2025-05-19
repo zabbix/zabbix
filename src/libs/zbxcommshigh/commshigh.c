@@ -508,7 +508,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 				addrs->values[0] = addr;
 			}
 
-			*retry = ZBX_REDIRECT_RETRY;
+			*retry = ZBX_REDIRECT_RETRY_NO_FAILOVER;
 			return SUCCEED;
 		}
 	}
@@ -636,11 +636,14 @@ retry:
 
 	if (SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry))
 	{
-		if (0 == retries && ZBX_REDIRECT_RETRY == retry)
+		if ((0 == retries && ZBX_REDIRECT_RETRY == retry) || ZBX_REDIRECT_RETRY_NO_FAILOVER == retry)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu", __func__,
 					addrs->values[0]->ip, addrs->values[0]->port);
-			retries++;
+
+			if (ZBX_REDIRECT_RETRY == retry)
+				retries++;
+
 			zbx_tcp_close(&sock);
 
 			goto retry;

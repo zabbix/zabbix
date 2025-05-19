@@ -467,6 +467,7 @@ unsigned int	zbx_tls_get_psk_usage(void);
 #define ZBX_REDIRECT_NONE		0
 #define ZBX_REDIRECT_RESET		1
 #define ZBX_REDIRECT_RETRY		2
+#define ZBX_REDIRECT_RETRY_NO_FAILOVER	3
 
 typedef struct
 {
