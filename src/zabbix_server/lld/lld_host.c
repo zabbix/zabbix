@@ -6567,7 +6567,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		lld_hosts_save(parent_hostid, &hosts, host_proto, monitored_by, proxyid, proxy_groupid, ipmi_authtype,
 				ipmi_privilege, ipmi_username, ipmi_password, tls_connect, tls_accept, tls_issuer,
 				tls_subject, tls_psk_identity, tls_psk, &hgsets, &permissions, &del_hostgroupids,
-				&del_hgsetids, dflags, rule_index);
+				&del_hgsetids, dflags | ZBX_FLAG_DISCOVERY_CREATED, rule_index);
 
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
 

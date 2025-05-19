@@ -1615,7 +1615,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
-				percent_right, ymin_type, ymax_type, dflags);
+				percent_right, ymin_type, ymax_type, dflags | ZBX_FLAG_DISCOVERY_CREATED);
 
 		lld_process_lost_graphs(&graphs, lifetime, lastcheck);
 
