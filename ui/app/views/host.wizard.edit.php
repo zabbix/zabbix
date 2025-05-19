@@ -937,7 +937,7 @@ function stepComplete(): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Configuration complete')),
-						new CTag('p', true, _s('Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s).', '#{host_name}'))
+						new CTag('p', true, '#{complete_message}')
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)

@@ -691,7 +691,9 @@ window.host_wizard_edit = new class {
 
 	#renderComplete() {
 		const view = this.#view_templates.step_complete.evaluateToElement({
-			host_name: this.#data.host.name
+			complete_message: this.#data.host.isNew
+				? sprintf(<?= json_encode(_('Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s).')) ?>, this.#data.host.name)
+				: <?= json_encode(_('Click Finish to close the Host wizard.')) ?>
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
