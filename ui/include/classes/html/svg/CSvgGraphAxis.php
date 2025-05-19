@@ -26,15 +26,6 @@ class CSvgGraphAxis extends CSvgGroup {
 	private const ZBX_STYLE_GRAPH_AXIS_BOTTOM = 'svg-graph-axis-bottom';
 
 	/**
-	 * Axis triangle icon size.
-	 *
-	 * @var int
-	 */
-	private const ZBX_ARROW_SIZE = 5;
-
-	private const ZBX_ARROW_OFFSET = 5;
-
-	/**
 	 * Array of labels. Key is coordinate, value is text label.
 	 *
 	 * @var array
@@ -119,41 +110,24 @@ class CSvgGraphAxis extends CSvgGroup {
 	}
 
 	private function getAxis(): array {
-		$offset = ceil(self::ZBX_ARROW_SIZE / 2);
-
 		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
-			$x = $this->x + $this->width + self::ZBX_ARROW_OFFSET;
-			$y = $this->y;
-
-			return [
-				// Draw axis line.
-				(new CSvgPath())
-					->setAttribute('shape-rendering', 'crispEdges')
-					->moveTo($this->x, $y)
-					->lineTo($x, $y),
-				// Draw arrow.
-				(new CSvgPath())
-					->moveTo($x + self::ZBX_ARROW_SIZE, $y)
-					->lineTo($x, $y - $offset)
-					->lineTo($x, $y + $offset)
-					->closePath()
-			];
+			$x_from = $this->x;
+			$y_from = $this->y;
+			$x_to = $x_from + $this->width;
+			$y_to = $y_from;
+		}
+		else {
+			$x_from = $this->type == GRAPH_YAXIS_SIDE_RIGHT ? $this->x : $this->x + $this->width;
+			$y_from = $this->y;
+			$x_to = $x_from;
+			$y_to = $y_from + $this->height;
 		}
 
-		$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
-		$y = $this->y - self::ZBX_ARROW_OFFSET;
-
 		return [
-			// Draw axis line.
 			(new CSvgPath())
 				->setAttribute('shape-rendering', 'crispEdges')
-				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET),
-			// Draw arrow.
-			(new CSvgPath())
-				->moveTo($x, $y - self::ZBX_ARROW_SIZE)
-				->lineTo($x - $offset, $y)
-				->lineTo($x + $offset, $y)
+				->moveTo($x_from, $y_from)
+				->lineTo($x_to, $y_to)
 				->closePath()
 		];
 	}

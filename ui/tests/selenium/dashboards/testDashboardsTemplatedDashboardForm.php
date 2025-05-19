@@ -43,6 +43,16 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	protected static $previous_widget_name = 'Widget for update';
 
 	/**
+	 * Callback executed before every test case. Automatically accept the alert.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		parent::onBeforeTestCase();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
+	}
+
+	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -2667,6 +2677,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill($fields);
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::WIDGET_SQL));
@@ -4409,7 +4420,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @return array
 	 */
 	protected function fillWidgetConfigurationFrom($data, $update = false) {
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->waitUntilReady(30)->one();
 		$form = $dialog->asForm();
 		$form->fill($data['fields']);
 
@@ -4500,9 +4511,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$this->query('button:Apply')->one()->click();
 		CDashboardElement::find()->one()->waitUntilReady();
 
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',)->one()]
+		);
+
 		$skip_selectors = [
 			'class:clock',
-			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
 			'xpath://footer',
 			// Cover Geomap widget, because it's screenshots are not stable.
@@ -4557,7 +4572,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host card',
-				'Host navigator', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
+				'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
 				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
 				'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 			];
@@ -4585,7 +4600,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	}
 
 	/**
-	 * Function that closes an overlay dialog and alert on a template dashboard before proceeding to the next test.
+	 * Function that closes an overlay dialog and cancel the template dashboard before proceeding to the next test.
 	 */
 	protected function closeDialogue() {
 		$overlay = COverlayDialogElement::find()->one(false);
@@ -4593,10 +4608,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$overlay->close();
 		}
 		$this->query('link:Cancel')->one()->forceClick();
-
-		if ($this->page->isAlertPresent()) {
-			$this->page->acceptAlert();
-		}
 	}
 
 	/**
@@ -4612,6 +4623,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
+				COverlayDialogElement::ensureNotPresent();
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {

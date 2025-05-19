@@ -950,6 +950,25 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'link_thresholds.validate':
+		$result = [];
+
+		if (array_key_exists('thresholds', $data)) {
+			$validation_rules = ['type' => API_OBJECTS, 'fields' => [
+				'threshold' => ['type' => API_NUMERIC]
+			]];
+
+			CApiInputValidator::validate($validation_rules, $data['thresholds'], 'thresholds', $error);
+
+			if ($error !== '') {
+				$result = [
+					'error' => $error
+				];
+			}
+		}
+
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }

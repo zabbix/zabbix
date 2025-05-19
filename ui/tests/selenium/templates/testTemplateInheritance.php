@@ -266,7 +266,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClick('add_item');
 		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
-		$this->zbxTestClickWait('add');
+
+		COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
+
 		$this->assertMessage(TEST_GOOD,'Graph added');
 
 		// check that the inherited graph matches the original
@@ -494,7 +496,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_protoitem');
+		$this->zbxTestClick('add_item_prototype');
 		$this->zbxTestLaunchOverlayDialog('Item prototypes');
 		$this->zbxTestClickLinkText('itemDiscovery');
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
@@ -504,7 +506,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
-		$this->zbxTestClickWait('add');
+		COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
+
 		$this->assertMessage(TEST_GOOD,'Graph prototype added');
 		$this->zbxTestTextPresent('Test LLD graph');
 

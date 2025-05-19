@@ -355,26 +355,21 @@ class testUrlParameters extends CLegacyWebTest {
 					]
 				]
 			],
-			// TODO: uncomment after ZBX-25928 fix.
-//			[
-//				'title' => 'Fatal error, please report to the Zabbix team',
-//				'check_server_name' => true,
-//				'server_name_on_page' => false,
-//				'test_cases' => [
-//					[
-//						'url' => self::POPUP.'item.edit&context=host&itemid=46050',
-//						'text_not_present' => 'Item',
-//						'fatal_error' => true,
-//						'text_present' => [
-//							'Incorrect value "host" for "context" field.',
-//							'Controller: popup',
-//							'action: popup',
-//							'context: host',
-//							'popup: item.edit'
-//						]
-//					]
-//				]
-//			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => self::POPUP.'item.edit&context=host&itemid=46050',
+						'text_not_present' => 'Item',
+						'access_denied' => true,
+						'text_present' => [
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
 			[
 				'title' => 'Item prototype edit',
 				'check_server_name' => true,
@@ -408,38 +403,38 @@ class testUrlParameters extends CLegacyWebTest {
 					]
 				]
 			],
-			// TODO: uncomment after ZBX-25928 fix.
-//			[
-//				'title' => 'Fatal error, please report to the Zabbix team',
-//				'check_server_name' => true,
-//				'server_name_on_page' => false,
-//				'test_cases' => [
-//					[
-//						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067',
-//						'text_not_present' => 'Item prototype',
-//						'fatal_error' => true,
-//						'text_present' => [
-//							'Incorrect value "" for "parent_discoveryid" field.',
-//							'Controller: popup',
-//							'action: popup',
-//							'context: template',
-//							'popup: item.prototype.edit'
-//						]
-//					],
-//					[
-//						'url' => self::POPUP.'item.prototype.edit&item.prototype.edit&itemid=400610&context=host',
-//						'text_not_present' => 'Item',
-//						'fatal_error' => true,
-//						'text_present' => [
-//							'Incorrect value "" for "parent_discoveryid" field.',
-//							'Controller: popup',
-//							'action: popup',
-//							'context: host',
-//							'popup: item.prototype.edit'
-//						]
-//					]
-//				]
-//			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067',
+						'text_not_present' => 'Item prototype',
+						'fatal_error' => true,
+						'text_present' => [
+							'Controller: popup',
+							'action: popup',
+							'context: template',
+							'itemid: 46067',
+							'popup: item.prototype.edit'
+						]
+					],
+					[
+						'url' => self::POPUP.'item.prototype.edit&item.prototype.edit&itemid=400610&context=host',
+						'text_not_present' => 'Item',
+						'fatal_error' => true,
+						'text_present' => [
+							'Controller: popup',
+							'action: popup',
+							'context: host',
+							'item_prototype_edit:',
+							'itemid: 400610',
+							'popup: item.prototype.edit'
+						]
+					]
+				]
+			],
 			[
 				'title' => 'Configuration of network maps',
 				'check_server_name' => true,

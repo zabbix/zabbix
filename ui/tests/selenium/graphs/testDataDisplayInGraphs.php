@@ -5501,18 +5501,25 @@ class testDataDisplayInGraphs extends CWebTest {
 				$filter_form->fill(['Show' => $show]);
 			}
 
+			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			$filter_form->submit();
+			$charts_table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+				$charts_table->waitUntilReloaded();
 				$this->page->waitUntilReady();
 			}
 
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
-			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			foreach ($charts_table->query('class:center')->waitUntilCount($count)->all() as $graph) {
+				$image = $graph->query('tag:img')->one();
+				$callback = function() use ($image) {
+					return CElementQuery::getDriver()->executeScript('return arguments[0].complete;', [$image]);
+				};
+				CElementQuery::wait()->until($callback, 'Failed to wait for image to be loaded');
 				$graph->waitUntilClassesNotPresent('is-loading', 60);
 			}
 

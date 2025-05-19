@@ -28,7 +28,7 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>				'in '.implode(',', ['host', 'template']),
+			'context' =>				'required|in '.implode(',', ['host', 'template']),
 			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
 			'correlation_tag' =>		'db triggers.correlation_tag',
 			'dependencies' =>			'array',
@@ -68,6 +68,25 @@ class CControllerTriggerEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->hasInput('hostid')) {
+			if ($this->getInput('context') === 'host') {
+				$exists = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $this->getInput('hostid')
+				]);
+			}
+			else {
+				$exists = (bool) API::Template()->get([
+					'output' => [],
+					'templateids' => $this->getInput('hostid')
+				]);
+			}
+
+			if (!$exists) {
+				return false;
+			}
+		}
+
 		if ($this->hasInput('triggerid')) {
 			$parameters = [
 				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',

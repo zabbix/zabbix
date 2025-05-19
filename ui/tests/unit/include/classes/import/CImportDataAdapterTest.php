@@ -1189,7 +1189,10 @@ class CImportDataAdapterTest extends TestCase {
 					'background_color' => '',
 					'zindex' => '0'
 				]],
-				'lines' => []
+				'lines' => [],
+				'background_scale' => (string) SYSMAP_BACKGROUND_SCALE_NONE,
+				'show_element_label' => (string) MAP_SHOW_LABEL_ALWAYS,
+				'show_link_label' => (string) MAP_SHOW_LABEL_ALWAYS
 			],
 			[
 				'name' => 'map',
@@ -1257,7 +1260,7 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_maintenance' => [
 							'name' => ''
 						],
-						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'evaltype' => (string) TAG_EVAL_TYPE_AND_OR,
 						'tags' => [],
 						'urls' => [
 							[
@@ -1271,7 +1274,9 @@ class CImportDataAdapterTest extends TestCase {
 								'expression' => 'last(/export-host/item)<>0 or last(/export-host/item)<>0 and last(/export-host/item)<>0',
 								'recovery_expression' => ''
 							]
-						]
+						],
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '0'
 					],
 					[
 						'elementtype' => '0',
@@ -1298,14 +1303,16 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_maintenance' => [
 							'name' => ''
 						],
-						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'evaltype' => (string) TAG_EVAL_TYPE_AND_OR,
 						'tags' => [],
 						'urls' => [],
 						'elements' => [
 							[
 								'host' => 'export-host'
 							]
-						]
+						],
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '1'
 					],
 					[
 						'elementtype' => '3',
@@ -1332,14 +1339,16 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_maintenance' => [
 							'name' => ''
 						],
-						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'evaltype' => (string) TAG_EVAL_TYPE_AND_OR,
 						'tags' => [],
 						'urls' => [],
 						'elements' => [
 							[
 								'name' => 'Zabbix servers'
 							]
-						]
+						],
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '2'
 					]
 				],
 				'links' => [
@@ -1359,7 +1368,9 @@ class CImportDataAdapterTest extends TestCase {
 									'recovery_expression' => ''
 								]
 							]
-						]
+						],
+						'indicator_type' => (string) MAP_INDICATOR_TYPE_TRIGGER,
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
 					],
 					[
 						'drawtype' => '0',
@@ -1367,7 +1378,8 @@ class CImportDataAdapterTest extends TestCase {
 						'label' => '',
 						'selementid1' => '32',
 						'selementid2' => '34',
-						'linktriggers' => []
+						'indicator_type' => (string) MAP_INDICATOR_TYPE_STATIC_LINK,
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
 					]
 				],
 				'shapes' => [[
@@ -1388,7 +1400,10 @@ class CImportDataAdapterTest extends TestCase {
 					'background_color' => '',
 					'zindex' => '0'
 				]],
-				'lines' => []
+				'lines' => [],
+				'background_scale' => (string) SYSMAP_BACKGROUND_SCALE_NONE,
+				'show_element_label' => (string) MAP_SHOW_LABEL_ALWAYS,
+				'show_link_label' => (string) MAP_SHOW_LABEL_ALWAYS
 			]
 		], $adapter->getMaps());
 	}
@@ -1397,6 +1412,9 @@ class CImportDataAdapterTest extends TestCase {
 		$adapter = $this->getAdapter($this->getMediaTypeXml());
 
 		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
+		$defaults += array_intersect_key(DB::getDefaults('media_type_oauth'), array_flip([
+			'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url'
+		]));
 
 		$this->assertEquals([
 			[

@@ -78,7 +78,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 				'selements' => [
 					// For testing the built-in macros with macro functions.
 					[
-						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
 						'label' => '{{HOST.HOST}.btoa()}, {{HOST.HOST}.htmldecode()}, {{HOST.HOST}.htmlencode()}',
@@ -87,7 +86,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
 					],
 					[
-						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
 						'label' => '{{HOST.HOST}.lowercase()}, {{HOST.HOST}.uppercase()}, '.
@@ -97,7 +95,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
 					],
 					[
-						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
 						'label' => '{{HOST.HOST}.tr(0-9abcA-L,*)}, {{HOST.HOST}.urlencode()}, {{HOST.HOST}.urldecode()}, '.
@@ -108,7 +105,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 					],
 					// For testing the expression macros with macro functions.
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa()}, {{?last(//'.self::ITEM_KEY.')}.fmtnum(0)}, '.
@@ -119,7 +115,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['triggerid' => $triggers['triggerids'][0]]]
 					],
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.uppercase()}, '.
@@ -133,7 +128,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 					],
 					// For testing incorrectly used arguments of macro functions.
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa(\)}, {{HOST.HOST}.htmldecode(/)}, '.
@@ -144,7 +138,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
 					],
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub()}, {{HOST.HOST}.lowercase(///)}, '.
@@ -157,7 +150,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 					],
 					// Check that regsub and iregsub functions working correctly without match.
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub(0, test)}, {{HOST.HOST}.regsub(0, test)}, '.
@@ -396,7 +388,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 		];
 
 		foreach ($objects as $object) {
-			$this->assertEquals($object['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[7]/*['.$object['id'].']')
+			$this->assertEquals($object['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[4]/*['.$object['id'].']')
 					->waitUntilVisible()->one()->getText(), 'Object expected label does not match, id='.$object['id']
 			);
 		}
