@@ -1139,15 +1139,28 @@ window.host_wizard_edit = new class {
 					}
 				})();
 
-				const option_prefix = this.#data.monitoring_os === 'linux' ? '--' : '-';
+				let psk_identity = '';
+				let psk = '';
 
-				const psk_identity = this.#data.tls_psk_identity !== ''
-					? `${option_prefix}psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
-					: `${option_prefix}psk-identity-stdin`;
+				if (this.#data.monitoring_os === 'linux') {
+					psk_identity = this.#data.tls_psk_identity !== ''
+						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+						: `--psk-identity-stdin`;
 
-				const psk = this.#data.tls_psk !== ''
-					? `${option_prefix}psk ${this.#data.tls_psk}`
-					: `${option_prefix}psk-stdin`;
+					psk = this.#data.tls_psk !== ''
+						? `--psk ${this.#data.tls_psk}`
+						: `--psk-stdin`;
+				}
+
+				if (this.#data.monitoring_os === 'windows') {
+					psk_identity = this.#data.tls_psk_identity !== ''
+						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+						: `-pskIdentityStdin`;
+
+					psk = this.#data.tls_psk !== ''
+						? `-psk ${this.#data.tls_psk}`
+						: `-pskStdin`;
+				}
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
 					psk: `${psk_identity} ${psk}`
