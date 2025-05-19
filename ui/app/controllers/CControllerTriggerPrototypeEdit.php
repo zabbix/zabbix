@@ -201,8 +201,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			if ($this->trigger_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 				$db_parent = API::TriggerPrototype()->get([
 					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid'],
-					'selectDiscoveryRule' => ['itemid'],
-					'selectDiscoveryRulePrototype' => ['itemid']
+					'selectDiscoveryRule' => ['itemid', 'templateid'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
 				]);
 				$db_parent = reset($db_parent);
 
