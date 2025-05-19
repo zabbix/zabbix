@@ -464,8 +464,6 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
-		this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
-
 		this.#updating_locked = false;
 
 		this.#validateStep();
@@ -475,7 +473,7 @@ window.host_wizard_edit = new class {
 		this.#updateProgress();
 		this.#updateNextButton();
 
-		setTimeout(() => {
+		requestAnimationFrame(() => {
 			const next_button_disabled = this.#next_button.hasAttribute('disabled');
 
 			this.#overlay.unsetLoading();
@@ -483,6 +481,15 @@ window.host_wizard_edit = new class {
 				&& this.#steps_queue[this.#current_step] !== this.STEP_COMPLETE ? '' : 'none';
 
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
+
+			const field_with_error = this.#dialogue.querySelector('.field-has-error');
+
+			if (field_with_error !== null) {
+				field_with_error.scrollIntoView({block: 'center', behavior: 'auto'});
+			}
+			else {
+				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
+			}
 		});
 	}
 
@@ -1065,6 +1072,7 @@ window.host_wizard_edit = new class {
 
 	#updateForm(path, new_value, old_value) {
 		const step = this.#getCurrentStep();
+
 		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
 		const step_init = !path;
 
@@ -1234,29 +1242,25 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
-		requestAnimationFrame(() => {
-			let first_field = true;
+		for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
+			const rule = this.#getValidationRule(path);
 
-			for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
-				const rule = this.#getValidationRule(path);
-
-				if (!rule?.active) {
-					continue;
-				}
-
-				this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : [],
-					step_init && first_field
-				);
-
-				if (error === null) {
-					rule.active = false;
-				}
+			if (!rule?.active) {
+				continue;
 			}
 
-			this.#next_button.toggleAttribute('disabled', this.#hasErrors());
+			this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : []);
 
-			this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
-		});
+			if (error === null) {
+				rule.active = false;
+			}
+		}
+
+		this.#next_button.toggleAttribute('disabled', this.#hasErrors());
+
+		if (path) {
+			requestAnimationFrame(() => this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top);
+		}
 	}
 
 	#updateFieldsAsterisk() {
@@ -1945,7 +1949,7 @@ window.host_wizard_edit = new class {
 			: false;
 	}
 
-	#updateFieldMessages(name, type, messages = [], scroll_to_field = false) {
+	#updateFieldMessages(name, type, messages = []) {
 		const field = this.#dialogue.querySelector(`[name="${name}"], [data-name="${name}"]`);
 
 		if (field === null) {
@@ -1966,10 +1970,6 @@ window.host_wizard_edit = new class {
 		messages.forEach(message => form_field.appendChild(this.#view_templates[type].evaluateToElement({
 			message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
 		})));
-
-		if (type === 'error' && scroll_to_field) {
-			form_field.scrollIntoView({behavior: 'smooth', block: 'center'});
-		}
 	}
 
 	#initReactiveData(target_object, on_change_callback) {
