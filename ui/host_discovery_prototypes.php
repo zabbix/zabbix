@@ -233,7 +233,7 @@ $fields = [
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'backurl' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
+	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"name","key_","delay","type","status","discover"'),	null],
 	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
@@ -843,17 +843,11 @@ else {
 
 	$data['discoveries'] = API::DiscoveryRulePrototype()->get($options);
 
-	switch ($sort_field) {
-		case 'delay':
-			orderItemsByDelay($data['discoveries'], $sort_order, ['usermacros' => true]);
-			break;
-
-		case 'status':
-			orderItemsByStatus($data['discoveries'], $sort_order);
-			break;
-
-		default:
-			order_result($data['discoveries'], $sort_field, $sort_order);
+	if ($sort_field === 'delay') {
+		orderItemsByDelay($data['discoveries'], $sort_order, ['usermacros' => true, 'lldmacros' => true]);
+	}
+	else {
+		order_result($data['discoveries'], $sort_field, $sort_order);
 	}
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
