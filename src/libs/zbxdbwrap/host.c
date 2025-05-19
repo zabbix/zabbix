@@ -1626,7 +1626,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_db_execute_multiple_query("update items set master_itemid=null where master_itemid is not null and",
 			"itemid", itemids);
 	zbx_db_execute_multiple_query("delete from items where", "itemid", itemids);
-	zbx_db_execute_multiple_query("delete from item_template_cache where", "itemid", itemids);
 
 	zbx_vector_uint64_destroy(&profileids);
 out:
@@ -1720,8 +1719,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 	zbx_db_execute("%s", sql);
-
-	zbx_db_execute_multiple_query("delete from httptest_template_cache where", "httptestid", httptestids);
 
 	zbx_vector_uint64_destroy(&httpstepids);
 	zbx_vector_uint64_destroy(&itemids);

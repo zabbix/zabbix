@@ -64,9 +64,9 @@ int	zbx_db_delete_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"with recursive cte as ("
-				" select h0.templateid, h0.hostid from hosts_templates h0"
+				" select h0.templateid,h0.hostid from hosts_templates h0"
 				" union all "
-				"select h1.templateid, c.hostid from cte c"
+				"select h1.templateid,c.hostid from cte c"
 				" join hosts_templates h1 on c.templateid=h1.hostid"
 			")"
 			" select templateid from cte where");
@@ -125,9 +125,9 @@ int	zbx_db_copy_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *ln
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"with recursive cte as ("
-				" select h0.templateid, h0.hostid from hosts_templates h0"
+				" select h0.templateid,h0.hostid from hosts_templates h0"
 				" union all "
-				"select h1.templateid, c.hostid from cte c"
+				"select h1.templateid,c.hostid from cte c"
 				" join hosts_templates h1 on c.templateid=h1.hostid"
 			")"
 			" select templateid from cte where");
