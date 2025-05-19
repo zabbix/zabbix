@@ -333,14 +333,17 @@
 
 	.form-description {
 		position: relative;
-		padding-top: 16px;
 		padding-left: 24px;
+
+		.markdown {
+			margin-top: 7px;
+		}
 
 		&::before {
 			content: '';
 			position: absolute;
-			top: 16px;
-			bottom: 0;
+			top: 0;
+			bottom: -1px;
 			left: 0;
 			width: 0;
 			border-left: 4px solid $form-description-border-color;

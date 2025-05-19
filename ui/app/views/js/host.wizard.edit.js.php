@@ -380,6 +380,11 @@ window.host_wizard_edit = new class {
 			macro_field_text: tmpl('host-wizard-macro-field-text'),
 			macro_field_secret: tmpl('host-wizard-macro-field-secret'),
 			macro_field_vault: tmpl('host-wizard-macro-field-vault'),
+			macro_field_description: new Template(`
+				<div class="${ZBX_STYLE_FORM_DESCRIPTION}">
+					<div class="${ZBX_STYLE_FORM_FIELDS_HINT}">#{macro}</div>
+				</div>
+			`),
 
 			progress: new Template(`
 				<div class="progress"></div>
@@ -399,8 +404,8 @@ window.host_wizard_edit = new class {
 			error: new Template(`
 				<span class="error">#{message}</span>
 			`),
-			description: new Template(`
-				<div class="${ZBX_STYLE_FORM_DESCRIPTION} ${ZBX_STYLE_MARKDOWN}">#{description}</div>
+			markdown: new Template(`
+				<div class="${ZBX_STYLE_MARKDOWN}">#{text}</div>
 			`),
 			radio_item: new Template(`
 				<li>
@@ -1661,45 +1666,46 @@ window.host_wizard_edit = new class {
 		const field_view = (() => {
 			switch (Number(config.type)) {
 				case this.WIZARD_FIELD_TEXT:
-					return this.#makeMacroFieldText(macro, config, row_index);
+					return this.#makeMacroFieldText(row_index, config, macro);
 
 				case this.WIZARD_FIELD_LIST:
-					return this.#makeMacroFieldList(macro, config, row_index);
+					return this.#makeMacroFieldList(row_index, config, macro);
 
 				case this.WIZARD_FIELD_CHECKBOX:
-					return this.#makeMacroFieldCheckbox(macro, config, row_index);
+					return this.#makeMacroFieldCheckbox(row_index, config);
 
 				default:
 					return null;
 			}
 		})();
 
-		const description_view = config.description
-			? this.#view_templates.description.evaluateToElement({description: config.description})
-			: null;
+		const description = this.#view_templates.macro_field_description.evaluateToElement({macro: macro.macro});
 
-		return {field: field_view, description: description_view};
+		if (config.description) {
+			description.appendChild(this.#view_templates.markdown.evaluateToElement({text: config.description}));
+		}
+
+		return {field: field_view, description};
 	}
 
-	#makeMacroFieldText({type, macro}, {label}, row_index) {
+	#makeMacroFieldText(row_index, {label}, {type}) {
 		switch (Number(type)) {
 			case this.MACRO_TYPE_SECRET:
-				return this.#view_templates.macro_field_secret.evaluateToElement({row_index, label, macro});
+				return this.#view_templates.macro_field_secret.evaluateToElement({row_index, label});
 
 			case this.MACRO_TYPE_VAULT:
-				return this.#view_templates.macro_field_vault.evaluateToElement({row_index, label, macro});
+				return this.#view_templates.macro_field_vault.evaluateToElement({row_index, label});
 
 			default:
-				return this.#view_templates.macro_field_text.evaluateToElement({row_index, label, macro});
+				return this.#view_templates.macro_field_text.evaluateToElement({row_index, label});
 		}
 	}
 
-	#makeMacroFieldList({macro, value}, {label, options}, row_index) {
+	#makeMacroFieldList(row_index, {label, options}, {value}) {
 		if (options.length > 5) {
 			const field_select = this.#view_templates.macro_field_select.evaluateToElement({
 				row_index,
 				label,
-				macro,
 				value
 			});
 			const select = field_select.querySelector('z-select');
@@ -1711,7 +1717,7 @@ window.host_wizard_edit = new class {
 			return field_select;
 		}
 		else {
-			const field_radio = this.#view_templates.macro_field_radio.evaluateToElement({label, macro, value});
+			const field_radio = this.#view_templates.macro_field_radio.evaluateToElement({label, value});
 			const radio_list = field_radio.querySelector('.radio-list-control');
 
 			radio_list.innerHTML = '';
@@ -1731,11 +1737,10 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#makeMacroFieldCheckbox({macro}, {label, options}, row_index) {
+	#makeMacroFieldCheckbox(row_index, {label, options}) {
 		return this.#view_templates.macro_field_checkbox.evaluateToElement({
 			row_index,
 			label,
-			macro,
 			value: options[0].checked,
 			unchecked_value: options[0].unchecked
 		});
