@@ -561,8 +561,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 				if ($history) {
 					return $history[$items[0]['itemid']][0]['value'] > 1000
-						? round($history[$items[0]['itemid']][0]['value'], -3)
-						: ceil($history[$items[0]['itemid']][0]['value']);
+						? floor($history[$items[0]['itemid']][0]['value'] / 10) * 10
+						: floor($history[$items[0]['itemid']][0]['value']);
 				}
 			}
 			else {
@@ -642,7 +642,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				if ($history) {
 					return $history[$items[0]['itemid']][0]['value'] > 1000
-						? round($history[$items[0]['itemid']][0]['value'], -3)
+						? ceil($history[$items[0]['itemid']][0]['value'] / 10) * 10
 						: ceil($history[$items[0]['itemid']][0]['value']);
 				}
 			}
