@@ -771,7 +771,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char program_type)
 {
-	int			found = 1, defaults_log_level;
+	int			defaults_log_level, found = 1;
 	zbx_setting_value_t	*values = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
