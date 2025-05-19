@@ -199,6 +199,12 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/ldap_host": cannot be empty.'
 			],
+			'Test update LDAP host requires ldap_bind_password' => [
+				'authentication' => [
+					'ldap_host' => 'test.host.com'
+				],
+				'expected_error' => 'Invalid parameter "ldap_bind_password": the parameter "ldap_bind_password" is missing.'
+			],
 			'Test invalid LDAP port' => [
 				'authentication' => [
 					'ldap_port' => 99999
@@ -369,7 +375,8 @@ class testAuthentication extends CAPITest {
 			],
 			'Test valid LDAP host' => [
 				'authentication' => [
-					'ldap_host' => 'test.ldap.host'
+					'ldap_host' => 'test.ldap.host',
+					'ldap_bind_password' => 'new_password'
 				],
 				'expected_error' => null
 			],

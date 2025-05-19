@@ -142,6 +142,10 @@ $http_tab = (new CFormList('list_http'))
 	);
 
 // LDAP configuration fields.
+$bind_password_warning = _('The previous password was cleared due to a host change. Please enter the new password.');
+$bind_password_warning = (makeWarningIcon($bind_password_warning))->addClass("bind_password_warning")
+	->addClass(ZBX_STYLE_DISPLAY_NONE)->addStyle('margin-left: 5px; margin-top: 4px;');
+
 if ($data['change_bind_password']) {
 	$password_box = (new CPassBox('ldap_bind_password', $data['ldap_bind_password'],
 		DB::getFieldLength('config', 'ldap_bind_password'))
@@ -208,7 +212,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setEnabled($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
 			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 	)
-	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), $password_box)
+	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), [$password_box, $bind_password_warning])
 	->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']')
 	->addRow((new CLabel(_('Login'), 'ldap_test_user'))->setAsteriskMark(),
 		(new CTextBox('ldap_test_user', $data['ldap_test_user']))

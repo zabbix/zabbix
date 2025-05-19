@@ -133,6 +133,18 @@ class CControllerAuthenticationUpdate extends CController {
 			return $is_valid;
 		}
 
+		if (array_key_exists('ldap_host', $ldap_auth_changed)
+				&& !array_key_exists('ldap_bind_password', $ldap_auth_changed)
+				&& $this->hasInput('change_bind_password') != 1) {
+
+			$error = _s('Invalid parameter "%1$s": %2$s.', 'ldap_bind_password',
+				_s('the parameter "%1$s" is missing', 'ldap_bind_password')
+			);
+
+			CMessageHelper::setErrorTitle($error);
+			$is_valid = false;
+		}
+
 		if ($this->getInput('ldap_bind_password', '') !== '') {
 			$ldap_fields[] = 'ldap_bind_dn';
 		}
@@ -376,9 +388,16 @@ class CControllerAuthenticationUpdate extends CController {
 			$data['passwd_check_rules'] |= $rule;
 		}
 
+		$data_before_diff = $data;
 		$data = array_diff_assoc($data, $auth);
 
 		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {
+			$data['ldap_bind_password'] = '';
+		}
+
+		if (array_key_exists('ldap_bind_password', $auth) && trim($auth['ldap_bind_password']) === ''
+				&& array_key_exists('ldap_bind_password', $data_before_diff)
+				&& trim($data_before_diff['ldap_bind_password']) === '') {
 			$data['ldap_bind_password'] = '';
 		}
 
