@@ -878,7 +878,7 @@ class CSetupWizard extends CForm {
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			])
 			->addItem([
-				(new CLabel(_('Verify server certificate')))
+				(new CLabel(_('Verify server certificate issuer and subject')))
 					->setFor('zbx_server_tls_certificate_check')->addClass(ZBX_STYLE_DISPLAY_NONE),
 				(new CFormField(
 					(new CCheckBox('zbx_server_tls_certificate_check'))
@@ -1078,7 +1078,7 @@ class CSetupWizard extends CForm {
 
 		if ($server_tls) {
 			$table->addRow(
-				(new CSpan(_('Web interface TLS CA file')))->addClass(ZBX_STYLE_GREY),
+				(new CSpan(_('Server TLS CA file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CA_FILE')
 			)
 			->addRow(
