@@ -28,15 +28,17 @@ class CDNParser extends CParser {
 	 */
 	public array $result = [];
 
-	public function parse($source, $pos = 0) {
+	public function parse($source, $pos = 0): int {
 		$this->result = [];
 
 		if ($source === '') {
 			return self::PARSE_SUCCESS;
 		}
 
+		$source = preg_replace('#(?<!\\\\);(?=(?:[^"]*"[^"]*")*[^"]*$)#', ',', $source);
+
 		foreach (self::split(',', $source) as $rdn) {
-			foreach (self::split('\+', $rdn) as $attribute) {
+			foreach (self::split('\\+', $rdn) as $attribute) {
 				if (!preg_match('#(?<!\\\\)=#', $attribute)) {
 					$this->result = [];
 
@@ -45,9 +47,16 @@ class CDNParser extends CParser {
 
 				[$name, $value] = self::split('=', $attribute);
 
+				$name = self::normalize($name);
+				$value = self::normalize($value);
+
+				if ($value !== '' && $value[0] === '"') {
+					$value = self::unquote($value);
+				}
+
 				$this->result[] = [
-					'name' => self::unescape(self::normalize($name)),
-					'value' => self::unescape(self::normalize($value))
+					'name'  => self::unescape($name),
+					'value' => self::unescape($value)
 				];
 			}
 		}
@@ -55,22 +64,67 @@ class CDNParser extends CParser {
 		return self::PARSE_SUCCESS;
 	}
 
-	private static function split(string $char, string $string) {
-		return preg_split("#(?<!\\\\)$char#", $string);
+	private static function split(string $char, string $string): array {
+		$delimiter = substr($char, -1);
+		$parts = [];
+		$current = '';
+		$bs_count = 0;
+		$in_quotes = false;
+		$len = strlen($string);
+
+		for ($i = 0; $i < $len; $i++) {
+			$ch = $string[$i];
+
+			if ($ch === '\\') {
+				$bs_count++;
+				$current .= $ch;
+
+				continue;
+			}
+
+			if ($ch === '"' && ($bs_count % 2) === 0) {
+				$in_quotes = !$in_quotes;
+				$current .= $ch;
+				$bs_count = 0;
+
+				continue;
+			}
+
+			if ($ch === $delimiter && ($bs_count % 2) === 0 && !$in_quotes) {
+				$parts[] = $current;
+				$current = '';
+				$bs_count = 0;
+
+				continue;
+			}
+
+			$current .= $ch;
+			$bs_count = 0;
+		}
+
+		$parts[] = $current;
+
+		if ($delimiter === '=' && count($parts) > 2) {
+			for ($i = 2, $iMax = count($parts); $i < $iMax; $i++) {
+				$parts[1] .= '='.$parts[$i];
+			}
+		}
+
+		return $parts;
 	}
 
 	private static function normalize(string $string): string {
-		$string = ltrim($string, ' ');
-		$string = preg_replace('#((?<!\\\\) )+$#', '', $string);
+		return preg_replace('#((?<!\\\\) )+$#', '', ltrim($string, ' '));
+	}
 
-		return $string;
+	private static function unquote(string $quoted): string {
+		return str_replace(['\\\\"', '\\\\\\'], ['"', '\\'], substr($quoted, 1, -1));
 	}
 
 	private static function unescape(string $string): string {
 		$chars = "\"\\\\=,+';<> ";
 		$string = preg_replace("#\\\\([$chars])#", '$1', $string);
-		$string = preg_replace('/^\\\\#/', '#', $string);
 
-		return $string;
+		return preg_replace('/^\\\\#/', '#', $string);
 	}
 }
