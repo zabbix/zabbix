@@ -107,7 +107,7 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 			}
 
 			if ($this->hasInput('interfaces')) {
-				$interfaces = $this->prepareInterfaces($this->getInput('interfaces'), $this->db_host);
+				$interfaces = $this->prepareInterfaces($this->getInput('interfaces'), $this->db_host['interfaces']);
 
 				$host['interfaces'] = array_merge(
 					$this->db_host['interfaces'], $this->processHostInterfaces($interfaces)
@@ -166,8 +166,9 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 		return array_merge($result, $new_groups);
 	}
 
-	private function prepareInterfaces(array $interfaces, array $host): array {
+	private function prepareInterfaces(array $interfaces, array $db_interfaces): array {
 		$address_parser = new CAddressParser(['usermacros' => true, 'lldmacros' => true, 'macros' => true]);
+		$db_interface_types = array_flip(array_column($db_interfaces, 'type'));
 
 		foreach ($interfaces as $key => &$interface) {
 			$address_parser->parse($interface['address']);
@@ -184,43 +185,42 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 
 			unset($interface['address']);
 
-			foreach ($host['interfaces'] as $host_interface) {
-				if ($interface['type'] === $host_interface['type']) {
-					$same = $interface['port'] === $host_interface['port']
-						&& $interface['useip'] == $host_interface['useip']
-						&& (($interface['useip'] == INTERFACE_USE_IP && $interface['ip'] === $host_interface['ip'])
-							|| ($interface['useip'] == INTERFACE_USE_DNS && $interface['dns'] === $host_interface['dns']));
+			foreach ($db_interfaces as $db_interface) {
+				if ($interface['type'] !== $db_interface['type']) {
+					continue;
+				}
 
-					if ($same) {
-						if (in_array($interface['type'], [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_JMX,
-								INTERFACE_TYPE_IPMI])) {
-							unset($interfaces[$key]);
+				$compare_keys = ['port', 'useip'];
+				$compare_keys[] = $interface['useip'] == INTERFACE_USE_IP ? 'ip' : 'dns';
 
-							break;
-						}
+				$interface_subset = array_intersect_key($interface, array_flip($compare_keys));
+				$db_interface_subset = array_intersect_key($db_interface, array_flip($compare_keys));
 
-						if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-							$identical = 0;
+				$db_interface_subset['useip'] = (int) $db_interface_subset['useip'];
 
-							foreach ($interface['details'] as $detail_key => $value) {
-								if ($value == $host_interface['details'][$detail_key]) {
-									$identical++;
-								}
-							}
+				// $interface is not same as $db_interface
+				if (array_diff_assoc($interface_subset, $db_interface_subset)) {
+					continue;
+				}
 
-							if ($identical === count($interface['details'])) {
-								unset($interfaces[$key]);
+				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+					$db_details_subset = array_intersect_key($db_interface['details'], $interface['details']);
 
-								break;
-							}
-						}
+					// $db_interface details are same as $interface details
+					if (!array_diff_assoc($interface['details'], $db_details_subset)) {
+						unset($interfaces[$key]);
+						break;
 					}
+				}
+				else {
+					unset($interfaces[$key]);
+					break;
 				}
 			}
 
 			$interface += [
 				'isNew' => true,
-				'main' => in_array($interface['type'], array_column($host['interfaces'], 'type'))
+				'main' => array_key_exists($interface['type'], $db_interface_types)
 					? INTERFACE_SECONDARY
 					: INTERFACE_PRIMARY
 			];

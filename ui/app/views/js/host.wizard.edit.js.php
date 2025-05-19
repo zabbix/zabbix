@@ -1849,9 +1849,9 @@ window.host_wizard_edit = new class {
 			}
 
 			if (rule.type === 'array' && rule.fields !== undefined) {
-				for (const array_value of value) {
+				for (const row of value) {
 					for (const name in rule.fields) {
-						const error = validate(rule.fields[name], array_value[name]);
+						const error = validate(rule.fields[name], row[name]);
 
 						if (error !== null) {
 							return error
