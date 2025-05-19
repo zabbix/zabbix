@@ -726,7 +726,7 @@ if (hasRequest('form')) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectDiscoveryData' => ['parent_itemid'],
+			'selectDiscoveryData' => ['parent_itemid', 'disable_source'],
 			'itemids' => $itemid
 		]);
 		$item = $items[0];
@@ -852,7 +852,7 @@ if (hasRequest('form')) {
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
 
-		$data['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+		$data['discovered_lld'] = (bool) ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED);
 
 		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 			$data['discoveryRule'] = $item['discoveryRule'];

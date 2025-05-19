@@ -760,6 +760,11 @@ $item_tab->addItem([
 
 $lld_lifetime_help_icons = makeHelpIcon(_('The value should be greater than LLD rule update interval.'));
 
+$disabled_by_lld_icon = $data['status'] == ITEM_STATUS_DISABLED && $data['discovered_lld']
+		&& $data['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+	: null;
+
 $item_tab
 	->addItem([
 		(new CLabel([_('Delete lost resources'), $lld_lifetime_help_icons], 'lifetime'))->setAsteriskMark(),
@@ -815,7 +820,7 @@ $item_tab
 		)
 	])
 	->addItem([
-		new CLabel(_('Enabled'), 'status'),
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
 	]);
 

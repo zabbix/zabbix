@@ -871,13 +871,12 @@ $formgrid
 		)
 	]);
 
-
-$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('discoveryData', $item)
-		&& $item['discoveryData'] && $item['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
-	: null;
-
 if ($data['source'] === 'item') {
+	$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && $item['discovered']
+			&& $item['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
+
 	$formgrid->addItem([
 		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(

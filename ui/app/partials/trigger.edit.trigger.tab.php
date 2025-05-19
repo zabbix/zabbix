@@ -297,11 +297,6 @@ $trigger_form_grid
 		)
 	]);
 
-$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('discoveryData', $data)
-		&& $data['discoveryData'] && $data['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
-	: null;
-
 if (array_key_exists('parent_discoveryid', $data)) {
 	$trigger_form_grid
 		->addItem([new CLabel(_('Create enabled'), 'status'),
@@ -317,7 +312,13 @@ if (array_key_exists('parent_discoveryid', $data)) {
 					->setReadonly($data['is_discovered_prototype'])
 			)
 		]);
-} else {
+}
+else {
+	$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('discoveryData', $data)
+			&& $data['discoveryData'] && $data['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
+
 	$trigger_form_grid
 		->addItem([
 			new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
