@@ -17,7 +17,7 @@
 /**
  * Base XML validation class.
  */
-class CXmlValidator extends CXmlValidatorGeneral {
+class CImportXmlValidator extends CXmlValidatorGeneral {
 
 	private $factory;
 
