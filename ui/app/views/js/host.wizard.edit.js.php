@@ -144,6 +144,7 @@ window.host_wizard_edit = new class {
 	#data = {
 		do_not_show_welcome: 0,
 		tls_required: true,
+		install_agent_required: true,
 		template_search_query: '',
 		selected_template: null,
 		selected_subclasses: {},
@@ -775,7 +776,8 @@ window.host_wizard_edit = new class {
 					response.snmp_interface_required && this.INTERFACE_TYPE_SNMP
 				].filter(Boolean);
 
-				this.#data.tls_required = this.#isRequiredInstallAgent()
+				this.#data.install_agent_required = response.install_agent_required;
+				this.#data.tls_required = this.#data.install_agent_required
 					&& (this.#host === null
 						|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
 
@@ -971,7 +973,7 @@ window.host_wizard_edit = new class {
 			this.#steps_queue.push(this.STEP_CREATE_HOST);
 		}
 
-		if (template_loaded && this.#isRequiredInstallAgent()) {
+		if (template_loaded && this.#data.install_agent_required) {
 			this.#steps_queue.push(this.STEP_INSTALL_AGENT);
 		}
 
@@ -1030,7 +1032,7 @@ window.host_wizard_edit = new class {
 			},
 			{
 				label: <?= json_encode(_('Install Zabbix agent')) ?>,
-				visible: template_loaded && this.#isRequiredInstallAgent(),
+				visible: template_loaded && this.#data.install_agent_required,
 				steps: [this.STEP_INSTALL_AGENT]
 			},
 			{
@@ -1363,11 +1365,6 @@ window.host_wizard_edit = new class {
 		const selected = this.#data.selected_template;
 
 		return selected && this.#templates.get(selected.split(':').pop());
-	}
-
-	#isRequiredInstallAgent() {
-		return this.#data.interface_required.includes(this.INTERFACE_TYPE_AGENT)
-			&& (!this.#host?.interfaces.some(({type}) => Number(type) === this.INTERFACE_TYPE_AGENT));
 	}
 
 	#isRequiredAddHostInterface() {

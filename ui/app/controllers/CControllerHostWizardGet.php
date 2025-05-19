@@ -76,6 +76,7 @@ class CControllerHostWizardGet extends CController {
 
 	protected function doAction(): void {
 		$host = null;
+		$interfaces_by_type = [];
 
 		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([
@@ -97,8 +98,6 @@ class CControllerHostWizardGet extends CController {
 			unset($host['tls_accept']);
 
 			// Take only first interface from each type if possible.
-			$interfaces_by_type = [];
-
 			foreach ($host['interfaces'] as $interface) {
 				if (!array_key_exists($interface['type'], $interfaces_by_type)) {
 					// Add "address" depending on IP/DNS usage. Original fields left as indication for CAddressParser.
@@ -131,41 +130,44 @@ class CControllerHostWizardGet extends CController {
 
 		$template['macros'] = $this->prepareTemplateMacros($template['macros']);
 
-		$agent_interface_types = [ITEM_TYPE_ZABBIX];
-		$snmp_interface_types = [ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP];
-		$ipmi_interface_types = [ITEM_TYPE_IPMI];
-		$jmx_interface_types = [ITEM_TYPE_JMX];
-
 		// Get template items, LLD rules and item prototypes that require interfaces.
 		$items = API::Item()->get([
 			'output' => ['type'],
 			'templateids' => $template['templateid'],
 			'filter' => [
-				'type' => array_keys(array_flip($agent_interface_types) + array_flip($snmp_interface_types) +
-					array_flip($ipmi_interface_types) + array_flip($jmx_interface_types)),
+				'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP,
+					ITEM_TYPE_IPMI, ITEM_TYPE_JMX
+				],
 				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE]
 			]
 		]);
 
+		$install_agent_required = false;
 		$agent_interface_required = false;
 		$snmp_interface_required = false;
 		$ipmi_interface_required = false;
 		$jmx_interface_required = false;
 
 		foreach ($items as $item) {
-			if (in_array($item['type'], $agent_interface_types)) {
+			if (in_array($item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE])) {
+				$install_agent_required = true;
+			}
+			if ($item['type'] == ITEM_TYPE_ZABBIX) {
 				$agent_interface_required = true;
 			}
-			if (in_array($item['type'], $snmp_interface_types)) {
+			if (in_array($item['type'], [ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP])) {
 				$snmp_interface_required = true;
 			}
-			if (in_array($item['type'], $ipmi_interface_types)) {
+			if ($item['type'] == ITEM_TYPE_IPMI) {
 				$ipmi_interface_required = true;
 			}
-			if (in_array($item['type'], $jmx_interface_types)) {
+			if ($item['type'] == ITEM_TYPE_JMX) {
 				$jmx_interface_required = true;
 			}
 		}
+
+		$install_agent_required = $install_agent_required
+			&& !array_key_exists(INTERFACE_TYPE_AGENT, $interfaces_by_type);
 
 		$data = [
 			/*
@@ -178,6 +180,7 @@ class CControllerHostWizardGet extends CController {
 			 * exists and macro names match, macro value is pre-filled from host instead of template.
 			 */
 			'template' => $template,
+			'install_agent_required' => $install_agent_required,
 			// Interface requirements according to template item, LLD rule and item prototype types.
 			'agent_interface_required' => $agent_interface_required,
 			'snmp_interface_required' => $snmp_interface_required,
