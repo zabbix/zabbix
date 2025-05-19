@@ -400,6 +400,25 @@ class CForm {
 			const field_path = field.getPath();
 			const subfield_path = new RegExp('^' + field_path + '/');
 
+			if (field instanceof CFieldMultiselect) {
+				const affixed_path = '/' + field_name + '_new';
+				const affixed_subfield = new RegExp('^/' + field_name + '_new/');
+
+				for (const error_path in raw_errors) {
+					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
+
+					if (!affixed) {
+						continue;
+					}
+
+					if (raw_errors[error_path].length) {
+						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
+							.filter(({message}) => message.length);
+						raw_errors[error_path] = [];
+					}
+				}
+			}
+
 			Object.entries(raw_errors).filter(([path]) => {
 				return field_path === path || subfield_path.test(path);
 			}).forEach(([path, errors]) => {
