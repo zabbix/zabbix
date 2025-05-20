@@ -34,8 +34,9 @@ class testTimescaleDb extends CIntegrationTest {
 		and must be guaranteed to be compressed
 	*/
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
-	static $db_extension = '';
+	private static $db_extension = null;
 	private static $itemid;
+	private static $tsdbVersion = null;
 
 	/**
 	 * Component configuration provider.
@@ -51,26 +52,48 @@ class testTimescaleDb extends CIntegrationTest {
 		];
 	}
 
-	private function retrieveExtention() {
-		self::$db_extension = '';
-
-		$sql = 'SELECT db_extension'.
-			' FROM config';
-
-		$res = DBfetch(DBselect($sql));
-
-		if ($res) {
-			self::$db_extension = $res['db_extension'];
+	private static function getDBExtention() {
+		if (self::$db_extension == null) {
+			$res = DBfetch(DBselect('SELECT db_extension FROM config'));
+			if ($res)
+				self::$db_extension = $res['db_extension'];
 		}
+
+		return self::$db_extension;
 	}
 
 	/**
-	 * Test TimescaleDb extension.
+	 * Clear all chunks in the table under test.
 	 */
 	private function clearChunks() {
-		$sql = 'SELECT drop_chunks(\''.self::TABLENAME.'\', older_than => '.time().')';
+		/* The interval is selected like so to make sure all chunks are deleted. */
+		$sql = "SELECT drop_chunks('".self::TABLENAME."', created_before => now() + interval '10 years')";
+		DBexecute($sql);
+	}
 
-		$res = DBfetch(DBselect($sql));
+	/**
+	 * Get TimescaleDB version. For example, version "2.19.5" equals to 21905.
+	 *
+	 * @return int
+	 */
+	private static function getTimescaleDBVersion() {
+		if (self::$tsdbVersion == null) {
+			$sql = "SELECT extversion FROM pg_extension WHERE extname='timescaledb';";
+
+			$res = DBfetch(DBselect($sql));
+
+			if ($res) {
+				list($major, $minor, $patch) = explode('.', $res['extversion']);
+
+				$ver = $major * 10000;
+				$ver += $minor * 100;
+				$ver += $patch;
+
+				self::$tsdbVersion = $ver;
+			}
+		}
+
+		return self::$tsdbVersion;
 	}
 
 	/**
@@ -80,18 +103,20 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkServerUp() {
-		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+		$db_ext = self::getDBExtention();
+		$this->assertNotNull($db_ext, "Failed to retrieve database extension");
+		$this->assertEquals(ZBX_DB_EXTENSION_TIMESCALEDB, $db_ext, "TimescaleDB extension is not available");
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'TimescaleDB version:');
+		$timescale_ver = $this->getTimescaleDBVersion();
+		$this->assertNotNull($timescale_ver, "Failed to get a valid TimescaleDB version");
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				sprintf("TimescaleDB version: [%d]", $timescale_ver));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function prepareData() {
-
-		$this->retrieveExtention();
-
 		// Create host "test_timescale"
 		$response = $this->call('host.create', [
 			[
@@ -148,7 +173,7 @@ class testTimescaleDb extends CIntegrationTest {
 	}
 
 	/**
-	 * Check compression of the chunk.
+	 * Check compression of the chunk. Deprecated since TimescaleDB 2.18.
 	 */
 	public function getCheckCompression() {
 		$req = DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')');
@@ -179,10 +204,6 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkHistoryRecords() {
-		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-
-		$this->reloadConfigurationCache();
-
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
@@ -197,7 +218,7 @@ class testTimescaleDb extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$count_end = $this->getHistoryCount();
@@ -209,21 +230,114 @@ class testTimescaleDb extends CIntegrationTest {
 		);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals('compression_status', $response['result'][0]);
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->executeHousekeeper();
+
+		$this->onAfterCheckHistoryRecords();
+	}
+
+	private function onAfterCheckHistoryRecords() {
+		/* There was no cleanup in the legacy test for TimescaleDB older than 2.18. */
+		if ($this->getTimescaleDBVersion() < 21800)
+			return;
+
+		/* Turn off compression policy and clear all chunks for the next tests. */
+		$response = $this->call('housekeeping.update',
+			['compression_status' => 0] // off
+		);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals('compression_status', $response['result'][0]);
+
+		$this->clearChunks();
 	}
 
 	/**
-	 * Test compression TimescaleDb.
+	 * Test compression of specific chunks by TimescaleDB.
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testTimescaleDb_checkCompression() {
-		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+	public function testTimescaleDb_checkCompression1() {
+		/* The legacy test for TimescaleDB older than 2.18 */
+		if ($this->getTimescaleDBVersion() < 21800) {
+			$this->executeHousekeeper();
+			$this->getCheckCompression();
 
-		$this->executeHousekeeper();
+			return;
+		}
 
-		$this->getCheckCompression();
+		/* Add history data so that TimescaleDB creates a few chunks for the test. */
+
+		$count_start = $this->getHistoryCount();
+		$this->assertNotEquals(-1, $count_start);
+
+		$input = [
+			/* start clock, value count */
+			[time() - self::COMPRESSION_OLDER_THAN - 1 * 24 * 3600, 100],
+			[time() - self::COMPRESSION_OLDER_THAN - 2 * 24 * 3600, 100],
+			[time() - self::COMPRESSION_OLDER_THAN - 3 * 24 * 3600, 100]
+		];
+
+		$sender_data = [];
+
+		foreach ($input as $item) {
+			$clock = $item[0];
+			$cnt = $item[1];
+
+			for ($i = 0, $ns = 0; $i < $cnt; $i++, $ns += 10, $clock++) {
+				$sender_data[] = [
+					'value' => $clock,
+					'clock' => $clock,
+					'ns' => $ns,
+					'host' => self::HOSTNAME,
+					'key' => self::TRAPNAME
+				];
+			}
+		}
+
+		$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
+
+		$count_end = $this->getHistoryCount();
+		$this->assertNotEquals(-1, $count_end);
+		$this->assertEquals(count($sender_data), $count_end - $count_start);
+
+		/* There should be no compressed chunks at this stage yet. */
+		$sql = "SELECT number_compressed_chunks FROM hypertable_columnstore_stats('".self::TABLENAME."')";
+		$res = DBfetch(DBselect($sql));
+		$this->assertArrayHasKey('number_compressed_chunks', $res);
+		$number_compressed_chunks0 = $res['number_compressed_chunks'];
+		$this->assertEquals(0, $number_compressed_chunks0,
+				"It is expected that there are no compressed chunks in the beginning.");
+
+		/* Get all chunk names. */
+		$res = DBfetchArray(DBselect("SELECT show_chunks('".self::TABLENAME."')"));
+		$chunks = array_column($res, 'show_chunks');
+		$total_chunks = count($chunks);
+		$this->assertGreaterThan(0, $total_chunks);
+
+		/* Compress specific chunks by names instead of using a compression policy. */
+		/* It is called convert to columnstore since TimescaleDB 2.18. */
+		foreach ($chunks as $chunk)
+			DBexecute("CALL convert_to_columnstore('".$chunk."')");
+
+		/* All chunks are expected to be compressed. */
+		$res = DBfetch(DBselect($sql));
+		$this->assertArrayHasKey('number_compressed_chunks', $res);
+		$number_compressed_chunks1 = $res['number_compressed_chunks'];
+		$this->assertEquals($total_chunks, $number_compressed_chunks1, "Not all chunks were compressed");
+
+		/* Decompress specific chunks by names. */
+		/* It is called convert to rowstore since TimescaleDB 2.18. */
+		foreach ($chunks as $chunk)
+			DBexecute("CALL convert_to_rowstore('".$chunk."')");
+
+		/* All chunks are expected to be decompressed now. */
+		$res = DBfetch(DBselect($sql));
+		$this->assertArrayHasKey('number_compressed_chunks', $res);
+		$number_compressed_chunks2 = $res['number_compressed_chunks'];
+		$this->assertEquals(0, $number_compressed_chunks2, "Not all chunks were decompressed");
 	}
 }
