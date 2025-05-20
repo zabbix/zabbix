@@ -278,7 +278,8 @@ function stepCreateHost($form): CTemplateTag {
 									'srcfld1' => 'hostid',
 									'dstfrm' => $form->getName(),
 									'dstfld1' => 'host',
-									'editable' => true
+									'editable' => true,
+									'normal_only' => true
 								]
 							],
 							'add_post_js' => false

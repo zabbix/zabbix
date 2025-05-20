@@ -171,6 +171,7 @@ switch ($data['method']) {
 					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $limit
 				];

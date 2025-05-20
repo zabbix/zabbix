@@ -1320,6 +1320,10 @@ class CControllerPopupGeneric extends CController {
 					];
 				}
 
+				if ($this->hasInput('normal_only')) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				}
+
 				$records = (!$this->group_preselect_required || $this->groupids)
 					? API::Host()->get($options)
 					: [];

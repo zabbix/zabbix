@@ -225,7 +225,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 			configuration.push({
 				label: t('Host Wizard'),
-				disabled: !options.isWriteable,
+				disabled: !options.isWriteable || options.isDiscovered,
 				url: url.getUrl()
 			});
 
