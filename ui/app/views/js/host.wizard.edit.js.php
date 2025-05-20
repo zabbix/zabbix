@@ -136,7 +136,7 @@ window.host_wizard_edit = new class {
 	/** @type {HTMLButtonElement} */
 	#next_button;
 
-	#sections_expanded = new Map();
+	#sections_collapsed = new Set();
 	#template_cards = new Map();
 
 	#csrf_token;
@@ -1459,11 +1459,7 @@ window.host_wizard_edit = new class {
 					title: category.charAt(0).toUpperCase() + category.slice(1)
 				});
 
-				const expanded = this.#sections_expanded.size === 0 || !!this.#sections_expanded.get(category);
-
-				this.#sections_expanded.set(category, expanded);
-
-				if (!expanded && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
+				if (this.#sections_collapsed.has(category) && !section.classList.contains(ZBX_STYLE_COLLAPSED)) {
 					toggleSection(section.querySelector('.toggle'));
 				}
 
@@ -1526,18 +1522,18 @@ window.host_wizard_edit = new class {
 				section.querySelector(`.<?= CSection::ZBX_STYLE_HEAD ?> h4`).append(` (${templates_count})`);
 
 				section.addEventListener('expand', () => {
-					this.#sections_expanded.set(category, true);
+					this.#sections_collapsed.delete(category);
 					this.#updateCardsHeight(section);
 				});
 				section.addEventListener('collapse', () => {
 					this.#data.show_info_by_template = null;
-					this.#sections_expanded.set(category, false);
+					this.#sections_collapsed.add(category);
 				});
 
 				sections.push(section);
 
 				setTimeout(() => {
-					if (this.#sections_expanded.get(category)) {
+					if (!this.#sections_collapsed.has(category)) {
 						this.#updateCardsHeight(section);
 					}
 				});
