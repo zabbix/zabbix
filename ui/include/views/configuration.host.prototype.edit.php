@@ -201,7 +201,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'readonly' => $data['is_discovered_prototype'],
+		'readonly' => $readonly,
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [
@@ -425,7 +425,7 @@ $tabs->addTab('tags-tab', _('Tags'),
 	new CPartial('configuration.tags.tab', [
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
-		'readonly' => $data['readonly'],
+		'readonly' => $data['readonly'] || $data['is_discovered_prototype'],
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab'
 	]),
@@ -453,7 +453,7 @@ $macro_tab = (new CFormList('macrosFormList'))
 		'macros_container'
 	);
 
-if (!$data['readonly']) {
+if (!($data['readonly'] || $data['is_discovered_prototype'])) {
 	$macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 		->addItem(
 			(new CRow([
@@ -627,7 +627,7 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'readonly' => $data['readonly'],
+		'readonly' => $data['readonly'] || $data['is_discovered_prototype'],
 		'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
 		'group_prototypes' => $host_prototype['groupPrototypes'],
 		'prototype_templateid' => $host_prototype['templateid'],
