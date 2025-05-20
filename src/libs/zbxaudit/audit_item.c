@@ -61,8 +61,7 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit detected: ->%d<-", flag);
-		THIS_SHOULD_NEVER_HAPPEN;
+		THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported item flag detected: %d", flag);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -133,7 +132,7 @@ void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_u
 void	zbx_audit_item_update_json_update_##resource(int audit_context_mode, zbx_uint64_t itemid, int flags,	\
 		type1 resource##_old, type1 resource##_new)							\
 {														\
-	char	prop[AUDIT_MAX_PROP_LEN];									\
+	char	prop[AUDIT_MAX_KEY_LEN];									\
 														\
 	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
@@ -1131,7 +1130,7 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	const char		*element = NULL;
-	char			prop[AUDIT_MAX_PROP_LEN];
+	char			prop[AUDIT_MAX_KEY_LEN];
 	zbx_uint64_t		index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1203,7 +1202,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 {
 	struct zbx_json_parse	jp_array_old, jp_object_old, jp_array_new, jp_object_new;
 	char			name_old[MAX_STRING_LEN], value_old[MAX_STRING_LEN], name_new[MAX_STRING_LEN],
-				value_new[MAX_STRING_LEN], prop[AUDIT_MAX_PROP_LEN];
+				value_new[MAX_STRING_LEN], prop[AUDIT_MAX_KEY_LEN];
 	const char		*member_old, *element_old = NULL, *member_new, *element_new = NULL;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1375,7 +1374,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t itemid, int flags,
 		const char *val)
 {
-	char		*val_tmp, *val_mut, *element = NULL, prop[AUDIT_MAX_PROP_LEN];
+	char		*val_tmp, *val_mut, *element = NULL, prop[AUDIT_MAX_KEY_LEN];
 	zbx_uint64_t	index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1440,7 +1439,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 		const char *val_old, const char *val_new)
 {
 	char		*val_old_tmp, *val_new_tmp, *val_old_mut, *val_new_mut, *element_old = NULL,
-			*element_new = NULL, prop[AUDIT_MAX_PROP_LEN];
+			*element_new = NULL, prop[AUDIT_MAX_KEY_LEN];
 	zbx_uint64_t	index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);

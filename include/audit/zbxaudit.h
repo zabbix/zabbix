@@ -66,6 +66,8 @@
 		ZBX_AUDIT_LLD_CONTEXT					\
 		)
 
+#define	AUDIT_DETAILS_KEY_LEN		100
+
 int	zbx_get_auditlog_enabled(void);
 int	zbx_get_auditlog_mode(void);
 
@@ -94,6 +96,8 @@ void	zbx_audit_prepare(int audit_context_mode);
 void	zbx_audit_clean(int audit_context_mode);
 void	zbx_audit_flush(int audit_context_mode);
 int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode);
+
+void	zbx_audit_get_status(int audit_context_mode, int *enabled);
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, uint64_t value, const char *table, const char *field);
@@ -146,13 +150,28 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 #define ZBX_AUDIT_RESOURCE_HISTORY			53
 #define ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE		56
 
-zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
+void	zbx_audit_entry_add(zbx_audit_entry_t *entry, const char *name);
+void	zbx_audit_entry_update(zbx_audit_entry_t *entry, const char *name);
 
-void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
-void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+void	zbx_audit_entry_add_int(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		int value1);
+void	zbx_audit_entry_update_int(zbx_audit_entry_t *entry, const char *name, int value1, int value2);
+void	zbx_audit_entry_delete_int(zbx_audit_entry_t *entry, const char *name, int value1);
+
+void	zbx_audit_entry_add_uint64(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		zbx_uint64_t value1);
+void	zbx_audit_entry_update_uint64(zbx_audit_entry_t *entry, const char *name, zbx_uint64_t value1,
+		zbx_uint64_t value2);
+void	zbx_audit_entry_delete_uint64(zbx_audit_entry_t *entry, const char *name, zbx_uint64_t value1);
+
+void	zbx_audit_entry_add_string(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		const char *value1);
+void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, const char *value1,
+		const char *value2);
+void	zbx_audit_entry_delete_string(zbx_audit_entry_t *entry, const char *name, const char *value1);
 
 /* maximum length of object property that's being logged, for example discoveryruleprototype.params */
-#define AUDIT_MAX_PROP_LEN       256
+#define AUDIT_MAX_KEY_LEN       256
 
 
 #endif	/* ZABBIX_ZBXAUDIT_H */

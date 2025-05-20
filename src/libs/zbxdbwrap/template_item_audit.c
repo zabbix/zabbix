@@ -21,7 +21,7 @@
 
 static void	lld_audit_item_add_string(const zbx_template_item_t *item, const char *field, const char *value)
 {
-	char	prop[AUDIT_MAX_PROP_LEN];
+	char	prop[AUDIT_MAX_KEY_LEN];
 
 	zbx_audit_update_json_append_string(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 			lld_audit_item_prop(item->flags, field, prop, sizeof(prop)),
@@ -30,7 +30,7 @@ static void	lld_audit_item_add_string(const zbx_template_item_t *item, const cha
 
 static void	lld_audit_item_add_uint64(const zbx_template_item_t *item, const char *field, zbx_uint64_t value)
 {
-	char	prop[AUDIT_MAX_PROP_LEN];
+	char	prop[AUDIT_MAX_KEY_LEN];
 
 	zbx_audit_update_json_append_uint64(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 			lld_audit_item_prop(item->flags, field, prop, sizeof(prop)),
@@ -40,7 +40,7 @@ static void	lld_audit_item_add_uint64(const zbx_template_item_t *item, const cha
 void	zbx_audit_item_update_json_add_data(int audit_context_mode, const zbx_template_item_t *item,
 		zbx_uint64_t hostid)
 {
-	char	prop[AUDIT_MAX_PROP_LEN];
+	char	prop[AUDIT_MAX_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 

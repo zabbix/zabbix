@@ -667,71 +667,295 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, con
 	delete_json(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
-zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create key for audit entry based on resource type and name        *
+ *                                                                            *
+ * Parameters: entry    - [IN] audit entry                                    *
+ *             name     - [IN] name to be included in the key                 *
+ *             key      - [OUT] resulting key                                 *
+ *             key_size - [IN] size of key buffer                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	audit_entry_make_key(const zbx_audit_entry_t *entry, const char *name, char *key, size_t key_size)
 {
-	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry, **paudit_entry;
+	const char	*owner;
 
-	local_audit_entry.id = id;
-	local_audit_entry.cuid = (char *)cuid;
-	local_audit_entry.id_table = id_table;
-
-	if (NULL == (paudit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &plocal_audit_entry)))
+	switch (entry->resource_type)
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
-	return *paudit_entry;
-}
-
-void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...)
-{
-	va_list		args;
-	int		value1, value2;
-
-	va_start(args, key);
-	value1 = va_arg(args, int);
-
-	switch (audit_op)
-	{
-		case ZBX_AUDIT_ACTION_ADD:
-			append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
+		case ZBX_AUDIT_RESOURCE_HOST:
+			owner = "host";
 			break;
-		case ZBX_AUDIT_ACTION_UPDATE:
-			value2 = va_arg(args, int);
-			update_int_json(&entry->details_json, key, value1, value2);
+		case ZBX_AUDIT_RESOURCE_GRAPH:
+			owner = "graph";
+			break;
+		case ZBX_AUDIT_RESOURCE_TRIGGER:
+			owner = "trigger";
+			break;
+		case ZBX_AUDIT_RESOURCE_HOST_GROUP:
+			owner = "hostgroup";
+			break;
+		case ZBX_AUDIT_RESOURCE_ITEM:
+			owner = "item";
+			break;
+		case ZBX_AUDIT_RESOURCE_SCENARIO:
+			owner = "scenario";
+			break;
+		case ZBX_AUDIT_RESOURCE_SCRIPT:
+			owner = "script";
+			break;
+		case ZBX_AUDIT_RESOURCE_PROXY:
+			owner = "proxy";
+			break;
+		case ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE:
+			owner = "triggerprototype";
+			break;
+		case ZBX_AUDIT_RESOURCE_GRAPH_PROTOTYPE:
+			owner = "graphprototype";
+			break;
+		case ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE:
+			owner = "itemprototype";
+			break;
+		case ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE:
+			owner = "hostprototype";
+			break;
+		case ZBX_AUDIT_RESOURCE_SETTINGS:
+			owner = "settings";
+			break;
+		case ZBX_AUDIT_RESOURCE_HA_NODE:
+			owner = "hanode";
+			break;
+		case ZBX_AUDIT_RESOURCE_LLD_RULE:
+			owner = "lldrule";
+			break;
+		case ZBX_AUDIT_RESOURCE_HISTORY:
+			owner = "history";
+			break;
+		case ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE:
+			owner = "lldruleprototype";
 			break;
 		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			break;
+			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown resource type: %d", entry->resource_type);
+			exit(EXIT_FAILURE);
 	}
 
-	va_end(args);
+	zbx_snprintf(key, key_size, "%s.%s", owner, name);
 }
 
-void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add detail creation for audit entry                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_add(zbx_audit_entry_t *entry, const char *name)
 {
-	va_list		args;
-	const char	*value1, *value2;
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
-	va_start(args, key);
-	value1 = va_arg(args, const char *);
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
 
-	switch (audit_op)
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	append_json_no_value(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add detail update for audit entry                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_update(zbx_audit_entry_t *entry, const char *name)
+{
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	append_json_no_value(&entry->details_json, AUDIT_DETAILS_ACTION_UPDATE, key);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add integer key creation for audit entry                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_add_int(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		int value1)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+
+	if (NULL != table)
 	{
-		case ZBX_AUDIT_ACTION_ADD:
-			append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
-			break;
-		case ZBX_AUDIT_ACTION_UPDATE:
-			value2 = va_arg(args, const char *);
-			update_str_json(&entry->details_json, key, value1, value2);
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			break;
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), "%d", value1);
+		if (SUCCEED == audit_field_value_matches_db_default(table, field, buffer, 0))
+			return;
 	}
 
-	va_end(args);
+	append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add integer key update for audit entry                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_update_int(zbx_audit_entry_t *entry, const char *name, int value1, int value2)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	update_int_json(&entry->details_json, key, value1, value2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add integer key removal for audit entry                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_delete_int(zbx_audit_entry_t *entry, const char *name, int value1)
+{
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key, value1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add uint64 key creation for audit entry                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_add_uint64(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		zbx_uint64_t value1)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+
+	if (NULL != table)
+	{
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value1);
+		if (SUCCEED == audit_field_value_matches_db_default(table, field, buffer, value1))
+			return;
+	}
+
+	append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add uint64 key update for audit entry                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_update_uint64(zbx_audit_entry_t *entry, const char *name, zbx_uint64_t value1,
+		zbx_uint64_t value2)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	update_uint64_json(&entry->details_json, key, value1, value2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add uint64 key removal for audit entry                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_delete_uint64(zbx_audit_entry_t *entry, const char *name, zbx_uint64_t value1)
+{
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key, value1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add string key creation for audit entry                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_add_string(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		const char *value1)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+
+	if (NULL != table && SUCCEED == audit_field_value_matches_db_default(table, field, value1, 0))
+		return;
+
+	append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add string key update for audit entry                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, const char *value1,
+		const char *value2)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	update_str_json(&entry->details_json, key, value1, value2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add string key removal for audit entry                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_delete_string(zbx_audit_entry_t *entry, const char *name, const char *value1)
+{
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key, value1);
 }
 
 /******************************************************************************
@@ -784,4 +1008,18 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get audit status                                                  *
+ *                                                                            *
+ * Parameters: audit_context_mode - [IN] audit context mode                   *
+ *             enabled            - [OUT] audit status (1 - enabled)          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_get_status(int audit_context_mode, int *enabled)
+{
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+	*enabled = 1;
 }
