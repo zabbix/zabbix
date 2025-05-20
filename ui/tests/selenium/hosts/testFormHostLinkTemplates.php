@@ -155,7 +155,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			// #0 Attach template to template
 			[
 				[
-					'link' => 'zabbix.php?action=template.list',
+					'link' => 'zabbix.php?action=template.list&filter_name=Form+test+template&filter_set=1',
 					'entity' => 'Template'
 				]
 			],

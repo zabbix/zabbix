@@ -1,3 +1,8 @@
+Changes for 7.0.13
+
+7.0.13rc1 was released as 7.0.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.13rc1
 
 New features:
@@ -6961,9 +6966,12 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.47rc1
+Changes for 5.0.47
 
-New features:
+5.0.47rc1 was released as 5.0.47 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.47rc1
 
 Bug fixes:
 ...G...PS. [ZBX-26080] fixed old file descriptors being held when external log rotation is used (dgoloscapov)
