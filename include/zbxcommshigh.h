@@ -19,8 +19,12 @@
 #include "zbxcfg.h"
 #include "zbxjson.h"
 
+#define	ZBX_FAILOVER_ENABLED	1
+#define	ZBX_FAILOVER_DISABLED	0
+
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
-		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls);
+		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls,
+		int use_failover);
 void	zbx_disconnect_from_server(zbx_socket_t *sock);
 
 int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
