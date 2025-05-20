@@ -12,6 +12,7 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 define("ALL_PRINTABLE_ASCII", ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~');
@@ -41,7 +42,7 @@ class testExpressionMacros extends CIntegrationTest {
 	private static $trigger_recovery_expression;
 	private static $event_name;
 	private static $event_name_resolved;
-	private static $USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED;
+	private static $BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED;
 
 	const TRAPPER_ITEM_NAME = 'trap' . ALL_PRINTABLE_ASCII;
 	const TRAPPER_ITEM_KEY = 'trap';
@@ -71,7 +72,7 @@ class testExpressionMacros extends CIntegrationTest {
 
 
 	// COMMON means common between main, recovery and update
-	const USER_MACROS_CONSISTENT_RESOLVE_COMMON = "ACTION.NAME -> {ACTION.NAME} <-
+	const BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON = "ACTION.NAME -> {ACTION.NAME} <-
 EVENT.ACK.STATUS -> {EVENT.ACK.STATUS} <-
 EVENT.NAME -> {EVENT.NAME} <-
 EVENT.NSEVERITY -> {EVENT.NSEVERITY} <-
@@ -122,34 +123,31 @@ TRIGGER.URL -> {TRIGGER.URL} <-
 TRIGGER.URL.NAME -> {TRIGGER.URL.NAME} <-
 TRIGGER.VALUE -> {TRIGGER.VALUE} <-";
 
-	const USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE = "EVENT.AGE -> {EVENT.AGE} <-
-EVENT.DURATION -> {EVENT.DURATION} <-";
-
-	const USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
+	const BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
 EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
 EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
 EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
 EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
-
-
-			const USER_MACROS_INCONSISTENT_RESOLVE = "ACTION.ID -> {ACTION.ID} <-
+			const BUILTIN_MACROS_INCONSISTENT_RESOLVE = "ACTION.ID -> {ACTION.ID} <-
 ESC.HISTORY -> {ESC.HISTORY} <-
 DATE -> {DATE} <-
 TIME -> {TIME} <-
+EVENT.AGE -> {EVENT.AGE} <-
 EVENT.DATE -> {EVENT.DATE} <-
+EVENT.DURATION -> {EVENT.DURATION} <-
 EVENT.ID -> {EVENT.ID} <-
 EVENT.TIME -> {EVENT.TIME} <-
 HOST.ID -> {HOST.ID} <-
-{ITEM.ID} -> {ITEM.ID} <-
+ITEM.ID -> {ITEM.ID} <-
 TRIGGER.ID -> {TRIGGER.ID} <-";
 
-	const USER_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY = "
+	const BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY = "
 EVENT.RECOVERY.ID -> {EVENT.RECOVERY.ID} <-
 EVENT.RECOVERY.TIME -> {EVENT.RECOVERY.TIME} <-";
 
-	const USER_MACROS_UNKNOWN = "EVENT.CAUSE.ACK.STATUS -> {EVENT.CAUSE.ACK.STATUS} <-
+	const BUILTIN_MACROS_UNKNOWN = "EVENT.CAUSE.ACK.STATUS -> {EVENT.CAUSE.ACK.STATUS} <-
 EVENT.CAUSE.AGE -> {EVENT.CAUSE.AGE} <-
 EVENT.CAUSE.DATE -> {EVENT.CAUSE.DATE} <-
 EVENT.CAUSE.DURATION -> {EVENT.CAUSE.DURATION} <-
@@ -246,7 +244,7 @@ ITEM.LOG.SOURCE -> {ITEM.LOG.SOURCE} <-
 ITEM.LOG.TIME -> {ITEM.LOG.TIME} <-
 TRIGGER.TEMPLATE.NAME -> {TRIGGER.TEMPLATE.NAME} <-";
 
-		const  USER_MACROS_UNKNOWN_RESOLVED = "EVENT.CAUSE.ACK.STATUS -> *UNKNOWN* <-
+		const  BUILTIN_MACROS_UNKNOWN_RESOLVED = "EVENT.CAUSE.ACK.STATUS -> *UNKNOWN* <-
 EVENT.CAUSE.AGE -> *UNKNOWN* <-
 EVENT.CAUSE.DATE -> *UNKNOWN* <-
 EVENT.CAUSE.DURATION -> *UNKNOWN* <-
@@ -345,7 +343,7 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 
 
 
-	const USER_MACROS_NON_REPLACEABLE = "{ALERT.MESSAGE}
+	const BUILTIN_MACROS_NON_REPLACEABLE = "{ALERT.MESSAGE}
 {ALERT.SENDTO}
 {ALERT.SUBJECT}
 {DISCOVERY.DEVICE.IPADDRESS}
@@ -421,11 +419,9 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 
 		self::$event_name = self::EVENT_PREFIX.'{?last(/{HOST.HOST}/'.self::TRAPPER_ITEM_KEY.'1)}';
 
-
-
 		self::$event_name_resolved = self::EVENT_PREFIX . self::VALUE_TO_FIRE_TRIGGER;
 
-		self::$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
+		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
 			"ACTION.NAME -> "							. self::ACTION_NAME									. " <-\n" .
 			"EVENT.ACK.STATUS -> "						. 'No'												. " <-\n" .
 			"EVENT.NAME -> "							. self::$event_name_resolved						. " <-\n" .
@@ -530,13 +526,6 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 		$this->assertEquals(count($items), count($response['result']['itemids']));
 
 
-			//'expression' => 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'1)='.self::VALUE_TO_FIRE_TRIGGER.' or '.
-			//		'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'2)='.self::VALUE_TO_FIRE_TRIGGER,
-			//'recovery_expression' => 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'1)='.self::VALUE_TO_RECOVER_TRIGGER,
-
-			//'event_name' => self::EVENT_PREFIX.'{?last(/{HOST.HOST}/'.self::TRAPPER_ITEM_KEY.'1)}',
-
-
 		// Create trigger
 		$response = $this->call('trigger.create', [
 			'description' => 'trigger_trap',
@@ -594,15 +583,15 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 						'subject' => self::SUBJECT_PREFIX.'{?last(//'.self::TRAPPER_ITEM_KEY.'1)}',
 						'message' => self::MESSAGE_PREFIX.'{?last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'1)}' . "\n" .
 							'===1===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
+							self::BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
 							'===2===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE . "\n" .
+							self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===3===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::USER_MACROS_UNKNOWN . "\n" .
+							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
 							'===5===' . "\n" .
-							self::USER_MACROS_NON_REPLACEABLE
+							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -626,13 +615,30 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 								'/macro/macroN:{?last(/{HOST.HOST}/{ITEM.KEY2})}'.
 								'/empty/macroN:{?last(//{ITEM.KEY2})}'. "\n" .
 							'===2===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
+							self::BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
 							'===3===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+							self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===4===' . "\n" .
-							self::USER_MACROS_UNKNOWN . "\n" .
+							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===5===' . "\n" .
-							self::USER_MACROS_NON_REPLACEABLE
+							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+							'===6===' . "\n" .
+							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				],
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 3,
+					'esc_step_to' => 3,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 4,
+						'subject' => "",
+						'message' => self::BUILTIN_MACROS_INCONSISTENT_RESOLVE
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -649,13 +655,13 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 						'subject' => self::SUBJECT_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_KEY.'1)}',
 						'message' => self::MESSAGE_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_KEY.'1,#2)}' . "\n" .
 							'===1===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
+							self::BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON . "\n" .
 							'===2===' . "\n" .
-							self::USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+							self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===3===' . "\n" .
-							self::USER_MACROS_UNKNOWN . "\n" .
+							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::USER_MACROS_NON_REPLACEABLE
+							self::BUILTIN_MACROS_NON_REPLACEABLE
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -706,16 +712,23 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+
+
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_RECOVER_TRIGGER);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true, 10, 3);
 
+
 		self::$alert_response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid],
 			'sortfield' => 'alertid'
 		], 5, 2);
-		$this->assertCount(3, self::$alert_response['result']);
+		$this->assertCount(4, self::$alert_response['result']);
+
 	}
 
 	/**
@@ -723,12 +736,7 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 	 */
 	public function testExpressionMacros_checkProblemMessage() {
 
-		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE_RESOLVED =
-			"EVENT.AGE -> "								. '0s' 												. " <-\n" .
-			"EVENT.DURATION -> "						. '0s'												. " <-" ;
-
-
-		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
+		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
 EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
 EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
@@ -737,15 +745,15 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
 		$message_expect = self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
-			self::$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
+			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
 			'===2===' . "\n" .
-			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_MAIN_MESSAGE_RESOLVED . "\n" .
+			$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
 			'===3===' . "\n" .
-			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::USER_MACROS_UNKNOWN_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
 			'===5===' . "\n" .
-			self::USER_MACROS_NON_REPLACEABLE;
+			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][0]['message']);
 	}
@@ -764,13 +772,14 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][1]['subject']);
 	}
 
+
 	/**
 	 * Test expression macro with {HOST.HOST} and {ITEM.KEY} macros
 	 * Next escalation step.
 	 */
 	public function testExpressionMacros_checkProblemMessage2() {
 
-		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
+		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
 EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
 EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
@@ -786,15 +795,35 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 				'/macro/macroN:' . self::VALUE_TO_RECOVER_TRIGGER .
 				'/empty/macroN:' . self::VALUE_TO_RECOVER_TRIGGER . "\n" .
 			'===2===' . "\n" .
-			self::$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
+			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
 			'===3===' . "\n" .
-			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::USER_MACROS_UNKNOWN_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===5===' . "\n" .
-			self::USER_MACROS_NON_REPLACEABLE;
+			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+			'===6===' . "\n" .
+			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][1]['message']);
+	}
+
+	public function testExpressionMacros_checkProblemMessage3_InconsistentMacros() {
+		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
+			"ESC.HISTORY[\s\S]*" .
+			"DATE[\s\S]*" .
+			"TIME[\s\S]*" .
+			"EVENT.AGE[\s\S]*" .
+			"EVENT.DATE[\s\S]*" .
+			"EVENT.DURATION[\s\S]*" .
+			"EVENT.ID[\s\S]*" .
+			"EVENT.TIME[\s\S]*" .
+			"HOST.ID[\s\S]*" .
+			"ITEM.ID[\s\S]*" .
+			"TRIGGER.ID[\s\S]*/";
+
+		$this->assertEquals("", self::$alert_response['result'][2]['subject']);
+		$this->assertRegExp($inconsistent_macros_resolved, self::$alert_response['result'][2]['message']);
 	}
 
 	/**
@@ -808,10 +837,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
 		$trigger_recovery_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_RECOVER_TRIGGER;
 
-
-
-
-		$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
+		$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
 			"ACTION.NAME -> "							. self::ACTION_NAME									. " <-\n" .
 			"EVENT.ACK.STATUS -> "						. 'No'												. " <-\n" .
 			"EVENT.NAME -> "							. self::$event_name_resolved						. " <-\n" .
@@ -865,7 +891,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
 		$recovery_event_name_resolved = self::EVENT_PREFIX . self::VALUE_TO_RECOVER_TRIGGER;
 
-		$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED =
+		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED =
 			"EVENT.RECOVERY.DATE -> "					. date('Y.m.d')										. " <-\n" .
 			"EVENT.RECOVERY.NAME -> "					. $recovery_event_name_resolved						. " <-\n" .
 			"EVENT.RECOVERY.STATUS -> "					. 'RESOLVED'										. " <-\n" .
@@ -873,21 +899,19 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 			"EVENT.RECOVERY.TAGSJSON -> "				. self::$event_tags_json							. " <-\n" .
 			"EVENT.RECOVERY.VALUE -> "					. '0'												. " <-";
 
-		//$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED_SOMETHING = "EVENT.RECOVERY.ID -> {EVENT.RECOVEVERY.ID} <- EVENT.RECOVERY.TIME -> {EVENT.RECOVERY.TIME} <-"
-
 		$recovery_message_expect = self::MESSAGE_PREFIX_RECOVERY . self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
-			$USER_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
+			$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
 			'===2===' . "\n" .
-			$USER_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
 			'===3===' . "\n" .
-			self::USER_MACROS_UNKNOWN_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::USER_MACROS_NON_REPLACEABLE;
+			self::BUILTIN_MACROS_NON_REPLACEABLE;
 
 
-		$this->assertEquals(self::SUBJECT_PREFIX_RECOVERY.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][2]['subject']);
-		$this->assertEquals($recovery_message_expect, self::$alert_response['result'][2]['message']);
+		$this->assertEquals(self::SUBJECT_PREFIX_RECOVERY.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][3]['subject']);
+		$this->assertEquals($recovery_message_expect, self::$alert_response['result'][3]['message']);
 	}
 
 	/**
@@ -896,4 +920,5 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	public function testExpressionMacros_checkEventName() {
 		$this->assertEquals(self::EVENT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$event_response['result'][0]['name']);
 	}
+
 }
