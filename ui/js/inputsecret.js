@@ -19,7 +19,7 @@
 (function($) {
 	'use strict';
 
-	function enableHandle(on_activate = false) {
+	function enableHandle(_, on_activate = false) {
 		var $btn_change = $(this),
 			$input = $btn_change.siblings('input[type=password]'),
 			$btn_undo = $btn_change
@@ -55,7 +55,7 @@
 		},
 		activateInput() {
 			return this.each(function() {
-				enableHandle.call($('.btn-change', $(this)), true);
+				enableHandle.call($('.btn-change', $(this)), null, true);
 			});
 		}
 	};
