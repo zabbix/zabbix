@@ -730,6 +730,16 @@ class CZabbixServer {
 		return true;
 	}
 
+	protected static function implodeDn(array $attributes): string {
+		$rdns = [];
+
+		foreach (array_reverse($attributes, true) as $name => $value) {
+			$rdns[] = "{$name}={$value}";
+		}
+
+		return implode(',', $rdns);
+	}
+
 	protected function validatePeerCertificate($socket): bool {
 		$subject_dn = $this->tls_config['CERTIFICATE_SUBJECT'];
 		$issuer_dn = $this->tls_config['CERTIFICATE_ISSUER'];
@@ -738,28 +748,12 @@ class CZabbixServer {
 		$cert = $params['options']['ssl']['peer_certificate'];
 
 		if ($info = @openssl_x509_parse($cert)) {
-			$dn_parser = new CDNParser();
-
-			if ($dn_parser->parse($issuer_dn) != CParser::PARSE_SUCCESS) {
+			if ($subject_dn && self::implodeDn((array) $info['subject']) !== $subject_dn) {
 				return false;
 			}
 
-			$peer_issuer = (array) $info['issuer'];
-			foreach ($dn_parser->result as ['name' => $name, 'value' => $value]) {
-				if (!array_key_exists($name, $peer_issuer) || $peer_issuer[$name] !== $value) {
-					return false;
-				}
-			}
-
-			if ($dn_parser->parse($subject_dn) != CParser::PARSE_SUCCESS) {
+			if ($issuer_dn && self::implodeDn((array) $info['issuer']) !== $issuer_dn) {
 				return false;
-			}
-
-			$peer_subject = (array) $info['subject'];
-			foreach ($dn_parser->result as ['name' => $name, 'value' => $value]) {
-				if (!array_key_exists($name, $peer_subject) || $peer_subject[$name] !== $value) {
-					return false;
-				}
 			}
 
 			return true;
