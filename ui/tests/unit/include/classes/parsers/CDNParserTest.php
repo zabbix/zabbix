@@ -110,4 +110,42 @@ class CDNParserTest extends TestCase {
 		$this->assertSame($dn_parser->parse($dn), $expect_result);
 		$this->assertSame($dn_parser->result, $expect_objects);
 	}
+
+	/**
+	 * @dataProvider dataProvider
+	 */
+	public function testParserMatchesLdapExplode(string $dn) {
+		$dn_parser = new CDNParser();
+
+		$parser_success = $dn_parser->parse($dn) == CParser::PARSE_SUCCESS;
+
+		$library_result = ldap_explode_dn($dn, 0);
+		$library_success = $library_result !== false;
+
+		$message = $library_success ? "Library succeeded in parsing '$dn'." : "Library failed in parsing '$dn'.";
+		$this->assertSame($parser_success, $library_success, $message);
+
+		if (is_array($library_result)) {
+			$this->assertSame(count($dn_parser->result), $library_result['count']);
+			$library_result_objects = [];
+			unset($library_result['count']);
+			foreach ($library_result as $rdn) {
+				[$name, $value] = explode('=', $rdn, 2);
+				$value = self::replaceHexChars($value);
+				$name = self::replaceHexChars($name);
+				$library_result_objects[] = ['name' => $name, 'value' => $value];
+			}
+
+			$this->assertSame($dn_parser->result, $library_result_objects);
+		}
+	}
+
+	private static function replaceHexChars(string $input) {
+		return preg_replace_callback(
+			pattern: '/\\\\([0-9A-Fa-f]{2})/',
+			callback: static fn (array $matches) => chr(hexdec($matches[1])),
+			subject: $input
+		);
+	}
+
 }
