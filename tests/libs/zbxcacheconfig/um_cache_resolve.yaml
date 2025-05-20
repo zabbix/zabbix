@@ -138,7 +138,7 @@ out:
   value: 00-0
 ---
 test case: Resolve {$M1} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M1}'
@@ -148,7 +148,7 @@ out:
   value: 1
 ---
 test case: Resolve {$M2} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2}'
@@ -158,7 +158,7 @@ out:
   value: 2
 ---
 test case: Resolve {$M2:1} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:1}'
@@ -168,7 +168,7 @@ out:
   value: 2-1
 ---
 test case: Resolve {$M2:2} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:2}'
@@ -178,7 +178,7 @@ out:
   value: 2-2
 ---
 test case: Resolve {$M2:3} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:3}'
@@ -188,7 +188,7 @@ out:
   value: 2-3
 ---
 test case: Resolve {$M2:4} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:4}'
@@ -198,7 +198,7 @@ out:
   value: 2-4
 ---
 test case: Resolve {$M2:5} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:5}'
@@ -208,7 +208,7 @@ out:
   value: 2-5
 ---
 test case: Resolve {$M2:6} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:6}'
@@ -218,7 +218,7 @@ out:
   value: 2-6
 ---
 test case: Resolve {$M2:7} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:7}'
@@ -228,7 +228,7 @@ out:
   value: 2-7
 ---
 test case: Resolve {$M2:8} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:8}'
@@ -238,7 +238,7 @@ out:
   value: 2-8
 ---
 test case: Resolve {$M2:9} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M2:9}'
@@ -248,7 +248,7 @@ out:
   value: 2-9
 ---
 test case: Resolve {$M3} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M3}'
@@ -258,7 +258,7 @@ out:
   value: 3
 ---
 test case: Resolve {$M4} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M4}'
@@ -268,7 +268,7 @@ out:
   value: 4
 ---
 test case: Resolve {$M4:1} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M4:1}'
@@ -278,7 +278,7 @@ out:
   value: 4-1
 ---
 test case: Resolve {$M4:2} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M4:2}'
@@ -288,7 +288,7 @@ out:
   value: 4-2
 ---
 test case: Resolve {$M5} from long macro list
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M5}'
@@ -298,7 +298,7 @@ out:
   value: 5
 ---
 test case: Resolve {$M:regex:123} 
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M:123}'
@@ -308,11 +308,21 @@ out:
   value: xyz
 ---
 test case: Resolve {$M:regex:abc} 
-include: &include um_cache_resolve.inc.yaml
+include: &include um_cache_resolve_00.inc.yaml
 in:
   config: *include
   macro: '{$M:abc}'
   hostids: [1]
 out:
   result: FAIL
+---
+test case: Test template resolve precendence
+include: &include um_cache_resolve_01.inc.yaml
+in:
+  config: *include
+  macro: '{$HOST_VALUE}'
+  hostids: [4]
+out:
+  result: SUCCEED
+  value: 'Host 1 value'
 ...
