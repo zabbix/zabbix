@@ -495,7 +495,8 @@ window.host_wizard_edit = new class {
 			}
 		}
 
-		view.querySelector('.js-show-templates').style.display = this.#source_host !== null ? '' : 'none';
+		view.querySelector('.js-show-templates')
+			.style.display = this.#source_host !== null && this.#linked_templates.length ? '' : 'none';
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
