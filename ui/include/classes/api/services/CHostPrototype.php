@@ -159,7 +159,7 @@ class CHostPrototype extends CHostBase {
 				$sqlParts['from'][] = 'host_hgset hh';
 				$sqlParts['from'][] = 'permission p';
 				$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
-				$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
+				$sqlParts['where'][] = 'hd.lldruleid=i.itemid';
 				$sqlParts['where'][] = 'i.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
