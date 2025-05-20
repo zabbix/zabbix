@@ -91,6 +91,11 @@ class CDNParserTest extends TestCase {
 				['name' => 'dc', 'value' => 'org']
 			]],
 
+			['CN=Test\\\\,O=Org', CParser::PARSE_SUCCESS, [
+				['name' => 'CN', 'value' => 'Test\\'],
+				['name' => 'O', 'value' => 'Org']
+			]],
+
 			// Multivalue RDN's
 			['cn=doe\, john+uid=123', CParser::PARSE_SUCCESS, [
 				['name' => 'cn', 'value' => 'doe, john'],
@@ -115,8 +120,70 @@ class CDNParserTest extends TestCase {
 		$this->assertSame($dn_parser->result, $expect_objects);
 	}
 
+	public function dataProviderExtensive() {
+		return [
+			// Basic case
+			['CN=John Doe,OU=Users,DC=example,DC=com'],
+
+			// Multiple AttributeType=Value in RDN
+			['CN=John Doe+UID=12345,OU=Users,DC=example,DC=com'],
+
+			// Escaped characters
+			['CN=Joh\\,n Doe,OU=Users,DC=example,DC=com'],         // Comma inside value
+			['CN=Joh\\+n Doe,OU=Users,DC=example,DC=com'],         // Plus inside value
+			['CN=Joh\\n Doe,OU=Users,DC=example,DC=com'],          // Backslash inside value
+			['CN=Joh\\;n Doe,OU=Users,DC=example,DC=com'],         // Semicolon inside value
+			['CN=Joh\\=n Doe,OU=Users,DC=example,DC=com'],         // Equals inside value
+
+			// Hex encoding (control and non-printable chars)
+			['CN=Hello \\2C World,OU=Test,DC=example,DC=com'],     // \2C = ','
+			['CN=Tabbed\\09Name,OU=Test,DC=example,DC=com'],       // \09 = Tab
+			['CN=Newline\\0AName,OU=Test,DC=example,DC=com'],      // \0A = Line Feed
+			['CN=Null\\00Char,OU=Test,DC=example,DC=com'],         // Null byte escape
+
+			// Leading/Trailing whitespace
+			[' CN = John Doe , OU = Users , DC = example , DC = com '],  // Spaces around =
+			['CN=John Doe , OU=Users,DC=example , DC=com'],              // Spaces after commas
+			['CN=John Doe   ,OU=Users  ,DC=example,DC=com'],             // Extra spaces before comma
+
+			// Empty RDN components (permitted but unusual)
+			['CN=John Doe,,OU=Users,DC=example,DC=com'],           // Empty component
+			['CN=John Doe,OU=,DC=example,DC=com'],                 // Empty value
+
+			// Special attribute names
+			['dc=example,dc=com'],
+			['o=University of Michigan,c=US'],
+			['cn=Steve Kille,o=ISODE Consortium,c=GB'],
+			['l=Los Angeles, st=California, c=US'],                // With spaces
+
+			// Internationalization / UTF-8
+			['CN=Éric,CN=André,DC=example,DC=com'],
+			/* ['CN=Klüger\\xC3\\x9F,OU=Users,DC=example,DC=com'],   // Mixed Unicode + escaped UTF-8 bytes */
+
+			// Hex-encoded binary values
+			['CN=# 040AFFFFFFFF'],                                 // Binary BER encoding format
+
+			// Quoted strings (less common, allowed)
+			['CN="Hello, World",OU=Test,DC=example,DC=com'],
+			['CN="Escaped \\"Quote\\"",OU=Test,DC=example,DC=com'],
+
+			// Complex nested escaping
+			['CN=First\\, Last\\\\,OU=People,DC=example,DC=com'],  // Combination of escapes
+
+			// Long DN with many RDNs
+			[implode(',', array_fill(0, 100, 'OU=Level'))],       // Deep hierarchy
+
+			// Empty DN string
+			[''],
+			['='],
+			['=org'],
+			['CN=John=Doe,OU=Users,DC=example,DC=com'],           // Invalid '=' in value without quotes or escape
+		];
+	}
+
 	/**
 	 * @dataProvider dataProvider
+	 * @dataProvider dataProviderExtensive
 	 */
 	public function testParserMatchesLdapExplode(string $dn) {
 		$dn_parser = new CDNParser();
