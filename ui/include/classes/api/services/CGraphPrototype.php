@@ -80,8 +80,6 @@ class CGraphPrototype extends CGraphGeneral {
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
-			'selectDiscoveryRule'		=> null,
-			'selectDiscoveryRulePrototype'	=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -305,7 +303,9 @@ class CGraphPrototype extends CGraphGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -398,66 +398,45 @@ class CGraphPrototype extends CGraphGeneral {
 		return $result;
 	}
 
-	private static function addRelatedDiscoveryRules(array $options, array &$result): void {
-		if ($options['selectDiscoveryRule'] === null) {
-			return;
-		}
-
-		$resource = DBselect(
-			'SELECT gi.graphid,id.lldruleid'.
-			' FROM graphs_items gi,item_discovery id,items i'.
-			' WHERE gi.itemid=id.itemid'.
-				' AND id.lldruleid=i.itemid'.
-				' AND '.dbConditionId('gi.graphid', array_keys($result)).
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
-		);
-
-		$relation_map = new CRelationMap();
-
-		while ($row = DBfetch($resource)) {
-			$relation_map->addRelation($row['graphid'], $row['lldruleid']);
-		}
-
-		$lld_rules = API::DiscoveryRule()->get([
-			'output' => $options['selectDiscoveryRule'],
-			'itemids' => $relation_map->getRelatedIds(),
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-	}
-
 	private static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
 		if ($options['selectDiscoveryRulePrototype'] === null) {
 			return;
 		}
 
+		foreach ($result as &$graph) {
+			$graph['discoveryRulePrototype'] = [];
+		}
+		unset($graph);
+
 		$resource = DBselect(
-			'SELECT gi.graphid,id.lldruleid'.
-			' FROM graphs_items gi,item_discovery id,items i'.
-			' WHERE gi.itemid=id.itemid'.
-				' AND id.lldruleid=i.itemid'.
-				' AND '.dbConditionId('gi.graphid', array_keys($result)).
+			'SELECT DISTINCT gi.graphid,id.lldruleid'.
+			' FROM graphs_items gi'.
+			' JOIN item_discovery id ON gi.itemid=id.itemid'.
+			' JOIN items i ON id.lldruleid=i.itemid'.
+			' WHERE '.dbConditionId('gi.graphid', array_keys($result)).
 				' AND '.dbConditionInt('i.flags',
 					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
 				)
 		);
 
-		$relation_map = new CRelationMap();
+		$graphids = [];
 
 		while ($row = DBfetch($resource)) {
-			$relation_map->addRelation($row['graphid'], $row['lldruleid']);
+			$graphids[$row['lldruleid']][] = $row['graphid'];
 		}
 
-		$lld_rule_prototypes = API::DiscoveryRulePrototype()->get([
+		$parent_lld_rules = API::DiscoveryRulePrototype()->get([
 			'output' => $options['selectDiscoveryRulePrototype'],
-			'itemids' => $relation_map->getRelatedIds(),
+			'itemids' => array_keys($graphids),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
-		$result = $relation_map->mapOne($result, $lld_rule_prototypes, 'discoveryRulePrototype');
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($graphids[$lldruleid] as $graphid) {
+				$result[$graphid]['discoveryRulePrototype'] = $parent_lld_rule;
+			}
+		}
 	}
 
 	/**

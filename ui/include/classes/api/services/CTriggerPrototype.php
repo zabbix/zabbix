@@ -83,8 +83,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectItems'					=> null,
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
-			'selectDiscoveryRule'			=> null,
-			'selectDiscoveryRulePrototype'	=> null,
 			'selectTags'					=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
@@ -422,7 +420,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -581,50 +581,52 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		$select_lld_rules = $options['selectDiscoveryRule'] !== null
-			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
-		$select_lld_rule_prototypes = $options['selectDiscoveryRulePrototype'] !== null
-			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
-
-		if ($select_lld_rules || $select_lld_rule_prototypes) {
-			$lld_links = DBselect(
-				'SELECT id.lldruleid,f.triggerid'.
-				' FROM item_discovery id,functions f'.
-				' WHERE '.dbConditionId('f.triggerid', $triggerPrototypeIds).
-					' AND f.itemid=id.itemid'
-			);
-			$relation_map = new CRelationMap();
-
-			while ($row = DBfetch($lld_links)) {
-				$relation_map->addRelation($row['triggerid'], $row['lldruleid']);
-			}
-
-			if ($select_lld_rules) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($select_lld_rule_prototypes) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
-		}
-
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
+	}
+
+	private static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototype'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['discoveryRulePrototype'] = [];
+		}
+		unset($trigger);
+
+		$resource = DBselect(
+			'SELECT DISTINCT f.triggerid,id.lldruleid'.
+			' FROM functions f'.
+			' JOIN item_discovery id ON f.itemid=id.itemid'.
+			' JOIN items i ON id.lldruleid=i.itemid'.
+			' WHERE '.dbConditionId('f.triggerid', array_keys($result)).
+				' AND '.dbConditionId('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$triggerids = [];
+
+		while ($row = DBfetch($resource)) {
+			$triggerids[$row['lldruleid']][] = $row['triggerid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototype'],
+			'itemids' => array_keys($triggerids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($triggerids[$lldruleid] as $triggerid) {
+				$result[$triggerid]['discoveryRulePrototype'] = $parent_lld_rule;
+			}
+		}
 	}
 
 	/**

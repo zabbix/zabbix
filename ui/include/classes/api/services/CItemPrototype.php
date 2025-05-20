@@ -98,8 +98,6 @@ class CItemPrototype extends CItemGeneral {
 			'selectHosts'					=> null,
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
-			'selectDiscoveryRule'			=> null,
-			'selectDiscoveryRulePrototype'	=> null,
 			'selectPreprocessing'			=> null,
 			'selectTags'					=> null,
 			'selectValueMap'				=> null,
@@ -313,8 +311,10 @@ class CItemPrototype extends CItemGeneral {
 
 	private static function validateGet(array &$options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectValueMap' => 		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectValueMap' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1395,37 +1395,6 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-		$select_lld_rule = $options['selectDiscoveryRule'] !== null
-			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
-		$select_lld_rule_prototype = $options['selectDiscoveryRulePrototype'] !== null
-			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
-
-		if ($select_lld_rule || $select_lld_rule_prototype) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
-
-			if ($select_lld_rule) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($select_lld_rule_prototype) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
-		}
-
 		// Adding item tags.
 		if ($options['selectTags'] !== null) {
 			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
@@ -1450,6 +1419,8 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;

@@ -210,37 +210,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			}
 		}
 
-		if ($options['selectDiscoveryRulePrototypes'] !== null) {
-			if ($options['selectDiscoveryRulePrototypes'] != API_OUTPUT_COUNT) {
-				$item_relation_map = $this->createRelationMap($result, 'lldruleid', 'itemid', 'item_discovery');
-
-				$items = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototypes'],
-					'itemids' => $item_relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $item_relation_map->mapMany($result, $items, 'discoveryRulePrototypes', $options['limitSelects']);
-			}
-			else {
-				$items = API::DiscoveryRulePrototype()->get([
-					'countOutput' => true,
-					'groupCount' => true,
-					'discoveryids' => $itemids,
-					'nopermissions' => true
-				]);
-
-				$items = array_column($items, null, 'lldruleid');
-
-				foreach ($result as $itemid => &$item) {
-					$item['discoveryRulePrototypes'] =
-						array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
-				}
-				unset($item);
-			}
-		}
-
 		if ($options['selectFilter'] !== null) {
 			$has_evaltype = $this->outputIsRequested('evaltype', $options['selectFilter']);
 			$has_formula = $this->outputIsRequested('formula', $options['selectFilter']);
@@ -589,6 +558,64 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	protected static function addRelatedChildDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototypes'] === null) {
+			return;
+		}
+
+		if ($options['selectDiscoveryRulePrototypes'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$item) {
+				$item['discoveryRulePrototypes'] = '0';
+			}
+			unset($item);
+
+			$child_items = API::DiscoveryRulePrototype()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'discoveryids' => array_keys($result),
+				'nopermissions' => true
+			]);
+
+			foreach ($child_items as $child_item) {
+				$result[$child_item['lldruleid']]['discoveryRulePrototypes'] = $child_item['rowscount'];
+			}
+
+			return;
+		}
+
+		foreach ($result as &$item) {
+			$item['discoveryRulePrototypes'] = [];
+		}
+		unset($item);
+
+		$resource = DBselect(
+			'SELECT id.lldruleid,i.itemid'.
+			' FROM item_discovery id'.
+			' JOIN items i ON id.itemid=i.itemid'.
+			' WHERE '.dbConditionId('id.lldruleid', array_keys($result)).
+				' AND '.dbConditionId('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$itemids = [];
+
+		while ($row = DBfetch($resource)) {
+			$itemids[$row['itemid']] = $row['lldruleid'];
+		}
+
+		$child_items = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototypes'],
+			'itemids' => array_keys($itemids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($child_items as $child_itemid => $child_item) {
+			$result[$itemids[$child_itemid]]['discoveryRulePrototypes'][] = $child_item;
+		}
 	}
 
 	/**

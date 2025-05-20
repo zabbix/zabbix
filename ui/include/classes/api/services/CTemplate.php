@@ -70,7 +70,6 @@ class CTemplate extends CHostGeneral {
 			'selectTemplates'			=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
-			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectMacros'				=> null,
@@ -83,10 +82,10 @@ class CTemplate extends CHostGeneral {
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
+			'limit'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
 		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
@@ -289,22 +288,19 @@ class CTemplate extends CHostGeneral {
 		return $result;
 	}
 
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array $options) {
-		// Validate input parameters.
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])]
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			// Output.
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
+			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])],
+			'selectDiscoveries' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
+			'selectDiscoveryRules' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
+			// Sort and limit.
+			'limitSelects' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
@@ -1075,6 +1071,8 @@ class CTemplate extends CHostGeneral {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$this->addRelatedTemplateGroups($options, $result);
+		self::addRelatedChildDiscoveries($options, $result);
+		self::addRelatedChildDiscoveryRules($options, $result);
 
 		$templateids = array_keys($result);
 

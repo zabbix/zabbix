@@ -227,7 +227,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$options['selectItems'] = API_OUTPUT_COUNT;
 		$options['selectTriggers'] = API_OUTPUT_COUNT;
 		$options['selectGraphs'] = API_OUTPUT_COUNT;
-		$options['selectDiscoveries'] = API_OUTPUT_COUNT;
+		$options['selectDiscoveryRules'] = API_OUTPUT_COUNT;
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
 	}
 
@@ -246,7 +246,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			$options['selectTriggers'] = API_OUTPUT_COUNT;
 			$options['selectGraphs'] = API_OUTPUT_COUNT;
 			$options['selectDashboards'] = API_OUTPUT_COUNT;
-			$options['selectDiscoveries'] = API_OUTPUT_COUNT;
+			$options['selectDiscoveryRules'] = API_OUTPUT_COUNT;
 			$options['selectHttpTests'] = API_OUTPUT_COUNT;
 		}
 
@@ -504,7 +504,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
 			),
-			CViewHelper::showNum($db_host['discoveries'])
+			CViewHelper::showNum($db_host['discoveryRules'])
 		]);
 		if ($current_element === 'discoveries') {
 			$lld_rules->addClass(ZBX_STYLE_SELECTED);

@@ -32,6 +32,14 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		'uuid'
 	];
 
+	public static function getOutputFieldsOnHost(): array {
+		return array_diff(self::OUTPUT_FIELDS, ['uuid']);
+	}
+
+	public static function getOutputFieldsOnTemplate(): array {
+		return array_diff(self::OUTPUT_FIELDS, ['flags', 'interfaceid', 'state', 'error']);
+	}
+
 	/**
 	 * Get DiscoveryRule data
 	 */
@@ -72,7 +80,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectHostPrototypes'			=> null,
-			'selectDiscoveryRulePrototypes'	=> null,
 			'selectFilter'					=> null,
 			'selectLLDMacroPaths'			=> null,
 			'selectPreprocessing'			=> null,
@@ -291,8 +298,9 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryRule' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CDiscoveryRule::OUTPUT_FIELDS, ['lldruleid'])), 'default' => null],
-			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_ALLOW_COUNT, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -346,49 +354,11 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$this->addRelatedDiscoveryRule($options, $result);
+		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
+		self::addRelatedChildDiscoveryRulePrototypes($options, $result);
 
 		return $result;
-	}
-
-	private function addRelatedDiscoveryRule(array $options, array &$result): void {
-		if ($options['selectDiscoveryRule'] === null) {
-			return;
-		}
-
-		foreach ($result as &$lld_rule) {
-			$lld_rule['discoveryRule'] = [];
-		}
-		unset($lld_rule);
-
-		$resource = DBselect(
-			'SELECT id.itemid,id2.lldruleid'.
-			' FROM item_discovery id'.
-			' JOIN item_discovery id2 ON id.parent_itemid=id2.itemid'.
-			' WHERE '.dbConditionId('id.itemid', array_keys($result))
-		);
-
-		$itemids = [];
-
-		while ($row = DBfetch($resource)) {
-			$itemids[$row['lldruleid']][] = $row['itemid'];
-		}
-
-		$parent_lld_rules = API::DiscoveryRule()->get([
-			'output' => $this->outputExtend($options['selectDiscoveryRule'], ['itemid']),
-			'itemids' => array_keys($itemids),
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($parent_lld_rules as $parent_lld_rule) {
-			foreach ($itemids[$parent_lld_rule['itemid']] as $itemid) {
-				$result[$itemid]['discoveryRule'] = $this->outputIsRequested('itemid', $options['selectDiscoveryRule'])
-					? $parent_lld_rule
-					: array_diff_key($parent_lld_rule, ['itemid' => true]);
-			}
-		}
 	}
 
 	/**

@@ -87,7 +87,7 @@ class CConfigurationExport {
 			$unlink_templates_entities = API::Template()->get([
 				'output' => [],
 				'selectItems' => ['itemid'],
-				'selectDiscoveries' => ['itemid'],
+				'selectDiscoveryRules' => ['itemid'],
 				'selectHttpTests' => ['httptestid'],
 				'selectGraphs' => ['graphid'],
 				'selectTriggers' => ['triggerid'],
@@ -102,7 +102,7 @@ class CConfigurationExport {
 							array_column($template_entity['items'], 'itemid')
 						);
 						$template_data['unlink_discoveries'] = array_merge($template_data['unlink_discoveries'],
-							array_column($template_entity['discoveries'], 'itemid')
+							array_column($template_entity['discoveryRules'], 'itemid')
 						);
 						$template_data['unlink_httptests'] = array_merge($template_data['unlink_httptests'],
 							array_column($template_entity['httpTests'], 'httptestid')

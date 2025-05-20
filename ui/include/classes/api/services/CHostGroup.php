@@ -90,8 +90,7 @@ class CHostGroup extends CApiService {
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CDiscoveryRule::OUTPUT_FIELDS, ['uuid'])), 'default' => null],
-			'selectDiscoveryRulePrototypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::getOutputFieldsOnHost()), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
@@ -1176,37 +1175,6 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		if ($options['selectDiscoveryRules'] !== null || $options['selectDiscoveryRulePrototypes']) {
-			$lld_links = DBFetchArray(DBselect(
-				'SELECT gd.groupid,hd.lldruleid'.
-				' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-				' WHERE '.dbConditionId('gd.groupid', $groupids).
-					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
-					' AND gp.hostid=hd.hostid'
-			));
-			$relation_map = $this->createRelationMap($lld_links, 'groupid', 'lldruleid');
-
-			if ($options['selectDiscoveryRules'] !== null) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRules'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapMany($result, $lld_rules, 'discoveryRules');
-			}
-
-			if ($options['selectDiscoveryRulePrototypes'] !== null) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototypes'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapMany($result, $lld_rules, 'discoveryRulePrototypes');
-			}
-		}
-
 		// adding host prototype
 		if ($options['selectHostPrototypes'] !== null) {
 			$db_links = DBFetchArray(DBselect(
@@ -1234,10 +1202,49 @@ class CHostGroup extends CApiService {
 			}
 		}
 
+		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedGroupDiscoveries($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
+	}
+
+	private static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRules'] === null) {
+			return;
+		}
+
+		foreach ($result as &$group) {
+			$group['discoveryRules'] = [];
+		}
+		unset($group);
+
+		$resource = DBselect(
+			'SELECT gd.groupid,hd.lldruleid'.
+			' FROM group_discovery gd'.
+			' JOIN group_prototype gp ON gd.parent_group_prototypeid=gp.group_prototypeid'.
+			' JOIN host_discovery hd ON gp.hostid=hd.hostid'.
+			' WHERE '.dbConditionId('gd.groupid', array_keys($result))
+		);
+
+		$groupids = [];
+
+		while ($row = DBfetch($resource)) {
+			$groupids[$row['lldruleid']][] = $row['groupid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRules'],
+			'itemids' => array_keys($groupids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($groupids[$lldruleid] as $groupid) {
+				$result[$groupid]['discoveryRules'][] = $parent_lld_rule;
+			}
+		}
 	}
 
 	private static function addRelatedGroupDiscoveries(array $options, array &$result): void {

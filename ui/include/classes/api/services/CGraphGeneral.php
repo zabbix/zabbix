@@ -505,6 +505,53 @@ abstract class CGraphGeneral extends CApiService {
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
 
+	protected static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		foreach ($result as &$graph) {
+			$graph['discoveryRule'] = [];
+		}
+		unset($graph);
+
+		$resource = self::isGraph()
+			? DBselect(
+				'SELECT DISTINCT gd.graphid,id.lldruleid'.
+				' FROM graph_discovery gd'.
+				' JOIN graphs_items gi ON gd.parent_graphid=gi.graphid'.
+				' JOIN item_discovery id ON gi.itemid=id.itemid'.
+				' WHERE '.dbConditionId('gd.graphid', array_keys($result))
+			)
+			: DBselect(
+				'SELECT DISTINCT gi.graphid,id.lldruleid'.
+				' FROM graphs_items gi'.
+				' JOIN item_discovery id ON gi.itemid=id.itemid'.
+				' JOIN items i ON id.lldruleid=i.itemid'.
+				' WHERE '.dbConditionId('gi.graphid', array_keys($result)).
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+			);
+
+		$graphids = [];
+
+		while ($row = DBfetch($resource)) {
+			$graphids[$row['lldruleid']][] = $row['graphid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => array_keys($graphids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($graphids[$lldruleid] as $graphid) {
+				$result[$graphid]['discoveryRule'] = $parent_lld_rule;
+			}
+		}
+	}
+
 	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;

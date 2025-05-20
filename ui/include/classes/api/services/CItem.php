@@ -131,7 +131,6 @@ class CItem extends CItemGeneral {
 			'selectTags'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectDiscoveryRule'		=> null,
 			'selectPreprocessing'		=> null,
 			'selectValueMap'			=> null,
 			'countOutput'				=> false,
@@ -457,6 +456,7 @@ class CItem extends CItemGeneral {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
 			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
@@ -1726,30 +1726,7 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$resource = DBselect(
-				'SELECT id.itemid,id2.lldruleid'.
-				' FROM item_discovery id,item_discovery id2'.
-				' WHERE id.parent_itemid=id2.itemid'.
-					' AND '.dbConditionId('id.itemid', array_keys($result))
-			);
-
-			$relation_map = new CRelationMap();
-
-			while ($row = DBfetch($resource)) {
-				$relation_map->addRelation($row['itemid'], $row['lldruleid']);
-			}
-
-			$lld_rules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-
-			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-		}
-
+		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedItemDiscovery($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 

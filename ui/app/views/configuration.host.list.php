@@ -533,7 +533,7 @@ foreach ($data['hosts'] as $host) {
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')
 			),
-			CViewHelper::showNum($host['discoveries'])
+			CViewHelper::showNum($host['discoveryRules'])
 		],
 		[
 			new CLink(_('Web'),

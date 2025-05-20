@@ -69,13 +69,10 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			// output
 			'output'						=> API_OUTPUT_EXTEND,
 			'selectHosts'					=> null,
-			'selectDiscoveryRule'			=> null,
-			'selectDiscoveryRulePrototype'	=> null,
 			'selectItems'					=> null,
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectHostPrototypes'			=> null,
-			'selectDiscoveryRulePrototypes'	=> null,
 			'selectFilter'					=> null,
 			'selectLLDMacroPaths'			=> null,
 			'selectPreprocessing'			=> null,
@@ -287,7 +284,10 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryData' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_ALLOW_COUNT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -321,35 +321,9 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$select_parent_rule = $options['selectDiscoveryRule'] !== null
-			&& $options['selectDiscoveryRule'] != API_OUTPUT_COUNT;
-		$select_parent_prototype = $options['selectDiscoveryRulePrototype'] !== null
-			&& $options['selectDiscoveryRulePrototype'] != API_OUTPUT_COUNT;
-
-		if ($select_parent_rule || $select_parent_prototype) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'lldruleid', 'item_discovery');
-		}
-
-		if ($select_parent_rule) {
-			$discovery_rules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relation_map->mapOne($result, $discovery_rules, 'discoveryRule');
-		}
-
-		if ($select_parent_prototype) {
-			$discovery_prototypes = API::DiscoveryRulePrototype()->get([
-				'output' => $options['selectDiscoveryRulePrototype'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relation_map->mapOne($result, $discovery_prototypes, 'discoveryRulePrototype');
-		}
-
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
+		self::addRelatedChildDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;

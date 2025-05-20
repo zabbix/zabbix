@@ -949,40 +949,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		if ($options['selectDiscoveries'] !== null) {
-			if ($options['selectDiscoveries'] != API_OUTPUT_COUNT) {
-				$items = API::DiscoveryRule()->get([
-					'output' => $this->outputExtend($options['selectDiscoveries'], ['hostid', 'itemid']),
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($items, 'name');
-				}
-
-				$relationMap = $this->createRelationMap($items, 'hostid', 'itemid');
-
-				$items = $this->unsetExtraFields($items, ['hostid', 'itemid'], $options['selectDiscoveries']);
-				$result = $relationMap->mapMany($result, $items, 'discoveries', $options['limitSelects']);
-			}
-			else {
-				$items = API::DiscoveryRule()->get([
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-				$items = zbx_toHash($items, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['discoveries'] = array_key_exists($hostid, $items)
-						? $items[$hostid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
 		if ($options['selectTriggers'] !== null) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
 				$triggers = [];
@@ -1151,6 +1117,126 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		return $result;
+	}
+
+	protected static function addRelatedChildDiscoveries(array $options, array &$result): void {
+		if ($options['selectDiscoveries'] === null) {
+			return;
+		}
+
+		if ($options['selectDiscoveries'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$host) {
+				$host['discoveries'] = '0';
+			}
+			unset($host);
+
+			$items = API::DiscoveryRule()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'hostids' => array_keys($result),
+				'nopermissions' => true
+			]);
+
+			foreach ($items as $item) {
+				$result[$item['hostid']]['discoveries'] = $item['rowscount'];
+			}
+
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveries'] = [];
+		}
+		unset($host);
+
+		$internal_fields = ['hostid'];
+
+		if ($options['limitSelects'] !== null) {
+			$internal_fields[] = 'name';
+		}
+
+		$items = API::DiscoveryRule()->get([
+			'output' => array_unique(array_merge($options['selectDiscoveries'], $internal_fields)),
+			'hostids' => array_keys($result),
+			'nopermissions' => true
+		]);
+
+		if ($options['limitSelects'] !== null) {
+			CArrayHelper::sort($items, ['name']);
+		}
+
+		$fields_to_unset = array_flip(array_diff($internal_fields, $options['selectDiscoveries']));
+
+		foreach ($items as $item) {
+			if ($options['limitSelects'] !== null
+					&& count($result[$item['hostid']]['discoveries']) == $options['limitSelects']) {
+				continue;
+			}
+
+			$result[$item['hostid']]['discoveries'][] = $fields_to_unset
+				? array_diff_key($item, $fields_to_unset)
+				: $item;
+		}
+	}
+
+	protected static function addRelatedChildDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRules'] === null) {
+			return;
+		}
+
+		if ($options['selectDiscoveryRules'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$host) {
+				$host['discoveryRules'] = '0';
+			}
+			unset($host);
+
+			$items = API::DiscoveryRule()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'hostids' => array_keys($result),
+				'nopermissions' => true
+			]);
+
+			foreach ($items as $item) {
+				$result[$item['hostid']]['discoveryRules'] = $item['rowscount'];
+			}
+
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryRules'] = [];
+		}
+		unset($host);
+
+		$internal_fields = ['hostid'];
+
+		if ($options['limitSelects'] !== null) {
+			$internal_fields[] = 'name';
+		}
+
+		$items = API::DiscoveryRule()->get([
+			'output' => array_unique(array_merge($options['selectDiscoveryRules'], $internal_fields)),
+			'hostids' => array_keys($result),
+			'nopermissions' => true
+		]);
+
+		if ($options['limitSelects'] !== null) {
+			CArrayHelper::sort($items, ['name']);
+		}
+
+		$fields_to_unset = array_flip(array_diff($internal_fields, $options['selectDiscoveryRules']));
+
+		foreach ($items as $item) {
+			if ($options['limitSelects'] !== null
+					&& count($result[$item['hostid']]['discoveryRules']) == $options['limitSelects']) {
+				continue;
+			}
+
+			$result[$item['hostid']]['discoveryRules'][] = $fields_to_unset
+				? array_diff_key($item, $fields_to_unset)
+				: $item;
+		}
 	}
 
 	protected static function addGroupsByData(array $data, array &$hosts): void {

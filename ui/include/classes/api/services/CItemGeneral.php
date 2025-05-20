@@ -2149,6 +2149,91 @@ abstract class CItemGeneral extends CApiService {
 		return $result;
 	}
 
+	protected static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		foreach ($result as &$item) {
+			$item['discoveryRule'] = [];
+		}
+		unset($item);
+
+		$resource = (self::isDiscoveryRule() || self::isItem())
+			? DBselect(
+				'SELECT id.itemid,id2.lldruleid'.
+				' FROM item_discovery id'.
+				' JOIN item_discovery id2 ON id.parent_itemid=id2.itemid'.
+				' WHERE '.dbConditionId('id.itemid', array_keys($result))
+			)
+			: DBselect(
+				'SELECT id.lldruleid,id.itemid'.
+				' FROM item_discovery id'.
+				' JOIN items i ON id.lldruleid=i.itemid'.
+				' WHERE '.dbConditionId('id.itemid', array_keys($result)).
+					' AND '.dbConditionId('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+			);
+
+		$itemids = [];
+
+		while ($row = DBfetch($resource)) {
+			$itemids[$row['lldruleid']][] = $row['itemid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => array_keys($itemids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($itemids[$lldruleid] as $itemid) {
+				$result[$itemid]['discoveryRule'] = $parent_lld_rule;
+			}
+		}
+	}
+
+	protected static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototype'] === null) {
+			return;
+		}
+
+		foreach ($result as &$item) {
+			$item['discoveryRulePrototype'] = [];
+		}
+		unset($item);
+
+		$resource = DBselect(
+			'SELECT id.lldruleid,id.itemid'.
+			' FROM item_discovery id'.
+			' JOIN items i ON id.lldruleid=i.itemid'.
+			' WHERE '.dbConditionId('id.itemid', array_keys($result)).
+				' AND '.dbConditionId('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$itemids = [];
+
+		while ($row = DBfetch($resource)) {
+			$itemids[$row['lldruleid']][] = $row['itemid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototype'],
+			'itemids' => array_keys($itemids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($itemids[$lldruleid] as $itemid) {
+				$result[$itemid]['discoveryRulePrototype'] = $parent_lld_rule;
+			}
+		}
+	}
+
 	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;

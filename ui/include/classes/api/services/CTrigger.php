@@ -111,7 +111,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectItems'					=> null,
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
-			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
 			'countOutput'					=> false,
@@ -527,6 +526,7 @@ class CTrigger extends CTriggerGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
 			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
@@ -781,30 +781,6 @@ class CTrigger extends CTriggerGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$lld_links = DBselect(
-				'SELECT id.lldruleid,td.triggerid'.
-				' FROM trigger_discovery td,item_discovery id,functions f'.
-				' WHERE '.dbConditionId('td.triggerid', $triggerids).
-					' AND td.parent_triggerid=f.triggerid'.
-					' AND f.itemid=id.itemid'
-			);
-			$relation_map = new CRelationMap();
-
-			while ($row = DBfetch($lld_links)) {
-				$relation_map->addRelation($row['triggerid'], $row['lldruleid']);
-			}
-
-			$lld_rules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-
-			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-		}
-
 		// adding last event
 		if ($options['selectLastEvent'] !== null) {
 			foreach ($result as $triggerId => $trigger) {
@@ -875,6 +851,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
+		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedTriggerDiscovery($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 

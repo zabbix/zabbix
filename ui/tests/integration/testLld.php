@@ -1808,7 +1808,7 @@ class testLld extends CIntegrationTest
 				'selectItems' => ['name', 'key_'],
 				'selectTriggers' => ['description'],
 				'selectGraphs' => ['name'],
-				'selectDiscoveries' => ['name']
+				'selectDiscoveryRules' => ['name']
 			]);
 			$this->assertCount(1, $response['result']);
 
@@ -2246,7 +2246,7 @@ class testLld extends CIntegrationTest
 			'selectItems' => ['name', 'key_'],
 			'selectTriggers' => ['description'],
 			'selectGraphs' => ['name'],
-			'selectDiscoveries' => ['name']
+			'selectDiscoveryRules' => ['name']
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('items', $response['result'][0]);

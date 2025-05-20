@@ -244,7 +244,7 @@ class CControllerHostList extends CController {
 				'details'
 			],
 			'selectItems' => API_OUTPUT_COUNT,
-			'selectDiscoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveryRules' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,

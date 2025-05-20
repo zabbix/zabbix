@@ -80,7 +80,6 @@ class CGraph extends CGraphGeneral {
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
-			'selectDiscoveryRule'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -304,6 +303,7 @@ class CGraph extends CGraphGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
 			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
@@ -367,8 +367,6 @@ class CGraph extends CGraphGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$graphids = array_keys($result);
-
 		// adding Items
 		if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
@@ -382,31 +380,7 @@ class CGraph extends CGraphGeneral {
 			$result = $relation_map->mapMany($result, $items, 'items');
 		}
 
-		if ($options['selectDiscoveryRule'] !== null) {
-			$lld_links = DBselect(
-				'SELECT id.lldruleid,gd.graphid'.
-				' FROM graph_discovery gd,item_discovery id,graphs_items gi,items i'.
-				' WHERE '.dbConditionId('gd.graphid', $graphids).
-					' AND gd.parent_graphid=gi.graphid'.
-					' AND gi.itemid=id.itemid'.
-					' AND id.lldruleid=i.itemid'
-			);
-			$relation_map = new CRelationMap();
-
-			while ($relation = DBfetch($lld_links)) {
-				$relation_map->addRelation($relation['graphid'], $relation['lldruleid']);
-			}
-
-			$lld_rules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-
-			$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-		}
-
+		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedGraphDiscovery($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 

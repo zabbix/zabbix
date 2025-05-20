@@ -30,6 +30,18 @@ abstract class CHostBase extends CApiService {
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
+	protected static function isHost(): bool {
+		return static::class === 'CHost';
+	}
+
+	protected static function isTemplate(): bool {
+		return static::class === 'CTemplate';
+	}
+
+	private static function isHostPrototype(): bool {
+		return static::class === 'CHostPrototype';
+	}
+
 	protected function checkTemplates(array &$hosts, ?array &$db_hosts = null, ?string $path = null,
 			?array $template_indexes = null, ?string $path_clear = null, ?array $template_clear_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
@@ -1880,6 +1892,51 @@ abstract class CHostBase extends CApiService {
 		}
 
 		return $result;
+	}
+
+	protected static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryRule'] = [];
+		}
+		unset($host);
+
+		$resource = self::isHost()
+			? DBselect(
+				'SELECT hd.hostid,hd2.lldruleid'.
+				' FROM host_discovery hd'.
+				' JOIN host_discovery hd2 ON hd.parent_hostid=hd2.hostid'.
+				' WHERE '.dbConditionId('hd.hostid', array_keys($result))
+			)
+			: DBselect(
+				'SELECT hd.lldruleid,hd.hostid'.
+				' FROM host_discovery hd'.
+				' JOIN items i ON i.itemid=hd.lldruleid'.
+				' WHERE '.dbConditionId('hd.hostid', array_keys($result)).
+					' AND '.dbConditionId('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+			);
+
+		$hostids = [];
+
+		while ($row = DBfetch($resource)) {
+			$hostids[$row['lldruleid']][] = $row['hostid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => array_keys($hostids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($hostids[$lldruleid] as $hostid) {
+				$result[$hostid]['discoveryRule'] = $parent_lld_rule;
+			}
+		}
 	}
 
 	protected static function addRelatedDiscoveryData(array $options, array &$result): void {

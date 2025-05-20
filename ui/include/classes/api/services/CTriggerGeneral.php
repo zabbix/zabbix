@@ -890,6 +890,53 @@ abstract class CTriggerGeneral extends CApiService {
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
 
+	protected static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['discoveryRule'] = [];
+		}
+		unset($trigger);
+
+		$resource = self::isTrigger()
+			? DBselect(
+				'SELECT DISTINCT td.triggerid,id.lldruleid'.
+				' FROM trigger_discovery td'.
+				' JOIN functions f ON td.parent_triggerid=f.triggerid'.
+				' JOIN item_discovery id ON f.itemid=id.itemid'.
+				' WHERE '.dbConditionId('td.triggerid', array_keys($result))
+			)
+			: DBselect(
+				'SELECT DISTINCT f.triggerid,id.lldruleid'.
+				' FROM functions f'.
+				' JOIN item_discovery id ON f.itemid=id.itemid'.
+				' JOIN items i ON id.lldruleid=i.itemid'.
+				' WHERE '.dbConditionId('f.triggerid', array_keys($result)).
+					' AND '.dbConditionId('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+		);
+
+		$triggerids = [];
+
+		while ($row = DBfetch($resource)) {
+			$triggerids[$row['lldruleid']][] = $row['triggerid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => array_keys($triggerids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($triggerids[$lldruleid] as $triggerid) {
+				$result[$triggerid]['discoveryRule'] = $parent_lld_rule;
+			}
+		}
+	}
+
 	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
 		if ($options['selectDiscoveryData'] === null) {
 			return;

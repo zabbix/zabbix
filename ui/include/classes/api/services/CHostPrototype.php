@@ -42,7 +42,6 @@ class CHostPrototype extends CHostBase {
 		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
 			'custom_interfaces', 'uuid', 'flags'
 		];
-		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
 		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
 		$interface_fields = ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
 
@@ -62,8 +61,8 @@ class CHostPrototype extends CHostBase {
 			'groupCount' =>						['type' => API_FLAG, 'default' => false],
 			'selectGroupLinks' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
 			'selectGroupPrototypes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['group_prototypeid', 'name']), 'default' => null],
-			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff($discovery_fields, ['lldruleid', 'discover'])), 'default' => null],
-			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff($discovery_fields, ['lldruleid'])), 'default' => null],
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectParentHost' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectInterfaces' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
@@ -224,32 +223,8 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		if ($options['selectDiscoveryRule'] !== null || $options['selectDiscoveryRulePrototype'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'hostid', 'lldruleid', 'host_discovery');
-
-			if ($options['selectDiscoveryRule'] !== null) {
-				$lld_rules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRule');
-			}
-
-			if ($options['selectDiscoveryRulePrototype'] !== null) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => $options['selectDiscoveryRulePrototype'],
-					'itemids' => $relation_map->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				$result = $relation_map->mapOne($result, $lld_rules, 'discoveryRulePrototype');
-			}
-		}
-
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
 
 		self::addRelatedGroupLinks($options, $result);
@@ -364,6 +339,46 @@ class CHostPrototype extends CHostBase {
 		}
 
 		return $result;
+	}
+
+	private static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototype'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryRulePrototype'] = [];
+		}
+		unset($host);
+
+		$resource = DBselect(
+			'SELECT hd.lldruleid,hd.hostid'.
+			' FROM host_discovery hd'.
+			' JOIN items i ON hd.lldruleid=i.itemid'.
+			' WHERE '.dbConditionId('hd.hostid', array_keys($result)).
+				' AND '.dbConditionId('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$hostids = [];
+
+		while ($row = DBfetch($resource)) {
+			$hostids[$row['lldruleid']][] = $row['hostid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototype'],
+			'itemids' => array_keys($hostids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($hostids[$lldruleid] as $hostid) {
+				$result[$hostid]['discoveryRulePrototype'] = $parent_lld_rule;
+			}
+		}
 	}
 
 	/**
