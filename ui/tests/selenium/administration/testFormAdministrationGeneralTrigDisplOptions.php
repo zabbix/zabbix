@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 /**
  * @backup settings
  */
@@ -148,7 +146,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 
 		$form->fill(['Use custom event status colours' => true]);
 		foreach ($color_pickers as $selector) {
-			$form->query('xpath:.//z-color-picker[@color-field-name='. CXPathHelper::escapeQuotes($selector).']')->one()
+			$form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')->one()
 					->click();
 			$color_picker_dialog = $this->query('class:color-picker-dialog')->asColorPicker()->one();
 			$this->assertEquals(6, $color_picker_dialog->query('class:color-picker-input')->one()->getAttribute('maxlength'));

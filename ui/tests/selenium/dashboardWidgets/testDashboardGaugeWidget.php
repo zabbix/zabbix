@@ -18,8 +18,6 @@ require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 /**
  * @backup dashboard, globalmacro
  *

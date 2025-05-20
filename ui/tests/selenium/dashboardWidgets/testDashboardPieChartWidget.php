@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 define('LOGIN', true);
 define('WITHOUT_LOGIN', false);
 define('DEFAULT_PAGE', null);
@@ -203,7 +201,7 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Check other generic widget fields.
 		$expected_values = [
-			'Type' => 'Pie chart',
+			'Type' => 'Pie chart',testDashboardPieChartWidget_Layout
 			'Show header' => true,
 			'Name' => '',
 			'Refresh interval' => 'Default (1 minute)'
@@ -221,8 +219,9 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Check Data set - Item pattern.
 		$expected_values = [
-			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',        // host pattern
-			'xpath:.//div[@id="ds_0_items_"]/..' => '',        // item pattern
+			'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => 0,	// data set color
+			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',							// host pattern
+			'xpath:.//div[@id="ds_0_items_"]/..' => '',							// item pattern
 			'Aggregation function' => 'last',
 			'Data set aggregation' => 'not used',
 			'Data set label' => ''
@@ -233,16 +232,13 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
 
-		// Check Data set color picker default setup.
-		$color_picker = $data_set_tab->query('xpath:.//z-color-picker[@color-field-name="ds[0][color]"]')->one();
-		$this->assertEquals(0, $color_picker->getAttribute('palette'));
-
-		foreach ([1 => 'F48485', 2 => '7AD9CC', 3 => '7E7E7E'] as $part => $color) {
-			$this->assertEquals('--color: #'.$color.';', $color_picker
-					->query('xpath:(.//div[@class="color-picker-palette-icon-part"])['.$part.']')->one()
-					->getAttribute('style')
-			);
+		// Check Data set color picker default palette colors setup.
+		$color_picker = $form->getField('xpath:.//z-color-picker[@color-field-name="ds[0][color]"]');
+		$pallete_colors = [];
+		foreach ($color_picker->query('class:color-picker-palette-icon-part')->all() as $part) {
+			$pallete_colors[] = $part->getCSSValue('background-color');
 		}
+		$this->assertEquals(['rgba(244, 132, 133, 1)', 'rgba(122, 217, 204, 1)', 'rgba(126, 126, 126, 1)'], $pallete_colors);
 
 		$buttons = [
 			'id:ds_0_hosts_',                                      // host multiselect
