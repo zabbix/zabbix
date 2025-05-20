@@ -126,7 +126,11 @@ class CDNParserTest extends TestCase {
 		$this->assertSame($parser_success, $library_success, $message);
 
 		if (is_array($library_result)) {
-			$this->assertSame(count($dn_parser->result), $library_result['count']);
+			$result_count = count($dn_parser->result);
+			$this->assertSame($result_count, $library_result['count'], sprintf(
+				"Library found '%s' RDNs, parser found '%s' in DN '%s'.", $library_result['count'], $result_count, $dn
+			));
+
 			$library_result_objects = [];
 			unset($library_result['count']);
 			foreach ($library_result as $rdn) {
@@ -136,7 +140,7 @@ class CDNParserTest extends TestCase {
 				$library_result_objects[] = ['name' => $name, 'value' => $value];
 			}
 
-			$this->assertSame($dn_parser->result, $library_result_objects);
+			$this->assertSame($dn_parser->result, $library_result_objects, "Issue with DN: '$dn'.");
 		}
 	}
 
