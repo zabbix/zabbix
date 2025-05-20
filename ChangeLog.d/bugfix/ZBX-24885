@@ -1,1 +1,1 @@
-..F....... [ZBX-24885] added class for tags to display them with and without filters the same on the Latest data page (msnihach)
+..F....... [ZBX-24885] fixed inconsistent tag display and unnecessary ellipsis on Latest data page (msnihach)
