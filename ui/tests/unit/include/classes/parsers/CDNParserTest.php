@@ -64,6 +64,24 @@ class CDNParserTest extends TestCase {
 			['cn=\\ john\\ ', CParser::PARSE_SUCCESS, [
 				['name' => 'cn', 'value' => ' john ']
 			]],
+			['cn=john\\\\, dc=org', CParser::PARSE_SUCCESS, [
+				['name' => 'cn', 'value' => 'john\\'],
+				['name' => 'dc', 'value' => 'org']
+			]],
+			['cn=john\\\\, dc=\\\\org', CParser::PARSE_SUCCESS, [
+				['name' => 'cn', 'value' => 'john\\'],
+				['name' => 'dc', 'value' => '\\org']
+			]],
+			['cn=\\"doe john, dc=\\"org\\"', CParser::PARSE_SUCCESS, [
+				['name' => 'cn', 'value' => '"doe john'],
+				['name' => 'dc', 'value' => '"org"']
+			]],
+
+			// Double quoted.
+			['cn="john doe", dc=john doe', CParser::PARSE_SUCCESS, [
+				['name' => 'cn', 'value' => 'john doe'],
+				['name' => 'dc', 'value' => 'john doe']
+			]],
 
 			// Repeated names.
 			['dc=example,dc=org', CParser::PARSE_SUCCESS, [
