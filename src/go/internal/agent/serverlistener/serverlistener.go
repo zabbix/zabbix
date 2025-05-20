@@ -175,7 +175,7 @@ func (sl *ServerListener) Stop() {
 	if sl.listener != nil {
 		err := sl.listener.Close()
 		if err != nil {
-			log.Errf("failed to stop passive check listener: %s", err.Error())
+			log.Errf("passive check listener fail: %s", err.Error())
 		}
 	}
 }

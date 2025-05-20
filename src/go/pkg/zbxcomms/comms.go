@@ -354,8 +354,11 @@ func (c *Connection) SetCompress(compress bool) {
 // Close stops the listener.
 func (l *Listener) Close() error {
 	err := l.listener.Close()
+	if err != nil {
+		return errs.Wrap(err, "failed to close listener")
+	}
 
-	return errs.Wrap(err, "failed to close listener")
+	return nil
 }
 
 func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
