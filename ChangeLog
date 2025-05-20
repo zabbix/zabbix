@@ -160,6 +160,11 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
+Changes for 7.2.7
+
+7.2.7rc1 was released as 7.2.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.2.7rc1
 
 New features:
