@@ -151,7 +151,7 @@ window.host_wizard_edit = new class {
 		show_info_by_template: null,
 		data_collection: ZBX_TEMPLATE_DATA_COLLECTION_ANY,
 		agent_mode: ZBX_TEMPLATE_AGENT_MODE_ANY,
-		show_templates: ZBX_TEMPLATE_SHOW_ANY,
+		show_templates: ZBX_TEMPLATE_SHOW_LINKED,
 		monitoring_os: 'linux',
 		monitoring_os_distribution: 'windows-new',
 		interface_required: [],
