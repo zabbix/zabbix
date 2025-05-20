@@ -201,7 +201,7 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Check other generic widget fields.
 		$expected_values = [
-			'Type' => 'Pie chart',testDashboardPieChartWidget_Layout
+			'Type' => 'Pie chart',
 			'Show header' => true,
 			'Name' => '',
 			'Refresh interval' => 'Default (1 minute)'
