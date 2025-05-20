@@ -25,12 +25,6 @@ class CDNParserTest extends TestCase {
 		return [
 			// Empty values.
 			['', CParser::PARSE_SUCCESS],
-			['=', CParser::PARSE_SUCCESS, [
-				['name' => '', 'value' => '']
-			]],
-			['=org', CParser::PARSE_SUCCESS, [
-				['name' => '', 'value' => 'org']
-			]],
 			['dc=', CParser::PARSE_SUCCESS, [
 				['name' => 'dc', 'value' => '']
 			]],
@@ -82,6 +76,14 @@ class CDNParserTest extends TestCase {
 				['name' => 'cn', 'value' => 'john doe'],
 				['name' => 'dc', 'value' => 'john doe']
 			]],
+			['cn="john ,=+<>#; doe", dc=john doe', CParser::PARSE_SUCCESS, [
+				['name' => 'cn', 'value' => 'john ,=+<>#; doe'],
+				['name' => 'dc', 'value' => 'john doe']
+			]],
+			['cn="john\\, doe", dc=john doe', CParser::PARSE_SUCCESS, [
+				['name' => 'cn', 'value' => 'john, doe'],
+				['name' => 'dc', 'value' => 'john doe']
+			]],
 
 			// Repeated names.
 			['dc=example,dc=org', CParser::PARSE_SUCCESS, [
@@ -97,7 +99,9 @@ class CDNParserTest extends TestCase {
 
 			// Failing cases.
 			['cn=john,ou', CParser::PARSE_FAIL],
-			['john', CParser::PARSE_FAIL]
+			['john', CParser::PARSE_FAIL],
+			['=org', CParser::PARSE_FAIL],
+			['=', CParser::PARSE_FAIL]
 		];
 	}
 
@@ -151,5 +155,4 @@ class CDNParserTest extends TestCase {
 			subject: $input
 		);
 	}
-
 }

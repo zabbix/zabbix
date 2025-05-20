@@ -39,6 +39,12 @@ class CDNParser extends CParser {
 
 		foreach (self::split(',', $source) as $rdn) {
 			foreach (self::split('\\+', $rdn) as $attribute) {
+				if ($attribute && $attribute[0] === '=') {
+					$this->result = [];
+
+					return self::PARSE_FAIL;
+				}
+
 				if (!preg_match('#(?<!\\\\)=#', $attribute)) {
 					$this->result = [];
 
