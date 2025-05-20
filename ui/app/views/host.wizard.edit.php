@@ -112,7 +112,8 @@ function stepSelectTemplate($old_template_count): array {
 			(new CDiv([
 				$old_template_count > 0
 					? makeMessageBox(ZBX_STYLE_MSG_INFO, [],
-						_s('Some templates (%1$s) are hidden. Custom templates are not supported.', $old_template_count)
+						_s('Some templates (%1$s) are hidden. Custom templates are not supported.', $old_template_count),
+						false
 					)
 					: null,
 

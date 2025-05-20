@@ -736,6 +736,8 @@ window.host_wizard_edit = new class {
 					throw {error: response.error};
 				}
 
+				this.#removeMessageBoxes();
+
 				this.#template = response.template;
 				this.#host = response.host;
 
@@ -928,13 +930,17 @@ window.host_wizard_edit = new class {
 	}
 
 	#addMessageBox(message_box) {
-		for (const messages of this.#dialogue.querySelectorAll('.overlay-dialogue-body output')) {
-			messages.remove();
-		}
+		this.#removeMessageBoxes();
 
 		const step_form = this.#dialogue.querySelector('.step-form');
 
 		step_form.parentNode.insertBefore(message_box, step_form);
+	}
+
+	#removeMessageBoxes() {
+		for (const messages of this.#dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad')) {
+			messages.remove();
+		}
 	}
 
 	#updateStepsQueue() {
