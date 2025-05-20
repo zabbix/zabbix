@@ -136,6 +136,8 @@ window.host_wizard_edit = new class {
 	/** @type {HTMLButtonElement} */
 	#next_button;
 
+	#show_cancel_screen = false;
+
 	#sections_collapsed = new Set();
 	#template_cards = new Map();
 
@@ -266,6 +268,8 @@ window.host_wizard_edit = new class {
 		this.#initViewTemplates();
 
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
+		this.#overlay.is_cancel_locked = true;
+
 		this.#dialogue = this.#overlay.$dialogue[0];
 
 		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
@@ -273,17 +277,48 @@ window.host_wizard_edit = new class {
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
 
+		this.#dialogue.addEventListener('dialogue.cancel', () => {
+			if (this.#show_cancel_screen) {
+				this.#show_cancel_screen = false;
+
+				this.#gotoStep(this.#current_step);
+			}
+			else {
+				this.#show_cancel_screen = true;
+
+				this.#renderCancelScreen();
+			}
+		});
+
 		this.#dialogue.addEventListener('click', ({target}) => {
 			if (target.classList.contains('js-tls-key-change')) {
 				this.#data.tls_required = true;
 			}
+
 			if (target.classList.contains('js-generate-pre-shared-key')) {
 				this.#data.tls_psk = this.#generatePSK();
 			}
+
 			if (target.classList.contains('js-template-info-toggle')) {
 				this.#data.show_info_by_template = this.#data.show_info_by_template !== target.template
 					? target.template
 					: null;
+			}
+
+			if (target.classList.contains('js-cancel')) {
+				this.#show_cancel_screen = true;
+
+				this.#renderCancelScreen();
+			}
+
+			if (target.classList.contains('js-cancel-no')) {
+				this.#show_cancel_screen = false;
+
+				this.#gotoStep(this.#current_step);
+			}
+
+			if (target.classList.contains('js-cancel-yes')) {
+				overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 			}
 		});
 
@@ -343,6 +378,7 @@ window.host_wizard_edit = new class {
 			step_configure_host: tmpl('host-wizard-step-configure-host'),
 			step_configuration_finish: tmpl('host-wizard-step-configuration-finish'),
 			step_complete: tmpl('host-wizard-step-complete'),
+			cancel_screen: tmpl('host-wizard-cancel-screen'),
 
 			templates_section: tmpl('host-wizard-templates-section'),
 			templates_section_no_found: tmpl('host-wizard-templates-section-no-found'),
@@ -452,7 +488,7 @@ window.host_wizard_edit = new class {
 		this.#updateForm();
 		this.#updateFieldsAsterisk();
 		this.#updateProgress();
-		this.#updateNextButton();
+		this.#updateDialogButton();
 
 		requestAnimationFrame(() => {
 			const next_button_disabled = this.#next_button.hasAttribute('disabled');
@@ -679,6 +715,14 @@ window.host_wizard_edit = new class {
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
+	}
+
+	#renderCancelScreen() {
+		const view = this.#view_templates.cancel_screen.evaluateToElement();
+
+		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
+
+		this.#updateDialogButton();
 	}
 
 	#onBeforeNextStep() {
@@ -1275,7 +1319,15 @@ window.host_wizard_edit = new class {
 		}
 	}
 
-	#updateNextButton() {
+	#updateDialogButton() {
+		for (const button of this.#dialogue.querySelectorAll('.js-cancel, .js-back, .js-next')) {
+			button.style.display = this.#show_cancel_screen ? 'none' : '';
+		}
+
+		for (const button of this.#dialogue.querySelectorAll('.js-cancel-yes, .js-cancel-no')) {
+			button.style.display = this.#show_cancel_screen ? '' : 'none';
+		}
+
 		switch (this.#getCurrentStep()) {
 			case this.STEP_CONFIGURATION_FINISH:
 				this.#next_button.innerText = this.#data.host.isNew

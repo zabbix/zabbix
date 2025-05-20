@@ -44,6 +44,7 @@
 
 		.overlay-dialogue-footer {
 			display: flex;
+			justify-content: flex-end;
 			align-items: baseline;
 			padding: 24px 56px;
 			border-top: 1px solid $ui-border-color;

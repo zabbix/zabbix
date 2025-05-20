@@ -40,7 +40,8 @@ $output = [
 			stepReadme(),
 			stepConfigureHost(),
 			stepConfigurationFinish(),
-			stepComplete()
+			stepComplete(),
+			cancelScreen()
 		])
 			->addClass('step-form')
 			->toString(),
@@ -48,8 +49,7 @@ $output = [
 		[
 			'title' => _('Cancel'),
 			'class' => ZBX_STYLE_BTN_LINK.' dialogue-cancel js-cancel',
-			'cancel' => true,
-			'action' => ''
+			'cancel' => true
 		],
 		[
 			'title' => _('Back'),
@@ -58,7 +58,18 @@ $output = [
 		[
 			'title' => _('Next'),
 			'class' => 'js-next',
+		],
+		[
+			'title' => _('No'),
+			'class' => 'btn-alt js-cancel-no',
+		],
+		[
+			'title' => _('Yes'),
+			'class' => 'js-cancel-yes',
+			'cancel' => true,
+			'action' => ''
 		]
+
 	],
 	'script_inline' => $this->readJsFile('host.wizard.edit.js.php')
 		.'host_wizard_edit.init('.json_encode([
@@ -940,6 +951,24 @@ function stepComplete(): CTemplateTag {
 					(new CDiv([
 						new CTag('h1', true, _('Configuration complete')),
 						new CTag('p', true, '#{complete_message}')
+					]))
+						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+						->addClass(ZBX_STYLE_FORMATED_TEXT)
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		]))->addClass('step-form-body')
+	);
+}
+
+function cancelScreen(): CTemplateTag {
+	return new CTemplateTag('host-wizard-cancel-screen',
+		(new CDiv([
+			(new CSection())
+				->addItem(
+					(new CDiv([
+						new CTag('h1', true, _('Cancel Host Wizard?')),
+						new CTag('p', true, _('Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)
