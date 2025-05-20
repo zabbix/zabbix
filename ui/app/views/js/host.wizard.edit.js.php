@@ -307,7 +307,9 @@ window.host_wizard_edit = new class {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
 						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-							success: true
+							success: true,
+							is_host_new: this.#data.host.isNew,
+							hostid: this.#data.host.id
 						}}));
 					}
 				})
@@ -320,31 +322,8 @@ window.host_wizard_edit = new class {
 		return_url.searchParams.set('action', 'host.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		this.initPopupListeners();
-
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
-	}
-
-	initPopupListeners() {
-		// TODO VM: move to Data Collection -> Host page and to Popup page
-		ZABBIX.EventHub.subscribe({
-			require: {
-				context: CPopupManager.EVENT_CONTEXT,
-				event: CPopupManagerEvent.EVENT_SUBMIT
-			},
-			callback: ({data, event}) => {
-				if (this.#data.host.isNew) {
-					const url = new URL('zabbix.php', location.href);
-
-					url.searchParams.set('action', 'latest.view');
-					url.searchParams.set('hostids[]', this.#data.host.id);
-					url.searchParams.set('filter_set', '1');
-
-					event.setRedirectUrl(url.href);
-				}
-			}
-		});
 	}
 
 	#initViewTemplates() {
