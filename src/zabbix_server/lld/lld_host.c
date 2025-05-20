@@ -287,6 +287,10 @@ typedef struct
 										/* should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_MONITORED_BY		__UINT64_C(0x00010000)	/* hosts.proxy_groupid field */
 										/* should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_STATUS			__UINT64_C(0x00010000)	/* hosts.status field */
+										/* should be updated (for prototypes) */
+#define ZBX_FLAG_LLD_HOST_UPDATE_DISCOVER		__UINT64_C(0x00010000)	/* hosts.discover field */
+										/* should be updated (for prototypes) */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -296,14 +300,18 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY |	\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK | ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES |		\
-		ZBX_FLAG_LLD_HOST_UPDATE_PROXY_GROUP | ZBX_FLAG_LLD_HOST_UPDATE_MONITORED_BY)
+		ZBX_FLAG_LLD_HOST_UPDATE_PROXY_GROUP | ZBX_FLAG_LLD_HOST_UPDATE_MONITORED_BY |		\
+		ZBX_FLAG_LLD_HOST_UPDATE_STATUS | ZBX_FLAG_LLD_HOST_UPDATE_DISCOVER)
 	zbx_uint64_t			flags;
 	const zbx_lld_row_t		*lld_row;
 	signed char			inventory_mode;
 	signed char			inventory_mode_orig;
 	unsigned char			status;
+	unsigned char			status_orig;
 	unsigned char			custom_interfaces;
 	unsigned char			custom_interfaces_orig;
+	unsigned char			discover;
+	unsigned char			discover_orig;
 	zbx_uint64_t			proxyid_orig;
 	zbx_uint64_t			proxy_groupid_orig;
 	signed char			ipmi_authtype_orig;
@@ -586,7 +594,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,hi.inventory_mode,"
 				"h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,"
 				"h.custom_interfaces,hh.hgsetid,hd.status,hd.ts_disable,hd.disable_source,h.status,"
-				"h.proxy_groupid,h.monitored_by"
+				"h.proxy_groupid,h.monitored_by,h.discover"
 			" from host_discovery hd"
 				" join hosts h"
 					" on hd.hostid=h.hostid"
@@ -618,6 +626,9 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 		host->lld_row = NULL;
 		host->inventory_mode = HOST_INVENTORY_DISABLED;
 		ZBX_STR2UCHAR(host->status, row[23]);
+		ZBX_STR2UCHAR(host->discover, row[26]);
+		host->discover_orig = 0;
+		host->status_orig = 0;
 		host->custom_interfaces_orig = 0;
 		host->monitored_by_orig = 0;
 		host->proxyid_orig = 0;
@@ -1075,7 +1086,8 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vector_lld_host_ptr_t *hosts_old,
 		const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
-		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, unsigned char custom_iface, char **error)
+		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, unsigned char custom_iface,
+		int dflags, char **error)
 {
 	char			*buffer = NULL;
 	int			host_found = 0;
@@ -1132,6 +1144,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 		host->status = status_proto;
 		host->inventory_mode = inventory_mode_proto;
 		host->custom_interfaces = custom_iface;
+		host->discover = discover_proto;
 		host->ipmi_username_orig = NULL;
 		host->ipmi_password_orig = NULL;
 		host->tls_issuer_orig = NULL;
@@ -1140,13 +1153,15 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 		host->tls_psk_orig = NULL;
 		host->tls_connect_orig = 0;
 		host->tls_accept_orig = 0;
+		host->status_orig = 0;
+		host->discover_orig = 0;
 
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
 		lld_override_host(&lld_row->overrides, host->host, &lnk_templateids, &host->inventory_mode,
 				&override_tags, &host->status, &discover_proto);
 
-		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE) && ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
 			zbx_vector_uint64_destroy(&host->lnk_templateids);
 			zbx_free(host->host);
@@ -1197,10 +1212,29 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 		lld_override_host(&lld_row->overrides, NULL != buffer ? buffer : host->host, &lnk_templateids,
 				&inventory_mode_proto, &override_tags, NULL, &discover_proto);
 
-		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
+		if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
-			host = NULL;
-			goto out;
+			if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
+			{
+				host = NULL;
+				goto out;
+			}
+		}
+		else
+		{
+			if (host->status != status_proto)
+			{
+				host->status_orig = host->status;
+				host->status = status_proto;
+				host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_STATUS;
+			}
+
+			if (host->discover != discover_proto)
+			{
+				host->discover_orig = host->discover;
+				host->discover = discover_proto;
+				host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_DISCOVER;
+			}
 		}
 
 		if (NULL != buffer)
@@ -3765,7 +3799,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "proxyid", "proxy_groupid",
 				"ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "status", "flags",
 				"tls_connect", "tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk",
-				"custom_interfaces", "monitored_by", (char *)NULL);
+				"custom_interfaces", "monitored_by", "discover", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host",
 				"lldruleid", (char *)NULL);
@@ -3881,7 +3915,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 					proxy_groupid, (int)ipmi_authtype, (int)ipmi_privilege, ipmi_username,
 					ipmi_password, (int)host->status, (int)(ZBX_FLAG_DISCOVERY_CREATED | dflags),
 					(int)tls_connect, (int)tls_accept, tls_issuer, tls_subject, tls_psk_identity,
-					tls_psk, (int)host->custom_interfaces, (int)monitored_by);
+					tls_psk, (int)host->custom_interfaces, (int)monitored_by, (int)host->discover);
 
 			audit_entry = zbx_audit_host_get_or_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD,
 					host->hostid, host->host, dflags);
@@ -4103,6 +4137,23 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_entry_update_int(audit_entry, "custom_interfaces",
 							host->custom_interfaces_orig, (int)host->custom_interfaces);
+				}
+				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_STATUS))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+							"%sstatus=%d", d, (int)host->status);
+					d = ",";
+
+					zbx_audit_entry_update_int(audit_entry, "status",
+							host->status_orig, (int)host->status);
+				}
+				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_DISCOVER))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+							"%sdiscover=%d", d, (int)host->discover);
+
+					zbx_audit_entry_update_int(audit_entry, "discover",
+							host->discover_orig, (int)host->discover);
 				}
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
@@ -6535,7 +6586,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 			if (NULL == (host = lld_host_make(&hosts, &hosts_old, host_proto, name_proto,
 					inventory_mode_proto, status, discover, &tags, lld_row, use_custom_interfaces,
-					error)))
+					dflags | ZBX_FLAG_DISCOVERY_CREATED, error)))
 			{
 				continue;
 			}
