@@ -316,7 +316,7 @@ in:
 out:
   result: FAIL
 ---
-test case: Test template resolve precendence
+test case: Test template resolve precedence
 include: &include um_cache_resolve_01.inc.yaml
 in:
   config: *include
