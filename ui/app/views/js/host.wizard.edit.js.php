@@ -1616,7 +1616,7 @@ window.host_wizard_edit = new class {
 			const tag_value = [tag, value].filter(val => val !== '').join(': ');
 
 			return this.#view_templates.tag.evaluateToElement({tag_value, hint_tag_value: escapeHtml(tag_value)});
-		}
+		};
 
 		if (template.tags.length) {
 			const temp_tag_list = tags_list.cloneNode(false);

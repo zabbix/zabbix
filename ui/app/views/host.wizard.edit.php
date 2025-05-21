@@ -53,7 +53,7 @@ $output = [
 		],
 		[
 			'title' => _('Back'),
-			'class' => 'js-back',
+			'class' => 'btn-alt js-back',
 		],
 		[
 			'title' => _('Next'),
