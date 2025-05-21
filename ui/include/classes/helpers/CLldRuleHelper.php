@@ -59,7 +59,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	private static function copy(array $src_items, array $dst_hosts): bool {
 		try {
 			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
+			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts, ZBX_FLAG_DISCOVERY_RULE);
 		}
 		catch (Exception $e) {
 			return false;

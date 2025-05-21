@@ -705,12 +705,13 @@ JAVASCRIPT;
 	/**
 	 * @param array  $src_items
 	 * @param array  $dst_hosts
+	 * @param int    $flags
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts): array {
+	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts, int $flags): array {
 		$dst_hostids = array_keys($dst_hosts);
 		$item_indexes = [];
 		$dst_master_itemids = [];
@@ -756,13 +757,57 @@ JAVASCRIPT;
 			}
 		}
 
+		$src_master_itemprototypes = [];
+		$dst_master_itemprototypes = [];
+
+		if ($flags == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+			$src_master_itemprototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($item_indexes),
+				'preservekeys' => true
+			]);
+			$dst_master_itemprototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'key_'],
+				'filter' => ['key_' => array_unique(array_column($src_master_itemprototypes, 'key_'))]
+			] + $host_filter);
+
+			foreach ($dst_master_itemprototypes as $dst_master_item) {
+				$_dst_master_itemids[$dst_master_item['key_']][$dst_master_item['hostid']] = $dst_master_item['itemid'];
+			}
+
+			foreach ($src_master_itemprototypes as $src_master_item) {
+				if (array_key_exists($src_master_item['key_'], $_dst_master_itemids)) {
+					foreach ($_dst_master_itemids[$src_master_item['key_']] as $dst_hostid => $dst_master_itemid) {
+						foreach ($item_indexes[$src_master_item['itemid']] as $src_itemid) {
+							$dst_master_itemids[$src_itemid][$dst_hostid] = $dst_master_itemid;
+						}
+					}
+				}
+			}
+		}
+
+		$missing_master_item = [
+			ZBX_FLAG_DISCOVERY_NORMAL => _('Cannot copy item with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => _('Cannot copy item prototype with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_RULE => _('Cannot copy LLD rule with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE => _('Cannot copy LLD rule prototype with key "%1$s" without its master item with key "%2$s".')
+		];
+
 		foreach ($dst_master_itemids as $src_itemid => $dst_host_master_itemids) {
 			foreach ($dst_host_master_itemids as $dst_hostid => $dst_master_itemid) {
 				if ($dst_master_itemid == 0) {
-					error(_s('Cannot copy item with key "%1$s" without its master item with key "%2$s".',
-						$src_items[$src_itemid]['key_'],
-						$src_master_items[$src_items[$src_itemid]['master_itemid']]['key_']
-					));
+					$src_item = $src_items[$src_itemid];
+					$error = array_key_exists($src_item['master_itemid'], $src_master_items)
+						? sprintf($missing_master_item[$src_item['flags']],
+							$src_item['key_'],
+							$src_master_items[$src_item['master_itemid']]['key_']
+						)
+						: _s('Cannot copy LLD rule prototype with key "%1$s" without its master item prototype with key "%2$s".',
+							$src_item['key_'],
+							$src_master_itemprototypes[$src_item['master_itemid']]['key_']
+						);
+
+					error($error);
 
 					throw new Exception();
 				}

@@ -32,7 +32,9 @@ class CLldRulePrototypeHelper extends CItemGeneralHelper {
 
 		try {
 			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
+			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts,
+				ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
+			);
 		}
 		catch (Exception $e) {
 			return false;
