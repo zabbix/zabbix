@@ -58,7 +58,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 ## Service setup
 
-1. Create a new web service. To do that navigate to *Admin* > *Web services* and import the [ZabbixTicketConnector.yml](ZabbixTicketConnector.yml) file.
+1. Create a new web service. To do so, navigate to *Admin* > *Web services* and import the [ZabbixTicketConnector.yml](ZabbixTicketConnector.yml) file.
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 [![](images/thumb.2.png?raw=true)](images/2.png)
@@ -71,13 +71,13 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 [![](images/thumb.6.png?raw=true)](images/6.png)
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
-3. Create a new customer user. Select the ID of the customer that you have created on the previous step.
+3. Create a new customer user. Select the ID of the customer that you created in the previous step.
 
 [![](images/thumb.8.png?raw=true)](images/8.png)
 [![](images/thumb.9.png?raw=true)](images/9.png)
 [![](images/thumb.10.png?raw=true)](images/10.png)
 
-4. Create a new agent. Depending on which ticket queue you would like to use for tickets created by the webhook set the `RW` permission for the group that this ticket queue belongs to. In the example below if you want to use the `Misc` queue, the `RW` permission for the `users` group must be set.
+4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the `RW` permission for the group that this ticket queue belongs to. In the example below, if you want to use the `Misc` queue, you must set the the `RW` permission for the group `users`.
 
 [![](images/thumb.11.png?raw=true)](images/11.png)
 [![](images/thumb.12.png?raw=true)](images/12.png)
@@ -87,9 +87,9 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 ## Zabbix configuration
 
-1. Before you can start using the **((OTRS)) CE** webhook, you need to set up the global macro `{$ZABBIX.URL}`:
+1. Before you can start using the **((OTRS)) CE** webhook, you need to set the global macro `{$ZABBIX.URL}`:
   - In the Zabbix web interface, go to *Administration* > *Macros* in the top-left dropdown menu.
-  - Set up the global macro `{$ZABBIX.URL}` which will contain the URL to the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or a localhost.
+  - Set the global macro `{$ZABBIX.URL}` to the URL of the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or localhost.
   - Specifying a protocol is mandatory, whereas the port is optional. Depending on the web server configuration, you might also need to append `/zabbix` to the end of URL. Good examples:
     - `http://zabbix.com`
     - `https://zabbix.lan/zabbix`
@@ -119,7 +119,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 [![](images/thumb.18.png?raw=true)](images/18.png)
 
-5. If you have **dynamic fields** in **((OTRS)) CE** and want them to be filled with values from Zabbix, add webhook parameters in the format `dynamicfield_<((OTRS)) CE dynamic field name>` in a manner similar to previous step. Dynamic fields can only be of the type **text**, **textarea**, **checkbox**, or **date**.
+5. If you have **dynamic fields** in **((OTRS)) CE** and want them to be filled with values from Zabbix, add webhook parameters in the format `dynamicfield_<((OTRS)) CE dynamic field name>`, similarly to the previous step. Dynamic fields can only be of the types **text**, **textarea**, **checkbox**, or **date**.
 
 6. If you want the webhook to close tickets related to **resolved** problems in Zabbix, you can change the following parameter value:
 
@@ -127,13 +127,13 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 7. If you use the ticket type feature, you can change the type of the created tickets:
 
-- `otrs_ticket_type` - **((OTRS)) CE** ticket type (set to `Unclassified` by default, which is present on fresh installations).
+- `otrs_ticket_type` - **((OTRS)) CE** ticket type (set to `Unclassified` by default; present on fresh installations).
 
 8. Click the *Enabled* checkbox to enable the mediatype and click the *Update* button to save the webhook settings.
 
 9. Create a Zabbix user and add media:
-  - If you want to create a new user,  go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
-  - In the *Media* tab, add a new media and select **OTRS CE** from the *Type* drop-down list. Though the *Send to* field is not used in the **((OTRS)) CE** webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
+  - To create a new user,  go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
+  - In the *Media* tab, click *Add* and select **OTRS CE** from the *Type* drop-down list. Though the *Send to* field is not used in the **((OTRS)) CE** webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
   - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to **((OTRS)) CE**.
 
 [![](images/thumb.19.png?raw=true)](images/19.png)
