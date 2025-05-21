@@ -2920,9 +2920,6 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		copy->data = lld_row->data;
 		zbx_vector_lld_item_link_ptr_create(&copy->item_links);
 		zbx_vector_lld_override_ptr_create(&copy->overrides);
-		zbx_vector_lld_override_ptr_append_array(&copy->overrides, lld_row->overrides.values,
-				lld_row->overrides.values_num);
-
 		zbx_vector_lld_row_ptr_append(&lld_rows_copy, copy);
 	}
 
