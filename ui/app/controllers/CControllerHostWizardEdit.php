@@ -86,7 +86,7 @@ class CControllerHostWizardEdit extends CController {
 		$item_prototypes = API::ItemPrototype()->get([
 			'output' => ['type'],
 			'selectHosts' => ['hostid'],
-			'hostids' => array_column($wizard_ready_templates, 'templateid'),
+			'hostids' => array_column($wizard_ready_templates, 'templateid')
 		]);
 
 		$item_prototypes_by_templateid = [];

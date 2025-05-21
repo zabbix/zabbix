@@ -125,7 +125,7 @@ class CRadioCardList extends CList {
 				(new CListItem([
 					(new CLabel([
 						$value['label'],
-						(new CSpan($radio))->addClass(self::ZBX_STYLE_CLASS_SELECTOR),
+						(new CSpan($radio))->addClass(self::ZBX_STYLE_CLASS_SELECTOR)
 					]))->addClass(self::ZBX_STYLE_CLASS_LABEL),
 					$value['content'] ?? null
 				]))->addClass(self::ZBX_STYLE_CLASS_CARD)

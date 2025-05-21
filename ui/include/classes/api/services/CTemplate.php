@@ -380,7 +380,7 @@ class CTemplate extends CHostGeneral {
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 				'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+					'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
 				]]
 			]],
 			'wizard_ready' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_NOT_READY, ZBX_WIZARD_READY])],
@@ -595,7 +595,7 @@ class CTemplate extends CHostGeneral {
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 				'config' => 			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+					'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
 				]]
 			]],
 			'wizard_ready' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_NOT_READY, ZBX_WIZARD_READY])],
@@ -1200,7 +1200,7 @@ class CTemplate extends CHostGeneral {
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 				'config' => 			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+					'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
 				]]
 			]],
 			'templates_link' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
@@ -1285,7 +1285,7 @@ class CTemplate extends CHostGeneral {
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 				'config' => 			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+					'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
 				]]
 			]],
 			'templates_link' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [

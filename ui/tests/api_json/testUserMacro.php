@@ -1626,7 +1626,7 @@ class testUserMacro extends CAPITest {
 						'config' => [
 							'type' => ZBX_WIZARD_FIELD_TEXT,
 							'label' => 'label_6_upd',
-							'description' => 'description_6_upd',
+							'description' => 'description_6_upd'
 						]
 					]
 				],
@@ -1652,7 +1652,7 @@ class testUserMacro extends CAPITest {
 					[
 						'hostmacroid' => '10008',
 						'config' => [
-							'priority' => 5,
+							'priority' => 5
 						]
 					]
 				],
@@ -1678,7 +1678,7 @@ class testUserMacro extends CAPITest {
 					[
 						'hostmacroid' => '10008',
 						'config' => [
-							'priority' => -1,
+							'priority' => -1
 						]
 					]
 				],
@@ -1690,7 +1690,7 @@ class testUserMacro extends CAPITest {
 					[
 						'hostmacroid' => '10009',
 						'config' => [
-							'section_name' => 'Advanced',
+							'section_name' => 'Advanced'
 						]
 					]
 				],

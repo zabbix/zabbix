@@ -53,15 +53,15 @@ $output = [
 		],
 		[
 			'title' => _('Back'),
-			'class' => 'btn-alt js-back',
+			'class' => 'btn-alt js-back'
 		],
 		[
 			'title' => _('Next'),
-			'class' => 'js-next',
+			'class' => 'js-next'
 		],
 		[
 			'title' => _('No'),
-			'class' => 'btn-alt js-cancel-no',
+			'class' => 'btn-alt js-cancel-no'
 		],
 		[
 			'title' => _('Yes'),
@@ -132,7 +132,7 @@ function stepSelectTemplate($old_template_count): array {
 					->addItem(
 						(new CDiv([
 							new CTag('h1', true, _('Select a template')),
-							new CTag('p', true, _('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.')),
+							new CTag('p', true, _('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.'))
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 							->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -169,7 +169,7 @@ function stepSelectTemplate($old_template_count): array {
 									->addValue(_('Linked'), ZBX_TEMPLATE_SHOW_LINKED)
 									->addValue(_('Not linked'), ZBX_TEMPLATE_SHOW_NOT_LINKED)
 									->setModern()
-							]))->addClass('js-show-templates'),
+							]))->addClass('js-show-templates')
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FULL)
 							->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
@@ -393,7 +393,7 @@ function stepInstallAgent($agent_script_data): array {
 												->setAriaRequired(),
 											(new CSimpleButton(_('Generate new')))
 												->addClass(ZBX_STYLE_BTN_GREY)
-												->addClass('js-generate-pre-shared-key'),
+												->addClass('js-generate-pre-shared-key')
 										]))->addClass('pre-shared-key-field'),
 
 										(new CDiv(
@@ -448,7 +448,7 @@ function stepInstallAgent($agent_script_data): array {
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- --agent2 --server-host {$agent_script_data['server_host']} #{psk}"),
+						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- --agent2 --server-host {$agent_script_data['server_host']} #{psk}")
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -462,7 +462,7 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
-						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 -serverHost {$agent_script_data['server_host']} #{psk}"),
+						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 -serverHost {$agent_script_data['server_host']} #{psk}")
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -506,7 +506,7 @@ function stepInstallAgent($agent_script_data): array {
 						])
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
-		),
+		)
 	];
 }
 
@@ -858,7 +858,7 @@ function stepConfigureHost(): array {
 								_('Configure host'),
 								(new CSpan('(2/2)'))->addClass('sub-step-counter')
 							]),
-							new CTag('p', true, _('To complete the setup, configure the following variables (host macros).')),
+							new CTag('p', true, _('To complete the setup, configure the following variables (host macros).'))
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 							->addClass(ZBX_STYLE_FORMATED_TEXT)

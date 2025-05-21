@@ -459,7 +459,7 @@ class CUserMacro extends CApiService {
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
 			]]
 		]];
 
@@ -519,7 +519,7 @@ class CUserMacro extends CApiService {
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 			'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])],
 			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
 			]]
 		]];
 
