@@ -754,7 +754,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 	public static function linkTemplateObjects(array $ruleids, array $hostids): void {
 		$fields = array_merge(
 			['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
-				'enabled_lifetime', 'description', 'status'
+				'enabled_lifetime', 'description', 'status', 'discover'
 			],
 			array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters']),
 			['hostid', 'templateid', 'flags']
