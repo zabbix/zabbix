@@ -609,7 +609,11 @@ class CElementQuery implements IWaitable {
 				'/div[contains(@class, "range-control")]',
 				'/div[contains(@class, "calendar-control")]'
 			],
-			'CColorPickerElement'		=> '/div[contains(@class, "color-picker")]',
+			'CColorPickerElement'		=> [
+				// TODO: change the first selector to '/div[@id="color_picker"]' when DEV-4301 is ready.
+				'/div[contains(@class, "color-picker")]',
+				'/z-color-picker'
+			],
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
 			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]',
 			'CFieldsetElement'			=> '/fieldset'

@@ -93,9 +93,10 @@ $available_js = [
 	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
-	'component.z-vertical.js' => '',
+	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
 	'class.base-component.js' => '',
@@ -585,6 +586,16 @@ $translate_strings = [
 	'class.navigationtree.js' => [
 		'Maintenance with data collection' => _('Maintenance with data collection'),
 		'Maintenance without data collection' => _('Maintenance without data collection')
+	],
+	'component.z-color-picker.js' => [
+		'Apply' => _('Apply'),
+		'Clear' => _('Clear'),
+		'D' => _x('D', 'Default color option'),
+		'No color' => _('No color'),
+		'Palette' => _('Palette'),
+		'Palette %1$d' => _('Palette %1$d'),
+		'Solid color' => _('Solid color'),
+		'Use default' => _('Use default')
 	]
 ];
 
@@ -598,9 +609,10 @@ if (empty($_GET['files'])) {
 		'colorpicker.js',
 		'common.js',
 		'component.z-bar-gauge.js',
-		'component.z-vertical.js',
+		'component.z-color-picker.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
+		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
 		'class.base-component.js',

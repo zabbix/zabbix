@@ -68,6 +68,13 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 	return audit_entry;
 }
 
+void	zbx_audit_entry_clean(zbx_audit_entry_t *entry)
+{
+	zbx_json_free(&entry->details_json);
+	zbx_free(entry->name);
+	zbx_free(entry->cuid);
+}
+
 zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table, const char *name,
 		int audit_action, int resource_type)
 {
@@ -283,9 +290,7 @@ void	zbx_audit_clean(int audit_context_mode)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_json_free(&((*audit_entry)->details_json));
-		zbx_free((*audit_entry)->name);
-		zbx_free((*audit_entry)->cuid);
+		zbx_audit_entry_clean(*audit_entry);
 		zbx_free(*audit_entry);
 	}
 

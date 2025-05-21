@@ -55,6 +55,10 @@ const ZBX_STYLE_LINK_ALT = 'link-alt';
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';
 
+const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
+
+const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
+
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';
