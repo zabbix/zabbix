@@ -468,6 +468,19 @@ class testUserMacro extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/priority": value must be 0.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$CONFIG9}',
+					'value' => 'valid',
+					'hostid' => '50010',
+					'config' => [
+						'type' => ZBX_WIZARD_FIELD_TEXT,
+						'section_name' => 'Advanced',
+						'label' => 'Config'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -941,7 +954,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10002',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_2_upd',
 							'description' => 'description_2_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1058,7 +1072,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10002',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_2_upd',
 							'description' => 'description_2_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1092,7 +1107,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10003',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_3',
 							'description' => '',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1337,7 +1353,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10004',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_4',
 							'description' => 'description_4_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1362,7 +1379,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10004',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_4',
 							'description' => 'description_4_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1590,7 +1608,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10005',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_5',
 							'description' => '',
 							'required' => DB::getDefault('hostmacro_config','required'),
@@ -1617,7 +1636,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10006',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => 0,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_6_upd',
 							'description' => 'description_6_upd',
 							'required' => DB::getDefault('hostmacro_config','required'),
@@ -1643,6 +1663,7 @@ class testUserMacro extends CAPITest {
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
 							'priority' => 5,
+							'section_name' => DB::getDefault('hostmacro_config','priority'),
 							'label' => 'label_8',
 							'description' => 'description_8',
 							'required' => DB::getDefault('hostmacro_config','required'),
@@ -1663,6 +1684,32 @@ class testUserMacro extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/config/priority": value must be one of 0-2147483647.',
 				'expect_db_rows' => []
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10009',
+						'config' => [
+							'section_name' => 'Advanced',
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10009',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
+							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => 'Advanced',
+							'label' => 'label_9',
+							'description' => 'description_9',
+							'required' => DB::getDefault('hostmacro_config','required'),
+							'regex' => '',
+							'options' => ''
+						]
+					]
+				]
 			]
 		];
 	}
@@ -1680,7 +1727,7 @@ class testUserMacro extends CAPITest {
 
 				if (array_key_exists('config', $hostmacros[$key])) {
 					$db_result_config = DBSelect(
-						'SELECT type,priority,label,description,required,regex,options'.
+						'SELECT type,priority,section_name,label,description,required,regex,options'.
 						' FROM hostmacro_config'.
 						' WHERE hostmacroid='.zbx_dbstr($id)
 					);

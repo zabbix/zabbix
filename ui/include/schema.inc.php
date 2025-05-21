@@ -3070,6 +3070,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
+			'section_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
 			'label' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

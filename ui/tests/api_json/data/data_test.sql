@@ -180,14 +180,16 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10006,140006,'{$TMPL_MACRO_7}','value_7','description_7');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10007,140007,'{$TMPL_MACRO_8}','value_8','description_8');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10008,140008,'{$TMPL_MACRO_8}','value_8','description_8');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10001,1,0,'label_1','',0,'','');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10002,1,0,'label_2','description_2',1,'/^[a-zA-Z0-9]*$/','');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10003,2,0,'label_3','',0,'','[{"value":"option1","text":"Option 1"},{"value":"option2","text":"Option 2"},{"value":"","text":"Option 3"}]');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10004,2,0,'label_4','description_4',1,'','[{"value":"option1","text":"Option 1"}]');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10005,3,0,'label_5','',0,'','[{"checked":"1","unchecked":"0"}]');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10006,3,0,'label_6','description_6',0,'','[{"checked":"option1","unchecked":"option2"}]');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10007,2,0,'label_7','description_7',1,'','[{"value":"option1","text":"Option 1"}]');
-INSERT INTO hostmacro_config (hostmacroid, type, priority, label, description, required, regex, options) VALUES (10008,1,0,'label_8','description_8',0,'','');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (10009,140008,'{$TMPL_MACRO_9}','value_9','description_9');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10001,1,0,'','label_1','',0,'','');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10002,1,0,'','label_2','description_2',1,'/^[a-zA-Z0-9]*$/','');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10003,2,0,'','label_3','',0,'','[{"value":"option1","text":"Option 1"},{"value":"option2","text":"Option 2"},{"value":"","text":"Option 3"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10004,2,0,'','label_4','description_4',1,'','[{"value":"option1","text":"Option 1"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10005,3,0,'','label_5','',0,'','[{"checked":"1","unchecked":"0"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10006,3,0,'','label_6','description_6',0,'','[{"checked":"option1","unchecked":"option2"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10007,2,0,'','label_7','description_7',1,'','[{"value":"option1","text":"Option 1"}]');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10008,1,0,'','label_8','description_8',0,'','');
+INSERT INTO hostmacro_config (hostmacroid, type, priority, section_name, label, description, required, regex, options) VALUES (10009,1,0,'','label_9','description_9',0,'','');
 
 -- icon map
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (1,'API icon map',2);

@@ -2971,6 +2971,10 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING, 'default' => '0'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 								]],
+								'section_name' =>			['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
 								'label' =>					['type' => XML_MULTIPLE, 'rules' => [
 																['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::MACRO_CONFIG_TYPE_TEXT => CXmlConstantName::MACRO_CONFIG_TYPE_TEXT, CXmlConstantValue::MACRO_CONFIG_TYPE_LIST => CXmlConstantName::MACRO_CONFIG_TYPE_LIST, CXmlConstantValue::MACRO_CONFIG_TYPE_CHECKBOX => CXmlConstantName::MACRO_CONFIG_TYPE_CHECKBOX]], 'type' => XML_STRING | XML_REQUIRED],
 																['else' => true, 'type' => XML_IGNORE_TAG]
