@@ -151,7 +151,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		]);
 
 		CDataHelper::call('authentication.update', [
-				'authentication_type' => SMTP_AUTHENTICATION_NORMAL,
+				'authentication_type' => ZBX_AUTH_LDAP,
 				'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
 				'disabled_usrgrpid' => 9, // Disabled.
 				'ldap_jit_status' => JIT_PROVISIONING_ENABLED

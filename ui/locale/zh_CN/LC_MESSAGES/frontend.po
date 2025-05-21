@@ -1802,6 +1802,26 @@ msgstr "作者"
 msgid "Authorization"
 msgstr "授权"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2205,6 +2225,10 @@ msgstr "转换 CSV 为 JSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "预计CUID"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3297,6 +3321,10 @@ msgstr "无法在 \"%3$s\"上找到由监控项\"%2$s\" 所引用的值映射\"%
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"监控项模板所引用的值映射 \"%1$s\"."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3660,6 +3688,10 @@ msgstr "无法大量更新可见主机名称。"
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "无法打开网址"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4460,6 +4492,10 @@ msgstr "不允许循环模板链接。"
 msgid "Class %1$s not found for action %2$s."
 msgstr "在动作%2$s未在分组%1$s中找到。"
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4680,6 +4716,10 @@ msgstr "团体字"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "紧凑视图"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -4907,6 +4947,10 @@ msgstr "配置刷新"
 msgid "Configuration updated"
 msgstr "配置已更新"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -4916,6 +4960,12 @@ msgstr "配置数据库连接"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "配置即时供应"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6716,6 +6766,10 @@ msgstr "描述"
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
 msgstr "描述尺寸"
+
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11442,6 +11496,11 @@ msgstr "LDAP 配置无效"
 msgid "Invalid MFA configuration"
 msgstr "MFA 配置无效"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "SAML 即时供应媒体类型映射配置无效。"
@@ -14297,6 +14356,10 @@ msgstr "新增媒介类型"
 msgid "New media type mapping"
 msgstr "新媒介类型映射"
 
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
 msgstr "添加操作"
@@ -14431,6 +14494,10 @@ msgstr "\"%1$s\" 在拓扑图中未定义。"
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "无变化。"
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15219,6 +15286,18 @@ msgstr "数字（整数）"
 msgid "Numeric (unsigned)"
 msgstr "数字 (无正负)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -15972,6 +16051,15 @@ msgstr "页面接收到错误的数据"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "分页栏"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17135,6 +17223,10 @@ msgstr "恢复时间"
 msgid "Rectangle"
 msgstr "矩形"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "引用属性"
@@ -17169,6 +17261,10 @@ msgstr "更新所选proxy配置？"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "刷新间隔"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18557,6 +18653,10 @@ msgstr "选择 SLA 以显示 SLA 报表。"
 msgid "Select prototype"
 msgstr "选择原型"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19358,6 +19458,10 @@ msgstr "软件架构信息。返回字符串"
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
 msgstr "上次检查软件更新"
+
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20296,6 +20400,10 @@ msgstr "模板\"%1$s\"自主机\"%2$s\"断连."
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "通过主机发现链接的模板不能取消链接。"
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20415,6 +20523,10 @@ msgstr "该 %1$s 不再被发现并且 %2$s, %3$s"
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "该 %1$s 不再被发现并 %2$s"
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URL 模板用于加载和显示地图上的瓦片图层。"
@@ -20431,6 +20543,14 @@ msgstr "从虚拟磁盘读取数据所需的平均时间，“url”- VMware 服
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "写入虚拟磁盘所需的平均时间，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- 磁盘设备实例"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -20863,6 +20983,14 @@ msgstr "今天到目前为止"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
+msgstr ""
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
@@ -21645,6 +21773,10 @@ msgstr "未更新"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "撤消问题确认。"
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24412,6 +24544,14 @@ msgstr "bitxor() - 按位异或"
 msgid "blinking"
 msgstr "闪烁"
 
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
 msgstr "用户名和密码都应该存在或为空"
@@ -26129,6 +26269,10 @@ msgstr "具有相同 UUID 的模板组已存在"
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
 msgstr "具有相同 UUID 的模板已存在"
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
