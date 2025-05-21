@@ -277,7 +277,7 @@ class CTriggerGeneralHelper {
 		CItemGeneralHelper::findParentLldTemplateid($data);
 
 		$parent_templates = array_key_exists('parent_lld', $data)
-			? getItemParentTemplates([$data['parent_lld']], ZBX_FLAG_DISCOVERY_RULE)['templates']
+			? getItemParentTemplates([$data['parent_lld']], $data['parent_lld']['flags'])['templates']
 			: getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		unset($parent_templates[0]);
 

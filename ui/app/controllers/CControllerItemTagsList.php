@@ -55,17 +55,23 @@ class CControllerItemTagsList extends CController {
 				'itemids' => [$this->getInput('itemid')]
 			];
 
-			if ($this->getInput('show_inherited_tags', 0) == 1) {
-				$options['selectDiscoveryRule'] = ['itemid', 'templateid'];
-			}
+			$items = API::Item()->get($options);
 
-			$items = API::Item()->get($options) ?: API::ItemPrototype()->get($options);
+			if (!$items) {
+				if ($this->getInput('show_inherited_tags', 0) == 1) {
+					$options['selectDiscoveryRule'] = ['itemid', 'templateid'];
+				}
+
+				$items = API::ItemPrototype()->get($options);
+			}
 
 			if (!$items) {
 				return false;
 			}
 
 			$this->item = reset($items);
+
+			$this->item = CArrayHelper::renameKeys($this->item, ['discoveryRule' => 'parent_lld']);
 		}
 		else {
 			$this->item =[
@@ -88,14 +94,7 @@ class CControllerItemTagsList extends CController {
 		$this->getInputs($data, array_keys($data));
 
 		$data['tags'] = array_filter($data['tags'], static fn($tag) => $tag['tag'] !== '' || $tag['value'] !== '');
-
-		if ($this->item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-			$data['readonly'] = true;
-
-			if ($data['show_inherited_tags'] == 1) {
-				$this->item['parent_lld'] = $this->item['discoveryRule'];
-			}
-		}
+		$data['readonly'] = $this->item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 
 		if ($data['show_inherited_tags'] == 1) {
 			$data['tags'] = CItemHelper::addInheritedTags($this->item, $data['tags']);

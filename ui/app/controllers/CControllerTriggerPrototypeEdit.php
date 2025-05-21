@@ -115,8 +115,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name', 'discover'
 				],
 				'selectHosts' => ['hostid'],
-				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-				'selectDiscoveryRulePrototype' => ['itemid', 'name', 'templateid'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'templateid', 'flags'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name', 'templateid', 'flags'],
 				'selectDiscoveryData' => ['parent_triggerid'],
 				'triggerids' => $this->getInput('triggerid'),
 				'selectItems' => ['itemid', 'templateid', 'flags'],
@@ -201,15 +201,20 @@ class CControllerTriggerPrototypeEdit extends CController {
 			if ($this->trigger_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 				$db_parent = API::TriggerPrototype()->get([
 					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid'],
-					'selectDiscoveryRule' => ['itemid', 'templateid'],
-					'selectDiscoveryRulePrototype' => ['itemid', 'templateid'],
+					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags']
 				]);
 				$db_parent = reset($db_parent);
 
 				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
-				$this->trigger_prototype['parent_lld'] = $parent_lld;
 				$this->trigger_prototype['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 			}
+			else {
+				$parent_lld =
+					$this->trigger_prototype['discoveryRule'] ?: $this->trigger_prototype['discoveryRulePrototype'];
+			}
+
+			$this->trigger_prototype['parent_lld'] = $parent_lld;
 
 			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger_prototype, $data);
 

@@ -781,7 +781,7 @@ JAVASCRIPT;
 
 		while ($data['parent_lld']['templateid'] == 0) {
 			$db_source = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'templateid'],
+				'output' => ['itemid', 'templateid', 'flags'],
 				'selectDiscoveryRule' => ['itemid'],
 				'itemids' => $lldruleid,
 				'nopermissions' => true
