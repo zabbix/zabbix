@@ -24,7 +24,7 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup items,actions,triggers
+ * @backup items,actions,triggers,globalmacro,hostmacro
  * @hosts test_macros
  */
 class testExpressionMacros extends CIntegrationTest {
@@ -130,7 +130,7 @@ EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
 EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
 EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
-			const BUILTIN_MACROS_INCONSISTENT_RESOLVE = "ACTION.ID -> {ACTION.ID} <-
+	const BUILTIN_MACROS_INCONSISTENT_RESOLVE = "ACTION.ID -> {ACTION.ID} <-
 ESC.HISTORY -> {ESC.HISTORY} <-
 DATE -> {DATE} <-
 TIME -> {TIME} <-
@@ -341,8 +341,6 @@ ITEM.LOG.SOURCE -> *UNKNOWN* <-
 ITEM.LOG.TIME -> *UNKNOWN* <-
 TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 
-
-
 	const BUILTIN_MACROS_NON_REPLACEABLE = "{ALERT.MESSAGE}
 {ALERT.SENDTO}
 {ALERT.SUBJECT}
@@ -399,11 +397,40 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 {USER.SURNAME}
 {USER.USERNAME}";
 
+	const MACRO_FUNCS = "ACTION.NAME.btoa() -> {{ACTION.NAME}.btoa()} <-
+USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> {{\$USER_MACRO_GLOBAL_DOUBLE}.fmtnum(15)} <-
+USER_MACRO_GLOBAL_TIME.fmttime(%H) -> {{\$USER_MACRO_GLOBAL_TIME}.fmttime(%H)} <-
+ACTION.NAME.htmldecode() -> {{ACTION.NAME}.htmldecode()} <-
+ACTION.NAME.htmlencode() -> {{ACTION.NAME}.htmlencode()} <-
+ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> {{ACTION.NAME}.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\")} <-
+ACTION.NAME.lowercase() -> {{ACTION.NAME}.lowercase()} <-
+ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> {{ACTION.NAME}.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\")} <-
+USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> {{\$USER_MACRO_GLOBAL_TIME}.regsub(\"^([0-9]+)\", \"\\1\")} <-
+USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> {{\$USER_MACRO_GLOBAL_DOUBLE}.tr(0,a)} <-
+ACTION.NAME.uppercase() -> {{ACTION.NAME}.uppercase()} <-
+ACTION.NAME.urldecode() -> {{ACTION.NAME}.urldecode()} <-
+ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
+
+	const MACRO_FUNCS_RESOLVED = "ACTION.NAME.btoa() -> YWN0aW9uX25hbWVfICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj9AQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVpbXF1eX2BhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX4= <-" . "\n" .
+		"USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> 0.123456789012346 <-" . "\n" . 	// NOTE last 12346, not 123456 !
+		"USER_MACRO_GLOBAL_TIME.fmttime(%H) -> 23 <-" . "\n" .
+		"ACTION.NAME.htmldecode() -> ". self::ACTION_NAME . " <-" . "\n" .
+		"ACTION.NAME.htmlencode() -> action_name_ !&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . 	// NOTE, \' -> \ disappears
+		"ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> * <-" . "\n" .
+		"ACTION.NAME.lowercase() -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
+		"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@*[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
+		"USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> 23 <-" . "\n" .
+		"USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> a.123456789a123456789 <-" . "\n" .
+		"ACTION.NAME.uppercase() -> ACTION_NAME_ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~ <-" . "\n" .
+		"ACTION.NAME.urldecode() -> " . self::ACTION_NAME . " <-" . "\n" .
+		"ACTION.NAME.urlencode() -> action_name_%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~ <-";
+
 
 	/**
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+
 
 		self::$event_tags_json = json_encode(array(['tag' => self::TAG_NAME, 'value' => self::TAG_VALUE]), JSON_UNESCAPED_SLASHES);
 
@@ -498,6 +525,27 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
 
+		$response = $this->call('usermacro.create', [
+			'hostid' => self::$hostid,
+			'macro' => '{$USER_MACRO_HOST}',
+			'value' => 'HOST_LEVEL_' . ALL_PRINTABLE_ASCII
+		]);
+
+		$response = $this->call('usermacro.createglobal', [
+			'macro' => '{$USER_MACRO_GLOBAL}',
+			'value' => 'GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII
+		]);
+
+		$response = $this->call('usermacro.createglobal', [
+			'macro' => '{$USER_MACRO_GLOBAL_DOUBLE}',
+			'value' => '0.1234567890123456789'
+		]);
+
+		$response = $this->call('usermacro.createglobal', [
+			'macro' => '{$USER_MACRO_GLOBAL_TIME}',
+			'value' => '23:12:55'
+		]);
+
 		// Get host interface ids.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
@@ -591,7 +639,13 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 							'===4===' . "\n" .
 							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
 							'===5===' . "\n" .
-							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY
+							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+							'===6===' . "\n" .
+							'USER_MACRO_HOST -> {$USER_MACRO_HOST} <-' . "\n" .
+							'===7===' . "\n" .
+							'USER_MACRO_GLOBAL -> {$USER_MACRO_GLOBAL} <-' . "\n" .
+							'===8===' . "\n" .
+							self::MACRO_FUNCS
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -623,7 +677,13 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 							'===5===' . "\n" .
 							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
 							'===6===' . "\n" .
-							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY
+							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+							'===7===' . "\n" .
+							'USER_MACRO_HOST -> {$USER_MACRO_HOST} <-' . "\n" .
+							'===8===' . "\n" .
+							'USER_MACRO_GLOBAL -> {$USER_MACRO_GLOBAL} <-' . "\n" .
+							'===9===' . "\n" .
+							self::MACRO_FUNCS
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -661,7 +721,13 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 							'===3===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::BUILTIN_MACROS_NON_REPLACEABLE
+							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+							'===5===' . "\n" .
+							'USER_MACRO_HOST -> {$USER_MACRO_HOST} <-' . "\n" .
+							'===6===' . "\n" .
+							'USER_MACRO_GLOBAL -> {$USER_MACRO_GLOBAL} <-' . "\n" .
+							'===7===' . "\n" .
+							self::MACRO_FUNCS
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -712,10 +778,8 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
-
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
-
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_RECOVER_TRIGGER);
 
@@ -753,7 +817,13 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 			'===4===' . "\n" .
 			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
 			'===5===' . "\n" .
-			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY;
+			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+			'===6===' . "\n" .
+			'USER_MACRO_HOST -> HOST_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
+			'===7===' . "\n" .
+			'USER_MACRO_GLOBAL -> GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
+			'===8===' . "\n" .
+			self::MACRO_FUNCS_RESOLVED;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][0]['message']);
 	}
@@ -803,7 +873,13 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 			'===5===' . "\n" .
 			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
 			'===6===' . "\n" .
-			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY;
+			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
+			'===7===' . "\n" .
+			'USER_MACRO_HOST -> HOST_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
+			'===8===' . "\n" .
+			'USER_MACRO_GLOBAL -> GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
+			'===9===' . "\n" .
+			self::MACRO_FUNCS_RESOLVED;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][1]['message']);
 	}
@@ -907,7 +983,13 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 			'===3===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::BUILTIN_MACROS_NON_REPLACEABLE;
+			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+			'===5===' . "\n" .
+			'USER_MACRO_HOST -> HOST_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
+			'===6===' . "\n" .
+			'USER_MACRO_GLOBAL -> GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
+			'===7===' . "\n" .
+			self::MACRO_FUNCS_RESOLVED;
 
 
 		$this->assertEquals(self::SUBJECT_PREFIX_RECOVERY.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][3]['subject']);
