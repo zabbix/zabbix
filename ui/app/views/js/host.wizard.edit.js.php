@@ -1304,8 +1304,10 @@ window.host_wizard_edit = new class {
 			if (path) {
 				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
 			}
+			else {
+				this.#overlay.recoverFocus();
+			}
 
-			this.#overlay.recoverFocus();
 			this.#overlay.containFocus();
 		});
 	}
