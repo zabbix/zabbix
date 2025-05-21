@@ -257,7 +257,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testTimescaleDb_checkCompression1() {
+	public function testTimescaleDb_checkCompression() {
 		/* The legacy test for TimescaleDB older than 2.18 */
 		if ($this->getTimescaleDBVersion() < 21800) {
 			$this->executeHousekeeper();
@@ -266,11 +266,13 @@ class testTimescaleDb extends CIntegrationTest {
 			return;
 		}
 
-		/* Add history data so that TimescaleDB creates a few chunks for the test. */
+		/* The current test for TimescaleDB 2.18 and newer */
 
+		/* Get the number of records before inserting test data */
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
+		/* Add history data so that TimescaleDB creates a few chunks for the test. */
 		$input = [
 			/* start clock, value count */
 			[time() - self::COMPRESSION_OLDER_THAN - 1 * 24 * 3600, 100],
@@ -300,6 +302,7 @@ class testTimescaleDb extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
 
+		/* Make sure all data was inserted as intended. */
 		$count_end = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_end);
 		$this->assertEquals(count($sender_data), $count_end - $count_start);
@@ -318,7 +321,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$total_chunks = count($chunks);
 		$this->assertGreaterThan(0, $total_chunks);
 
-		/* Compress specific chunks by names instead of using a compression policy. */
+		/* Compress specific chunks by names without using a compression policy. */
 		/* It is called convert to columnstore since TimescaleDB 2.18. */
 		foreach ($chunks as $chunk)
 			DBexecute("CALL convert_to_columnstore('".$chunk."')");
