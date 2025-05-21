@@ -286,6 +286,8 @@ class testDashboardGraphWidget extends testWidgets {
 		$dashboard->getWidget('Graph');
 		$form = $overlay->asForm();
 		$element = $overlay->query('id:svg-graph-preview')->one();
+		// TODO: removed Add button from screenshots due to overlay height with decimal value and unstable test on Jenkins.
+		$add_button = $overlay->getFooter()->query('button:Add')->one();
 
 		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
@@ -298,7 +300,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 			$this->page->removeFocus();
 			sleep(1);
-			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
+			$this->assertScreenshotExcept($overlay, [$element, $add_button], 'tab_'.$tab);
 		}
 
 		$overlay->close();
