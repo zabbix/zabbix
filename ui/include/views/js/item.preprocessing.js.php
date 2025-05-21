@@ -616,6 +616,10 @@
 						? ['preprocessing', 'key']
 						: ['preprocessing'];
 
+					if (validate_fields.includes('key')) {
+						item_edit_form.form.findFieldByName('key').setChanged();
+					}
+
 					item_edit_form.form.validateFieldsForAction(validate_fields).then((result) => {
 						if (!result) {
 							return;
