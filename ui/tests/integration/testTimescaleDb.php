@@ -308,6 +308,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->assertEquals(count($sender_data), $count_end - $count_start);
 
 		/* There should be no compressed chunks at this stage yet. */
+		/* It is called hypertable columnstore stats since TimescaleDB 2.18. */
 		$sql = "SELECT number_compressed_chunks FROM hypertable_columnstore_stats('".self::TABLENAME."')";
 		$res = DBfetch(DBselect($sql));
 		$this->assertArrayHasKey('number_compressed_chunks', $res);
