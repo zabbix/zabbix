@@ -1083,7 +1083,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 				->setEnabled(!$options['readonly']);
 	}
 
-	if ($tag['type'] & ZBX_PROPERTY_INHERITED) {
+	if ($tag['type'] == ZBX_PROPERTY_INHERITED) {
 		$value_field->setAttribute('data-skip-from-submit', '');
 		$tag_field->setAttribute('data-skip-from-submit', '');
 
