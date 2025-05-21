@@ -391,7 +391,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
 					err:  nil,
-					out: []byte(`{								
+					out: []byte(`{
 								"json_format_version": [1, 0],
 								"smartctl": {
 									"version": [7, 1],
@@ -519,7 +519,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
 					err:  nil,
-					out: []byte(`{								
+					out: []byte(`{
 								"json_format_version": [1, 0],
 								"smartctl": {
 									"version": [7, 1],
@@ -599,7 +599,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
 					err:  nil,
-					out: []byte(`{								
+					out: []byte(`{
 								"json_format_version": [1, 0],
 								"smartctl": {
 									"version": [7, 1],
@@ -644,6 +644,40 @@ func TestPlugin_execute(t *testing.T) {
 						SmartAttributes: smartAttributes{},
 					},
 				},
+			},
+			false,
+		},
+		{
+			"+nonZeroStatusCode",
+			args{
+				jsonRunner: true,
+			},
+			[]expectation{
+				{
+					args: []string{
+						"--scan", "-j",
+					},
+					out: mock.Outputs.Get("env_2").AllDevicesScan,
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					err:  nil,
+					out:  []byte(`{}`),
+				},
+				{
+					args: []string{"-a", "/dev/sda", "-j"},
+					err:  nil,
+					out:  mock.Outputs.Get("env_2").AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+				},
+			},
+			&runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {
+						serialNumber: "X6GMTKX2T",
+						jsonData:     string(mock.Outputs.Get("env_2").AllSmartInfoScans.Get("-a /dev/sda -d sat -j")),
+					},
+				},
+				devices: nil,
 			},
 			false,
 		},
@@ -757,7 +791,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
 					err:  nil,
-					out: []byte(`{								
+					out: []byte(`{
 								"json_format_version": [1, 0],
 								"smartctl": {
 									"version": [7, 1],
