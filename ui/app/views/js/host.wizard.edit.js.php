@@ -493,8 +493,6 @@ window.host_wizard_edit = new class {
 			const next_button_disabled = this.#next_button.hasAttribute('disabled');
 
 			this.#overlay.unsetLoading();
-			this.#overlay.recoverFocus();
-			this.#overlay.containFocus();
 
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 
@@ -721,9 +719,13 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
+		this.#updateProgress();
 		this.#updateDialogButton();
-		this.#overlay.recoverFocus();
-		this.#overlay.containFocus();
+
+		requestAnimationFrame(() => {
+			this.#overlay.recoverFocus();
+			this.#overlay.containFocus();
+		});
 	}
 
 	#onBeforeNextStep() {
@@ -1025,7 +1027,7 @@ window.host_wizard_edit = new class {
 		const template_loaded = this.#template !== null;
 		let progress = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER} .progress`);
 
-		if (this.#getCurrentStep() === this.STEP_WELCOME) {
+		if (this.#getCurrentStep() === this.STEP_WELCOME || this.#show_cancel_screen) {
 			if (progress !== null) {
 				progress.remove();
 			}
@@ -1298,9 +1300,14 @@ window.host_wizard_edit = new class {
 
 		this.#next_button.toggleAttribute('disabled', this.#hasErrors());
 
-		if (path) {
-			requestAnimationFrame(() => this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top);
-		}
+		requestAnimationFrame(() => {
+			if (path) {
+				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
+			}
+
+			this.#overlay.recoverFocus();
+			this.#overlay.containFocus();
+		});
 	}
 
 	#updateFieldsAsterisk() {

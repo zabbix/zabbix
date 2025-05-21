@@ -326,13 +326,13 @@ Overlay.prototype.recoverFocus = function() {
 	}
 
 	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus({preventScroll: true});
+		jQuery('[autofocus=autofocus]', this.$dialogue)[0]?.focus({preventScroll: true});
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus({preventScroll: true});
+		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0]?.focus({preventScroll: true});
 	}
 	else {
-		jQuery(':focusable:first', this.$dialogue)[0].focus({preventScroll: true});
+		jQuery(':focusable:first', this.$dialogue)[0]?.focus({preventScroll: true});
 	}
 };
 
@@ -345,8 +345,8 @@ Overlay.prototype.containFocus = function() {
 	focusable.off('keydown.containFocus');
 
 	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
+		var first_focusable = focusable.filter(':first:not([disabled])'),
+			last_focusable = focusable.filter(':last:not([disabled])');
 
 		first_focusable
 			.on('keydown.containFocus', function(e) {
