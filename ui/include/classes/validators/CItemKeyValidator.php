@@ -14,7 +14,15 @@
 **/
 
 
-class CItemPrototypeKeyValidator extends CValidator {
+class CItemKeyValidator extends CValidator {
+
+	protected bool $lldmacros = false;
+
+	public function __construct(array $options = []) {
+		if (array_key_exists('lldmacros', $options)) {
+			$this->lldmacros = (bool) $options['lldmacros'];
+		}
+	}
 
 	public function validate($value) {
 		$itemkey_parser = new CItemKey();
@@ -26,13 +34,15 @@ class CItemPrototypeKeyValidator extends CValidator {
 			return false;
 		}
 
-		$parameters = CMacrosResolverGeneral::getItemKeyParameters($itemkey_parser->getParamsRaw());
-		['lldmacros' => $result] = CMacrosResolverGeneral::extractMacros($parameters, ['lldmacros' => true]);
+		if ($this->lldmacros) {
+			$parameters = CMacrosResolverGeneral::getItemKeyParameters($itemkey_parser->getParamsRaw());
+			['lldmacros' => $result] = CMacrosResolverGeneral::extractMacros($parameters, ['lldmacros' => true]);
 
-		if (!$result) {
-			$this->setError(_('This field must contain at least one low-level discovery macro.'));
+			if (!$result) {
+				$this->setError(_('This field must contain at least one low-level discovery macro.'));
 
-			return false;
+				return false;
+			}
 		}
 
 		return true;
