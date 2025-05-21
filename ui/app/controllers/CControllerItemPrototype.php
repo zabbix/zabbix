@@ -100,12 +100,7 @@ abstract class CControllerItemPrototype extends CController {
 		];
 	}
 
-	/**
-	 * Additional validation for user input consumed by create and update actions.
-	 *
-	 * @return bool
-	 */
-	protected function validateInputEx(): bool {
+	protected function validateInputExtended(): bool {
 		if (!$this->validateInputPreprocessing($this->getInput('preprocessing', []))) {
 			return false;
 		}

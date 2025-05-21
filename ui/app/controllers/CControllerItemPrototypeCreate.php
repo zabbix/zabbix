@@ -22,7 +22,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules()) && $this->validateInputEx();
+		$ret = $this->validateInput(self::getValidationRules()) && $this->validateInputExtended();
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
