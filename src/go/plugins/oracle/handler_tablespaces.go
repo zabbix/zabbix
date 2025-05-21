@@ -65,7 +65,7 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 
 	// Check if first character is numeric
 	var conntype string
-	if len(conn) > 0 && strings.ToUpper(conn)[0] < 65 {
+	if conn != "" && strings.ToUpper(conn)[0] < 65 {
 		conntype = "CON_ID"
 	} else {
 		conntype = "CON$NAME"

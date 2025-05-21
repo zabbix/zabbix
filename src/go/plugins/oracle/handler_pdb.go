@@ -25,11 +25,12 @@ import (
 
 func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var PDBInfo string
+
 	connname := params["Database"]
 
 	// Check if first character is numeric
 	var conntype string
-	if len(connname) > 0 && strings.ToUpper(connname)[0] < 65 {
+	if connname != "" && strings.ToUpper(connname)[0] < 65 {
 		conntype = "CON_ID"
 	} else {
 		conntype = "NAME"
@@ -55,7 +56,7 @@ func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 	return PDBInfo, nil
 }
 
-func getPDBQuery(conntype string, name string) (string, []any) {
+func getPDBQuery(conntype, name string) (string, []any) {
 	const query = `
 	SELECT
 		JSON_ARRAYAGG(
