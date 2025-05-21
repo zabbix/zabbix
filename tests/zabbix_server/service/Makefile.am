@@ -14,6 +14,7 @@ COMMON_SRC_FILES = \
 COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice_server.a \
+	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \

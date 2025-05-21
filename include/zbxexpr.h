@@ -212,6 +212,7 @@ int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_toke
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token);
+int	zbx_token_is_user_macro(const char *macro, const zbx_token_t *token);
 /* token END */
 
 /* report scheduling */
@@ -284,6 +285,8 @@ char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int 
 const char	**zbx_get_indexable_macros(void);
 
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
+int	zbx_substitute_spec_macros(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, ...);
 
 /* macro function calculation */
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);

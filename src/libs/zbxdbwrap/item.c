@@ -21,6 +21,7 @@
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
+#include "zbxcalc.h"
 
 /******************************************************************************
  *                                                                            *

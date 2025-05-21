@@ -364,7 +364,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*tz = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
-	zbx_dc_um_handle_t	*um_handle = NULL;
+	zbx_dc_um_handle_t	*um_handle_unmasked = NULL, *um_handle_masked = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s, manualinput:%s",
@@ -575,24 +575,23 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 
 	if (0 != hostid)	/* script on host */
-		macro_type = ZBX_MACRO_TYPE_SCRIPT;
+		macro_type = ZBX_SCRIPT_MACROS;
 	else
-		macro_type = (NULL != recovery_event) ? ZBX_MACRO_TYPE_SCRIPT_RECOVERY : ZBX_MACRO_TYPE_SCRIPT_NORMAL;
+		macro_type = (NULL != recovery_event) ? ZBX_SCRIPT_RECOVERY_MACROS : ZBX_SCRIPT_NORMAL_MACROS;
 
-	um_handle = zbx_dc_open_user_macros();
+	um_handle_masked = zbx_dc_open_user_macros_masked();
+	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
-		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_type,
+				um_handle_unmasked, problem_event, recovery_event, user->userid, &host, tz))
 		{
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
-				&host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_type,
+				um_handle_masked, problem_event, recovery_event, user->userid, &host, tz))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -602,10 +601,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	{
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
-			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, tz,
-					(char **)&webhook_params.values[i].second, macro_type, error,
-					sizeof(error)))
+			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,
+					sizeof(error), macro_type, um_handle_unmasked, problem_event, recovery_event,
+					user->userid, &host, tz))
 			{
 				goto fail;
 			}
@@ -647,8 +645,10 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		ZBX_UNUSED(audit_res);
 	}
 fail:
-	if (NULL != um_handle)
-		zbx_dc_close_user_macros(um_handle);
+	if (NULL != um_handle_unmasked)
+		zbx_dc_close_user_macros(um_handle_unmasked);
+	if (NULL != um_handle_masked)
+		zbx_dc_close_user_macros(um_handle_masked);
 
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);

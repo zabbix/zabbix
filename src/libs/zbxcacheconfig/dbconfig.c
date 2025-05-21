@@ -9774,6 +9774,30 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache host identifier referenced by an item or a lld-rule.        *
+ *                                                                            *
+ * Parameters: hostids - [OUT] host identifier cache                          *
+ *             itemid  - [IN]  item identifier                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		zbx_dc_item_t	item;
+		int		errcode;
+
+		zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+		if (SUCCEED == errcode)
+			zbx_vector_uint64_append(hostids, item.host.hostid);
+
+		zbx_dc_config_clean_items(&item, &errcode, 1);
+	}
+}
+
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 {
 	ZBX_DC_HOST		*dc_host;

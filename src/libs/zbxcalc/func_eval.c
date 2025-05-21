@@ -12,22 +12,20 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "evalfunc.h"
-#include "funcparam.h"
-#include "zbxexpression.h"
+#include "zbxcalc.h"
 
-#include "zbxregexp.h"
+#include "eval.h"
+#include "funcparam.h"
+#include "anomalystl.h"
+
+#include "zbxvariant.h"
+#include "zbxcacheconfig.h"
+#include "zbxtime.h"
+#include "zbxhistory.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
-#include "zbxtrends.h"
-#include "anomalystl.h"
-#include "zbxnum.h"
-#include "zbxstr.h"
-#include "zbxexpr.h"
-#include "zbxparam.h"
-#include "zbxvariant.h"
-#include "zbxdb.h"
-#include "zbxeval.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
@@ -383,8 +381,8 @@ int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_
 			{
 				double	num1, num2;
 
-				if (ZBX_INFINITY != (num1 = zbx_evaluate_string_to_double(value)) &&
-						ZBX_INFINITY != (num2 = zbx_evaluate_string_to_double(valuemap->value)) &&
+				if (ZBX_INFINITY != (num1 = evaluate_string_to_double(value)) &&
+						ZBX_INFINITY != (num2 = evaluate_string_to_double(valuemap->value)) &&
 						SUCCEED == zbx_double_compare(num1, num2))
 				{
 					goto map_value;
@@ -410,18 +408,18 @@ int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_
 		}
 
 		if (ITEM_VALUE_TYPE_STR != value_type &&
-				ZBX_INFINITY != (input_value = zbx_evaluate_string_to_double(value)))
+				ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
 		{
 			double	min, max;
 
 			if (ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL == valuemap->type &&
-					ZBX_INFINITY != (max = zbx_evaluate_string_to_double(valuemap->value)))
+					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
 			{
 				if (input_value <= max)
 					goto map_value;
 			}
 			else if (ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL == valuemap->type &&
-					ZBX_INFINITY != (min = zbx_evaluate_string_to_double(valuemap->value)))
+					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
 			{
 				if (input_value >= min)
 					goto map_value;
@@ -456,15 +454,15 @@ int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_
 
 					if (NULL == ptr)
 					{
-						min = zbx_evaluate_string_to_double(range_str);
+						min = evaluate_string_to_double(range_str);
 						found = ZBX_INFINITY != min &&
 								SUCCEED == zbx_double_compare(input_value, min);
 					}
 					else
 					{
 						*ptr = '\0';
-						min = zbx_evaluate_string_to_double(range_str);
-						max = zbx_evaluate_string_to_double(ptr + 1);
+						min = evaluate_string_to_double(range_str);
+						max = evaluate_string_to_double(ptr + 1);
 						if (ZBX_INFINITY != min && ZBX_INFINITY != max &&
 								input_value >= min && input_value <= max)
 						{

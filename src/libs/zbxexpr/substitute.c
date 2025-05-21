@@ -180,8 +180,6 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 
 			va_end(pargs);
 
-			if (SUCCEED < ret) continue; /* resolver did everything */
-
 			if ((ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type) &&
 					NULL != replace_to)
 			{
@@ -288,6 +286,21 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 	va_start(args, resolver);
 
 	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
+
+	va_end(args);
+
+	return ret;
+}
+
+int	zbx_substitute_spec_macros(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, ...)
+{
+	int	ret;
+	va_list	args;
+
+	va_start(args, resolver);
+
+	ret = substitute_macros_args(search, data, error, maxerrlen, resolver, args);
 
 	va_end(args);
 

@@ -12,16 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_EVALFUNC_H
-#define ZABBIX_EVALFUNC_H
+#ifndef ZABBIX_ZBXCALC_EVAL_H
+#define ZABBIX_ZBXCALC_EVAL_H
 
-#include "zbxeval.h"
-
-#include "zbxtypes.h"
-#include "zbxcacheconfig.h"
 #include "zbxhistory.h"
-#include "zbxalgo.h"
-#include "zbxtime.h"
+#include "zbxcacheconfig.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
@@ -50,9 +45,13 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, zbx_dc_item_t *item, const char *par
 
 int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
 		unsigned char value_type);
+double	evaluate_string_to_double(const char *in);
 
 int	zbx_is_trigger_function(const char *name, size_t len);
 
 int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_eval_count_pattern_data_t *pdata,
 		zbx_vector_history_record_t *records, int limit, int *count, char **error);
+
+const char	*zbx_type_string(zbx_value_type_t type);
+
 #endif

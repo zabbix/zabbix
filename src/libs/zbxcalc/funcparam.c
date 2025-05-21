@@ -13,7 +13,6 @@
 **/
 
 #include "funcparam.h"
-#include "datafunc.h"
 
 #include "zbxtrends.h"
 #include "zbxnum.h"

@@ -26,6 +26,7 @@
 #include "zbx_expression_constants.h"
 #include "zbxexpression.h"
 #include "zbxdb.h"
+#include "zbxcalc.h"
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -267,6 +268,70 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 		default:
 			break;
 	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate result of expression macro.                             *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_expression_macro_result(const zbx_db_event *event, char *data, zbx_strloc_t *loc,
+		zbx_timespec_t *ts, char **replace_to, char **error)
+{
+	int				ret = FAIL;
+	zbx_eval_context_t		ctx;
+	const zbx_vector_uint64_t	*hostids;
+	zbx_variant_t			value;
+	zbx_expression_eval_t		eval;
+	char				*expression = NULL;
+	size_t				exp_alloc = 0, exp_offset = 0;
+	zbx_dc_um_handle_t		*um_handle;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, data + loc->l, loc->r - loc->l + 1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression: '%s'", __func__, expression);
+
+	um_handle = zbx_dc_open_user_macros();
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_EXPRESSION_MACRO, error))
+		goto out;
+
+	if (SUCCEED != zbx_db_trigger_get_all_hostids(&event->trigger, &hostids))
+	{
+		*error = zbx_strdup(NULL, "cannot obtain host identifiers for the expression macro");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_eval_substitute_macros(&ctx, NULL, &zbx_db_trigger_supplement_eval_resolv, um_handle,
+			hostids->values, hostids->values_num, event))
+	{
+		goto out;
+	}
+
+	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
+	zbx_expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
+
+	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
+	{
+		*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
+		zbx_variant_clear(&value);
+	}
+
+	zbx_expression_eval_clear(&eval);
+out:
+	zbx_eval_clear(&ctx);
+	zbx_free(expression);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

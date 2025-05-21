@@ -12,7 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxexpression.h"
+#include "zbxcalc.h"
+
+#include "eval.h"
 
 #include "zbxnum.h"
 #include "zbxvariant.h"
@@ -184,7 +186,7 @@ static void	variant_convert_to_double(zbx_variant_t *var)
 {
 	if (ZBX_VARIANT_STR == var->type)
 	{
-		double	var_double_value = zbx_evaluate_string_to_double(var->data.str);
+		double	var_double_value = evaluate_string_to_double(var->data.str);
 		if (ZBX_INFINITY == var_double_value)
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
@@ -216,7 +218,7 @@ static double	variant_get_double(const zbx_variant_t *var)
 		case ZBX_VARIANT_DBL:
 			return var->data.dbl;
 		case ZBX_VARIANT_STR:
-			return zbx_evaluate_string_to_double(var->data.str);
+			return evaluate_string_to_double(var->data.str);
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_INFINITY;
@@ -1094,7 +1096,7 @@ int	zbx_evaluate_unknown(const char *expression, double *value, char *error, siz
  * Return value: resulting double                                             *
  *                                                                            *
  ******************************************************************************/
-double	zbx_evaluate_string_to_double(const char *in)
+double	evaluate_string_to_double(const char *in)
 {
 	int		len;
 	double		result_double_value;

@@ -12,10 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxexpression.h"
-#include "datafunc.h"
-#include "evalfunc.h"
-#include "expression.h"
+#include "zbxcalc.h"
+
+#include "eval.h"
 
 #include "zbxcachevalue.h"
 #include "zbxeval.h"
@@ -34,6 +33,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbwrap.h"
+#include "zbx_expression_constants.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
@@ -1801,12 +1801,13 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			zbx_history_record_vector_create(&values);
 
-			if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts)
-					&& 0 < values.values_num)
+			if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count,
+					ts) && 0 < values.values_num)
 			{
 				if (ZBX_VALUE_FUNC_LAST == item_func)
 				{
-					var_vector_append_history_record(&values, dcitem->value_type, results_var_vector);
+					var_vector_append_history_record(&values, dcitem->value_type,
+							results_var_vector);
 				}
 				else
 				{
@@ -2169,6 +2170,31 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_
 	return SUCCEED;
 }
 
+/* macros that are supported in expression macro */
+static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: extract index from valid indexed host or item key macro.          *
+ *                                                                            *
+ * Return value: the index or -1 if it was not valid indexed host or item key *
+ *               macro.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	expr_macro_index(const char *macro)
+{
+	zbx_strloc_t	loc;
+	int		func_num;
+
+	loc.l = 0;
+	loc.r = strlen(macro) - 1;
+
+	if (NULL != zbx_macro_in_list(macro, loc, expr_macros, &func_num))
+		return func_num;
+
+	return -1;
+}
+
 /******************************************************************************
 *                                                                             *
 * Purpose: resolve expression with an empty host macro (default host),        *
@@ -2195,7 +2221,7 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 		/* resolve host */
 
 		if (0 != (ZBX_ITEM_QUERY_HOST_ONE & query->flags))
-			func_num = zbx_expr_macro_index(query->ref.host);
+			func_num = expr_macro_index(query->ref.host);
 		else if (0 != (ZBX_ITEM_QUERY_HOST_SELF & query->flags))
 			func_num = 1;
 		else
@@ -2210,7 +2236,7 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 		/* resolve item key */
 
 		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
-				-1 != (func_num = zbx_expr_macro_index(query->ref.key)))
+				-1 != (func_num = expr_macro_index(query->ref.key)))
 		{
 			resolve_expression_query_macro(trigger, &zbx_dc_get_item_key, "item key", func_num, query,
 					&query->ref.key, &item_keys);
