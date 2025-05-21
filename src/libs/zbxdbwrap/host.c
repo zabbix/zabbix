@@ -821,6 +821,58 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check that host is either created by LLD or that templates do not *
+ *          have LLD rules of nested type                                     *
+ *                                                                            *
+ * Parameters: hostid      - [IN] host identifier                             *
+ *             templateids - [IN] template IDs                                *
+ *             error       - [OUT] error message                              *
+ *             max_error_len - [IN] maximum error message length              *
+ *                                                                            *
+ * Return value: SUCCEED - validation passed                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_nested_lldrules(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
+		char *error, size_t max_error_len)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	result = zbx_db_select("select flags from hosts where hostid=" ZBX_FS_UI64, hostid);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+		goto out;
+
+	if (0 != (atoi(row[0]) & ZBX_FLAG_DISCOVERY_CREATED))
+		goto out;
+
+	zbx_db_free_result(result);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from items where type=%d and flags&%d=0 and",
+			ITEM_TYPE_NESTED_LLD, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids->values,
+			templateids->values_num);
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_strlcpy(error, "nested LLD rules are supported only on hosts created by LLD", max_error_len);
+		ret = FAIL;
+	}
+out:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Description: Check collisions between host and linked template             *
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
@@ -850,6 +902,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		goto out;
 
 	if (SUCCEED != (ret = validate_httptests(hostid, templateids, error, max_error_len)))
+		goto out;
+
+	if (SUCCEED != (ret = validate_nested_lldrules(hostid, templateids, error, max_error_len)))
 		goto out;
 
 	zbx_vector_graph_valid_ptr_create(&graphs);
