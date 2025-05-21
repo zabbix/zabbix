@@ -51,6 +51,7 @@ class CControllerHostWizardEdit extends CController {
 			$host = API::Host()->get([
 				'output' => ['hostid', 'name'],
 				'hostids' => $this->getInput('hostid'),
+				'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
 				'editable' => true,
 				'limit' => 1
 			]);

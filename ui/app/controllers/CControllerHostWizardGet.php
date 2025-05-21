@@ -50,6 +50,7 @@ class CControllerHostWizardGet extends CController {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => $this->getInput('hostid'),
+				'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
 				'editable' => true,
 				'limit' => 1
 			]);
