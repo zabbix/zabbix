@@ -845,12 +845,12 @@ class CHistoryManager {
 						: $time_from;
 				}
 
-				$sql = 'SELECT '.implode(', ', $sql_select).
+				$sql = 'SELECT '.implode(',', $sql_select).
 					' FROM '.$sql_from.
 					' WHERE '.dbConditionInt('itemid', $itemids).
 						' AND clock>='.$_time_from.
 						' AND clock<='.$time_to.
-					' GROUP BY '.implode(', ', $sql_group_by);
+					' GROUP BY '.implode(',', $sql_group_by);
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
 					if ($source === 'history') {
