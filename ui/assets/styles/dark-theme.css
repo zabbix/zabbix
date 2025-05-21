@@ -6039,6 +6039,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .form-field textarea,
     .modal-popup-host-wizard .form-field z-select > button {
       border-radius: 2px; }
+    .modal-popup-host-wizard .form-field z-select .list li {
+      max-width: 100%; }
     .modal-popup-host-wizard .form-field input[type="checkbox"] + label {
       cursor: pointer; }
     .modal-popup-host-wizard .form-field .multiselect-control {
@@ -6053,6 +6055,17 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .form-field .macro-input-group textarea {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0; }
+    .modal-popup-host-wizard .form-field .radio-list-control {
+      display: flex;
+      max-width: 100%; }
+      .modal-popup-host-wizard .form-field .radio-list-control li {
+        flex: 1 1 auto;
+        min-width: 0; }
+      .modal-popup-host-wizard .form-field .radio-list-control label {
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis; }
     .modal-popup-host-wizard .form-field .warning {
       line-height: 16px; }
       .modal-popup-host-wizard .form-field .warning::before {

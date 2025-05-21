@@ -255,6 +255,14 @@
 			border-radius: 2px;
 		}
 
+		z-select {
+			.list {
+				li {
+					max-width: 100%;
+				}
+			}
+		}
+
 		input[type="checkbox"] + label {
 			cursor: pointer;
 		}
@@ -280,6 +288,23 @@
 			textarea {
 				border-top-right-radius: 0;
 				border-bottom-right-radius: 0;
+			}
+		}
+
+		.radio-list-control {
+			display: flex;
+			max-width: 100%;
+
+			li {
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+
+			label {
+				box-sizing: border-box;
+				max-width: 100%;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		}
 
