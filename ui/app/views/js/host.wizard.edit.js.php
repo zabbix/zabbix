@@ -983,9 +983,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#removeMessageBoxes() {
-		for (const messages of this.#dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad')) {
-			messages.remove();
-		}
+		this.#dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
 	}
 
 	#updateStepsQueue() {
