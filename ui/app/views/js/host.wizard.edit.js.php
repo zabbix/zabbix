@@ -342,7 +342,6 @@ window.host_wizard_edit = new class {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
 						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-							success: true,
 							is_host_new: this.#data.host.isNew,
 							hostid: this.#data.host.id
 						}}));
