@@ -493,8 +493,6 @@ window.host_wizard_edit = new class {
 			const next_button_disabled = this.#next_button.hasAttribute('disabled');
 
 			this.#overlay.unsetLoading();
-			this.#back_button.style.display = this.#current_step > 0
-				&& this.#steps_queue[this.#current_step] !== this.STEP_COMPLETE ? '' : 'none';
 
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 
@@ -1317,13 +1315,18 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateDialogButton() {
-		for (const button of this.#dialogue.querySelectorAll('.js-cancel, .js-back, .js-next')) {
-			button.style.display = this.#show_cancel_screen ? 'none' : '';
+		for (const button of this.#dialogue.querySelectorAll('.js-cancel')) {
+			button.hidden = this.#show_cancel_screen;
 		}
 
 		for (const button of this.#dialogue.querySelectorAll('.js-cancel-yes, .js-cancel-no')) {
-			button.style.display = this.#show_cancel_screen ? '' : 'none';
+			button.hidden = !this.#show_cancel_screen;
 		}
+
+		this.#back_button.hidden = this.#show_cancel_screen || this.#current_step === 0
+			|| this.#steps_queue[this.#current_step] === this.STEP_COMPLETE;
+
+		this.#next_button.hidden = this.#show_cancel_screen;
 
 		switch (this.#getCurrentStep()) {
 			case this.STEP_CONFIGURATION_FINISH:
