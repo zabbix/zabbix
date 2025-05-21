@@ -722,6 +722,8 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
 		this.#updateDialogButton();
+		this.#overlay.recoverFocus();
+		this.#overlay.containFocus();
 	}
 
 	#onBeforeNextStep() {
