@@ -848,8 +848,7 @@ class CHistoryManager {
 				$sql = 'SELECT '.implode(',', $sql_select).
 					' FROM '.$sql_from.
 					' WHERE '.dbConditionInt('itemid', $itemids).
-						' AND clock>='.$_time_from.
-						' AND clock<='.$time_to.
+						' AND clock BETWEEN '.$_time_from.' AND '.$time_to.
 					' GROUP BY '.implode(',', $sql_group_by);
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
@@ -861,20 +860,17 @@ class CHistoryManager {
 								'SELECT h2.itemid,h2.clock,'.($function == AGGREGATE_FIRST ? 'MIN' : 'MAX').'(h2.ns) AS ns,s2.tick'.
 								' FROM '.$sql_from.' h2'.
 								' JOIN ('.$sql.') s2 ON h2.itemid=s2.itemid AND h2.clock=s2.clock'.
-								' WHERE h2.clock>='.$_time_from.
-									' AND h2.clock<='.$time_to.
+								' WHERE h2.clock BETWEEN '.$_time_from.' AND '.$time_to.
 								' GROUP BY h2.itemid,h2.clock,s2.tick'.
 							') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns'.
-							' WHERE h.clock>='.$_time_from.
-								' AND h.clock<='.$time_to;
+							' WHERE h.clock BETWEEN '.$_time_from.' AND '.$time_to;
 					}
 					else {
 						$sql =
 							'SELECT DISTINCT h.itemid,h.value_avg AS value,h.clock,0 AS ns,s.tick'.
 							' FROM '.$sql_from.' h'.
 							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock'.
-							' WHERE h.clock>='.$_time_from.
-								' AND h.clock<='.$time_to;
+							' WHERE h.clock BETWEEN '.$_time_from.' AND '.$time_to;
 					}
 				}
 
