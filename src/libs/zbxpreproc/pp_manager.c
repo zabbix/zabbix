@@ -682,17 +682,22 @@ static void	zbx_pp_manager_get_values_stats(zbx_pp_manager_t *manager, int is_nu
 {
 	zbx_hashset_iter_t	iter;
 	zbx_pp_item_t		*item;
-	zbx_pp_top_stats_t	*stat;
 
 	zbx_hashset_iter_reset(&manager->items, &iter);
 
 	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
+		zbx_int64_t		num;
+		zbx_pp_top_stats_t	*stat;
 
+		num = 0 == is_num ? (zbx_int64_t)item->preproc->values_sz : (zbx_int64_t)item->preproc->values_num;
+
+		if (0 == num)
+			continue;
+
+		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
 		stat->itemid = item->itemid;
-		stat->num = 0 == is_num ?
-				(zbx_int64_t)item->preproc->values_sz : (zbx_int64_t)item->preproc->values_num;
+		stat->num = num;
 
 		zbx_vector_pp_top_stats_ptr_append(stats, stat);
 	}
