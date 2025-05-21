@@ -104,7 +104,7 @@ abstract class CControllerItem extends CController {
 	 * @return bool
 	 */
 	protected function validateInputEx(): bool {
-		if (!$this->validateInputPreprocessingEx($this->getInput('preprocessing', []))) {
+		if (!$this->validateInputPreprocessing($this->getInput('preprocessing', []))) {
 			return false;
 		}
 
@@ -157,7 +157,7 @@ abstract class CControllerItem extends CController {
 		return $ret && $this->validateReferredObjects();
 	}
 
-	protected function validateInputPreprocessingEx(array $steps): bool {
+	protected function validateInputPreprocessing(array $steps): bool {
 		$has_delta_step = false;
 		$has_any_error_step = false;
 		$has_discard_value_step = false;
