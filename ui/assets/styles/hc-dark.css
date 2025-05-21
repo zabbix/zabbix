@@ -6104,6 +6104,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .templates-card-list .no-data-message {
     padding-top: 32px;
     padding-bottom: 32px; }
+  .modal-popup-host-wizard .host-macro-list {
+    display: contents; }
 
 .link-action {
   color: #ffffff;

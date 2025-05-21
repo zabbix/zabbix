@@ -641,7 +641,7 @@ window.host_wizard_edit = new class {
 		const view = this.#view_templates.step_configure_host.evaluateToElement();
 		const substep_counter = this.#steps_queue.includes(this.STEP_README)
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
-		const macros_list = view.querySelector('.js-host-macro-list');
+		const macros_list = view.querySelector('.host-macro-list');
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 

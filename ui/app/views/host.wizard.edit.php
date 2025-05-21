@@ -866,9 +866,11 @@ function stepConfigureHost(): array {
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
 				(new CSection())
+					->addItem(
+						(new CDiv())->addClass('host-macro-list')
+					)
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-					->addClass('js-host-macro-list'),
 			]))->addClass('step-form-body')
 		),
 		new CTemplateTag('host-wizard-macro-field-checkbox',
