@@ -108,4 +108,9 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 	lld_audit_item_add_uint64(item, "verify_peer", item_prototype->verify_peer);
 	lld_audit_item_add_uint64(item, "verify_host", item_prototype->verify_host);
 	lld_audit_item_add_uint64(item, "allow_traps", item_prototype->allow_traps);
+
+	if (0 != (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		lld_audit_item_add_uint64(item, "discover", item_prototype->discover);
+	}
 }

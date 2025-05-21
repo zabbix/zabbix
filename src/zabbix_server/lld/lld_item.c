@@ -406,7 +406,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					"post_type,http_proxy,headers,retrieve_mode,request_method,output_format,"
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
 					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
-					"enabled_lifetime_type,evaltype,flags"
+					"enabled_lifetime_type,evaltype,flags,discover"
 				" from items"
 				" where");
 
@@ -672,6 +672,24 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 				zbx_vector_uint64_append(&lldruleids, item->itemid);
 			else
 				zbx_vector_uint64_append(&tag_itemids, item->itemid);
+
+			if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			{
+				item->discover = atoi(row[50]);
+				if (item->discover != item_prototype->discover)
+				{
+					item->discover_orig = item->discover;
+					item->discover = item_prototype->discover;
+					item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DISCOVER;
+				}
+
+				if (item->status != item_prototype->status)
+				{
+					item->status_orig = item->status;
+					item->status = item_prototype->status;
+					item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_STATUS;
+				}
+			}
 
 			item->lld_row = NULL;
 
@@ -1740,19 +1758,25 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	history = item_prototype->history;
 	trends = item_prototype->trends;
 	item->status = item_prototype->status;
-	discover = item_prototype->discover;
 
 	zbx_vector_db_tag_ptr_create(&item->override_tags);
 
-	if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
-		lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
-				&item->status, &discover);
+		discover = item_prototype->discover;
+
+		if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+		{
+			lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends,
+					&item->override_tags, &item->status, &discover);
+		}
+		else
+		{
+			lld_override_lldrule(&lld_row->overrides, item->name, &delay, &item->status, &discover);
+		}
 	}
 	else
-	{
-		lld_override_lldrule(&lld_row->overrides, item->name, &delay, &item->status, &discover);
-	}
+		discover = ZBX_PROTOTYPE_DISCOVER;
 
 	item->key_ = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
@@ -1975,17 +1999,23 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	delay = item_prototype->delay;
 	history = item_prototype->history;
 	trends = item_prototype->trends;
-	discover = item_prototype->discover;
 
-	if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
-		lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
-				NULL, &discover);
+		discover = item_prototype->discover;
+
+		if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+		{
+			lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends,
+					&item->override_tags, NULL, &discover);
+		}
+		else
+		{
+			lld_override_lldrule(&lld_row->overrides, item->name, &delay, NULL, &discover);
+		}
 	}
 	else
-	{
-		lld_override_lldrule(&lld_row->overrides, item->name, &delay, NULL, &discover);
-	}
+		discover = ZBX_PROTOTYPE_DISCOVER;
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2401,20 +2431,25 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 					continue;
 				}
 
-				if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+				if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 				{
-					if (SUCCEED != lld_validate_item_override_no_discover(&lld_row->overrides,
-							ref->item->name, item_prototype->discover))
+					if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 					{
-						continue;
+						if (SUCCEED != lld_validate_item_override_no_discover(
+								&lld_row->overrides, ref->item->name,
+								item_prototype->discover))
+						{
+							continue;
+						}
 					}
-				}
-				else
-				{
-					if (SUCCEED != lld_validate_lldrule_override_no_discover(&lld_row->overrides,
-							ref->item->name, item_prototype->discover))
+					else
 					{
-						continue;
+						if (SUCCEED != lld_validate_lldrule_override_no_discover(
+								&lld_row->overrides, ref->item->name,
+								item_prototype->discover))
+						{
+							continue;
+						}
 					}
 				}
 
@@ -2859,7 +2894,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
 				item_prototype->allow_traps, item_prototype->lifetime, item_prototype->lifetime_type,
 				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
-				item_prototype->evaltype);
+				item_prototype->evaltype, item_prototype->discover);
 
 		/* In the case of prototype item discovery find the discovered LLD rule id */
 		if (NULL != rule_index)
@@ -3341,9 +3376,23 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sevaltype=%d", d, item_prototype->evaltype);
+		d = ",";
 		zbx_audit_item_update_json_update_evaltype(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-				item->item_flags, item->evaltype_orig,
-				item_prototype->evaltype);
+				item->item_flags, item->evaltype_orig, item_prototype->evaltype);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_STATUS))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sstatus=%d", d, item->status);
+		d = ",";
+		zbx_audit_item_update_json_update_status(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				item->item_flags, item->status_orig, item->status);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DISCOVER))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdiscover=%d", d, item->discover);
+		d = ",";
+		zbx_audit_item_update_json_update_discover(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				item->item_flags, item->discover_orig, item->discover);
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
@@ -3515,7 +3564,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				"retrieve_mode", "request_method", "output_format", "ssl_cert_file", "ssl_key_file",
 				"ssl_key_password", "verify_peer", "verify_host", "allow_traps",
 				"lifetime", "lifetime_type", "enabled_lifetime", "enabled_lifetime_type",
-				"evaltype", (char *)NULL);
+				"evaltype", "discover", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", "lastcheck", "lldruleid", (char *)NULL);
