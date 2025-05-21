@@ -493,6 +493,8 @@ window.host_wizard_edit = new class {
 			const next_button_disabled = this.#next_button.hasAttribute('disabled');
 
 			this.#overlay.unsetLoading();
+			this.#overlay.recoverFocus();
+			this.#overlay.containFocus();
 
 			this.#next_button.toggleAttribute('disabled', next_button_disabled);
 
