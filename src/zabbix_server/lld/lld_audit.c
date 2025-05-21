@@ -49,7 +49,7 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 	lld_audit_item_add_string(item, "delay", item->delay);
 	lld_audit_item_add_uint64(item, "hostid", hostid);
 	lld_audit_item_add_string(item, "name", item->name);
-	lld_audit_item_add_string(item, "key", item->key_);
+	lld_audit_item_add_string(item, "key_", item->key_);
 	lld_audit_item_add_uint64(item, "type", item_prototype->type);
 	lld_audit_item_add_uint64(item, "value_type", item_prototype->value_type);
 	lld_audit_item_add_string(item, "history", item->history);
