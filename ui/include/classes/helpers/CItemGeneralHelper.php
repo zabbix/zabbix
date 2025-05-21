@@ -173,6 +173,8 @@ JAVASCRIPT;
 			}
 		}
 
+		$item_tags_uniqe = [];
+
 		// Overwrite and attach item's own tags.
 		foreach ($item_tags as $tag) {
 			if (array_key_exists($tag['tag'], $inherited_tags)
@@ -180,11 +182,15 @@ JAVASCRIPT;
 				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 			}
 			else {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				$item_tags_uniqe[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 			}
 		}
 
 		foreach ($inherited_tags as $tag) {
+			$tags = array_merge($tags, array_values($tag));
+		}
+
+		foreach ($item_tags_uniqe as $tag) {
 			$tags = array_merge($tags, array_values($tag));
 		}
 
