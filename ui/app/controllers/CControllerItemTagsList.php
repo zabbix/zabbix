@@ -72,7 +72,7 @@ class CControllerItemTagsList extends CController {
 				'itemid' => 0,
 				'templateid' => 0,
 				'hostid' => $this->getInput('hostid', 0),
-				'flag' => ZBX_FLAG_DISCOVERY_NORMAL
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL
 			];
 		}
 
