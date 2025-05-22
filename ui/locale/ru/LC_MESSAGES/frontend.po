@@ -1849,6 +1849,26 @@ msgstr "Автор"
 msgid "Authorization"
 msgstr "Авторизация"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2252,6 +2272,10 @@ msgstr "CSV в JSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "Ожидается CUID "
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3472,6 +3496,10 @@ msgstr "Не удалось найти преобразование значен
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в прототипу элементов данных \"%2$s\" в правиле обнаружения \"%3$s\" на \"%4$s\"."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3839,6 +3867,10 @@ msgstr "Невозможно массово обновить видимое им
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "Не удалось открыть URL"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4663,6 +4695,10 @@ msgstr "Закольцованное соединение шаблонов не 
 msgid "Class %1$s not found for action %2$s."
 msgstr "Класс %1$s не найден для действия %2$s."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4883,6 +4919,10 @@ msgstr "Community"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "Компактный вид"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5110,6 +5150,10 @@ msgstr "Обновление настроек"
 msgid "Configuration updated"
 msgstr "Настройки обновлены"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -5119,6 +5163,12 @@ msgstr "Настройка подключения к БД"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "Настройка JIT инициализации"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6933,6 +6983,10 @@ msgstr "Описание"
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
 msgstr "Размер описания"
+
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11699,6 +11753,11 @@ msgstr "Некорректные настройки LDAP"
 msgid "Invalid MFA configuration"
 msgstr "Некорректные настройки MFA"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Ошибочная конфигурация сопоставления способа оповещения JIT инициализации SAML."
@@ -14602,6 +14661,10 @@ msgstr "Новый способ оповещений"
 msgid "New media type mapping"
 msgstr "Новое соответствие способа оповещений"
 
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
 msgstr "Новая операция"
@@ -14736,6 +14799,10 @@ msgstr "Не указан \"%1$s\" у карты сети."
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "Без изменений."
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15524,6 +15591,18 @@ msgstr "Числовой (целочисленный)"
 msgid "Numeric (unsigned)"
 msgstr "Числовой (целое положительное)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -16279,6 +16358,15 @@ msgstr "Страница получила некорректные данные"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "Навигатор"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17446,6 +17534,10 @@ msgstr "Время восстановления"
 msgid "Rectangle"
 msgstr "Прямоугольник"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Атрибут ссылки"
@@ -17480,6 +17572,10 @@ msgstr "Обновить конфигурацию на выбранном про
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "Интервал обновления"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18884,6 +18980,10 @@ msgstr "Выберите SLA для отображения отчета по SLA
 msgid "Select prototype"
 msgstr "Выбрать прототип"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19687,6 +19787,10 @@ msgstr "Информация об архитектуре программног�
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
 msgstr "Время последней проверки программного обеспечения"
+
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20631,6 +20735,10 @@ msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети 
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "Шаблоны, присоединённые обнаружением узлов сети, нельзя отсоединять."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20750,6 +20858,10 @@ msgstr "%1$s более не обнаруживается и %2$s, %3$s."
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "%1$s более не обнаруживается и %2$s."
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "Шаблон URL используется для загрузки и отображения слоя плитки на географических картах."
@@ -20766,6 +20878,14 @@ msgstr "Среднее время чтения с виртуального ди�
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "Среднее время записи на виртуальный диск, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"экземпляр\" - экземпляр дискового устройства"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21205,6 +21325,14 @@ msgstr "Сегодня до сих пор"
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "Редактировать токен"
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -22000,6 +22128,10 @@ msgstr "Без изменений"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "Отмена подтверждения проблемы."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24785,6 +24917,14 @@ msgstr "bitxor() - Битовое исключающее ИЛИ"
 msgid "blinking"
 msgstr "мигание"
 
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
 msgstr "как имя пользователя, так и пароль должны присутствовать или быть пустыми"
@@ -26502,6 +26642,10 @@ msgstr "группа шаблонов с таким UUID уже существу
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
 msgstr "шаблон с таким UUID уже существует"
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
