@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-04 19:04+0000\n"
+"PO-Revision-Date: 2025-05-16 21:07+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1826,23 +1826,23 @@ msgstr "Autorisation"
 
 #: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
 msgid "Authorization code"
-msgstr ""
+msgstr "Code d'autorisation"
 
 #: app/views/oauth.edit.php:136
 msgid "Authorization endpoint"
-msgstr ""
+msgstr "Point de terminaison d'autorisation"
 
 #: app/views/oauth.edit.php:148
 msgid "Authorization parameters"
-msgstr ""
+msgstr "Paramètres d'autorisation"
 
 #: app/views/oauth.edit.php:137
 msgid "Authorization server URL for requesting user authorization."
-msgstr ""
+msgstr "URL du serveur d'autorisation pour demander l'autorisation de l'utilisateur."
 
 #: app/views/oauth.edit.php:189
 msgid "Authorization server URL to exchange the authorization code for an access token."
-msgstr ""
+msgstr "URL du serveur d'autorisation pour échanger le code d'autorisation contre un jeton d'accès."
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
@@ -2250,7 +2250,7 @@ msgstr "Un CUID est attendu"
 
 #: app/controllers/CControllerOauthAuthorize.php:135
 msgid "CURL Error"
-msgstr ""
+msgstr "Erreur CURL"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3409,7 +3409,7 @@ msgstr "Impossible de trouver la table de correspondances \"%1$s\" utilisée pou
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
-msgstr ""
+msgstr "Impossible d'obtenir le code d'autorisation."
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3779,7 +3779,7 @@ msgstr "Impossible d'ouvrir l'URL"
 
 #: app/views/oauth.edit.php:229
 msgid "Cannot open authorization popup window."
-msgstr ""
+msgstr "Impossible d'ouvrir la fenêtre contextuelle d'autorisation."
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4594,7 +4594,7 @@ msgstr "Classe %1$s introuvable pour l'action %2$s."
 
 #: jsLoader.php:551
 msgid "Clear"
-msgstr ""
+msgstr "Effacer"
 
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
@@ -4819,7 +4819,7 @@ msgstr "Vue compacte"
 
 #: app/views/oauth.edit.php:228
 msgid "Complete authentication to get tokens."
-msgstr ""
+msgstr "Terminer l'authentification pour obtenir des jetons."
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5049,7 +5049,7 @@ msgstr "Configuration mise à jour"
 
 #: app/views/mediatype.edit.php:184
 msgid "Configure"
-msgstr ""
+msgstr "Configurer"
 
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
@@ -5065,7 +5065,7 @@ msgstr "Configurer le provisionnement JIT"
 #: app/views/mediatype.edit.php:155
 #, c-format
 msgid "Configured %1$s ago"
-msgstr ""
+msgstr "Configuré il y a %1$s"
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6876,7 +6876,7 @@ msgstr "Taille de la description"
 
 #: app/views/oauth.edit.php:46
 msgid "Destination URL where successful authorization redirects."
-msgstr ""
+msgstr "URL de destination vers laquelle l'autorisation réussie redirige."
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11626,7 +11626,7 @@ msgstr "Configuration de l'authentification multi-facteur invalide"
 #: app/controllers/CControllerOauthCheck.php:44
 #: app/controllers/CControllerOauthEdit.php:43
 msgid "Invalid OAuth configuration"
-msgstr ""
+msgstr "Configuration OAuth non valide"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -14509,7 +14509,7 @@ msgstr "Nouvelle correspondance de type de média"
 
 #: app/views/oauth.edit.php:237
 msgid "New oauth"
-msgstr ""
+msgstr "Nouvelle OAuth"
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14648,7 +14648,7 @@ msgstr "Aucun changement."
 
 #: jsLoader.php:553
 msgid "No color"
-msgstr ""
+msgstr "Pas de couleur"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15439,15 +15439,15 @@ msgstr "Numérique (non signé)"
 
 #: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
 msgid "OAuth"
-msgstr ""
+msgstr "OAuth"
 
 #: app/controllers/CControllerOauthAuthorize.php:155
 msgid "OAuth response missing mandatory fields."
-msgstr ""
+msgstr "Il manque des champs obligatoires dans la réponse OAuth."
 
 #: app/views/mediatype.edit.php:177
 msgid "OAuth tokens"
-msgstr ""
+msgstr "Jetons OAuth"
 
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
@@ -16206,12 +16206,12 @@ msgstr "Pager"
 
 #: jsLoader.php:554
 msgid "Palette"
-msgstr ""
+msgstr "Palette"
 
 #: jsLoader.php:555
 #, c-format
 msgid "Palette %1$d"
-msgstr ""
+msgstr "Palette %1$d"
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17379,7 +17379,7 @@ msgstr "Rectangle"
 
 #: app/views/oauth.edit.php:44
 msgid "Redirection endpoint"
-msgstr ""
+msgstr "Point de terminaison de redirection"
 
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
@@ -17418,7 +17418,7 @@ msgstr "Intervalle de rafraîchissement"
 
 #: app/views/mediatype.edit.php:163
 msgid "Refresh token is invalid or outdated."
-msgstr ""
+msgstr "Le jeton d'actualisation n'est pas valide ou obsolète."
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18817,7 +18817,7 @@ msgstr "Sélectionner le prototype"
 
 #: app/views/oauth.edit.php:171
 msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
-msgstr ""
+msgstr "Sélectionnez la méthode de récupération : automatiquement via une page de redirection ou manuellement si la récupération automatique échoue."
 
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
@@ -19624,7 +19624,7 @@ msgstr "Mise à jour du logiciel vérifiée pour la dernière fois"
 
 #: jsLoader.php:556
 msgid "Solid color"
-msgstr ""
+msgstr "Couleur unie"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20568,7 +20568,7 @@ msgstr "Les modèles liés par la découverte d'hôte ne peuvent pas être disso
 
 #: app/views/oauth.edit.php:169
 msgid "Temporary token to exchange for an access token."
-msgstr ""
+msgstr "Jeton temporaire à échanger contre un jeton d'accès."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
@@ -20691,7 +20691,7 @@ msgstr "Le %1$s n'est plus découvert et %2$s."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
-msgstr ""
+msgstr "L'URL doit être conforme à la politique du fournisseur OAuth."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -20712,11 +20712,11 @@ msgstr "Durée moyenne d'une écriture sur le disque virtuel, \"url\" - URL du s
 
 #: app/views/oauth.edit.php:70
 msgid "The client identifier registered within the authorization server."
-msgstr ""
+msgstr "L'identifiant client enregistré dans le serveur d'autorisation."
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
-msgstr ""
+msgstr "Le secret client enregistré dans le serveur d'autorisation."
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21160,7 +21160,7 @@ msgstr ""
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
-msgstr ""
+msgstr "Paramètres du jeton"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21952,7 +21952,7 @@ msgstr "Annuler l'acquittement du problème."
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
-msgstr ""
+msgstr "Code réponse HTTP inattendu."
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24731,11 +24731,11 @@ msgstr "clignotant"
 
 #: include/classes/api/services/CMediatype.php:680
 msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
-msgstr ""
+msgstr "« access_token » et « access_expires_in » doivent être spécifiés lors du marquage du jeton d'accès comme valide"
 
 #: include/classes/api/services/CMediatype.php:695
 msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
-msgstr ""
+msgstr "« access_token » et « access_expires_in » doivent être présents ou absents"
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -26457,7 +26457,7 @@ msgstr "un modèle avec le même UUID existe déjà"
 
 #: include/classes/api/services/CMediatype.php:688
 msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
-msgstr ""
+msgstr "le paramètre « refresh_token » doit être spécifié lors du marquage du jeton d'actualisation comme valide"
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831

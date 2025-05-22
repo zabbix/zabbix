@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-29 15:16+0000\n"
+"PO-Revision-Date: 2025-05-22 09:10+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1180,7 +1180,7 @@ msgstr "エージェントのインターフェース"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr "エージェント種別チェック。返却値は1 - Zabbixエージェント；2 - Zabbixエージェント2"
+msgstr "エージェント種別チェック。返り値: 1 - Zabbixエージェント, 2 - Zabbixエージェント2"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -4453,11 +4453,11 @@ msgstr "指定したUDPのポート番号が待ち受け状態になっている
 
 #: include/classes/data/CItemData.php:1165
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr "TCPサービスのパフォーマンスをチェック。サービスがダウンしている場合は「0」を返し、秒数を返す場合はサービスへの接続にかかった秒数を返す。"
+msgstr "TCPサービスのパフォーマンスチェック。返り値: 0 - サービスがダウンしている, 0以外の数値 - サービスへの接続にかかった秒数"
 
 #: include/classes/data/CItemData.php:1199
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr "UDPサービスのパフォーマンスをチェック。サービスがダウンしている場合は「0」を返し、秒数を返す場合はサービスからの応答が返るまでの秒数を返す。"
+msgstr "UDPサービスのパフォーマンスチェック。返り値: 0 - サービスがダウンしている, 0以外の数値 - サービスから応答が返るまでの秒数"
 
 #: include/classes/api/services/CDRule.php:691
 msgid "Checks should be unique."
@@ -6770,7 +6770,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
-msgstr "インストール済みパッケージの詳細リスト。JSONフォーマットのテキストで返す"
+msgstr "インストール済みパッケージの詳細リスト。JSONフォーマットのテキストを返す"
 
 #: app/partials/action.operations.php:32 app/partials/action.operations.php:35
 #: app/partials/action.recovery.operations.php:30
@@ -7267,7 +7267,7 @@ msgstr "ディスク読み込み統計。typeがsectors、operations、bytesの�
 
 #: include/classes/data/CItemData.php:1719
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "ディスク容量。バイト単位であれば整数値で返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "ディスク容量。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1575
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
@@ -8202,7 +8202,7 @@ msgstr "実行"
 
 #: include/classes/data/CItemData.php:2608
 msgid "Execute WMI query and return the JSON document with all selected objects"
-msgstr "WMIクエリを実行して選択したすべてのオブジェクトをJSONドキュメントで返す"
+msgstr "WMIクエリを実行し、選択したすべてのオブジェクトのJSONドキュメントを返す"
 
 #: include/classes/data/CItemData.php:2600
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
@@ -8569,7 +8569,7 @@ msgstr "ファイルの所有者情報。文字列値を返す"
 
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
-msgstr "バイト(デフォルト)または行数でのファイルサイズ。整数値を返す"
+msgstr "ファイルサイズ。バイト単位(デフォルト)または行数の整数値を返す"
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -11261,11 +11261,11 @@ msgstr "情報"
 
 #: include/classes/data/CItemData.php:1631
 msgid "Information about a file. Returns JSON"
-msgstr "ファイルの情報。JSONで返す"
+msgstr "ファイルの情報。JSONを返す"
 
 #: include/classes/data/CItemData.php:1321
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr "サービス情報の取得。引数がstateやstartupなら整数値を返す。引数がdisplayname、path、userなら文字列値を返す。引数がdescriptionならテキスト値を返す。具体的には引数がstateで状態が開始なら「0」、一時停止なら「１」、開始中なら「2」、一時停止中なら「3」、再開中なら「4」、停止中なら「5」、停止なら「6」、不明なら「7」、該当サービスなしなら「255」を返す。また、引数がstartupでスタートアップの種類が自動なら「0」、自動(遅延開始)なら「1」、手動なら「2」、無効なら「3」、不明なら「4」を返す。"
+msgstr "サービスに関する情報。引数がstate、startupなら整数値を、displayname、path、userなら文字列値を、descriptionならテキスト値を返す。state(状態)の返り値: 0 - 停止, 1 - 一時停止, 2 - 開始中, 3 - 一時停止中, 4 - 再開中, 5 - 停止中, 6 - 停止, 7 - 不明, 255 - 該当サービスなし。startup(スタートアップの種類)の返り値: 0 - 自動, 1 - 自動(遅延開始), 2 - 手動, 3 - 無効, 4 - 不明"
 
 #: include/views/configuration.host.prototype.edit.php:270
 msgid "Inherit"
@@ -12682,11 +12682,11 @@ msgstr "リストがありません"
 
 #: include/classes/data/CItemData.php:1265
 msgid "List of OS processes with attributes. Returns JSON array"
-msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
+msgstr "OS上の属性情報付きのプロセスのリスト。JSON配列を返す"
 
 #: include/classes/data/CItemData.php:1305
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
-msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
+msgstr "指定されたキーにあるWindowsレジストリの値またはキーのリスト。JSONを返す。"
 
 #: include/classes/data/CItemData.php:2743
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
@@ -12706,35 +12706,35 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
-msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
+msgstr "ブロックデバイスとそのタイプのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr "検出されたCPUコアのリスト。JSONで返す"
+msgstr "検出されたCPUコアのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1591
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr "再帰的なディレクトリエントリのリスト。JSONで返す"
+msgstr "再帰的なディレクトリエントリのリスト。JSONを返す。"
 
 #: include/classes/data/CItemData.php:1695
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr "マウントされたファイルシステムとそのタイプのリスト。JSONで返す"
+msgstr "マウントされたファイルシステムとそのタイプのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr "マウントされたファイルシステムのリスト、それらのタイプ、ディスクスペースとiノードの統計のリスト。JSONで返す"
+msgstr "マウントされたファイルシステム、タイプ、ディスクスペースおよびinodeの統計のリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
-msgstr "ネットワークインターフェースのリスト。JSONで返す"
+msgstr "ネットワークインターフェースのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1249
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスの英語でのリスト。JSONで返す"
+msgstr "英語のオブジェクト名を使用して検出されたWindowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1241
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONで返す"
+msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONを返す"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
@@ -12924,7 +12924,7 @@ msgstr "MD2"
 
 #: include/classes/data/CItemData.php:1639
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
-msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値を文字列値で返す。"
+msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値の文字列値を返す。"
 
 #: app/views/mfa.edit.php:161
 msgid "MFA method"
@@ -13533,7 +13533,7 @@ msgstr "VMwareリソースプールのメモリメトリクス、\"url\" - VMwar
 
 #: include/classes/data/CItemData.php:1727
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "バイト単位もしくはトータルからのパーセンテージでのメモリサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "メモリサイズ。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1273
 msgid "Memory used by process in bytes. Returns integer"
@@ -15254,7 +15254,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1711
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr "iノードの数値またはパーセンテージ。数値であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "inodeの数値またはパーセンテージ。数値であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
 
 #: include/items.inc.php:1585 include/items.inc.php:1589
 #: include/items.inc.php:1593
@@ -15533,7 +15533,7 @@ msgstr "OS情報。文字列値を返す。"
 
 #: include/classes/data/CItemData.php:1487
 msgid "Operating system version information. Returns JSON"
-msgstr "OSのバージョン情報。JSONで返す"
+msgstr "OSのバージョン情報。JSONを返す"
 
 #: app/views/popup.operation.edit.php:61 app/views/popup.service.edit.php:67
 #: app/views/popup.sla.edit.php:130
@@ -16277,11 +16277,11 @@ msgstr "パーセンタイルライン (右)"
 
 #: include/classes/data/CItemData.php:1214
 msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
-msgstr ""
+msgstr "DNSクエリの実行。DNSがダウンしている場合は0を返し、そうでない場合はクエリ時間を秒単位で返します(小数点を含む)"
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
-msgstr "DNSクエリの実行。要求した情報のタイプの文字列を返す。"
+msgstr "DNSクエリの実行。要求したタイプの情報の文字列を返す。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
@@ -17124,7 +17124,7 @@ msgstr "タグとサービスの表示/設定"
 
 #: include/classes/data/CItemData.php:1070
 msgid "Reads modbus data. Returns various types"
-msgstr "modbusデータを読み込む。様々なデータ型の値を返却"
+msgstr "modbusデータを読み込む。様々なデータ型を返す"
 
 #: include/actions.inc.php:62
 msgid "Received value"
@@ -17858,7 +17858,7 @@ msgstr "UNIXのバーミッションを4桁の8進数文字列で返す"
 
 #: include/classes/data/CItemData.php:983
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
-msgstr "ICMP pingの応答時間を秒で返す。例： 0.02"
+msgstr "ICMP pingの応答時間の秒数を返す。例: 0.02"
 
 #: include/classes/data/CItemData.php:2680
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -17867,7 +17867,7 @@ msgstr "Zabbixに設定されたホストのネットワークインターフェ
 #: include/classes/data/CItemData.php:2623
 #: include/classes/data/CItemData.php:2785
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
-msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスをJSONオブジェクトで返す。"
+msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスのJSONオブジェクトを返す。"
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -17887,7 +17887,7 @@ msgstr "パラメータに一致したTCPソケットの数を返す。整数を
 
 #: include/classes/data/CItemData.php:1217
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
-msgstr "パラメータに一致したUDPソケットの数を返す。整数で返す"
+msgstr "パラメータに一致したUDPソケットの数を返す。整数を返す"
 
 #: include/classes/data/CItemData.php:2862
 msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
@@ -19951,15 +19951,15 @@ msgstr "メンテナンス終了: %1$s"
 
 #: include/classes/data/CItemData.php:1511
 msgid "Swap in (from device into memory) statistics. Returns integer"
-msgstr "スワップイン（デバイスからメモリへ）の統計。整数値を返す。"
+msgstr "スワップイン(デバイスからメモリ)の統計。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1519
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr "スワップアウト（メモリからデバイスへ）の統計。 整数値を返す。"
+msgstr "スワップアウト(メモリからデバイス)の統計。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1527
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "スワップ容量のサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "スワップ容量。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/locales.inc.php:63
 msgid "Swedish (sv_SE)"
@@ -20024,7 +20024,7 @@ msgstr "システムステータス"
 
 #: include/classes/data/CItemData.php:1447
 msgid "System time. Returns integer with type as UTC; string - with type as local"
-msgstr "システム時刻。utcなら整数値、localなら文字列で返す"
+msgstr "システム時刻。typeがutcなら整数値、localなら文字列値を返す"
 
 #: include/classes/data/CItemData.php:1543
 msgid "System uptime in seconds. Returns integer"
@@ -22706,11 +22706,11 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1981
 msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMwareデータストアの容量統計。\"url\" - VMwareサービスのURL, \"uuid\"  - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"mode\" - total(デフォルト)/free/pfree/uncommitted。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1834
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "VMwareデータストアのバイト単位かトータルからのパーセンテージによる容量の統計値。バイト単位なら整数、パーセンテージなら浮動小数で返す。"
+msgstr "VMwareデータストアの容量の統計値。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1806
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
@@ -22878,7 +22878,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1743
 msgid "VMware virtual center alarms data, returns JSON, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware virtual centerのアラーム情報。JSONを返す。\"url\" - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:2226
 msgid "VMware virtual machine alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -23179,7 +23179,7 @@ msgstr "MQTTトピックの値。返却されるデータフォーマットは�
 
 #: include/classes/data/CItemData.php:1233
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
-msgstr "英語でWindowsパフォーマンスカウンターの値。数値、文字列値、テキスト値で返す(リクエストに依存)"
+msgstr "英語のWindowsパフォーマンスカウンターの値。リクエストに応じて、整数値、浮動小数点値、文字列値、テキスト値を返す"
 
 #: include/classes/data/CItemData.php:1225
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
@@ -23353,7 +23353,7 @@ msgstr "関連するレポートの表示"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "バイト単位もしくはトータルからのパーセンテージでの仮想メモリサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "仮想メモリサイズ。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: app/partials/configuration.host.edit.html.php:102
 #: app/views/configuration.discovery.edit.php:168
