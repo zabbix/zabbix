@@ -183,10 +183,10 @@ class CControllerHostWizardGet extends CController {
 			'template' => $template,
 			'install_agent_required' => $install_agent_required,
 			// Interface requirements according to template item, LLD rule and item prototype types.
-			'agent_interface_required' => $agent_interface_required,
-			'snmp_interface_required' => $snmp_interface_required,
-			'ipmi_interface_required' => $ipmi_interface_required,
-			'jmx_interface_required' => $jmx_interface_required
+			'agent_interface_required' => $agent_interface_required && !array_key_exists(INTERFACE_TYPE_AGENT, $interfaces_by_type),
+			'snmp_interface_required' => $snmp_interface_required && !array_key_exists(INTERFACE_TYPE_SNMP, $interfaces_by_type),
+			'ipmi_interface_required' => $ipmi_interface_required && !array_key_exists(INTERFACE_TYPE_IPMI, $interfaces_by_type),
+			'jmx_interface_required' => $jmx_interface_required && !array_key_exists(INTERFACE_TYPE_JMX, $interfaces_by_type)
 		];
 
 		$response = new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]);
