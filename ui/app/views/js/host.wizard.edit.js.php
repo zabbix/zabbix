@@ -270,8 +270,6 @@ window.host_wizard_edit = new class {
 		this.#initViewTemplates();
 
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
-		this.#overlay.is_cancel_locked = true;
-
 		this.#dialogue = this.#overlay.$dialogue[0];
 
 		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
@@ -308,6 +306,10 @@ window.host_wizard_edit = new class {
 			}
 
 			if (target.classList.contains('js-cancel')) {
+				if (this.#data.selected_template === null) {
+					overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
+				}
+
 				this.#show_cancel_screen = true;
 
 				this.#renderCancelScreen();
@@ -729,8 +731,8 @@ window.host_wizard_edit = new class {
 		this.#updateDialogButton();
 
 		requestAnimationFrame(() => {
-			this.#overlay.recoverFocus();
 			this.#overlay.containFocus();
+			this.#dialogue.querySelector('.js-cancel-yes').focus();
 		});
 	}
 
@@ -1142,6 +1144,7 @@ window.host_wizard_edit = new class {
 
 				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
+					this.#overlay.is_cancel_locked = true;
 				}
 
 				if (path === 'show_info_by_template') {
@@ -1351,20 +1354,20 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateDialogButton() {
-		for (const button of this.#dialogue.querySelectorAll('.js-cancel')) {
-			button.hidden = this.#show_cancel_screen;
-		}
+		const step = this.#getCurrentStep();
+
+		const cancel_button = this.#dialogue.querySelector('.js-cancel');
+		cancel_button.hidden = this.#show_cancel_screen || step === this.STEP_COMPLETE;
+
+		this.#back_button.hidden = this.#show_cancel_screen || this.#current_step === 0 || step === this.STEP_COMPLETE;
+
+		this.#next_button.hidden = this.#show_cancel_screen;
 
 		for (const button of this.#dialogue.querySelectorAll('.js-cancel-yes, .js-cancel-no')) {
 			button.hidden = !this.#show_cancel_screen;
 		}
 
-		this.#back_button.hidden = this.#show_cancel_screen || this.#current_step === 0
-			|| this.#steps_queue[this.#current_step] === this.STEP_COMPLETE;
-
-		this.#next_button.hidden = this.#show_cancel_screen;
-
-		switch (this.#getCurrentStep()) {
+		switch (step) {
 			case this.STEP_CONFIGURATION_FINISH:
 				this.#next_button.innerText = this.#data.host.isNew
 					? <?= json_encode(_('Create')) ?>
