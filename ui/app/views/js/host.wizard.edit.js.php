@@ -837,8 +837,8 @@ window.host_wizard_edit = new class {
 							row_index,
 							type: 'number',
 							required: true,
-							min: 1,
-							max: 65535
+							min: <?= ZBX_MIN_PORT_NUMBER ?>,
+							max: <?= ZBX_MAX_PORT_NUMBER ?>
 						},
 						...(interface_type === this.INTERFACE_TYPE_SNMP && {
 							[`interfaces.${row_index}.details.community`]: {
