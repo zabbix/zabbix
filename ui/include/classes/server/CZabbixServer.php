@@ -730,14 +730,45 @@ class CZabbixServer {
 		return true;
 	}
 
+	/**
+	 * Constructs issuer string according to Zabbix rules for matching Issuer and Subject strings.
+	 *
+	 * @param array<string|string[]>  Parsed and structured issuer or subject field from openssl_x509_parse result.
+	 */
 	protected static function implodeDn(array $attributes): string {
-		$rdns = [];
+		// Correcting the mixed type from openssl extension, where multivalue RDN is list of values.
+		$attributes = array_map(fn (string|array $value) => (array) $value, $attributes);
 
-		foreach (array_reverse($attributes, true) as $name => $value) {
-			$rdns[] = "{$name}={$value}";
+		// Common names ordered according to "RFC 4514", remaining names appended in alphabetical order.
+		ksort($attributes, SORT_NATURAL);
+		$sequence = ['CN', 'L', 'ST', 'O', 'OU', 'C', 'STREET', 'DC', 'UID'];
+
+		$result_ordered = [];
+		foreach ($sequence as $name) {
+			if (!array_key_exists($name, $attributes)) {
+				continue;
+			}
+
+			// Field values are reversed as per Zabbix documentation.
+			$values = array_reverse($attributes[$name]);
+
+			foreach ($values as $value) {
+				$result_ordered[] = "{$name}={$value}";
+			}
+
+			unset($attributes[$name]);
 		}
 
-		return implode(',', $rdns);
+		foreach ($attributes as $name => $values) {
+			// Field values are reversed as per Zabbix documentation.
+			$values = array_reverse($attributes[$name]);
+
+			foreach ($values as $value) {
+				$result_ordered[] = "{$name}={$value}";
+			}
+		}
+
+		return implode(',', $result_ordered);
 	}
 
 	protected function validatePeerCertificate($socket): bool {
