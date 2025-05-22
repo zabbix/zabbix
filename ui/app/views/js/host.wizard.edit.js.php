@@ -839,7 +839,7 @@ window.host_wizard_edit = new class {
 						},
 						[`interfaces.${row_index}.port`]: {
 							row_index,
-							type: 'number',
+							type: 'integer',
 							required: true,
 							min: <?= ZBX_MIN_PORT_NUMBER ?>,
 							max: <?= ZBX_MAX_PORT_NUMBER ?>
@@ -1985,8 +1985,8 @@ window.host_wizard_edit = new class {
 				}
 			}
 
-			if (rule.type === 'number' && value !== '' ) {
-				if (isNaN(value)) {
+			if (rule.type === 'integer' && value !== '') {
+				if (!/^-?\d+$/.test(value)) {
 					return <?= json_encode(_('This value is not a valid integer.')) ?>;
 				}
 
