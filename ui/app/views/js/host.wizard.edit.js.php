@@ -359,7 +359,9 @@ window.host_wizard_edit = new class {
 		});
 
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'host.list');
+
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#updateStepsQueue();
@@ -916,6 +918,7 @@ window.host_wizard_edit = new class {
 
 	#saveHost() {
 		const submit_url = new URL('zabbix.php', location.href);
+
 		submit_url.searchParams.set('action', this.#data.host.isNew ? 'host.wizard.create' : 'host.wizard.update');
 
 		return fetch(submit_url.href, {
