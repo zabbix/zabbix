@@ -1485,8 +1485,7 @@ window.host_wizard_edit = new class {
 					return template.name.toLowerCase().includes(query)
 						|| template.description.toLowerCase().includes(query)
 						|| template.tags.some(({tag, value}) => {
-							return tag.toLowerCase().includes(query)
-								|| value.toLowerCase().includes(query);
+							return tag.toLowerCase().includes(query) || value.toLowerCase().includes(query);
 						});
 				}
 
