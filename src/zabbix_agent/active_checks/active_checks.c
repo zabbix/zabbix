@@ -486,7 +486,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			char	host_port[MAX_STRING_LEN];
 
 			zbx_join_hostport(host_port, sizeof(host_port), host, port);
-			zabbix_log(LOG_LEVEL_ERR, "no active checks on server [%s]: %s", host_port, tmp);
+			zabbix_log(level_error, "no active checks on server [%s]: %s", host_port, tmp);
 		}
 		else
 			zabbix_log(level_error, "no active checks on server");
