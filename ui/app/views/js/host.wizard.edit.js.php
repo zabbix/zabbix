@@ -1769,7 +1769,9 @@ window.host_wizard_edit = new class {
 			}
 		})();
 
-		const description = this.#view_templates.macro_field_description.evaluateToElement({macro: macro.macro});
+		const description = this.#view_templates.macro_field_description.evaluateToElement({
+			macro: `<?= _('Macro') ?>: ${macro.macro}`
+		});
 
 		if (config.description) {
 			description.appendChild(this.#view_templates.markdown.evaluateToElement({text: config.description}));
