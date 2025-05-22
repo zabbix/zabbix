@@ -4473,6 +4473,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$form->invalidate();
 		$filled_data = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		// In case of the scenario with identical widgets the same widget needs to be added once again.
 		if (array_key_exists('duplicate widget', $data)) {
