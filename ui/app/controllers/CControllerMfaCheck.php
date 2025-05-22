@@ -106,11 +106,7 @@ class CControllerMfaCheck extends CController {
 			'clientid' => ''
 		];
 
-		if ($this->getInput("client_secret") !== null) {
-			$data['client_secret'] = $this->getInput('client_secret', '');
-		}
-
-		$this->getInputs($data, array_keys($data));
+		$this->getInputs($data, array_keys($data + ['client_secret' => '']));
 
 		foreach ($data as $key => $field) {
 			if ($field === '') {
