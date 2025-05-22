@@ -17,7 +17,6 @@
 /**
  * @var CView $this
  */
-
 ?>
 
 window.host_wizard_edit = new class {
