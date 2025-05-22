@@ -112,6 +112,7 @@ window.host_wizard_edit = new class {
 	/** @type {Map<number, object>} */
 	#templates;
 	#linked_templates;
+	#agent_script_server_host;
 
 	#source_host = null;
 	#host = null;
@@ -256,13 +257,14 @@ window.host_wizard_edit = new class {
 
 	#updating_locked = true;
 
-	async init({templates, linked_templates, wizard_show_welcome, source_host, csrf_token}) {
+	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
 		}, new Map());
 		this.#linked_templates = linked_templates;
 		this.#data.do_not_show_welcome = wizard_show_welcome === 1 ? 0 : 1;
 		this.#source_host = source_host;
+		this.#agent_script_server_host = agent_script_server_host;
 		this.#csrf_token = csrf_token;
 
 		this.#initViewTemplates();
@@ -1195,8 +1197,13 @@ window.host_wizard_edit = new class {
 
 				let psk_identity = '';
 				let psk = '';
+				let server_host = '';
 
 				if (this.#data.monitoring_os === 'linux') {
+					server_host = this.#agent_script_server_host !== ''
+						? `--server-host ${this.#agent_script_server_host}`
+						: `--server-host-stdin`;
+
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
 						: `--psk-identity-stdin`;
@@ -1207,6 +1214,10 @@ window.host_wizard_edit = new class {
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
+					server_host = this.#agent_script_server_host !== ''
+						? `-serverHost ${this.#agent_script_server_host}`
+						: `-serverHostStdin`;
+
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
 						: `-pskIdentityStdin`;
@@ -1217,7 +1228,9 @@ window.host_wizard_edit = new class {
 				}
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
-					psk: `${psk_identity} ${psk}`
+					server_host,
+					psk_identity,
+					psk
 				});
 				break;
 

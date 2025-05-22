@@ -163,19 +163,25 @@ class CControllerHostWizardEdit extends CController {
 
 	protected static function getServerHost(): string {
 		$result = [];
+		$unsupported_addresses = ['localhost', '127.0.0.1'];
 
 		/** @var CConfigFile $config */
 		$config = ZBase::getInstance()->Component()->get('config')->config;
-		if ($config['ZBX_SERVER'] && $config['ZBX_SERVER_PORT']) {
-			$result[] = $config['ZBX_SERVER'].':'.$config['ZBX_SERVER_PORT'];
+		if ($config['ZBX_SERVER'] && $config['ZBX_SERVER_PORT']
+				&& !in_array($config['ZBX_SERVER'], $unsupported_addresses, true)) {
+			$result[] = $config['ZBX_SERVER'] . ':' . $config['ZBX_SERVER_PORT'];
 		}
 		else {
 			$hanodes = API::HaNode()->get([
 				'output' => ['address', 'port']
 			]);
 
-			foreach ($hanodes as $hanode) {
-				$result[] = $hanode['address'].':'.$hanode['port'];
+			if ($hanodes !== false) {
+				foreach ($hanodes as $hanode) {
+					if (!in_array($hanode['address'], $unsupported_addresses, true)) {
+						$result[] = $hanode['address'] . ':' . $hanode['port'];
+					}
+				}
 			}
 		}
 
