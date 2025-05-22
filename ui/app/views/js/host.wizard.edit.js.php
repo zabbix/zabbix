@@ -2106,7 +2106,7 @@ window.host_wizard_edit = new class {
 					value.flatMap((item, index) =>
 						(item && typeof item === 'object')
 							? this.#getInputsData(item, `${full_key}[${index}]`)
-							: { name: `${full_key}[${index}]`, value: item }
+							: {name: `${full_key}[${index}]`, value: item}
 					)
 				);
 			}
@@ -2115,7 +2115,7 @@ window.host_wizard_edit = new class {
 				return fields.concat(this.#getInputsData(value, full_key));
 			}
 
-			return fields.concat({ name: full_key, value });
+			return fields.concat({name: full_key, value});
 		}, []);
 	}
 
