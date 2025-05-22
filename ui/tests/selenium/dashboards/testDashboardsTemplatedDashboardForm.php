@@ -2677,6 +2677,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill($fields);
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::WIDGET_SQL));
@@ -4472,6 +4473,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$form->invalidate();
 		$filled_data = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		// In case of the scenario with identical widgets the same widget needs to be added once again.
 		if (array_key_exists('duplicate widget', $data)) {

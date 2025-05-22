@@ -1799,6 +1799,26 @@ msgstr "作成者"
 msgid "Authorization"
 msgstr "認可"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2202,6 +2222,10 @@ msgstr "CSVからJSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "CUIDで指定してください"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3294,6 +3318,10 @@ msgstr "\"%3$s\"上のアイテム\"%2$s\"で使用されている値のマッ�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3657,6 +3685,10 @@ msgstr "ホストの表示名を一括更新できません。"
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "URLを開けません"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4457,6 +4489,10 @@ msgstr "テンプレートの循環リンクは行えません。"
 msgid "Class %1$s not found for action %2$s."
 msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4677,6 +4713,10 @@ msgstr "コミュニティ"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "コンパクト表示"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -4904,6 +4944,10 @@ msgstr "設定リフレッシュ"
 msgid "Configuration updated"
 msgstr "設定を更新しました"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -4913,6 +4957,12 @@ msgstr "データベース接続設定"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "JITプロビジョニングの設定"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6713,6 +6763,10 @@ msgstr "説明"
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
 msgstr "説明のサイズ"
+
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11439,6 +11493,11 @@ msgstr "LDAPの設定が正しくありません"
 msgid "Invalid MFA configuration"
 msgstr "多要素認証(MFA)の設定が正しくありません"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "SAML JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
@@ -14294,6 +14353,10 @@ msgstr "新規メディアタイプ"
 msgid "New media type mapping"
 msgstr "新しいメディアタイプのマッピングの作成"
 
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
 msgstr "実行内容の作成"
@@ -14428,6 +14491,10 @@ msgstr "マップに\"%1$s\"が定義されていません。"
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "変更はありません。"
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15216,6 +15283,18 @@ msgstr "数値 (整数)"
 msgid "Numeric (unsigned)"
 msgstr "数値 (整数)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -15969,6 +16048,15 @@ msgstr "誤ったデータを受信しました"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "ページャー"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17132,6 +17220,10 @@ msgstr "復旧時刻"
 msgid "Rectangle"
 msgstr "長方形"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "リファレンスの属性"
@@ -17166,6 +17258,10 @@ msgstr "選択したプロキシの設定をリフレッシュしますか？"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "リフレッシュ間隔"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18554,6 +18650,10 @@ msgstr "選択したSLAのSLAレポートを表示。"
 msgid "Select prototype"
 msgstr "プロトタイプの選択"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19355,6 +19455,10 @@ msgstr "ソフトウェアのアーキテクチャ情報。文字列値を返す
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
 msgstr "ソフトウェア更新最終チェック日"
+
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20293,6 +20397,10 @@ msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除し�
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "ホストのディスカバリでリンクされたテンプレートは削除できません。"
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20412,6 +20520,10 @@ msgstr ""
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr ""
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URLテンプレートは、地理マップ上にタイルレイヤーを読み込んで表示するために使用されます。"
@@ -20427,6 +20539,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -20861,6 +20981,14 @@ msgstr "今日(現在まで)"
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "トークンの編集"
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21642,6 +21770,10 @@ msgstr "変更なし"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "障害確認の解除"
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24409,6 +24541,14 @@ msgstr "bitxor() - ビットXOR演算"
 msgid "blinking"
 msgstr "点滅"
 
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
 msgstr "ユーザー名とパスワードの両方を指定するか空である必要があります"
@@ -26125,6 +26265,10 @@ msgstr ""
 
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814

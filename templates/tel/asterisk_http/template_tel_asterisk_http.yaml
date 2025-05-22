@@ -700,8 +700,8 @@ zabbix_export:
                   value: availability
             - uuid: 100d38b62c1d4ce298a9fadfbab19e4c
               expression: 'last(/Asterisk by HTTP/asterisk.uptime)<10m'
-              name: 'Asterisk: Host has been restarted'
-              event_name: 'Asterisk: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Asterisk: Service has been restarted'
+              event_name: 'Asterisk: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -727,8 +727,8 @@ zabbix_export:
           triggers:
             - uuid: 4e99b65188264ba1aa80e24662f9b3cd
               expression: 'last(/Asterisk by HTTP/asterisk.uptime_reload)<10m'
-              name: 'Asterisk: has been reloaded'
-              event_name: 'Asterisk: has been reloaded (uptime < 10m)'
+              name: 'Asterisk: Configuration has been reloaded'
+              event_name: 'Asterisk: Configuration has been reloaded (last reload < 10m ago)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

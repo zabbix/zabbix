@@ -1,12 +1,18 @@
 Changes for 7.4.0rc1
 
 New features:
+A.F....PS. [ZBXNEXT-9805] added OAuth support for email media type (askolmeisters, gcalenko)
+..F....... [ZBXNEXT-8919] implemented new color picker in Graph and Pie chart widgets, added palette feature (apoga)
 
 Bug fixes:
+..F....... [ZBX-26064] enabled the "Remove" link for LDAP users manually added media (rgontarski)
+.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
+..F....... [ZBX-26263] fixed field focus on label click (msnihach)
+.......PS. [ZBX-25984] improved handling of NoSuchObject and NoSuchInstance responses in SNMP checks (dgoloscapov)
 ........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
-.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout from config instead of 60s (askolmeisters)
+.......PS. [ZBX-26319] fixed timeout in remote script execution to use TrapperTimeout instead of 60 s (askolmeisters)
 .......P.. [ZBX-26270] fixed database sync error after removing interface used by item (sboidenko)
-.......PS. [ZBX-25402] fixed numbered user macro parsing in a macro function (askolmeisters)
+.......PS. [ZBX-25402] fixed numbered user macro parsing in macro function (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0beta2
@@ -152,6 +158,18 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.8rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.7
+
+7.2.7rc1 was released as 7.2.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.7rc1
@@ -603,6 +621,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.14rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.13
+
+7.0.13rc1 was released as 7.0.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.13rc1
@@ -7568,9 +7598,12 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.47rc1
+Changes for 5.0.47
 
-New features:
+5.0.47rc1 was released as 5.0.47 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.47rc1
 
 Bug fixes:
 ...G...PS. [ZBX-26080] fixed old file descriptors being held when external log rotation is used (dgoloscapov)

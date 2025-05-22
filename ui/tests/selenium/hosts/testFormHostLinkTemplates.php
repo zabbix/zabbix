@@ -232,6 +232,11 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			}
 		}
 		else {
+			if (!$this->query('link', self::TEMPLATE)->exists()) {
+				$this->query('name:zbx_filter')->asForm()->one()->fill(['Name' => self::TEMPLATE])->submit();
+				$this->page->waitUntilReady();
+			}
+
 			$this->query('link', self::TEMPLATE)->waitUntilVisible()->one()->click();
 		}
 	}
