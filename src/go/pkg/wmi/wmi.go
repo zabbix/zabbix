@@ -219,6 +219,8 @@ func variantToValue(v *ole.VARIANT) any {
 		if len(arr) == 0 {
 			return nil
 		}
+
+		return arr
 	}
 
 	return sanitizeOLEValue(v.Value())
