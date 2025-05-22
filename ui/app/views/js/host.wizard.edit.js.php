@@ -629,7 +629,11 @@ window.host_wizard_edit = new class {
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
-		view.querySelector(`.${ZBX_STYLE_MARKDOWN}`).innerHTML = this.#template.readme;
+
+		const markdown = view.querySelector(`.${ZBX_STYLE_MARKDOWN}`);
+
+		markdown.innerHTML = this.#template.readme;
+		markdown.querySelectorAll('a[href]').forEach(link => link.setAttribute('target', '_blank'));
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
