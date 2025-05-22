@@ -373,13 +373,10 @@ func isValidHostname(hostname string) bool {
 func validateHost(host string) error {
 	host = strings.TrimSpace(host)
 
-	fmt.Println("HELLO")
-	fmt.Println(isValidHostname(host))
 	if net.ParseIP(host) != nil || isValidHostname(host) {
 		return nil
 	}
 
-	fmt.Println("HELLO 2")
 	return errs.Errorf("failed to validate host: %q", host)
 }
 

@@ -652,7 +652,7 @@ func TestParseServerActive(t *testing.T) {
 	}{
 		{
 			"+IPv6",
-			"0.0.0.0/0", nil,
+			"fe80::72d5:8d8b:b2ca:206", nil,
 			false,
 			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}},
 		},
