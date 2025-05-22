@@ -839,9 +839,7 @@ function stepReadme(): CTemplateTag {
 
 			(new CSection())
 				->addItem(
-					(new CDiv())
-						->addClass(ZBX_STYLE_MARKDOWN)
-						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					(new CDiv())->addClass('js-readme')
 				)
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 		]))->addClass('step-form-body')

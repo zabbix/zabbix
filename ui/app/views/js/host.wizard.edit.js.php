@@ -634,10 +634,7 @@ window.host_wizard_edit = new class {
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
-		const markdown = view.querySelector(`.${ZBX_STYLE_MARKDOWN}`);
-
-		markdown.innerHTML = this.#template.readme;
-		markdown.querySelectorAll('a[href]').forEach(link => link.setAttribute('target', '_blank'));
+		view.querySelector('.js-readme').appendChild(this.#makeMarkdown(this.#template.readme));
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 	}
@@ -1774,7 +1771,7 @@ window.host_wizard_edit = new class {
 		});
 
 		if (config.description) {
-			description.appendChild(this.#view_templates.markdown.evaluateToElement({text: config.description}));
+			description.appendChild(this.#makeMarkdown(config.description));
 		}
 
 		return {field: field_view, description};
@@ -1836,6 +1833,16 @@ window.host_wizard_edit = new class {
 			value: options[0].checked,
 			unchecked_value: options[0].unchecked
 		});
+	}
+
+	#makeMarkdown(content) {
+		const markdown = this.#view_templates.markdown.evaluateToElement();
+
+		markdown.innerHTML = content;
+
+		markdown.querySelectorAll('a[href]').forEach(link => link.setAttribute('target', '_blank'));
+
+		return markdown;
 	}
 
 	#disableWelcomeStep() {
