@@ -276,6 +276,10 @@ window.host_wizard_edit = new class {
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
 
 		this.#dialogue.addEventListener('dialogue.cancel', () => {
+			if (!this.#overlay.is_cancel_locked) {
+				return;
+			}
+
 			if (this.#show_cancel_screen) {
 				this.#show_cancel_screen = false;
 
@@ -1370,6 +1374,8 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_COMPLETE:
+				this.#overlay.is_cancel_locked = false;
+
 				this.#next_button.innerText = <?= json_encode(_('Finish')) ?>;
 				break;
 
