@@ -20,6 +20,10 @@ $disabled-bg-color: #f0f0f0;
 $disabled-item-color: #ffffff;
 $disabled-item-bg-color: #9f9f9f;
 
+$progress-complete-color: #111111;
+$progress-current-color: #484848;
+$progress-default-color: #9f9f9f;
+
 // Layout
 $header-bg-color: #f3f3f3;
 $sidebar-bg-color: #000000;
@@ -29,6 +33,7 @@ $sidebar-mode-icon-hover-color: #ffffff;
 
 // Main
 $font-color: #000000;
+$font-light-color: #222222;
 $font-selected-color: #ffffff;
 $font-alt-color: #333333;
 $body-bg-color: #ffffff;
@@ -105,6 +110,9 @@ $ui-tab-bg-selected-color: #888888;
 $form-border-color: #888888;
 $form-focus-border-color: #000000;
 $form-fields-group-border-color: #888888;
+$form-field-hint-color: #383838;
+$form-radio-selected-color: #000000;
+$form-description-border-color: #000000;
 
 $form-disabled-font-color: #9f9f9f;
 $form-disabled-bg-color: #f0f0f0;

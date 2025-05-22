@@ -2739,7 +2739,7 @@ button {
     overflow: hidden; }
   .markdown pre, .modal-popup-host-wizard .formated-text pre {
     padding: 5px;
-    background: #f8f8f8;
+    background: #383838;
     border: 1px solid #4f4f4f;
     border-radius: 2px; }
 
@@ -3359,7 +3359,7 @@ output {
     border-radius: 2px;
     white-space: normal; }
     .radio-card-list .radio-card:has(input[type="radio"]:checked) {
-      border-color: #02659f; }
+      border-color: #69818d; }
   .radio-card-list .radio-card-label {
     position: relative;
     padding-right: 26px;
@@ -3387,7 +3387,7 @@ output {
         height: 8px;
         top: 3px;
         left: 3px;
-        background-color: #02659f;
+        background-color: #69818d;
         border-radius: 50%; }
 
 .radio-list-control {
@@ -5037,11 +5037,11 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
   font-weight: bold; }
 
 .dashboard-widget-item .svg-arrow-up {
-  fill: #3DC51D; }
+  fill: #3dc51d; }
 .dashboard-widget-item .svg-arrow-down {
-  fill: #FC5A5A; }
+  fill: #fc5a5a; }
 .dashboard-widget-item .svg-arrow-up-down {
-  fill: #3DC51D; }
+  fill: #3dc51d; }
 
 div.dashboard-widget-itemcard .item-card {
   min-width: 300px; }
@@ -5928,8 +5928,6 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-top: 1px solid #303030; }
       .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer .dialogue-cancel {
         margin-right: auto; }
-  .modal-popup-host-wizard pre {
-    background: #0e1012; }
   .modal-popup-host-wizard output {
     margin: 16px 0 0; }
   .modal-popup-host-wizard section {
@@ -5996,17 +5994,17 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         right: 0;
         bottom: 0;
         height: 0;
-        border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, #ccd5d9);
+        border-bottom: 4px var(--progress-type-style, solid) var(--pregress-step-color, #3d3d3d);
         border-radius: 2px; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-complete {
-        --pregress-step-color: #0275b8; }
+        --pregress-step-color: #69818d; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-current {
-        --pregress-step-color: #768d99;
+        --pregress-step-color: #4f4f4f;
         color: #f2f2f2; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-error {
         --pregress-step-color: #e45959; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-disabled {
-        --progress-stype-style: dashed; }
+        --progress-type-style: dashed; }
     .modal-popup-host-wizard .progress .progress-info {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -6026,11 +6024,12 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     gap: 8px 16px; }
   .modal-popup-host-wizard .fields-group {
     padding: 8px;
-    background: #ebebeb;
+    background: #383838;
     border-radius: 2px; }
   .modal-popup-host-wizard .form-field {
     display: grid;
-    gap: 4px; }
+    gap: 4px;
+    min-width: 0; }
     .modal-popup-host-wizard .form-field > * {
       min-width: 0; }
     .modal-popup-host-wizard .form-field > label {
@@ -6059,6 +6058,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-bottom-right-radius: 0; }
     .modal-popup-host-wizard .form-field .radio-list-control {
       display: flex;
+      justify-self: start;
       max-width: 100%; }
       .modal-popup-host-wizard .form-field .radio-list-control li {
         flex: 1 1 auto;
@@ -6091,7 +6091,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     font-size: 11px;
     line-height: 16px;
     white-space: initial;
-    color: #5e7988; }
+    color: #737373; }
   .modal-popup-host-wizard .form-description {
     position: relative;
     padding-left: 24px; }
@@ -6104,7 +6104,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       bottom: -1px;
       left: 0;
       width: 0;
-      border-left: 4px solid #0275b8;
+      border-left: 4px solid #69818d;
       border-radius: 2px; }
   .modal-popup-host-wizard .pre-shared-key-field {
     display: grid;
@@ -6799,7 +6799,7 @@ div .overlay-dialogue.wordbreak {
     height: 8px;
     top: 3px;
     left: 3px;
-    background-color: #02659f;
+    background-color: #69818d;
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #4f4f4f !important; }

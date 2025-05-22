@@ -429,8 +429,8 @@ window.host_wizard_edit = new class {
 			`),
 			radio_item: new Template(`
 				<li>
-					<input type="radio" id="#{id}" name="#{name}" value="#{value}">
-					<label for="#{id}">#{label}</label>
+					<input type="radio" id="#{id}" name="#{name}" value="#{value}" />
+					<label for="#{id}" title="#{label}">#{label}</label>
 				</li>
 			`),
 			template_info: new Template(`

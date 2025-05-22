@@ -5029,11 +5029,11 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
   font-weight: bold; }
 
 .dashboard-widget-item .svg-arrow-up {
-  fill: #3DC51D; }
+  fill: #3dc51d; }
 .dashboard-widget-item .svg-arrow-down {
-  fill: #FC5A5A; }
+  fill: #fc5a5a; }
 .dashboard-widget-item .svg-arrow-up-down {
-  fill: #3DC51D; }
+  fill: #3dc51d; }
 
 div.dashboard-widget-itemcard .item-card {
   min-width: 300px; }
@@ -5920,8 +5920,6 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-top: 1px solid #dfe4e7; }
       .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer .dialogue-cancel {
         margin-right: auto; }
-  .modal-popup-host-wizard pre {
-    background: #ebeef0; }
   .modal-popup-host-wizard output {
     margin: 16px 0 0; }
   .modal-popup-host-wizard section {
@@ -5988,7 +5986,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         right: 0;
         bottom: 0;
         height: 0;
-        border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, #ccd5d9);
+        border-bottom: 4px var(--progress-type-style, solid) var(--pregress-step-color, #ccd5d9);
         border-radius: 2px; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-complete {
         --pregress-step-color: #0275b8; }
@@ -5998,7 +5996,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       .modal-popup-host-wizard .progress .progress-step.progress-step-error {
         --pregress-step-color: #e33734; }
       .modal-popup-host-wizard .progress .progress-step.progress-step-disabled {
-        --progress-stype-style: dashed; }
+        --progress-type-style: dashed; }
     .modal-popup-host-wizard .progress .progress-info {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -6022,7 +6020,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     border-radius: 2px; }
   .modal-popup-host-wizard .form-field {
     display: grid;
-    gap: 4px; }
+    gap: 4px;
+    min-width: 0; }
     .modal-popup-host-wizard .form-field > * {
       min-width: 0; }
     .modal-popup-host-wizard .form-field > label {
@@ -6051,6 +6050,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-bottom-right-radius: 0; }
     .modal-popup-host-wizard .form-field .radio-list-control {
       display: flex;
+      justify-self: start;
       max-width: 100%; }
       .modal-popup-host-wizard .form-field .radio-list-control li {
         flex: 1 1 auto;

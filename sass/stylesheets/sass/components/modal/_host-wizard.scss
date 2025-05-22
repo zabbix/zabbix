@@ -55,10 +55,6 @@
 		}
 	}
 
-	pre {
-		background: $body-bg-color;
-	}
-
 	output {
 		margin: 16px 0 0;
 	}
@@ -173,7 +169,7 @@
 				right: 0;
 				bottom: 0;
 				height: 0;
-				border-bottom: 4px var(--progress-stype-style, solid) var(--pregress-step-color, #{$progress-default-color});
+				border-bottom: 4px var(--progress-type-style, solid) var(--pregress-step-color, #{$progress-default-color});
 				border-radius: 2px;
 			}
 
@@ -191,7 +187,7 @@
 			}
 
 			&.progress-step-disabled {
-				--progress-stype-style: dashed;
+				--progress-type-style: dashed;
 			}
 		}
 
@@ -240,6 +236,7 @@
 	.form-field {
 		display: grid;
 		gap: 4px;
+		min-width: 0;
 
 		> * {
 			min-width: 0;
@@ -297,6 +294,7 @@
 
 		.radio-list-control {
 			display: flex;
+			justify-self: start;
 			max-width: 100%;
 
 			li {
