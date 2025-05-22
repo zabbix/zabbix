@@ -129,7 +129,7 @@ class CControllerHostWizardGet extends CController {
 			$template['readme'] = $parsedown->text($template['readme']);
 		}
 
-		$template['macros'] = $this->prepareTemplateMacros($template['macros']);
+		$template['macros'] = $this->prepareTemplateMacros($template['macros'], $parsedown);
 
 		// Get template items, LLD rules and item prototypes that require interfaces.
 		$items = API::Item()->get([
@@ -193,13 +193,18 @@ class CControllerHostWizardGet extends CController {
 		$this->setResponse($response);
 	}
 
-	private function prepareTemplateMacros(array $macros): array {
-		foreach ($macros as $m => $macro) {
+	private function prepareTemplateMacros(array $macros, $parsedown): array {
+		foreach ($macros as $m => &$macro) {
 			// Skip macros that do no have config set up.
 			if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
 				unset($macros[$m]);
 			}
+
+			if ($macro['config']['description'] !== '') {
+				$macro['config']['description'] = $parsedown->text($macro['config']['description']);
+			}
 		}
+		unset($macro);
 
 		usort($macros, static function (array $macro_a, array $macro_b): int {
 			$priority_a = (int) $macro_a['config']['priority'];
