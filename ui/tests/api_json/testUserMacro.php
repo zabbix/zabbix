@@ -412,7 +412,7 @@ class testUserMacro extends CAPITest {
 						]]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config','required').'.'
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config', 'required').'.'
 			],
 			[
 				'hostmacro' => [
@@ -954,8 +954,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10002',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_2_upd',
 							'description' => 'description_2_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1072,8 +1072,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10002',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_2_upd',
 							'description' => 'description_2_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1107,8 +1107,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10003',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_3',
 							'description' => '',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1353,8 +1353,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10004',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_4',
 							'description' => 'description_4_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1379,8 +1379,8 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10004',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_4',
 							'description' => 'description_4_upd',
 							'required' => (string) ZBX_WIZARD_FIELD_NOT_REQUIRED,
@@ -1413,7 +1413,7 @@ class testUserMacro extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config','required').'.',
+				'expected_error' => 'Invalid parameter "/1/config/required": value must be '.DB::getDefault('hostmacro_config', 'required').'.',
 				'expect_db_rows' => []
 			],
 			[
@@ -1608,11 +1608,11 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10005',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_LIST,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_5',
 							'description' => '',
-							'required' => DB::getDefault('hostmacro_config','required'),
+							'required' => DB::getDefault('hostmacro_config', 'required'),
 							'regex' => '',
 							'options' => '[{"value":"option1","text":"Option 1"}]'
 						]
@@ -1636,11 +1636,11 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10006',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_6_upd',
 							'description' => 'description_6_upd',
-							'required' => DB::getDefault('hostmacro_config','required'),
+							'required' => DB::getDefault('hostmacro_config', 'required'),
 							'regex' => '',
 							'options' => ''
 						]
@@ -1663,10 +1663,36 @@ class testUserMacro extends CAPITest {
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
 							'priority' => 5,
-							'section_name' => DB::getDefault('hostmacro_config','priority'),
+							'section_name' => DB::getDefault('hostmacro_config', 'section_name'),
 							'label' => 'label_8',
 							'description' => 'description_8',
-							'required' => DB::getDefault('hostmacro_config','required'),
+							'required' => DB::getDefault('hostmacro_config', 'required'),
+							'regex' => '',
+							'options' => ''
+						]
+					]
+				]
+			],
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '10008',
+						'config' => [
+							'section_name' => 'advanced config'
+						]
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '10008',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
+							'priority' => 5,
+							'section_name' => 'advanced config',
+							'label' => 'label_8',
+							'description' => 'description_8',
+							'required' => DB::getDefault('hostmacro_config', 'required'),
 							'regex' => '',
 							'options' => ''
 						]
@@ -1700,11 +1726,11 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '10009',
 						'config' => [
 							'type' => (string) ZBX_WIZARD_FIELD_TEXT,
-							'priority' => DB::getDefault('hostmacro_config','priority'),
+							'priority' => DB::getDefault('hostmacro_config', 'priority'),
 							'section_name' => 'Advanced',
 							'label' => 'label_9',
 							'description' => 'description_9',
-							'required' => DB::getDefault('hostmacro_config','required'),
+							'required' => DB::getDefault('hostmacro_config', 'required'),
 							'regex' => '',
 							'options' => ''
 						]
@@ -1755,7 +1781,7 @@ class testUserMacro extends CAPITest {
 						if ($hostmacros[$key]['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
 							$this->assertEmpty($db_row_config['regex']);
 							$this->assertEquals($db_row_config['required'],
-								DB::getDefault('hostmacro_config','required')
+								DB::getDefault('hostmacro_config', 'required')
 							);
 							$this->assertNotEmpty($db_row_config['options']);
 						}
