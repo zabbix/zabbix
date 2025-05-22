@@ -5877,6 +5877,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-top: 1px solid #444444; }
       .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer .dialogue-cancel {
         margin-right: auto; }
+  .modal-popup-host-wizard pre {
+    background: #111111; }
   .modal-popup-host-wizard output {
     margin: 16px 0 0; }
   .modal-popup-host-wizard section {

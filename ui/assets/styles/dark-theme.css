@@ -5928,6 +5928,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       border-top: 1px solid #303030; }
       .modal-popup-host-wizard.overlay-dialogue.modal .overlay-dialogue-footer .dialogue-cancel {
         margin-right: auto; }
+  .modal-popup-host-wizard pre {
+    background: #0e1012; }
   .modal-popup-host-wizard output {
     margin: 16px 0 0; }
   .modal-popup-host-wizard section {
