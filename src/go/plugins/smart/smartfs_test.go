@@ -789,7 +789,6 @@ func TestPlugin_execute(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -953,7 +952,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1012,7 +1010,6 @@ func Test_evaluateVersion(t *testing.T) {
 		{"-empty", args{}, true},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			if err := evaluateVersion(tt.args.versionDigits); (err != nil) != tt.wantErr {
@@ -1041,7 +1038,6 @@ func Test_cutPrefix(t *testing.T) {
 		{"-empty", args{""}, ""},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			if got := cutPrefix(tt.args.in); got != tt.want {
@@ -1155,7 +1151,6 @@ func Test_deviceParser_checkErr(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			dp := deviceParser{Smartctl: tt.fields.Smartctl}
@@ -1641,7 +1636,6 @@ func Test_getAllDeviceInfoByType(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1820,7 +1814,6 @@ func Test_getRaidDevices(t *testing.T) {
 		// because of lack of test data
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1937,7 +1930,6 @@ func Test_setDeviceData(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2147,7 +2139,6 @@ func Test_runner_parseOutput(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2324,7 +2315,6 @@ func TestPlugin_getDevices(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2496,7 +2486,6 @@ func Test_formatDeviceOutput(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2586,7 +2575,6 @@ func TestPlugin_scanDevices(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
