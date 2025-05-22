@@ -71,8 +71,8 @@ $output = [
 		]
 
 	],
-	'script_inline' => $this->readJsFile('host.wizard.edit.js.php')
-		.'host_wizard_edit.init('.json_encode([
+	'script_inline' => $this->readJsFile('host.wizard.edit.js.php').
+		'host_wizard_edit.init('.json_encode([
 			'templates' => $data['templates'],
 			'linked_templates' => $data['linked_templates'],
 			'wizard_show_welcome' => $data['wizard_show_welcome'],
@@ -100,7 +100,7 @@ function stepWelcome(): CTemplateTag {
 						new CTag('p', true,
 							_('The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix.')
 						),
-						new CTag('p', true, _('You can always access Host Wizard from Data Collection > Hosts.'))
+						new CTag('p', true, _('You can always access Host Wizard from Data collection > Hosts.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -375,7 +375,7 @@ function stepInstallAgent($agent_script_data): array {
 										))->addClass(ZBX_STYLE_FORMATED_TEXT),
 										(new CDiv(
 											new CTag('p', true,
-												_('If you don\'t know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations.')
+												_('If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations.')
 											)
 										))
 											->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -417,7 +417,6 @@ function stepInstallAgent($agent_script_data): array {
 									]))->addClass('js-tls-input')
 								)
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-
 							(new CListItem())
 								->addItem(
 									(new CTag('h6', true, [_('Select the OS of your monitoring target')]))
@@ -457,7 +456,6 @@ function stepInstallAgent($agent_script_data): array {
 									]))->addClass('js-windows-distribution-select')
 								)
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-
 							(new CListItem())
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 								->addclass('js-install-agent-readme')
@@ -547,13 +545,13 @@ function stepInstallAgent($agent_script_data): array {
 							(new CLink(_('Open installation instructions'),
 								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)
 							))->setTarget('_blank'),
-							' (', _s('Mac OS'), ')'
+							' (', _('Mac OS'), ')'
 						]),
 						new CTag('p', true, [
 							(new CLink(_('Open installation instructions'),
 								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)
 							))->setTarget('_blank'),
-							' (', _s('Other OS'), ')'
+							' (', _('Other OS'), ')'
 						])
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
