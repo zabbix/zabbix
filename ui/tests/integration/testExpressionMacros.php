@@ -397,33 +397,36 @@ TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 {USER.SURNAME}
 {USER.USERNAME}";
 
-	const MACRO_FUNCS = "ACTION.NAME.btoa() -> {{ACTION.NAME}.btoa()} <-
-USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> {{\$USER_MACRO_GLOBAL_DOUBLE}.fmtnum(15)} <-
-USER_MACRO_GLOBAL_TIME.fmttime(%H) -> {{\$USER_MACRO_GLOBAL_TIME}.fmttime(%H)} <-
-ACTION.NAME.htmldecode() -> {{ACTION.NAME}.htmldecode()} <-
-ACTION.NAME.htmlencode() -> {{ACTION.NAME}.htmlencode()} <-
-ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> {{ACTION.NAME}.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\")} <-
-ACTION.NAME.lowercase() -> {{ACTION.NAME}.lowercase()} <-
-ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> {{ACTION.NAME}.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\")} <-
-USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> {{\$USER_MACRO_GLOBAL_TIME}.regsub(\"^([0-9]+)\", \"\\1\")} <-
-USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> {{\$USER_MACRO_GLOBAL_DOUBLE}.tr(0,a)} <-
-ACTION.NAME.uppercase() -> {{ACTION.NAME}.uppercase()} <-
-ACTION.NAME.urldecode() -> {{ACTION.NAME}.urldecode()} <-
-ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
+	const MACRO_FUNCS = "ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> {{ACTION.NAME}.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\")} <-";
+	const MACRO_FUNCS_RESOLVED = "ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@*[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-";
 
-	const MACRO_FUNCS_RESOLVED = "ACTION.NAME.btoa() -> YWN0aW9uX25hbWVfICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj9AQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVpbXF1eX2BhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX4= <-" . "\n" .
-		"USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> 0.123456789012346 <-" . "\n" . 	// NOTE last 12346, not 123456 !
-		"USER_MACRO_GLOBAL_TIME.fmttime(%H) -> 23 <-" . "\n" .
-		"ACTION.NAME.htmldecode() -> ". self::ACTION_NAME . " <-" . "\n" .
-		"ACTION.NAME.htmlencode() -> action_name_ !&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . 	// NOTE, \' -> \ disappears
-		"ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> * <-" . "\n" .
-		"ACTION.NAME.lowercase() -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
-		"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@*[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
-		"USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> 23 <-" . "\n" .
-		"USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> a.123456789a123456789 <-" . "\n" .
-		"ACTION.NAME.uppercase() -> ACTION_NAME_ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~ <-" . "\n" .
-		"ACTION.NAME.urldecode() -> " . self::ACTION_NAME . " <-" . "\n" .
-		"ACTION.NAME.urlencode() -> action_name_%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~ <-";
+// 	const MACRO_FUNCS = "ACTION.NAME.btoa() -> {{ACTION.NAME}.btoa()} <-
+// USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> {{\$USER_MACRO_GLOBAL_DOUBLE}.fmtnum(15)} <-
+// USER_MACRO_GLOBAL_TIME.fmttime(%H) -> {{\$USER_MACRO_GLOBAL_TIME}.fmttime(%H)} <-
+// ACTION.NAME.htmldecode() -> {{ACTION.NAME}.htmldecode()} <-
+// ACTION.NAME.htmlencode() -> {{ACTION.NAME}.htmlencode()} <-
+// ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> {{ACTION.NAME}.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\")} <-
+// ACTION.NAME.lowercase() -> {{ACTION.NAME}.lowercase()} <-
+// ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> {{ACTION.NAME}.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\")} <-
+// USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> {{\$USER_MACRO_GLOBAL_TIME}.regsub(\"^([0-9]+)\", \"\\1\")} <-
+// USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> {{\$USER_MACRO_GLOBAL_DOUBLE}.tr(0,a)} <-
+// ACTION.NAME.uppercase() -> {{ACTION.NAME}.uppercase()} <-
+// ACTION.NAME.urldecode() -> {{ACTION.NAME}.urldecode()} <-
+// ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
+
+// 	const MACRO_FUNCS_RESOLVED = "ACTION.NAME.btoa() -> YWN0aW9uX25hbWVfICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj9AQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVpbXF1eX2BhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX4= <-" . "\n" .
+// 		"USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> 0.123456789012346 <-" . "\n" . 	// NOTE last 12346, not 123456 !
+// 		"USER_MACRO_GLOBAL_TIME.fmttime(%H) -> 23 <-" . "\n" .
+// 		"ACTION.NAME.htmldecode() -> ". self::ACTION_NAME . " <-" . "\n" .
+// 		"ACTION.NAME.htmlencode() -> action_name_ !&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . 	// NOTE, \' -> \ disappears
+// 		"ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> * <-" . "\n" .
+// 		"ACTION.NAME.lowercase() -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
+// 		"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@*[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
+// 		"USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> 23 <-" . "\n" .
+// 		"USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> a.123456789a123456789 <-" . "\n" .
+// 		"ACTION.NAME.uppercase() -> ACTION_NAME_ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~ <-" . "\n" .
+// 		"ACTION.NAME.urldecode() -> " . self::ACTION_NAME . " <-" . "\n" .
+// 		"ACTION.NAME.urlencode() -> action_name_%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~ <-";
 
 
 	/**
