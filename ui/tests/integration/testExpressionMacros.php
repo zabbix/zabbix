@@ -548,12 +548,12 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL_DOUBLE}',
-			'value' => $SAMPLE_DOUBLE_VALUE
+			'value' => self::$SAMPLE_DOUBLE_VALUE
 		]);
 
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL_TIME}',
-			'value' => $TIME_BUILDIN_MACRO_SIM
+			'value' => self::$TIME_BUILDIN_MACRO_SIM
 		]);
 
 		// Get host interface ids.
