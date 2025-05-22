@@ -20,14 +20,21 @@ define("ALL_PRINTABLE_ASCII", ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNO
 define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~');
 
 /**
- * Test suite for expression macros
+ * Test suite for:
+ *     1) built-in macros
+ *     2) user macros
+ *     3) expression macros
+ *     4) macro functions
+ *     for the events caused by:
+ *
+ *        triggers
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @backup items,actions,triggers,globalmacro,hostmacro
  * @hosts test_macros
  */
-class testExpressionMacros extends CIntegrationTest {
+class testMacrosTrigger extends CIntegrationTest {
 
 	private static $hostid;
 	private static $triggerid;
@@ -70,8 +77,10 @@ class testExpressionMacros extends CIntegrationTest {
 	const TRIGGER_OPDATA = 'strata_trigger_opdata' . ALL_PRINTABLE_ASCII;
 	const TRIGGER_EVENT_NAME = 'strata_trigger_event_name' . ALL_PRINTABLE_ASCII;
 
+	const TIME_BUILDIN_MACRO_SIM = '23:12:55';
+	const SAMPLE_DOUBLE_VALUE = '0.1234567890123456789';
 
-	// COMMON means common between main, recovery and update
+	// COMMON means common between main, recovery and update actions
 	const BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON = "ACTION.NAME -> {ACTION.NAME} <-
 EVENT.ACK.STATUS -> {EVENT.ACK.STATUS} <-
 EVENT.NAME -> {EVENT.NAME} <-
@@ -421,7 +430,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		"ACTION.NAME.htmldecode() -> ". self::ACTION_NAME . " <-" . "\n" .
 		"ACTION.NAME.htmlencode() -> action_name_ !&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . 	// NOTE, \' -> \ disappears
 		"ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> * <-" . "\n" .
-		"ACTION.NAME.lowercase() -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
+		"ACTION.NAME.lowercase() -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . // NOTE, \' -> \ disappears
 		"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> *UNKNOWN* <-" . "\n" .
 		"USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> 23 <-" . "\n" .
 		"USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> a.123456789a123456789 <-" . "\n" .
@@ -434,7 +443,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-
 
 		self::$event_tags_json = json_encode(array(['tag' => self::TAG_NAME, 'value' => self::TAG_VALUE]), JSON_UNESCAPED_SLASHES);
 
@@ -461,7 +469,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			"EVENT.OPDATA -> "							. self::TRIGGER_OPDATA								. " <-\n" .
 			"EVENT.SEVERITY -> "						. 'Average'											. " <-\n" . // self::TRIGGER_PRIORITY
 			"EVENT.SOURCE -> "							. '0'												. " <-\n" . // 0 -> Trigger
-			"EVENT.STATUS -> "							. 'PROBLEM'											. " <-\n" . //  1 -> PROBLEM
+			"EVENT.STATUS -> "							. 'PROBLEM'											. " <-\n" . // 1 -> PROBLEM
 			"EVENT.TAGS -> "							. self::TAG_NAME . ':' . self::TAG_VALUE			. " <-\n" .
 			"EVENT.TAGSJSON -> "						. self::$event_tags_json							. " <-\n" .
 			"EVENT.UPDATE.HISTORY -> "					. ''												. " <-\n" .
@@ -504,8 +512,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			"TRIGGER.URL.NAME -> "						. self::TRIGGER_URL_NAME							. " <-\n" .
 			"TRIGGER.VALUE -> "							. '1' . " <-";													// 1 -> Problem
 
-
-		// Create host "test_macros".
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
 			'interfaces' => [
@@ -542,12 +548,12 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL_DOUBLE}',
-			'value' => '0.1234567890123456789'
+			'value' => $SAMPLE_DOUBLE_VALUE
 		]);
 
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL_TIME}',
-			'value' => '23:12:55'
+			'value' => $TIME_BUILDIN_MACRO_SIM
 		]);
 
 		// Get host interface ids.
@@ -561,7 +567,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
-		// Create trapper items
 		$items = [];
 		for ($i = 1; $i < 3; $i++) {
 			$items[] = [
@@ -577,8 +582,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(count($items), count($response['result']['itemids']));
 
-
-		// Create trigger
 		$response = $this->call('trigger.create', [
 			'description' => 'trigger_trap',
 			'expression' => self::$trigger_expression,
@@ -766,7 +769,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 *
 	 * @backup alerts,events,history_uint
 	 */
-	public function testExpressionMacros_getData() {
+	public function testMacrosTrigger_getData() {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'2', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_FIRE_TRIGGER);
@@ -802,7 +805,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	/**
 	 * Test expression macro in problem message
 	 */
-	public function testExpressionMacros_checkProblemMessage() {
+	public function testMacrosTrigger_checkProblemMessage() {
 
 		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
@@ -835,23 +838,22 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	/**
 	 * Test expression macro with empty hostname
 	 */
-	public function testExpressionMacros_checkEmptyHostname() {
+	public function testMacrosTrigger_checkEmptyHostname() {
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$alert_response['result'][0]['subject']);
 	}
 
 	/**
 	 * Test expression macro in function with argument
 	 */
-	public function testExpressionMacros_checkFunctionArgument() {
+	public function testMacrosTrigger_checkFunctionArgument() {
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][1]['subject']);
 	}
-
 
 	/**
 	 * Test expression macro with {HOST.HOST} and {ITEM.KEY} macros
 	 * Next escalation step.
 	 */
-	public function testExpressionMacros_checkProblemMessage2() {
+	public function testMacrosTrigger_checkProblemMessage2() {
 
 		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
@@ -888,7 +890,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 		$this->assertEquals($message_expect, self::$alert_response['result'][1]['message']);
 	}
 
-	public function testExpressionMacros_checkProblemMessage3_InconsistentMacros() {
+	public function testMacrosTrigger_checkProblemMessage3_InconsistentMacros() {
 		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
 			"ESC.HISTORY[\s\S]*" .
 			"DATE[\s\S]*" .
@@ -909,7 +911,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	/**
 	 * Test expression macro in recovery message
 	 */
-	public function testExpressionMacros_checkRecoveryMessage() {
+	public function testMacrosTrigger_checkRecoveryMessage() {
 
 		$trigger_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
 				' or ' .
@@ -1003,7 +1005,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	/**
 	 * Test expression macro in event name
 	 */
-	public function testExpressionMacros_checkEventName() {
+	public function testMacrosTrigger_checkEventName() {
 		$this->assertEquals(self::EVENT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$event_response['result'][0]['name']);
 	}
 
