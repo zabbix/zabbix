@@ -1216,15 +1216,15 @@ window.host_wizard_edit = new class {
 				if (this.#data.monitoring_os === 'windows') {
 					server_host = this.#agent_script_server_host !== ''
 						? `-serverHost ${this.#agent_script_server_host}`
-						: `-serverHostStdin`;
+						: `-serverHostSTDIN`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
-						: `-pskIdentityStdin`;
+						: `-pskIdentitySTDIN`;
 
 					psk = this.#data.tls_psk !== ''
 						? `-psk ${this.#data.tls_psk}`
-						: `-pskStdin`;
+						: `-pskSTDIN`;
 				}
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
