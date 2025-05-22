@@ -449,7 +449,7 @@ function stepInstallAgent($agent_script_data): array {
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- --agent2 #{server_host} #{psk_identity} #{psk}")
+						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{psk_identity} #{psk}")
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -463,7 +463,7 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
-						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 -agent2 #{server_host} #{psk_identity} #{psk}")
+						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{psk_identity} #{psk}")
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
