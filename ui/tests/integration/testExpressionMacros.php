@@ -34,7 +34,7 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  * @backup items,actions,triggers,globalmacro,hostmacro
  * @hosts test_macros
  */
-class testMacrosTrigger extends CIntegrationTest {
+class testExpressionMacros extends CIntegrationTest {
 
 	private static $hostid;
 	private static $triggerid;
@@ -769,7 +769,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 *
 	 * @backup alerts,events,history_uint
 	 */
-	public function testMacrosTrigger_getData() {
+	public function testExpressionMacros_getData() {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'2', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_FIRE_TRIGGER);
@@ -805,7 +805,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	/**
 	 * Test expression macro in problem message
 	 */
-	public function testMacrosTrigger_checkProblemMessage() {
+	public function testExpressionMacros_checkProblemMessage() {
 
 		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
@@ -838,14 +838,14 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	/**
 	 * Test expression macro with empty hostname
 	 */
-	public function testMacrosTrigger_checkEmptyHostname() {
+	public function testExpressionMacros_checkEmptyHostname() {
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$alert_response['result'][0]['subject']);
 	}
 
 	/**
 	 * Test expression macro in function with argument
 	 */
-	public function testMacrosTrigger_checkFunctionArgument() {
+	public function testExpressionMacros_checkFunctionArgument() {
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][1]['subject']);
 	}
 
@@ -853,7 +853,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	 * Test expression macro with {HOST.HOST} and {ITEM.KEY} macros
 	 * Next escalation step.
 	 */
-	public function testMacrosTrigger_checkProblemMessage2() {
+	public function testExpressionMacros_checkProblemMessage2() {
 
 		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
@@ -890,7 +890,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 		$this->assertEquals($message_expect, self::$alert_response['result'][1]['message']);
 	}
 
-	public function testMacrosTrigger_checkProblemMessage3_InconsistentMacros() {
+	public function testExpressionMacros_checkProblemMessage3_InconsistentMacros() {
 		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
 			"ESC.HISTORY[\s\S]*" .
 			"DATE[\s\S]*" .
@@ -911,7 +911,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	/**
 	 * Test expression macro in recovery message
 	 */
-	public function testMacrosTrigger_checkRecoveryMessage() {
+	public function testExpressionMacros_checkRecoveryMessage() {
 
 		$trigger_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
 				' or ' .
@@ -1005,7 +1005,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	/**
 	 * Test expression macro in event name
 	 */
-	public function testMacrosTrigger_checkEventName() {
+	public function testExpressionMacros_checkEventName() {
 		$this->assertEquals(self::EVENT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$event_response['result'][0]['name']);
 	}
 
