@@ -61,11 +61,11 @@ type PluginExport struct {
 }
 
 type uid struct {
-	UID uint32
+	uid uint32
 }
 
 type userNotFoundError struct {
-	Name string
+	name string
 }
 
 var impl Plugin = Plugin{
@@ -263,7 +263,7 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 }
 
 func (err *userNotFoundError) Error() string {
-	return fmt.Sprintf("User `%s` not found!", err.Name)
+	return fmt.Sprintf("User `%s` not found!", err.name)
 }
 
 // Cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam()) ignores remote services like SSSD.
@@ -295,7 +295,7 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 			return query, &userNotFoundError{}
 		}
 
-		query.userid = int64(uid.UID)
+		query.userid = int64(uid.uid)
 	}
 
 	query.cmdlinePattern = pattern
@@ -661,7 +661,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 
 	userID := int64(-1)
 	if uid != nil {
-		userID = int64(uid.UID)
+		userID = int64(uid.uid)
 	}
 
 	processes, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser)
