@@ -263,7 +263,7 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 }
 
 func (err *userNotFoundError) Error() string {
-	return fmt.Sprintf("User `%s` not found!", err.name)
+	return fmt.Sprintf("user `%s` not found!", err.name)
 }
 
 // Cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam()) ignores remote services like SSSD.
