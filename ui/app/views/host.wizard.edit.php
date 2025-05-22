@@ -97,7 +97,9 @@ function stepWelcome(): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Welcome to the Host Wizard')),
-						new CTag('p', true, _('The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix.')),
+						new CTag('p', true,
+							_('The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix.')
+						),
 						new CTag('p', true, _('You can always access Host Wizard from Data Collection > Hosts.'))
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -133,7 +135,9 @@ function stepSelectTemplate($old_template_count): array {
 					->addItem(
 						(new CDiv([
 							new CTag('h1', true, _('Select a template')),
-							new CTag('p', true, _('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.'))
+							new CTag('p', true,
+								_('A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target.')
+							)
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 							->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -267,8 +271,12 @@ function stepCreateHost($form): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Create or select a host')),
-						new CTag('p', true, _s('The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target.', '#{template_name}')),
-						new CTag('p', true, _('Hosts are organized into host groups for easier management and access control.'))
+						new CTag('p', true,
+							_s('The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target.', '#{template_name}')
+						),
+						new CTag('p', true,
+							_('Hosts are organized into host groups for easier management and access control.')
+						)
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -339,7 +347,9 @@ function stepInstallAgent($agent_script_data): array {
 					->addItem(
 						(new CDiv([
 							new CTag('h1', true, _('Install Zabbix agent')),
-							new CTag('p', true, _s('The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target.', '#{template_name}')),
+							new CTag('p', true,
+								_s('The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target.', '#{template_name}')
+							),
 							new CTag('p', true, _('Skip OS selection if you already have Zabbix agent installed.'))
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -359,10 +369,14 @@ function stepInstallAgent($agent_script_data): array {
 								->addItem(
 									(new CDiv([
 										(new CDiv(
-											new CTag('p', true, _('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.'))
+											new CTag('p', true,
+												_('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.')
+											)
 										))->addClass(ZBX_STYLE_FORMATED_TEXT),
 										(new CDiv(
-											new CTag('p', true, _('If you don\'t know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations.'))
+											new CTag('p', true,
+												_('If you don\'t know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations.')
+											)
 										))
 											->addClass(ZBX_STYLE_FORMATED_TEXT)
 											->addClass('js-tls-exists'),
@@ -412,9 +426,18 @@ function stepInstallAgent($agent_script_data): array {
 								->addItem(
 									new CFormField(
 										(new CRadioCardList('monitoring_os', 'linux'))
-											->addValue(['label' => _('Linux'), 'value' => 'linux'])
-											->addValue(['label' => _('Windows'), 'value' => 'windows'])
-											->addValue(['label' => _('Other'), 'value' => 'other'])
+											->addValue([
+												'label' => _('Linux'),
+												'value' => 'linux'
+											])
+											->addValue([
+												'label' => _('Windows'),
+												'value' => 'windows'
+											])
+											->addValue([
+												'label' => _('Other'),
+												'value' => 'other'
+											])
 											->addClass(ZBX_STYLE_GRID_COLUMNS)
 									)
 								)
@@ -422,8 +445,14 @@ function stepInstallAgent($agent_script_data): array {
 									(new CFormField([
 										new CLabel(_('Select the OS distribution'), 'windows-new'),
 										(new CRadioCardList('monitoring_os_distribution'))
-											->addValue(['label' => _('Windows 10/Server 2016 or later'), 'value' => 'windows-new'])
-											->addValue(['label' => _('Older version'), 'value' => 'windows-old'])
+											->addValue([
+												'label' => _('Windows 10/Server 2016 or later'),
+												'value' => 'windows-new'
+											])
+											->addValue([
+												'label' => _('Older version'),
+												'value' => 'windows-old'
+											])
 											->addClass(ZBX_STYLE_GRID_COLUMNS)
 									]))->addClass('js-windows-distribution-select')
 								)
@@ -444,12 +473,15 @@ function stepInstallAgent($agent_script_data): array {
 		new CTemplateTag('host-wizard-step-install-agent-os-linux',
 			(new CListItem())
 				->addItem(
-					(new CTag('h6', true, [_('Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:')]))
-						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+					(new CTag('h6', true,
+						_('Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:')
+					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('pre', true, "$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{psk_identity} #{psk}")
+						new CTag('pre', true,
+							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{psk_identity} #{psk}"
+						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -457,13 +489,18 @@ function stepInstallAgent($agent_script_data): array {
 		new CTemplateTag('host-wizard-step-install-agent-os-windows-new',
 			(new CListItem())
 				->addItem(
-					(new CTag('h6', true, [_('Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:')]))
-						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+					(new CTag('h6', true,
+						_('Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:')
+					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('pre', true, "Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"),
-						new CTag('pre', true, "powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{psk_identity} #{psk}")
+						new CTag('pre', true,
+							"Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"
+						),
+						new CTag('pre', true,
+							"powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{psk_identity} #{psk}"
+						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -471,16 +508,22 @@ function stepInstallAgent($agent_script_data): array {
 		new CTemplateTag('host-wizard-step-install-agent-os-windows-old',
 			(new CListItem())
 				->addItem(
-					(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
-						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+					(new CTag('h6', true,
+						_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')
+					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
-						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
 						new CTag('p', true,
-							(new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MSI)))
-								->setTarget('_blank'))
+							_('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')
+						),
+						new CTag('p', true,
+							_('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')
+						),
+						new CTag('p', true,
+							(new CLink(_('Open installation instructions'),
+								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MSI)
+							))->setTarget('_blank'))
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
 		),
@@ -488,21 +531,28 @@ function stepInstallAgent($agent_script_data): array {
 		new CTemplateTag('host-wizard-step-install-agent-os-other',
 			(new CListItem())
 				->addItem(
-					(new CTag('h6', true, [_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')]))
-						->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
+					(new CTag('h6', true,
+						_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')
+					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
 					(new CDiv([
-						new CTag('p', true, _('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')),
-						new CTag('p', true, _('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')),
+						new CTag('p', true,
+							_('Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1.')
+						),
+						new CTag('p', true,
+							_('Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step.')
+						),
 						new CTag('p', true, [
-							(new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)))
-								->setTarget('_blank'),
+							(new CLink(_('Open installation instructions'),
+								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)
+							))->setTarget('_blank'),
 							' (', _s('Mac OS'), ')'
 						]),
 						new CTag('p', true, [
-							(new CLink(_('Open installation instructions'), CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)))
-								->setTarget('_blank'),
+							(new CLink(_('Open installation instructions'),
+								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_OTHER)
+							))->setTarget('_blank'),
 							' (', _s('Other OS'), ')'
 						])
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -519,8 +569,16 @@ function stepAddHostInterface(): array {
 					->addItem(
 						(new CDiv([
 							new CTag('h1', true, _('Add host interface')),
-							new CTag('p', true, _s('The template you selected (%1$s) requires the %2$s to be added to the host (%3$s).', '#{template_name}', '#{interfaces_long}', '#{host_name}')),
-							new CTag('p', true, _s('Note: %1$s must be configured and enabled on your monitoring target.', '#{interfaces_short}'))
+							new CTag('p', true,
+								_s('The template you selected (%1$s) requires the %2$s to be added to the host (%3$s).',
+									'#{template_name}', '#{interfaces_long}', '#{host_name}'
+								)
+							),
+							new CTag('p', true,
+								_s('Note: %1$s must be configured and enabled on your monitoring target.',
+									'#{interfaces_short}'
+								)
+							)
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN)
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
@@ -591,7 +649,8 @@ function stepAddHostInterface(): array {
 							->addClass(ZBX_STYLE_GRID_COLUMNS_2),
 						(new CDiv([
 							new CFormField([
-								(new CLabel(_('SNMP version'), 'label_interfaces_#{row_index}_details_version'))->setAsteriskMark(),
+								(new CLabel(_('SNMP version'), 'label_interfaces_#{row_index}_details_version'))
+									->setAsteriskMark(),
 								(new CSelect('interfaces[#{row_index}][details][version]'))
 									->addOptions(CSelect::createOptionsFromArray([
 										SNMP_V1 => _('SNMPv1'),
@@ -750,7 +809,9 @@ function stepAddHostInterface(): array {
 				->addItem(
 					(new CDiv([
 						new CTag('h4', true, _('Enable IPMI checks on Zabbix server')),
-						new CTag('p', true, _('In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value.')),
+						new CTag('p', true,
+							_('In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value.')
+						),
 						new CTag('p', true, [
 							_('For more details, see'),
 							' ',
@@ -802,8 +863,12 @@ function stepAddHostInterface(): array {
 							(new CLink(_('Zabbix documentation'), CDocHelper::getUrl(CDocHelper::ITEM_TYPES_JMX_AGENT)))
 								->setTarget('_blank')
 						]),
-						new CTag('p', true, _('2. Configure your Java application to support remote JMX monitoring. For example:')),
-						new CTag('pre', true, "JAVA_OPTS=\"-Dcom.sun.management.jmxremote \\\n-Dcom.sun.management.jmxremote.local.only=false \\\n-Dcom.sun.management.jmxremote.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.rmi.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.authenticate=false \\\n-Dcom.sun.management.jmxremote.ssl=false \\\n-Djava.rmi.server.hostname=<JMX address>\""),
+						new CTag('p', true,
+							_('2. Configure your Java application to support remote JMX monitoring. For example:')
+						),
+						new CTag('pre', true,
+							"JAVA_OPTS=\"-Dcom.sun.management.jmxremote \\\n-Dcom.sun.management.jmxremote.local.only=false \\\n-Dcom.sun.management.jmxremote.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.rmi.port=<JMX port> \\\n-Dcom.sun.management.jmxremote.authenticate=false \\\n-Dcom.sun.management.jmxremote.ssl=false \\\n-Djava.rmi.server.hostname=<JMX address>\""
+						),
 						new CTag('p', true, [
 							_('For more details, see'), ' ',
 							(new CLink(_('JMX monitoring'), CDocHelper::getUrl(CDocHelper::PROCESSES_JAVA_GATEWAY)))
@@ -830,7 +895,11 @@ function stepReadme(): CTemplateTag {
 							_('Configure host'),
 							(new CSpan('(1/2)'))->addClass('sub-step-counter')
 						]),
-						new CTag('p', true, _s('The template you selected (%1$s) requires additional configuration.', '#{template_name}'))
+						new CTag('p', true,
+							_s('The template you selected (%1$s) requires additional configuration.',
+								'#{template_name}'
+							)
+						)
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -857,7 +926,9 @@ function stepConfigureHost(): array {
 								_('Configure host'),
 								(new CSpan('(2/2)'))->addClass('sub-step-counter')
 							]),
-							new CTag('p', true, _('To complete the setup, configure the following variables (host macros).'))
+							new CTag('p', true,
+								_('To complete the setup, configure the following variables (host macros).')
+							)
 						]))
 							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 							->addClass(ZBX_STYLE_FORMATED_TEXT)
@@ -969,7 +1040,9 @@ function cancelScreen(): CTemplateTag {
 				->addItem(
 					(new CDiv([
 						new CTag('h1', true, _('Cancel Host Wizard?')),
-						new CTag('p', true, _('Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?'))
+						new CTag('p', true,
+							_('Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?')
+						)
 					]))
 						->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 						->addClass(ZBX_STYLE_FORMATED_TEXT)
