@@ -67,14 +67,13 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 }
 
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
-		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls,
-		int use_failover)
+		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls)
 {
 	int		res = FAIL;
 	const char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d, use_failover:%d]", __func__,
-			addrs->values[0]->ip, addrs->values[0]->port, timeout, connect_timeout, use_failover);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
+			addrs->values[0]->ip, addrs->values[0]->port, timeout, connect_timeout);
 
 	switch (config_tls->connect_mode)
 	{
@@ -97,49 +96,39 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			goto out;
 	}
 
-	if (ZBX_FAILOVER_ENABLED == use_failover)
+	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout,
+			config_tls->connect_mode, tls_arg1, tls_arg2, level)))
 	{
-		if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout,
-				config_tls->connect_mode, tls_arg1, tls_arg2, level)))
+		if (0 != retry_interval)
 		{
-			if (0 != retry_interval)
-			{
 #if !defined(_WINDOWS) && !defined(__MINGW32)
-				int	lastlogtime = (int)time(NULL);
+			int	lastlogtime = (int)time(NULL);
 
-				zabbix_log(LOG_LEVEL_WARNING, "Will try to reconnect every %d second(s)",
-						retry_interval);
+			zabbix_log(LOG_LEVEL_WARNING, "Will try to reconnect every %d second(s)",
+					retry_interval);
 
-				while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip,
-						addrs, timeout, connect_timeout, config_tls->connect_mode, tls_arg1,
-						tls_arg2, LOG_LEVEL_DEBUG)))
+			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs,
+					timeout, connect_timeout, config_tls->connect_mode, tls_arg1,
+					tls_arg2, LOG_LEVEL_DEBUG)))
+			{
+				int	now = (int)time(NULL);
+
+				if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
-					int	now = (int)time(NULL);
-
-					if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
-						lastlogtime = now;
-					}
-
-					sleep((unsigned int)retry_interval);
+					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
+					lastlogtime = now;
 				}
 
-				if (FAIL != res)
-					zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
-#else
-				zabbix_log(LOG_LEVEL_WARNING, "Could not to connect to server.");
-#endif
+				sleep((unsigned int)retry_interval);
 			}
+
+			if (FAIL != res)
+				zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Could not to connect to server.");
+#endif
 		}
 	}
-	else if (FAIL != (res = zbx_tcp_connect(sock, source_ip, addrs->values[0]->ip, addrs->values[0]->port,
-				connect_timeout, config_tls->connect_mode, tls_arg1, tls_arg2)))
-	{
-		/* successful connection without failover */
-		zbx_socket_set_deadline(sock, timeout);
-	}
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -569,6 +558,69 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: sends data to socket and receives response                        *
+ *                                                                            *
+ * Parameters: sock  - [IN] socket descriptor                                 *
+ *             data  - [IN] data to send                                      *
+ *             addr  - [IN] address information for logging                   *
+ *             out   - [OUT] buffer for response                              *
+ *             error - [OUT] error message in case of failure                 *
+ *                                                                            *
+ * Return value: SUCCEED - data successfully exchanged                        *
+ *               SEND_ERROR - failed to send data                             *
+ *               RECV_ERROR - failed to receive response                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_comms_exchange_data(zbx_socket_t *sock, const char *data, zbx_addr_t *addr,
+		char **out, char **error)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "sending to [%s]:%d: %s", addr->ip, addr->port, data);
+
+	if (SUCCEED != zbx_tcp_send(sock, data))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unable to send to [%s]:%d: %s",
+					addr->ip, addr->port, zbx_socket_strerror());
+
+		if (NULL != error)
+			*error = zbx_strdup(NULL, zbx_socket_strerror());
+
+		return SEND_ERROR;
+	}
+
+	if (SUCCEED != zbx_tcp_recv(sock))
+	{
+		/* if no data is expected then recv failure means */
+		/* the other side closed connection as expected   */
+		if (NULL == out)
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "unable to receive from [%s]:%d: %s",
+					addr->ip, addr->port, zbx_socket_strerror());
+
+		if (NULL != error)
+			*error = zbx_strdup(NULL, zbx_socket_strerror());
+
+		return RECV_ERROR;
+	}
+	else
+	{
+		if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(sock, 0, NULL))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot gracefully close connection: %s",
+					zbx_socket_strerror());
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "received: %s", sock->buffer);
+
+	if (NULL != out)
+		*out = zbx_socket_detach_buffer(sock);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: connect to a host and exchange data                               *
  *                                                                            *
  * Return value: SUCCEED - data was exchanged successfully                    *
@@ -586,106 +638,102 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error)
 {
 	zbx_socket_t		sock;
-	int			ret = FAIL, retries = 0, retry = ZBX_REDIRECT_NONE, use_failover = ZBX_FAILOVER_ENABLED;
+	int			ret = FAIL, retries = 0, retry = ZBX_REDIRECT_NONE;
+	int			conn_ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-retry:
-	if (SUCCEED != zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout, retry_interval,
-			loglevel, config_tls, use_failover))
+
+	while (1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unable to connect to [%s]:%d: %s",
-				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
+		conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout, retry_interval,
+				loglevel, config_tls);
 
-		if (NULL != error)
-			*error = zbx_strdup(NULL, zbx_socket_strerror());
-		ret = CONNECT_ERROR;
-
-		goto out;
-	}
-
-	if (NULL != connect_callback)
-		data = connect_callback(cb_data);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending: %s", __func__, data);
-
-	if (SUCCEED != zbx_tcp_send(&sock, data))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unable to send to [%s]:%d: %s",
-				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
-		if (NULL != error)
-			*error = zbx_strdup(NULL, zbx_socket_strerror());
-		ret = SEND_ERROR;
-
-		goto cleanup;
-	}
-
-	if (SUCCEED != zbx_tcp_recv(&sock))
-	{
-		/* if no data is expected then recv failure means */
-		/* the other side closed connection as expected   */
-		if (NULL == out)
-			goto success;
-
-		zabbix_log(loglevel, "unable to receive from [%s]:%d: %s",
-				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
-		if (NULL != error)
-			*error = zbx_strdup(NULL, zbx_socket_strerror());
-		ret = RECV_ERROR;
-
-		goto cleanup;
-	}
-	else
-	{
-		if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(&sock, 0, NULL))
+		if (SUCCEED != conn_ret)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection: %s",
-					zbx_socket_strerror());
-		}
-	}
+			zabbix_log(LOG_LEVEL_DEBUG, "unable to connect to [%s]:%d: %s",
+					addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() received: %s", __func__, sock.buffer);
+			if (NULL != error)
+				*error = zbx_strdup(NULL, zbx_socket_strerror());
+			ret = CONNECT_ERROR;
 
-	if (SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry))
-	{
-		if (0 == retries && ZBX_REDIRECT_RETRY == retry)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu", __func__,
-					addrs->values[0]->ip, addrs->values[0]->port);
-
-			retries++;
-			zbx_tcp_close(&sock);
-			use_failover = ZBX_FAILOVER_ENABLED;
-
-			goto retry;
-		}
-		else if (ZBX_REDIRECT_RETRY_NO_FAILOVER == retry)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying without failover to:"
-				"[%s]:%hu", __func__, addrs->values[0]->ip, addrs->values[0]->port);
-
-			zbx_tcp_close(&sock);
-			use_failover = ZBX_FAILOVER_DISABLED;
-
-			goto retry;
+			goto out;
 		}
 
-		if (NULL != error)
+		if (NULL != connect_callback)
+			data = connect_callback(cb_data);
+
+		if (SUCCEED == (ret = zbx_comms_exchange_data(&sock, data, addrs->values[0], out, error)) &&
+			(SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry)))
 		{
-			if (ZBX_REDIRECT_RETRY == retry)
-				*error = zbx_strdup(NULL, "sequential redirect responses detected");
-			else
-				*error = zbx_strdup(NULL, "connection was reset because of service being offline");
+			if (0 == retries && ZBX_REDIRECT_RETRY == retry)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu",
+						__func__, addrs->values[0]->ip, addrs->values[0]->port);
+
+				retries++;
+				zbx_tcp_close(&sock);
+
+				if (NULL != out)
+					zbx_free(*out);
+
+				continue;
+			}
+			else if (ZBX_REDIRECT_RETRY_NO_FAILOVER == retry)
+			{
+				zbx_vector_addr_ptr_t	addrs_tmp;
+
+				zbx_tcp_close(&sock);
+
+				if (NULL != out)
+					zbx_free(*out);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() direct connection without failover to: [%s]:%hu",
+						__func__, addrs->values[0]->ip, addrs->values[0]->port);
+
+				zbx_vector_addr_ptr_create(&addrs_tmp);
+				zbx_vector_addr_ptr_append(&addrs_tmp, addrs->values[0]);
+
+				conn_ret = zbx_connect_to_server(&sock, source_ip, &addrs_tmp, timeout, connect_timeout,
+						0, loglevel, config_tls);
+
+				zbx_vector_addr_ptr_destroy(&addrs_tmp);
+
+				if (SUCCEED != conn_ret)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "direct connection without failover failed: %s",
+							zbx_socket_strerror());
+
+					if (NULL != error)
+						*error = zbx_strdup(NULL, zbx_socket_strerror());
+
+					ret = CONNECT_ERROR;
+
+					goto out;
+				}
+
+				if (NULL != connect_callback)
+					data = connect_callback(cb_data);
+
+				ret = zbx_comms_exchange_data(&sock, data, addrs->values[0], out, error);
+
+			}
+			else if (NULL != error)
+			{
+				if (ZBX_REDIRECT_RETRY == retry)
+					*error = zbx_strdup(NULL, "sequential redirect responses detected");
+				else
+				{
+					*error = zbx_strdup(NULL,
+						"connection was reset because of service being offline");
+				}
+			}
 		}
 
-		goto cleanup;
+		break;
 	}
 
-	if (NULL != out)
-		*out = zbx_socket_detach_buffer(&sock);
-success:
-	ret = SUCCEED;
-cleanup:
-	if (SUCCEED != ret && ZBX_FAILOVER_ENABLED == use_failover)
+	if (SUCCEED != ret)
 		zbx_addrs_failover(addrs);
 
 	zbx_tcp_close(&sock);

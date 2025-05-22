@@ -189,7 +189,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		/* retry till have a connection */
 		if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
 				args->config_timeout, args->config_proxydata_frequency, LOG_LEVEL_WARNING,
-				args->zbx_config_tls, ZBX_FAILOVER_ENABLED))
+				args->zbx_config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
