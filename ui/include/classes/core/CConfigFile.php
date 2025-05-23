@@ -305,7 +305,7 @@ $SSO[\'CERT_STORAGE\']	= \'database\';
 // Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
 //$SSO[\'SP_KEY\']		= \'conf/certs/sp.key\';
 //$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
-//$SSO[\'IDP_CERT\']	= \'conf/certs/idp.crt\'
+//$SSO[\'IDP_CERT\']	= \'conf/certs/idp.crt\';
 
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
