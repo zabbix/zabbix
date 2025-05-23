@@ -1321,12 +1321,16 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids, int audi
 	}
 	zbx_db_large_query_clear(&query);
 
-	zbx_vector_uint64_sort(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (0 != children_triggerids.values_num)
+	{
+		zbx_vector_uint64_sort(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_db_delete_triggers(&children_triggerids, audit_context_mode);
+		DBdelete_trigger_hierarchy(&children_triggerids, audit_context_mode);
+	}
+
 	zbx_db_delete_triggers(triggerids, audit_context_mode);
 
 	zbx_vector_uint64_destroy(&children_triggerids);
@@ -1467,7 +1471,9 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids, int audit_co
 		zbx_vector_uint64_uniq(&children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_db_delete_graphs(&children_graphids, audit_context_mode);
+
+
+		DBdelete_graph_hierarchy(&children_graphids, audit_context_mode);
 	}
 
 	zbx_db_delete_graphs(graphids, audit_context_mode);
