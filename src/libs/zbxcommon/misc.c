@@ -98,6 +98,8 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				"[file:%s,line:%d] zbx_calloc: allocating already allocated memory. "
 				"Please report this to Zabbix developers.",
 				filename, line);
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
 	}
 
 	if (0 == nmemb || 0 == size)
@@ -107,6 +109,9 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				"allocating " ZBX_FS_SIZE_T " memory objects of size " ZBX_FS_SIZE_T ". "
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)nmemb, (zbx_fs_size_t)size);
+				THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 	}
 	nmemb = MAX(nmemb, 1);
 	size = MAX(size, 1);
@@ -118,6 +123,9 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
+			THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 
 	exit(EXIT_FAILURE);
 }
@@ -140,6 +148,9 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 				"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. "
 				"Please report this to Zabbix developers.",
 				filename, line);
+				THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 	}
 
 	if (0 == size)
@@ -149,6 +160,9 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)size);
+				THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 	}
 	size = MAX(size, 1);
 
@@ -160,6 +174,9 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 			"[file:%s,line:%d] zbx_malloc: out of memory. "
 			"Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
+			THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 
 	exit(EXIT_FAILURE);
 }
@@ -183,6 +200,9 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)size);
+				THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 	}
 	size = MAX(size, 1);
 
@@ -193,6 +213,9 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
+			THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+
 
 	exit(EXIT_FAILURE);
 }
