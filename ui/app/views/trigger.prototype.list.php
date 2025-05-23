@@ -214,7 +214,7 @@ $buttons = [
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->setId('js-massupdate-trigger')
-	],
+	]
 ];
 
 if ($data['is_parent_discovered']) {
