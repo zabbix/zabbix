@@ -56,11 +56,11 @@ foreach ($data['items'] as $item) {
 	)];
 
 	if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		$name[] = (new CLink($item['parent_lld']['name'],
+		$name[] = (new CLink($data['source_link_data']['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
 				->setArgument('popup', 'item.prototype.edit')
-				->setArgument('parent_discoveryid', $item['parent_lld']['itemid'])
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 				->setArgument('itemid', $item['discoveryData']['parent_itemid'])
 				->setArgument('context', 'host')
 				->getUrl()

@@ -16,6 +16,8 @@
 
 class CControllerItemPrototypeList extends CControllerItemPrototype {
 
+	private array $parent_discovery = [];
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -32,22 +34,24 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$ret = (bool) API::DiscoveryRule()->get([
-				'output' => ['itemid'],
+			$options = [
+				'output' => ['itemid', 'name', 'hostid', 'flags'],
+				'selectDiscoveryData' => ['parent_itemid'],
+				'selectHosts' => ['status'],
 				'itemids' => $this->getInput('parent_discoveryid'),
 				'editable' => true
-			]);
+			];
 
-			if (!$ret) {
-				$ret = (bool) API::DiscoveryRulePrototype()->get([
-					'output' => ['itemid'],
-					'itemids' => $this->getInput('parent_discoveryid'),
-					'editable' => true
-				]);
-			}
+			$this->parent_discovery =
+				API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+			$ret = (bool) $this->parent_discovery;
 
 			if (!$ret) {
 				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
+			}
+			else {
+				$this->parent_discovery = reset($this->parent_discovery);
 			}
 		}
 
@@ -67,40 +71,29 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			$this->updateProfileSort();
 		}
 
-		$parent_lld = API::DiscoveryRule()->get([
-			'output' => ['hostid', 'flags'],
-			'selectHosts' => ['status'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
-
-		if (!$parent_lld) {
-			$parent_lld = API::DiscoveryRulePrototype()->get([
-				'output' => ['hostid', 'flags'],
-				'selectHosts' => ['status'],
-				'itemids' => $this->getInput('parent_discoveryid'),
-				'editable' => true
-			]);
-		}
-
-		$parent_lld = reset($parent_lld);
-
 		$data = [
 			'action' => $this->getAction(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'context' => $this->getInput('context'),
-			'hostid' => $parent_lld['hostid'],
+			'hostid' => $this->parent_discovery['hostid'],
 			'items' => [],
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
-			'is_parent_discovered' => $parent_lld['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
+			'is_parent_discovered' => $this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 			'sort' => $profile['sort'],
 			'sortorder' => $profile['sortorder']
 		];
 		$context = $this->getInput('context');
-		$is_template_lld = $parent_lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
+		$is_template_lld = $this->parent_discovery['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
 
 		if (($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld)) {
 			$data['items'] = $this->getItems($profile);
+
+			if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$data['source_link_data'] = [
+					'parent_itemid' => $this->parent_discovery['discoveryData']['parent_itemid'],
+					'name' => $this->parent_discovery['name']
+				];
+			}
 		}
 
 		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $data['items'], $profile['sort'],
@@ -127,66 +120,12 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			],
 			'discoveryids' => [$this->getInput('parent_discoveryid')],
 			'selectTags' => ['tag', 'value'],
-			'selectDiscoveryRule' => ['itemid'],
-			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectDiscoveryData' => ['parent_itemid'],
 			'editable' => true,
 			'sortfield' => $profile['sort'],
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
-
-		// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
-		$parent_itemids = [];
-		$parent_lldruleids = [];
-
-		foreach ($items as $item) {
-			if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-				$parent_lld = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
-				$parent_itemids[$item['discoveryData']['parent_itemid']] = $item['itemid'];
-				$parent_lldruleids[$parent_lld['itemid']][] = $item['itemid'];
-			}
-		}
-
-		if ($parent_itemids) {
-			$parent_item_prototypes = API::ItemPrototype()->get([
-				'output' => [],
-				'selectDiscoveryRule' => ['itemid'],
-				'selectDiscoveryRulePrototype' => ['itemid'],
-				'itemids' => array_keys($parent_itemids),
-				'preservekeys' => true
-			]);
-
-			foreach ($parent_item_prototypes as $itemid => $parent_item_prototype) {
-				$parent_lld = $parent_item_prototype['discoveryRule'] ?: $parent_item_prototype['discoveryRulePrototype'];
-				$items[$parent_itemids[$itemid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
-			}
-
-			$lld_rules = API::DiscoveryRule()->get([
-				'output' => [],
-				'selectDiscoveryRule' => ['name'],
-				'itemids' => array_keys($parent_lldruleids),
-				'preservekeys' => true
-			]);
-
-			if (!$lld_rules) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => [],
-					'selectDiscoveryRule' => ['name'],
-					'selectDiscoveryRulePrototype' => ['name'],
-					'itemids' => array_keys($parent_lldruleids),
-					'preservekeys' => true
-				]);
-			}
-
-			foreach ($lld_rules as $lldruleid => $lld_rule) {
-				$parent_lld = $lld_rule['discoveryRule'] ?: $lld_rule['discoveryRulePrototype'];
-
-				foreach ($parent_lldruleids[$lldruleid] as $itemid) {
-					$items[$itemid]['parent_lld']['name'] = $parent_lld['name'];
-				}
-			}
-		}
 
 		$items = expandItemNamesWithMasterItems($items, 'itemprototypes');
 

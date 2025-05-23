@@ -75,7 +75,7 @@ $discoveryTable = (new CTableInfo())
 	])
 	->setPageNavigation($data['paging']);
 
-$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
 $csrf_token = CCsrfTokenHelper::get('host_discovery_prototypes.php');
 
 foreach ($data['discoveries'] as $discovery) {
@@ -86,10 +86,10 @@ foreach ($data['discoveries'] as $discovery) {
 	);
 
 	if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		$description[] = (new CLink($discovery['parent_lld']['name'],
+		$description[] = (new CLink($data['source_link_data']['name'],
 			(new CUrl('host_discovery_prototypes.php'))
 				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $discovery['parent_lld']['itemid'])
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 				->setArgument('itemid', $discovery['discoveryData']['parent_itemid'])
 				->setArgument('context', 'host')
 		))

@@ -16,10 +16,7 @@
 
 class CControllerTriggerPrototypeList extends CController {
 
-	/**
-	 * @var array
-	 */
-	private array $discovery_rule;
+	private array $parent_discovery = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -45,25 +42,20 @@ class CControllerTriggerPrototypeList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
+		$options = [
+			'output' => ['itemid', 'name', 'hostid', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
 
-		if (!$discovery_rule) {
-			$discovery_rule = API::DiscoveryRulePrototype()->get([
-				'output' => ['name', 'itemid', 'hostid'],
-				'itemids' => $this->getInput('parent_discoveryid'),
-				'editable' => true
-			]);
-		}
+		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-		if (!$discovery_rule) {
+		if (!$this->parent_discovery) {
 			return false;
 		}
 
-		$this->discovery_rule = reset($discovery_rule);
+		$this->parent_discovery = reset($this->parent_discovery);
 
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -73,8 +65,8 @@ class CControllerTriggerPrototypeList extends CController {
 	protected function doAction() {
 		$data = [
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
-			'discovery_rule' => $this->discovery_rule,
-			'hostid' => $this->discovery_rule['hostid'],
+			'discovery_rule' => $this->parent_discovery,
+			'hostid' => $this->parent_discovery['hostid'],
 			'triggers' => [],
 			'dependency_triggers' => [],
 			'context' => $this->getInput('context'),
@@ -129,6 +121,13 @@ class CControllerTriggerPrototypeList extends CController {
 			];
 
 			$data['triggers'] = API::TriggerPrototype()->get($options);
+
+			if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$data['source_link_data'] = [
+					'parent_itemid' => $this->parent_discovery['discoveryData']['parent_itemid'],
+					'name' => $this->parent_discovery['name']
+				];
+			}
 		}
 
 		order_result($data['triggers'], $sort_field, $sort_order);
@@ -153,58 +152,6 @@ class CControllerTriggerPrototypeList extends CController {
 			'triggerids' => array_column($data['triggers'], 'triggerid'),
 			'preservekeys' => true
 		]);
-
-		// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
-		$parent_triggerids = [];
-		$parent_lldruleids = [];
-
-		foreach ($data['triggers'] as $trigger) {
-			if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-				$parent_lld = $trigger['discoveryRule'] ?: $trigger['discoveryRulePrototype'];
-				$parent_triggerids[$trigger['discoveryData']['parent_triggerid']] = $trigger['triggerid'];
-				$parent_lldruleids[$parent_lld['itemid']][] = $trigger['triggerid'];
-			}
-		}
-
-		if ($parent_triggerids) {
-			$parent_trigger_prototypes = API::TriggerPrototype()->get([
-				'output' => [],
-				'selectDiscoveryRule' => ['itemid'],
-				'selectDiscoveryRulePrototype' => ['itemid'],
-				'triggerids' => array_keys($parent_triggerids),
-				'preservekeys' => true
-			]);
-
-			foreach ($parent_trigger_prototypes as $triggerid => $parent_lld_prototype) {
-				$parent_lld = $parent_lld_prototype['discoveryRule'] ?: $parent_lld_prototype['discoveryRulePrototype'];
-				$data['triggers'][$parent_triggerids[$triggerid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
-			}
-
-			$lld_rules = API::DiscoveryRule()->get([
-				'output' => [],
-				'selectDiscoveryRule' => ['name'],
-				'itemids' => array_keys($parent_lldruleids),
-				'preservekeys' => true
-			]);
-
-			if (!$lld_rules) {
-				$lld_rules = API::DiscoveryRulePrototype()->get([
-					'output' => [],
-					'selectDiscoveryRule' => ['name'],
-					'selectDiscoveryRulePrototype' => ['name'],
-					'itemids' => array_keys($parent_lldruleids),
-					'preservekeys' => true
-				]);
-			}
-
-			foreach ($lld_rules as $lldruleid => $lld_rule) {
-				$parent_lld = $lld_rule['discoveryRule'] ?: $lld_rule['discoveryRulePrototype'];
-
-				foreach ($parent_lldruleids[$lldruleid] as $triggerid) {
-					$data['triggers'][$triggerid]['parent_lld']['name'] = $parent_lld['name'];
-				}
-			}
-		}
 
 		order_result($data['triggers'], $sort_field, $sort_order);
 

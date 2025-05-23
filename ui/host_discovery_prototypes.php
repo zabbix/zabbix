@@ -249,33 +249,34 @@ $itemid = getRequest('itemid');
 
 if (getRequest('parent_discoveryid')) {
 	$options = [
-		'output' => ['itemid', 'flags'],
+		'output' => ['itemid', 'name', 'flags'],
+		'selectDiscoveryData' => ['parent_itemid'],
 		'itemids' => getRequest('parent_discoveryid'),
 		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 		'editable' => true
 	];
 
-	$db_parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+	$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-	if (!$db_parent_discovery) {
+	if (!$parent_discovery) {
 		access_deny();
 	}
 
-	$db_parent_discovery = reset($db_parent_discovery);
+	$parent_discovery = reset($parent_discovery);
 
-	if ($db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+	if ($parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 		if (hasRequest('add') || hasRequest('update')) {
 			access_deny();
 		}
 	}
 
-	$hosts = $db_parent_discovery['hosts'];
+	$hosts = $parent_discovery['hosts'];
 
 	if ($itemid != 0) {
 		$discovery_prototype = API::DiscoveryRulePrototype()->get([
-			'itemids' => $itemid,
 			'output' => API_OUTPUT_EXTEND,
-			'editable' => true
+			'itemids' => $itemid,
+			'discoveryids' => $parent_discovery['itemid']
 		]);
 
 		if (!$discovery_prototype) {
@@ -306,7 +307,7 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	$result = API::DiscoveryRulePrototype()->delete([$itemid]);
 
 	if ($result) {
-		uncheckTableRows($db_parent_discovery['itemid']);
+		uncheckTableRows($parent_discovery['itemid']);
 	}
 
 	show_messages($result, _('Discovery prototype deleted'), _('Cannot delete discovery prototype'));
@@ -528,7 +529,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		uncheckTableRows($db_parent_discovery['itemid']);
+		uncheckTableRows($parent_discovery['itemid']);
 
 		if (hasRequest('backurl')) {
 			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
@@ -613,7 +614,7 @@ if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
 		'editable' => true
 	]);
 
-	uncheckTableRows($db_parent_discovery['itemid'], zbx_objectValues($hostdrules, 'itemid'));
+	uncheckTableRows($parent_discovery['itemid'], zbx_objectValues($hostdrules, 'itemid'));
 }
 
 /*
@@ -812,18 +813,18 @@ if (hasRequest('form')) {
 else {
 	$data = [
 		'hostid' => $hosts[0]['hostid'],
-		'parent_discoveryid' => $db_parent_discovery['itemid'],
-		'is_parent_discovered' => $db_parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
+		'parent_discoveryid' => $parent_discovery['itemid'],
+		'is_parent_discovered' => $parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
 		'active_tab' => CProfile::get($prefix.'discovery_prototypes.filter.active', 1),
-		'checkbox_hash' => $db_parent_discovery['itemid'],
+		'checkbox_hash' => $parent_discovery['itemid'],
 		'context' => getRequest('context')
 	];
 
 	// Select LLD prototypes.
 	$options = [
-		'discoveryids' => $db_parent_discovery['itemid'],
+		'discoveryids' => $parent_discovery['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 		'selectItems' => API_OUTPUT_COUNT,
@@ -831,8 +832,6 @@ else {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
-		'selectDiscoveryRule' => ['itemid'],
-		'selectDiscoveryRulePrototype' => ['itemid'],
 		'selectDiscoveryData' => ['parent_itemid'],
 		'editable' => true,
 		'templated' => ($data['context'] === 'template'),
@@ -852,56 +851,11 @@ else {
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
 
-	// Get the name of the LLD rule that discovered the prototype and the parent_itemid for the prototype source.
-	$parent_itemids = [];
-	$parent_lldruleids = [];
-
-	foreach ($data['discoveries'] as $discovery) {
-		if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-			$parent_lld = $discovery['discoveryRule'] ?: $discovery['discoveryRulePrototype'];
-			$parent_itemids[$discovery['discoveryData']['parent_itemid']] = $discovery['itemid'];
-			$parent_lldruleids[$parent_lld['itemid']][] = $discovery['itemid'];
-		}
-	}
-
-	if ($parent_itemids) {
-		$parent_lld_prototypes = API::DiscoveryRulePrototype()->get([
-			'output' => [],
-			'selectDiscoveryRule' => ['itemid'],
-			'selectDiscoveryRulePrototype' => ['itemid'],
-			'itemids' => array_keys($parent_itemids),
-			'preservekeys' => true
-		]);
-
-		foreach ($parent_lld_prototypes as $itemid => $parent_lld_prototype) {
-			$parent_lld = $parent_lld_prototype['discoveryRule'] ?: $parent_lld_prototype['discoveryRulePrototype'];
-			$data['discoveries'][$parent_itemids[$itemid]]['parent_lld']['itemid'] = $parent_lld['itemid'];
-		}
-
-		$lld_rules = API::DiscoveryRule()->get([
-			'output' => [],
-			'selectDiscoveryRule' => ['name'],
-			'itemids' => array_keys($parent_lldruleids),
-			'preservekeys' => true
-		]);
-
-		if (!$lld_rules) {
-			$lld_rules = API::DiscoveryRulePrototype()->get([
-				'output' => [],
-				'selectDiscoveryRule' => ['name'],
-				'selectDiscoveryRulePrototype' => ['name'],
-				'itemids' => array_keys($parent_lldruleids),
-				'preservekeys' => true
-			]);
-		}
-
-		foreach ($lld_rules as $lldruleid => $lld_rule) {
-			$parent_lld = $lld_rule['discoveryRule'] ?: $lld_rule['discoveryRulePrototype'];
-
-			foreach ($parent_lldruleids[$lldruleid] as $itemid) {
-				$data['discoveries'][$itemid]['parent_lld']['name'] = $parent_lld['name'];
-			}
-		}
+	if ($parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$data['source_link_data'] = [
+			'parent_itemid' => $parent_discovery['discoveryData']['parent_itemid'],
+			'name' => $parent_discovery['name']
+		];
 	}
 
 	// pager

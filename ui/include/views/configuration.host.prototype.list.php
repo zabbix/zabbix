@@ -78,10 +78,10 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	);
 
 	if ($hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		$name[] = (new CLink($hostPrototype['parent_lld']['name'],
+		$name[] = (new CLink($data['source_link_data']['name'],
 			(new CUrl('host_prototypes.php'))
 				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $hostPrototype['parent_lld']['itemid'])
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 				->setArgument('hostid', $hostPrototype['discoveryData']['parent_hostid'])
 				->setArgument('context', 'host')
 		))

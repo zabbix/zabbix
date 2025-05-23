@@ -103,11 +103,11 @@ foreach ($data['graphs'] as $graph) {
 	);
 
 	if ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		$name[] = (new CLink($graph['parent_lld']['name'],
+		$name[] = (new CLink($data['source_link_data']['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
 				->setArgument('popup', 'graph.prototype.edit')
-				->setArgument('parent_discoveryid', $graph['parent_lld']['itemid'])
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 				->setArgument('graphid', $graph['discoveryData']['parent_graphid'])
 				->setArgument('context', 'host')
 				->getUrl()

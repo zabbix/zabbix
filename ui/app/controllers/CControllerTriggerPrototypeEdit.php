@@ -18,10 +18,7 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerTriggerPrototypeEdit extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $trigger_prototype;
+	private array $trigger_prototype = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -71,19 +68,13 @@ class CControllerTriggerPrototypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
+		$options = [
 			'output' => ['itemid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
 
-		if (!$discovery_rule) {
-			$discovery_rule = API::DiscoveryRulePrototype()->get([
-				'output' => ['itemid'],
-				'itemids' => $this->getInput('parent_discoveryid'),
-				'editable' => true
-			]);
-		}
+		$discovery_rule = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
 		if (!$discovery_rule) {
 			return false;
@@ -119,6 +110,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 				'selectDiscoveryRulePrototype' => ['itemid', 'name', 'templateid', 'flags'],
 				'selectDiscoveryData' => ['parent_triggerid'],
 				'triggerids' => $this->getInput('triggerid'),
+				'discoveryids' => $this->getInput('parent_discoveryid'),
 				'selectItems' => ['itemid', 'templateid', 'flags'],
 				'selectDependencies' => ['triggerid'],
 				'selectTags' => ['tag', 'value']
@@ -129,9 +121,6 @@ class CControllerTriggerPrototypeEdit extends CController {
 			}
 
 			$this->trigger_prototype = reset($trigger_prototypes);
-		}
-		else {
-			$this->trigger_prototype = null;
 		}
 
 		return true;
@@ -214,9 +203,10 @@ class CControllerTriggerPrototypeEdit extends CController {
 					$this->trigger_prototype['discoveryRule'] ?: $this->trigger_prototype['discoveryRulePrototype'];
 			}
 
-			$this->trigger_prototype['parent_lld'] = $parent_lld;
-
-			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger_prototype, $data);
+			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData(
+				$this->trigger_prototype + ['parent_lld' => $parent_lld],
+				$data
+			);
 
 			if ($data['form_refresh']) {
 				if ($data['show_inherited_tags']) {

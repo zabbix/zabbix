@@ -17,10 +17,7 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerGraphPrototypeEdit extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $discovery_rule = [];
+	private array $parent_discovery = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -79,25 +76,19 @@ class CControllerGraphPrototypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
+		$options = [
 			'output' => ['itemid', 'hostid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
 
-		if (!$discovery_rule) {
-			$discovery_rule = API::DiscoveryRulePrototype()->get([
-				'output' => ['itemid', 'hostid'],
-				'itemids' => $this->getInput('parent_discoveryid'),
-				'editable' => true
-			]);
-		}
+		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-		if (!$discovery_rule) {
+		if (!$this->parent_discovery) {
 			return false;
 		}
 
-		$this->discovery_rule = reset($discovery_rule);
+		$this->parent_discovery = reset($this->parent_discovery);
 
 		if ($this->hasInput('graphid')) {
 			$graphid = $this->getInput('graphid');
@@ -106,6 +97,7 @@ class CControllerGraphPrototypeEdit extends CController {
 				$graph_prototype = (bool) API::GraphPrototype()->get([
 					'output' => [],
 					'graphids' => $graphid,
+					'discoveryids' => $this->parent_discovery['itemid'],
 					'editable' => true
 				]);
 
@@ -124,7 +116,7 @@ class CControllerGraphPrototypeEdit extends CController {
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
-			'hostid' => $this->discovery_rule['hostid'],
+			'hostid' => $this->parent_discovery['hostid'],
 			'context' => $this->getInput('context'),
 			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => $this->getInput('readonly', 0),

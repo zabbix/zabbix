@@ -86,11 +86,11 @@ foreach ($data['triggers'] as $trigger) {
 	);
 
 	if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-		$description[] = (new CLink($trigger['parent_lld']['name'],
+		$description[] = (new CLink($data['source_link_data']['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
 				->setArgument('popup', 'trigger.prototype.edit')
-				->setArgument('parent_discoveryid', $trigger['parent_lld']['itemid'])
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 				->setArgument('triggerid', $trigger['discoveryData']['parent_triggerid'])
 				->setArgument('context', 'host')
 				->getUrl()

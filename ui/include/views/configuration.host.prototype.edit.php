@@ -60,16 +60,14 @@ if ($host_prototype['hostid'] != 0) {
 $host_tab = new CFormList('hostlist');
 
 if ($data['is_discovered_prototype']) {
-	$parent_lld = $host_prototype['discoveryRule'] ?: $host_prototype['discoveryRulePrototype'];
-
 	$discovered_url = (new CUrl('host_prototypes.php'))
 		->setArgument('form', 'update')
-		->setArgument('parent_discoveryid', $parent_lld['itemid'])
+		->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 		->setArgument('hostid', $host_prototype['discoveryData']['parent_hostid'])
 		->setArgument('context', $data['context'])
 		->getUrl();
 
-	$host_tab->addRow(_('Discovered by'), (new CLink($parent_lld['name'], $discovered_url)));
+	$host_tab->addRow(_('Discovered by'), (new CLink($data['source_link_data']['name'], $discovered_url)));
 }
 
 if ($data['templates']) {
