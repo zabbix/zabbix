@@ -32,8 +32,7 @@ BINARIES_tests = \
 	zbx_custom_interval_is_scheduling \
 	zbx_user_macro_quote_context_dyn \
 	zbx_substitute_item_key_params \
-	zbx_substitute_snmp_oid_params \
-	zbx_calculate_macro_function
+	zbx_substitute_snmp_oid_params
 
 if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
@@ -41,7 +40,8 @@ endif
 
 if SERVER
 BINARIES_tests += \
-	zbx_substitute_macros_um
+	zbx_substitute_macros_um \
+	zbx_calculate_macro_function
 
 CONFIGCACHE_WRAP_FUNCS = \
 	-Wl,--wrap=__zbx_shmem_malloc \
@@ -614,7 +614,7 @@ zbx_substitute_snmp_oid_params_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_substitute_snmp_oid_params_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
-
+if SERVER
 EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
@@ -715,3 +715,4 @@ zbx_calculate_macro_function_CFLAGS = $(EXPR_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxexpression
+endif
