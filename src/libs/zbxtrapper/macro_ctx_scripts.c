@@ -265,7 +265,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int macro_
 		zbx_dc_um_handle_t * um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t userid, const zbx_dc_host_t *dc_host, const char *tz)
 {
-	int	ret;
+	int	ret = SUCCEED;
 
 	/* Shared data */
 	int				user_names_found = 0;
