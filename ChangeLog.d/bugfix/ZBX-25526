@@ -1,0 +1,1 @@
+...G...... [ZBX-25526] made Zabbix agent 2 proc.num, proc.cpu.util, proc.get and proc.mem items behave consistently with Zabbix agent when non-existing user is specified (arimdjonoks)
