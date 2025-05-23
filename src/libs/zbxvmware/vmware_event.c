@@ -1483,11 +1483,12 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_shmem_get_vmware_mem());
 
-	zbx_snprintf(msg, sizeof(msg), "Events (number/chunk/endtime):%d / " ZBX_FS_UI64
-			" / " ZBX_FS_TIME_T " VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
+	zbx_snprintf(msg, sizeof(msg), "Events (number/collected/chunk/endtime/error):%d / %d / " ZBX_FS_UI64
+			" / " ZBX_FS_TIME_T " / [%s] VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
 			ZBX_FS_UI64 " / " ZBX_FS_UI64,
 			NULL != service->eventlog.data ? service->eventlog.data->events.values_num : 0,
-			shmem_free_sz, service->eventlog.end_time, vmware_shmem_get_vmware_mem()->free_size,
+			evt_data->events.values_num, shmem_free_sz, service->eventlog.end_time,
+			NULL == evt_data->error ? "none" : evt_data->error, vmware_shmem_get_vmware_mem()->free_size,
 			zbx_vmware_get_vmware()->strpool_sz, vmware_shmem_get_vmware_mem()->total_size);
 
 	zbx_vmware_unlock();
