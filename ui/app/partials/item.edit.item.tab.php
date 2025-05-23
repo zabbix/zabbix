@@ -886,7 +886,7 @@ if ($data['source'] === 'item') {
 				(new CUrl())
 					->setArgument('action', 'latest.view')
 					->setArgument('hostids[]', $item['hostid'])
-					->setArgument('name', $item['name'])
+					->setArgument('name', $item['name_resolved'])
 					->setArgument('filter_set', '1')
 			))->setTarget('_blank')))
 		);

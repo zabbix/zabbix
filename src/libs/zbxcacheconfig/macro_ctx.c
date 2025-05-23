@@ -19,6 +19,7 @@
 #include "zbxip.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "zbxparam.h"
 
 static int	common_resolv(zbx_macro_resolv_data_t *p, zbx_uint64_t hostid, const char *host, const char *name,
 		const zbx_dc_interface_t *interface, zbx_uint64_t itemid, char **replace_to)
@@ -256,6 +257,64 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 			ret = common_resolv(p, item->host.hostid, item->host.host, item->host.name, &item->interface,
 					item->itemid, replace_to);
 		}
+	}
+
+	return ret;
+}
+
+int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args)
+{
+	int	ret = SUCCEED;
+
+	/* Passed parameters */
+	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
+	const zbx_dc_item_t		*item = va_arg(args, const zbx_dc_item_t *);
+
+	ZBX_UNUSED(num);
+
+	if (NULL == strchr(data, '{'))
+		return ret;
+
+	*param = zbx_strdup(NULL, data);
+
+	if (0 != level)
+		zbx_unquote_key_param(*param);
+
+	zbx_substitute_macros(param, NULL, 0, zbx_macro_field_params_resolv, um_handle, item);
+
+	if (0 != level)
+	{
+		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
+			zbx_free(*param);
+	}
+
+	return ret;
+}
+
+int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args)
+{
+	int	ret = SUCCEED;
+
+	/* Passed parameters */
+	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
+	const zbx_uint64_t		*hostid = va_arg(args, const zbx_uint64_t *);
+
+	ZBX_UNUSED(num);
+
+	if (NULL == strchr(data, '{'))
+		return ret;
+
+	*param = zbx_strdup(NULL, data);
+
+	if (0 != level)
+		zbx_unquote_key_param(*param);
+
+	zbx_dc_expand_user_and_func_macros(um_handle, param, hostid, 1, NULL);
+
+	if (0 != level)
+	{
+		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
+			zbx_free(*param);
 	}
 
 	return ret;

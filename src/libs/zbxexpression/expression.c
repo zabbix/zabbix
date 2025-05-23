@@ -23,15 +23,12 @@
 #include "zbxcachevalue.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-#include "zbxparam.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_expression_constants.h"
 #include "zbxevent.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "zbxinterface.h"
-#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *
@@ -608,6 +605,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
 
+	ZBX_UNUSED(dc_item);
+	ZBX_UNUSED(history_data_item);
+	ZBX_UNUSED(hostid);
+
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:EMPTY", __func__);
@@ -944,7 +945,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger,
 							N_functionid, &itemid)))
 					{
-						ret = expr_get_item_key(itemid, &replace_to);
+						ret = zbx_dc_get_item_key(itemid, &replace_to);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
@@ -1336,7 +1337,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger,
 							N_functionid, &itemid)))
 					{
-						ret = expr_get_item_key(itemid, &replace_to);
+						ret = zbx_dc_get_item_key(itemid, &replace_to);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
@@ -1869,7 +1870,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_KEY) || 0 == strcmp(m, MVAR_TRIGGER_KEY))
 				{
-					ret = expr_get_item_key(c_event->objectid, &replace_to);
+					ret = zbx_dc_get_item_key(c_event->objectid, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
 				{
@@ -2036,7 +2037,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_KEY))
 				{
-					ret = expr_get_item_key(c_event->objectid, &replace_to);
+					ret = zbx_dc_get_item_key(c_event->objectid, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_KEY_ORIG))
 				{
@@ -2520,123 +2521,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 			}
 		}
-		else if (0 == indexed_macro &&
-				0 != (macro_type & (ZBX_MACRO_TYPE_ITEM_KEY)))
-		{
-			zbx_uint64_t			c_hostid, c_itemid;
-			const char			*host, *name;
-			const zbx_dc_interface_t	*c_interface;
-
-			if (NULL != history_data_item)
-			{
-				c_hostid = history_data_item->host.hostid;
-				c_itemid = history_data_item->itemid;
-				host = history_data_item->host.host;
-				name = history_data_item->host.name;
-				c_interface = &history_data_item->interface;
-			}
-			else
-			{
-				c_hostid = dc_item->host.hostid;
-				c_itemid = dc_item->itemid;
-				host = dc_item->host.host;
-				name = dc_item->host.name;
-				c_interface = &dc_item->interface;
-			}
-
-			if (SUCCEED == token_is_user_macro(m, &token))
-			{
-				zbx_dc_get_user_macro(um_handle, m, &c_hostid, 1, &replace_to);
-
-				pos = token.loc.r;
-			}
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
-			{
-				replace_to = zbx_strdup(replace_to, host);
-			}
-			else if (0 == strcmp(m, MVAR_HOST_NAME))
-			{
-				replace_to = zbx_strdup(replace_to, name);
-			}
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
-			{
-				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
-				{
-					if ('\0' != *c_interface->ip_orig && FAIL == zbx_is_ip(c_interface->ip_orig))
-					{
-						ret = FAIL;
-					}
-					else
-						replace_to = zbx_strdup(replace_to, c_interface->ip_orig);
-				}
-				else
-				{
-					ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-							ZBX_DC_REQUEST_HOST_IP);
-				}
-			}
-			else if	(0 == strcmp(m, MVAR_HOST_DNS))
-			{
-				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
-				{
-					if ('\0' != *c_interface->dns_orig &&
-							FAIL == zbx_is_ip(c_interface->dns_orig) &&
-							FAIL == zbx_validate_hostname(c_interface->dns_orig))
-					{
-						ret = FAIL;
-					}
-					else
-						replace_to = zbx_strdup(replace_to, c_interface->dns_orig);
-				}
-				else
-				{
-					ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-							ZBX_DC_REQUEST_HOST_DNS);
-				}
-			}
-			else if (0 == strcmp(m, MVAR_HOST_CONN))
-			{
-				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
-				{
-					if (FAIL == zbx_is_ip(c_interface->addr) &&
-							FAIL == zbx_validate_hostname(c_interface->addr))
-					{
-						ret = FAIL;
-					}
-					else
-						replace_to = zbx_strdup(replace_to, c_interface->addr);
-				}
-				else
-				{
-					ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-							ZBX_DC_REQUEST_HOST_CONN);
-				}
-			}
-			else if (0 == strcmp(m, MVAR_HOST_PORT))
-			{
-				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
-				{
-					zbx_dsprintf(replace_to, "%u", c_interface->port);
-				}
-				else
-				{
-					ret = zbx_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-							ZBX_DC_REQUEST_HOST_PORT);
-				}
-			}
-		}
-		else if (0 != (macro_type & (ZBX_MACRO_TYPE_COMMON | ZBX_MACRO_TYPE_SNMP_OID)))
-		{
-			if (SUCCEED == token_is_user_macro(m, &token))
-			{
-				if (NULL != hostid)
-					zbx_dc_get_user_macro(um_handle, m, hostid, 1, &replace_to);
-				else
-					zbx_dc_get_user_macro(um_handle, m, NULL, 0, &replace_to);
-
-				pos = token.loc.r;
-			}
-		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_SCRIPT))
 		{
 			if (SUCCEED == token_is_user_macro(m, &token))
@@ -2782,128 +2666,6 @@ out:
 	return res;
 }
 
-typedef struct
-{
-	zbx_uint64_t				*hostid;
-	zbx_dc_item_t				*dc_item;
-	zbx_macro_resolver_f			resolver_cb;
-	const void				*resolver_data;
-	int					macro_type;
-}
-replace_key_param_data_t;
-
-/******************************************************************************
- *                                                                            *
- * Comments: auxiliary function for substitute_key_macros().                  *
- *                                                                            *
- ******************************************************************************/
-static int	replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
-			char **param)
-{
-	replace_key_param_data_t		*replace_key_param_data = (replace_key_param_data_t *)cb_data;
-	zbx_uint64_t				*hostid = replace_key_param_data->hostid;
-	zbx_dc_item_t				*dc_item = replace_key_param_data->dc_item;
-	zbx_macro_resolver_f			resolver_cb = replace_key_param_data->resolver_cb;
-	const void				*resolver_data = replace_key_param_data->resolver_data;
-	int					macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
-
-	ZBX_UNUSED(num);
-
-	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
-		return ret;
-
-	if (NULL == strchr(data, '{'))
-		return ret;
-
-	*param = zbx_strdup(NULL, data);
-
-	if (0 != level)
-		zbx_unquote_key_param(*param);
-
-	if (NULL == resolver_cb)
-		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL, NULL, NULL,
-				NULL, NULL, param, macro_type, NULL, 0);
-	else
-		resolver_cb(param, resolver_data);
-
-	if (0 != level)
-	{
-		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
-			zbx_free(*param);
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: safely substitutes macros in parameters of an item key and OID.   *
- *                                                                            *
- * Example:  key                     | macro  | result            | return    *
- *          -------------------------+--------+-------------------+---------  *
- *           echo.sh[{$MACRO}]       | a      | echo.sh[a]        | SUCCEED   *
- *           echo.sh[{$MACRO}]       | a\     | echo.sh[a\]       | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a      | echo.sh["a"]      | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a\     | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       |  a     | echo.sh[" a"]     | SUCCEED   *
- *           echo.sh[{$MACRO}]       |  a\    | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     |  a     | echo.sh[" a"]     | SUCCEED   *
- *           echo.sh["{$MACRO}"]     |  a\    | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | "a"    | echo.sh["\"a\""]  | SUCCEED   *
- *           echo.sh[{$MACRO}]       | "a"\   | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | "a"    | echo.sh["\"a\""]  | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | "a"\   | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | a,b    | echo.sh["a,b"]    | SUCCEED   *
- *           echo.sh[{$MACRO}]       | a,b\   | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | a,b    | echo.sh["a,b"]    | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a,b\   | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | a]     | echo.sh["a]"]     | SUCCEED   *
- *           echo.sh[{$MACRO}]       | a]\    | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | a]     | echo.sh["a]"]     | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | a]\    | undefined         | FAIL      *
- *           echo.sh[{$MACRO}]       | [a     | echo.sh["a]"]     | SUCCEED   *
- *           echo.sh[{$MACRO}]       | [a\    | undefined         | FAIL      *
- *           echo.sh["{$MACRO}"]     | [a     | echo.sh["[a"]     | SUCCEED   *
- *           echo.sh["{$MACRO}"]     | [a\    | undefined         | FAIL      *
- *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
- *                                                                            *
- ******************************************************************************/
-int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, int macro_type, char *error,
-		size_t maxerrlen)
-{
-	replace_key_param_data_t	replace_key_param_data;
-	int				key_type, ret;
-
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:'%s'", __func__, *data);
-
-	replace_key_param_data.hostid = hostid;
-	replace_key_param_data.dc_item = dc_item;
-	replace_key_param_data.resolver_cb = macro_resolver_cb;
-	replace_key_param_data.resolver_data = resolver_data;
-	replace_key_param_data.macro_type = macro_type;
-
-	switch (macro_type)
-	{
-		case ZBX_MACRO_TYPE_ITEM_KEY:
-			key_type = ZBX_KEY_TYPE_ITEM;
-			break;
-		case ZBX_MACRO_TYPE_SNMP_OID:
-			key_type = ZBX_KEY_TYPE_OID;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
-	}
-
-	ret = zbx_replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error,
-			maxerrlen);
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute_simple_macros with masked secret macros                *
@@ -2943,39 +2705,6 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 	return ret;
 
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: substitute_key_macros with masked secret macros.                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, int macro_type, char *error,
-		size_t maxerrlen)
-{
-	return substitute_key_macros_impl(data, hostid, dc_item, macro_resolver_cb, resolver_data, macro_type, error,
-			maxerrlen);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: substitute_key_macros with unmasked secret macros.                *
- *                                                                            *
- ******************************************************************************/
-int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item, int macro_type,
-		char *error, size_t maxerrlen)
-{
-	int			ret;
-	zbx_dc_um_handle_t	*um_handle;
-
-	um_handle = zbx_dc_open_user_macros_secure();
-
-	ret = substitute_key_macros_impl(data, hostid, dc_item, NULL, NULL, macro_type, error, maxerrlen);
-
-	zbx_dc_close_user_macros(um_handle);
-
-	return ret;
 }
 
 /******************************************************************************

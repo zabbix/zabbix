@@ -68,7 +68,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|----------|--------|--------------------------------|
 |InfluxDB: Health check was failed|<p>The InfluxDB instance is not available or unhealthy.</p>|`last(/InfluxDB by HTTP/influx.healthcheck)=0`|High||
 |InfluxDB: Version has changed|<p>InfluxDB version has changed. Acknowledge to close the problem manually.</p>|`last(/InfluxDB by HTTP/influxdb.version,#1)<>last(/InfluxDB by HTTP/influxdb.version,#2) and length(last(/InfluxDB by HTTP/influxdb.version))>0`|Info|**Manual close**: Yes|
-|InfluxDB: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/InfluxDB by HTTP/influxdb.uptime)<10m`|Info|**Manual close**: Yes|
+|InfluxDB: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/InfluxDB by HTTP/influxdb.uptime)<10m`|Info|**Manual close**: Yes|
 |InfluxDB: Too many tasks failure runs|<p>"Number of failure runs completed across all tasks is too high."</p>|`min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}`|Warning||
 
 ### LLD rule Organizations discovery
