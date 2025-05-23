@@ -643,17 +643,17 @@ class DB {
 	 *
 	 * @return array of ids
 	 */
-	public static function update($table, $data) {
+	public static function update($table, $data, bool $filter_existing = false) {
 		if (empty($data)) {
 			return true;
 		}
 
-		$tableSchema = self::getSchema($table);
+		$table_schema = self::getSchema($table);
 
 		$data = zbx_toArray($data);
 		foreach ($data as $row) {
 			// check
-			self::checkValueTypes($tableSchema, $row['values']);
+			self::checkValueTypes($table_schema, $row['values']);
 			if (empty($row['values'])) {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without values.', $table));
 			}
@@ -674,19 +674,32 @@ class DB {
 			}
 
 			// where condition processing
-			$sqlWhere = [];
-			foreach ($row['where'] as $field => $values) {
-				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
-				}
-				$values = zbx_toArray($values);
-				sort($values); // sorting ids to prevent deadlocks when two transactions depend on each other
+			if ($filter_existing) {
+				$pkids = array_keys(self::select($table, [
+					'output' => [],
+					'filter' => $row['where'],
+					'preservekeys' => true
+				]));
 
-				$sqlWhere[] = dbConditionString($field, $values);
+				$sql_where = [dbConditionId($table_schema['key'], $pkids)];
+			}
+			else {
+				$sql_where = [];
+
+				foreach ($row['where'] as $field => $values) {
+					if (!isset($table_schema['fields'][$field]) || is_null($values)) {
+						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
+					}
+					$values = zbx_toArray($values);
+					sort($values); // sorting ids to prevent deadlocks when two transactions depend on each other
+
+					$sql_where[] = dbConditionString($field, $values);
+				}
 			}
 
 			// sql execution
-			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
+			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sql_where);
+
 			if (!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 			}
@@ -831,28 +844,42 @@ class DB {
 	 *
 	 * @param string $table
 	 * @param array  $wheres pair of fieldname => fieldvalues
-	 * @param bool   $use_or
+	 * @param bool   $filter_existing
 	 *
 	 * @return bool
 	 */
-	public static function delete($table, $wheres, $use_or = false) {
+	public static function delete($table, $wheres, $filter_existing = false) {
 		if (empty($wheres) || !is_array($wheres)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform delete statement on table "%1$s" without where condition.', $table));
 		}
+
 		$table_schema = self::getSchema($table);
 
-		$sqlWhere = [];
-		foreach ($wheres as $field => $values) {
-			if (!isset($table_schema['fields'][$field]) || is_null($values)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
-			}
-			$values = zbx_toArray($values);
-			sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
+		if ($filter_existing) {
+			$pkids = array_keys(self::select($table, [
+				'output' => [],
+				'filter' => $wheres,
+				'preservekeys' => true
+			]));
 
-			$sqlWhere[] = dbConditionString($field, $values);
+			$sql_where = [dbConditionId($table_schema['key'], $pkids)];
+		}
+		else {
+			$sql_where = [];
+
+			foreach ($wheres as $field => $values) {
+				if (!isset($table_schema['fields'][$field]) || is_null($values)) {
+					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
+				}
+				$values = zbx_toArray($values);
+				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
+
+				$sql_where[] = dbConditionString($field, $values);
+			}
 		}
 
-		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
+		$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $sql_where);
+
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 		}
