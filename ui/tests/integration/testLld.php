@@ -1025,7 +1025,7 @@ class testLld extends CIntegrationTest{
 
 		$response = $this->call('itemprototype.update', [
 			'itemid' => self::$item_protoid_item_types,
-			'key_' => 'itemtype.test.renamed[{#NAME}]',
+			'key_' => 'itemtype.test.renamed[{#NAME}]'
 		]);
 
 		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
