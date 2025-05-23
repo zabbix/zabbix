@@ -180,6 +180,8 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 
 			va_end(pargs);
 
+			if (SUCCEED < ret) continue; /* resolver did everything */
+
 			if ((ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type) &&
 					NULL != replace_to)
 			{
