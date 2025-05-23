@@ -1,1 +1,1 @@
-...G...... [ZBX-26114] refactored passive checks for run() to incorporate initial reads (sjurgensons)
+...G...... [ZBX-26114] improved Zabbix agent 2 accept rate on high RTT (sjurgensons)
