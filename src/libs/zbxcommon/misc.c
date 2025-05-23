@@ -99,7 +99,10 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				"Please report this to Zabbix developers.",
 				filename, line);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
+
 	}
 
 	if (0 == nmemb || 0 == size)
@@ -110,7 +113,9 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)nmemb, (zbx_fs_size_t)size);
 				THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 	}
 	nmemb = MAX(nmemb, 1);
@@ -149,7 +154,9 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 				"Please report this to Zabbix developers.",
 				filename, line);
 				THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 	}
 
@@ -161,7 +168,9 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)size);
 				THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 	}
 	size = MAX(size, 1);
@@ -175,7 +184,9 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 			"Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 			THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 
 	exit(EXIT_FAILURE);
@@ -201,7 +212,9 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)size);
 				THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 	}
 	size = MAX(size, 1);
@@ -214,7 +227,9 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 			"[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 			THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 
 
 	exit(EXIT_FAILURE);
