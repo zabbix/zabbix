@@ -10,6 +10,7 @@ SUBDIRS = \
 	zbxcfg \
 	zbxcachevalue \
 	zbxcacheconfig \
+	zbxcalc \
 	zbxdb \
 	zbxdbhigh \
 	zbxhistory \
