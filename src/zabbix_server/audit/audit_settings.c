@@ -21,7 +21,7 @@ zbx_audit_entry_t	*zbx_audit_settings_create_entry(int audit_context_mode, int a
 {
 	int	audit_enabled = 0;
 
-	zbx_audit_get_status(ZBX_AUDIT_HA_CONTEXT, &audit_enabled);
+	zbx_audit_get_status(audit_context_mode, &audit_enabled);
 
 	if (0 == audit_enabled)
 		return NULL;

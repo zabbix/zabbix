@@ -667,6 +667,23 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, con
 	delete_json(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
+zbx_audit_entry_t	*audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table)
+{
+	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry, **paudit_entry;
+
+	local_audit_entry.id = id;
+	local_audit_entry.cuid = (char *)cuid;
+	local_audit_entry.id_table = id_table;
+
+	if (NULL == (paudit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &plocal_audit_entry)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return *paudit_entry;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create key for audit entry based on resource type and name        *
@@ -726,13 +743,13 @@ static void	audit_entry_make_key(const zbx_audit_entry_t *entry, const char *nam
 			owner = "hanode";
 			break;
 		case ZBX_AUDIT_RESOURCE_LLD_RULE:
-			owner = "lldrule";
+			owner = "discoveryrule";
 			break;
 		case ZBX_AUDIT_RESOURCE_HISTORY:
 			owner = "history";
 			break;
 		case ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE:
-			owner = "lldruleprototype";
+			owner = "discoveryruleprototype";
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown resource type: %d", entry->resource_type);
@@ -775,6 +792,19 @@ void	zbx_audit_entry_update(zbx_audit_entry_t *entry, const char *name)
 	audit_entry_make_key(entry, name, key, sizeof(key));
 	append_json_no_value(&entry->details_json, AUDIT_DETAILS_ACTION_UPDATE, key);
 }
+
+void	zbx_audit_entry_delete(zbx_audit_entry_t *entry, const char *name)
+{
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+	delete_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -819,23 +849,6 @@ void	zbx_audit_entry_update_int(zbx_audit_entry_t *entry, const char *name, int 
 
 	audit_entry_make_key(entry, name, key, sizeof(key));
 	update_int_json(&entry->details_json, key, value1, value2);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: add integer key removal for audit entry                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_audit_entry_delete_int(zbx_audit_entry_t *entry, const char *name, int value1)
-{
-	char	key[AUDIT_DETAILS_KEY_LEN];
-
-	/* auditlog has been disabled */
-	if (NULL == entry)
-		return;
-
-	audit_entry_make_key(entry, name, key, sizeof(key));
-	append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key, value1);
 }
 
 /******************************************************************************
@@ -886,23 +899,6 @@ void	zbx_audit_entry_update_uint64(zbx_audit_entry_t *entry, const char *name, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add uint64 key removal for audit entry                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_audit_entry_delete_uint64(zbx_audit_entry_t *entry, const char *name, zbx_uint64_t value1)
-{
-	char	key[AUDIT_DETAILS_KEY_LEN];
-
-	/* auditlog has been disabled */
-	if (NULL == entry)
-		return;
-
-	audit_entry_make_key(entry, name, key, sizeof(key));
-	append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key, value1);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: add string key creation for audit entry                           *
  *                                                                            *
  ******************************************************************************/
@@ -939,23 +935,6 @@ void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, c
 
 	audit_entry_make_key(entry, name, key, sizeof(key));
 	update_str_json(&entry->details_json, key, value1, value2);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: add string key removal for audit entry                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_audit_entry_delete_string(zbx_audit_entry_t *entry, const char *name, const char *value1)
-{
-	char	key[AUDIT_DETAILS_KEY_LEN];
-
-	/* auditlog has been disabled */
-	if (NULL == entry)
-		return;
-
-	audit_entry_make_key(entry, name, key, sizeof(key));
-	append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_DELETE, key, value1);
 }
 
 /******************************************************************************

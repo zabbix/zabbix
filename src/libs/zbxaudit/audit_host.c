@@ -1015,7 +1015,7 @@ void	zbx_audit_hostgroup_update_json_delete_group(zbx_audit_entry_t *audit_entry
 		return;
 
 	zbx_snprintf(key, sizeof(key), "groups[" ZBX_FS_UI64 "]", hostgroupid);
-	zbx_audit_entry_delete_uint64(audit_entry, key, groupid);
+	zbx_audit_entry_delete(audit_entry, key);
 }
 
 /******************************************************************************
@@ -1083,7 +1083,7 @@ void	zbx_audit_host_update_json_delete_interface(zbx_audit_entry_t *audit_entry,
 		return;
 
 	zbx_snprintf(key, sizeof(key), "host.interfaces[" ZBX_FS_UI64 "]", interfaceid);
-	zbx_audit_entry_delete_uint64(audit_entry, key, interfaceid);
+	zbx_audit_entry_delete(audit_entry, key);
 }
 
 void	zbx_audit_host_update_json_delete_hostmacro(zbx_audit_entry_t *audit_entry, zbx_uint64_t hostmacroid)
@@ -1094,7 +1094,7 @@ void	zbx_audit_host_update_json_delete_hostmacro(zbx_audit_entry_t *audit_entry,
 		return;
 
 	zbx_snprintf(key, sizeof(key), "host.macros[" ZBX_FS_UI64 "]", hostmacroid);
-	zbx_audit_entry_delete_uint64(audit_entry, key, hostmacroid);
+	zbx_audit_entry_delete(audit_entry, key);
 }
 
 void	zbx_audit_entry_host_update_json_delete_tag(zbx_audit_entry_t *audit_entry, zbx_uint64_t tagid)
@@ -1105,7 +1105,7 @@ void	zbx_audit_entry_host_update_json_delete_tag(zbx_audit_entry_t *audit_entry,
 		return;
 
 	zbx_snprintf(key, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "]", tagid);
-	zbx_audit_entry_delete_uint64(audit_entry, key, tagid);
+	zbx_audit_entry_delete(audit_entry, key);
 }
 
 void	zbx_audit_entry_host_update_json_add_tls_and_psk(zbx_audit_entry_t *audit_entry, int tls_connect,
