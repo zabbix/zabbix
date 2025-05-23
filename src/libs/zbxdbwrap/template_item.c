@@ -2442,7 +2442,7 @@ static void	save_template_lld_overrides(zbx_vector_lld_override_ptr_t *overrides
 
 					zbx_audit_discovery_rule_update_json_add_lld_override_optemplate(
 							audit_context_mode, (*pitem)->itemid, overrideid,
-							lld_override_optemplateid,
+							override_operationid, lld_override_optemplateid,
 							override_operation->templateids.values[k]);
 
 					lld_override_optemplateid++;
