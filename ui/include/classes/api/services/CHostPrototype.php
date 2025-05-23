@@ -2522,13 +2522,11 @@ class CHostPrototype extends CHostBase {
 				' AND '.dbConditionId('hd.parent_hostid', $hostids)
 		), 'hostid');
 
-		CHost::deleteForce($discovered_hosts);
+		if ($discovered_hosts) {
+			CHost::deleteForce($discovered_hosts);
+		}
 
-		DB::delete('interface', ['hostid' => $hostids]);
-		DB::delete('hosts_templates', ['hostid' => $hostids]);
-		DB::delete('host_tag', ['hostid' => $hostids]);
-		DB::delete('hostmacro', ['hostid' => $hostids]);
-		DB::delete('host_inventory', ['hostid' => $hostids]);
+		DB::delete('host_tag', ['hostid' => $hostids], true);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]
