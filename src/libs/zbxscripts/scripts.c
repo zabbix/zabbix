@@ -13,7 +13,6 @@
 **/
 
 #include "zbxscripts.h"
-#include "zbxexpression.h"
 
 #include "zbxexec.h"
 #include "zbxtasks.h"
@@ -430,11 +429,12 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 		int config_timeout, const char *config_source_ip, unsigned char program_type, char *error,
 		size_t max_error_len)
 {
-	int		ret;
-	AGENT_RESULT	agent_result;
-	char		*param = NULL, *port = NULL;
-	zbx_dc_item_t	item;
-	int		version;
+	int			ret;
+	AGENT_RESULT		agent_result;
+	char			*param = NULL, *port = NULL;
+	zbx_dc_item_t		item;
+	int			version;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -449,8 +449,10 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	}
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+	um_handle = zbx_dc_open_user_macros_masked();
+	zbx_dc_expand_user_and_func_macros(um_handle, &port, &host->hostid, 1, NULL);
+	zbx_dc_close_user_macros(um_handle);
 
 	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
@@ -744,23 +746,24 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
-	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_um_handle_t	*um_handle = NULL, *um_handle_secure = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	um_handle = zbx_dc_open_user_macros();
+	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
+	{
+		um_handle = zbx_dc_open_user_macros_masked();
+		um_handle_secure = zbx_dc_open_user_macros_secure();
+	}
 
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_SSH:
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &script->publickey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &script->privatekey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &script->publickey, hostid, 1, NULL);
+			zbx_dc_expand_user_and_func_macros(um_handle, &script->privatekey, hostid, 1, NULL);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &script->port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &script->port, hostid, 1, NULL);
 
 			if ('\0' != *script->port && SUCCEED != (ret = zbx_is_ushort(script->port, NULL)))
 			{
@@ -768,10 +771,8 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 				goto out;
 			}
 
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &script->username, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &script->password, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle_secure, &script->username, hostid, 1, NULL);
+			zbx_dc_expand_user_and_func_macros(um_handle_secure, &script->password, hostid, 1, NULL);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			zbx_dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
@@ -784,7 +785,11 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 			goto out;
 	}
 
-	zbx_dc_close_user_macros(um_handle);
+	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
+	{
+		zbx_dc_close_user_macros(um_handle_secure);
+		zbx_dc_close_user_macros(um_handle);
+	}
 
 	ret = SUCCEED;
 out:

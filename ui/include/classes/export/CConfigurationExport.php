@@ -1490,7 +1490,8 @@ class CConfigurationExport {
 				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'message_format',
 				'exec_path', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'script',
 				'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
-				'parameters', 'provider'
+				'parameters', 'provider', 'redirection_url', 'client_id', 'client_secret', 'authorization_url',
+				'token_url'
 			],
 			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,
