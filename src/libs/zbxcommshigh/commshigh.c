@@ -605,7 +605,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 	conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout, retry_interval,
 			loglevel, config_tls);
 
-	while (1)
+	for (;;)
 	{
 		if (SUCCEED != conn_ret)
 		{
@@ -614,6 +614,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 
 			if (NULL != error)
 				*error = zbx_strdup(NULL, zbx_socket_strerror());
+
 			ret = CONNECT_ERROR;
 
 			goto out;
@@ -647,6 +648,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 
 				conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout,
 						retry_interval, loglevel, config_tls);
+
 				continue;
 			}
 			else if (ZBX_REDIRECT_RETRY == conn_ret)
@@ -671,7 +673,6 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 				zbx_vector_addr_ptr_destroy(&addrs_tmp);
 
 				continue;
-
 			}
 			else if (ZBX_REDIRECT_NONE == conn_ret)
 			{
