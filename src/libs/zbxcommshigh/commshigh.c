@@ -452,7 +452,7 @@ int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned
  *                                    connection to server                    *
  *               ZBX_REDIRECT_RETRY - normal redirect with retry              *
  *               ZBX_REDIRECT_NONE  - redirect with revision older than used  *
- *               FAIL               - wrong or non-redirect message           *
+ *               ZBX_REDIRECT_FAIL  - wrong or non-redirect message           *
  *                                                                            *
  * Comments: In the case of valid and fresh redirect information either the   *
  *           existing redirect address is updated and moved at the start of   *
@@ -471,16 +471,16 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 	unsigned char		reset;
 
 	if (FAIL == zbx_json_open(data, &jp))
-		return FAIL;
+		return ZBX_REDIRECT_FAIL;
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, buf, sizeof(buf), NULL))
-		return FAIL;
+		return ZBX_REDIRECT_FAIL;
 
 	if (0 != strcmp(buf, ZBX_PROTO_VALUE_FAILED))
-		return FAIL;
+		return ZBX_REDIRECT_FAIL;
 
 	if (SUCCEED != zbx_parse_redirect_response(&jp, &host, &port, &revision, &reset))
-		return FAIL;
+		return ZBX_REDIRECT_FAIL;
 
 	if (ZBX_REDIRECT_RESET == reset)
 	{
@@ -513,7 +513,6 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 	addr->revision = revision;
 	addr->port = (0 == port ? ZBX_DEFAULT_SERVER_PORT : port);
 	zbx_vector_addr_ptr_insert(addrs, addr, 0);
-
 
 	return ZBX_REDIRECT_RETRY;
 }
@@ -603,12 +602,11 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 	int			conn_ret, ret = FAIL, retries = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout, retry_interval,
+			loglevel, config_tls);
 
 	while (1)
 	{
-		conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout, retry_interval,
-				loglevel, config_tls);
-
 		if (SUCCEED != conn_ret)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "unable to connect to [%s]:%d: %s",
@@ -626,24 +624,29 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 
 		if (SUCCEED == (ret = zbx_comms_exchange_data(&sock, data, addrs->values[0], out, error)))
 		{
-			conn_ret = comms_check_redirect(sock.buffer, addrs);
-			if (ZBX_REDIRECT_RESET == conn_ret)
+			if (ZBX_REDIRECT_FAIL != (conn_ret = comms_check_redirect(sock.buffer, addrs)))
 			{
-				if ( 0 != retries)
+				if (0 != retries)
 				{
 					*error = zbx_strdup(NULL, "sequential redirect responses detected");
 					ret = SUCCEED;
 					break;
 				}
+				retries++;
+			}
+
+			if (ZBX_REDIRECT_RESET == conn_ret)
+			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu",
 						__func__, addrs->values[0]->ip, addrs->values[0]->port);
 
-				retries++;
 				zbx_tcp_close(&sock);
 
 				if (NULL != out)
 					zbx_free(*out);
 
+				conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout,
+						retry_interval, loglevel, config_tls);
 				continue;
 			}
 			else if (ZBX_REDIRECT_RETRY == conn_ret)
@@ -667,31 +670,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 
 				zbx_vector_addr_ptr_destroy(&addrs_tmp);
 
-				if (SUCCEED != conn_ret)
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "direct connection without failover failed: %s",
-							zbx_socket_strerror());
-
-					if (NULL != error)
-						*error = zbx_strdup(NULL, zbx_socket_strerror());
-
-					ret = CONNECT_ERROR;
-
-					goto out;
-				}
-
-				if (NULL != connect_callback)
-					data = connect_callback(cb_data);
-
-				if (SUCCEED !=
-					(ret = zbx_comms_exchange_data(&sock, data, addrs->values[0], out, error)) ||
-					(FAIL != comms_check_redirect(sock.buffer, addrs)))
-				{
-					ret = CONNECT_ERROR;
-
-					if (NULL != error)
-						*error = zbx_strdup(NULL, "redirect failed");
-				}
+				continue;
 
 			}
 			else if (ZBX_REDIRECT_NONE == conn_ret)
