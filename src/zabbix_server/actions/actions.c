@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "zbxexpr.h"
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"

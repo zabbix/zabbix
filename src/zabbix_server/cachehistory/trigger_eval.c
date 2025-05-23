@@ -18,7 +18,6 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
-#include "zbxexpression.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"
 #include "zbxvariant.h"

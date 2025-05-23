@@ -14,10 +14,7 @@
 
 #include "eval.h"
 
-#include "zbx_item_constants.h"
-#include "zbx_trigger_constants.h"
 #include "zbx_discoverer_constants.h"
-#include "zbxdbhigh.h"
 #include "zbxexpression.h"
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service)

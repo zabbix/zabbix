@@ -26,6 +26,13 @@
 #include "zbxparam.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxregexp.h"
+#include "zbxstr.h"
+#include "zbxtrends.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1

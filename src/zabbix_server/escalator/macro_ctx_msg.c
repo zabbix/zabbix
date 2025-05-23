@@ -20,10 +20,8 @@
 #include "zbx_expression_constants.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
-#include "zbx_trigger_constants.h"
-#include "zbxcalc.h"
-#include "zbx_item_constants.h"
-#include "zbxexpression.h"
+#include "zbxalgo.h"
+#include "zbxtime.h"
 
 static int	macro_message_normal_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen)

@@ -13,7 +13,6 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"

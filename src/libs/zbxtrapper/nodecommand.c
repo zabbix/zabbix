@@ -16,7 +16,6 @@
 
 #include "zbxtrapper.h"
 
-#include "zbxexpression.h"
 #include "zbxscripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"

@@ -24,7 +24,6 @@
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbx_expression_constants.h"
-#include "zbxexpression.h"
 #include "zbxdb.h"
 #include "zbxcalc.h"
 

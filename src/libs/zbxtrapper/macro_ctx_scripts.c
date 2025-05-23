@@ -18,6 +18,9 @@
 #include "zbx_expression_constants.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbwrap.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

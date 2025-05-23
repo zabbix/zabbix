@@ -21,6 +21,13 @@
 #include "zbxevent.h"
 #include "zbxexpression.h"
 #include "zbxcalc.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *
