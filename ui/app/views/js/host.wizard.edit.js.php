@@ -252,7 +252,9 @@ window.host_wizard_edit = new class {
 
 	#macro_reset_list = {};
 
-	#updating_locked = true;
+	#data_update_locked = false;
+	#form_update_locked = false;
+	#pending_form_update = false;
 
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
@@ -273,21 +275,36 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
+		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
+		this.#dialogue.addEventListener('mouseup', () => {
+			this.#form_update_locked = false;
+
+			if (this.#pending_form_update) {
+				this.#pending_form_update = false;
+				this.#updateForm();
+			}
+		});
 
 		this.#dialogue.addEventListener('dialogue.cancel', () => {
-			if (!this.#overlay.is_cancel_locked) {
-				return;
-			}
+			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
+				overlayDialogueDestroy(this.#overlay.dialogueid);
 
-			if (this.#show_cancel_screen) {
-				this.#show_cancel_screen = false;
-
-				this.#gotoStep(this.#current_step);
+				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
+					is_host_new: this.#data.host.isNew,
+					hostid: this.#data.host.id
+				}}));
 			}
 			else {
-				this.#show_cancel_screen = true;
+				if (this.#show_cancel_screen) {
+					this.#show_cancel_screen = false;
 
-				this.#renderCancelScreen();
+					this.#gotoStep(this.#current_step);
+				}
+				else {
+					this.#show_cancel_screen = true;
+
+					this.#renderCancelScreen();
+				}
 			}
 		});
 
@@ -447,7 +464,7 @@ window.host_wizard_edit = new class {
 
 	#gotoStep(queue_index) {
 		this.#current_step = queue_index;
-		this.#updating_locked = true;
+		this.#data_update_locked = true;
 
 		switch (this.#getCurrentStep()) {
 			case this.STEP_WELCOME:
@@ -487,7 +504,7 @@ window.host_wizard_edit = new class {
 				break;
 		}
 
-		this.#updating_locked = false;
+		this.#data_update_locked = false;
 
 		this.#validateStep();
 		this.#updateFields();
@@ -1116,6 +1133,12 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
+		if (this.#form_update_locked) {
+			this.#pending_form_update = true;
+
+			return;
+		}
+
 		const step = this.#getCurrentStep();
 
 		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
@@ -1145,7 +1168,7 @@ window.host_wizard_edit = new class {
 
 				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
-					this.#overlay.is_cancel_locked = true;
+					this.#overlay.has_custom_cancel = true;
 				}
 
 				if (path === 'show_info_by_template') {
@@ -1376,8 +1399,6 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_COMPLETE:
-				this.#overlay.is_cancel_locked = false;
-
 				this.#next_button.innerText = <?= json_encode(_('Finish')) ?>;
 				break;
 
@@ -1861,7 +1882,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#onFormDataChange(path, new_value, old_value) {
-		if (this.#updating_locked) {
+		if (this.#data_update_locked) {
 			return;
 		}
 
