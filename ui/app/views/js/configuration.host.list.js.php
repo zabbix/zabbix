@@ -218,7 +218,7 @@
 					action: 'host.wizard.edit'
 				},
 				callback: ({data, event}) => {
-					if (data.submit.is_host_new) {
+					if (data.submit.redirect_latest) {
 						const url = new URL('zabbix.php', location.href);
 
 						url.searchParams.set('action', 'latest.view');

@@ -290,8 +290,7 @@ window.host_wizard_edit = new class {
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 
 				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-					is_host_new: this.#data.host.isNew,
-					hostid: this.#data.host.id
+					redirect_latest: false
 				}}));
 			}
 			else {
@@ -364,7 +363,7 @@ window.host_wizard_edit = new class {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
 						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-							is_host_new: this.#data.host.isNew,
+							redirect_latest: this.#data.host.isNew,
 							hostid: this.#data.host.id
 						}}));
 					}
