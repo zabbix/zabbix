@@ -3,8 +3,6 @@
 noinst_LIBRARIES = libzbxexpression.a
 
 libzbxexpression_a_SOURCES = \
-	datafunc.c \
-	datafunc.h \
 	expression.c \
 	expression.h \
 	triggerfunc.c

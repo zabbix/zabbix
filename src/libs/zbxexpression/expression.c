@@ -14,7 +14,6 @@
 
 #include "zbxexpression.h"
 #include "expression.h"
-#include "datafunc.h"
 
 #include "zbxdb.h"
 #include "zbxvariant.h"
