@@ -326,7 +326,7 @@ static void	am_db_get_trigger_expressions(zbx_vector_uint64_t *auth_email_mediat
  *                                                                            *
  ******************************************************************************/
 static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t now, zbx_uint64_t mediatypeid,
-		int type, const char *smtp_server, const char *smtp_helo, const char *smtp_email,
+		int type, const char *name, const char *smtp_server, const char *smtp_helo, const char *smtp_email,
 		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
@@ -349,6 +349,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 
 	mediatype->last_access = now;
 	ZBX_UPDATE_VALUE(mediatype->type, type, ret);
+	ZBX_UPDATE_STR(mediatype->name, name, ret);
 	ZBX_UPDATE_STR(mediatype->smtp_server, smtp_server, ret);
 	ZBX_UPDATE_STR(mediatype->smtp_helo, smtp_helo, ret);
 	ZBX_UPDATE_STR(mediatype->smtp_email, smtp_email, ret);
@@ -401,7 +402,8 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
-				"maxsessions,maxattempts,attempt_interval,message_format,script,timeout,process_tags"
+				"maxsessions,maxattempts,attempt_interval,message_format,script,timeout,process_tags,"
+				"name"
 			" from media_type"
 			" where");
 
@@ -436,16 +438,17 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 		maxattempts = atoi(row[15]);
 		ZBX_STR2UCHAR(message_format, row[17]);
 
-		mediatype = am_db_update_mediatype(amdb, now, mediatypeid, type,row[2], row[3], row[4], row[5],
-				row[6], row[7], row[8], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-				smtp_authentication, maxsessions, maxattempts, row[16], message_format, row[18], row[19],
-				atoi(row[20]));
+		mediatype = am_db_update_mediatype(amdb, now, mediatypeid, type, row[21], row[2], row[3], row[4],
+				row[5], row[6], row[7], row[8], smtp_port, smtp_security, smtp_verify_peer,
+				smtp_verify_host, smtp_authentication, maxsessions, maxattempts, row[16],
+				message_format, row[18], row[19], atoi(row[20]));
 
 		if (NULL != mediatype)
 			zbx_vector_am_db_mediatype_ptr_append(mediatypes, mediatype);
 
 		if (NULL != auth_email_mediatypeids && MEDIA_TYPE_EMAIL == type &&
-				SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+				(SMTP_AUTHENTICATION_PASSWORD == smtp_authentication ||
+				SMTP_AUTHENTICATION_OAUTH == smtp_authentication))
 		{
 			zbx_vector_uint64_append(auth_email_mediatypeids, mediatypeid);
 		}

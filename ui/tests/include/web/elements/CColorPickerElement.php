@@ -17,6 +17,8 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Color picker element.
  */
@@ -45,11 +47,49 @@ class CColorPickerElement extends CElement {
 		if ($color === null) {
 			$overlay->query('button:Use default')->one()->click();
 		}
+		elseif ($overlay->query('class:color-picker-tabs')->one(false)->isValid()) {
+			$overlay->asColorPicker()->selectTab('Solid color');
+			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
+		}
+		// TODO: remove the below else part and move elseif to else when DEV-4301 is ready.
 		else {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
-		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		$apply_button = $overlay->query('button:Apply');
+
+		// TODO: remove the else part of this if -> else and remove the condition itself after DEV-4301 is ready.
+		if ($apply_button->exists()) {
+			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+				$overlay->waitUntilNotVisible();
+			}
+			else {
+				if (!$apply_button->one()->isAttributePresent('disabled')) {
+					throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+				}
+			}
+		}
+		else {
+			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Switch color-picker tab by its name.
+	 *
+	 * @return $this
+	 */
+	public function selectTab($name) {
+		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
+		$tab_element = $this->query($selector.'/..')->one();
+
+		if (!$tab_element->hasClass('color-picker-tab-selected')) {
+			$this->query($selector)->waitUntilPresent()->one()->click();
+			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
+		}
 
 		return $this;
 	}
@@ -79,12 +119,21 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Close color pick overlay dialog.
+	 * Close color picker overlay dialog.
 	 *
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		// TODO: remove the $button variable and the if part of the below if -> else after DEV-4301 is ready.
+		$button = $this->query('class:btn-overlay-close')->one(false);
+		if ($button->isValid()) {
+			$button->click()->waitUntilNotVisible();
+		}
+		else {
+			$dialog = (new CElementQuery('id:color_picker'))->one();
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+			$dialog->waitUntilNotPresent();
+		}
 	}
 
 	/**
@@ -94,5 +143,22 @@ class CColorPickerElement extends CElement {
 	 */
 	public function fill($color) {
 		$this->overwrite($color);
+	}
+
+	/**
+	 * Check if color-picker dialog can be submitted
+	 *
+	 * @param boolean	$submitable		should dialog submission be disabled or not
+	 *
+	 * @return type
+	 */
+	public function isSubmittionDisabled($submitable = false) {
+		$dialog = (new CElementQuery('id:color_picker'))->one();
+		$clickable = $dialog->query('button:Apply')->one()->isClickable();
+
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+		$displayed = $dialog->isDisplayed();
+
+		return ($clickable === $submitable && $displayed === !$submitable);
 	}
 }
