@@ -642,6 +642,8 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
+		$dashboard->cancelEditing();
+		$this->page->waitUntilReady();
 	}
 
 	public function testDashboardProblemsWidget_SimpleUpdate() {
