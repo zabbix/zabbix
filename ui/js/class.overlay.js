@@ -43,7 +43,7 @@ function Overlay({
 	this._position = position;
 	this._position_fix = position_fix;
 	this.element = trigger_element;
-	this.is_cancel_locked = false;
+	this.has_custom_cancel = false;
 
 	this.headerid = `overlay-dialogue-header-title-${this.dialogueid}`;
 
@@ -131,11 +131,12 @@ Overlay.prototype._initListeners = function() {
 		close_button_click: e => {
 			e.preventDefault();
 
-			this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-				dialogueid: this.dialogueid
-			}}));
-
-			if (!this.is_cancel_locked) {
+			if (this.has_custom_cancel) {
+				this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
+					dialogueid: this.dialogueid
+				}}));
+			}
+			else {
 				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 			}
 		},
@@ -566,11 +567,12 @@ Overlay.prototype.makeButton = function(obj) {
 			this._block_cancel_action = true;
 
 			if (!obj.keepOpen) {
-				this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-					dialogueid: this.dialogueid
-				}}));
-
-				if (!this.is_cancel_locked) {
+				if (this.has_custom_cancel) {
+					this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
+						dialogueid: this.dialogueid
+					}}));
+				}
+				else {
 					overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 				}
 			}
