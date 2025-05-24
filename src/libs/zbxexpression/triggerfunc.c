@@ -108,6 +108,9 @@ void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, 
 
 	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
 
+	if (0 == functionids.values_num)
+		return;
+
 	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 

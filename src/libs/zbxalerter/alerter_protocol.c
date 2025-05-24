@@ -670,6 +670,10 @@ void	zbx_alerter_deserialize_medias(const unsigned char *data, zbx_am_media_t **
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, medias_num);
+
+	if (0 == *medias_num)
+		return;
+
 	*medias = (zbx_am_media_t **)zbx_malloc(NULL, *medias_num * sizeof(zbx_am_media_t *));
 	for (int i = 0; i < *medias_num; i++)
 	{
@@ -731,8 +735,11 @@ zbx_uint32_t	zbx_alerter_serialize_results(unsigned char **data, zbx_am_result_t
 void	zbx_alerter_deserialize_results(const unsigned char *data, zbx_am_result_t ***results, int *results_num)
 {
 	zbx_uint32_t	len;
-
 	data += zbx_deserialize_value(data, results_num);
+
+	if (0 == *results_num)
+		return;
+
 	*results = (zbx_am_result_t **)zbx_malloc(NULL, *results_num * sizeof(zbx_am_result_t *));
 
 	for (int i = 0; i < *results_num; i++)
