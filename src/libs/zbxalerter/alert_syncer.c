@@ -854,11 +854,13 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 		}
 
 		zbx_free(sql);
+
+
+		zbx_free(results);
 	}
 
 	zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
 	zbx_vector_events_tags_destroy(&update_events_tags);
-	zbx_free(results);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
 
