@@ -1087,8 +1087,9 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		}
 
 		if (0 != events->values_num && keep_time < events->values[0]->timestamp -
-				events->values[events->values_num - 1]->timestamp)
-		{
+				events->values[events->values_num - 1]->timestamp &&
+				ZBX_MAXQUERYMETRICS_UNLIMITED == soap_count && 0 != parsed_count)
+		{				/* we will not trim first and the latest events in event queue */
 			mem_free += vmware_service_clear_event_data_keeptime(keep_time, strpool_sz, events);
 		}
 	}
