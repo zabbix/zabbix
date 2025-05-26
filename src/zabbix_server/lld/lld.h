@@ -121,10 +121,6 @@ typedef struct
 }
 zbx_lld_lifetime_t;
 
-
-void	lld_lifetime_init(zbx_lld_lifetime_t *lifetime, const char *key, zbx_uint64_t hostid, int type,
-		const char *duration);
-
 typedef struct
 {
 	const zbx_lld_entry_t		*data;
@@ -538,7 +534,7 @@ typedef struct
 }
 zbx_lld_item_ref_t;
 
-int	lld_resolve_macros(char **text, const void *resolver_data);
+int	lld_substitute_key_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
 int	zbx_substitute_lld_macros(char **data, const zbx_lld_entry_t *lld_obj, int flags, char *error,
 		size_t max_error_len);

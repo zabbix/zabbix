@@ -24,6 +24,7 @@
 #include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
+#include "zbxparam.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_macro_path_ptr, zbx_lld_macro_path_t *)
 
@@ -389,8 +390,7 @@ static int	substitute_item_query_lld_macros(const zbx_eval_context_t *ctx, const
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_substitute_key_macros(&query.key, NULL, NULL, lld_resolve_macros, lld_obj,
-			ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
+	if (SUCCEED != zbx_substitute_item_key_params(&query.key, err, sizeof(err), lld_substitute_key_cb, lld_obj))
 	{
 		*error = zbx_strdup(NULL, err);
 		goto out;
@@ -664,11 +664,32 @@ int	zbx_substitute_lld_macros(char **data, const zbx_lld_entry_t *lld_obj, int f
 	return ret;
 }
 
-int	lld_resolve_macros(char **text, const void *resolver_data)
+int	lld_substitute_key_cb(const char *data, int level, int num, int quoted, char **param, va_list args)
 {
-	const zbx_lld_entry_t	*entry = (const zbx_lld_entry_t *)resolver_data;
+	int	ret = SUCCEED;
 
-	return zbx_substitute_lld_macros(text, entry, ZBX_MACRO_ANY, NULL, 0);
+	/* Passed parameters */
+	const zbx_lld_entry_t	*entry = va_arg(args, const zbx_lld_entry_t *);
+
+	ZBX_UNUSED(num);
+
+	if (NULL == strchr(data, '{'))
+		return ret;
+
+	*param = zbx_strdup(NULL, data);
+
+	if (0 != level)
+		zbx_unquote_key_param(*param);
+
+	zbx_substitute_lld_macros(param, entry, ZBX_MACRO_ANY, NULL, 0);
+
+	if (0 != level)
+	{
+		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
+			zbx_free(*param);
+	}
+
+	return ret;
 }
 
 /********************************************************************************
@@ -731,8 +752,8 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 			char	*key = NULL, *host = NULL;
 
 			if (SUCCEED != zbx_parse_host_key(param, &host, &key) ||
-					SUCCEED != zbx_substitute_key_macros(&key, NULL, NULL, lld_resolve_macros,
-							lld_obj, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
+					SUCCEED != zbx_substitute_item_key_params(&key, NULL, 0, lld_substitute_key_cb,
+							lld_obj))
 			{
 				zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
 				zbx_free(host);

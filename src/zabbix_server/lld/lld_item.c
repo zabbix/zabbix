@@ -1781,8 +1781,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->key_ = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
 
-	if (FAIL == (ret = zbx_substitute_key_macros(&item->key_, NULL, NULL, lld_resolve_macros, lld_obj,
-			ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
+	if (FAIL == (ret = zbx_substitute_item_key_params(&item->key_, err, sizeof(err), lld_substitute_key_cb,
+			lld_obj)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
 	}
@@ -1833,8 +1833,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->snmp_oid_orig = NULL;
 
 	if (SUCCEED == ret && ITEM_TYPE_SNMP == item_prototype->type &&
-			FAIL == (ret = zbx_substitute_key_macros(&item->snmp_oid, NULL, NULL, lld_resolve_macros,
-					lld_obj, ZBX_MACRO_TYPE_SNMP_OID, err, sizeof(err))))
+			FAIL == (ret = zbx_substitute_snmp_oid_params(&item->snmp_oid, err, sizeof(err),
+					lld_substitute_key_cb, lld_obj)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in SNMP OID key parameters: %s.\n", err);
 	}
@@ -2021,8 +2021,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	{
 		buffer = zbx_strdup(buffer, item_prototype->key);
 
-		if (SUCCEED == zbx_substitute_key_macros(&buffer, NULL, NULL, lld_resolve_macros, lld_obj,
-				ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
+		if (SUCCEED == zbx_substitute_item_key_params(&buffer, err, sizeof(err), lld_substitute_key_cb,
+				lld_obj))
 		{
 			item->key_orig = item->key_;
 			item->key_ = buffer;
@@ -2132,8 +2132,9 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
 
-	if (ITEM_TYPE_SNMP == item_prototype->type && FAIL == zbx_substitute_key_macros(&buffer, NULL, NULL,
-			lld_resolve_macros, lld_obj, ZBX_MACRO_TYPE_SNMP_OID, err, sizeof(err)))
+	if (ITEM_TYPE_SNMP == item_prototype->type &&
+			FAIL == zbx_substitute_snmp_oid_params(&buffer, err, sizeof(err), lld_substitute_key_cb,
+					lld_obj))
 	{
 		*error = zbx_strdcatf(*error, "Cannot update item, error in SNMP OID key parameters: %s.\n", err);
 	}
@@ -2419,8 +2420,8 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 			{
 				item_stub.key_ = zbx_strdup(item_stub.key_, item_prototype->keys.values[k]);
 
-				if (SUCCEED != zbx_substitute_key_macros(&item_stub.key_, NULL, NULL,
-						lld_resolve_macros, lld_row->data, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
+				if (SUCCEED != zbx_substitute_item_key_params(&item_stub.key_, NULL, 0,
+						lld_substitute_key_cb, lld_row->data))
 				{
 					continue;
 				}

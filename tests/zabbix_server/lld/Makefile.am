@@ -107,6 +107,8 @@ LLD_LIBS = \
 	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \

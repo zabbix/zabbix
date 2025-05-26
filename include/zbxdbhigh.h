@@ -279,6 +279,7 @@ typedef struct ZBX_DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
+	char			*name;
 	char			*smtp_server;
 	char			*smtp_helo;
 	char			*smtp_email;

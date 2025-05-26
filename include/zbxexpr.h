@@ -18,7 +18,7 @@
 #include "zbxcommon.h"
 
 int	zbx_is_hostname_char(unsigned char c);
-int	zbx_is_key_char(unsigned char c);
+int	zbx_is_key_char(int c);
 int	zbx_is_function_char(unsigned char c);
 int	zbx_is_macro_char(unsigned char c);
 int	zbx_is_discovery_macro(const char *name);
@@ -291,5 +291,10 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 
 void	zbx_url_encode(const char *source, char **result);
 int	zbx_url_decode(const char *source, char **result);
+
+typedef int (*zbx_subst_func_t)(const char *data, int level, int num, int quoted, char **param, va_list args);
+
+int	zbx_substitute_snmp_oid_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...);
+int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...);
 
 #endif /* ZABBIX_EXPR_H */

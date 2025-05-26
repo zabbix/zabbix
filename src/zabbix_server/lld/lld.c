@@ -1069,8 +1069,8 @@ void	lld_row_free(zbx_lld_row_t *lld_row)
 	zbx_free(lld_row);
 }
 
-void	lld_lifetime_init(zbx_lld_lifetime_t *lifetime, const char *key, zbx_uint64_t hostid, int type,
-		const char *duration)
+static void	lld_lifetime_init(zbx_lld_lifetime_t *lifetime, const char *key, zbx_uint64_t hostid, int type,
+		const char *duration, zbx_dc_um_handle_t *um_handle)
 {
 	if (ZBX_LLD_LIFETIME_TYPE_AFTER != (lifetime->type = (unsigned char)type))
 	{
@@ -1080,8 +1080,7 @@ void	lld_lifetime_init(zbx_lld_lifetime_t *lifetime, const char *key, zbx_uint64
 
 	char	*duration_res = zbx_strdup(NULL, duration);
 
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&duration_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_dc_expand_user_and_func_macros(um_handle, &duration_res, &hostid, 1, NULL);
 
 	if (SUCCEED != zbx_is_time_suffix(duration_res, &lifetime->duration, ZBX_LENGTH_UNLIMITED))
 	{
@@ -1146,8 +1145,8 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		filter.evaltype = atoi(row[2]);
 		filter.expression = zbx_strdup(NULL, row[3]);
-		lld_lifetime_init(&lifetime, discovery_key, hostid, atoi(row[4]), row[5]);
-		lld_lifetime_init(&enabled_lifetime, discovery_key, hostid, atoi(row[6]), row[7]);
+		lld_lifetime_init(&lifetime, discovery_key, hostid, atoi(row[4]), row[5], um_handle);
+		lld_lifetime_init(&enabled_lifetime, discovery_key, hostid, atoi(row[6]), row[7], um_handle);
 	}
 	zbx_db_free_result(result);
 
