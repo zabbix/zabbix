@@ -356,10 +356,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = this.parent_discoveryid
-							? new URL('host_discovery_prototypes.php', location.href)
-								.searchParams.set('parent_discoveryid', this.parent_discoveryid)
-							: new URL('host_discovery.php', location.href);
+						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);
 

@@ -38,7 +38,7 @@
 					uncheckTableRows('host_discovery_prototypes_' + this.checkbox_hash, [], false);
 
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('host_discovery_prototypes.php', location.href);
+						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);
 
