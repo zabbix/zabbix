@@ -497,9 +497,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-					zabbix_log(LOG_LEVEL_INFORMATION, "BADGER STRATA: ->%s<-", value->str);
 					decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					if (0 != strlen(value->str))
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_INT:
