@@ -629,7 +629,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// delete host from maps
-		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids]);
+		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids], true);
 
 		// delete web scenarios
 		$db_httptests = DB::select('httptest', [

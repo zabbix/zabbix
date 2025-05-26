@@ -1747,7 +1747,7 @@ class CHost extends CHostGeneral {
 		DB::delete('sysmaps_elements', [
 			'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 			'elementid' => $hostids
-		]);
+		], true);
 
 		self::deleteHgSets($db_hosts);
 
