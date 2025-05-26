@@ -55,8 +55,8 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 2\. Set up personal or group notifications:
 
 2\.1 Personal notifications:
-  
-2\.1\.1 Obtain the chat ID of the user the bot should send messages to. The user should send `/getid` to `@myidbot` in the Telegram messenger.
+
+2\.1\.1 Retrieve the chat ID of the user the bot should send messages to. The user should send `/getid` to `@myidbot` in the Telegram messenger.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
 
@@ -66,22 +66,22 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 2\.2 Group notifications:
 
-2\.2\.1 Obtain the group ID of the group that the bot should send messages to. Add `@myidbot` and the bot created in step 1 to your group.
+2\.2\.1 Retrieve the group ID of the group that the bot should send messages to. Add `@myidbot` and the bot created in step 1 to your group.
 
 2\.2\.2 In the group chat, send: `/getgroupid@myidbot`.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
-2\.2\.3 If the bot is added to a supergroup and you want the bot to send messages to a specific topic instead of the default *General* channel, right click any message in that topic and click `Copy Message Link`. The copied link have the following format: `https://t.me/c/<short_group_id>/<topic_id>/<message_id>`, for example `https://t.me/c/1234567890/2/1`. In this example the topic ID will be `2`.
+2\.2\.3 If the bot is added to a supergroup and you want the bot to send messages to a specific topic instead of the default *General* channel, right-click any message in that topic and click *Copy Message Link*. The copied link will have the following format: `https://t.me/c/<short_group_id>/<topic_id>/<message_id>`, for example: `https://t.me/c/1234567890/2/1`. In this example, the topic ID is `2`.
 
 [![](images/thumb.5.png?raw=true)](images/5.png)
 
 Note:
-- Group ID is a negative number, for example: `-1234567890`
-- Supergroup ID is a negative number prefixed with `-100`, for example: `-1001234567890`
-- Public group or supergroup ID can also be specified in media type properties as a name prefixed by `@`, for example: `@MyGroupName`
-  
-3\. Depending on where you want to send notifications, copy and save the bot token, personal chat ID or group ID and topic ID (if you want to send messages to a specific supergroup topic), as you will need these later to set up media type in Zabbix.
+- The group ID is a negative number, for example: `-1234567890`.
+- The supergroup ID is a negative number prefixed with `-100`, for example: `-1001234567890`.
+- The public group or supergroup ID can also be specified in media type properties as a name prefixed by `@`, for example: `@MyGroupName`.
+
+3\. Depending on where you want to send notifications, copy and save the bot token, personal chat ID or group ID, and topic ID (if you want to send messages to a specific supergroup topic), as you will need these later to set up the media type in Zabbix.
 
 ## Zabbix configuration
 
@@ -94,20 +94,20 @@ Note:
 
 [![](images/thumb.6.png?raw=true)](images/6.png)
 
-More about formatting options of messages in Telegram Bot API documentation:
+Learn more about message formatting options in Telegram Bot API documentation:
 - [Markdown](https://core.telegram.org/bots/api#markdown-style)
 - [HTML](https://core.telegram.org/bots/api#html-style)
 - [MarkdownV2](https://core.telegram.org/bots/api#markdownv2-style)
 
-Note: Your Telegram-related actions should be separated from other notification actions (for example, SMS), otherwise you may get plain text alerts with raw Markdown/HTML tags if you use these in alerts subject and body.
+Note: Your Telegram-related actions should be separated from other notification types (e.g., SMS); otherwise, if you use Markdown or HTML in the alert subject or body, you may receive plain-text alerts with raw tags.
 
-3. Click the *Enabled* checkbox to enable the mediatype and click the *Update* button to save the webhook settings.
+3. Click the *Enabled* checkbox to enable the media type and click the *Update* button to save the webhook settings.
 
 4. Create a Zabbix user and add media:
-  - To create a new user,  go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
+  - To create a new user, go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
   - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to **Telegram**.
   - In the *Media* tab, click *Add* and select **Telegram** from the *Type* drop-down list.
-  - In the *Send to* field specify the Telegram user chat ID or group ID that you obtained during Telegram setup. If you want to send notifications to a specific topic in case of supergroup, specify the topic ID after the semicolon delimiter in the format `<group_id>:<topic_id>`, for example: `-1001234567890:2`, `@MyGroupName:2`.
+  - In the *Send to* field, specify the Telegram user chat ID or group ID that you retrieved during Telegram setup. To send notifications to a specific topic within a supergroup, specify the topic ID after the semicolon delimiter in the format `<group_id>:<topic_id>`, for example: `-1001234567890:2`, `@MyGroupName:2`.
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 [![](images/thumb.8.png?raw=true)](images/8.png)
