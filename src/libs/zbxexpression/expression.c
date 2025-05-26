@@ -109,7 +109,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	char				*expression = NULL;
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
-	zbx_user_names_t		*user_names = NULL;
 
 	ZBX_UNUSED(dc_item);
 	ZBX_UNUSED(history_data_item);
@@ -581,7 +580,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 
 	zbx_vc_flush_stats();
 
-	zbx_user_names_free(user_names);
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 

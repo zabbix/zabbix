@@ -574,9 +574,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 
 	if (0 != hostid)	/* script on host */
-		macro_type = ZBX_SCRIPT_MACROS;
+		macro_type = ZBX_SCRIPT_ON_HOST;
 	else
-		macro_type = (NULL != recovery_event) ? ZBX_SCRIPT_RECOVERY_MACROS : ZBX_SCRIPT_NORMAL_MACROS;
+		macro_type = (NULL != recovery_event) ? ZBX_SCRIPT_RECOVERY : ZBX_SCRIPT_NORMAL;
 
 	um_handle_masked = zbx_dc_open_user_macros_masked();
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
@@ -584,13 +584,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_type,
-				um_handle_unmasked, problem_event, recovery_event, user->userid, &host, tz))
+				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz))
 		{
 			goto fail;
 		}
 
 		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_type,
-				um_handle_masked, problem_event, recovery_event, user->userid, &host, tz))
+				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -602,7 +602,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		{
 			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,
 					sizeof(error), macro_type, um_handle_unmasked, problem_event, recovery_event,
-					user->userid, &host, tz))
+					&user->userid, &host, tz))
 			{
 				goto fail;
 			}

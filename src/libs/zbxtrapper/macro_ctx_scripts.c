@@ -261,9 +261,9 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	return ret;
 }
 
-int	substitute_script_macros(char **data, char *error, int maxerrlen, int macro_type,
+int	substitute_script_macros(char **data, char *error, int maxerrlen, int script_type,
 		zbx_dc_um_handle_t * um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t userid, const zbx_dc_host_t *dc_host, const char *tz)
+		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz)
 {
 	int	ret = SUCCEED;
 
@@ -275,21 +275,23 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int macro_
 	zbx_db_event			*cause_event = NULL;
 	zbx_db_event			*cause_recovery_event = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&item_hosts);
 
-	switch (macro_type)
+	switch (script_type)
 	{
-		case ZBX_SCRIPT_MACROS:
+		case ZBX_SCRIPT_ON_HOST:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_host_script_resolv, um_handle,
 					&userid, dc_host, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
-		case ZBX_SCRIPT_NORMAL_MACROS:
+		case ZBX_SCRIPT_NORMAL:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
 					event, r_event, &userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
-		case ZBX_SCRIPT_RECOVERY_MACROS:
+		case ZBX_SCRIPT_RECOVERY:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_recovery_script_resolv, um_handle,
 					event, r_event, &userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
@@ -302,6 +304,8 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int macro_
 
 	if (NULL != user_names)
 		zbx_user_names_free(user_names);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }

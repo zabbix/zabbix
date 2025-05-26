@@ -203,9 +203,9 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	return ret;
 }
 
-int	substitute_message_macros(char **data, char *error, int maxerrlen, int macro_type,
-		zbx_dc_um_handle_t * um_handle, zbx_uint64_t actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, zbx_uint64_t userid, const zbx_dc_host_t *dc_host,
+int	substitute_message_macros(char **data, char *error, int maxerrlen, int message_type,
+		zbx_dc_um_handle_t * um_handle, zbx_uint64_t *actionid, const zbx_db_event *event,
+		const zbx_db_event *r_event, zbx_uint64_t *userid, const zbx_dc_host_t *dc_host,
 		const zbx_db_alert *alert, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, const zbx_db_acknowledge *ack)
 {
@@ -218,6 +218,8 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int macro
 	zbx_db_event			*cause_event = NULL;
 	zbx_db_event			*cause_recovery_event = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&item_hosts);
 
 	const zbx_db_event	*c_event = ((NULL != r_event) ? r_event : event);
@@ -225,29 +227,31 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int macro
 	if (NULL != c_event && EVENT_SOURCE_TRIGGERS == c_event->source)
 		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 
-	switch (macro_type)
+	switch (message_type)
 	{
-		case ZBX_MESSAGE_NORMAL_MACROS:
+		case ZBX_MESSAGE_NORMAL:
 			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
-					&macro_message_normal_resolv, um_handle, actionid, event, r_event, &userid,
-					dc_host, alert, service_alarm, service, tz, ack, item_hosts, &trigger_hosts,
-					&cause_event, &cause_recovery_event);
-			break;
-		case ZBX_MESSAGE_UPDATE_MACROS:
-			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
-					&macro_message_update_resolv, um_handle, actionid, event, r_event, &userid,
+					&macro_message_normal_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, item_hosts, &trigger_hosts,
 					&cause_event, &cause_recovery_event);
 			break;
-		case ZBX_MESSAGE_RECOVERY_MACROS:
+		case ZBX_MESSAGE_UPDATE:
 			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
-					&macro_message_recovery_resolv, um_handle, actionid, event, r_event, &userid,
+					&macro_message_update_resolv, um_handle, actionid, event, r_event, userid,
+					dc_host, alert, service_alarm, service, tz, ack, item_hosts, &trigger_hosts,
+					&cause_event, &cause_recovery_event);
+			break;
+		case ZBX_MESSAGE_RECOVERY:
+			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
+					&macro_message_recovery_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, item_hosts, &trigger_hosts,
 					&cause_event, &cause_recovery_event);
 			break;
 	}
 
 	zbx_vector_uint64_destroy(&item_hosts);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
