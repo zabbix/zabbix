@@ -304,6 +304,7 @@ static void	add_history_bin(const zbx_vector_dc_history_ptr_t *history)
 		if (ITEM_VALUE_TYPE_BIN != h->value_type)
 			continue;
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER ADD_HISTORY_BIN: ->%s<-", h->value.str);
 		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
 	}
 
