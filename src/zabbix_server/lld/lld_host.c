@@ -100,8 +100,8 @@ typedef struct
 	unsigned char	version_orig;
 	unsigned char	bulk;
 	unsigned char	bulk_orig;
-	zbx_uint64_t	max_repetitions;
-	zbx_uint64_t	max_repetitions_orig;
+	int		max_repetitions;
+	int		max_repetitions_orig;
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE		__UINT64_C(0x00000001)	/* interface_snmp.type */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK		__UINT64_C(0x00000002)	/* interface_snmp.bulk */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY	__UINT64_C(0x00000004)	/* interface_snmp.community */
@@ -1473,7 +1473,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 						ZBX_AUDIT_ACTION_UPDATE, hostid,
 						(NULL == host->host_orig) ? host->host : host->host_orig, 0);
 
-				zbx_audit_hostgroup_update_json_delete_group(audit_entry, hostgroupid, groupid);
+				zbx_audit_hostgroup_update_json_delete_group(audit_entry, groupid);
 			}
 			else
 			{

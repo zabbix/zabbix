@@ -1006,15 +1006,14 @@ const char	*zbx_audit_host_group_key(zbx_uint64_t groupid, const char *field, ch
 	return key;
 }
 
-void	zbx_audit_hostgroup_update_json_delete_group(zbx_audit_entry_t *audit_entry, zbx_uint64_t hostgroupid,
-		zbx_uint64_t groupid)
+void	zbx_audit_hostgroup_update_json_delete_group(zbx_audit_entry_t *audit_entry, zbx_uint64_t groupid)
 {
 	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	if (NULL == audit_entry)
 		return;
 
-	zbx_snprintf(key, sizeof(key), "groups[" ZBX_FS_UI64 "]", hostgroupid);
+	zbx_snprintf(key, sizeof(key), "groups[" ZBX_FS_UI64 "]", groupid);
 	zbx_audit_entry_delete(audit_entry, key);
 }
 

@@ -227,8 +227,7 @@ const char	*zbx_audit_host_tag_key(zbx_uint64_t tagid, const char *field, char *
 const char	*zbx_audit_host_group(zbx_uint64_t groupid, char *key, size_t key_size);
 const char	*zbx_audit_host_group_key(zbx_uint64_t groupid, const char *field, char *key, size_t key_size);
 
-void	zbx_audit_hostgroup_update_json_delete_group(zbx_audit_entry_t *audit_entry, zbx_uint64_t hostgroupid,
-		zbx_uint64_t groupid);
+void	zbx_audit_hostgroup_update_json_delete_group(zbx_audit_entry_t *audit_entry, zbx_uint64_t groupid);
 zbx_audit_entry_t	*zbx_audit_hostgroup_get_or_create_entry(int audit_context_mode, int audit_action,
 		zbx_uint64_t groupid, const char *name);
 
