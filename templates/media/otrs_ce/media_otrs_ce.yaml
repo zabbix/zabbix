@@ -631,7 +631,7 @@ zabbix_export:
         
         3. Create a new customer user. Select the ID of the customer that you created in the previous step.
         
-        4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the "RW" permission for the group that this ticket queue belongs to. In the example below, if you want to use the "Misc" queue, you must set the the "RW" permission for the group "users".
+        4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the "RW" permission for the group that this ticket queue belongs to. In the example below, if you want to use the "Misc" queue, you must set the "RW" permission for the group "users".
         
         Zabbix configuration:
         
