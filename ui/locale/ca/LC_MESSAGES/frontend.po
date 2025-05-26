@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-01 18:38+0000\n"
+"PO-Revision-Date: 2025-05-15 20:22+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1825,23 +1825,23 @@ msgstr "Autorització"
 
 #: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
 msgid "Authorization code"
-msgstr ""
+msgstr "Codi d'autorització"
 
 #: app/views/oauth.edit.php:136
 msgid "Authorization endpoint"
-msgstr ""
+msgstr "Punt final d'autorització"
 
 #: app/views/oauth.edit.php:148
 msgid "Authorization parameters"
-msgstr ""
+msgstr "Paràmetres d'autorització"
 
 #: app/views/oauth.edit.php:137
 msgid "Authorization server URL for requesting user authorization."
-msgstr ""
+msgstr "URL del servidor d'autorització per demanar l'autorització de l'usuari."
 
 #: app/views/oauth.edit.php:189
 msgid "Authorization server URL to exchange the authorization code for an access token."
-msgstr ""
+msgstr "URL del servidor d'autorització per bescanviar el codi d'autorització per un token d'accés."
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
@@ -2249,7 +2249,7 @@ msgstr "S'espera un CUID"
 
 #: app/controllers/CControllerOauthAuthorize.php:135
 msgid "CURL Error"
-msgstr ""
+msgstr "Error de CURL"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3408,7 +3408,7 @@ msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'ele
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
-msgstr ""
+msgstr "No es pot pas obtindre el codi d'autorització."
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3778,7 +3778,7 @@ msgstr "No es pot obrir la URL"
 
 #: app/views/oauth.edit.php:229
 msgid "Cannot open authorization popup window."
-msgstr ""
+msgstr "No es pot obrir la finestra emergent d'autorització."
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4593,7 +4593,7 @@ msgstr "No s'ha trobat la classe %1$s per a l'acció %2$s."
 
 #: jsLoader.php:551
 msgid "Clear"
-msgstr ""
+msgstr "Netejar"
 
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
@@ -4818,7 +4818,7 @@ msgstr "Vista compacta"
 
 #: app/views/oauth.edit.php:228
 msgid "Complete authentication to get tokens."
-msgstr ""
+msgstr "Acabeu l'autenticació per obtindre tokens."
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5048,7 +5048,7 @@ msgstr "Configuració actualitzada"
 
 #: app/views/mediatype.edit.php:184
 msgid "Configure"
-msgstr ""
+msgstr "Configurar"
 
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
@@ -5064,7 +5064,7 @@ msgstr "Configurar el provisionament JIT"
 #: app/views/mediatype.edit.php:155
 #, c-format
 msgid "Configured %1$s ago"
-msgstr ""
+msgstr "Configurat fa %1$s"
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6875,7 +6875,7 @@ msgstr "Mida de la descripció"
 
 #: app/views/oauth.edit.php:46
 msgid "Destination URL where successful authorization redirects."
-msgstr ""
+msgstr "URL de destí on redirigeix una autorització correcta."
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11625,7 +11625,7 @@ msgstr "Configuració MFA no vàlida"
 #: app/controllers/CControllerOauthCheck.php:44
 #: app/controllers/CControllerOauthEdit.php:43
 msgid "Invalid OAuth configuration"
-msgstr ""
+msgstr "Configuració d'OAuth no vàlida"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -14508,7 +14508,7 @@ msgstr "Nou mapatge del tipus de suport"
 
 #: app/views/oauth.edit.php:237
 msgid "New oauth"
-msgstr ""
+msgstr "Nova oauth"
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14647,7 +14647,7 @@ msgstr "Sense canvis."
 
 #: jsLoader.php:553
 msgid "No color"
-msgstr ""
+msgstr "Sense color"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15438,15 +15438,15 @@ msgstr "Numèric (sense signar)"
 
 #: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
 msgid "OAuth"
-msgstr ""
+msgstr "OAuth"
 
 #: app/controllers/CControllerOauthAuthorize.php:155
 msgid "OAuth response missing mandatory fields."
-msgstr ""
+msgstr "Manquen els camps obligatoris a la resposta d'OAuth."
 
 #: app/views/mediatype.edit.php:177
 msgid "OAuth tokens"
-msgstr ""
+msgstr "Tokens d'OAuth"
 
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
@@ -16205,12 +16205,12 @@ msgstr "Paginador"
 
 #: jsLoader.php:554
 msgid "Palette"
-msgstr ""
+msgstr "Paleta"
 
 #: jsLoader.php:555
 #, c-format
 msgid "Palette %1$d"
-msgstr ""
+msgstr "Paleta %1$d"
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17378,7 +17378,7 @@ msgstr "Rectangle"
 
 #: app/views/oauth.edit.php:44
 msgid "Redirection endpoint"
-msgstr ""
+msgstr "Punt final de redirecció"
 
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
@@ -17417,7 +17417,7 @@ msgstr "Interval de recàrrega"
 
 #: app/views/mediatype.edit.php:163
 msgid "Refresh token is invalid or outdated."
-msgstr ""
+msgstr "El token d'actualització no és vàlid o és obsolet."
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18816,7 +18816,7 @@ msgstr "Tria el prototip"
 
 #: app/views/oauth.edit.php:171
 msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
-msgstr ""
+msgstr "Trieu el mètode de recuperació: automàticament a través d'una pàgina de redirecció o manualment si la recuperació automàtica falla."
 
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
@@ -19623,7 +19623,7 @@ msgstr "Darrera verificació d'actualització del programari"
 
 #: jsLoader.php:556
 msgid "Solid color"
-msgstr ""
+msgstr "Color sòlid"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20567,7 +20567,7 @@ msgstr "Les plantilles enllaçades pel descobriment de l'equip no es poden pas d
 
 #: app/views/oauth.edit.php:169
 msgid "Temporary token to exchange for an access token."
-msgstr ""
+msgstr "Token temporal per bescanviar per un token d'accés."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
@@ -20690,7 +20690,7 @@ msgstr "Ja no es descobreix %1$s i %2$s."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
-msgstr ""
+msgstr "L'URL ha de complir amb la política del proveïdor d'OAuth."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -20711,11 +20711,11 @@ msgstr "El temps mitjà que triga una escriptura a disc virtual, \"url\" - URL d
 
 #: app/views/oauth.edit.php:70
 msgid "The client identifier registered within the authorization server."
-msgstr ""
+msgstr "L'identificador de client registrat al servidor d'autorització."
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
-msgstr ""
+msgstr "El secret del client registrat dins del servidor d'autorització."
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21155,11 +21155,11 @@ msgstr "Edició del token"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Punt final del token"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
-msgstr ""
+msgstr "Paràmetres del token"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21951,7 +21951,7 @@ msgstr "Desfer el reconeixement del problema."
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
-msgstr ""
+msgstr "Codi d'estat de resposta HTTP inesperat."
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24730,11 +24730,11 @@ msgstr "fent pampallugues"
 
 #: include/classes/api/services/CMediatype.php:680
 msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
-msgstr ""
+msgstr "Cal especificar tant \"access_token\" com \"access_expires_in\" quan es marca el token d'accés com a vàlid."
 
 #: include/classes/api/services/CMediatype.php:695
 msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
-msgstr ""
+msgstr "tant \"access_token\" com \"access_expires_in\" haurien de ser presents o absents"
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -26456,7 +26456,7 @@ msgstr "ja existeix una plantilla amb el mateix UUID"
 
 #: include/classes/api/services/CMediatype.php:688
 msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
-msgstr ""
+msgstr "Cal especificar el paràmetre \"refresh_token\" quan es marca el token d'actualització com a vàlid."
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831

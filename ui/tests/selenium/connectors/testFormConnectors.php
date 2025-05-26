@@ -1405,6 +1405,6 @@ class testFormConnectors extends CWebTest {
 			}
 		}
 
-		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::find()->waitUntilReady()->one()->close();
 	}
 }
