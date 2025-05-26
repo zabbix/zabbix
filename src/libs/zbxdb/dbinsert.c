@@ -340,7 +340,15 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
 
 #if defined (HAVE_MYSQL)
-	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	if (0 == binary_data_len)
+	{
+		int k = 0x7fffffff;
+		k += 9;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+	else
+		escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
 #endif
 	dbconn_escape_bin(db, binary_data, &escaped_binary, binary_data_len);
 
