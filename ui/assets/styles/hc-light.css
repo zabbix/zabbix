@@ -2366,7 +2366,7 @@ div[data-field-type="set"].has-error {
 
 .macro-input-group textarea.has-error, .macro-input-group textarea.has-error:focus {
   border-width: 1px 0 1px 1px; }
-.macro-input-group .has-error + .btn-und, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
+.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
   border-color: #ad1f1f; }
 .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle {
   border-color: #ad1f1f; }

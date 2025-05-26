@@ -109,7 +109,7 @@ div[data-field-type="set"] {
 	}
 
 	.has-error {
-		& + .btn-und,
+		& + .btn-undo,
 		&:focus + .btn-undo,
 		& + .btn-undo:focus {
 			border-color: $error;
