@@ -33,33 +33,36 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			$options = [
-				'output' => ['itemid', 'name', 'hostid', 'flags'],
-				'selectDiscoveryData' => ['parent_itemid'],
-				'selectHosts' => ['status'],
-				'itemids' => $this->getInput('parent_discoveryid'),
-				'editable' => true
-			];
-
-			$this->parent_discovery =
-				API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
-
-			$ret = (bool) $this->parent_discovery;
-
-			if (!$ret) {
-				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
-			}
-			else {
-				$this->parent_discovery = reset($this->parent_discovery);
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		if (!parent::checkPermissions()) {
+			return false;
+		}
+
+		$options = [
+			'output' => ['itemid', 'name', 'hostid', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid'],
+			'selectHosts' => ['status'],
+			'itemids' => $this->getInput('parent_discoveryid'),
+			'editable' => true
+		];
+
+		$this->parent_discovery =
+			API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+		if (!$this->parent_discovery) {
+			return false;
+		}
+
+		$this->parent_discovery = reset($this->parent_discovery);
+
+		return true;
 	}
 
 	public function doAction() {
@@ -123,8 +126,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			'selectDiscoveryData' => ['parent_itemid'],
 			'editable' => true,
 			'sortfield' => $profile['sort'],
-			'limit' => $limit,
-			'preservekeys' => true
+			'limit' => $limit
 		]);
 
 		$items = expandItemNamesWithMasterItems($items, 'itemprototypes');

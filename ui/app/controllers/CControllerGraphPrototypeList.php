@@ -123,8 +123,7 @@ class CControllerGraphPrototypeList extends CController {
 		$data['graphs'] = API::GraphPrototype()->get([
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover', 'flags'],
 			'selectDiscoveryData' => ['parent_graphid'],
-			'graphids' => array_column($data['graphs'], 'graphid'),
-			'preservekeys' => true
+			'graphids' => array_column($data['graphs'], 'graphid')
 		]);
 
 		if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {

@@ -613,15 +613,14 @@ else {
 	// get items
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['hostPrototypes'] = API::HostPrototype()->get([
-		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
 		'selectTags' => ['tag', 'value'],
 		'selectDiscoveryData' => ['parent_hostid'],
-		'editable' => true,
+		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortField,
 		'limit' => $limit,
-		'preservekeys' => true
+		'editable' => true
 	]);
 
 	if ($parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {

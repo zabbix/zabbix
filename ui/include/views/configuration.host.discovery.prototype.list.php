@@ -19,7 +19,7 @@
  * @var array $data
  */
 
-require_once dirname(__FILE__).'/js/configuration.host.discovery.prototype.list.js.php';
+require_once __DIR__.'/js/configuration.host.discovery.prototype.list.js.php';
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Discovery prototypes'))

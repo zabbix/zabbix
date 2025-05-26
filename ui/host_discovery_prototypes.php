@@ -14,15 +14,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/items.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once __DIR__.'/include/config.inc.php';
+require_once __DIR__.'/include/hosts.inc.php';
+require_once __DIR__.'/include/items.inc.php';
+require_once __DIR__.'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery prototypes');
 $page['file'] = 'host_discovery_prototypes.php';
 
-require_once dirname(__FILE__).'/include/page_header.php';
+require_once __DIR__.'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 
@@ -824,7 +824,6 @@ else {
 
 	// Select LLD prototypes.
 	$options = [
-		'discoveryids' => $parent_discovery['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 		'selectItems' => API_OUTPUT_COUNT,
@@ -833,11 +832,11 @@ else {
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryData' => ['parent_itemid'],
-		'editable' => true,
+		'discoveryids' => $parent_discovery['itemid'],
 		'templated' => ($data['context'] === 'template'),
 		'sortfield' => $sort_field,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
-		'preservekeys' => true
+		'editable' => true
 	];
 
 	$data['discoveries'] = API::DiscoveryRulePrototype()->get($options);
@@ -884,4 +883,4 @@ else {
 	echo (new CView('configuration.host.discovery.prototype.list', $data))->getOutput();
 }
 
-require_once dirname(__FILE__).'/include/page_footer.php';
+require_once __DIR__.'/include/page_footer.php';
