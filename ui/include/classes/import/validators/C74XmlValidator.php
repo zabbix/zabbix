@@ -626,18 +626,21 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 							'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
 							'dns' =>					['type' => XML_STRING, 'default' => ''],
 							'port' =>					['type' => XML_STRING, 'default' => '10050'],
-							'details' =>				['type' => XML_ARRAY, 'rules' => [
-								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-								'community' =>				['type' => XML_STRING, 'default' => ''],
-								'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
-								'contextname' =>			['type' => XML_STRING, 'default' => ''],
-								'securityname' =>			['type' => XML_STRING, 'default' => ''],
-								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-								'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-								'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-								'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+							'details' =>				['type' => XML_MULTIPLE, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
+									'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
+									'community' =>				['type' => XML_STRING, 'default' => ''],
+									'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
+									'contextname' =>			['type' => XML_STRING, 'default' => ''],
+									'securityname' =>			['type' => XML_STRING, 'default' => ''],
+									'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+									'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
+									'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
+									'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
+									'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
+									'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
@@ -3329,11 +3332,11 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
 					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
-					'redirection_url' =>		['type' => XML_STRING],
-					'client_id' =>				['type' => XML_STRING],
-					'client_secret' =>			['type' => XML_STRING],
-					'authorization_url' =>		['type' => XML_STRING],
-					'token_url' =>				['type' => XML_STRING],
+					'redirection_url' =>		['type' => XML_STRING, 'default' => ''],
+					'client_id' =>				['type' => XML_STRING, 'default' => ''],
+					'client_secret' =>			['type' => XML_STRING, 'default' => ''],
+					'authorization_url' =>		['type' => XML_STRING, 'default' => ''],
+					'token_url' =>				['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
 					'attempts' =>				['type' => XML_STRING, 'default' => '3'],
