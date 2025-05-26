@@ -1628,7 +1628,12 @@ static void 	lld_override_data_save(zbx_uint64_t itemid, const zbx_lld_override_
 static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t itemid,
 		zbx_sync_row_t *row)
 {
-	char	delim = ' ';
+	#define KEY(s)	zbx_audit_lldrule_override(row->rowid, s, key, sizeof(key))
+
+	char			key[AUDIT_DETAILS_KEY_LEN], delim = ' ';
+	zbx_audit_entry_t	*audit_entry;
+
+	audit_entry = zbx_audit_item_get_entry(ZBX_AUDIT_LLD_CONTEXT, itemid);
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update lld_override set");
 
@@ -1655,22 +1660,15 @@ static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%d", atoi(row->cols[i]));
 		}
 
-		if (LLD_OVERRIDE_COL_FORMULA == i || LLD_OVERRIDE_COL_EVALTYPE == i)
-		{
-			zbx_audit_discovery_rule_update_json_update_lld_override_filter_str(ZBX_AUDIT_LLD_CONTEXT,
-					itemid, row->rowid, fields[i], row->cols_orig[i], row->cols[i]);
-		}
-		else
-		{
-			zbx_audit_discovery_rule_update_json_update_lld_override_str(ZBX_AUDIT_LLD_CONTEXT,
-					itemid, row->rowid, fields[i], row->cols_orig[i], row->cols[i]);
-		}
+		zbx_audit_entry_update_string(audit_entry, KEY(fields[i]), row->cols_orig[i], row->cols[i]);
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where lld_overrideid=" ZBX_FS_UI64
 			";\n", row->rowid);
 
 	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+#undef KEY
 }
 
 /******************************************************************************
@@ -1702,6 +1700,8 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 
 	for (int i = 0; i < items->values_num; i++)
 	{
+		zbx_audit_entry_t	*audit_entry = NULL;
+
 		item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
@@ -1718,8 +1718,10 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 			{
 				zbx_vector_uint64_append(&delids_override, row->rowid);
 
-				zbx_audit_discovery_rule_update_json_delete_lld_override(ZBX_AUDIT_LLD_CONTEXT,
-						item->itemid, row->rowid);
+				if (NULL == audit_entry)
+					audit_entry = zbx_audit_item_get_entry(ZBX_AUDIT_LLD_CONTEXT, item->itemid);
+
+				zbx_audit_entry_update_json_delete_lld_override(audit_entry, row->rowid);
 			}
 			else if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
@@ -1838,15 +1840,17 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 
 			if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 			{
+				zbx_audit_entry_t	*audit_entry;
+
 				row->rowid = ((zbx_lld_override_data_t *)row->data)->overrideid = overrideid++;
 
 				zbx_db_insert_add_values(&db_insert, row->rowid, item->itemid, row->cols[0],
 						atoi(row->cols[1]), atoi(row->cols[2]), atoi(row->cols[3]),
 						row->cols[4]);
 
-				zbx_audit_discovery_rule_update_json_add_lld_override(ZBX_AUDIT_LLD_CONTEXT,
-						item->itemid, row->rowid, row->cols[0], atoi(row->cols[1]),
-						atoi(row->cols[2]));
+				audit_entry = zbx_audit_item_get_entry(ZBX_AUDIT_LLD_CONTEXT, item->itemid);
+				zbx_audit_entry_update_json_add_lld_override(audit_entry, row->rowid, row->cols[0],
+						atoi(row->cols[1]), atoi(row->cols[2]));
 			}
 			else if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE))
 			{

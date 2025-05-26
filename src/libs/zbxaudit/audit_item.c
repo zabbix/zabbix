@@ -656,34 +656,9 @@ void   zbx_audit_discovery_rule_update_json_delete_lld_macro_path(int audit_cont
 void	zbx_audit_discovery_rule_update_json_add_lld_override(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, const char *name, int step, int stop)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
-		audit_key_step[AUDIT_DETAILS_KEY_LEN], audit_key_stop[AUDIT_DETAILS_KEY_LEN],
-		audit_key_lld_overrideid[AUDIT_DETAILS_KEY_LEN];
+	zbx_audit_entry_t	*audit_entry = zbx_audit_item_get_entry(audit_context_mode, itemid);
 
-	RETURN_IF_AUDIT_OFF(audit_context_mode);
-
-	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.overrides[" ZBX_FS_UI64 "]", overrideid);
-	zbx_snprintf(audit_key_lld_overrideid, sizeof(audit_key_lld_overrideid), "discoveryrule.overrides[" ZBX_FS_UI64
-			"].lld_overrideid", overrideid);
-	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "discoveryrule.overrides[" ZBX_FS_UI64 "].name",
-			overrideid);
-	zbx_snprintf(audit_key_step, sizeof(audit_key_step), "discoveryrule.overrides[" ZBX_FS_UI64 "].step",
-			overrideid);
-	zbx_snprintf(audit_key_stop, sizeof(audit_key_stop), "discoveryrule.overrides[" ZBX_FS_UI64 "].stop",
-			overrideid);
-
-#define AUDIT_TABLE_NAME	"lld_override"
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
-
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-			audit_key_lld_overrideid, overrideid, NULL, NULL);
-	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name,
-			AUDIT_TABLE_NAME, "name");
-	zbx_audit_update_json_append_int(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_step, step,
-			AUDIT_TABLE_NAME, "step");
-	zbx_audit_update_json_append_int(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_stop, stop,
-			AUDIT_TABLE_NAME, "stop");
-#undef AUDIT_TABLE_NAME
+	zbx_audit_entry_update_json_add_lld_override(audit_entry, overrideid, name, step, stop);
 }
 
 void	zbx_audit_discovery_rule_update_json_update_lld_override_str(int audit_context_mode, zbx_uint64_t itemid,
@@ -702,13 +677,9 @@ void	zbx_audit_discovery_rule_update_json_update_lld_override_str(int audit_cont
 void	zbx_audit_discovery_rule_update_json_delete_lld_override(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid)
 {
-	char	buf[AUDIT_DETAILS_KEY_LEN];
+	zbx_audit_entry_t	*audit_entry = zbx_audit_item_get_entry(audit_context_mode, itemid);
 
-	RETURN_IF_AUDIT_OFF(audit_context_mode);
-
-	zbx_snprintf(buf, sizeof(buf), "discoveryrule.overrides[" ZBX_FS_UI64 "]", overrideid);
-
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, buf);
+	zbx_audit_entry_update_json_delete_lld_override(audit_entry, overrideid);
 }
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(int audit_context_mode, zbx_uint64_t itemid,
@@ -1403,6 +1374,17 @@ const char	*zbx_audit_lldrule_filter_condition(zbx_uint64_t filterid, const char
 	return key;
 }
 
+const char	*zbx_audit_lldrule_override(zbx_uint64_t overrideid, const char *field, char *key, size_t key_size)
+{
+	size_t	offset = zbx_snprintf(key, key_size, "overrides[" ZBX_FS_UI64 "]",
+			overrideid);
+
+	if (NULL != field)
+		zbx_snprintf(key + offset, key_size - offset, ".%s", field);
+
+	return key;
+}
+
 const char	*zbx_audit_lldrule_override_filter_condition(zbx_uint64_t overrideid, zbx_uint64_t filterid,
 		const char *field, char *key, size_t key_size)
 {
@@ -1432,7 +1414,7 @@ const char	*zbx_audit_lldrule_override_operation_optag(zbx_uint64_t overrideid, 
 {
 	size_t	offset;
 
-	zbx_audit_lldrule_override_operation(overrideid, operationid, NULL, key, sizeof(key));
+	zbx_audit_lldrule_override_operation(overrideid, operationid, NULL, key, key_size);
 	offset = strlen(key);
 
 	offset += zbx_snprintf(key + offset, key_size - offset, ".optags[" ZBX_FS_UI64 "]", optagid);
@@ -1448,7 +1430,7 @@ const char	*zbx_audit_lldrule_override_operation_optemplate(zbx_uint64_t overrid
 {
 	size_t	offset;
 
-	zbx_audit_lldrule_override_operation(overrideid, operationid, NULL, key, sizeof(key));
+	zbx_audit_lldrule_override_operation(overrideid, operationid, NULL, key, key_size);
 	offset = strlen(key);
 
 	offset += zbx_snprintf(key + offset, key_size - offset, ".optemplates[" ZBX_FS_UI64 "]", optemplateid);
@@ -1655,6 +1637,39 @@ void	zbx_audit_entry_update_json_add_lld_override_optemplate(zbx_audit_entry_t *
 
 	zbx_audit_entry_add(audit_entry, KEY(NULL));
 	zbx_audit_entry_add_uint64(audit_entry, AUDIT_TABLE_NAME, "templateid", KEY("templateid"), templateid);
+
+#undef AUDIT_TABLE_NAME
+#undef KEY
+}
+
+void	zbx_audit_entry_update_json_delete_lld_override(zbx_audit_entry_t *audit_entry,
+		zbx_uint64_t overrideid)
+{
+	if (NULL == audit_entry)
+		return;
+
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_audit_lldrule_override(overrideid, NULL, key, sizeof(key));
+	zbx_audit_entry_delete(audit_entry, key);
+}
+
+void	zbx_audit_entry_update_json_add_lld_override(zbx_audit_entry_t *audit_entry, zbx_uint64_t overrideid,
+		const char *name, int step, int stop)
+{
+#define KEY(s) zbx_audit_lldrule_override(overrideid, s, key, sizeof(key))
+#define AUDIT_TABLE_NAME	"lld_override_optag"
+
+	if (NULL == audit_entry)
+		return;
+
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_audit_entry_add(audit_entry, KEY(NULL));
+	zbx_audit_entry_add_uint64(audit_entry, NULL, NULL, KEY("lld_overrideid"), overrideid);
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "name", KEY("name"), name);
+	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "step", KEY("step"), step);
+	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "stop", KEY("stop"), stop);
 
 #undef AUDIT_TABLE_NAME
 #undef KEY
