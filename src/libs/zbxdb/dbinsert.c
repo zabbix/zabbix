@@ -346,10 +346,10 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 #endif
 	dbconn_escape_bin(db, binary_data, &escaped_binary, binary_data_len);
 
+	zbx_free(*sql_insert_data);
 	*sql_insert_data = escaped_binary;
 out:
 	zbx_free(binary_data);
-	zbx_free(*sql_insert_data);
 }
 #else
 static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_insert_data)
