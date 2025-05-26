@@ -1953,7 +1953,9 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->cancelEditing();
+			// Change dashboard from cancelEditing() to save() to check deadlock issue.
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Write new name to update widget for update scenario.
 			if ($update) {

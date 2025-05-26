@@ -1,10 +1,23 @@
 Changes for 7.4.0rc1
 
 New features:
+.........T [ZBXNEXT-9784] added support multiple websites in Website certificate by Zabbix agent 2 template (abakaldin)
 A.F....PS. [ZBXNEXT-9805] added OAuth support for email media type (askolmeisters, gcalenko)
 ..F....... [ZBXNEXT-8919] implemented new color picker in Graph and Pie chart widgets, added palette feature (apoga)
 
 Bug fixes:
+...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+.......P.. [ZBX-26428] fixed Zabbix proxy sync error on global macros update (sboidenko)
+...G...... [ZBX-26114] improved Zabbix agent 2 accept rate on high RTT (sjurgensons)
+...G...... [ZBX-25526] made Zabbix agent 2 proc.num, proc.cpu.util, proc.get and proc.mem items behave consistently with Zabbix agent when non-existing user is specified (arimdjonoks)
+.........T [ZBX-26369] added ticket type parameter to OTRS CE media type, updated documentation, added missing web service file (drasikhov)
+.........T [ZBX-25684] updated regex in Asterisk by HTTP template to work with enabled maxcalls option (drasikhov)
+.......PS. [ZBX-26297] improved server warning log message for out of order value identifier detection between Zabbix server and Zabbix proxy (rtrizna)
+.........T [ZBX-25538] updated uptime triggers in templates (drasikhov)
+..F....... [ZBX-26113] updated the link to Latest data in the item configuration form (msnihach)
+..F....... [ZBX-26296] removed monospace font style from description field (msnihach)
+..F....... [ZBX-26377] added the "parent_discoveryid" argument into paging data (msnihach)
+........S. [ZBX-26256] fixed scheduled report not being created when start date is set in the future and beyond the current cycle (askolmeisters)
 ..F....... [ZBX-26064] enabled the "Remove" link for LDAP users manually added media (rgontarski)
 .......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
 ..F....... [ZBX-26263] fixed field focus on label click (msnihach)
@@ -158,6 +171,24 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.8rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+...G...... [ZBX-26114] improved Zabbix agent 2 accept rate on high RTT (sjurgensons)
+...G...... [ZBX-25526] made Zabbix agent 2 proc.num, proc.cpu.util, proc.get and proc.mem items behave consistently with Zabbix agent when non-existing user is specified (arimdjonoks)
+.........T [ZBX-26369] added ticket type parameter to OTRS CE media type, updated documentation, added missing web service file (drasikhov)
+.......PS. [ZBX-26297] improved server warning log message for out of order value identifier detection between Zabbix server and Zabbix proxy (rtrizna)
+.........T [ZBX-25684] updated regex in Asterisk by HTTP template to work with enabled maxcalls option (drasikhov)
+.........T [ZBX-25538] updated uptime triggers in templates (drasikhov)
+..F....... [ZBX-26263] fixed field focus on label click (msnihach)
+..F....... [ZBX-26113] updated the link to Latest data in the item configuration form (msnihach)
+..F....... [ZBX-26377] added the "parent_discoveryid" argument into paging data (msnihach)
+........S. [ZBX-26256] fixed scheduled report not being created when start date is set in the future and beyond the current cycle (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.7
@@ -614,6 +645,24 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.14rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+...G...... [ZBX-26114] improved Zabbix agent 2 accept rate on high RTT (sjurgensons)
+...G...... [ZBX-25526] made Zabbix agent 2 proc.num, proc.cpu.util, proc.get and proc.mem items behave consistently with Zabbix agent when non-existing user is specified (arimdjonoks)
+.........T [ZBX-26369] added ticket type parameter to OTRS CE media type, updated documentation, added missing web service file (drasikhov)
+.......PS. [ZBX-26297] improved server warning log message for out of order value identifier detection between Zabbix server and Zabbix proxy (rtrizna)
+.........T [ZBX-25684] updated regex in Asterisk by HTTP template to work with enabled maxcalls option (drasikhov)
+.........T [ZBX-25538] updated uptime triggers in templates (drasikhov)
+..F....... [ZBX-26263] fixed field focus on label click (msnihach)
+..F....... [ZBX-26113] updated the link to Latest data in the item configuration form (msnihach)
+..F....... [ZBX-26377] added the "parent_discoveryid" argument into paging data (msnihach)
+........S. [ZBX-26256] fixed scheduled report not being created when start date is set in the future and beyond the current cycle (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.13
@@ -4137,6 +4186,7 @@ New features:
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
