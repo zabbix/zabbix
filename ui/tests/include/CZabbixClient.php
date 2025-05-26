@@ -16,6 +16,7 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/core/ZBase.php';
 require_once dirname(__FILE__).'/../../include/classes/server/CZabbixServer.php';
 
 /**
