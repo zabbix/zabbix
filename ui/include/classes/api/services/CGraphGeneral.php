@@ -68,9 +68,7 @@ abstract class CGraphGeneral extends CApiService {
 		];
 
 		if (self::isGraphPrototype()) {
-			$options['filter'] = [
-				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
-			];
+			$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE];
 		}
 
 		$db_graphs = $this->get($options);
@@ -675,12 +673,8 @@ abstract class CGraphGeneral extends CApiService {
 			$db_items += API::ItemPrototype()->get([
 				'output' => ['name', 'value_type', 'hostid'],
 				'selectHosts' => ['status'],
-				'selectDiscoveryRule' => ['itemid'],
-				'selectDiscoveryRulePrototype' => ['itemid'],
 				'itemids' => $itemids,
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
-				],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE],
 				'preservekeys' => true
 			] + $permission_options);
 		}
@@ -690,6 +684,17 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		if (self::isGraphPrototype()) {
+			$resource = DBselect(
+				'SELECT id.lldruleid,id.itemid'.
+				' FROM item_discovery id'.
+				' JOIN items i ON id.lldruleid=i.itemid'.
+				' WHERE '.dbConditionId('id.itemid', array_keys($db_items))
+			);
+
+			while ($row = DBfetch($resource)) {
+				$db_items[$row['itemid']]['ruleid'] = $row['lldruleid'];
+			}
+
 			$this->checkDiscoveryRuleCount($graphs, $db_items);
 		}
 
@@ -770,19 +775,14 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	private function checkDiscoveryRuleCount(array $graphs, array $db_items): void {
 		foreach ($graphs as $graph) {
-			// for update method we will skip this step, if no items are set
-			if (isset($graph['gitems'])) {
+			if (array_key_exists('gitems', $graph)) {
 				$lld_ruleids = [];
 
 				foreach ($graph['gitems'] as $gitem) {
 					$db_item = $db_items[$gitem['itemid']];
 
-					if (array_key_exists('discoveryRule', $db_item) && $db_item['discoveryRule']) {
-						$lld_ruleids[$db_item['discoveryRule']['itemid']] = true;
-					}
-
-					if (array_key_exists('discoveryRulePrototype', $db_item) && $db_item['discoveryRulePrototype']) {
-						$lld_ruleids[$db_item['discoveryRulePrototype']['itemid']] = true;
+					if (array_key_exists('ruleid', $db_item)) {
+						$lld_ruleids[$db_item['ruleid']] = true;
 					}
 				}
 

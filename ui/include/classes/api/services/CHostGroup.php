@@ -36,9 +36,7 @@ class CHostGroup extends CApiService {
 
 	public const OUTPUT_FIELDS = ['groupid', 'name', 'flags', 'uuid'];
 
-	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete',
-		'status'
-	];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_group_prototypeid', 'name', 'ts_delete', 'status'];
 
 	/**
 	 * Get host groups.
@@ -1059,7 +1057,7 @@ class CHostGroup extends CApiService {
 					'/hosts/'.($i + 1), _('object does not exist, or you have no permissions to it')
 				));
 			}
-			elseif ($db_hosts[$host['hostid']]['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			elseif ($db_hosts[$host['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/hosts/'.($i + 1),
 					_s('cannot update readonly parameter "%1$s" of discovered object', 'groups')
