@@ -468,7 +468,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			}
 
 			$host_statuses[] = $item['host_status'];
-			unset($item['host_status'], $item['flags'], $item['value_type']);
+			unset($item['host_status'], $item['value_type']);
 		}
 		unset($item);
 
@@ -486,7 +486,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
-			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 		}
 		unset($item);
 	}

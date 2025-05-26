@@ -560,7 +560,7 @@ class CHostPrototype extends CHostBase {
 			$host['hostid'] = array_shift($hostids);
 
 			$host_statuses[] = $host['host_status'];
-			unset($host['host_status'], $host['flags']);
+			unset($host['host_status']);
 		}
 		unset($host);
 
