@@ -1806,8 +1806,8 @@ static void	am_update_watchdog(zbx_am_t *manager, zbx_ipc_message_t *message)
 
 	zbx_alerter_deserialize_medias(message->data, &medias, &medias_num);
 
-	if (0 == medias_num)
-		return;
+	/* if (0 == medias_num) */
+	/* 	return; */
 
 	am_sync_watchdog(manager, medias, medias_num);
 
