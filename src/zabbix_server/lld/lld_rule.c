@@ -1629,6 +1629,7 @@ static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *
 		zbx_sync_row_t *row)
 {
 	#define KEY(s)	zbx_audit_lldrule_override(row->rowid, s, key, sizeof(key))
+	#define KEY_FILTER(s)	zbx_audit_lldrule_override_filter(row->rowid, s, key, sizeof(key))
 
 	char			key[AUDIT_DETAILS_KEY_LEN], delim = ' ';
 	zbx_audit_entry_t	*audit_entry;
@@ -1654,10 +1655,14 @@ static void	lld_rule_override_update_sql(char **sql, size_t *sql_alloc, size_t *
 			value_esc = zbx_db_dyn_escape_string(row->cols[i]);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s'", value_esc);
 			zbx_free(value_esc);
+
+			zbx_audit_entry_update_string(audit_entry, KEY(fields[i]), row->cols_orig[i], row->cols[i]);
 		}
 		else
 		{
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%d", atoi(row->cols[i]));
+			zbx_audit_entry_update_string(audit_entry, KEY_FILTER(fields[i]), row->cols_orig[i],
+					row->cols[i]);
 		}
 
 		zbx_audit_entry_update_string(audit_entry, KEY(fields[i]), row->cols_orig[i], row->cols[i]);

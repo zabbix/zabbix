@@ -685,26 +685,9 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_override(int audit_context_
 void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, int evaltype, const char *formula)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_evaltype[AUDIT_DETAILS_KEY_LEN],
-		audit_key_formula[AUDIT_DETAILS_KEY_LEN];
+	zbx_audit_entry_t	*audit_entry = zbx_audit_item_get_entry(audit_context_mode, itemid);
 
-	RETURN_IF_AUDIT_OFF(audit_context_mode);
-
-	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.overrides[" ZBX_FS_UI64 "].filter", overrideid);
-
-	zbx_snprintf(audit_key_evaltype, sizeof(audit_key_evaltype), "discoveryrule.overrides[" ZBX_FS_UI64
-			"].filter.evaltype", overrideid);
-
-	zbx_snprintf(audit_key_formula, sizeof(audit_key_formula), "discoveryrule.overrides[" ZBX_FS_UI64
-			"].filter.formula", overrideid);
-
-#define	AUDIT_TABLE_NAME	"lld_override"
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_int(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_evaltype, evaltype,
-			AUDIT_TABLE_NAME, "evaltype");
-	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_formula, formula,
-			AUDIT_TABLE_NAME, "formula");
-#undef 	AUDIT_TABLE_NAME
+	zbx_audit_entry_update_json_add_lld_override_filter(audit_entry, overrideid, evaltype, formula);
 }
 
 void	zbx_audit_discovery_rule_update_json_update_lld_override_filter_str(int audit_context_mode, zbx_uint64_t itemid,
@@ -744,18 +727,17 @@ void	zbx_audit_discovery_rule_update_json_add_lld_override_operation(int audit_c
 void	zbx_audit_discovery_rule_update_json_add_lld_override_##resource(int audit_context_mode,		\
 		zbx_uint64_t itemid, zbx_uint64_t overrideid, zbx_uint64_t resource##_id, type resource)	\
 {														\
-	char	buf[AUDIT_DETAILS_KEY_LEN], audit_key[AUDIT_DETAILS_KEY_LEN];					\
+	char	key[AUDIT_DETAILS_KEY_LEN];									\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
+	zbx_audit_entry_t	*audit_entry = zbx_audit_item_get_entry(audit_context_mode, itemid);            \
 														\
-	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.overrides[" ZBX_FS_UI64			\
-			"].operations[" ZBX_FS_UI64 "]."#resource, overrideid, resource##_id);			\
-	zbx_snprintf(buf, sizeof(buf), "discoveryrule.overrides[" ZBX_FS_UI64					\
-			"].operations[" ZBX_FS_UI64 "]."#resource"."#field, overrideid, resource##_id);		\
+	if (NULL == audit_entry)										\
+		return;												\
 														\
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);	\
-	zbx_audit_update_json_append_##type2(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, buf, resource,	\
-			table, #field);										\
+	zbx_audit_lldrule_override_operation(overrideid, resource##_id, NULL, key, sizeof(key));		\
+	zbx_audit_entry_add(audit_entry, key);									\
+	zbx_audit_lldrule_override_operation(overrideid, resource##_id, #field, key, sizeof(key));		\
+	zbx_audit_entry_add_##type2(audit_entry, table, #field, key, resource);					\
 }
 
 PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(opstatus, int, int, "lld_override_opstatus", status)
@@ -825,10 +807,12 @@ void	zbx_audit_discovery_rule_update_json_update_lld_override_optemplate(int aud
 void	zbx_audit_item_prototype_update_json_add_lldruleid(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t parent_itemid)
 {
-	RETURN_IF_AUDIT_OFF(audit_context_mode);
+	zbx_audit_entry_t	*audit_entry = zbx_audit_item_get_entry(audit_context_mode, itemid);
 
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, "itemprototype.ruleid",
-			parent_itemid, NULL, NULL);
+	if (NULL == audit_entry)
+		return;
+
+	zbx_audit_entry_add_uint64(audit_entry, NULL, NULL, "ruleid", parent_itemid);
 }
 
 void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zbx_uint64_t itemid, int flags,
@@ -1385,6 +1369,18 @@ const char	*zbx_audit_lldrule_override(zbx_uint64_t overrideid, const char *fiel
 	return key;
 }
 
+const char	*zbx_audit_lldrule_override_filter(zbx_uint64_t overrideid, const char *field, char *key,
+		size_t key_size)
+{
+	size_t	offset = zbx_snprintf(key, key_size, "overrides[" ZBX_FS_UI64 "].filter",
+			overrideid);
+
+	if (NULL != field)
+		zbx_snprintf(key + offset, key_size - offset, ".%s", field);
+
+	return key;
+}
+
 const char	*zbx_audit_lldrule_override_filter_condition(zbx_uint64_t overrideid, zbx_uint64_t filterid,
 		const char *field, char *key, size_t key_size)
 {
@@ -1670,6 +1666,25 @@ void	zbx_audit_entry_update_json_add_lld_override(zbx_audit_entry_t *audit_entry
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "name", KEY("name"), name);
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "step", KEY("step"), step);
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "stop", KEY("stop"), stop);
+
+#undef AUDIT_TABLE_NAME
+#undef KEY
+}
+
+void	zbx_audit_entry_update_json_add_lld_override_filter(zbx_audit_entry_t *audit_entry, zbx_uint64_t overrideid,
+		int evaltype, const char *formula)
+{
+#define KEY(s) zbx_audit_lldrule_override_filter(overrideid, s, key, sizeof(key))
+#define AUDIT_TABLE_NAME	"lld_override"
+
+	if (NULL == audit_entry)
+		return;
+
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_audit_entry_add(audit_entry, KEY(NULL));
+	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "evaltype", KEY("evaltype"), evaltype);
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "formula", KEY("formula"), formula);
 
 #undef AUDIT_TABLE_NAME
 #undef KEY
