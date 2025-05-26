@@ -197,11 +197,15 @@ abstract class CControllerItem extends CController {
 				case ZBX_PREPROC_VALIDATE_RANGE:
 					$min = $step['params_0'];
 					$max = $step['params_1'];
-					$has_macro = substr($min, 0, 1) === '{' || substr($max, 0, 1) === '{';
-					if (!$has_macro && floatval($min) >= floatval($max)) {
-						$this->addFormError("/preprocessing/$index/params_1",
-							_('Cannot be less than or equal to "Min".'), CFormValidator::ERROR_LEVEL_PRIMARY
-						);
+
+					if ($min !== '' && $max !== '') {
+						$has_macro = substr($min, 0, 1) === '{' || substr($max, 0, 1) === '{';
+
+						if (!$has_macro && floatval($min) >= floatval($max)) {
+							$this->addFormError("/preprocessing/$index/params_1",
+								_('Cannot be less than or equal to "Min".'), CFormValidator::ERROR_LEVEL_PRIMARY
+							);
+						}
 					}
 					break;
 			}
