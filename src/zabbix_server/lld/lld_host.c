@@ -3506,7 +3506,7 @@ static void	lld_interface_snmp_prepare_sql(zbx_audit_entry_t *audit_entry, const
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS))
 	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smax_repetitions=" ZBX_FS_UI64, d,
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smax_repetitions=%d", d,
 				snmp->max_repetitions);
 		d = ",";
 
