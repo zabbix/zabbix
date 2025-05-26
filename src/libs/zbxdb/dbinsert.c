@@ -342,9 +342,6 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 #if defined (HAVE_MYSQL)
 	if (0 == binary_data_len)
 	{
-		int k = 0x7fffffff;
-		k += 9;
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADER: %d", k);
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 	else
