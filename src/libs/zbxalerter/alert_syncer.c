@@ -855,7 +855,6 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 
 		zbx_free(sql);
 
-
 		zbx_free(results);
 	}
 
