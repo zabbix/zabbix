@@ -724,7 +724,7 @@ void	zbx_alerter_deserialize_results(const unsigned char *data, zbx_am_result_t 
 
 	data += zbx_deserialize_value(data, results_num);
 
-	if (0 != results_num)
+	if (0 != *results_num)
 	{
 		*results = (zbx_am_result_t **)zbx_malloc(NULL, (size_t)*results_num * sizeof(zbx_am_result_t *));
 
