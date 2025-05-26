@@ -281,7 +281,7 @@ window.host_wizard_edit = new class {
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm();
+				this.#updateForm(true);
 			}
 		});
 
@@ -1347,7 +1347,7 @@ window.host_wizard_edit = new class {
 			if (path) {
 				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
 			}
-			else {
+			else if (step_init) {
 				this.#overlay.recoverFocus();
 			}
 
