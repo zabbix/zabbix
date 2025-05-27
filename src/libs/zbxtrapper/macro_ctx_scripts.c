@@ -114,7 +114,7 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 
 	/* Passed arguments holding cached data */
 	int			*user_names_found = va_arg(args, int *);
-	zbx_user_names_t	*user_names = va_arg(args, zbx_user_names_t *);
+	zbx_user_names_t	**user_names = va_arg(args, zbx_user_names_t **);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
@@ -158,7 +158,7 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
 					0 == strcmp(p->macro, MVAR_USER_ALIAS))
 			{
-				resolve_user_macros(*userid, p->macro, &user_names, user_names_found, replace_to);
+				resolve_user_macros(*userid, p->macro, user_names, user_names_found, replace_to);
 			}
 		}
 	}
@@ -275,7 +275,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	zbx_db_event			*cause_event = NULL;
 	zbx_db_event			*cause_recovery_event = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() script_type:%d", __func__, script_type);
 
 	zbx_vector_uint64_create(&item_hosts);
 
@@ -283,17 +283,17 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	{
 		case ZBX_SCRIPT_ON_HOST:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_host_script_resolv, um_handle,
-					&userid, dc_host, &user_names_found, &user_names,
+					userid, dc_host, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
 		case ZBX_SCRIPT_NORMAL:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
-					event, r_event, &userid, dc_host, tz, &user_names_found, &user_names,
+					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
 		case ZBX_SCRIPT_RECOVERY:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_recovery_script_resolv, um_handle,
-					event, r_event, &userid, dc_host, tz, &user_names_found, &user_names,
+					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
 		default:
