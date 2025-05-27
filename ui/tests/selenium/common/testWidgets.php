@@ -32,6 +32,7 @@ class testWidgets extends CWebTest {
 	const MACRO_URL_ENCODE_VALUE = 'h://test.com/macro?functions=urlencode&urld=a🎸';
 	const MACRO_URL_DECODE = '{$MACRO.URL.DECODE}';
 	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da%F0%9F%8E%B8';
+	const PATH_TO_COLOR_PICKER = 'xpath:.//z-color-picker[@color-field-name=';
 
 	protected static $dashboardid;
 
@@ -345,6 +346,19 @@ class testWidgets extends CWebTest {
 
 		foreach ($expected_values as $attribute => $expected_value) {
 			$this->assertEquals($expected_value, $range->getAttribute($attribute));
+		}
+	}
+
+	/**
+	 * Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
+	 *
+	 * @param array             $data         data provider
+	 */
+	public function checkColorPickerState($data) {
+		if (CTestArrayHelper::get($data, 'invalid_color')) {
+			$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
+			$this->assertTrue($color_picker->isSubmittionDisabled());
+			$color_picker->close();
 		}
 	}
 }

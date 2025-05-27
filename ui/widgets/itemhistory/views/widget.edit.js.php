@@ -82,7 +82,6 @@ window.widget_form = new class extends CWidgetForm {
 				).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(e));
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'edit':
@@ -103,7 +102,6 @@ window.widget_form = new class extends CWidgetForm {
 				).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(e));
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'remove':
@@ -160,10 +158,5 @@ window.widget_form = new class extends CWidgetForm {
 		input.setAttribute('name', name);
 		input.setAttribute('value', value);
 		this.#form.appendChild(input);
-	}
-
-	// Need to remove function after sub-popups auto close.
-	#removeColorpicker() {
-		$('#color_picker').hide();
 	}
 };
