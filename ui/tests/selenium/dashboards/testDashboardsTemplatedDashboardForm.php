@@ -4466,6 +4466,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 		// In case of the scenario with identical widgets the same widget needs to be added once again.
 		if (array_key_exists('duplicate widget', $data)) {
+			COverlayDialogElement::ensureNotPresent();
 			$this->query('button:Add')->one()->waitUntilClickable()->click();
 			$form->invalidate();
 			$form->fill($data['fields']);
