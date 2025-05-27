@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @backup hosts,items,item_rtdata,triggers,actions,operations,graphs
  *
  */
-class testLld extends CIntegrationTest{
+class testNestedLLD extends CIntegrationTest{
 
 	const HOSTNAME_MAIN = "lld_test_host";
 	const HOSTNAME_ITEMTYPES = "lld_itemtype_test_host";
@@ -403,25 +403,6 @@ class testLld extends CIntegrationTest{
 		return true;
 	}
 
-	// Test basic data sending.
-	public function testLld_SendData() {
-		$trapper_data = [
-			["name" => "ServiceA", "type" => "service", "status" => "ok"],
-			["name" => "ServiceB", "type" => "service", "status" => "critical"],
-			["name" => "DiskC", "type" => "disk", "status" => "ok"],
-			["name" => "UnknownD", "type" => "unknown", "status" => "warning"],
-			["name" => "ServiceE", "type" => "service", "status" => "critical"],
-			["name" => "ServiceF", "type" => "service", "status" => "ignored"],
-			["name" => "ServiceG", "type" => "service", "status" => "nodiscover"],
-			["name" => "ServiceH", "type" => "service", "status" => "nodiscover", "failfilter" => "yes"]
-		];
-
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-
-		return true;
-	}
-
 	// For comprehensive discovery regression test (DiscoveryWithFiltersOverrides)
 	private function checkDiscoveredHostgroups($expected_suffix) {
 		// Each expected group is present and contains one discovered host
@@ -506,7 +487,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test hostgroup, host, and item discovery with filters and overrides.
-	public function testLld_DiscoveryWithFiltersOverrides() {
+	public function testNestedLLD_DiscoveryWithFiltersOverrides() {
 		$expected_suffix = ['A', 'B', 'E', 'F', 'G'];
 
 		$this->checkDiscoveredHostgroups($expected_suffix);
@@ -539,7 +520,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Update filter formula, rediscovery.
-	public function testLld_UpdateFormula() {
+	public function testNestedLLD_UpdateFormula() {
 		$response = $this->call('discoveryrule.update', [
 			'itemid' => self::$lld_ruleid_main,
 			'filter' => [
@@ -610,7 +591,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Send initial trapper data, make sure that nothing was rediscovered.
-	public function testLld_NoUpdatesWithoutChanges() {
+	public function testNestedLLD_NoUpdatesWithoutChanges() {
 		$start_ts = time();
 
 		$this->clearLog(self::COMPONENT_SERVER);
@@ -642,7 +623,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Creation of new element.
-	public function testLld_NewElement() {
+	public function testNestedLLD_NewElement() {
 		$start_ts = time();
 
 		$this->clearLog(self::COMPONENT_SERVER);
@@ -687,7 +668,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Rediscovery triggering override.
-	public function testLld_RediscoveryTriggeringOverride() {
+	public function testNestedLLD_RediscoveryTriggeringOverride() {
 		$start_ts = time();
 
 		$this->clearLog(self::COMPONENT_SERVER);
@@ -739,7 +720,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Update of override
-	public function testLld_UpdateOverride() {
+	public function testNestedLLD_UpdateOverride() {
 		$this->clearLog(self::COMPONENT_SERVER);
 
 		$trapper_data = [
@@ -883,7 +864,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Cycle through item prototype types.
-	public function testLld_ItemPrototypeTypeUpdate() {
+	public function testNestedLLD_ItemPrototypeTypeUpdate() {
 		$trapper_data = [
 			['{#NAME}' => 'itemtypetest']
 		];
@@ -1007,7 +988,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Item prototype key update.
-	public function testLld_itemProtoKeyUpdate() {
+	public function testNestedLLD_itemProtoKeyUpdate() {
 		$trapper_data = [
 			['{#NAME}' => 'itemtypetest']
 		];
@@ -1041,7 +1022,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Item param update by LLD macro change.
-	public function testLld_itemKeyUpdateFromMacro() {
+	public function testNestedLLD_itemKeyUpdateFromMacro() {
 		$trapper_data = [
 			['{#NAME}' => 'itemtypetest']
 		];
@@ -1276,7 +1257,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test LLD macro updates application to fields.
-	public function testLld_testLLDMacroFieldChanges() {
+	public function testNestedLLD_testLLDMacroFieldChanges() {
 		$item_prototypes = [
 			[
 				'name' => 'fieldtest.agent.{#NAME}',
@@ -1625,7 +1606,7 @@ class testLld extends CIntegrationTest{
 	/*
 	 * @backup hosts,items,item_rtdata,triggers
 	 */
-	public function testLld_testNestedDRulesFromHost() {
+	public function testNestedLLD_testNestedDRulesFromHost() {
 		$this->importData("lld_test_host_dbs");
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -1688,7 +1669,7 @@ class testLld extends CIntegrationTest{
 	/*
 	 * @backup hosts,items,item_rtdata,triggers
 	 */
-	public function testLld_testNestedDRulesFromHostWithTmplLinkage() {
+	public function testNestedLLD_testNestedDRulesFromHostWithTmplLinkage() {
 		$this->importData("lld_test_server_dbs");
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -1702,7 +1683,7 @@ class testLld extends CIntegrationTest{
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @onAfter clearAutoregAction
 	 */
-	public function testLld_testNestedAutoreg() {
+	public function testNestedLLD_testNestedAutoreg() {
 		$response = $this->call('template.get', [
 			'output' => ['templateid'],
 			'filter' => [
@@ -1805,7 +1786,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test normal and nested element removal (items / triggers / graphs / hosts etc).
-	public function testLld_testResourceRemoval() {
+	public function testNestedLLD_testResourceRemoval() {
 		$hostname = "lld_test_lost_resources";
 
 		$this->importData($hostname);
@@ -1932,7 +1913,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test removal of multiple level nested LLD rules.
-	public function testLld_testRemovalOfMultilevelNestedRules() {
+	public function testNestedLLD_testRemovalOfMultilevelNestedRules() {
 		$hostname = "lld_test_multilevel";
 
 		$this->importData($hostname);
@@ -2009,7 +1990,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test overrides of nested rules, including update.
-	public function testLld_Overrides() {
+	public function testNestedLLD_Overrides() {
 		$hostname = "lld_test_overrides";
 
 		$this->importData($hostname);
@@ -2145,7 +2126,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test discovery rule prototype having item prototype as a master item.
-	public function testLld_discoveryRuleProtoWithMasterItem() {
+	public function testNestedLLD_discoveryRuleProtoWithMasterItem() {
 		$hostname = "lld_dep_proto";
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -2181,7 +2162,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test updates of prototypes that are owned by second level lld rule prototype.
-	public function testLld_checkUpdatesOfSecondLevelProtos() {
+	public function testNestedLLD_checkUpdatesOfSecondLevelProtos() {
 		$hostname = "lld_drule_proto_elem_update";
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -2313,7 +2294,7 @@ class testLld extends CIntegrationTest{
 	}
 
 	// Test template tag propagation to the problem that was generated by trigger prototype from nested rule.
-	public function testLld_testTmplTagPropagation() {
+	public function testNestedLLD_testTmplTagPropagation() {
 		$hostname = 'lld_template_tags_host';
 		$this->importData('lld_test_template_tags');
 		$this->importData($hostname);

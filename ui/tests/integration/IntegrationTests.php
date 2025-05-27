@@ -59,7 +59,7 @@ require_once dirname(__FILE__).'/testConfigVariables.php';
 require_once dirname(__FILE__).'/testLLDLinking.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
-require_once dirname(__FILE__).'/testLld.php';
+require_once dirname(__FILE__).'/testNestedLLD.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -114,7 +114,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDLinking');
 		$suite->addTestSuite('testUserMacrosWithContext');
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
-		$suite->addTestSuite('testLld');
+		$suite->addTestSuite('testNestedLLD');
 
 		return $suite;
 	}
