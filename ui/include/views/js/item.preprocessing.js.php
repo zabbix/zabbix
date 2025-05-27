@@ -189,7 +189,6 @@
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('Script'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('data-notrim', '')
 	?>
 </script>
 
