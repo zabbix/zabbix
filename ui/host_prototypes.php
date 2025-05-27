@@ -367,7 +367,7 @@ if (hasRequest('form')) {
 		'discovery_rule' => $parent_discovery,
 		'host_prototype' => [
 			'hostid' => $hostid,
-			'templateid' => ($hostid == 0) ? 0 : $hostPrototype['templateid'],
+			'templateid' => $hostid == 0 ? 0 : $hostPrototype['templateid'],
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
@@ -384,7 +384,6 @@ if (hasRequest('form')) {
 			'main_interfaces' => getRequest('mainInterfaces', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'is_discovered_prototype' => $hostid != 0 && $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 			&& $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE,
 		'groups' => [],
@@ -393,6 +392,7 @@ if (hasRequest('form')) {
 		// Parent discovery rules.
 		'templates' => []
 	];
+	$data['readonly'] = $data['host_prototype']['templateid'] !=0 || $data['is_discovered_prototype'];
 
 	if ($parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 		$data['source_link_data'] = [

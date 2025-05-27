@@ -24,8 +24,6 @@ require_once __DIR__.'/js/configuration.host.prototype.edit.js.php';
 $host_prototype = $data['host_prototype'];
 $parent_host = $data['parent_host'];
 
-$readonly = $host_prototype['templateid'] || $data['is_discovered_prototype'];
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Host prototypes'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_EDIT))
@@ -76,7 +74,7 @@ if ($data['templates']) {
 
 $host_tab->addRow(
 	(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
-	(new CTextBox('host', $host_prototype['host'], $readonly))
+	(new CTextBox('host', $host_prototype['host'], $data['readonly']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 		->setAriaRequired()
@@ -87,7 +85,7 @@ $name = ($host_prototype['name'] != $host_prototype['host']) ? $host_prototype['
 
 $host_tab->addRow(
 	_('Visible name'),
-	(new CTextBox('name', $name, $readonly))
+	(new CTextBox('name', $name, $data['readonly']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 );
@@ -199,7 +197,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'readonly' => $readonly,
+		'readonly' => $data['readonly'],
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [
@@ -291,7 +289,7 @@ $host_tab->addRow(
 			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
 			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
 			->setModern()
-			->setReadonly($readonly),
+			->setReadonly($data['readonly']),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
 			->setId('interfaces-table')
 			->addClass(ZBX_STYLE_HOST_INTERFACES),
@@ -309,7 +307,7 @@ $host_tab->addRow(
 					? null
 					: 'display: none'
 				)
-				->setEnabled(!$readonly)
+				->setEnabled(!$data['readonly'])
 		)
 	]
 );
@@ -423,7 +421,7 @@ $tabs->addTab('tags-tab', _('Tags'),
 	new CPartial('configuration.tags.tab', [
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
-		'readonly' => $data['readonly'] || $data['is_discovered_prototype'],
+		'readonly' => $data['readonly'],
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab'
 	]),
@@ -451,7 +449,7 @@ $macro_tab = (new CFormList('macrosFormList'))
 		'macros_container'
 	);
 
-if (!($data['readonly'] || $data['is_discovered_prototype'])) {
+if (!$data['readonly']) {
 	$macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 		->addItem(
 			(new CRow([
@@ -539,7 +537,7 @@ $tabs->addTab('inventoryTab', _('Inventory'),
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setReadonly($readonly)
+				->setReadonly($data['readonly'])
 				->setModern()
 		),
 	TAB_INDICATOR_INVENTORY
@@ -625,7 +623,7 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'readonly' => $data['readonly'] || $data['is_discovered_prototype'],
+		'readonly' => $data['readonly'],
 		'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
 		'group_prototypes' => $host_prototype['groupPrototypes'],
 		'prototype_templateid' => $host_prototype['templateid'],
