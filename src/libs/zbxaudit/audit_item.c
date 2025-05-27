@@ -1654,7 +1654,7 @@ void	zbx_audit_entry_update_json_add_lld_override(zbx_audit_entry_t *audit_entry
 		const char *name, int step, int stop)
 {
 #define KEY(s) zbx_audit_lldrule_override(overrideid, s, key, sizeof(key))
-#define AUDIT_TABLE_NAME	"lld_override_optag"
+#define AUDIT_TABLE_NAME	"lld_override"
 
 	if (NULL == audit_entry)
 		return;
