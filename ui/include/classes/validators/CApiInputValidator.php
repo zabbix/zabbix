@@ -1594,7 +1594,8 @@ class CApiInputValidator {
 			if (!self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error)) {
 				return false;
 			}
-			elseif ($data === API_OUTPUT_EXTEND && array_key_exists('in', $rule) && $flags & API_NORMALIZE) {
+
+			if ($data === API_OUTPUT_EXTEND && array_key_exists('in', $rule) && $flags & API_NORMALIZE) {
 				$data = explode(',', $rule['in']);
 			}
 

@@ -1783,7 +1783,7 @@ class testLld extends CIntegrationTest{
 				'selectItems' => ['name', 'key_'],
 				'selectTriggers' => ['description'],
 				'selectGraphs' => ['name'],
-				'selectDiscoveries' => ['name']
+				'selectDiscoveryRules' => ['name']
 			]);
 			$this->assertCount(1, $response['result']);
 
@@ -1791,7 +1791,7 @@ class testLld extends CIntegrationTest{
 			$this->assertCount($tc['expected']['items'], $host['items']);
 			$this->assertCount($tc['expected']['triggers'], $host['triggers']);
 			$this->assertCount($tc['expected']['graphs'], $host['graphs']);
-			$this->assertCount($tc['expected']['discoveries'], $host['discoveries']);
+			$this->assertCount($tc['expected']['discoveryRules'], $host['discoveryRules']);
 
 			$response = $this->call('host.get', [
 				'searchWildcardsEnabled' => true,
@@ -1840,7 +1840,7 @@ class testLld extends CIntegrationTest{
 				'expected' => [
 					'items' => 4,
 					'triggers' => 4,
-					'discoveries' => 3,
+					'discoveryRules' => 3,
 					'graphs' => 4,
 					'hosts' => 4
 				]
@@ -1857,7 +1857,7 @@ class testLld extends CIntegrationTest{
 				'expected' => [
 					'items' => 2,
 					'triggers' => 2,
-					'discoveries' => 2,
+					'discoveryRules' => 2,
 					'graphs' => 2,
 					'hosts' => 2
 				]
@@ -2215,7 +2215,7 @@ class testLld extends CIntegrationTest{
 			'selectItems' => ['name', 'key_'],
 			'selectTriggers' => ['description'],
 			'selectGraphs' => ['name'],
-			'selectDiscoveries' => ['name']
+			'selectDiscoveryRules' => ['name']
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('items', $response['result'][0]);
