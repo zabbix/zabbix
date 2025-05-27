@@ -143,13 +143,13 @@ HEREDOC
 my $tsdb_compress_sql = <<'HEREDOC'
 	PERFORM set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
 
-	-- extversion is a string in format "2.19.5"
+	-- extversion is a version string in format "2.19.5"
 	SELECT extversion INTO tsdb_version FROM pg_extension WHERE extname = 'timescaledb';
 
 	tsdb_version_major := substring(tsdb_version, '^\d+')::INTEGER;
 	tsdb_version_minor := substring(tsdb_version, '^\d+\.(\d+)')::INTEGER;
 
-	-- Check if TimescaleDB version is greater or equal than 2.18.x
+	-- Check if TimescaleDB version is greater than or equal to 2.18.x
 	IF tsdb_version_major > 2 OR (tsdb_version_major = 2 AND tsdb_version_minor >= 18)
 	THEN
 		-- Available since TimescaleDB 2.18.0

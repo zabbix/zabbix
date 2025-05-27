@@ -52,7 +52,7 @@ class testTimescaleDb extends CIntegrationTest {
 		];
 	}
 
-	private static function getDBExtention() {
+	private static function getDBExtension() {
 		if (self::$db_extension == null) {
 			$res = DBfetch(DBselect('SELECT db_extension FROM config'));
 			if ($res)
@@ -103,7 +103,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkServerUp() {
-		$db_ext = self::getDBExtention();
+		$db_ext = self::getDBExtension();
 		$this->assertNotNull($db_ext, "Failed to retrieve database extension");
 		$this->assertEquals(ZBX_DB_EXTENSION_TIMESCALEDB, $db_ext, "TimescaleDB extension is not available");
 

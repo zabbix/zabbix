@@ -58,14 +58,14 @@ static int		compress_older_cache = 0;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check that hypertables are segmented                              *
+ * Purpose: enables compression policy by declaring column to segment by      *
  *                                                                            *
  * Parameters: table_name - [IN] hypertable name                              *
  *             segmentby  - [IN] field to segment by                          *
  *             orderby    - [IN] field to order by                            *
  *                                                                            *
  ******************************************************************************/
-static void	hk_check_table_segmentation(const char *table_name, const char *segmentby, const char *orderby)
+static void	hk_compression_policy_enable(const char *table_name, const char *segmentby, const char *orderby)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -109,23 +109,32 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 		{
 			/* Available since TimescaleDB 2.18.0:                                         */
 			/* timescaledb.enable_columnstore, timescaledb.segmentby, timescaledb.orderby. */
-			zbx_db_execute(
+			if (ZBX_DB_OK > zbx_db_execute(
 					"alter table %s set("
 						"timescaledb.enable_columnstore=true,"
 						"timescaledb.segmentby='%s',"
 						"timescaledb.orderby='%s')",
-					table_name, segmentby, orderby);
+					table_name, segmentby, orderby))
+
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "failed to enable compression policy for table '%s'",
+						table_name);
+			}
 		}
 		else
 		{
 			/* Deprecated since TimescaleDB 2.18.0:                                                */
 			/* timescaledb.compress, timescaledb.compress_segmentby, timescaledb.compress_orderby. */
-			zbx_db_execute(
+			if (ZBX_DB_OK > zbx_db_execute(
 					"alter table %s set("
 						"timescaledb.compress,"
 						"timescaledb.compress_segmentby='%s',"
 						"timescaledb.compress_orderby='%s')",
-					table_name, segmentby, orderby);
+					table_name, segmentby, orderby))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "failed to enable compression policy for table '%s'",
+						table_name);
+			}
 		}
 	}
 
@@ -193,18 +202,34 @@ static void	hk_compression_policy_remove(const char *table_name)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
 	if (1 == ZBX_DB_TSDB_GE_V2_18)
-		/* available since TimescaleDB 2.18.0 */
-		(void)zbx_db_execute("call remove_columnstore_policy('%s')", table_name);
+	{
+		/* remove_columnstore_policy() is available since TimescaleDB 2.18.0 */
+		if (ZBX_DB_OK > zbx_db_execute("call remove_columnstore_policy('%s')", table_name))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to remove compression policy from table '%s'",
+					table_name);
+		}
+	}
 	else
-		/* deprecated since TimescaleDB 2.18.0 */
-		zbx_db_free_result(zbx_db_select("select remove_compression_policy('%s')", table_name));
+	{
+		zbx_db_result_t	result;
+
+		/* remove_compression_policy() is deprecated since TimescaleDB 2.18.0 */
+		if (NULL == (result = zbx_db_select("select remove_compression_policy('%s')", table_name)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to remove compression policy from table '%s'",
+					table_name);
+		}
+
+		zbx_db_free_result(result);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds compress after policy to hypertable                          *
+ * Purpose: adds compress_after policy to hypertable                          *
  *                                                                            *
  * Parameters: table_name - [IN]                                              *
  *             ts         - [IN] compress older than, timestamp in seconds    *
@@ -217,7 +242,7 @@ static int	hk_policy_compress_after_add(const char *table_name, int ts)
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s ts %d", __func__, table_name, ts);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table:%s ts:%d", __func__, table_name, ts);
 
 	if (1 == ZBX_DB_TSDB_GE_V2_18)
 	{
@@ -245,7 +270,7 @@ static int	hk_policy_compress_after_add(const char *table_name, int ts)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds created before compression policy to hypertable              *
+ * Purpose: adds created_before compression policy to hypertable              *
  *                                                                            *
  * Parameters: table_name - [IN]                                              *
  *             age        - [IN] compress created before, interval in seconds *
@@ -258,7 +283,7 @@ static int	hk_policy_compress_created_before_add(const char *table_name, int age
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table:%s age:%d", __func__, table_name, age);
 
 	if (1 == ZBX_DB_TSDB_GE_V2_18)
 	{
@@ -298,7 +323,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 {
 	int	compress_after;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d, compression_policy %d", __func__, table_name, age,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table:%s age:%d, compression_policy %d", __func__, table_name, age,
 			compression_policy);
 
 	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)) && -1 != compress_after)
@@ -306,7 +331,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 		if (0 != compress_after)
 			hk_compression_policy_remove(table_name);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table: %s age %d", table_name, age);
+		zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table:%s age:%d", table_name, age);
 
 		int	res = FAIL;
 
@@ -324,7 +349,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 		}
 
 		if (FAIL == res)
-			zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add compression policy to table '%s'", table_name);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -364,7 +389,7 @@ static void	hk_history_enable_compression(int age)
 			zbx_db_free_result(res);
 		}
 
-		hk_check_table_segmentation(table->name, table->segmentby, table->orderby);
+		hk_compression_policy_enable(table->name, table->segmentby, table->orderby);
 
 		hk_set_table_compression_age(table->name, age, table->compression_policy);
 	}
