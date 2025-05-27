@@ -153,7 +153,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 
 	if (SUCCEED != lld_macro_value_by_name(lld_obj, *data + l, &replace_to))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
+		zabbix_log(LOG_LEVEL_TRACE, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
 		(*data)[r + 1] = c;
 		zbx_free(replace_to);
