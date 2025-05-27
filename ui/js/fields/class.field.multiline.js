@@ -21,7 +21,13 @@ class CFieldMultiline extends CField {
 	}
 
 	getValueTrimmed() {
-		return this.getValue().trim();
+		const value = this.getValue();
+
+		if (value === null || !this._allow_trim) {
+			return value;
+		}
+
+		return value.trim();
 	}
 
 	getValue() {
