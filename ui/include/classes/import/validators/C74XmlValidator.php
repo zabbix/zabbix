@@ -1708,7 +1708,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]],
-									'posts' =>					['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
+									'posts' =>					['type' => 0, 'default' => [], 'ex_validate' => [$this, 'validateHttpPosts']],
 									'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
 										'variable' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -2928,7 +2928,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]],
-									'posts' =>					['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
+									'posts' =>					['type' => 0, 'default' => [], 'ex_validate' => [$this, 'validateHttpPosts']],
 									'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
 										'variable' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -3184,7 +3184,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
 							// The tag 'elementtype' should be validated before the 'elements' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules']],
+							'elements' =>				['type' => 0, 'default' => [], 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
 							'show_label' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SHOW_LABEL_DEFAULT, 'in' => [CXmlConstantValue::SHOW_LABEL_DEFAULT => CXmlConstantName::SHOW_LABEL_DEFAULT, CXmlConstantValue::SHOW_LABEL_AUTO_HIDE => CXmlConstantName::SHOW_LABEL_AUTO_HIDE, CXmlConstantValue::SHOW_LABEL_ALWAYS => CXmlConstantName::SHOW_LABEL_ALWAYS]],
@@ -3330,7 +3330,7 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'message_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
-					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
+					'parameters' =>				['type' => 0, 'default' => [], 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
 					'redirection_url' =>		['type' => XML_STRING, 'default' => ''],
 					'client_id' =>				['type' => XML_STRING, 'default' => ''],
