@@ -507,7 +507,6 @@ zabbix_export:
         	Logger.log(Logger.WARN, 'notification failed: ' + error);
         	throw 'Sending failed: ' + error;
         }
-      timeout: 10s
       process_tags: 'YES'
       description: |
         This media type integrates your Zabbix installation with Telegram using the Zabbix webhook feature.
