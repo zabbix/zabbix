@@ -56,7 +56,6 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  *
  * Agent items are expected to return different values depending on the macro context.
  *
- * @required-components server
  * @onAfter clearData
  */
 class testUserMacrosWithContext extends CIntegrationTest {
@@ -209,15 +208,23 @@ class testUserMacrosWithContext extends CIntegrationTest {
 
 	/**
 	 *
-	 * @required-components server
+	 * @required-components server, agent
+	 *
+	 * Note: agent is not required for this test.
+	 * However, starting agent when server is started is the easiest way to ensure that agent items configured for
+	 * other test cases do not become unavailable after failing with network errors.
 	 */
 	public function testUserMacrosWithContext_inTriggerExpressions() {
-		$this->sendSenderValue(self::HOSTNAME, 'trap1', 10);
-		$this->sendSenderValue(self::HOSTNAME, 'trap2', 20);
-		$this->sendSenderValue(self::HOSTNAME, 'trap3', 30);
-		$this->sendSenderValue(self::HOSTNAME, 'trap4', 30);
-		$this->sendSenderValue(self::HOSTNAME, 'trap5', 30);
-		$this->sendSenderValue(self::HOSTNAME, 'trap6', 10);
+		$senderValues = [
+			['host' => self::HOSTNAME, 'key' => 'trap1', 'value' => 10],
+			['host' => self::HOSTNAME, 'key' => 'trap2', 'value' => 20],
+			['host' => self::HOSTNAME, 'key' => 'trap3', 'value' => 30],
+			['host' => self::HOSTNAME, 'key' => 'trap4', 'value' => 30],
+			['host' => self::HOSTNAME, 'key' => 'trap5', 'value' => 30],
+			['host' => self::HOSTNAME, 'key' => 'trap6', 'value' => 10]
+		];
+
+		$this->sendSenderValues($senderValues);
 
 		$response = $this->callUntilDataIsPresent('problem.get', [
 			'output' => ['name'],
