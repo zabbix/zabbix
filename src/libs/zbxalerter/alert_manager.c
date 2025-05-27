@@ -1422,29 +1422,32 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	if (0 == access(*cmd, X_OK))
 	{
-		const char		*p;
-		struct zbx_json_parse	jp;
-		char			*buf = NULL;
-		size_t			buf_alloc = 0;
-
-		if (SUCCEED != zbx_json_open(alert->params, &jp))
+		if (NULL != alert->params)
 		{
-			*error = zbx_dsprintf(*error, "Cannot parse parameters: %s", zbx_json_strerror());
-			goto out;
+			const char		*p;
+			struct zbx_json_parse	jp;
+			char			*buf = NULL;
+			size_t			buf_alloc = 0;
+
+			if (SUCCEED != zbx_json_open(alert->params, &jp))
+			{
+				*error = zbx_dsprintf(*error, "Cannot parse parameters: %s", zbx_json_strerror());
+				goto out;
+			}
+
+			for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
+			{
+				char	*param_esc;
+
+				param_esc = zbx_dyn_escape_shell_single_quote(buf);
+
+				zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
+
+				zbx_free(param_esc);
+			}
+
+			zbx_free(buf);
 		}
-
-		for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
-		{
-			char	*param_esc;
-
-			param_esc = zbx_dyn_escape_shell_single_quote(buf);
-
-			zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
-
-			zbx_free(param_esc);
-		}
-
-		zbx_free(buf);
 
 		ret = SUCCEED;
 	}
