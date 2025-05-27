@@ -103,6 +103,8 @@ $available_js = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.expandable.subfilter.js' => '',
+	'class.form.js' => '',
+	'class.form.validator.js' => '',
 	'class.geomaps.js' => '',
 	'class.localstorage.js' => '',
 	'class.menu.js' => '',
@@ -162,7 +164,19 @@ $available_js = [
 	'sysmap.js' => 'pages/sysmap/',
 	'items.js' => 'pages/',
 	'report4.js' => 'pages/',
-	'setup.js' => 'pages/'
+	'setup.js' => 'pages/',
+	// fields
+	'class.field.js' => 'fields/',
+	'class.field.array.js' => 'fields/',
+	'class.field.checkbox.js' => 'fields/',
+	'class.field.hidden.js' => 'fields/',
+	'class.field.multiline.js' => 'fields/',
+	'class.field.multiselect.js' => 'fields/',
+	'class.field.radiolist.js' => 'fields/',
+	'class.field.set.js' => 'fields/',
+	'class.field.textarea.js' => 'fields/',
+	'class.field.textbox.js' => 'fields/',
+	'class.field.zselect.js' => 'fields/'
 ];
 
 $translate_strings = [
@@ -398,6 +412,33 @@ $translate_strings = [
 		'S_COLLAPSE' => _('Collapse'),
 		'S_EXPAND' => _('Expand')
 	],
+	'class.form.js' => [
+		'Page received incorrect data' => _('Page received incorrect data')
+	],
+	'class.form.validator.js' => [
+		'An array is expected.' => _('An array is expected.'),
+		'Required field is missing.' => _('Required field is missing.'),
+		'This value does not match pattern.' => _('This value does not match pattern.'),
+		'This value is not a valid identifier.' => _('This value is not a valid identifier.'),
+		'This value is not a valid integer.' => _('This value is not a valid integer.'),
+		'This value is not a valid floating-point value.' => _('This value is not a valid floating-point value.'),
+		'This object already exists.' => _('This object already exists.'),
+		'This value is not a valid string.' => _('This value is not a valid string.'),
+		'This field cannot be empty.' => _('This field cannot be empty.'),
+		'This value is too long.' => _('This value is too long.'),
+		'This value cannot be one of %1$s.' => _('This value cannot be one of %1$s.'),
+		'This value cannot be %1$s.' => _('This value cannot be %1$s.'),
+		'This value must be %1$s.' => _('This value must be %1$s.'),
+		'This value must be no less than "%1$s".' => _('This value must be no less than "%1$s".'),
+		'This value must be no greater than "%1$s".' => _('This value must be no greater than "%1$s".'),
+		'This value must be one of %1$s.' => _('This value must be one of %1$s.'),
+		'Entry "%1$s" is not unique.' => _('Entry "%1$s" is not unique.'),
+		'within range %1$s' => _('within range %1$s'),
+		'within ranges %1$s' => _('within ranges %1$s'),
+		'one of %1$s' => _('one of %1$s'),
+		' or ' => _(' or '),
+		'%1$s: %2$s' => _('%1$s: %2$s')
+	],
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
@@ -576,6 +617,19 @@ if (empty($_GET['files'])) {
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
+		'class.field.js',
+		'class.field.array.js',
+		'class.field.checkbox.js',
+		'class.field.hidden.js',
+		'class.field.multiline.js',
+		'class.field.multiselect.js',
+		'class.field.radiolist.js',
+		'class.field.set.js',
+		'class.field.textarea.js',
+		'class.field.textbox.js',
+		'class.field.zselect.js',
+		'class.form.js',
+		'class.form.validator.js',
 		'class.menu.js',
 		'class.menu-item.js',
 		'class.rpc.js',

@@ -1,0 +1,137 @@
+.error-container {
+	&:empty {
+		display: none;
+	}
+}
+
+.errors-list {
+	margin-top: 4px;
+
+	.error {
+		margin-top: 0;
+	}
+}
+
+.error {
+	display: block;
+	margin-top: 4px;
+	white-space: break-spaces;
+	word-break: break-word;
+	line-height: $body-line-height;
+	color: $error;
+}
+
+z-select.has-error button.focusable:active,
+z-select.has-error button.focusable:hover,
+z-select.has-error button.focusable,
+input[type="text"].has-error,
+input[type="password"].has-error,
+input[type="search"].has-error,
+input[type="number"].has-error,
+input[type="email"].has-error,
+input[type="time"].has-error,
+input[type="file"].has-error,
+textarea.has-error {
+	border: 1px solid $error;
+
+	&:focus {
+		border-color: $error-focus;
+	}
+}
+
+.multiselect-control {
+	&.has-error {
+		> .multiselect {
+			border: 1px solid $error;
+		}
+
+		&:focus-within {
+			.multiselect {
+				border-color: $error-focus;
+			}
+		}
+	}
+}
+
+.multilineinput-control {
+	&.has-error {
+		> input[readonly][type="text"] {
+			border: 1px solid $error;
+		}
+	}
+}
+
+div[data-field-type="set"] {
+	&.has-error {
+		padding-left: 5px;
+		width: min-content;
+		border: 1px solid $error;
+	}
+}
+
+.radio-list-control {
+	&.has-error {
+		input[type="radio"] {
+			& + label {
+				border-color: $error;
+			}
+
+			&:checked + label {
+				border-color: $error;
+				background-color: $error;
+				color: $form-radio-list-checked-color;
+				-webkit-text-fill-color: $form-radio-list-checked-color;
+			}
+		}
+	}
+}
+
+.checkbox-radio[type="checkbox"] {
+	&.has-error {
+		& + label span {
+			border: 1px solid $error;
+			color: $white;
+		}
+
+		&:checked + label span::after {
+			border-left-color: $error;
+			border-bottom-color: $error;
+		}
+	}
+}
+
+.macro-input-group {
+	textarea {
+		&.has-error,
+		&.has-error:focus {
+			border-width: 1px 0 1px 1px;
+		}
+	}
+
+	.has-error {
+		& + .btn-undo,
+		&:focus + .btn-undo,
+		& + .btn-undo:focus {
+			border-color: $error;
+		}
+
+		& ~ .btn-dropdown-container {
+			.btn-dropdown-toggle {
+				border-color: $error;
+
+				&:hover,
+				&:focus,
+				&[aria-expanded="true"] {
+					background-color: $error-focus;
+					color: $white;
+				}
+			}
+		}
+	}
+}
+
+.list-check-radio {
+	.error {
+		margin-top: 0;
+	}
+}

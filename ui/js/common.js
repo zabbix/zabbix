@@ -403,6 +403,12 @@ function PopUp(action, parameters, {
 					data: resp.data || null
 				});
 
+				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+					for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
+						form.dispatchEvent(new CustomEvent('form.destroyed'));
+					}
+				});
+
 				const resizeHandler = (grid) => {
 					for (const label of grid.querySelectorAll(':scope > label')) {
 						const rect = label.getBoundingClientRect()
@@ -704,6 +710,10 @@ function validate_trigger_expression(overlay) {
 			overlayDialogueDestroy(overlay.dialogueid);
 
 			obj.dispatchEvent(new Event('change'));
+
+			if (window.trigger_edit_popup) {
+				window.trigger_edit_popup.form.validateChanges(['expression', 'recovery_expression']);
+			}
 		},
 		dataType: 'json',
 		type: 'POST'
@@ -1073,6 +1083,37 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 	else {
 		sessionStorage.removeItem(key);
 	}
+}
+
+/**
+ * Set value in multidimensional object.
+ *
+ * @param {object} object - object to modify
+ * @param {array}  path   - array with keys, where value must be added
+ * @param {mixed}  value  - value to be added
+ *
+ * @return {object} - modified input object
+ */
+function objectSetDeepValue(object, path, value) {
+	let tmp = object;
+
+	while (path.length > 1) {
+		const key = path.shift();
+
+		if (!(key in tmp)) {
+			tmp[key] = {};
+		}
+
+		if (typeof tmp[key] !== 'object') {
+			throw Error('Invalid path. Node is not an Object.');
+		}
+
+		tmp = tmp[key];
+	}
+
+	tmp[path.shift()] = value;
+
+	return object;
 }
 
 // Fix jQuery ui.sortable vertical positioning bug.

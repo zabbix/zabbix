@@ -2013,6 +2013,7 @@ define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
+define('ZBX_STYLE_ERROR_CONTAINER', 'error-container');
 define('ZBX_STYLE_VISIBILITY_HIDDEN', 'visibility-hidden');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');

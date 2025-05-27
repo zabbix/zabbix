@@ -26,10 +26,17 @@ else {
 	$link = null;
 	$is_hostprototype = array_key_exists('parent_hostid', $data);
 	$inherited_width = $is_hostprototype ? ZBX_TEXTAREA_MACRO_INHERITED_WIDTH : ZBX_TEXTAREA_MACRO_VALUE_WIDTH;
+
 	$table = (new CTable())
 		->setId('tbl_macros')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 		->addClass('inherited-macros-table');
+
+	if ($data['has_inline_validation']) {
+		$table
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'macros');
+	}
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = (new CLink(_('configure'), (new CUrl('zabbix.php'))
@@ -53,11 +60,18 @@ else {
 	]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
+		$skip_from_submit = $data['has_inline_validation']
+			&& !($macro['inherited_type'] & ZBX_PROPERTY_OWN) ? 1 : null;
+
+		$value = array_key_exists('value', $macro) ? $macro['value'] : null;
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', $value, false))
 			->setReadonly($data['readonly']
 				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
 				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
-			);
+			)
+			->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
+			->setErrorLabel($data['has_inline_validation'] ? _('Effective value') : null)
+			->setAttribute('data-skip-from-submit', $skip_from_submit);
 
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
@@ -68,42 +82,58 @@ else {
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
+				->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
 				->disableSpellcheck()
+				->setErrorLabel($data['has_inline_validation'] ? _('Macro') : null)
+				->setAttribute('data-skip-from-submit', $skip_from_submit)
 		];
 
-		$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
+		$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][discovery_state]', $macro['discovery_state']))
+			->setAttribute('data-field-type', 'hidden')
+			->setAttribute('data-skip-from-submit', $skip_from_submit);
 
 		if (array_key_exists('hostmacroid', $macro)) {
-			$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][hostmacroid]', $macro['hostmacroid']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
 		}
 
-		$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
+		$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][inherited_type]', $macro['inherited_type']))
+			->setAttribute('data-field-type', 'hidden')
+			->setAttribute('data-skip-from-submit', $skip_from_submit);
 
 		if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
 			$inherited_macro = $macro[$macro['inherited_level']];
-			$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
-			$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
-			$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][inherited][value]', $inherited_macro['value']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][inherited][description]', $inherited_macro['description']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][inherited][macro_type]', $inherited_macro['type']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
 		}
 
 		if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-			$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
-			$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
-			$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][original_value]', $macro['original']['value']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][original_description]', $macro['original']['description']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
+			$macro_cell[] = (new CInput('hidden', 'macros['.$i.'][original_macro_type]', $macro['original']['type']))
+				->setAttribute('data-field-type', 'hidden')
+				->setAttribute('data-skip-from-submit', $skip_from_submit);
 		}
 
 		if (array_key_exists('allow_revert', $macro)) {
-			$macro_value->setAttribute('placeholder', 'value');
 			$macro_value->addRevertButton();
 			$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
 				|| array_key_exists('value', $macro)
 			);
 
 			$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
-		}
-
-		if (array_key_exists('value', $macro)) {
-			$macro_value->setAttribute('value', $macro['value']);
 		}
 
 		if (!$data['readonly']) {
@@ -195,10 +225,12 @@ else {
 			->addRow((new CRow([
 				(new CCol([
 					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
+						->setErrorContainer('macros_'.$i.'_error_container')
 						->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 						->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
-						->setReadonly($description_readonly),
+						->setReadonly($description_readonly)
+						->setAttribute('data-skip-from-submit', $skip_from_submit),
 					($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
 						? (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY)
 						: null
@@ -206,7 +238,15 @@ else {
 					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 					->addClass(CControllerHostMacrosList::MACRO_TEXTAREA_PARENT)
 					->setColSpan(count($row))
-			]))->addClass('form_row'));
+				]))->addClass('form_row')
+			)
+			->addRow($data['has_inline_validation']
+				? (new CCol())
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setAttribute('colspan', count($row))
+					->setId('macros_'.$i.'_error_container')
+				: null
+			);
 	}
 
 	if (!$data['readonly']) {

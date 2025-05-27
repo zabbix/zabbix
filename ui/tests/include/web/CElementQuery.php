@@ -599,7 +599,7 @@ class CElementQuery implements IWaitable {
 				'/ul[contains(@class, "list-check-radio")]'
 			],
 			'CHostInterfaceElement'		=> [
-				'/div/div[contains(@class, "interface-container")]/../..'
+				'/div/div/div[contains(@class, "interface-container")]/../../..'
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
