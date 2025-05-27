@@ -944,6 +944,28 @@ void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, c
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add secret key creation for audit entry                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_entry_add_secret(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
+		const char *value1)
+{
+	char	key[AUDIT_MAX_KEY_LEN];
+
+	/* auditlog has been disabled */
+	if (NULL == entry)
+		return;
+
+	audit_entry_make_key(entry, name, key, sizeof(key));
+
+	if (NULL != table && SUCCEED == audit_field_value_matches_db_default(table, field, value1, 0))
+		return;
+
+	append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, ZBX_MACRO_SECRET_MASK);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: record history push request results into audit log                *
  *                                                                            *
  ******************************************************************************/

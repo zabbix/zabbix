@@ -39,7 +39,7 @@ static void	lld_audit_item_add_uint64(const zbx_lld_item_full_t *item, const cha
 }
 
 void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
-		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid)
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid, zbx_uint64_t lldruleid)
 {
 	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_LLD_CONTEXT);
 
@@ -109,8 +109,9 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 	lld_audit_item_add_uint64(item, "verify_host", item_prototype->verify_host);
 	lld_audit_item_add_uint64(item, "allow_traps", item_prototype->allow_traps);
 
-	if (0 != (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		lld_audit_item_add_uint64(item, "discover", item_prototype->discover);
+		lld_audit_item_add_uint64(item, "lldruleid", lldruleid);
 	}
 }

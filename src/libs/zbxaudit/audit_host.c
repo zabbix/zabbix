@@ -1108,7 +1108,7 @@ void	zbx_audit_entry_host_update_json_delete_tag(zbx_audit_entry_t *audit_entry,
 }
 
 void	zbx_audit_entry_host_update_json_add_tls_and_psk(zbx_audit_entry_t *audit_entry, int tls_connect,
-		int tls_accept)
+		int tls_accept, const char *tls_psk, const char *tls_psk_identity)
 {
 #define AUDIT_TABLE_NAME	"hosts"
 
@@ -1117,18 +1117,19 @@ void	zbx_audit_entry_host_update_json_add_tls_and_psk(zbx_audit_entry_t *audit_e
 
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "tls_connect", "tls_connect", tls_connect);
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "tls_accept", "tls_accept", tls_accept);
-	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "tls_psk_identity", "tls_psk_identity",
-			ZBX_MACRO_SECRET_MASK);
-	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "tls_psk", "tls_psk",
-			ZBX_MACRO_SECRET_MASK);
+	zbx_audit_entry_add_secret(audit_entry, AUDIT_TABLE_NAME, "tls_psk", "tls_psk", tls_psk);
+	zbx_audit_entry_add_secret(audit_entry, AUDIT_TABLE_NAME, "tls_psk_identity", "tls_psk_identity",
+			tls_psk_identity);
 
 #undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_host_update_json_add_details(zbx_audit_entry_t *audit_entry, const char *host, const char *name,
 		unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, int ipmi_authtype,
-		int ipmi_privilege, const char *ipmi_username, int status, int flags, int tls_connect, int tls_accept,
-		const char *tls_issuer, const char *tls_subject, int custom_interfaces, int inventory_mode)
+		int ipmi_privilege, const char *ipmi_username, const char *ipmi_password, int status, int flags,
+		int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk,
+		const char *tls_psk_identity, int custom_interfaces, int inventory_mode, int discover,
+		zbx_uint64_t lldruleid)
 {
 #define	AUDIT_TABLE_NAME	"hosts"
 
@@ -1143,19 +1144,25 @@ void	zbx_audit_host_update_json_add_details(zbx_audit_entry_t *audit_entry, cons
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "ipmi_authtype", "ipmi_authtype", ipmi_authtype);
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "ipmi_privilege", "ipmi_privilege", ipmi_privilege);
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "ipmi_username", "ipmi_username", ipmi_username);
-	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "ipmi_password", "ipmi_password",
-			ZBX_MACRO_SECRET_MASK);
+	zbx_audit_entry_add_secret(audit_entry, AUDIT_TABLE_NAME, "ipmi_password", "ipmi_password", ipmi_password);
 
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "status", "status", status);
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "flags", "flags", flags);
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "tls_issuer", "tls_issuer", tls_issuer);
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "tls_subject", "tls_subject", tls_subject);
 
-	zbx_audit_entry_host_update_json_add_tls_and_psk(audit_entry, tls_connect, tls_accept);
+	zbx_audit_entry_host_update_json_add_tls_and_psk(audit_entry, tls_connect, tls_accept, tls_psk,
+			tls_psk_identity);
 
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "custom_interfaces", "custom_interfaces",
 			custom_interfaces);
 	zbx_audit_entry_add_int(audit_entry, "host_inventory", "inventory_mode", "inventory_mode", inventory_mode);
+
+	if (0 != (flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "discover", "discover", discover);
+		zbx_audit_entry_add_uint64(audit_entry, NULL, NULL, "lldruleid", lldruleid);
+	}
 
 #undef AUDIT_TABLE_NAME
 }
@@ -1275,9 +1282,9 @@ void	zbx_audit_entry_host_update_json_add_tag(zbx_audit_entry_t *audit_entry, zb
 		return;
 
 	zbx_audit_entry_add(audit_entry, zbx_audit_host_tag(tagid, key, sizeof(key)));
-	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "tag", "tag", tag);
-	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "value", "value", value);
-	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "automatic", "automatic", automatic);
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "tag", KEY("tag"), tag);
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "value", KEY("value"), value);
+	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "automatic", KEY("automatic"), automatic);
 
 #undef AUDIT_TABLE_NAME
 #undef KEY

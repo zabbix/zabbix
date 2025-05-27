@@ -3947,9 +3947,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 			zbx_audit_host_update_json_add_details(audit_entry, host->host, host->name, monitored_by,
 					proxyid, proxy_groupid, (int)ipmi_authtype, (int)ipmi_privilege, ipmi_username,
-					(int)host->status, dflags | ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
-					(int)tls_accept, tls_issuer, tls_subject, host->custom_interfaces,
-					(int)host->inventory_mode);
+					ipmi_password, (int)host->status, dflags | ZBX_FLAG_DISCOVERY_CREATED,
+					(int)tls_connect, (int)tls_accept, tls_issuer, tls_subject, tls_psk,
+					tls_psk_identity, host->custom_interfaces, (int)host->inventory_mode,
+					(int)host->discover, lldruleid);
 		}
 		else
 		{

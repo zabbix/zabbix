@@ -238,11 +238,13 @@ void	zbx_audit_host_update_json_delete_hostmacro(zbx_audit_entry_t *audit_entry,
 void	zbx_audit_entry_host_update_json_delete_tag(zbx_audit_entry_t *audit_entry, zbx_uint64_t tagid);
 
 void	zbx_audit_entry_host_update_json_add_tls_and_psk(zbx_audit_entry_t *audit_entry, int tls_connect,
-		int tls_accept);
+		int tls_accept, const char *tls_psk, const char *tls_psk_identity);
 void	zbx_audit_host_update_json_add_details(zbx_audit_entry_t *audit_entry, const char *host, const char *name,
 		unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, int ipmi_authtype,
-		int ipmi_privilege, const char *ipmi_username, int status, int flags, int tls_connect, int tls_accept,
-		const char *tls_issuer, const char *tls_subject, int custom_interfaces, int inventory_mode);
+		int ipmi_privilege, const char *ipmi_username, const char *ipmi_password, int status, int flags,
+		int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk,
+		const char *tls_psk_identity, int custom_interfaces, int inventory_mode, int discover,
+		zbx_uint64_t lldruleid);
 void	zbx_audit_host_update_json_add_interface(zbx_audit_entry_t *audit_entry, zbx_uint64_t interfaceid, int main,
 		int type, int useip, const char *ip, const char *dns, const char *port);
 void	zbx_audit_entry_host_update_json_add_snmp_interface(zbx_audit_entry_t *audit_entry, int version,

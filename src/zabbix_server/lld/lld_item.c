@@ -2920,7 +2920,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 		zbx_audit_item_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, item->itemid, item->name,
 				item_prototype->item_flags | ZBX_FLAG_DISCOVERY_CREATED);
-		zbx_audit_item_update_json_add_lld_data(item, item_prototype, hostid);
+		zbx_audit_item_update_json_add_lld_data(item, item_prototype, hostid, lldruleid);
 	}
 
 	for (index = 0; index < item->dependent_items.values_num; index++)
