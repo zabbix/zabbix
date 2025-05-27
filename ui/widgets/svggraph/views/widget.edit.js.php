@@ -18,7 +18,7 @@ use Widgets\SvgGraph\Includes\CWidgetFieldDataSet;
 
 ?>
 
-window.widget_svggraph_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * @type {Map<HTMLLIElement, CSortable>}
@@ -34,7 +34,7 @@ window.widget_svggraph_form = new class {
 		colorPalette.setThemeColors(color_palette);
 
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
-		this._form = document.getElementById('widget-dialogue-form');
+		this._form = this.getForm();
 		this._templateid = templateid;
 		this._dataset_wrapper = document.getElementById('data_sets');
 		this._any_ds_aggregation_function_enabled = false;
@@ -63,16 +63,26 @@ window.widget_svggraph_form = new class {
 		});
 
 		jQuery(`#${form_tabs_id}`)
-			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', () => this.onGraphConfigChange());
+			.on('change', 'input, z-color-picker, z-select, .multiselect', () => this.onGraphConfigChange());
+
+		this._dataset_wrapper.addEventListener('input', e => {
+			if (e.target.matches('input[name$="[data_set_label]"]') || e.target.matches('input[name$="[timeshift]"]')) {
+				this.registerUpdateEvent();
+			}
+		});
 
 		this._datasetTabInit();
 		this._problemsTabInit();
 
-		this.onGraphConfigChange();
+		this._updateForm();
+		this._updatePreview();
+
+		this.ready();
 	}
 
 	onGraphConfigChange() {
+		this.registerUpdateEvent();
+
 		this._updateForm();
 		this._updatePreview();
 	}
@@ -128,10 +138,6 @@ window.widget_svggraph_form = new class {
 				);
 			})
 			.on('click', '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', function(e) {
-				if (!e.target.classList.contains('color-picker-preview')) {
-					jQuery.colorpicker('hide');
-				}
-
 				const list_item = e.target.closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
 
 				if (list_item.classList.contains('<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')) {
@@ -139,7 +145,7 @@ window.widget_svggraph_form = new class {
 				}
 
 				if (e.target.classList.contains('js-click-expand')
-						|| e.target.classList.contains('color-picker-preview')) {
+						|| e.target.closest(`.${ZBX_STYLE_COLOR_PICKER}`) !== null) {
 					$data_sets.zbx_vertical_accordion('expandNth',
 						[...list_item.parentElement.children].indexOf(list_item)
 					);
@@ -169,24 +175,13 @@ window.widget_svggraph_form = new class {
 						message_block.style.display = 'none';
 					}
 
-					widget_svggraph_form._initSingleItemSortable(dataset);
+					widget_form._initSingleItemSortable(dataset);
 				}
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
 
 		// Initialize rangeControl UI elements.
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this._dataset_wrapper)).rangeControl();
-
-		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			jQuery(colorpicker).colorpicker({
-				onUpdate: function(color) {
-					jQuery('.<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>',
-						jQuery(this).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')
-					).css('background-color', `#${color}`);
-				},
-				appendTo: '.overlay-dialogue-body'
-			});
-		}
 
 		this._dataset_wrapper.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add-item')) {
@@ -324,9 +319,9 @@ window.widget_svggraph_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of this._form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 
@@ -344,10 +339,6 @@ window.widget_svggraph_form = new class {
 
 		const dataset = this._getOpenedDataset();
 
-		for (const colorpicker of dataset.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
-		}
-
 		for (const range_control of dataset.querySelectorAll('.<?= CRangeControl::ZBX_STYLE_CLASS ?>')) {
 			jQuery(range_control).rangeControl();
 		}
@@ -358,6 +349,8 @@ window.widget_svggraph_form = new class {
 
 		this._initDataSetSortable();
 		this._updateForm();
+
+		this.registerUpdateEvent();
 	}
 
 	_cloneDataset() {
@@ -454,6 +447,8 @@ window.widget_svggraph_form = new class {
 				this.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this._updateDatasetsLabel();
 				this._updatePreview();
+
+				this.registerUpdateEvent();
 			});
 		}
 	}
@@ -512,7 +507,7 @@ window.widget_svggraph_form = new class {
 					srctbl: 'items',
 					srcfld1: 'itemid',
 					srcfld2: 'name',
-					dstfrm: widget_svggraph_form._form.id,
+					dstfrm: this._form.id,
 					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
 					dstfld2: `items_${dataset_index}_${row_index}_name`,
 					numeric: 1,
@@ -528,7 +523,7 @@ window.widget_svggraph_form = new class {
 					srctbl: 'items',
 					srcfld1: 'itemid',
 					srcfld2: 'name',
-					dstfrm: widget_svggraph_form._form.id,
+					dstfrm: this._form.id,
 					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
 					dstfld2: `items_${dataset_index}_${row_index}_name`,
 					numeric: 1,
@@ -556,7 +551,7 @@ window.widget_svggraph_form = new class {
 	_selectWidget(row = null, exclude_typed_references = []) {
 		const widgets = ZABBIX.Dashboard.getReferableWidgets({
 			type: CWidgetsData.DATA_TYPE_ITEM_ID,
-			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+			widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 		});
 
 		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
@@ -641,15 +636,15 @@ window.widget_svggraph_form = new class {
 
 		const used_colors = [];
 
-		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of this._form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 
-		jQuery(`#items_${dataset_index}_${items_new_index}_color`)
-			.val(colorPalette.getNextColor(used_colors))
-			.colorpicker();
+		row.querySelector(`.${ZBX_STYLE_COLOR_PICKER}`).color = colorPalette.getNextColor(used_colors);
+
+		this.registerUpdateEvent();
 	}
 
 	_removeSingleItem(element) {
@@ -660,6 +655,8 @@ window.widget_svggraph_form = new class {
 		this._updateSingleItemsOrder(dataset);
 		this._initSingleItemSortable(dataset);
 		this._updatePreview();
+
+		this.registerUpdateEvent();
 	}
 
 	_initSingleItemSortable(dataset) {
@@ -680,6 +677,8 @@ window.widget_svggraph_form = new class {
 		sortable.on(CSortable.EVENT_SORT, () => {
 			this._updateSingleItemsOrder(dataset);
 			this._updatePreview();
+
+			this.registerUpdateEvent();
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);
@@ -689,7 +688,7 @@ window.widget_svggraph_form = new class {
 		const widgets = ZABBIX.Dashboard
 			.getReferableWidgets({
 				type: CWidgetsData.DATA_TYPE_ITEM_ID,
-				widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+				widget_context: ZABBIX.Dashboard.getWidgetEditingContext()
 			})
 			.reduce((map, widget) => map.set(widget.getFields().reference, widget.getHeaderName()), new Map());
 
@@ -722,8 +721,6 @@ window.widget_svggraph_form = new class {
 	}
 
 	_updateSingleItemsOrder(dataset) {
-		jQuery.colorpicker('destroy', jQuery('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input', dataset));
-
 		const dataset_index = dataset.getAttribute('data-set');
 
 		for (const row of dataset.querySelectorAll('.single-item-table-row')) {
@@ -733,11 +730,6 @@ window.widget_svggraph_form = new class {
 			row.querySelector('.table-col-name a').id = `${prefix}_name`;
 			row.querySelector('.table-col-action input[name$="[itemids][]"]').id = `${prefix}_itemid`;
 			row.querySelector('.table-col-action input[name$="[references][]"]').id = `${prefix}_reference`;
-
-			const colorpicker = row.querySelector('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input');
-
-			colorpicker.id = `${prefix}_color`;
-			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
 		}
 	}
 
@@ -930,6 +922,7 @@ window.widget_svggraph_form = new class {
 
 	#update_preview_abort_controller = null;
 	#update_preview_loading_timeout = null;
+	#update_preview_had_errors = false;
 
 	_updatePreview() {
 		if (this.#update_preview_abort_controller !== null) {
@@ -1029,9 +1022,12 @@ window.widget_svggraph_form = new class {
 					throw {error: response.error};
 				}
 
-				for (const element of this._form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
+				// Do not remove initial messages displayed by CWidgetEditDialogue.
+				if (this.#update_preview_had_errors) {
+					for (const element of this._form.parentNode.children) {
+						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+							element.parentNode.removeChild(element);
+						}
 					}
 				}
 
@@ -1080,6 +1076,8 @@ window.widget_svggraph_form = new class {
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this._form.parentNode.insertBefore(message_box, this._form);
+
+				this.#update_preview_had_errors = true;
 			});
 	}
 
