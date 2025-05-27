@@ -105,9 +105,6 @@ func (a *addressPool) addRedirect(address string, revision uint64) bool {
 			a.pool = append(a.pool[:i], a.pool[i+1:]...)
 
 			break
-		} else if addr.addr == address {
-			a.pool[0], a.pool[i] = a.pool[i], a.pool[0]
-			return false
 		}
 	}
 
