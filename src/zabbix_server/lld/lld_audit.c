@@ -112,6 +112,6 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 	if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		lld_audit_item_add_uint64(item, "discover", item_prototype->discover);
-		lld_audit_item_add_uint64(item, "lldruleid", lldruleid);
+		lld_audit_item_add_uint64(item, "ruleid", lldruleid);
 	}
 }

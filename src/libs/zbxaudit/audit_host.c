@@ -1161,7 +1161,7 @@ void	zbx_audit_host_update_json_add_details(zbx_audit_entry_t *audit_entry, cons
 	if (0 != (flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "discover", "discover", discover);
-		zbx_audit_entry_add_uint64(audit_entry, NULL, NULL, "lldruleid", lldruleid);
+		zbx_audit_entry_add_uint64(audit_entry, NULL, NULL, "ruleid", lldruleid);
 	}
 
 #undef AUDIT_TABLE_NAME
