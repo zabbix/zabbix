@@ -72,6 +72,8 @@ function escapeHtml(string) {
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {
+	const old_value = obj.value;
+
 	if (obj != null) {
 		if (allowempty) {
 			if (obj.value.length == 0 || obj.value == null) {
@@ -99,6 +101,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 		if (obj.value < 0) {
 			obj.value = obj.value * -1;
 		}
+	}
+
+	if (old_value !== obj.value) {
+		obj.dispatchEvent(new Event('input', {bubbles: true}));
 	}
 }
 
