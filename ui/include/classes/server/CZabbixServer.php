@@ -131,14 +131,15 @@ class CZabbixServer {
 	 * @param int         $connect_timeout
 	 * @param int         $timeout
 	 * @param int         $total_bytes_limit
+	 * @param array       $tls_config
 	 */
-	public function __construct($host, $port, $connect_timeout, $timeout, $total_bytes_limit) {
+	public function __construct($host, $port, $connect_timeout, $timeout, $total_bytes_limit, array $tls_config = []) {
 		$this->host = $host;
 		$this->port = $port;
 		$this->connect_timeout = $connect_timeout;
 		$this->timeout = $timeout;
 		$this->total_bytes_limit = $total_bytes_limit;
-		$this->tls_config = ZBase::getConfig()['ZBX_SERVER_TLS'];
+		$this->tls_config = $tls_config ?: ZBase::getConfig()['ZBX_SERVER_TLS'];
 		$this->error_code = self::ERROR_CODE_NONE;
 	}
 
