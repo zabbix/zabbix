@@ -31,16 +31,20 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup items,actions,triggers,globalmacro,hostmacro
  * @hosts test_macros
+ * @onAfter clearData
  */
 class testExpressionMacros extends CIntegrationTest {
 
 	private static $hostid;
 	private static $triggerid;
-	private static $trigger_actionid;
+	private static $trigger_action_id;
 	private static $alert_response;
 	private static $event_response;
+
+	private static $item_ids = [];
+	private static $usermacro_ids = [];
+	private static $globalmacro_ids = [];
 
 	private static $event_tags_json;
 	private static $trigger_expression_explain;
@@ -541,20 +545,28 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			'value' => 'HOST_LEVEL_' . ALL_PRINTABLE_ASCII
 		]);
 
+		array_push(self::$usermacro_ids, $response['result']['hostmacroids'][0]);
+
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL}',
 			'value' => 'GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII
 		]);
+
+		array_push(self::$globalmacro_ids, $response['result']['globalmacroids'][0]);
 
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL_DOUBLE}',
 			'value' => self::SAMPLE_DOUBLE_VALUE
 		]);
 
+		array_push(self::$globalmacro_ids, $response['result']['globalmacroids'][0]);
+
 		$response = $this->call('usermacro.createglobal', [
 			'macro' => '{$USER_MACRO_GLOBAL_TIME}',
 			'value' => self::TIME_BUILDIN_MACRO_SIM
 		]);
+
+		array_push(self::$globalmacro_ids, $response['result']['globalmacroids'][0]);
 
 		// Get host interface ids.
 		$response = $this->call('host.get', [
@@ -567,9 +579,9 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
-		$items = [];
+		self::$item_ids = [];
 		for ($i = 1; $i < 3; $i++) {
-			$items[] = [
+			self::$item_ids[] = [
 				'hostid' => self::$hostid,
 				'name' => self::TRAPPER_ITEM_NAME.$i,
 				'key_' => self::TRAPPER_ITEM_KEY.$i,
@@ -578,9 +590,9 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			];
 		}
 
-		$response = $this->call('item.create', $items);
+		$response = $this->call('item.create', self::$item_ids);
 		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(count($items), count($response['result']['itemids']));
+		$this->assertEquals(count(self::$item_ids), count($response['result']['itemids']));
 
 		$response = $this->call('trigger.create', [
 			'description' => 'trigger_trap',
@@ -744,7 +756,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
-		self::$trigger_actionid = $response['result']['actionids'][0];
+		self::$trigger_action_id = $response['result']['actionids'][0];
 
 		return true;
 	}
@@ -795,7 +807,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 
 
 		self::$alert_response = $this->callUntilDataIsPresent('alert.get', [
-			'actionids' => [self::$trigger_actionid],
+			'actionids' => [self::$trigger_action_id],
 			'sortfield' => 'alertid'
 		], 5, 2);
 		$this->assertCount(4, self::$alert_response['result']);
@@ -1009,4 +1021,18 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 		$this->assertEquals(self::EVENT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$event_response['result'][0]['name']);
 	}
 
+	public static function clearData(): void {
+
+		if (!empty(self::$usermacro_ids)) {
+			CDataHelper::call('usermacro.delete', self::$usermacro_ids);
+		}
+
+		if (!empty(self::$globalmacro_ids)) {
+			CDataHelper::call('usermacro.deleteglobal', self::$globalmacro_ids);
+		}
+
+		CDataHelper::call('trigger.delete', [self::$triggerid]);
+		CDataHelper::call('action.delete', [self::$trigger_action_id]);
+		CDataHelper::call('item.delete', [self::$item_ids]);
+	}
 }
