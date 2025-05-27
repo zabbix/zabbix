@@ -189,9 +189,10 @@ class CControllerTriggerPrototypeEdit extends CController {
 		if ($this->trigger_prototype) {
 			if ($this->trigger_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 				$db_parent = API::TriggerPrototype()->get([
-					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid'],
+					'output' => [],
 					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
-					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags']
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
+					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid']
 				]);
 				$db_parent = reset($db_parent);
 
@@ -213,13 +214,16 @@ class CControllerTriggerPrototypeEdit extends CController {
 					$data['tags'] = $trigger['tags'];
 				}
 
-				$data = array_merge($data, [
-					'templateid' => $trigger['templateid'],
-					'limited' => $trigger['limited'],
-					'flags' => $trigger['flags'],
-					'templates' => $trigger['templates'],
-					'hostid' => $trigger['hostid']
-				]);
+				$data = array_intersect_key($trigger, array_flip([
+					'templateid',
+					'limited',
+					'flags',
+					'templates',
+					'hostid',
+					'discoveryRule',
+					'discoveryRulePrototype',
+					'discoveryData'
+				])) + $data;
 			}
 			else {
 				$data = $trigger;

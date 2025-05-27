@@ -180,8 +180,8 @@ class CControllerTriggerEdit extends CController {
 			if ($this->trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 				$db_parent = API::TriggerPrototype()->get([
 					'triggerids' => $this->trigger['discoveryData']['parent_triggerid'],
-					'selectDiscoveryRule' => ['itemid', 'templateid'],
-					'selectDiscoveryRulePrototype' => ['itemid', 'templateid']
+					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags']
 				]);
 				$db_parent = reset($db_parent);
 

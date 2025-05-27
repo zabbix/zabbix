@@ -52,6 +52,7 @@ class CControllerItemTagsList extends CController {
 		if ($this->hasInput('itemid')) {
 			$options = [
 				'output' => ['itemid', 'templateid', 'hostid', 'flags'],
+				'selectDiscoveryData' => ['parent_itemid'],
 				'itemids' => [$this->getInput('itemid')]
 			];
 
@@ -59,7 +60,8 @@ class CControllerItemTagsList extends CController {
 
 			if (!$items) {
 				if ($this->getInput('show_inherited_tags', 0) == 1) {
-					$options['selectDiscoveryRule'] = ['itemid', 'templateid'];
+					$options['selectDiscoveryRule'] = ['itemid', 'templateid', 'flags'];
+					$options['selectDiscoveryRulePrototype'] = ['itemid', 'templateid', 'flags'];
 				}
 
 				$items = API::ItemPrototype()->get($options);
@@ -70,8 +72,6 @@ class CControllerItemTagsList extends CController {
 			}
 
 			$this->item = reset($items);
-
-			$this->item = CArrayHelper::renameKeys($this->item, ['discoveryRule' => 'parent_lld']);
 		}
 		else {
 			$this->item =[
@@ -97,6 +97,21 @@ class CControllerItemTagsList extends CController {
 		$data['readonly'] = $this->item['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
 
 		if ($data['show_inherited_tags'] == 1) {
+			if ($this->item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_parent = API::ItemPrototype()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
+					'itemids' => $this->item['discoveryData']['parent_itemid']
+				]);
+				$db_parent = reset($db_parent);
+
+				$this->item['parent_lld'] = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			}
+			elseif ($this->item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$this->item['parent_lld'] = $this->item['discoveryRule'] ?: $this->item['discoveryRulePrototype'];
+			}
+
 			$data['tags'] = CItemHelper::addInheritedTags($this->item, $data['tags']);
 		}
 

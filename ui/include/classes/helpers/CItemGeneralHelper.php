@@ -123,7 +123,7 @@ JAVASCRIPT;
 		$tags = [];
 
 		$parent_templates = array_key_exists('parent_lld', $item)
-			? getItemParentTemplates([$item['parent_lld']], ZBX_FLAG_DISCOVERY_RULE)['templates']
+			? getItemParentTemplates([$item['parent_lld']], $item['parent_lld']['flags'])['templates']
 			: getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		unset($parent_templates[0]);
 
@@ -825,20 +825,25 @@ JAVASCRIPT;
 		$lldruleid = $data['parent_lld']['itemid'];
 
 		while ($data['parent_lld']['templateid'] == 0) {
-			$db_source = API::DiscoveryRule()->get([
+			$options = [
 				'output' => ['itemid', 'templateid', 'flags'],
 				'selectDiscoveryRule' => ['itemid'],
 				'itemids' => $lldruleid,
 				'nopermissions' => true
-			]);
+			];
 
-			$data['parent_lld'] = reset($db_source);
+			$db_source = API::DiscoveryRule()->get($options)
+				?: API::DiscoveryRulePrototype()->get($options + ['selectDiscoveryRulePrototype' => ['itemid']]);
 
-			if (!$data['parent_lld']['discoveryRule']) {
+			$data['parent_lld'] = reset($db_source) + ['discoveryRulePrototype' => []];
+
+			$parent_lld = $data['parent_lld']['discoveryRule'] ?: $data['parent_lld']['discoveryRulePrototype'];
+
+			if (!$parent_lld) {
 				break;
 			}
 
-			$lldruleid = $data['parent_lld']['discoveryRule']['itemid'];
+			$lldruleid = $parent_lld['itemid'];
 		}
 	}
 }
