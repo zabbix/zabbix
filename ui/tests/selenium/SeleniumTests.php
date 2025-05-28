@@ -77,6 +77,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardPieChartWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidget.php';
@@ -420,6 +421,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
+		$suite->addTestSuite('testDashboardProblemHostsWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
