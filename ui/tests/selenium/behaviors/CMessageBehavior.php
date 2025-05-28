@@ -54,4 +54,29 @@ class CMessageBehavior extends CBehavior {
 			}
 		}
 	}
+
+	/**
+	 * Compare inline message text and check that corresponding field is highlighted.
+	 *
+	 * @param CFormElement	$form		form that contains the field with the error
+	 * @param array			$fields		array of field selector and expected inline error string pairs
+	 */
+	public function assertInlineError($form, $fields) {
+		foreach ($fields as $selector => $error_text) {
+			$field = $form->getField($selector);
+			$field->waitUntilClassesPresent('has-error');
+
+			if ($field->isAttributePresent('data-error-container')) {
+				$container_field = $form->query('id', $field->getAttribute('data-error-container'))->one();
+				$this->test->assertTrue(in_array($error_text, $container_field->query('class:error')->waitUntilPresent()
+						->all()->asText()), $error_text.' was not found among inline error messages.'
+				);
+			}
+			else {
+				$this->test->assertEquals($error_text, $field->query('xpath:./../span[@class="error"]|./../../span[@class="error"]')
+						->waitUntilPresent()->one()->getText()
+				);
+			}
+		}
+	}
 }

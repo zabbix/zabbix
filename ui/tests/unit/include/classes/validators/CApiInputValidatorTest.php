@@ -5064,7 +5064,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
@@ -5088,7 +5088,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
@@ -5106,31 +5106,31 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO10}{$MACRO11}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO8}{#MACRO9}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'-1',
 				'/1/port',
-				'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'9999999999',
 				'/1/port',
-				'Invalid parameter "/1/port": a number is too large.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'65536',
 				'/1/port',
-				'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],

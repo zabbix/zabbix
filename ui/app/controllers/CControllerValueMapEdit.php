@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerPopupValueMapEdit extends CController {
+class CControllerValueMapEdit extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
@@ -22,12 +22,12 @@ class CControllerPopupValueMapEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'edit' => 'in 1,0',
+			'edit' => 'in 1',
 			'mappings' => 'array',
 			'name' => 'string',
-			'update' => 'in 1',
 			'valuemapid' => 'id',
-			'valuemap_names' => 'array'
+			'valuemap_names' => 'array',
+			'source' => 'required|in host,template,massupdate'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,7 +51,7 @@ class CControllerPopupValueMapEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'action' => 'popup.valuemap.update',
+			'action' => 'popup.valuemap.check',
 			'edit' => 0,
 			'mappings' => [],
 			'name' => '',
@@ -61,7 +61,7 @@ class CControllerPopupValueMapEdit extends CController {
 		$this->getInputs($data, array_keys($data));
 
 		if (!$data['mappings']) {
-			$mappings = [['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => '']];
+			$data['mappings'] = [['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => '']];
 		}
 		else {
 			$mappings = [];
@@ -79,10 +79,42 @@ class CControllerPopupValueMapEdit extends CController {
 			if ($default) {
 				$mappings[] = $default;
 			}
+
+			$data['mappings'] = $mappings;
 		}
 
-		$data['mappings'] = $mappings;
+		if ($this->getInput('source') === 'host') {
+			$rules = CControllerHostCreate::getValidationRules()['fields']['valuemaps'];
+
+			if ($data['valuemap_names']) {
+				$rules['fields']['name'] += ['not_in' => $data['valuemap_names']];
+
+				if (!array_key_exists('messages', $rules['fields']['name'])) {
+					$rules['fields']['name']['messages'] = [];
+				}
+				$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
+			}
+
+			$data += ['js_validation_rules' => (new CFormValidator($rules))->getRules()];
+		}
+		elseif ($this->getInput('source') === 'template') {
+			$rules = CControllerTemplateCreate::getValidationRules()['fields']['valuemaps'];
+
+			if ($data['valuemap_names']) {
+				$rules['fields']['name'] += ['not_in' => $data['valuemap_names']];
+
+				if (!array_key_exists('messages', $rules['fields']['name'])) {
+					$rules['fields']['name']['messages'] = [];
+				}
+				$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
+			}
+
+			$data += ['js_validation_rules' => (new CFormValidator($rules))->getRules()];
+		}
+
 		$data += [
+			'has_inline_validation' => $this->getInput('source') === 'host' || $this->getInput('source') === 'template',
+			'source' => $this->getInput('source'),
 			'title' => _('Value mapping'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

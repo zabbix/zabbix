@@ -55,16 +55,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			' wf.value_itemid, wf.value_graphid';
 
 	/**
-	 * Callback executed before every test case. Automatically accept the alert.
-	 *
-	 * @before
-	 */
-	public function onBeforeTestCase() {
-		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
-	}
-
-	/**
 	 * Create dashboards with widgets for test and define the corresponding dashboard ID.
 	 */
 	public static function prepareDashboardData() {

@@ -40,6 +40,12 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 			'column' => $column
 		];
 
+		$names = [];
+		for ($i = 1; $i < 5; $i++) {
+			$names['interface_main_'.$i] = 'Default';
+		}
+		$instance->setFieldNames($names);
+
 		return $instance;
 	}
 
