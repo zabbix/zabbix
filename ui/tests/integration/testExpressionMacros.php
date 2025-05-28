@@ -560,25 +560,21 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		array_push(self::$usermacro_ids, $response['result']['hostmacroids'][0]);
 
 		$response = $this->call('usermacro.createglobal', [
-			'macro' => '{$USER_MACRO_GLOBAL}',
-			'value' => 'GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII
+			[
+				'macro' => '{$USER_MACRO_GLOBAL}',
+				'value' => 'GLOBAL_LEVEL_' . ALL_PRINTABLE_ASCII
+			],
+			[
+				'macro' => '{$USER_MACRO_GLOBAL_DOUBLE}',
+				'value' => self::SAMPLE_DOUBLE_VALUE
+			],
+			[
+				'macro' => '{$USER_MACRO_GLOBAL_TIME}',
+				'value' => self::TIME_BUILDIN_MACRO_SIM
+			]
 		]);
 
-		array_push(self::$globalmacro_ids, $response['result']['globalmacroids'][0]);
-
-		$response = $this->call('usermacro.createglobal', [
-			'macro' => '{$USER_MACRO_GLOBAL_DOUBLE}',
-			'value' => self::SAMPLE_DOUBLE_VALUE
-		]);
-
-		array_push(self::$globalmacro_ids, $response['result']['globalmacroids'][0]);
-
-		$response = $this->call('usermacro.createglobal', [
-			'macro' => '{$USER_MACRO_GLOBAL_TIME}',
-			'value' => self::TIME_BUILDIN_MACRO_SIM
-		]);
-
-		array_push(self::$globalmacro_ids, $response['result']['globalmacroids'][0]);
+		array_push(self::$globalmacro_ids, $response['result']['globalmacroids']);
 
 		// Get host interface ids.
 		$response = $this->call('host.get', [
