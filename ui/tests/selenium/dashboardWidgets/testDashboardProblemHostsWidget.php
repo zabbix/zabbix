@@ -25,7 +25,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 
 	const DEFAULT_DASHBOARD = 'Dashboard for Problem hosts widget test';
 	const DELETE_WIDGET = 'Problem hosts for delete';
-	
+
 	protected static $default_widget = 'Problem hosts for update';
 	protected static $dashboardid;
 
@@ -188,10 +188,10 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		foreach ($popup_options as $field => $popup_values) {
 			$popup_menu = $form->getField($field)->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
 			$this->assertTrue($popup_menu->isClickable());
-			
+
 			foreach ($popup_values as $title) {
 				$popup_menu->asPopupButton()->getMenu()->select($title);
-				
+
 				if ($title !== 'Dashboard') {
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 					$this->assertEquals($title, $dialog->getTitle());
@@ -446,26 +446,26 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
-		
+
 		// If scenario requires to trim trailing and leading spaces, remove them from data for comparison.
 		if (CTestArrayHelper::get($data, 'trim')) {
 			$data = CTestArrayHelper::trim($data);
 		}
-		
+
 		$header = (array_key_exists('Name', $data['fields'])) ? $data['fields']['Name'] : self::$default_widget;
-		
+
 		// Add new widget or update existing widget.
 		if ($update) {
 			$form = $dashboard->getWidget(self::$default_widget)->edit();
 			COverlayDialogElement::find()->one()->waitUntilReady();
-		
+
 			$unfilled_fields = $form->getValues();
 		}
 		else {
 			$form = $dashboard->edit()->addWidget()->asForm();
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problem hosts')]);
-			
+
 			$unfilled_fields = [
 				'Show header' => true,
 				'Type' => 'Problem hosts',
@@ -484,7 +484,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		}
 
 		$form->fill($data['fields']);
-		
+
 		if (array_key_exists('tags', $data)) {
 			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
 			$tags_table->clear();
@@ -595,7 +595,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		else {
 			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		}
-		
+
 		if ($cancel || !$save_dashboard) {
 			$form->fill([
 					'Name' => 'No save',
@@ -616,7 +616,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 					'value' => 'value'
 			]);
 		}
-		
+
 		if ($cancel) {
 			$dialog->close();
 		}
