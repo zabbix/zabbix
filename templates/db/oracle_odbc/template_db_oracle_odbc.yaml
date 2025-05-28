@@ -1975,7 +1975,7 @@ zabbix_export:
                            CDB_TABLESPACES ct
                       WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                         AND cdf.CON_ID = ct.CON_ID
-                        AND ct.CON_ID = '{#CON_ID}'
+                        AND (ct.CON_ID = '{#CON_ID}' or (ct.CON$NAME is null and ct.CON_ID = 0))
                         AND cdf.TABLESPACE_NAME = '{#TABLESPACE}'
                         AND ct.CONTENTS = '{#CONTENTS}') df,
                      (SELECT TRUNC(SUM(BYTES)) AS FREE,
@@ -2048,7 +2048,7 @@ zabbix_export:
                            CDB_TABLESPACES ct
                       WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                         AND ctf.CON_ID = ct.CON_ID
-                        AND ct.CON_ID = '{#CON_ID}'
+                        AND (ct.CON_ID = '{#CON_ID}' or (ct.CON$NAME is null and ct.CON_ID = 0))
                         AND ctf.TABLESPACE_NAME = '{#TABLESPACE}'
                         AND ct.CONTENTS = '{#CONTENTS}') Y
                 GROUP BY Y.CON_NAME,
