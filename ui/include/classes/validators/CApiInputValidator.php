@@ -4398,10 +4398,10 @@ class CApiInputValidator {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	private static function validatePrivateKey($rule, &$data, $path, &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
