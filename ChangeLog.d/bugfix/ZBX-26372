@@ -1,0 +1,1 @@
+A.F....... [ZBX-26372] fixed long-running TimescaleDB queries when requesting historical data (gcalenko, Sasha)
