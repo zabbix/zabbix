@@ -150,7 +150,7 @@ class CAuthentication extends CApiService {
 			$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 			if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-				static::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
+				self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
 			}
 		}
 	}

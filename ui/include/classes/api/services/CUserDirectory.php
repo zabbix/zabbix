@@ -403,6 +403,16 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateCreate(array &$userdirectories): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'idp_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkSamlRequirements($userdirectories);
+
 		$api_input_rules = self::getValidationRules();
 
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
@@ -553,6 +563,7 @@ class CUserDirectory extends CApiService {
 			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])]
 
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -582,6 +593,8 @@ class CUserDirectory extends CApiService {
 		}
 		unset($userdirectory);
 
+		self::checkSamlRequirements($userdirectories);
+
 		self::addSamlWriteOnlyDbFields($userdirectories, $db_userdirectories);
 
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
@@ -601,6 +614,18 @@ class CUserDirectory extends CApiService {
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
 	}
 
+	private static function checkSamlRequirements(array $userdirectories): void {
+		foreach ($userdirectories as $userdirectory) {
+			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+				if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
+				}
+			}
+		}
+	}
+
 	private static function addSamlWriteOnlyDbFields(array $userdirectories, array &$db_userdirectories): void {
 		$userdirectoryids = [];
 
@@ -615,11 +640,11 @@ class CUserDirectory extends CApiService {
 			return;
 		}
 
-		$arr = [
+		$options = [
 			'output' => ['userdirectoryid', 'idp_certificate', 'sp_certificate', 'sp_private_key'],
-			'userdirectoryids' => $userdirectoryids,
+			'userdirectoryids' => $userdirectoryids
 		];
-		$resource = DBselect(DB::makeSql('userdirectory_saml', $arr));
+		$resource = DBselect(DB::makeSql('userdirectory_saml', $options));
 
 		while ($row = DBfetch($resource)) {
 			$db_userdirectories[$row['userdirectoryid']] += $row;
@@ -1479,8 +1504,8 @@ class CUserDirectory extends CApiService {
 			]]
 			: ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => self::getProvisionMediaValidationFields()];
 
-		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'idp_type' =>			['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
+		return ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => $specific_fields + [
+			'idp_type' =>			['type' => API_ANY],
 			'name' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
 										['else' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'name')] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'name')])

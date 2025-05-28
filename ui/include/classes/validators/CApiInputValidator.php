@@ -278,10 +278,10 @@ class CApiInputValidator {
 				return self::validateSelementId($rule, $data, $path, $error);
 
 			case API_SSL_CERTIFICATE:
-				return self::validateCertificate($rule, $data, $path, $error);
+				return self::validateSslCertificate($rule, $data, $path, $error);
 
 			case API_SSL_PRIVATE_KEY:
-				return self::validatePrivateKey($rule, $data, $path, $error);
+				return self::validateSslPrivateKey($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -4377,11 +4377,26 @@ class CApiInputValidator {
 			: self::validateId([], $data, $path, $error);
 	}
 
-	private static function validateCertificate($rule, &$data, $path, &$error): bool {
+	/**
+	 * Validate SSL certificate. The OpenSSL PHP extension is required to be enabled.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSslCertificate(array $rule, &$data, string $path, string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if ($data === '') {
+			return true;
 		}
 
 		if (mb_strlen($data) > self::SSL_CERTIFICATE_MAX_LENGTH) {
@@ -4389,24 +4404,36 @@ class CApiInputValidator {
 
 			return false;
 		}
-		elseif ($data !== '') {
-			$is_certificate = @openssl_x509_read($data);
 
-			if (!$is_certificate) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded certificate is expected'));
+		if (!openssl_x509_parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded certificate is expected'));
 
-				return false;
-			}
+			return false;
 		}
 
 		return true;
 	}
 
-	private static function validatePrivateKey($rule, &$data, $path, &$error): bool {
+	/**
+	 * Validate SSL private key. The OpenSSL PHP extension is required to be enabled.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSslPrivateKey(array $rule, &$data, string $path, string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if ($data === '') {
+			return true;
 		}
 
 		if (mb_strlen($data) > self::SSL_PRIVATE_KEY_MAX_LENGTH) {
@@ -4414,14 +4441,11 @@ class CApiInputValidator {
 
 			return false;
 		}
-		elseif ($data !== '') {
-			$is_private_key = openssl_pkey_get_private($data);
 
-			if (!$is_private_key) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded private key is expected'));
+		if (!openssl_pkey_get_private($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded private key is expected'));
 
-				return false;
-			}
+			return false;
 		}
 
 		return true;
