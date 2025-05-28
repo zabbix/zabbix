@@ -606,15 +606,32 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			$itemids[$row['itemid']] = $row['lldruleid'];
 		}
 
+		$internal_fields = $options['limitSelects'] !== null ? ['name'] : [];
+
 		$child_items = API::DiscoveryRulePrototype()->get([
-			'output' => $options['selectDiscoveryRulePrototypes'],
+			'output' => array_unique(array_merge($options['selectDiscoveryRulePrototypes'], $internal_fields)),
 			'itemids' => array_keys($itemids),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
+		if ($options['limitSelects'] !== null) {
+			CArrayHelper::sort($child_items, ['name']);
+		}
+
+		$fields_to_unset = array_flip(array_diff($internal_fields, $options['selectDiscoveryRulePrototypes']));
+
 		foreach ($child_items as $child_itemid => $child_item) {
-			$result[$itemids[$child_itemid]]['discoveryRulePrototypes'][] = $child_item;
+			$lldruleid = $itemids[$child_itemid];
+
+			if ($options['limitSelects'] !== null
+					&& count($result[$lldruleid]['discoveryRulePrototypes']) == $options['limitSelects']) {
+				continue;
+			}
+
+			$result[$lldruleid]['discoveryRulePrototypes'][] = $fields_to_unset
+				? array_diff_key($child_item, $fields_to_unset)
+				: $child_item;
 		}
 	}
 
