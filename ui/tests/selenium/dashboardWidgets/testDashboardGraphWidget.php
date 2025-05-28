@@ -19,8 +19,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 /**
  * @backup widget, profiles
  *

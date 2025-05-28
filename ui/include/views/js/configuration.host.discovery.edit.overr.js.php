@@ -135,9 +135,13 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="lldoverride-tag-row">
-	<?= renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['field_name' => 'optag', 'add_post_js' => false]) ?>
-</script>
+
+<?php
+(new CTemplateTag('lldoverride-tag-row',
+	renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['field_name' => 'optag', 'add_post_js' => false])
+))->show();
+?>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {

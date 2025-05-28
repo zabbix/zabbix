@@ -105,7 +105,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			&& $this->item_type != ITEM_TYPE_NESTED;
 
 		// Check if key is valid for item types it's mandatory.
-		if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+		if (in_array($this->item_type, self::$item_types_has_key_mandatory)) {
 			$item_key_parser = new CItemKey();
 
 			if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {

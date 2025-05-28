@@ -253,12 +253,16 @@ $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 );
 
 $host_interface_template = (new CTemplateTag('host-interface-row-tmpl'))->addItem(
-	new CPartial('configuration.host.interface.row')
+	new CPartial('configuration.host.interface.row', ['is_snmp' => false])
+);
+$host_interface_snmp_template = (new CTemplateTag('host-interface-row-snmp-tmpl'))->addItem(
+	new CPartial('configuration.host.interface.row', ['is_snmp' => true])
 );
 
 $host_tab
 	->addItem($group_prototype_template)
-	->addItem($host_interface_template);
+	->addItem($host_interface_template)
+	->addItem($host_interface_snmp_template);
 
 $interface_header = renderInterfaceHeaders();
 
@@ -293,6 +297,18 @@ $host_tab->addRow(
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
 			->setId('interfaces-table')
 			->addClass(ZBX_STYLE_HOST_INTERFACES),
+		(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_AGENT, 0))
+			->setAttribute('data-prevent-validation-on-change', 1)
+			->setAttribute('data-field-type', 'hidden'),
+		(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_SNMP, 0))
+			->setAttribute('data-prevent-validation-on-change', 1)
+			->setAttribute('data-field-type', 'hidden'),
+		(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_IPMI, 0))
+			->setAttribute('data-prevent-validation-on-change', 1)
+			->setAttribute('data-field-type', 'hidden'),
+		(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_JMX, 0))
+			->setAttribute('data-prevent-validation-on-change', 1)
+			->setAttribute('data-field-type', 'hidden'),
 		new CDiv(
 			(new CButton('interface-add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -423,7 +439,8 @@ $tabs->addTab('tags-tab', _('Tags'),
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
 		'tabs_id' => 'tabs',
-		'tags_tab_id' => 'tags-tab'
+		'tags_tab_id' => 'tags-tab',
+		'has_inline_validation' => false
 	]),
 	TAB_INDICATOR_TAGS
 );
@@ -443,7 +460,8 @@ $macro_tab = (new CFormList('macrosFormList'))
 			[
 				'macros' => $data['macros'],
 				'parent_hostid' => $data['parent_host']['hostid'],
-				'readonly' => $data['templates'] || $data['is_discovered_prototype']
+				'readonly' => $data['templates'] || $data['is_discovered_prototype'],
+				'has_inline_validation' => false
 			]
 		),
 		'macros_container'

@@ -806,12 +806,7 @@ class testFormTabIndicators extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'close_dialog')) {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$dialog->query('class:btn-overlay-close')->one()->click();
-			if (CTestArrayHelper::get($data, 'widget_type', false)) {
-				$this->page->acceptAlert();
-			}
-			$dialog->ensureNotPresent();
+			COverlayDialogElement::find()->one()->waitUntilReady()->close();
 		}
 	}
 

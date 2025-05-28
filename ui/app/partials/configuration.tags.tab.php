@@ -44,6 +44,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 
 		case 'item':
+			$data['has_inline_validation'] = true;
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
 			$on_change = null;
 			break;

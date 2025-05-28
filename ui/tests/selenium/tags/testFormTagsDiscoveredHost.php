@@ -49,22 +49,35 @@ class testFormTagsDiscoveredHost extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'inline_error' => ['id:tags_2_tag' => 'Name: This field cannot be empty.']
 				]
 			],
-			// No errors for the same added tags, but the duplicate tag is not saved.
 			[
 				[
+					'expected' => TEST_BAD,
 					'tags' => [
 						[
 							'tag' => 'discovered',
 							'value' => 'true'
-						],
-						[
-							'tag' => 'discovered without tag value',
-							'value' => ''
 						]
-					]
+					],
+					'inline_error' => ['id:tags_2_tag' => 'Tag name and value combination is not unique.']
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 'value'
+						],
+						[
+							'tag' => 'tag',
+							'value' => '  value  '
+						]
+					],
+					'inline_error' => ['id:tags_3_tag' => 'Tag name and value combination is not unique.']
 				]
 			],
 			[
@@ -72,15 +85,25 @@ class testFormTagsDiscoveredHost extends testFormTags {
 					'tags' => [
 						[
 							'tag' => 'discovered',
-							'value' => 'true'
+							'value' => 'True'
 						],
 						[
-							'tag' => 'discovered without tag value',
+							'tag' => 'Discovered without tag value',
 							'value' => ''
 						],
 						[
 							'tag' => 'discovered without tag value',
 							'value' => 'true'
+						]
+					],
+					'existing_tags' => [
+						[
+							'tag' => 'discovered',
+							'value' => 'true'
+						],
+						[
+							'tag' => 'discovered without tag value',
+							'value' => ''
 						]
 					]
 				]
@@ -89,27 +112,10 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	}
 
 	/**
-	 * Test update of Discovered Host with inherited tags.
-	 *
-	 * @dataProvider getInheritedUpdateData
-	 */
-	public function testFormTagsDiscoveredHost_InheritedUpdate($data) {
-		$this->update_name = $this->clone_name;
-		$this->checkTagsUpdate($data, 'host');
-	}
-
-	/**
 	 * Test cloning of Discovered Host with tags.
 	 */
 	public function testFormTagsDiscoveredHost_Clone() {
 		$this->executeCloning('discovered host');
-	}
-
-	/**
-	 * Test removing tags from Discovered Host.
-	 */
-	public function testFormTagsDiscoveredHost_RemoveTags() {
-		$this->clearTags('host');
 	}
 
 	/**
@@ -121,6 +127,9 @@ class testFormTagsDiscoveredHost extends testFormTags {
 		$inherited_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE automatic=1 AND hostid='.
 				$hostid.' ORDER BY tag, value');
 		$this->page->login()->open($this->link);
+		$this->query('button:Reset')->one()->click();
+		$this->page->waitUntilReady();
+
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 		$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Tags');
@@ -135,5 +144,24 @@ class testFormTagsDiscoveredHost extends testFormTags {
 			$this->assertFalse($row->getColumn('Value')->children()->one()->isEnabled());
 			$this->assertEquals('(created by host discovery)', $row->getColumn('')->getText());
 		}
+
+		COverlayDialogElement::find()->one()->close();
+	}
+
+	/**
+	 * Test update of Discovered Host with inherited tags.
+	 *
+	 * @dataProvider getInheritedUpdateData
+	 */
+	public function testFormTagsDiscoveredHost_InheritedUpdate($data) {
+		$this->update_name = $this->clone_name;
+		$this->checkTagsUpdate($data, 'host');
+	}
+
+	/**
+	 * Test removing tags from Discovered Host.
+	 */
+	public function testFormTagsDiscoveredHost_RemoveTags() {
+		$this->clearTags('host');
 	}
 }

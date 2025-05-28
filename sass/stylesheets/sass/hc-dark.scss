@@ -6,7 +6,6 @@ $ui-transitions: false;
 $red: #ff5050;
 
 $orange: #ff7800;
-
 $dark-yellow: #ffa20d;
 $yellow: #a78820;
 $lighter-yellow: #222222;
@@ -21,6 +20,9 @@ $white: #000000 !important;
 $disabled-bg-color: #000000;
 $disabled-item-color: #b5b5b5;
 $disabled-item-bg-color: #383838;
+
+$error: #ff5e5e;
+$error-focus: #ff5e5e;
 
 // Layout
 $header-bg-color: #070707;
@@ -519,6 +521,12 @@ a.btn-icon,
 			}
 		}
 	}
+
+	&.has-error {
+		input[type="radio"]:focus + label {
+			box-shadow: 0 0 0 2px rgba($error-focus, 0.35);
+		}
+	}
 }
 
 a {
@@ -658,9 +666,25 @@ a.link-action {
 	}
 }
 
+.multiselect-control {
+	&.has-error {
+		> .multiselect.active {
+			box-shadow: 0 0 0 1px $error-focus;
+		}
+	}
+}
+
 .checkbox-radio {
 	&:focus + label span {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
+	}
+
+	&[type="checkbox"] {
+		&.has-error {
+			&:focus + label span {
+				box-shadow: 0 0 0 1px $error-focus;
+			}
+		}
 	}
 }
 
@@ -668,6 +692,22 @@ a.link-action {
 	li {
 		padding-left: 1px;
 		margin-left: -1px;
+	}
+}
+
+z-select.has-error button.focusable:active,
+z-select.has-error button.focusable:hover,
+z-select.has-error button.focusable,
+input[type="text"].has-error,
+input[type="password"].has-error,
+input[type="search"].has-error,
+input[type="number"].has-error,
+input[type="email"].has-error,
+input[type="time"].has-error,
+input[type="file"].has-error,
+textarea.has-error {
+	&:focus {
+		box-shadow: 0 0 0 1px $error-focus;
 	}
 }
 

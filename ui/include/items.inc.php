@@ -1792,6 +1792,8 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
  */
 function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	foreach ($preprocessing as &$step) {
+		$step = CItemGeneralHelper::normalizeFormDataPreprocessingStep($step);
+
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:

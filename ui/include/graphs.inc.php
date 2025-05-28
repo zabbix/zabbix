@@ -1606,7 +1606,9 @@ function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTa
 						->setReadonly($readonly)
 				),
 				new CCol(
-					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+					(new CColorPicker('items[#{number}][color]'))
+						->setColor('#{color}')
+						->setReadonly($readonly)
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
@@ -1660,7 +1662,9 @@ function getItemTemplateStacked(bool $readonly): CTag {
 						->setReadonly($readonly)
 				),
 				new CCol(
-					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+					(new CColorPicker('items[#{number}][color]'))
+						->setColor('#{color}')
+						->setReadonly($readonly)
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
@@ -1715,7 +1719,9 @@ function getItemTemplatePieAndExploded(bool $readonly): CTag {
 						->setReadonly($readonly)
 				),
 				new CCol(
-					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+					(new CColorPicker('items[#{number}][color]'))
+						->setColor('#{color}')
+						->setReadonly($readonly)
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))

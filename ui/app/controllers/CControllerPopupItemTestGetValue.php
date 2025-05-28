@@ -83,7 +83,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			}
 
 			// Check if key is valid for item types it's mandatory.
-			if ($ret && in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+			if ($ret && in_array($this->item_type, self::$item_types_has_key_mandatory)) {
 				$key = $this->getInput('key', '');
 
 				/*
