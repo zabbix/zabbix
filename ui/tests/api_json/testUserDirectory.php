@@ -750,19 +750,19 @@ class testUserDirectory extends CAPITest {
 				'userdirectories' => [
 					['userdirectoryid' => 'API SAML', 'idp_certificate' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
 				],
-				'expected_error' => 'Invalid parameter "/1/idp_certificate": value is not PEM encoded certificate.'
+				'expected_error' => 'Invalid parameter "/1/idp_certificate": a PEM-encoded certificate is expected.'
 			],
 			'Test invalid SAML SP certificate format' => [
 				'userdirectories' => [
 					['userdirectoryid' => 'API SAML', 'sp_certificate' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
 				],
-				'expected_error' => 'Invalid parameter "/1/sp_certificate": value is not PEM encoded certificate.'
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": a PEM-encoded certificate is expected.'
 			],
 			'Test invalid SAML SP private key format' => [
 				'userdirectories' => [
 					['userdirectoryid' => 'API SAML', 'sp_private_key' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
 				],
-				'expected_error' => 'Invalid parameter "/1/sp_private_key": value is not PEM encoded private key.'
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": a PEM-encoded private key is expected.'
 			],
 			'Test invalid SAML IdP certificate length' => [
 				'userdirectories' => [
