@@ -2,9 +2,7 @@ $red: #e33734 !default;
 $lighter-red: #e3c5c5 !default;
 
 $orange: #f24f1d !default;
-
 $gold: #f3a914 !default;
-
 $yellow: #fad634 !default;
 $dark-yellow: #e99003 !default;
 $lighter-yellow: #fcf7c2 !default;
@@ -36,6 +34,9 @@ $warning-color: $dark-yellow !default;
 $disabled-bg-color: #ebebeb !default;
 $disabled-item-color: #768d99 !default;
 $disabled-item-bg-color: #ccd5d9 !default;
+
+$error: #cc0000 !default;
+$error-focus: #ad1f1f !default;
 
 $progress-complete-color: #0275b8 !default;
 $progress-current-color: #768d99 !default;
@@ -193,6 +194,8 @@ $form-search-border-color: #010a0f !default;
 $form-search-focused-color: $form-search-color !default;
 $form-search-focused-bg-color: $form-search-bg-color !default;
 $form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
+
+$form-radio-list-checked-color: $white !default;
 
 // Buttons.
 $btn-color: #ffffff !default;

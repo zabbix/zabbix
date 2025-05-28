@@ -42,13 +42,13 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/buttons";
 @import "components/icons-extended";
 @import "components/checkbox-list";
-@import "components/color-picker";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
 @import "components/form-search";
+@import "components/form-errors";
 @import "components/inline-filter";
 @import "components/list-table";
 @import "components/no-data-message";
@@ -799,6 +799,11 @@ form {
 			&.high-bg,
 			&.disaster-bg {
 				padding-left: 5px;
+			}
+
+			&.error-container {
+				padding-top: 0;
+				padding-bottom: 0;
 			}
 		}
 
@@ -3771,7 +3776,7 @@ svg {
 
 .interfaces {
 	display: grid;
-	grid-template-columns: 26px repeat(7, max-content);
+	grid-template-columns: 26px repeat(7, min-content);
 	margin-bottom: 5px;
 	line-height: 24px;
 
@@ -3840,6 +3845,16 @@ svg {
 	.no-interface {
 		grid-column: 1 / -1;
 		color: $font-alt-color;
+		width: 441px;
+	}
+
+	.error-container {
+		grid-column: 3 / -1;
+		margin-bottom: 5px;
+
+		.errors-list {
+			margin-top: 0;
+		}
 	}
 }
 

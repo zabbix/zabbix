@@ -131,7 +131,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=template.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:template_name' => 'CSRF validation template create',
+						'xpath://div[@id="template_groups_"]/..' => 'Templates'
+					]
 				]
 			],
 			// #7 Template update.
@@ -139,7 +143,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=template.list',
-					'overlay' => 'update'
+					'overlay' => 'update',
+					'fields' => [
+						'id:template_name' => 'CSRF validation template update',
+						'xpath://div[@id="template_groups_"]/..' => 'templates'
+					]
 				]
 			],
 			// #8 Host create.
@@ -147,14 +155,22 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=host.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:host' => 'CSRF validation host create',
+						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
+					]
 				]
 			],
 			// #9 Host update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062'
+					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062',
+					'fields' => [
+						'id:host' => 'CSRF validation host update',
+						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
+					]
 				]
 			],
 			// #10 Item update.
@@ -170,7 +186,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation item create',
+						'id:key' => 'csrf.test.key'
+					]
 				]
 			],
 			// #12 Trigger update.
@@ -186,7 +206,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM triggers',
 					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF test name',
+						'id:expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1])>0'
+					]
 				]
 			],
 			// #14 Graph update.
@@ -676,6 +700,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		}
 		else {
 			$element = $this;
+		}
+
+		// Mandatory fields in views with inline validation should be filled in, to stop it from preventing form submission.
+		if (array_key_exists('fields', $data)) {
+			foreach ($data['fields'] as $field => $value) {
+				$this->query($field)->one()->detect()->fill($value);
+			}
 		}
 
 		// Delete hidden input with CSRF token.

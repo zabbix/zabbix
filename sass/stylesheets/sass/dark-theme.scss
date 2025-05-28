@@ -4,6 +4,9 @@ $theme-name: 'dark';
 $red: #e45959;
 $lighter-red: #433131;
 
+$error: #ff5555;
+$error-focus: #ff9b9b;
+
 $dark-yellow: #e99003;
 $yellow: #a78820;
 $lighter-yellow: #2f280a;
@@ -92,6 +95,8 @@ $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
 $input-disabled-placeholder-color: #404040;
+
+$form-radio-list-checked-color: $action-hover-color;
 
 // Search form
 $form-search-bg-color: #191919;

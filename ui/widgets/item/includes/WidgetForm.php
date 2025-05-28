@@ -225,7 +225,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('desc_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('desc_color', _('Color'))
+				(new CWidgetFieldColor('desc_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))
@@ -258,7 +258,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))->setDefault(1)
 			)
 			->addField(
-				new CWidgetFieldColor('value_color', _('Color'))
+				(new CWidgetFieldColor('value_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(1)
@@ -282,7 +282,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_bold', _('Bold')))->setDefault(1)
 			)
 			->addField(
-				new CWidgetFieldColor('units_color', _('Color'))
+				(new CWidgetFieldColor('units_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('time_h_pos', _('Horizontal position'), [
@@ -306,22 +306,22 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('time_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('time_color', _('Color'))
+				(new CWidgetFieldColor('time_color', _('Color')))->allowInherited()
 			)
 			->addField(
-				new CWidgetFieldColor('up_color', _('Change indicator'))
+				(new CWidgetFieldColor('up_color', _('Change indicator')))->allowInherited()
 			)
 			->addField(
-				new CWidgetFieldColor('down_color', _('Change indicator'))
+				(new CWidgetFieldColor('down_color', _('Change indicator')))->allowInherited()
 			)
 			->addField(
-				new CWidgetFieldColor('updown_color', _('Change indicator'))
+				(new CWidgetFieldColor('updown_color', _('Change indicator')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldSparkline('sparkline', _('Sparkline')))->setDefault(self::SPARKLINE_DEFAULT)
 			)
 			->addField(
-				new CWidgetFieldColor('bg_color', _('Background color'))
+				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [

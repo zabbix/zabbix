@@ -1171,13 +1171,23 @@ function getConditionFormula(conditions, evalType) {
 	 */
 	function removeRow(table, row, options) {
 		if (options.remove_next_sibling) {
+			removeErrorContainers(row.next());
 			row.next().remove();
 		}
 
+		removeErrorContainers(row);
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);
 		table.trigger('afterremove.dynamicRows', options);
+	}
+
+	function removeErrorContainers($row) {
+		$('[data-error-container]', $row).each(function () {
+			if ($('#' + $(this).data('errorContainer'), $row.next()).length) {
+				$row.next().remove();
+			}
+		});
 	}
 
 	/**
