@@ -1265,6 +1265,8 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			zabbix_log(LOG_LEVEL_DEBUG, "OK");
 
 		zbx_free(data);
+	} else {
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
 	}
 
 	if (SUCCEED == ret_metrics)
