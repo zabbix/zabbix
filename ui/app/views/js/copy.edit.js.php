@@ -71,7 +71,6 @@ window.copy_popup = new class {
 				helper_options.popup.parameters.srcfld1 = 'groupid';
 				helper_options.popup.parameters.with_hosts = '1';
 				helper_options.objectOptions.with_hosts = '1';
-
 				break;
 
 			case <?= COPY_TYPE_TO_HOST ?>:
