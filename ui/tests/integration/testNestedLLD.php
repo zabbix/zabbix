@@ -406,7 +406,7 @@ class testNestedLLD extends CIntegrationTest{
 	// For comprehensive discovery regression test (DiscoveryWithFiltersOverrides)
 	private function checkDiscoveredHostgroups($expected_suffix) {
 		// Each expected group is present and contains one discovered host
-		$response = $this->call('hostgroup.get', [
+		$response = $this->callUntilDataIsPresent('hostgroup.get', [
 			'searchWildcardsEnabled' => true,
 			'search' => [
 				'name' => 'Group for host Service*'
@@ -415,8 +415,9 @@ class testNestedLLD extends CIntegrationTest{
 			'sortorder' => 'ASC',
 			'sortfield' => 'name',
 			'output' => ['name']
-		]);
-		$this->assertCount(count($expected_suffix), $response['result']);
+		], 60, 1);
+		$this->assertCount(count($expected_suffix), $response['result'],
+			'expected group(s) were not discovered');
 
 		for ($i = 0; $i < count($expected_suffix); $i++) {
 			$hstgrp = $response['result'][$i];
@@ -425,7 +426,10 @@ class testNestedLLD extends CIntegrationTest{
 
 			$hostname = "Grouped Host Service" . $expected_suffix[$i];
 			$this->assertArrayHasKey('hosts', $hstgrp);
-			$this->assertCount(1, $hstgrp['hosts']);
+
+			$msg = 'discovered group does not contain expected host ' . $hostname;
+			$this->assertCount(1, $hstgrp['hosts'], $msg);
+
 			$this->assertEquals($hostname, $hstgrp['hosts'][0]['host']);
 		}
 	}
@@ -433,7 +437,7 @@ class testNestedLLD extends CIntegrationTest{
 	// For comprehensive discovery regression test (DiscoveryWithFiltersOverrides)
 	private function checkDiscoveredHosts($expected_suffix) {
 		// Discovered hosts without group prototypes are present
-		$response = $this->call('host.get', [
+		$response = $this->callUntilDataIsPresent('host.get', [
 			'searchWildcardsEnabled' => true,
 			'search' => [
 				'name' => 'Discovered Host Service*'
@@ -441,8 +445,9 @@ class testNestedLLD extends CIntegrationTest{
 			'sortorder' => 'ASC',
 			'sortfield' => 'host',
 			'output' => ['host']
-		]);
-		$this->assertCount(count($expected_suffix), $response['result']);
+		], 60, 1);
+		$this->assertCount(count($expected_suffix), $response['result'],
+			'expected host(s) were not discovered');
 
 		for ($i = 0; $i < count($expected_suffix); $i++) {
 			$hostname = 'Discovered Host Service' . $expected_suffix[$i];
@@ -460,12 +465,12 @@ class testNestedLLD extends CIntegrationTest{
 			'sortfield' => 'host',
 			'output' => ['host']
 		]);
-		$this->assertEmpty($response['result']);
+		$this->assertEmpty($response['result'], 'host(s) that should have been filtered were discovered');
 	}
 
 	// For comprehensive discovery regression test (DiscoveryWithFiltersOverrides)
 	private function checkDiscoveredItemsAndTriggers($expected_items) {
-		$response = $this->call('item.get', [
+		$response = $this->callUntilDataIsPresent('item.get', [
 			'searchWildcardsEnabled' => true,
 			'search' => [
 				'name' => 'Discovered*'
@@ -474,13 +479,17 @@ class testNestedLLD extends CIntegrationTest{
 			'sortfield' => 'name',
 			'output' => ['name'],
 			'selectTriggers' => ['description', 'priority']
-		]);
-		$this->assertCount(count($expected_items), $response['result']);
+		], 60, 1);
+		$this->assertCount(count($expected_items), $response['result'],
+			'expected item(s) were not discovered');
 
 		for ($i = 0; $i < count($expected_items); $i++) {
 			$item = $response['result'][$i];
 			$this->assertEquals($expected_items[$i]['item_name'], $item['name']);
-			$this->assertCount(1, $item['triggers']);
+
+			$msg = 'trigger was not discovered for item ' . $expected_items[$i]['item_name'];
+			$this->assertCount(1, $item['triggers'], $msg);
+
 			$this->assertEquals($expected_items[$i]['trigger_description'], $item['triggers'][0]['description']);
 			$this->assertEquals($expected_items[$i]['priority'], $item['triggers'][0]['priority']);
 		}
@@ -488,6 +497,20 @@ class testNestedLLD extends CIntegrationTest{
 
 	// Test hostgroup, host, and item discovery with filters and overrides.
 	public function testNestedLLD_DiscoveryWithFiltersOverrides() {
+		$trapper_data = [
+			["name" => "ServiceA", "type" => "service", "status" => "ok"],
+			["name" => "ServiceB", "type" => "service", "status" => "critical"],
+			["name" => "DiskC", "type" => "disk", "status" => "ok"],
+			["name" => "UnknownD", "type" => "unknown", "status" => "warning"],
+			["name" => "ServiceE", "type" => "service", "status" => "critical"],
+			["name" => "ServiceF", "type" => "service", "status" => "ignored"],
+			["name" => "ServiceG", "type" => "service", "status" => "nodiscover"],
+			["name" => "ServiceH", "type" => "service", "status" => "nodiscover", "failfilter" => "yes"]
+		];
+
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+
 		$expected_suffix = ['A', 'B', 'E', 'F', 'G'];
 
 		$this->checkDiscoveredHostgroups($expected_suffix);
@@ -616,7 +639,9 @@ class testNestedLLD extends CIntegrationTest{
 
 		foreach ($response['result'] as $audit_entry) {
 			$this->assertArrayHasKey('resourcename', $audit_entry);
-			$this->assertStringNotContainsString('Service', $audit_entry['resourcename']);
+
+			$this->assertStringNotContainsString('Service', $audit_entry['resourcename'],
+				'object(s) should not have been rediscovered/updated/deleted');
 		}
 
 		return true;
@@ -643,9 +668,9 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
-		$response = $this->call('auditlog.get', [
+		$response = $this->callUntilDataIsPresent('auditlog.get', [
 			'time_from' => $start_ts
-		]);
+		], 30, 1);
 
 		$audit_entries = [
 			'Discovered Host ServiceX' => false,
@@ -662,7 +687,7 @@ class testNestedLLD extends CIntegrationTest{
 				$audit_entries[$resname] = true;
 		}
 
-		$this->assertContainsOnly('bool', $audit_entries, true);
+		$this->assertContainsOnly('bool', $audit_entries, true, 'new element was not discovered');
 
 		return true;
 	}
@@ -688,22 +713,24 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
-		$response = $this->call('auditlog.get', [
+		$response = $this->callUntilDataIsPresent('auditlog.get', [
 			'time_from' => $start_ts
-		]);
+		], 60, 1);
 
 		$audit_entry_found = false;
 		foreach ($response['result'] as $audit_entry) {
 			$this->assertArrayHasKey('resourcename', $audit_entry);
 
 			if (strstr($audit_entry['resourcename'], 'Trigger for ServiceX')) {
-				$this->assertStringContainsString('update', $audit_entry['details']);
+				$this->assertStringContainsString('update', $audit_entry['details'],
+					'incorrect operation, expected update');
+
 				$audit_entry_found = true;
 				break;
 			}
 		}
 
-		$this->assertTrue($audit_entry_found);
+		$this->assertTrue($audit_entry_found, 'rediscovery did not succeed for ServiceX trigger');
 
 		$response = $this->call('item.get', [
 			'search' => [
@@ -877,7 +904,7 @@ class testNestedLLD extends CIntegrationTest{
 				'name' => 'Itm itemtypetest'
 			]
 		]);
-		$this->assertCount(1, $response['result']);
+		$this->assertCount(1, $response['result'], 'item was not discovered');
 		$itemid = $response['result'][0]['itemid'];
 
 		$param_update = [
@@ -1001,7 +1028,7 @@ class testNestedLLD extends CIntegrationTest{
 				'name' => 'Itm itemtypetest'
 			]
 		]);
-		$this->assertCount(1, $response['result']);
+		$this->assertCount(1, $response['result'], 'item was not discovered');
 		$itemid = $response['result'][0]['itemid'];
 
 		$response = $this->call('itemprototype.update', [
@@ -1035,7 +1062,7 @@ class testNestedLLD extends CIntegrationTest{
 				'name' => 'Itm itemtypetest'
 			]
 		]);
-		$this->assertCount(1, $response['result']);
+		$this->assertCount(1, $response['result'], 'item was not discovered');
 		$itemid = $response['result'][0]['itemid'];
 
 		$trapper_data = [
@@ -1057,7 +1084,7 @@ class testNestedLLD extends CIntegrationTest{
 				'name' => 'Itm renamedparam'
 			]
 		]);
-		$this->assertCount(1, $response['result']);
+		$this->assertCount(1, $response['result'], 'key was not updated from macro');
 		$this->assertEquals(ITEM_STATUS_ACTIVE, $response['result'][0]['status']);
 		$this->assertStringContainsString('renamedparam', $response['result'][0]['key_']);
 
@@ -1236,14 +1263,14 @@ class testNestedLLD extends CIntegrationTest{
 			]
 		];
 
-		$response = $this->call('item.get', [
+		$response = $this->callUntilDataIsPresent('item.get', [
 			'searchWildcardsEnabled' => true,
 			'search' => [
 				'name' => 'fieldtest.*'
 			],
 			'output' => 'extend'
-		]);
-		$this->assertCount(count($expected_items), $response['result']);
+		], 60, 1);
+		$this->assertCount(count($expected_items), $response['result'], 'item(s) were not discovered');
 
 		foreach ($response['result'] as $discovered_item) {
 			$item_name = $discovered_item['name'];
@@ -1441,8 +1468,11 @@ class testNestedLLD extends CIntegrationTest{
 				'host' => $hostname
 			]
 		]);
-		$this->assertArrayHasKey('result', $response, json_encode($response));
-		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
+		$this->assertArrayHasKey('result', $response);
+
+		$this->assertArrayHasKey('hostid', $response['result'][0],
+			'failed to find host/template ' . $hostname);
+
 		$hostid = $response['result'][0]['hostid'];
 
 		$expected_rules = [
@@ -1496,7 +1526,7 @@ class testNestedLLD extends CIntegrationTest{
 			]
 		];
 
-		$response = $this->call('discoveryrule.get', [
+		$response = $this->callUntilDataIsPresent('discoveryrule.get', [
 			'hostids' => [$hostid],
 			"selectItems" => ["name", "key_"],
 			"selectPreprocessing" => ["type", "params"],
@@ -1510,22 +1540,32 @@ class testNestedLLD extends CIntegrationTest{
 			"output" => ["name", "key_", "items", "preprocessing"],
 			"sortfield" => "key_",
 			"sortorder" => "ASC"
-		]);
-		$this->assertCount(count($expected_rules), $response['result']);
+		], 60, 1);
+
+		$this->assertCount(count($expected_rules), $response['result'],
+			'expected nested lld rule(s) were not discovered');
 
 		for ($i = 0; $i < count($expected_rules); $i++) {
 			$discovered_rule = $response['result'][$i];
 			$expected_rule = $expected_rules[$i];
 
-			$this->assertArrayHasKey($i, $response['result'], 'Following lld rule was not discovered: ' . json_encode($expected_rule));
+			$this->assertArrayHasKey($i, $response['result'],
+				'expected lld rule was not discovered: ' . json_encode($expected_rule));
+
 			$this->assertEquals($expected_rules[$i]['key_'], $discovered_rule['key_']);
 			$this->assertEquals($expected_rules[$i]['name'], $discovered_rule['name']);
 
 			$this->assertArrayHasKey('items', $discovered_rule);
-			$this->assertArrayHasKey(0, $discovered_rule['items'], 'Following lld rule has not required prototype: ' . json_encode($expected_rule));
+			$this->assertArrayHasKey(0, $discovered_rule['items'],
+				'expected lld rule does not have required prototype: ' . json_encode($expected_rule));
+
 			unset($discovered_rule['items'][0]['itemid']);
-			$this->assertEquals($expected_rule['items'], $discovered_rule['items'], 'Item prototypes does not match for rule ' . $discovered_rule['name']);
-			$this->assertEquals($expected_rule['preprocessing'], $discovered_rule['preprocessing'], 'Preproc does not match for rule ' . $discovered_rule['name']);
+
+			$this->assertEquals($expected_rule['items'], $discovered_rule['items'],
+				'item prototypes does not match for rule ' . $discovered_rule['name']);
+
+			$this->assertEquals($expected_rule['preprocessing'], $discovered_rule['preprocessing'],
+				'preproc does not match for rule ' . $discovered_rule['name']);
 		}
 
 		$this->sendSenderValue($hostname, 'main_drule', self::$trapper_data_nested1);
@@ -1584,7 +1624,7 @@ class testNestedLLD extends CIntegrationTest{
 			]
 		];
 
-		$response = $this->call('item.get', [
+		$response = $this->callUntilDataIsPresent('item.get', [
 			'hostids' => [$hostid],
 			'sortfield' => 'key_',
 			'sortorder' => 'ASC',
@@ -1592,11 +1632,13 @@ class testNestedLLD extends CIntegrationTest{
 				'name',
 				'key_'
 			]
-		]);
-		$this->assertCount(count($expected), $response['result']);
+		], 60, 1);
+		$this->assertCount(count($expected), $response['result'], 'expected item(s) were not discovered');
 
 		for ($i = 0; $i < count($expected); $i++) {
-			$this->assertArrayHasKey($i, $response['result'], 'Following item was not discovered: ' . json_encode($expected[$i]));
+			$this->assertArrayHasKey($i, $response['result'],
+				'expected item was not discovered: ' . json_encode($expected[$i]));
+
 			$ditem = $response['result'][$i];
 			$this->assertEquals($expected[$i]['key_'], $ditem['key_']);
 			$this->assertEquals($expected[$i]['name'], $ditem['name']);
@@ -1618,7 +1660,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		$dbs = ['db1', 'db2', 'db3'];
 
-		$response = $this->call('host.get', [
+		$response = $this->callUntilDataIsPresent('host.get', [
 			"selectItems" => ["name", "key_"],
 			'searchWildcardsEnabled' => true,
 			'search' => [
@@ -1626,8 +1668,8 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'sortorder' => 'ASC',
 			'sortfield' => 'host'
-		]);
-		$this->assertCount(count($dbs), $response['result']);
+		], 60, 1);
+		$this->assertCount(count($dbs), $response['result'], 'expected host(s) was not discovered');
 
 		for ($i = 0; $i < count($dbs); $i++) {
 			$db = $dbs[$i];
@@ -1690,7 +1732,7 @@ class testNestedLLD extends CIntegrationTest{
 				'name' => 'lld_test_autoreg_main_template'
 			]
 		]);
-		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey(0, $response['result'], 'failed to load template');
 		$this->assertArrayHasKey('templateid', $response['result'][0]);
 		$templateid_main = $response['result'][0]['templateid'];
 
@@ -1740,7 +1782,7 @@ class testNestedLLD extends CIntegrationTest{
 			'sortorder' => 'ASC',
 			'sortfield' => 'host'
 		], 240, 2);
-		$this->assertCount(1, $response['result']);
+		$this->assertCount(1, $response['result'], 'host failed to autoregist');
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -1759,20 +1801,27 @@ class testNestedLLD extends CIntegrationTest{
 		foreach ($testcases as $tc) {
 			$this->sendRuleData($hostname, 'main_drule', $tc['data']);
 
-			$response = $this->call('host.get', [
+			$response = $this->callUntilDataIsPresent('host.get', [
 				'hostids' => [$hostid],
 				'selectItems' => ['name', 'key_'],
 				'selectTriggers' => ['description'],
 				'selectGraphs' => ['name'],
 				'selectDiscoveryRules' => ['name']
 			]);
-			$this->assertCount(1, $response['result']);
+			$this->assertCount(1, $response['result'], 'host ' . $hostname . 'was not discovered');
 
 			$host = $response['result'][0];
-			$this->assertCount($tc['expected']['items'], $host['items']);
-			$this->assertCount($tc['expected']['triggers'], $host['triggers']);
-			$this->assertCount($tc['expected']['graphs'], $host['graphs']);
-			$this->assertCount($tc['expected']['discoveryRules'], $host['discoveryRules']);
+			$this->assertCount($tc['expected']['items'], $host['items'],
+				'expected discovered item count does not match');
+
+			$this->assertCount($tc['expected']['triggers'], $host['triggers'],
+				'expected discovered trigger count does not match');
+
+			$this->assertCount($tc['expected']['graphs'], $host['graphs'],
+				'expected discovered graph count does not match');
+
+			$this->assertCount($tc['expected']['discoveryRules'], $host['discoveryRules'],
+				'expected discovered lld rule count does not match');
 
 			$response = $this->call('host.get', [
 				'searchWildcardsEnabled' => true,
@@ -1781,7 +1830,8 @@ class testNestedLLD extends CIntegrationTest{
 				],
 				'countOutput' => true
 			]);
-			$this->assertEquals($tc['expected']['hosts'], $response['result']);
+			$this->assertEquals($tc['expected']['hosts'], $response['result'],
+				'expected discovered host count does not match');
 		}
 	}
 
@@ -1792,13 +1842,13 @@ class testNestedLLD extends CIntegrationTest{
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$response = $this->call('host.get', [
+		$response = $this->callUntilDataIsPresent('host.get', [
 			'output' => ['hostid'],
 			'filter' => [
 				'host' => $hostname
 			]
-		]);
-		$this->assertArrayHasKey('result', $response, json_encode($response));
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response, 'host not found');
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
 
@@ -1919,13 +1969,13 @@ class testNestedLLD extends CIntegrationTest{
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$response = $this->call('host.get', [
+		$response = $this->callUntilDataIsPresent('host.get', [
 			'output' => ['hostid'],
 			'filter' => [
 				'host' => $hostname
 			]
-		]);
-		$this->assertArrayHasKey('result', $response, json_encode($response));
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response, 'host not found');
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
 
@@ -1963,7 +2013,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(4, $response['result']);
+		$this->assertEquals(4, $response['result'], 'nested rule(s) were not discovered');
 
 		$data = [
 			[
@@ -1986,7 +2036,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(2, $response['result']);
+		$this->assertEquals(2, $response['result'], 'nested rule(s) were not removed');
 	}
 
 	// Test overrides of nested rules, including update.
@@ -2001,7 +2051,7 @@ class testNestedLLD extends CIntegrationTest{
 				'host' => $hostname
 			]
 		]);
-		$this->assertArrayHasKey('result', $response, json_encode($response));
+		$this->assertArrayHasKey('result', $response, 'host not found');
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
 
@@ -2033,14 +2083,14 @@ class testNestedLLD extends CIntegrationTest{
 			]
 		];
 
-		$response = $this->call('discoveryruleprototype.get', [
+		$response = $this->callUntilDataIsPresent('discoveryruleprototype.get', [
 			'output' => ['itemid'],
 			"hostids" => [$hostid],
 			"search" => [
 				"name" => "nested[{#PARENTNAME}]"
 			]
-		]);
-		$this->assertArrayHasKey('result', $response, json_encode($response));
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response, 'lld rule prototype was not found');
 		$this->assertArrayHasKey('itemid', $response['result'][0], json_encode($response['result']));
 		$druleproto_id = $response['result'][0]['itemid'];
 
@@ -2082,7 +2132,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(3, $response['result']);
+		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match");
 
 		$response = $this->call('discoveryrule.get', [
 			'hostids' => [$hostid],
@@ -2091,7 +2141,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(0, $response['result']);
+		$this->assertEquals(0, $response['result'], 'rule should not have been discovered due to override');
 
 		$overrides[0]['operations'][0]['opdiscover']['discover'] = 0;
 		$response = $this->call('discoveryruleprototype.update', [
@@ -2143,21 +2193,25 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendRuleData($hostname, 'main_drule', $data);
 
 		foreach (["dep_first", "dep_second"] as $elem) {
-			$response = $this->call('discoveryrule.get', [
+			$rulename = 'dep_drule[' . $elem . ']';
+			$itemname = 'master_item[' . $elem . ']';
+
+			$response = $this->callUntilDataIsPresent('discoveryrule.get', [
 				'search' => [
-					'name' => 'dep_drule[' . $elem . ']'
+					'name' => $rulename
 				],
 				'countOutput' => true
 			]);
-			$this->assertEquals(1, $response['result']);
+			$this->assertEquals(1, $response['result'],
+				'rule ' . $rulename . 'was not discovered');
 
 			$response = $this->call('item.get', [
 				'search' => [
-					'key_' => 'master_item[' . $elem . ']'
+					'key_' => $itemname
 				],
 				'countOutput' => true
 			]);
-			$this->assertEquals(1, $response['result']);
+			$this->assertEquals(1, $response['result'], 'item ' . $itemname . 'was not discovered');
 		}
 	}
 
@@ -2173,7 +2227,7 @@ class testNestedLLD extends CIntegrationTest{
 				'host' => $hostname
 			]
 		]);
-		$this->assertArrayHasKey('result', $response, json_encode($response));
+		$this->assertArrayHasKey('result', $response, 'host not found');
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 		$hostid = $response['result'][0]['hostid'];
 
@@ -2188,7 +2242,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		$this->sendRuleData($hostname, 'main_drule', $data);
 
-		$response = $this->call('discoveryruleprototype.get', [
+		$response = $this->callUntilDataIsPresent('discoveryruleprototype.get', [
 			'hostids' => [$hostid],
 			'search' => [
 				'name' => 'nested[{#PARENTNAME}]'
@@ -2197,7 +2251,7 @@ class testNestedLLD extends CIntegrationTest{
 			'selectTriggers' => ['description'],
 			'selectGraphs' => ['name'],
 			'selectDiscoveryRules' => ['name']
-		]);
+		], 60, 1);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('items', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['items']);
@@ -2244,7 +2298,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		$this->sendRuleData($hostname, 'main_drule', $data);
 
-		$response = $this->call('item.get', [
+		$response = $this->callUntilDataIsPresent('item.get', [
 			'hostid' => $hostid,
 			'search' => [
 				'name' => 'item.update.nested[A,B]'
@@ -2254,14 +2308,13 @@ class testNestedLLD extends CIntegrationTest{
 				'type',
 				'delay'
 			]
-		]);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertCount(1, $response['result']);
+		], 60, 1);
+		$this->assertArrayHasKey(0, $response['result'], 'item was not updated');
 		$this->assertEquals(ITEM_VALUE_TYPE_FLOAT, $response['result'][0]['value_type']);
 		$this->assertEquals(ITEM_TYPE_SIMPLE, $response['result'][0]['type']);
 		$this->assertEquals(10, $response['result'][0]['delay']);
 
-		$response = $this->call('trigger.get', [
+		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [$hostid],
 			'search' => [
 				'description' => 'item.update.nested[A,B]'
@@ -2271,14 +2324,13 @@ class testNestedLLD extends CIntegrationTest{
 				'type',
 				'priority'
 			]
-		]);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertCount(1, $response['result']);
+		], 60, 1);
+		$this->assertArrayHasKey(0, $response['result'], 'trigger was not updated');
 		$this->assertEquals(1, $response['result'][0]['manual_close']);
 		$this->assertEquals(1, $response['result'][0]['type']);
 		$this->assertEquals(TRIGGER_SEVERITY_DISASTER, $response['result'][0]['priority']);
 
-		$response = $this->call('graph.get', [
+		$response = $this->callUntilDataIsPresent('graph.get', [
 			'search' => [
 				'name' => 'graph.update.nested[A,B]'
 			],
@@ -2286,9 +2338,8 @@ class testNestedLLD extends CIntegrationTest{
 				'width',
 				'height'
 			]
-		]);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertCount(1, $response['result']);
+		], 60, 1);
+		$this->assertArrayHasKey(0, $response['result'], 'graph was not updated');
 		$this->assertEquals(222, $response['result'][0]['width']);
 		$this->assertEquals(111, $response['result'][0]['height']);
 	}
@@ -2326,7 +2377,9 @@ class testNestedLLD extends CIntegrationTest{
 			"selectTags" => "extend"
 		], 30, 2);
 		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertArrayHasKey(0, $response['result'][0]['tags']);
+		$this->assertArrayHasKey(0, $response['result'][0]['tags'],
+			'template level tags were not found in a problem');
+
 		$this->assertEquals($expected_tag, $response['result'][0]['tags'][0]);
 	}
 }
