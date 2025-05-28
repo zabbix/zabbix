@@ -121,6 +121,12 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		}
 
 		$data = [
+			'js_test_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: true)
+			))->getRules(),
+			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
+				? (new CFormValidator(CControllerItemPrototypeCreate::getValidationRules()))->getRules()
+				: (new CFormValidator(CControllerItemPrototypeUpdate::getValidationRules()))->getRules(),
 			'item' => $item,
 			'host' => $host,
 			'readonly' => (bool) $item['templateid'],

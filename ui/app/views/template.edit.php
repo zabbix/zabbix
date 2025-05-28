@@ -24,6 +24,7 @@ $form = (new CForm())
 	->setId('templates-form')
 	->setName('template-edit-form')
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addVar('templateid', $data['templateid'])
 	->addVar('clone_templateid', $data['clone_templateid'] ?? null)
 	->addVar('clone', $data['clone'] ?: null);
 
@@ -52,6 +53,8 @@ if ($data['linked_templates']) {
 	$linked_templates= (new CTable())
 		->setHeader([_('Name'), _('Actions')])
 		->setId('linked-templates')
+		->setAttribute('data-field-name', 'templates')
+		->setAttribute('data-field-type', 'array')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
@@ -94,7 +97,7 @@ if ($data['linked_templates']) {
 $templates_field_items[] = (new CMultiSelect([
 	'name' => 'template_add_templates[]',
 	'object_name' => 'templates',
-	'data' => $data['add_templates'],
+	'data' => $data['template_add_templates'],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'templates',
@@ -122,6 +125,7 @@ $template_tab
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'template_groups[]',
+				'new_item_name' => 'template_groups_new[]',
 				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 				'data' => $data['groups_ms'],
@@ -166,26 +170,25 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'show_inherited_tags' => $data['show_inherited_tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
-	'tags_tab_id' => 'template-tags-tab'
+	'tags_tab_id' => 'template-tags-tab',
+	'has_inline_validation' => true
 ]);
 
-$form->addItem(
-	(new CTemplateTag('tag-row-tmpl'))
-		->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
-);
-
 // Macros tab.
-$macros_tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
+$macros_tmpl = $data['show_inherited_template_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 
 $macros_tab = (new CFormList('macrosFormList'))
-	->addRow(null, (new CRadioButtonList('show_inherited_template_macros', (int) $data['show_inherited_macros']))
+	->addRow(null, (new CRadioButtonList('show_inherited_template_macros',
+			(int) $data['show_inherited_template_macros'])
+	)
 		->addValue(_('Template macros'), 0)
 		->addValue(_('Inherited and template macros'), 1)
 		->setModern()
 	)
 	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'has_inline_validation' => true
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {
@@ -194,16 +197,21 @@ if (!$data['readonly']) {
 			(new CRow([
 				(new CCol([
 					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Macro'))
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}')
 						->disableSpellcheck()
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+					(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 						->setAttribute('placeholder', _('description'))
@@ -215,13 +223,23 @@ if (!$data['readonly']) {
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]))
 				->addClass('form_row')
-		);
+		)
+	->addItem(
+		new CRow(
+			(new CCol())
+				->setId('macros_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(4)
+		)
+	);
 
 	$macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 		->addItem(
 			(new CRow([
 				(new CCol([
 					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Macro'))
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}')
@@ -229,7 +247,9 @@ if (!$data['readonly']) {
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+					(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+						->setErrorContainer('macros_#{rowNum}_error_container')
+						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
@@ -260,6 +280,14 @@ if (!$data['readonly']) {
 						->setAttribute('placeholder', _('description'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
 			]))->addClass('form_row')
+		)
+		->addItem(
+			new CRow(
+				(new CCol())
+					->setId('macros_#{rowNum}_error_container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setColSpan(4)
+			)
 		);
 
 	$macros_tab
@@ -274,7 +302,7 @@ $valuemap_tab = (new CFormList('valuemap-formlist'))->addRow(
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
-		'form' => 'templates',
+		'form' => 'template',
 		'table_id' => 'template-valuemap-table',
 		'with_label' => true
 	])
@@ -336,6 +364,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			template_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'templateid' => $data['templateid'],
 				'warnings' => $data['warnings']
 			], JSON_THROW_ON_ERROR).');

@@ -46,7 +46,10 @@ $fields = [
 	'macros' =>					[null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
-	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'main_interface_'.INTERFACE_TYPE_AGENT	=> [T_ZBX_INT, O_OPT, null, null, null],
+	'main_interface_'.INTERFACE_TYPE_SNMP	=> [T_ZBX_INT, O_OPT, null, null, null],
+	'main_interface_'.INTERFACE_TYPE_IPMI	=> [T_ZBX_INT, O_OPT, null, null, null],
+	'main_interface_'.INTERFACE_TYPE_JMX	=> [T_ZBX_INT, O_OPT, null, null, null],
 	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -120,6 +123,19 @@ $macros = array_filter($macros, function($macro) {
 
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
+
+$interfaces = array_filter(getRequest('interfaces', []), function ($interface) {
+	unset($interface['main']);
+
+	return $interface;
+});
+
+foreach ($interfaces as $index => &$interface) {
+	$interface['main'] = getRequest('main_interface_'.$interface['type'], 0) == $index
+		? INTERFACE_PRIMARY
+		: INTERFACE_SECONDARY;
+}
+unset($interface);
 
 /*
  * Actions
@@ -217,9 +233,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces')),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
-			'interfaces' => prepareHostPrototypeInterfaces(
-				getRequest('interfaces', []), getRequest('mainInterfaces', [])
-			),
+			'interfaces' => prepareHostPrototypeInterfaces($interfaces),
 			'groupLinks' => prepareHostPrototypeGroupLinks(getRequest('group_links', [])),
 			'groupPrototypes' => prepareHostPrototypeGroupPrototypes(getRequest('group_prototypes', [])),
 			'templates' => zbx_toObject(
@@ -370,8 +384,7 @@ if (hasRequest('form')) {
 			'groupPrototypes' => getRequest('group_prototypes', []),
 			'macros' => $macros,
 			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces')),
-			'interfaces' => getRequest('interfaces', []),
-			'main_interfaces' => getRequest('mainInterfaces', [])
+			'interfaces' => $interfaces
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
@@ -484,12 +497,6 @@ if (hasRequest('form')) {
 		}
 	}
 	else {
-		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
-			if (array_key_exists($type, $data['host_prototype']['main_interfaces'])) {
-				$interfaceid = $data['host_prototype']['main_interfaces'][$type];
-				$data['host_prototype']['interfaces'][$interfaceid]['main'] = INTERFACE_PRIMARY;
-			}
-		}
 		$data['host_prototype']['interfaces'] = array_values($data['host_prototype']['interfaces']);
 	}
 

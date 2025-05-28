@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-26 08:31+0000\n"
-"Last-Translator: Kamila <kamilawkosmowska@gmail.com>\n"
+"PO-Revision-Date: 2025-05-14 12:32+0000\n"
+"Last-Translator: Stanislaw <s.trajewski@outlook.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1849,6 +1849,26 @@ msgstr "Autor"
 msgid "Authorization"
 msgstr "Autoryzacja"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -2252,6 +2272,10 @@ msgstr "CSV do JSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "Spodziewano się CUID"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -3472,6 +3496,10 @@ msgstr "Nie można znaleźć mapy wartości \"%1$s\" użytej dla pozycji \"%2$s\
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nie można znaleźć mapy wartości \"%1$s\" użytej dla prototypu pozycji \"%2$s\" dla reguły wykrywania \"%3$s\" w \"%4$s\"."
 
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
+
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
 #: include/classes/api/services/CRole.php:659
@@ -3839,6 +3867,10 @@ msgstr "Nie można masowo zmienić widocznej nazwy hosta."
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "Nie można otworzyć adresu URL"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4663,6 +4695,10 @@ msgstr "Cykliczne połączenia szablonów są zabronione."
 msgid "Class %1$s not found for action %2$s."
 msgstr "Klasa %1$s nie znaleziono dla akcji %2$s."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4883,6 +4919,10 @@ msgstr "uwspólnienie"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "Kompaktowy widok"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5110,6 +5150,10 @@ msgstr "Odświeżenie konfuguracji"
 msgid "Configuration updated"
 msgstr "Zaktualizowano konfigurację"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -5119,6 +5163,12 @@ msgstr "Konfiguruj połączenie DB"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "Konfiguruj dostępy JIT"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -6933,6 +6983,10 @@ msgstr "Opis"
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
 msgstr "Rozmiar opisu"
+
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -11699,6 +11753,11 @@ msgstr "Nieprawidłowa konfiguracja LDAP"
 msgid "Invalid MFA configuration"
 msgstr "Nieprawidłowa konfiguracja usługi MFA"
 
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP SAML dla mapowania typów mediów."
@@ -13870,7 +13929,7 @@ msgstr "Metody"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
 msgid "Metrics"
-msgstr ""
+msgstr "Metryki"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -14562,11 +14621,11 @@ msgstr "Nowy wyłączony czas przestoju"
 
 #: app/views/graph.edit.php:130
 msgid "New graph"
-msgstr ""
+msgstr "Nowy wykres"
 
 #: app/views/graph.prototype.edit.php:131
 msgid "New graph prototype"
-msgstr ""
+msgstr "Nowy prototyp wykresu"
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -14601,6 +14660,10 @@ msgstr "Nowy typ mediów"
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
 msgstr "Nowe mapowanie typów mediów"
+
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14736,6 +14799,10 @@ msgstr "Nie podano \"%1$s\" dla mapy."
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "Brak zmian."
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15524,6 +15591,18 @@ msgstr "Liczba (całkowita)"
 msgid "Numeric (unsigned)"
 msgstr "Liczba (całkowita bez znaku)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -16279,6 +16358,15 @@ msgstr "Strona zawiera nieprawidłowe dane"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "Pager"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17446,6 +17534,10 @@ msgstr "Czas przywrócenia"
 msgid "Rectangle"
 msgstr "Prostokąt"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Atrybut odniesienia"
@@ -17480,6 +17572,10 @@ msgstr "Odświeżyć konfigurację wybranego proxy?"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "Przedział odświeżania"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18884,6 +18980,10 @@ msgstr "Wybierz SLA by wyświetlić jego raport."
 msgid "Select prototype"
 msgstr "Wybierz prototyp"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19687,6 +19787,10 @@ msgstr "Informacje o architekturze oprogramowania. Zwraca ciąg znaków"
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
 msgstr "Ostatnio sprawdzona aktualizacja oprogramowania"
+
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20631,6 +20735,10 @@ msgstr "Szablony \"%1$s\" odłączone od hostów \"%2$s\"."
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "Szablonów połączonych przez wykrywanie hostów nie można odłączyć."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20750,6 +20858,10 @@ msgstr "%1$s nie jest już wykrywany i %2$s, %3$s."
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "%1$s nie jest już wykrywany i %2$s."
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "Szablon URL używany do ładowania i wyświetlania warstwy kafelków w mapach geograficznych."
@@ -20766,6 +20878,14 @@ msgstr "Średni czas odczytu z dysku wirtualnego, \"url\" - URL usługi VMware, 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "Średni czas zapisu z dysku wirtualnego, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator maszyny wirtualnej VMware, \"instance\" - instancja urządzenia dysku"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21205,6 +21325,14 @@ msgstr "Dzisiaj jak dotąd"
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "Edycja tokena"
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -22000,6 +22128,10 @@ msgstr "Bez zmian"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "Cofnij potwierdzenie problemu."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -24785,6 +24917,14 @@ msgstr "bitxor() - Bitowa alternatywa rozłączna"
 msgid "blinking"
 msgstr "migotanie"
 
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
 msgstr "zarówno nazwa użytkownika i hasło powinny być obecne lub puste"
@@ -26502,6 +26642,10 @@ msgstr "grupa szablonów o tym samym identyfikatorze UUID już istnieje"
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
 msgstr "szablon o tym samym identyfikatorze UUID już istnieje"
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831

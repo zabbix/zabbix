@@ -140,6 +140,12 @@ class CControllerItemEdit extends CControllerItem {
 		}
 
 		$data = [
+			'js_test_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
+			))->getRules(),
+			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
+				? (new CFormValidator(CControllerItemCreate::getValidationRules()))->getRules()
+				: (new CFormValidator(CControllerItemUpdate::getValidationRules()))->getRules(),
 			'item' => $item,
 			'host' => $host,
 			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
@@ -273,8 +279,8 @@ class CControllerItemEdit extends CControllerItem {
 		if ($this->hasInput('itemid')) {
 			[$item] = API::Item()->get([
 				'output' => [
-					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'name_resolved', 'key_', 'delay', 'history', 'trends',
+					'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
 					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 					'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',

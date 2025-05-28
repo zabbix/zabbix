@@ -1811,7 +1811,10 @@ static int	proxyconfig_sync_settings(zbx_vector_table_data_ptr_t *config_tables,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == (td = proxyconfig_get_table(config_tables, "settings")))
+	{
+		ret = SUCCEED;
 		goto ret;
+	}
 
 	proxyconfig_prepare_table(td, NULL, NULL, &settings_id_hash, NULL);
 

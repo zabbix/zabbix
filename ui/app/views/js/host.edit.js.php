@@ -24,11 +24,13 @@ window.host_edit_popup = {
 	overlay: null,
 	dialogue: null,
 	form: null,
+	form_element: null,
 
-	init({host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
+	init({rules, host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.initial_proxy_groupid = proxy_groupid;
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
@@ -45,7 +47,7 @@ window.host_edit_popup = {
 						<?= json_encode(_('Cloned host parameter values have been modified.')) ?>, true, false
 					)[0];
 
-			this.form.parentNode.insertBefore(message_box, this.form);
+			this.form_element.parentNode.insertBefore(message_box, this.form_element);
 		}
 
 		this.initHostTab(host_interfaces, host_is_discovered);
@@ -54,13 +56,13 @@ window.host_edit_popup = {
 		this.initInventoryTab();
 		this.initEncryptionTab();
 
-		this.initial_form_fields = getFormFields(this.form);
+		this.initial_form_fields = getFormFields(this.form_element);
 		this.initEvents();
 		this.initPopupListeners();
 	},
 
 	initEvents() {
-		this.form.addEventListener('click', e => {
+		this.form_element.addEventListener('click', e => {
 			if (e.target.classList.contains('js-unlink')) {
 				this.unlinkTemplate(e.target);
 			}
@@ -106,7 +108,7 @@ window.host_edit_popup = {
 	 * Sets up visible name placeholder synchronization.
 	 */
 	initHostTab(host_interfaces, host_is_discovered) {
-		const host_field = this.form.querySelector('#host');
+		const host_field = this.form_element.querySelector('#host');
 
 		['input', 'paste'].forEach((event_type) => {
 			host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
@@ -124,11 +126,11 @@ window.host_edit_popup = {
 
 		$groups_ms.on('change', () => {
 			$groups_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="groups["]')].map((input) => input.value)
+				[... this.form_element.querySelectorAll('[name^="groups["]')].map((input) => input.value)
 			);
 		});
 
-		this.form.querySelector('#monitored_by').addEventListener('change', () => this.updateMonitoredBy());
+		this.form_element.querySelector('#monitored_by').addEventListener('change', () => this.updateMonitoredBy());
 		jQuery('#proxy_groupid').on('change', () => this.updateMonitoredBy());
 
 		this.updateMonitoredBy();
@@ -140,13 +142,16 @@ window.host_edit_popup = {
 	 * @param {string} placeholder  Text to display as default host alias.
 	 */
 	setVisibleNamePlaceholder(placeholder) {
-		this.form.querySelector('#visiblename').placeholder = placeholder;
+		this.form_element.querySelector('#visiblename').placeholder = placeholder;
 	},
 
 	initHostInterfaces(host_interfaces, host_is_discovered) {
-		const host_interface_row_tmpl = this.form.querySelector('#host-interface-row-tmpl').innerHTML;
+		const host_interface_row_tmpl = this.form_element.querySelector('#host-interface-row-tmpl').innerHTML;
+		const host_interface_row_snmp_tmpl = document.getElementById('host-interface-row-snmp-tmpl').innerHTML;
 
-		window.hostInterfaceManager = new HostInterfaceManager(host_interfaces, host_interface_row_tmpl);
+		window.hostInterfaceManager = new HostInterfaceManager(host_interfaces, host_interface_row_tmpl,
+			host_interface_row_snmp_tmpl
+		);
 
 		hostInterfaceManager.render();
 
@@ -156,27 +161,27 @@ window.host_edit_popup = {
 	},
 
 	updateMonitoredBy() {
-		const monitored_by = this.form.querySelector('[name="monitored_by"]:checked').value;
+		const monitored_by = this.form_element.querySelector('[name="monitored_by"]:checked').value;
 
-		for (const field of this.form.querySelectorAll('.js-field-proxy')) {
+		for (const field of this.form_element.querySelectorAll('.js-field-proxy')) {
 			field.style.display = monitored_by == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
 		}
 
-		for (const field of this.form.querySelectorAll('.js-field-proxy-group, .js-field-proxy-group-proxy')) {
+		for (const field of this.form_element.querySelectorAll('.js-field-proxy-group, .js-field-proxy-group-proxy')) {
 			field.style.display = monitored_by == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
 		}
 
 		if (monitored_by == <?= ZBX_MONITORED_BY_PROXY_GROUP ?>) {
 			const proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
-			const proxy_assigned = this.form.querySelector('.js-proxy-assigned');
-			const proxy_not_assigned = this.form.querySelector('.js-proxy-not-assigned');
+			const proxy_assigned = this.form_element.querySelector('.js-proxy-assigned');
+			const proxy_not_assigned = this.form_element.querySelector('.js-proxy-not-assigned');
 
-			for (const element of this.form.querySelectorAll('.js-field-proxy-group-proxy')) {
+			for (const element of this.form_element.querySelectorAll('.js-field-proxy-group-proxy')) {
 				element.style.display = proxy_group.length ? '' : 'none';
 			}
 
 			if (proxy_group.length && proxy_assigned !== null
-				&& proxy_group[0]['id'] === this.initial_proxy_groupid) {
+					&& proxy_group[0]['id'] === this.initial_proxy_groupid) {
 				proxy_assigned.style.display = '';
 				proxy_not_assigned.style.display = 'none';
 			}
@@ -197,16 +202,21 @@ window.host_edit_popup = {
 		$('#add_templates_').trigger('change');
 
 		if (linked_templates.querySelector('tbody:empty') !== null) {
-			linked_templates.remove();
+			// Node must be kept into DOM to find the position where error must be shown.
+			linked_templates.style.display = 'none';
 		}
 	},
 
 	unlinkAndClearTemplate(button, templateid) {
 		const clear_tmpl = document.createElement('input');
+
 		clear_tmpl.type = 'hidden';
-		clear_tmpl.name = 'clear_templates[]';
+		clear_tmpl.name = `clear_templates[${templateid}]`;
+		clear_tmpl.setAttribute('data-field-type', 'hidden');
 		clear_tmpl.value = templateid;
-		button.form.appendChild(clear_tmpl);
+
+		this.form_element.appendChild(clear_tmpl);
+		this.form.discoverAllFields();
 
 		this.unlinkTemplate(button);
 	},
@@ -219,7 +229,7 @@ window.host_edit_popup = {
 	getLinkedTemplates() {
 		const linked_templateids = [];
 
-		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+		this.form_element.querySelectorAll('[name^="templates["').forEach(input => {
 			linked_templateids.push(input.value);
 		});
 
@@ -356,45 +366,74 @@ window.host_edit_popup = {
 	 */
 	initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
-			container: $('#macros_container .table-forms-td-right')
+			container: $('#macros_container .table-forms-td-right'),
+			load_callback: () => {
+				this.form.discoverAllFields();
+
+				const fields = [];
+
+				Object.values(this.form.findFieldByName('macros').getFields()).forEach(field => {
+					fields.push(field.getName());
+					field.setChanged();
+				});
+
+				this.form.validateChanges(fields, true);
+			},
+			source: 'host'
 		});
 
-		const show_inherited_macros_element = document.getElementById('show_inherited_macros');
-		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
+		$('#host-tabs', this.form_element).on('tabscreate tabsactivate', (e, ui) => {
+			const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
+			const show_inherited_macros = this.form_element
+				.querySelector('input[name=show_inherited_macros]:checked').value == 1;
 
-		this.macros_manager.initMacroTable(this.show_inherited_macros);
+			if (panel.attr('id') === 'macros-tab') {
+				// Please note that macro initialization must take place once and only when the tab is visible.
+				if (e.type === 'tabsactivate') {
+					const templateids = this.getAllTemplates();
 
-		const observer = new IntersectionObserver(entries => {
-			if (entries[0].isIntersecting && this.show_inherited_macros) {
-				const templateids = this.getAllTemplates();
+					// First time always load inherited macros.
+					if (this.all_templateids === null) {
+						this.all_templateids = templateids;
 
-				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
-					this.all_templateids = templateids;
-
-					this.macros_manager.load(this.show_inherited_macros, templateids);
+						if (show_inherited_macros) {
+							this.macros_manager.load(show_inherited_macros, templateids);
+							this.macros_initialized = true;
+						}
+					}
+					// Other times load inherited macros only if templates changed.
+					else if (show_inherited_macros && this.all_templateids.xor(templateids).length > 0) {
+						this.all_templateids = templateids;
+						this.macros_manager.load(show_inherited_macros, templateids);
+					}
 				}
+
+				if (this.macros_initialized) {
+					return;
+				}
+
+				// Initialize macros.
+				this.macros_manager.initMacroTable(show_inherited_macros);
+
+				this.macros_initialized = true;
 			}
 		});
-		observer.observe(document.getElementById('macros-tab'));
 
-		show_inherited_macros_element.addEventListener('change', e => {
-			this.show_inherited_macros = e.target.value == 1;
-			this.all_templateids = this.getAllTemplates();
-
-			this.macros_manager.load(this.show_inherited_macros, this.all_templateids);
-		});
+		this.form_element.querySelector('#show_inherited_macros').onchange = (e) => {
+			this.macros_manager.load(e.target.value == 1, this.getAllTemplates());
+		};
 	},
 
 	/**
 	 * Set up of inventory functionality.
 	 */
 	initInventoryTab() {
-		this.form.querySelectorAll('[name=inventory_mode]').forEach((item) => {
-			item.addEventListener('change', function () {
-				let inventory_fields = this.form.querySelectorAll('[name^="host_inventory"]'),
-					item_links = this.form.querySelectorAll('.populating_item');
+		this.form_element.querySelectorAll('[name=inventory_mode]').forEach((item) => {
+			item.addEventListener('change', () => {
+				let inventory_fields = this.form_element.querySelectorAll('[name^="host_inventory"]'),
+					item_links = this.form_element.querySelectorAll('.populating_item');
 
-				switch (this.value) {
+				switch (item.value) {
 					case '<?= HOST_INVENTORY_DISABLED ?>':
 						inventory_fields.forEach((field) => field.disabled = true);
 						item_links.forEach((link) => link.style.display = 'none');
@@ -412,7 +451,7 @@ window.host_edit_popup = {
 						item_links.forEach((link) => link.style.display = '');
 						break;
 				}
-			})
+			});
 		});
 	},
 
@@ -420,14 +459,14 @@ window.host_edit_popup = {
 	 * Set up of encryption functionality.
 	 */
 	initEncryptionTab() {
-		this.form.querySelectorAll('[name=tls_connect], [name^=tls_in_]').forEach((field) => {
+		this.form_element.querySelectorAll('[name=tls_connect], [name^=tls_in_]').forEach((field) => {
 			field.addEventListener('change', () => this.updateEncryptionFields());
 		});
 
-		if (this.form.querySelector('#change_psk')) {
-			this.form.querySelector('#change_psk').addEventListener('click', () => {
-				this.form.querySelector('#change_psk').closest('div').remove();
-				this.form.querySelector('[for="change_psk"]').remove();
+		if (this.form_element.querySelector('#change_psk')) {
+			this.form_element.querySelector('#change_psk').addEventListener('click', () => {
+				this.form_element.querySelector('#change_psk').closest('div').remove();
+				this.form_element.querySelector('[for="change_psk"]').remove();
 				this.updateEncryptionFields();
 			});
 		}
@@ -439,47 +478,33 @@ window.host_edit_popup = {
 	 * Propagate changes of selected encryption type to related inputs.
 	 */
 	updateEncryptionFields() {
-		let selected_connection = this.form.querySelector('[name="tls_connect"]:checked').value,
-			use_psk = (this.form.querySelector('[name="tls_in_psk"]').checked
-				|| selected_connection == <?= HOST_ENCRYPTION_PSK ?>),
-			use_cert = (this.form.querySelector('[name="tls_in_cert"]').checked
+		const selected_connection = this.form_element.querySelector('[name="tls_connect"]:checked').value;
+		let use_psk = (this.form_element.querySelector('[name="tls_in_psk"]').checked
+				|| selected_connection == <?= HOST_ENCRYPTION_PSK ?>);
+		const use_cert = (this.form_element.querySelector('[name="tls_in_cert"]').checked
 				|| selected_connection == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
 
 		// If PSK is selected or checked.
-		if (this.form.querySelector('#change_psk')) {
-			this.form.querySelector('#change_psk').closest('div').style.display = use_psk ? '' : 'none';
-			this.form.querySelector('[for="change_psk"]').style.display = use_psk ? '' : 'none';
+		const change_psk = document.getElementById('change_psk');
+		if (change_psk !== null) {
+			change_psk.closest('div').style.display = use_psk ? '' : 'none';
+			this.form_element.querySelector('[for="change_psk"]').style.display = use_psk ? '' : 'none';
 
-			// As long as button is there, other PSK fields must be hidden.
+			// As long as button is there, other PSK fields must be hidden and disabled.
 			use_psk = false;
 		}
-		this.form.querySelector('#tls_psk_identity').closest('div').style.display = use_psk ? '' : 'none';
-		this.form.querySelector('[for="tls_psk_identity"]').style.display = use_psk ? '' : 'none';
-		this.form.querySelector('#tls_psk').closest('div').style.display = use_psk ? '' : 'none';
-		this.form.querySelector('[for="tls_psk"]').style.display = use_psk ? '' : 'none';
 
-		// If certificate is selected or checked.
-		this.form.querySelector('#tls_issuer').closest('div').style.display = use_cert ? '' : 'none';
-		this.form.querySelector('[for="tls_issuer"]').style.display = use_cert ? '' : 'none';
-		this.form.querySelector('#tls_subject').closest('div').style.display = use_cert ? '' : 'none';
-		this.form.querySelector('[for="tls_subject"]').style.display = use_cert ? '' : 'none';
+		['tls_psk_identity', 'tls_psk'].forEach((field_id) => {
+			document.getElementById(field_id).disabled = !use_psk;
+			document.getElementById(field_id).closest('div').style.display = use_psk ? '' : 'none';
+			document.querySelector(`[for="${field_id}"]`).style.display = use_psk ? '' : 'none';
+		});
 
-		// Update tls_accept.
-		let tls_accept = 0x00;
-
-		if (this.form.querySelector('[name="tls_in_none"]').checked) {
-			tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
-		}
-
-		if (this.form.querySelector('[name="tls_in_psk"]').checked) {
-			tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
-		}
-
-		if (this.form.querySelector('[name="tls_in_cert"]').checked) {
-			tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
-		}
-
-		this.form.querySelector('#tls_accept').value = tls_accept;
+		['tls_issuer', 'tls_subject'].forEach((field_id) => {
+			document.getElementById(field_id).disabled = !use_cert;
+			document.getElementById(field_id).closest('div').style.display = use_cert ? '' : 'none';
+			document.querySelector(`[for="${field_id}"]`).style.display = use_cert ? '' : 'none';
+		});
 	},
 
 	/**
@@ -494,7 +519,7 @@ window.host_edit_popup = {
 		this.trimFields(fields);
 		fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
 
-		if (this.form.querySelector('#change_psk')) {
+		if (this.form_element.querySelector('#change_psk')) {
 			delete fields.tls_psk_identity;
 			delete fields.tls_psk;
 		}
@@ -572,34 +597,50 @@ window.host_edit_popup = {
 	},
 
 	isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form_element))
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	},
 
 	submit() {
 		this.removePopupMessages();
 
-		const fields = this.preprocessFormFields(getFormFields(this.form), false);
-		const curl = new Curl(this.form.getAttribute('action'));
+		const fields = this.form.getAllValues();
+		const curl = new Curl(this.form_element.getAttribute('action'));
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+
+					return;
 				}
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+
+							return;
+						}
+
+						overlayDialogueDestroy(this.overlay.dialogueid);
+
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					})
+					.catch(this.ajaxExceptionHandler)
+					.finally(() => {
+						this.overlay.unsetLoading();
+					});
 			});
 	},
 
@@ -607,10 +648,11 @@ window.host_edit_popup = {
 		this.overlay.setLoading();
 		this.hostid = null;
 
-		const parameters = this.preprocessFormFields(getFormFields(this.form), true);
+		const parameters = this.preprocessFormFields(getFormFields(this.form_element), true);
 		delete parameters.sid;
 		parameters.clone = 1;
 
+		this.form.release();
 		this.overlay = ZABBIX.PopupManager.open('host.edit', parameters);
 	},
 
@@ -643,7 +685,7 @@ window.host_edit_popup = {
 	},
 
 	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
+		for (const el of this.form_element.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
 			}
@@ -651,7 +693,7 @@ window.host_edit_popup = {
 	},
 
 	ajaxExceptionHandler: (exception) => {
-		const form = host_edit_popup.form;
+		const form = host_edit_popup.form_element;
 
 		let title, messages;
 

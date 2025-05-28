@@ -218,7 +218,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Dell R740: Physical disk [{#DISK_NAME}]: Critical state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],)=3`|Average||
 |Dell R740: Physical disk [{#DISK_NAME}]: Warning state|<p>Please check the device for warnings.</p>|`last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],)=2`|Warning|**Depends on**:<br><ul><li>Dell R740: Physical disk [{#DISK_NAME}]: Critical state</li></ul>|
-|Dell R740: Physical disk [{#DISK_NAME}]: Has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0`|Info|**Manual close**: Yes|
+|Dell R740: Physical disk [{#DISK_NAME}] has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual disk discovery
 
