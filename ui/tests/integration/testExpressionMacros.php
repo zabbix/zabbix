@@ -460,7 +460,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-
 		self::$event_tags_json = json_encode(array(['tag' => self::TAG_NAME, 'value' => self::TAG_VALUE]), JSON_UNESCAPED_SLASHES);
 
 		self::$trigger_expression_explain = self::VALUE_TO_FIRE_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
@@ -818,20 +817,17 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true, 10, 3);
 
-
 		self::$alert_response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_action_id],
 			'sortfield' => 'alertid'
 		], 5, 2);
 		$this->assertCount(4, self::$alert_response['result']);
-
 	}
 
 	/**
 	 * Test expression macro in problem message
 	 */
 	public function testExpressionMacros_checkProblemMessage() {
-
 		$message_expect = self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
 			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
@@ -872,7 +868,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 * Next escalation step.
 	 */
 	public function testExpressionMacros_checkProblemMessage2() {
-
 		$message_expect = self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
 				'/host/macro:' . self::VALUE_TO_FIRE_TRIGGER .
@@ -884,7 +879,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			'===2===' . "\n" .
 			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
 			'===3===' . "\n" .
-			self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 			'===4===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===5===' . "\n" .
@@ -923,7 +918,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 * Test expression macro in recovery message
 	 */
 	public function testExpressionMacros_checkRecoveryMessage() {
-
 		$trigger_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
 				' or ' .
 				self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER;
@@ -1021,7 +1015,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	}
 
 	public static function clearData(): void {
-
 		if (!empty(self::$usermacro_ids)) {
 			CDataHelper::call('usermacro.delete', self::$usermacro_ids);
 		}
