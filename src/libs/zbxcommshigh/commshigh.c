@@ -660,7 +660,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 				if (NULL != out)
 					zbx_free(*out);
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() direct connection without failover to: [%s]:%hu",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect connection without failover to: [%s]:%hu",
 						__func__, addrs->values[0]->ip, addrs->values[0]->port);
 
 				zbx_vector_addr_ptr_create(&addrs_tmp);
