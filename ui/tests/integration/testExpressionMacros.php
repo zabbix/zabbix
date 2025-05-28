@@ -367,7 +367,7 @@ ITEM.LOG.TIME -> *UNKNOWN* <-
 TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 
 	/* These macros are not resolved. */
-	const BUILTIN_MACROS_NON_REPLACEABLE = "{ALERT.MESSAGE}
+	const BUILTIN_MACROS_NON_EXPANDABLE = "{ALERT.MESSAGE}
 {ALERT.SENDTO}
 {ALERT.SUBJECT}
 {DISCOVERY.DEVICE.IPADDRESS}
@@ -668,7 +668,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 							'===3===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+							self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
 							'===5===' . "\n" .
 							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===6===' . "\n" .
@@ -706,7 +706,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 							'===4===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===5===' . "\n" .
-							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+							self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
 							'===6===' . "\n" .
 							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===7===' . "\n" .
@@ -752,7 +752,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 							'===3===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+							self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
 							'===5===' . "\n" .
 							'USER_MACRO_HOST -> {$USER_MACRO_HOST} <-' . "\n" .
 							'===6===' . "\n" .
@@ -788,11 +788,6 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		];
 	}
 
-	/**
-	 * Get data
-	 *
-	 * @backup alerts,events,history_uint
-	 */
 	public function testExpressionMacros_getData() {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'2', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_RECOVER_TRIGGER);
@@ -836,7 +831,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			'===3===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+			self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
 			'===5===' . "\n" .
 			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 			'===6===' . "\n" .
@@ -874,7 +869,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			'===4===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===5===' . "\n" .
-			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+			self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
 			'===6===' . "\n" .
 			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 			'===7===' . "\n" .
@@ -988,7 +983,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			'===3===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::BUILTIN_MACROS_NON_REPLACEABLE . "\n" .
+			self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
 			'===5===' . "\n" .
 			'USER_MACRO_HOST -> HOST_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
 			'===6===' . "\n" .
