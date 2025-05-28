@@ -19,6 +19,9 @@
  */
 class CApiInputValidator {
 
+	public const SSL_CERTIFICATE_MAX_LENGTH = 10000;
+	public const SSL_PRIVATE_KEY_MAX_LENGTH = 10000;
+
 	/**
 	 * Base validation function.
 	 *
@@ -273,6 +276,12 @@ class CApiInputValidator {
 
 			case API_SELEMENTID:
 				return self::validateSelementId($rule, $data, $path, $error);
+
+			case API_SSL_CERTIFICATE:
+				return self::validateCertificate($rule, $data, $path, $error);
+
+			case API_SSL_PRIVATE_KEY:
+				return self::validatePrivateKey($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -357,6 +366,8 @@ class CApiInputValidator {
 			case API_PROMETHEUS_LABEL:
 			case API_NUMBER:
 			case API_SELEMENTID:
+			case API_SSL_CERTIFICATE:
+			case API_SSL_PRIVATE_KEY:
 				return true;
 
 			case API_OBJECT:
@@ -4364,5 +4375,55 @@ class CApiInputValidator {
 		return is_string($data)
 			? self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error)
 			: self::validateId([], $data, $path, $error);
+	}
+
+	private static function validateCertificate($rule, &$data, $path, &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (mb_strlen($data) > self::SSL_CERTIFICATE_MAX_LENGTH) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+		elseif ($data !== '') {
+			$is_certificate = @openssl_x509_read($data);
+
+			if (!$is_certificate) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded certificate is expected'));
+
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private static function validatePrivateKey($rule, &$data, $path, &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (mb_strlen($data) > self::SSL_PRIVATE_KEY_MAX_LENGTH) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+		elseif ($data !== '') {
+			$is_private_key = openssl_pkey_get_private($data);
+
+			if (!$is_private_key) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded private key is expected'));
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

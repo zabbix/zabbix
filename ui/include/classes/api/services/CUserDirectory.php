@@ -119,22 +119,27 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
-			$saml_output = CArrayHelper::renameKeys(array_flip($saml_output), self::SAML_HASH_FIELDS);
-			$dbname_hashname = array_flip(self::SAML_HASH_FIELDS);
+			$requested_hash_fields = array_intersect($saml_output, array_keys(self::SAML_HASH_FIELDS));
 
-			$sql_parts = [
-				'select' => array_merge(['userdirectoryid'], array_flip($saml_output)),
-				'from' => ['userdirectory_saml'],
-				'where' => [dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_SAML])]
+			foreach ($requested_hash_fields as $i => $hash_field) {
+				$saml_output[$i] = self::SAML_HASH_FIELDS[$hash_field];
+			}
+
+			$_options = [
+				'output' => array_merge(['userdirectoryid'], $saml_output),
+				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_SAML]
 			];
+			$resource = DBselect(DB::makeSql('userdirectory_saml', $_options));
 
-			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
-			while ($row = DBfetch($result)) {
-				foreach (array_intersect_key($row, $dbname_hashname) as $db_field => $db_value) {
-					$row[$db_field] = $db_value === '' ? '' : md5($db_value);
+			while ($row = DBfetch($resource)) {
+				foreach ($requested_hash_fields as $hash_field) {
+					$field = self::SAML_HASH_FIELDS[$hash_field];
+
+					$row[$hash_field] = $row[$field] === '' ? '' : md5($row[$field]);
+					unset($row[$field]);
 				}
 
-				$db_userdirectories[$row['userdirectoryid']] += CArrayHelper::renameKeys($row, $dbname_hashname);
+				$db_userdirectories[$row['userdirectoryid']] += $row;
 			}
 		}
 
@@ -150,50 +155,6 @@ class CUserDirectory extends CApiService {
 		}
 
 		return $db_userdirectories;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
-		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
-
-		$selected_ldap_fields = [];
-		foreach (self::LDAP_OUTPUT_FIELDS as $field) {
-			if ($this->outputIsRequested($field, $options['output'])) {
-				$selected_ldap_fields[] = 'ldap.'.$field;
-			}
-		}
-		if ($selected_ldap_fields) {
-			$sql_parts['left_join'][] = [
-				'alias' => 'ldap',
-				'table' => 'userdirectory_ldap',
-				'using' => 'userdirectoryid'
-			];
-			$sql_parts['left_table'] = ['alias' => $tableAlias, 'table' => $tableName];
-
-			if (!$options['countOutput']) {
-				$sql_parts['select'] = array_merge($sql_parts['select'], $selected_ldap_fields);
-			}
-		}
-
-		$selected_saml_fields = [];
-		foreach (self::SAML_OUTPUT_FIELDS as $field) {
-			if ($this->outputIsRequested($field, $options['output'])) {
-				$selected_saml_fields[] = 'saml.'.$field;
-			}
-		}
-		if ($selected_saml_fields) {
-			$sql_parts['left_join'][] = [
-				'alias' => 'saml',
-				'table' => 'userdirectory_saml',
-				'using' => 'userdirectoryid'
-			];
-			$sql_parts['left_table'] = ['alias' => $tableAlias, 'table' => $tableName];
-
-			if (!$options['countOutput']) {
-				$sql_parts['select'] = array_merge($sql_parts['select'], $selected_saml_fields);
-			}
-		}
-
-		return $sql_parts;
 	}
 
 	private function validateGet(array &$options): void {
@@ -448,7 +409,6 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkSamlCertificates($userdirectories);
 		self::checkDuplicates($userdirectories);
 		self::checkProvisionGroups($userdirectories);
 		self::checkMediaTypes($userdirectories);
@@ -598,23 +558,13 @@ class CUserDirectory extends CApiService {
 		}
 
 		$db_userdirectories = $this->get([
-			'output' => self::OUTPUT_FIELDS,
+			'output' => array_diff(self::OUTPUT_FIELDS, array_keys(self::SAML_HASH_FIELDS)),
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
 			'preservekeys' => true
 		]);
 
 		if (count($db_userdirectories) != count($userdirectories)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$db_saml_userdirectories = DB::select('userdirectory_saml', [
-			'output' => ['idp_certificate', 'sp_certificate', 'sp_private_key'],
-			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
-			'preservekeys' => true
-		]);
-
-		foreach ($db_saml_userdirectories as $db_saml_userdirectoryid => $db_saml_userdirectory) {
-			$db_userdirectories[$db_saml_userdirectoryid] += $db_saml_userdirectory;
 		}
 
 		foreach ($userdirectories as $i => &$userdirectory) {
@@ -632,6 +582,8 @@ class CUserDirectory extends CApiService {
 		}
 		unset($userdirectory);
 
+		self::addSamlWriteOnlyDbFields($userdirectories, $db_userdirectories);
+
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
@@ -644,10 +596,34 @@ class CUserDirectory extends CApiService {
 
 		self::validateProvisionMedias($userdirectories, $db_userdirectories);
 
-		self::checkSamlCertificates($userdirectories, $db_userdirectories);
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
+	}
+
+	private static function addSamlWriteOnlyDbFields(array $userdirectories, array &$db_userdirectories): void {
+		$userdirectoryids = [];
+
+		foreach ($userdirectories as $userdirectory) {
+			if ($userdirectory['idp_type'] == IDP_TYPE_SAML
+					&& array_intersect_key($userdirectory, array_flip(self::SAML_HASH_FIELDS))) {
+				$userdirectoryids[] = $userdirectory['userdirectoryid'];
+			}
+		}
+
+		if (!$userdirectoryids) {
+			return;
+		}
+
+		$arr = [
+			'output' => ['userdirectoryid', 'idp_certificate', 'sp_certificate', 'sp_private_key'],
+			'userdirectoryids' => $userdirectoryids,
+		];
+		$resource = DBselect(DB::makeSql('userdirectory_saml', $arr));
+
+		while ($row = DBfetch($resource)) {
+			$db_userdirectories[$row['userdirectoryid']] += $row;
+		}
 	}
 
 	private static function addRequiredFieldsByType(array &$userdirectories, array $db_userdirectories): void {
@@ -1631,6 +1607,18 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
+			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
+			]],
+			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
+			]],
+			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_PRIVATE_KEY],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
+			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 											'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
@@ -1644,65 +1632,7 @@ class CUserDirectory extends CApiService {
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])]] + $provision_media_rule,
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-			]],
-			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
-			]],
-			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
-			]],
-			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_STRING_UTF8, 'length' => 10000],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
 			]]
 		]];
-	}
-
-	private static function checkSamlCertificates(array $userdirectories, ?array $db_userdirectories = null): void {
-		$fields = array_flip(['idp_certificate', 'sp_certificate', 'sp_private_key']);
-		$check_openssl = false;
-
-		foreach ($userdirectories as $i => $userdirectory) {
-			$db_userdirectory = $db_userdirectories !== null
-				? $db_userdirectories[$userdirectory['userdirectoryid']]
-				: null;
-
-			foreach (array_intersect_key($userdirectory, $fields) as $field => $value) {
-				if ($value === '') {
-					continue;
-				}
-
-				$check_openssl = true;
-
-				if ($db_userdirectory !== null && $db_userdirectory[$field] === $value) {
-					continue;
-				}
-
-				switch ($field) {
-					case 'idp_certificate':
-					case 'sp_certificate':
-						if (function_exists('openssl_x509_parse') && !openssl_x509_parse($value)) {
-							self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i + 1).'/'.$field, _('value is not PEM encoded certificate')
-							));
-						}
-						break;
-
-					case 'sp_private_key':
-						if (function_exists('openssl_pkey_get_private') && !openssl_pkey_get_private($value)) {
-							self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i + 1).'/'.$field, _('value is not PEM encoded private key')
-							));
-						}
-						break;
-				}
-			}
-		}
-
-		if ($check_openssl) {
-			CAuthentication::checkOpenSslExtension();
-		}
 	}
 }
