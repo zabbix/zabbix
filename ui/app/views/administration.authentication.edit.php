@@ -310,79 +310,79 @@ if ($data['saml_certs_editable']) {
 		->addItem([
 			new CLabel(_('IdP certificate'), 'idp_certificate'),
 			(new CFormField([
-				$data['idp_certificate_hash'] === ''
+				$data['show_idp_certificate_input']
 					? null
 					: (new CSimpleButton(_('Change IdP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-change-button')
 						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('idp_certificate', $data['idp_certificate']))
+					(new CTextArea('idp_certificate', $data['idp_certificate'] ?? ''))
 						->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-						->addClass($data['idp_certificate_hash'] === '' ? 'saml-enabled' : '')
+						->addClass($data['show_idp_certificate_input'] ? 'saml-enabled' : '')
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setEnabled($data['idp_certificate_hash'] === ''),
+						->setEnabled($data['show_idp_certificate_input']),
 					(new CButton('idp_certificate_file', _('Choose file')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-file-button')
 						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['idp_certificate_hash'] === '' ? '' : 'display:none')
+					->addStyle($data['show_idp_certificate_input'] ? '' : 'display:none')
 			]))
 		])
 		->addItem([
 			new CLabel(_('SP private key'), 'sp_private_key'),
 			(new CFormField([
-				$data['sp_private_key_hash'] === ''
+				$data['show_sp_private_key_input']
 					? null
 					: (new CSimpleButton(_('Change SP private key')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-change-button')
 						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('sp_private_key', $data['sp_private_key']))
+					(new CTextArea('sp_private_key', $data['sp_private_key'] ?? ''))
 						->setAttribute('placeholder', _('PEM-encoded SP private key'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-						->addClass($data['sp_private_key_hash'] === '' ? 'saml-enabled' : '')
+						->addClass($data['show_sp_private_key_input'] ? 'saml-enabled' : '')
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setEnabled($data['sp_private_key_hash'] === ''),
+						->setEnabled($data['show_sp_private_key_input']),
 					(new CButton('sp_private_key_file', _('Choose file')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-file-button')
 						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['sp_private_key_hash'] === '' ? '' : 'display:none')
+					->addStyle($data['show_sp_private_key_input'] ? '' : 'display:none')
 			]))
 		])
 		->addItem([
 			new CLabel(_('SP certificate'), 'sp_certificate'),
 			(new CFormField([
-				$data['sp_certificate_hash'] === ''
+				$data['show_sp_certificate_input']
 					? null
 					: (new CSimpleButton(_('Change SP certificate')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-change-button')
 						->addClass('saml-enabled'),
 				(new CDiv([
-					(new CTextArea('sp_certificate', $data['sp_certificate']))
+					(new CTextArea('sp_certificate', $data['sp_certificate'] ?? ''))
 						->setAttribute('placeholder', _('PEM-encoded SP certificate'))
 						->setRows(3)
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-						->addClass($data['sp_certificate_hash'] === '' ? 'saml-enabled' : '')
+						->addClass($data['show_sp_certificate_input'] ? 'saml-enabled' : '')
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setEnabled($data['sp_certificate_hash'] === ''),
+						->setEnabled($data['show_sp_certificate_input']),
 					(new CButton('sp_certificate_file', _('Choose file')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->addClass('js-saml-cert-file-button')
 						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['sp_certificate_hash'] === '' ? '' : 'display:none')
+					->addStyle($data['show_sp_certificate_input'] ? '' : 'display:none')
 			]))
 		]);
 }
@@ -800,6 +800,15 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 
+$certs_status = [];
+if ($data['saml_certs_editable']) {
+	$certs_status = [
+		'saml_idp_certificate_exists' => $data['idp_certificate_hash'] !== '',
+		'saml_sp_certificate_exists' => $data['sp_certificate_hash'] !== '',
+		'saml_sp_private_key_exists' => $data['sp_private_key_hash'] !== ''
+	];
+}
+
 (new CScriptTag(
 	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
@@ -810,11 +819,8 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'templates' => $templates,
 		'mfa_methods' => $data['mfa_methods'],
 		'mfa_default_row_index' => $data['mfa_default_row_index'],
-		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
-		'saml_idp_certificate_exists' => $data['saml_certs_editable'] && $data['idp_certificate_hash'] !== '',
-		'saml_sp_certificate_exists' => $data['saml_certs_editable'] && $data['sp_certificate_hash'] !== '',
-		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== ''
-	]).');'
+		'is_http_auth_allowed' => $data['is_http_auth_allowed']
+	] + $certs_status).');'
 ))
 	->setOnDocumentReady()
 	->show();

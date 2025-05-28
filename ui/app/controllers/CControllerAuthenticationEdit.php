@@ -186,13 +186,25 @@ class CControllerAuthenticationEdit extends CController {
 			];
 
 			if ($data['saml_certs_editable']) {
+				$userdirectories = API::UserDirectory()->get([
+					'output' => ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'],
+					'filter' => ['idp_type' => IDP_TYPE_SAML]
+				]);
+				$userdirectory = reset($userdirectories);
+				
+				$this->getInputs($config_fields, [
+					'idp_certificate',
+					'sp_certificate',
+					'sp_private_key'
+				]);
+				
 				$config_fields += [
-					'idp_certificate' => '',
-					'sp_certificate' => '',
-					'sp_private_key' => '',
-					'idp_certificate_hash' => $this->hasInput('idp_certificate') ? '' : '1',
-					'sp_certificate_hash' => $this->hasInput('sp_certificate') ? '' : '1',
-					'sp_private_key_hash' => $this->hasInput('sp_private_key') ? '' : '1'
+					'show_idp_certificate_input' => self::showCertificateInputFieldOnRefresh('idp_certificate', $config_fields, $userdirectory),
+					'show_sp_certificate_input' => self::showCertificateInputFieldOnRefresh('sp_certificate', $config_fields, $userdirectory),
+					'show_sp_private_key_input' => self::showCertificateInputFieldOnRefresh('sp_private_key', $config_fields, $userdirectory),
+					'idp_certificate_hash' => $userdirectory['idp_certificate_hash'],
+					'sp_certificate_hash' => $userdirectory['sp_certificate_hash'],
+					'sp_private_key_hash' => $userdirectory['sp_private_key_hash']
 				];
 			}
 
@@ -286,7 +298,10 @@ class CControllerAuthenticationEdit extends CController {
 				$saml_configuration += [
 					'idp_certificate' => '',
 					'sp_certificate' => '',
-					'sp_private_key' => ''
+					'sp_private_key' => '',
+					'show_idp_certificate_input' => self::showCertificateInputField('idp_certificate_hash', $saml_configuration),
+					'show_sp_certificate_input' => self::showCertificateInputField('sp_certificate_hash', $saml_configuration),
+					'show_sp_private_key_input' => self::showCertificateInputField('sp_private_key_hash', $saml_configuration)
 				];
 			}
 
@@ -504,5 +519,18 @@ class CControllerAuthenticationEdit extends CController {
 		unset($mfa_method);
 
 		return $mfa_methods;
+	}
+	
+	private static function showCertificateInputFieldOnRefresh(string $key, array $input, array $db): bool {
+		$hashed_fields = array_flip(CUserDirectory::SAML_HASH_FIELDS);
+		
+		$modified = array_key_exists($key, $input);
+		$has_new_input_value = $modified && $input[$key] !== '';
+		
+		return $has_new_input_value || $db[$hashed_fields[$key]] === '';
+	}
+
+	private static function showCertificateInputField(string $key, array $input): bool {
+		return array_key_exists($key, $input) && $input[$key] === '';
 	}
 }
