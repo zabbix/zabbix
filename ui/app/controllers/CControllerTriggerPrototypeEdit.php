@@ -192,7 +192,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 					'output' => [],
 					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
 					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
-					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid']
+					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid'],
+					'nopermissions' => true
 				]);
 				$db_parent = reset($db_parent);
 

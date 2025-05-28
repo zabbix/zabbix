@@ -102,7 +102,8 @@ class CControllerItemTagsList extends CController {
 					'output' => [],
 					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
 					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
-					'itemids' => $this->item['discoveryData']['parent_itemid']
+					'itemids' => $this->item['discoveryData']['parent_itemid'],
+					'nopermissions' => true
 				]);
 				$db_parent = reset($db_parent);
 

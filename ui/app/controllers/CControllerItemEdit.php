@@ -143,7 +143,8 @@ class CControllerItemEdit extends CControllerItem {
 			$db_parent = API::ItemPrototype()->get([
 				'itemids' => $item['discoveryData']['parent_itemid'],
 				'selectDiscoveryRule' => ['itemid'],
-				'selectDiscoveryRulePrototype' => ['itemid']
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'nopermissions' => true
 			]);
 			$db_parent = reset($db_parent);
 

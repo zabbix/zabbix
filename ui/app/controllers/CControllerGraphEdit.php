@@ -121,7 +121,8 @@ class CControllerGraphEdit extends CController {
 				$db_parent = API::GraphPrototype()->get([
 					'graphids' => $graph['discoveryData']['parent_graphid'],
 					'selectDiscoveryRule' => ['itemid'],
-					'selectDiscoveryRulePrototype' => ['itemid']
+					'selectDiscoveryRulePrototype' => ['itemid'],
+					'nopermissions' => true
 				]);
 				$db_parent = reset($db_parent);
 
