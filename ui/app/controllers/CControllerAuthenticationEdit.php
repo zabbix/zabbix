@@ -191,13 +191,13 @@ class CControllerAuthenticationEdit extends CController {
 					'filter' => ['idp_type' => IDP_TYPE_SAML]
 				]);
 				$userdirectory = reset($userdirectories);
-				
+
 				$this->getInputs($config_fields, [
 					'idp_certificate',
 					'sp_certificate',
 					'sp_private_key'
 				]);
-				
+
 				$config_fields += [
 					'show_idp_certificate_input' => self::showCertificateInputFieldOnRefresh('idp_certificate', $config_fields, $userdirectory),
 					'show_sp_certificate_input' => self::showCertificateInputFieldOnRefresh('sp_certificate', $config_fields, $userdirectory),
@@ -520,13 +520,13 @@ class CControllerAuthenticationEdit extends CController {
 
 		return $mfa_methods;
 	}
-	
+
 	private static function showCertificateInputFieldOnRefresh(string $key, array $input, array $db): bool {
 		$hashed_fields = array_flip(CUserDirectory::SAML_HASH_FIELDS);
-		
+
 		$modified = array_key_exists($key, $input);
 		$has_new_input_value = $modified && $input[$key] !== '';
-		
+
 		return $has_new_input_value || $db[$hashed_fields[$key]] === '';
 	}
 
