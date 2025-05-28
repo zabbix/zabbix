@@ -825,7 +825,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	}
 
 	/**
-	 * Test expression macro in problem message
+	 * Test macros resolution during the initial operation (when trigger fire first time).
 	 */
 	public function testExpressionMacros_checkProblemMessage() {
 		$message_expect = self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER . "\n" .
@@ -847,25 +847,16 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 			self::MACRO_FUNCS_RESOLVED;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][0]['message']);
-	}
 
-	/**
-	 * Test expression macro with empty hostname
-	 */
-	public function testExpressionMacros_checkEmptyHostname() {
+		/* Test expression macro with empty hostname. */
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$alert_response['result'][0]['subject']);
-	}
 
-	/**
-	 * Test expression macro in function with argument
-	 */
-	public function testExpressionMacros_checkFunctionArgument() {
+		/* Test expression macro in function with argument. */
 		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][1]['subject']);
 	}
 
 	/**
-	 * Test expression macro with {HOST.HOST} and {ITEM.KEY} macros
-	 * Next escalation step.
+	 * Test macro resolution during the first escalation step (1 minute passed after trigger was fired).
 	 */
 	public function testExpressionMacros_checkProblemMessage2() {
 		$message_expect = self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER . "\n" .
@@ -896,6 +887,9 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		$this->assertEquals($message_expect, self::$alert_response['result'][1]['message']);
 	}
 
+	/**
+	 * Test macro resolution during the second escalation step (2 minutes passed after trigger was fired).
+	 */
 	public function testExpressionMacros_checkProblemMessage3_InconsistentMacros() {
 		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
 			"ESC.HISTORY[\s\S]*" .
@@ -915,7 +909,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	}
 
 	/**
-	 * Test expression macro in recovery message
+	 * Test macro resolution during the recovery operation.
 	 */
 	public function testExpressionMacros_checkRecoveryMessage() {
 		$trigger_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
@@ -1005,12 +999,8 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 
 		$this->assertEquals(self::SUBJECT_PREFIX_RECOVERY.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][3]['subject']);
 		$this->assertEquals($recovery_message_expect, self::$alert_response['result'][3]['message']);
-	}
 
-	/**
-	 * Test expression macro in event name
-	 */
-	public function testExpressionMacros_checkEventName() {
+		/* Test expression macro in event name. */
 		$this->assertEquals(self::EVENT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$event_response['result'][0]['name']);
 	}
 
