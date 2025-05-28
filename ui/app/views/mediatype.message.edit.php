@@ -110,7 +110,6 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['params']['old_message_type'] == -1 ? _('Add') : _('Update'),
-			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'mediatype_message_popup.submit();'

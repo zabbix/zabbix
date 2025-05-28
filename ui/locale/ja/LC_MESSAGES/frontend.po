@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-06 03:49+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2025-05-22 09:10+0000\n"
+"Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -321,11 +321,11 @@ msgstr "(ホストディスカバリによって作成)"
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(レガシー) 単一の値を同期的に取得し、オプションで他の値と組み合わせて取得する。"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(レガシー) JSONでサブツリーを取得する。"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -1180,7 +1180,7 @@ msgstr "エージェントのインターフェース"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr "エージェント種別チェック。返却値は1 - Zabbixエージェント；2 - Zabbixエージェント2"
+msgstr "エージェント種別チェック。返り値: 1 - Zabbixエージェント, 2 - Zabbixエージェント2"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1352,6 +1352,14 @@ msgstr "集約されたデータセットの凡例ラベルとしても使用さ
 #: include/classes/setup/CSetupWizard.php:1034
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
+
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr "いつも"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1791,6 +1799,26 @@ msgstr "作成者"
 msgid "Authorization"
 msgstr "認可"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -1803,6 +1831,14 @@ msgstr "自動"
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "自動"
+
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr "自動で非表示にする。"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1925,6 +1961,10 @@ msgstr "背景色"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "背景のイメージ"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr "背景縮尺"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2059,11 +2099,11 @@ msgstr "境界幅"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "接続の暗号化設定を変更する場合は、\"tls_connect\" フィールドと \"tls_accept\" フィールドの両方を指定する必要があります。"
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "接続の暗号化用の 事前共有鍵を変更する場合は、「tls_psk_identity」フィールドと「tls_psk」フィールドの両方を指定する必要があります。"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2136,7 +2176,7 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "スワップインの待機の為に費やされたCPU時間、\"url\" - VMwareサービスURL、 \"uuid\" - VMware仮想マシンのグローバル一意識別子、\"instance\" - CPUインスタンス"
 
 #: include/classes/data/CItemData.php:1939
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -2182,6 +2222,10 @@ msgstr "CSVからJSON"
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
 msgstr "CUIDで指定してください"
+
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -2665,7 +2709,7 @@ msgstr "デフォルトのユーザーディレクトリを削除できません
 #: include/classes/api/services/CDRule.php:772
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "検出ルール \"%2$s\" 中の検出チェック \"%1$s\" を削除できません: %3$s。"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2676,7 +2720,7 @@ msgstr[0] "ディスカバリルールを削除できません"
 #: include/classes/api/services/CDRule.php:979
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "検出ルール \"%1$s\" を削除できません。: %2$s"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2701,7 +2745,7 @@ msgstr[0] "ホストを削除できません"
 #: include/classes/api/services/CHost.php:1631
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "ホスト \"%1$s\" を削除できません。: %2$s"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2717,7 +2761,7 @@ msgstr[0] "ホストグループを削除できません"
 #: include/classes/api/services/CHostGroup.php:767
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "ホスト グループ \"%1$s\" を削除できません。: %2$s"
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2849,7 +2893,7 @@ msgstr[0] "テンプレートを削除できません"
 #: include/classes/api/services/CTemplate.php:805
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "テンプレート \"%1$s\" を削除できません。: %2$s"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2887,7 +2931,7 @@ msgstr[0] "トリガーを削除できません"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "トリガー \"%1$s\" を削除できません。: %2$s"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -2912,12 +2956,12 @@ msgstr[0] "ユーザーグループを削除できません"
 #: include/classes/api/services/CUserGroup.php:1330
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "ユーザー グループ \"%1$s\" は LDAP ユーザー ディレクトリ \"%2$s\" によって使用されているため、削除できません。"
 
 #: include/classes/api/services/CUserGroup.php:1325
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "ユーザー グループ \"%1$s\" は SAML ユーザー ディレクトリによって使用されているため、削除できません。"
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3199,6 +3243,11 @@ msgstr "グラフ\"%3$s\"のY軸の最小値として利用されている\"%2$s
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr "マップ \"%3$s\" のリンクで使用されている \"%2$s\" のアイテム \"%1$s\" が見つかりません。"
+
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
@@ -3268,6 +3317,10 @@ msgstr "\"%3$s\"上のアイテム\"%2$s\"で使用されている値のマッ�
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
+
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3348,7 +3401,7 @@ msgstr "同じアイテムキーのアイテムがすでにあるので、テン
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ LLD ルールを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
@@ -3383,17 +3436,17 @@ msgstr "同じキーを持つLLDルールが既に存在するため、テンプ
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをホスト \"%3$s\" に継承できません。同じキーを持つアイテム プロトタイプが既にテンプレート \"%4$s\" から継承されているためです。"
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをホスト \"%3$s\" に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをテンプレート \"%3$s\" に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -3632,6 +3685,10 @@ msgstr "ホストの表示名を一括更新できません。"
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "URLを開けません"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4396,11 +4453,11 @@ msgstr "指定したUDPのポート番号が待ち受け状態になっている
 
 #: include/classes/data/CItemData.php:1165
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr "TCPサービスのパフォーマンスをチェック。サービスがダウンしている場合は「0」を返し、秒数を返す場合はサービスへの接続にかかった秒数を返す。"
+msgstr "TCPサービスのパフォーマンスチェック。返り値: 0 - サービスがダウンしている, 0以外の数値 - サービスへの接続にかかった秒数"
 
 #: include/classes/data/CItemData.php:1199
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr "UDPサービスのパフォーマンスをチェック。サービスがダウンしている場合は「0」を返し、秒数を返す場合はサービスからの応答が返るまでの秒数を返す。"
+msgstr "UDPサービスのパフォーマンスチェック。返り値: 0 - サービスがダウンしている, 0以外の数値 - サービスから応答が返るまでの秒数"
 
 #: include/classes/api/services/CDRule.php:691
 msgid "Checks should be unique."
@@ -4431,6 +4488,10 @@ msgstr "テンプレートの循環リンクは行えません。"
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
+
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
@@ -4652,6 +4713,10 @@ msgstr "コミュニティ"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "コンパクト表示"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -4879,6 +4944,10 @@ msgstr "設定リフレッシュ"
 msgid "Configuration updated"
 msgstr "設定を更新しました"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -4888,6 +4957,12 @@ msgstr "データベース接続設定"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "JITプロビジョニングの設定"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -5253,6 +5328,14 @@ msgstr "メンテナンス期間の作成と変更"
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
 msgstr "マップの作成と変更"
+
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr "独自メディアの作成と変更"
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr "ユーザーメディアの作成と変更"
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -5860,6 +5943,11 @@ msgstr "データベース接続のTLS暗号化"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr "データベースエラーが発生しました。"
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6559,19 +6647,19 @@ msgstr "削除しました"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "削除されたホスト"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "削除されたホストグループ"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "削除されたホストグループ"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "削除されたトリガー"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -6676,9 +6764,13 @@ msgstr "説明"
 msgid "Description size"
 msgstr "説明のサイズ"
 
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
-msgstr "インストール済みパッケージの詳細リスト。JSONフォーマットのテキストで返す"
+msgstr "インストール済みパッケージの詳細リスト。JSONフォーマットのテキストを返す"
 
 #: app/partials/action.operations.php:32 app/partials/action.operations.php:35
 #: app/partials/action.recovery.operations.php:30
@@ -7059,6 +7151,10 @@ msgstr "ディスカバリオブジェクト"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
@@ -7171,7 +7267,7 @@ msgstr "ディスク読み込み統計。typeがsectors、operations、bytesの�
 
 #: include/classes/data/CItemData.php:1719
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "ディスク容量。バイト単位であれば整数値で返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "ディスク容量。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1575
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
@@ -7187,7 +7283,7 @@ msgstr "正常イベントの表示期間"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "アクションを表示"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7203,7 +7299,7 @@ msgstr "ローカル時間を表示"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "ログ時間を表示"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7477,6 +7573,10 @@ msgstr "ツリー要素の変更"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "ウィジェットの変更"
+
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7914,6 +8014,10 @@ msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 msgid "Error message"
 msgstr "エラーメッセージ"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr "エラーテキスト"
+
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
 #: app/partials/administration.system.info.php:160
@@ -8098,7 +8202,7 @@ msgstr "実行"
 
 #: include/classes/data/CItemData.php:2608
 msgid "Execute WMI query and return the JSON document with all selected objects"
-msgstr "WMIクエリを実行して選択したすべてのオブジェクトをJSONドキュメントで返す"
+msgstr "WMIクエリを実行し、選択したすべてのオブジェクトのJSONドキュメントを返す"
 
 #: include/classes/data/CItemData.php:2600
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
@@ -8444,7 +8548,7 @@ msgstr "フィールド名"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr ""
+msgstr "フィールド要件:"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8465,7 +8569,7 @@ msgstr "ファイルの所有者情報。文字列値を返す"
 
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
-msgstr "バイト(デフォルト)または行数でのファイルサイズ。整数値を返す"
+msgstr "ファイルサイズ。バイト単位(デフォルト)または行数の整数値を返す"
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -8933,6 +9037,10 @@ msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "グラフを削除しました"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr "グラフの編集"
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -8978,6 +9086,10 @@ msgstr "グラフのプロトタイプを追加しました"
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "グラフのプロトタイプを削除しました"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr "グラフのプロトタイプの編集"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9489,7 +9601,7 @@ msgstr "ホストに同じタイプのデフォルトインターフェースは
 
 #: widgets/hostcard/Widget.php:32
 msgid "Host card"
-msgstr ""
+msgstr "ホストカード"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -9514,7 +9626,7 @@ msgstr[0] "ホストを無効にしました"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "ホストの編集"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9575,7 +9687,7 @@ msgstr[0] "ホストグループを削除しました"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "ホストグループの編集"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9713,7 +9825,7 @@ msgstr "ホストネットワーク"
 #: widgets/topitems/includes/WidgetForm.php:128
 #: widgets/topitems/views/widget.edit.php:63
 msgid "Host ordering"
-msgstr ""
+msgstr "ホストの順序"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11094,6 +11206,10 @@ msgstr "深刻度を増やす"
 msgid "Indefinitely"
 msgstr "無期限"
 
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
 msgstr "インジケーター"
@@ -11145,11 +11261,11 @@ msgstr "情報"
 
 #: include/classes/data/CItemData.php:1631
 msgid "Information about a file. Returns JSON"
-msgstr "ファイルの情報。JSONで返す"
+msgstr "ファイルの情報。JSONを返す"
 
 #: include/classes/data/CItemData.php:1321
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr "サービス情報の取得。引数がstateやstartupなら整数値を返す。引数がdisplayname、path、userなら文字列値を返す。引数がdescriptionならテキスト値を返す。具体的には引数がstateで状態が開始なら「0」、一時停止なら「１」、開始中なら「2」、一時停止中なら「3」、再開中なら「4」、停止中なら「5」、停止なら「6」、不明なら「7」、該当サービスなしなら「255」を返す。また、引数がstartupでスタートアップの種類が自動なら「0」、自動(遅延開始)なら「1」、手動なら「2」、無効なら「3」、不明なら「4」を返す。"
+msgstr "サービスに関する情報。引数がstate、startupなら整数値を、displayname、path、userなら文字列値を、descriptionならテキスト値を返す。state(状態)の返り値: 0 - 停止, 1 - 一時停止, 2 - 開始中, 3 - 一時停止中, 4 - 再開中, 5 - 停止中, 6 - 停止, 7 - 不明, 255 - 該当サービスなし。startup(スタートアップの種類)の返り値: 0 - 自動, 1 - 自動(遅延開始), 2 - 手動, 3 - 無効, 4 - 不明"
 
 #: include/views/configuration.host.prototype.edit.php:270
 msgid "Inherit"
@@ -11376,6 +11492,11 @@ msgstr "LDAPの設定が正しくありません"
 #: app/controllers/CControllerMfaEdit.php:48
 msgid "Invalid MFA configuration"
 msgstr "多要素認証(MFA)の設定が正しくありません"
+
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -11852,6 +11973,10 @@ msgstr "アイテム"
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr "アイテムカード"
+
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "アイテムは秘密な値を持つユーザー定義マクロを含んでいます。これらのマクロの値は手動で入力する必要があります。"
@@ -11877,7 +12002,7 @@ msgstr[0] "アイテムを無効にしました"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "アイテムの編集"
 
 #: items.php:707
 msgid "Item enabled"
@@ -11917,7 +12042,7 @@ msgstr "アイテムが選択されていません"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr ""
+msgstr "アイテムの順序"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -11952,7 +12077,7 @@ msgstr[0] "アイテムのプロトタイプを削除しました"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "アイテムのプロトタイプの編集"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12250,7 +12375,7 @@ msgstr "LLDルール"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのLLDルールがすでに存在します。"
 
 #: app/views/correlation.edit.php:175 app/views/popup.action.edit.php:53
 #: app/views/popup.lldoverride.php:99 app/views/popup.operation.edit.php:435
@@ -12464,7 +12589,7 @@ msgstr "ライセンスは"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "制限"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
@@ -12557,11 +12682,11 @@ msgstr "リストがありません"
 
 #: include/classes/data/CItemData.php:1265
 msgid "List of OS processes with attributes. Returns JSON array"
-msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
+msgstr "OS上の属性情報付きのプロセスのリスト。JSON配列を返す"
 
 #: include/classes/data/CItemData.php:1305
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
-msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
+msgstr "指定されたキーにあるWindowsレジストリの値またはキーのリスト。JSONを返す。"
 
 #: include/classes/data/CItemData.php:2743
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
@@ -12581,35 +12706,35 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
-msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
+msgstr "ブロックデバイスとそのタイプのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr "検出されたCPUコアのリスト。JSONで返す"
+msgstr "検出されたCPUコアのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1591
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr "再帰的なディレクトリエントリのリスト。JSONで返す"
+msgstr "再帰的なディレクトリエントリのリスト。JSONを返す。"
 
 #: include/classes/data/CItemData.php:1695
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr "マウントされたファイルシステムとそのタイプのリスト。JSONで返す"
+msgstr "マウントされたファイルシステムとそのタイプのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr "マウントされたファイルシステムのリスト、それらのタイプ、ディスクスペースとiノードの統計のリスト。JSONで返す"
+msgstr "マウントされたファイルシステム、タイプ、ディスクスペースおよびinodeの統計のリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
-msgstr "ネットワークインターフェースのリスト。JSONで返す"
+msgstr "ネットワークインターフェースのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1249
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスの英語でのリスト。JSONで返す"
+msgstr "英語のオブジェクト名を使用して検出されたWindowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONを返す"
 
 #: include/classes/data/CItemData.php:1241
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONで返す"
+msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONを返す"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
@@ -12799,7 +12924,7 @@ msgstr "MD2"
 
 #: include/classes/data/CItemData.php:1639
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
-msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値を文字列値で返す。"
+msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値の文字列値を返す。"
 
 #: app/views/mfa.edit.php:161
 msgid "MFA method"
@@ -12877,7 +13002,7 @@ msgstr "メンテナンス\"%1$s\"はすでに存在します。"
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "メンテナンスの編集"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13404,11 +13529,11 @@ msgstr "メモリ上限: %1$s"
 
 #: include/classes/data/CItemData.php:2212
 msgid "Memory metrics of VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id, \"mode\"- consumed(default)/ballooned/overhead memory"
-msgstr ""
+msgstr "VMwareリソースプールのメモリメトリクス、\"url\" - VMwareサービスURL、\"rpid\" - VMwareリソースプールID、\"mode\" - consumed(デフォルト)/ballooned/overhead memory"
 
 #: include/classes/data/CItemData.php:1727
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "バイト単位もしくはトータルからのパーセンテージでのメモリサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "メモリサイズ。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1273
 msgid "Memory used by process in bytes. Returns integer"
@@ -13505,6 +13630,10 @@ msgstr "メソッドが見つかりません。"
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
 msgstr "認証方法"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr "メトリクス"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13677,7 +13806,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "モジュールの編集"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -14182,6 +14311,14 @@ msgstr "新しいイベントタグの値"
 msgid "New excluded downtime"
 msgstr "新規除外するダウンタイム"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "新しいホストの作成"
@@ -14204,6 +14341,10 @@ msgstr "新規アイテムのプロトタイプ"
 msgid "New maintenance period"
 msgstr "新しいメンテナンス期間の作成"
 
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
+
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
 msgstr "新規メディアタイプ"
@@ -14211,6 +14352,10 @@ msgstr "新規メディアタイプ"
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
 msgstr "新しいメディアタイプのマッピングの作成"
+
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14346,6 +14491,10 @@ msgstr "マップに\"%1$s\"が定義されていません。"
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "変更はありません。"
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr ""
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15105,7 +15254,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1711
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr "iノードの数値またはパーセンテージ。数値であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "inodeの数値またはパーセンテージ。数値であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
 
 #: include/items.inc.php:1585 include/items.inc.php:1589
 #: include/items.inc.php:1593
@@ -15133,6 +15282,18 @@ msgstr "数値 (整数)"
 #: include/views/configuration.item.prototype.edit.php:107
 msgid "Numeric (unsigned)"
 msgstr "数値 (整数)"
+
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
 
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
@@ -15372,7 +15533,7 @@ msgstr "OS情報。文字列値を返す。"
 
 #: include/classes/data/CItemData.php:1487
 msgid "Operating system version information. Returns JSON"
-msgstr "OSのバージョン情報。JSONで返す"
+msgstr "OSのバージョン情報。JSONを返す"
 
 #: app/views/popup.operation.edit.php:61 app/views/popup.service.edit.php:67
 #: app/views/popup.sla.edit.php:130
@@ -15888,6 +16049,15 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr "ページャー"
 
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
 msgstr "パラメータ"
@@ -16107,11 +16277,11 @@ msgstr "パーセンタイルライン (右)"
 
 #: include/classes/data/CItemData.php:1214
 msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
-msgstr ""
+msgstr "DNSクエリの実行。DNSがダウンしている場合は0を返し、そうでない場合はクエリ時間を秒単位で返します(小数点を含む)"
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
-msgstr "DNSクエリの実行。要求した情報のタイプの文字列を返す。"
+msgstr "DNSクエリの実行。要求したタイプの情報の文字列を返す。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
@@ -16608,6 +16778,10 @@ msgstr "PrometheusからJSON"
 msgid "Properties"
 msgstr "プロパティ"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "プロトコル"
@@ -16950,7 +17124,7 @@ msgstr "タグとサービスの表示/設定"
 
 #: include/classes/data/CItemData.php:1070
 msgid "Reads modbus data. Returns various types"
-msgstr "modbusデータを読み込む。様々なデータ型の値を返却"
+msgstr "modbusデータを読み込む。様々なデータ型を返す"
 
 #: include/actions.inc.php:62
 msgid "Received value"
@@ -17046,13 +17220,17 @@ msgstr "復旧時刻"
 msgid "Rectangle"
 msgstr "長方形"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "リファレンスの属性"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
-msgstr ""
+msgstr "参照しているウィジェットが利用できなくなりました。設定を更新してください。"
 
 #: jsLoader.php:195
 msgid "Referred widget is unavailable"
@@ -17080,6 +17258,10 @@ msgstr "選択したプロキシの設定をリフレッシュしますか？"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "リフレッシュ間隔"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr ""
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -17676,7 +17858,7 @@ msgstr "UNIXのバーミッションを4桁の8進数文字列で返す"
 
 #: include/classes/data/CItemData.php:983
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
-msgstr "ICMP pingの応答時間を秒で返す。例： 0.02"
+msgstr "ICMP pingの応答時間の秒数を返す。例: 0.02"
 
 #: include/classes/data/CItemData.php:2680
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -17685,7 +17867,7 @@ msgstr "Zabbixに設定されたホストのネットワークインターフェ
 #: include/classes/data/CItemData.php:2623
 #: include/classes/data/CItemData.php:2785
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
-msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスをJSONオブジェクトで返す。"
+msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスのJSONオブジェクトを返す。"
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -17705,7 +17887,7 @@ msgstr "パラメータに一致したTCPソケットの数を返す。整数を
 
 #: include/classes/data/CItemData.php:1217
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
-msgstr "パラメータに一致したUDPソケットの数を返す。整数で返す"
+msgstr "パラメータに一致したUDPソケットの数を返す。整数を返す"
 
 #: include/classes/data/CItemData.php:2862
 msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
@@ -18468,6 +18650,10 @@ msgstr "選択したSLAのSLAレポートを表示。"
 msgid "Select prototype"
 msgstr "プロトタイプの選択"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -18940,6 +19126,12 @@ msgstr "ヘッダーを表示"
 msgid "Show hosts in maintenance"
 msgstr "メンテナンス中のホストを表示"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "ラベルを表示"
@@ -18957,6 +19149,14 @@ msgstr "凡例を表示"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "表示する行数"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19256,6 +19456,10 @@ msgstr "ソフトウェアのアーキテクチャ情報。文字列値を返す
 msgid "Software update last checked"
 msgstr "ソフトウェア更新最終チェック日"
 
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
+
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr "このアイテムのヒストリの一部は圧縮されている可能性があるので削除できません。"
@@ -19414,12 +19618,20 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "固定"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmodesは(all, float, uint, str, log, text, not supported)から、casheがhistoryならmodesは(pfree, free, total, used, pused)から、cacheがindexならmodesは(pfree, free, total, used, pused)から、cacheがtrendならmodesは(pfree, free, total, used, pused)から選択。"
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -19739,15 +19951,15 @@ msgstr "メンテナンス終了: %1$s"
 
 #: include/classes/data/CItemData.php:1511
 msgid "Swap in (from device into memory) statistics. Returns integer"
-msgstr "スワップイン（デバイスからメモリへ）の統計。整数値を返す。"
+msgstr "スワップイン(デバイスからメモリ)の統計。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1519
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr "スワップアウト（メモリからデバイスへ）の統計。 整数値を返す。"
+msgstr "スワップアウト(メモリからデバイス)の統計。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1527
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "スワップ容量のサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "スワップ容量。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/locales.inc.php:63
 msgid "Swedish (sv_SE)"
@@ -19812,7 +20024,7 @@ msgstr "システムステータス"
 
 #: include/classes/data/CItemData.php:1447
 msgid "System time. Returns integer with type as UTC; string - with type as local"
-msgstr "システム時刻。utcなら整数値、localなら文字列で返す"
+msgstr "システム時刻。typeがutcなら整数値、localなら文字列値を返す"
 
 #: include/classes/data/CItemData.php:1543
 msgid "System uptime in seconds. Returns integer"
@@ -20185,6 +20397,10 @@ msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除し�
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "ホストのディスカバリでリンクされたテンプレートは削除できません。"
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20304,6 +20520,10 @@ msgstr ""
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr ""
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URLテンプレートは、地理マップ上にタイルレイヤーを読み込んで表示するために使用されます。"
@@ -20319,6 +20539,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -20754,6 +20982,14 @@ msgstr "今日(現在まで)"
 msgid "Token edit"
 msgstr "トークンの編集"
 
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
 #: include/views/js/monitoring.sysmaps.js.php:684
@@ -20785,7 +21021,7 @@ msgstr "上位ホスト"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "上位アイテム"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21506,7 +21742,7 @@ msgstr "利用不可"
 
 #: jsLoader.php:206 jsLoader.php:211
 msgid "Unavailable widget"
-msgstr ""
+msgstr "利用できないウィジェット"
 
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
@@ -21534,6 +21770,10 @@ msgstr "変更なし"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "障害確認の解除"
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -22091,7 +22331,7 @@ msgstr "ユーザーは無効のグループやGUIアクセスが無効のグル
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "ユーザーは無効なグループまたはGUIアクセスが無効なグループに自分自身を追加することはできません。"
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22228,7 +22468,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "ユーザーは自分自身を削除することはできません。"
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22466,11 +22706,11 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1981
 msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMwareデータストアの容量統計。\"url\" - VMwareサービスのURL, \"uuid\"  - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"mode\" - total(デフォルト)/free/pfree/uncommitted。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1834
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "VMwareデータストアのバイト単位かトータルからのパーセンテージによる容量の統計値。バイト単位なら整数、パーセンテージなら浮動小数で返す。"
+msgstr "VMwareデータストアの容量の統計値。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1806
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
@@ -22638,7 +22878,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1743
 msgid "VMware virtual center alarms data, returns JSON, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware virtual centerのアラーム情報。JSONを返す。\"url\" - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:2226
 msgid "VMware virtual machine alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -22939,7 +23179,7 @@ msgstr "MQTTトピックの値。返却されるデータフォーマットは�
 
 #: include/classes/data/CItemData.php:1233
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
-msgstr "英語でWindowsパフォーマンスカウンターの値。数値、文字列値、テキスト値で返す(リクエストに依存)"
+msgstr "英語のWindowsパフォーマンスカウンターの値。リクエストに応じて、整数値、浮動小数点値、文字列値、テキスト値を返す"
 
 #: include/classes/data/CItemData.php:1225
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
@@ -23113,7 +23353,7 @@ msgstr "関連するレポートの表示"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "バイト単位もしくはトータルからのパーセンテージでの仮想メモリサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
+msgstr "仮想メモリサイズ。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: app/partials/configuration.host.edit.html.php:102
 #: app/views/configuration.discovery.edit.php:168
@@ -23308,6 +23548,10 @@ msgstr "ウィジェット"
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "ダッシュボード\"%1$s\"のページ#%2$d上の X:%3$d, Y:%4$d のウィジェットは範囲外です。"
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
@@ -24177,6 +24421,18 @@ msgstr "ascii() - 値の左端の文字のASCIIコードを返す"
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - 角度の値のアークサイン、ラジアンで示す"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24233,6 +24489,10 @@ msgstr "baselinewma() - 季節内のデータ期間を平均してベースラ�
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - 値が指定された範囲内であるかチェック (1 - 範囲内, 0 - その他)"
 
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr "バイナリアイテムはサポートされていません"
+
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
 #: include/classes/screens/CScreenHistory.php:432
@@ -24280,6 +24540,14 @@ msgstr "bitxor() - ビットXOR演算"
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "blinking"
 msgstr "点滅"
+
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -24751,6 +25019,10 @@ msgstr "存在する"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - オイラー数の累乗値"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - オイラー数の累乗値マイナス1"
@@ -24875,6 +25147,10 @@ msgstr "ホストグループ"
 msgid "host group with the same UUID already exists"
 msgstr ""
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -24891,6 +25167,10 @@ msgstr "ホストパターン"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
 msgstr ""
 
 #: include/classes/api/services/CMap.php:844
@@ -24952,6 +25232,10 @@ msgstr "要素の数が正しくありません"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "\"%1$s\"から始まる条件式が正しくありません"
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25513,6 +25797,14 @@ msgstr "副次的な障害から削除する権限がありません"
 msgid "no permissions to create and edit maps"
 msgstr "マップの作成と変更の権限がありません"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr "独自メディアの作成と変更の権限がありません"
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr "ユーザーメディアの作成と変更の権限がありません"
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "障害抑制の権限がありません"
@@ -25741,7 +26033,7 @@ msgstr "参照したオブジェクトが存在しません"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
 msgid "referred widget is unavailable"
-msgstr ""
+msgstr "参照しているウィジェットが利用できません"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
@@ -25973,6 +26265,10 @@ msgstr ""
 
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
@@ -26372,6 +26668,14 @@ msgstr[0] "値は%1$sにしてください"
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "値は\"%1$s\"から\"%2$s\"までにしてください"
+
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"

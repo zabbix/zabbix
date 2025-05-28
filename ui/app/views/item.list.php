@@ -116,7 +116,7 @@ foreach ($data['items'] as $item) {
 			->setArgument('action', 'popup')
 			->setArgument('popup', 'trigger.edit')
 			->setArgument('triggerid', $trigger['triggerid'])
-			->setArgument('hostid', key($trigger['hosts']))
+			->setArgument('hostid', array_column($trigger['hosts'], 'hostid')[0])
 			->setArgument('context', $data['context'])
 			->getUrl();
 

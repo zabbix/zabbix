@@ -826,7 +826,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
- * Return value: license information from datase as string                    *
+ * Return value: license information from database as string                  *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
  *               "timescale" for TimescaleDB Community Edition                *
  *                                                                            *

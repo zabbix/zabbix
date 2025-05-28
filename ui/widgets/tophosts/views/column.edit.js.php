@@ -88,12 +88,12 @@ window.tophosts_column_edit_form = new class {
 				allow_empty: true,
 				dataCallback: row_data => {
 					if (!('color' in row_data)) {
-						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const color_pickers = this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 						const used_colors = [];
 
-						for (const color of colors) {
-							if (color.value !== '') {
-								used_colors.push(color.value);
+						for (const color_picker of color_pickers) {
+							if (color_picker.color !== '') {
+								used_colors.push(color_picker.color);
 							}
 						}
 
@@ -101,18 +101,8 @@ window.tophosts_column_edit_form = new class {
 					}
 				}
 			})
-			.on('afteradd.dynamicRows', ({target}) => {
-				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', target);
-
-				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-
-				this.#updateForm();
-			})
+			.on('afteradd.dynamicRows', () => this.#updateForm())
 			.on('afterremove.dynamicRows', () => this.#updateForm());
-
-		for (const colorpicker of thresholds_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
 
 		const highlights_table = document.getElementById('highlights_table');
 
@@ -124,12 +114,12 @@ window.tophosts_column_edit_form = new class {
 				allow_empty: true,
 				dataCallback: row_data => {
 					if (!('color' in row_data)) {
-						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const color_pickers = this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 						const used_colors = [];
 
-						for (const color of colors) {
-							if (color.value !== '') {
-								used_colors.push(color.value);
+						for (const color_picker of color_pickers) {
+							if (color_picker.color !== '') {
+								used_colors.push(color_picker.color);
 							}
 						}
 
@@ -137,18 +127,8 @@ window.tophosts_column_edit_form = new class {
 					}
 				}
 			})
-			.on('afteradd.dynamicRows', ({target}) => {
-				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', target);
-
-				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-
-				this.#updateForm();
-			})
+			.on('afteradd.dynamicRows', () => this.#updateForm())
 			.on('afterremove.dynamicRows', () => this.#updateForm());
-
-		for (const colorpicker of highlights_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
 
 		for (const input of this.#form.querySelectorAll('[type="text"]')) {
 			input.value = input.value.trim();

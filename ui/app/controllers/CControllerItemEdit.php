@@ -18,6 +18,16 @@ require 'include/forms.inc.php';
 
 class CControllerItemEdit extends CControllerItem {
 
+	/**
+	 * @var array
+	 */
+	private $host;
+
+	/**
+	 * @var array
+	 */
+	private $template;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -56,6 +66,34 @@ class CControllerItemEdit extends CControllerItem {
 	protected function checkPermissions(): bool {
 		if (!CWebUser::isLoggedIn() || !$this->validateReferredObjects()) {
 			return false;
+		}
+
+		if ($this->getInput('context') === 'host') {
+			$host = API::Host()->get([
+				'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
+				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
+				'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+			]);
+
+			if (!$host) {
+				return false;
+			}
+
+			$this->host = reset($host);
+		}
+		else {
+			$template = API::Template()->get([
+				'output' => ['templateid', 'name', 'flags'],
+				'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+			]);
+
+			if (!$template) {
+				return false;
+			}
+
+			$this->template = reset($template);
 		}
 
 		return parent::checkPermissions();
@@ -102,6 +140,12 @@ class CControllerItemEdit extends CControllerItem {
 		}
 
 		$data = [
+			'js_test_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
+			))->getRules(),
+			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
+				? (new CFormValidator(CControllerItemCreate::getValidationRules()))->getRules()
+				: (new CFormValidator(CControllerItemUpdate::getValidationRules()))->getRules(),
 			'item' => $item,
 			'host' => $host,
 			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
@@ -137,12 +181,7 @@ class CControllerItemEdit extends CControllerItem {
 	 * @return array
 	 */
 	protected function getHost(): array {
-		[$host] = API::Host()->get([
-			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
-			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
-		]);
+		$host = $this->host;
 
 		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 			$host['proxyid'] = $host['assigned_proxyid'];
@@ -165,11 +204,7 @@ class CControllerItemEdit extends CControllerItem {
 	 * @return array
 	 */
 	protected function getTemplate(): array {
-		[$template] = API::Template()->get([
-			'output' => ['templateid', 'name', 'flags'],
-			'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
-		]);
+		$template = $this->template;
 		$template += [
 			'hostid' => $template['templateid'],
 			'proxyid' => 0,
@@ -244,8 +279,8 @@ class CControllerItemEdit extends CControllerItem {
 		if ($this->hasInput('itemid')) {
 			[$item] = API::Item()->get([
 				'output' => [
-					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'name_resolved', 'key_', 'delay', 'history', 'trends',
+					'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
 					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 					'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',

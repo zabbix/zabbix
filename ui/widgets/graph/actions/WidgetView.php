@@ -244,7 +244,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($is_resource_available) {
 			// Build graph action and data source links.
 			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				if (!$edit_mode && !$this->hasInput('has_custom_time_period')) {
+				if ((!$this->isTemplateDashboard() || $this->fields_values['override_hostid'])
+						&& !$this->hasInput('has_custom_time_period')) {
 					$time_control_data['loadSBox'] = 1;
 				}
 
@@ -325,7 +326,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 
-					if (!$edit_mode && !$this->hasInput('has_custom_time_period')) {
+					if ((!$this->isTemplateDashboard() || $this->fields_values['override_hostid'])
+							&& !$this->hasInput('has_custom_time_period')) {
 						$time_control_data['loadSBox'] = 1;
 					}
 				}

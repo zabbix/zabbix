@@ -911,7 +911,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 {
 	char				*tmp = NULL, *error = NULL;
 	size_t				tmp_alloc = 0, tmp_offset;
-	int				i, j, start_counter = 0;
+	int				i, j, k, start_counter = 0;
 	zbx_vmware_perf_entity_t	*entity;
 	xmlDoc				*doc = NULL;
 
@@ -971,11 +971,21 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 					continue;
 				}
 
-				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
-						"<ns0:metricId><ns0:counterId>" ZBX_FS_UI64
-						"</ns0:counterId><ns0:instance>%s</ns0:instance></ns0:metricId>",
-						counter->counterid, NULL == counter->query_instance ?
-						entity->query_instance : counter->query_instance);
+				for (k = 0; k < counter->query_instance.values_num; k++)
+				{
+					zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+							"<ns0:metricId><ns0:counterId>" ZBX_FS_UI64 "</ns0:counterId>"
+							"<ns0:instance>%s</ns0:instance></ns0:metricId>",
+							counter->counterid, counter->query_instance.values[k]);
+				}
+
+				if (0 == counter->query_instance.values_num)
+				{
+					zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+							"<ns0:metricId><ns0:counterId>" ZBX_FS_UI64 "</ns0:counterId>"
+							"<ns0:instance>%s</ns0:instance></ns0:metricId>",
+							counter->counterid, entity->query_instance);
+				}
 
 				counter->state |= ZBX_VMWARE_COUNTER_UPDATING;
 
@@ -1609,8 +1619,8 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 	zbx_vmware_perf_counter_t	*counter;
 	int				i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64, __func__, type, id,
-			counterid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __func__, type, id,
+			counterid, instance);
 
 	if (NULL == (pentity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
@@ -1649,11 +1659,11 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 	else
 		counter = (zbx_vmware_perf_counter_t *)pentity->counters.values[i];
 
-	if (*ZBX_VMWARE_PERF_QUERY_ALL != *pentity->query_instance)
-		counter->query_instance = vmware_shared_strdup(instance);
+	if (FAIL == zbx_vector_str_search(&counter->query_instance, instance, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		zbx_vector_str_append(&counter->query_instance, vmware_shared_strdup(instance));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counter state:%X", __func__, zbx_result_string(ret),
-			counter->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counter state:%X instances:%d", __func__, zbx_result_string(ret),
+			counter->state, counter->query_instance.values_num);
 
 	return ret;
 }

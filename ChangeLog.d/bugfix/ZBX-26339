@@ -1,0 +1,1 @@
+.......PS. [ZBX-26339] fixed user macro resolving order in templates so that in case of conflict import order of templates takes precedence over the linking order (askolmeisters)

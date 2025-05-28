@@ -447,7 +447,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => '3'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Name": value (Valuemap for delete) already exists.',
 					'inline_error' => [
 						'Name' => 'Given valuemap name is already taken.'
 					]
@@ -466,7 +465,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => '1'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Name": cannot be empty.',
 					'inline_error' => [
 						'Name' => 'This field cannot be empty.'
 					]
@@ -478,7 +476,6 @@ class testFormValueMappings extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Valuemap without mappings',
 					'remove_all' => true,
-					'error_details' => 'Incorrect value for field "Mappings": cannot be empty.',
 					'inline_error' => [
 						'xpath:.//div[@data-field-name="mappings"]' => 'This field cannot be empty.'
 					]
@@ -505,7 +502,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_{index}_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -524,7 +520,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => '1'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Name": cannot be empty.',
 					'inline_error' => [
 						'Name' => 'This field cannot be empty.'
 					]
@@ -551,7 +546,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => '    '
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_{index}_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -578,7 +572,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => '1 again'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": value (one) already exists.',
 					'inline_error' => [
 						'name:mappings[{index}][type]' => 'Mapping type and value combination is not unique.'
 					]
@@ -598,7 +591,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'this is text'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": a floating point value is expected.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: This value is not a valid floating-point value.'
 					]
@@ -618,7 +610,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'this is text'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": a floating point value is expected.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: This value is not a valid floating-point value.'
 					]
@@ -638,7 +629,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'several symbols'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": invalid range expression.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: Invalid range.'
 					]
@@ -658,7 +648,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'empty value'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: This field cannot be empty.'
 					]
@@ -678,7 +667,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'empty value'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": a floating point value is expected.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: This field cannot be empty.'
 					]
@@ -698,7 +686,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'empty value'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": a floating point value is expected.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: This field cannot be empty.'
 					]
@@ -718,7 +705,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'empty value'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_value' => 'Value: This field cannot be empty.'
 					]
@@ -743,7 +729,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'empty value2'
 						]
 					],
-					'error_details' => 'Incorrect value for field "Value": value () already exists.',
 					'inline_error' => [
 						'name:mappings[{index}][type]' => 'Mapping type and value combination is not unique.'
 					]
@@ -763,7 +748,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -783,7 +767,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -803,7 +786,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -823,7 +805,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -843,7 +824,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -862,7 +842,6 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => ''
 						]
 					],
-					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.',
 					'inline_error' => [
 						'id:mappings_0_newvalue' => 'Mapped to: This field cannot be empty.'
 					]
@@ -915,7 +894,7 @@ class testFormValueMappings extends CWebTest {
 			$mapping_table->fill($data['mappings']);
 		}
 
-		if ($source === 'host' && array_key_exists('inline_error', $data)) {
+		if (array_key_exists('inline_error', $data)) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -924,25 +903,19 @@ class testFormValueMappings extends CWebTest {
 		}
 
 		if ($expected === TEST_BAD) {
-			if ($source === 'host' && array_key_exists('inline_error', $data)) {
-				$inline_error = [];
-				$key = array_key_first($data['inline_error']);
+			$inline_error = [];
+			$key = array_key_first($data['inline_error']);
 
-				if (str_contains($key, '{index}')) {
-					// Mapping index is by 1 less than the count of mappings.
-					$new_key = str_replace('{index}', $mapping_table->getRows()->count() - 1, $key);
-					$inline_error[$new_key] = $data['inline_error'][$key];
-				}
-				else {
-					$inline_error = $data['inline_error'];
-				}
-
-				$this->assertInlineError($form, $inline_error);
+			if (str_contains($key, '{index}')) {
+				// Mapping index is by 1 less than the count of mappings.
+				$new_key = str_replace('{index}', $mapping_table->getRows()->count() - 1, $key);
+				$inline_error[$new_key] = $data['inline_error'][$key];
 			}
 			else {
-				$this->assertMessage(TEST_BAD, null, $data['error_details']);
+				$inline_error = $data['inline_error'];
 			}
 
+			$this->assertInlineError($form, $inline_error);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
 			$dialog->close();
@@ -1064,6 +1037,7 @@ class testFormValueMappings extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->submit()->waitUntilNotVisible();
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
 		// Check that no changes occurred in the database.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -1195,7 +1169,8 @@ class testFormValueMappings extends CWebTest {
 			$form->selectTab('Value mapping');
 		}
 		else {
-			$this->assertMessage(TEST_BAD, 'Cannot add template', 'Field "groups" is mandatory.');
+			$this->assertInlineError($form, ['Template groups' => 'This field cannot be empty.']);
+			$form->selectTab('Value mapping');
 		}
 
 		// Check that the value mapping data is still populated.
@@ -1217,7 +1192,7 @@ class testFormValueMappings extends CWebTest {
 		$update_form->selectTab('Value mapping');
 		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
 		$update_form->query('id:valuemap_add')->one()->click();
-		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		$mapping_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 
 		// Take a screenshot to test draggable object position of value mapping field.
 		$this->page->removeFocus();

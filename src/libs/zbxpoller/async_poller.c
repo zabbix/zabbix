@@ -524,7 +524,7 @@ static void	sock_state_cb(void *data, int s, int read, int write)
 	if (0 == events)
 	{
 		if (NULL == fd_event)
-			zabbix_log(LOG_LEVEL_WARNING, "cannt find event for fd:%d", s);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find event for fd:%d", s);
 
 		goto out;
 	}
