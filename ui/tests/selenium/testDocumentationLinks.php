@@ -2448,7 +2448,7 @@ class testDocumentationLinks extends CWebTest {
 				$element = CTestArrayHelper::get($action, 'element', null);
 				call_user_func_array([$this, $action['callback']], [$element]);
 
-				// $dialog->isValid() can be false if a widget is added.
+				// $dialog->isValid() can be false for $location variable if the widget is added too quickly.
 				if ($element === 'id:dashboard-add-widget') {
 					COverlayDialogElement::get('Add widget')->waitUntilReady();
 				}
