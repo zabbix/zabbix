@@ -249,7 +249,8 @@ static int	hk_policy_compress_after_add(const char *table_name, int ts)
 		int	rc;
 
 		/* available since TimescaleDB 2.18.0 */
-		rc = zbx_db_execute("call add_columnstore_policy('%s', after => integer '%d')", table_name, ts);
+		rc = zbx_db_execute("call add_columnstore_policy('%s', after => integer '%d', if_not_exists => true)",
+				table_name, ts);
 		ret = (ZBX_DB_OK > rc ? FAIL : SUCCEED);
 	}
 	else
@@ -257,8 +258,8 @@ static int	hk_policy_compress_after_add(const char *table_name, int ts)
 		zbx_db_result_t	result;
 
 		/* deprecated since TimescaleDB 2.18.0 */
-		result = zbx_db_select("select add_compression_policy('%s', compress_after => integer '%d')",
-				table_name, ts);
+		result = zbx_db_select("select add_compression_policy('%s', compress_after => integer '%d',"
+				" if_not_exists => true)", table_name, ts);
 		ret = (NULL == result ? FAIL : SUCCEED);
 		zbx_db_free_result(result);
 	}
@@ -290,8 +291,8 @@ static int	hk_policy_compress_created_before_add(const char *table_name, int age
 		int	rc;
 
 		/* available since TimescaleDB 2.18.0 */
-		rc = zbx_db_execute("call add_columnstore_policy('%s', created_before => interval '%d')", table_name,
-				age);
+		rc = zbx_db_execute("call add_columnstore_policy('%s', created_before => interval '%d',"
+				" if_not_exists => true)", table_name, age);
 		ret = (ZBX_DB_OK > rc ? FAIL : SUCCEED);
 	}
 	else
@@ -299,8 +300,8 @@ static int	hk_policy_compress_created_before_add(const char *table_name, int age
 		zbx_db_result_t	result;
 
 		/* deprecated since TimescaleDB 2.18.0 */
-		result = zbx_db_select("select add_compression_policy('%s', compress_created_before => interval '%d')",
-				table_name, age);
+		result = zbx_db_select("select add_compression_policy('%s', compress_created_before => interval '%d',"
+				" if_not_exists => true)", table_name, age);
 		ret = (NULL == result ? FAIL : SUCCEED);
 		zbx_db_free_result(result);
 	}
