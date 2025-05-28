@@ -2022,7 +2022,7 @@ abstract class CTriggerGeneral extends CApiService {
 					? 'SELECT i.itemid,i.key_,i.value_type,i.flags,id.lldruleid'.
 						' FROM items i'.
 						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-						' JOIN items ii ON id.lldruleid=ii.itemid'.
+						' LEFT JOIN items ii ON id.lldruleid=ii.itemid'.
 						' WHERE i.hostid='.$host_keys['hostid'].
 							' AND '.dbConditionString('i.key_', array_keys($host_keys['keys'])).
 							' AND '.dbConditionInt('i.flags', [
