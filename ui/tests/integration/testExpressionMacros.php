@@ -84,7 +84,7 @@ class testExpressionMacros extends CIntegrationTest {
 	const TIME_BUILDIN_MACRO_SIM = '23:12:55';
 	const SAMPLE_DOUBLE_VALUE = '0.1234567890123456789';
 
-	// COMMON means common between main, recovery and update actions
+	/* COMMON means common between 1) operations 2) recovery operations 3) update operations */
 	const BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON = "ACTION.NAME -> {ACTION.NAME} <-
 EVENT.ACK.STATUS -> {EVENT.ACK.STATUS} <-
 EVENT.NAME -> {EVENT.NAME} <-
@@ -136,6 +136,9 @@ TRIGGER.URL -> {TRIGGER.URL} <-
 TRIGGER.URL.NAME -> {TRIGGER.URL.NAME} <-
 TRIGGER.VALUE -> {TRIGGER.VALUE} <-";
 
+	/* There macros resolve to some consistent values */
+	/* ONLY during the recovery operations. For other */
+	/* operations they are not resolved.              */
 	const BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
 EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
 EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
@@ -143,6 +146,10 @@ EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
 EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
 EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 
+	/* These macros resolve to new values on every test run - like time or id. */
+	/* So, their resulting values are not checked with assertEquals().         */
+	/* It is still important to have them in the test, since they can          */
+	/* cause memory issues (that would be detected with sanitizers).           */
 	const BUILTIN_MACROS_INCONSISTENT_RESOLVE = "ACTION.ID -> {ACTION.ID} <-
 ESC.HISTORY -> {ESC.HISTORY} <-
 DATE -> {DATE} <-
@@ -156,10 +163,14 @@ HOST.ID -> {HOST.ID} <-
 ITEM.ID -> {ITEM.ID} <-
 TRIGGER.ID -> {TRIGGER.ID} <-";
 
+	/* These macros resolve to new values on every test run - like time or id  */
+	/* ONLY during the recovery operations. For other operations they are not  */
+	/* resolved.                                                               */
 	const BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY = "
 EVENT.RECOVERY.ID -> {EVENT.RECOVERY.ID} <-
 EVENT.RECOVERY.TIME -> {EVENT.RECOVERY.TIME} <-";
 
+	/* There macros resolve to a value of UNKNOWN.*/
 	const BUILTIN_MACROS_UNKNOWN = "EVENT.CAUSE.ACK.STATUS -> {EVENT.CAUSE.ACK.STATUS} <-
 EVENT.CAUSE.AGE -> {EVENT.CAUSE.AGE} <-
 EVENT.CAUSE.DATE -> {EVENT.CAUSE.DATE} <-
@@ -257,7 +268,8 @@ ITEM.LOG.SOURCE -> {ITEM.LOG.SOURCE} <-
 ITEM.LOG.TIME -> {ITEM.LOG.TIME} <-
 TRIGGER.TEMPLATE.NAME -> {TRIGGER.TEMPLATE.NAME} <-";
 
-		const  BUILTIN_MACROS_UNKNOWN_RESOLVED = "EVENT.CAUSE.ACK.STATUS -> *UNKNOWN* <-
+	/* Resolved self::BUILTIN_MACROS_UNKNOWN. */
+	const  BUILTIN_MACROS_UNKNOWN_RESOLVED = "EVENT.CAUSE.ACK.STATUS -> *UNKNOWN* <-
 EVENT.CAUSE.AGE -> *UNKNOWN* <-
 EVENT.CAUSE.DATE -> *UNKNOWN* <-
 EVENT.CAUSE.DURATION -> *UNKNOWN* <-
@@ -354,6 +366,7 @@ ITEM.LOG.SOURCE -> *UNKNOWN* <-
 ITEM.LOG.TIME -> *UNKNOWN* <-
 TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 
+	/* These macros are not resolved. */
 	const BUILTIN_MACROS_NON_REPLACEABLE = "{ALERT.MESSAGE}
 {ALERT.SENDTO}
 {ALERT.SUBJECT}
@@ -819,18 +832,11 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 	 */
 	public function testExpressionMacros_checkProblemMessage() {
 
-		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
-EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
-EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
-EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
-EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
-EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
-
 		$message_expect = self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
 			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
 			'===2===' . "\n" .
-			$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 			'===3===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
@@ -867,13 +873,6 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 	 */
 	public function testExpressionMacros_checkProblemMessage2() {
 
-		$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED = "EVENT.RECOVERY.DATE -> {EVENT.RECOVERY.DATE} <-
-EVENT.RECOVERY.NAME -> {EVENT.RECOVERY.NAME} <-
-EVENT.RECOVERY.STATUS -> {EVENT.RECOVERY.STATUS} <-
-EVENT.RECOVERY.TAGS -> {EVENT.RECOVERY.TAGS} <-
-EVENT.RECOVERY.TAGSJSON -> {EVENT.RECOVERY.TAGSJSON} <-
-EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
-
 		$message_expect = self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
 				'/host/macro:' . self::VALUE_TO_FIRE_TRIGGER .
@@ -885,7 +884,7 @@ EVENT.RECOVERY.VALUE -> {EVENT.RECOVERY.VALUE} <-";
 			'===2===' . "\n" .
 			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
 			'===3===' . "\n" .
-			$BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
+			self::BUILTIN_MACROS_CONSISTENT_RESOLVE_ONLY_RECOVERY_RESOLVED . "\n" .
 			'===4===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===5===' . "\n" .
