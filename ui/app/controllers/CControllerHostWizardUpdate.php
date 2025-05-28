@@ -26,6 +26,7 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 		$fields = [
 			'hostid' =>				'required|db hosts.hostid',
 			'groups' =>				'array',
+			'groups_new' =>			'array',
 			'templateid' =>			'required|db hosts.hostid',
 			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
 			'tls_psk' =>			'db hosts.tls_psk|not_empty',
@@ -100,9 +101,13 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 
 			$this->getInputs($host, ['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password']);
 
-			if ($this->hasInput('groups')) {
+			if ($this->hasInput('groups') || $this->hasInput('groups_new')) {
 				$host['groups'] = $this->processHostGroups(
-					$this->prepareGroups($this->getInput('groups'), $this->db_host['hostgroups'])
+					array_unique(array_merge(
+						$this->getInput('groups', []),
+						array_column($this->db_host['hostgroups'], 'groupid')
+					)),
+					$this->getInput('groups_new', [])
 				);
 			}
 
@@ -155,15 +160,6 @@ class CControllerHostWizardUpdate extends CControllerHostWizardUpdateGeneral {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
-	}
-
-	private function prepareGroups(array $groups, array $db_groups): array {
-		$existing_groups = array_filter($groups, 'is_string');
-		$new_groups = array_filter($groups, 'is_array');
-
-		$result = array_unique(array_merge($existing_groups, array_column($db_groups, 'groupid')));
-
-		return array_merge($result, $new_groups);
 	}
 
 	private function prepareInterfaces(array $interfaces, array $db_interfaces): array {

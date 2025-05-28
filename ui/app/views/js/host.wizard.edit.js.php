@@ -192,7 +192,9 @@ window.host_wizard_edit = new class {
 			}
 		},
 		host: null,
+		host_new: null,
 		groups: [],
+		groups_new: [],
 		templates: [],
 		tls_psk: null,
 		tls_psk_identity: null,
@@ -208,7 +210,11 @@ window.host_wizard_edit = new class {
 		[this.STEP_CREATE_HOST]: {
 			host: {
 				type: 'object',
-				required: true,
+				required: () => this.#data.host_new === null
+			},
+			host_new: {
+				base_path: 'host',
+				type: 'object',
 				fields: {
 					id: {
 						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/,
@@ -218,7 +224,11 @@ window.host_wizard_edit = new class {
 			},
 			groups: {
 				type: 'array',
-				required: () => this.#data.host?.isNew,
+				required: () => this.#data.host_new !== null && !this.#data.groups_new.length
+			},
+			groups_new: {
+				base_path: 'groups',
+				type: 'array',
 				fields: {
 					id: {
 						regex: /^(?!\/)(.*?)(?<!\/)$/,
@@ -363,8 +373,8 @@ window.host_wizard_edit = new class {
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
 						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-							redirect_latest: this.#data.host.isNew,
-							hostid: this.#data.host.id
+							redirect_latest: this.#data.host_new !== null,
+							hostid: this.#data.host_new?.id
 						}}));
 					}
 				})
@@ -565,22 +575,44 @@ window.host_wizard_edit = new class {
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
 
 		const host_ms = jQuery('#host', view).multiSelect().on('change', (e, detail) => {
-			detail && this.#setValueByName(this.#data, detail.options.name,
-				Object.keys(detail.values.selected).length ? Object.values(detail.values.selected)[0] : null
-			);
+			if (!detail) {
+				return;
+			}
+
+			const value = Object.keys(detail.values.selected).length ? Object.values(detail.values.selected)[0] : null;
+
+			this.#setValueByName(this.#data, detail.options.name, value?.isNew ? null : value);
+			this.#setValueByName(this.#data, detail.options.newItemName, value?.isNew ? value : null);
 		});
 
 		if (this.#data.host !== null) {
 			host_ms.multiSelect('addData', [this.#data.host]);
 		}
 
+		if (this.#data.host_new !== null) {
+			host_ms.multiSelect('addData', [this.#data.host_new]);
+		}
+
 		const groups_ms = jQuery('#groups_', view).multiSelect().on('change', (_, detail) => {
-			detail && this.#setValueByName(this.#data, detail.options.name, Object.values(detail.values.selected));
+			if (!detail) {
+				return;
+			}
+
+			const {groups, groups_new} = Object.values(detail.values.selected).reduce((result, value) => {
+				if (value.isNew) {
+					result.groups_new.push(value);
+				}
+				else {
+					result.groups.push(value);
+				}
+				return result;
+			}, {groups: [], groups_new: []});
+
+			this.#setValueByName(this.#data, detail.options.name, groups);
+			this.#setValueByName(this.#data, detail.options.newItemName, groups_new);
 		});
 
-		if (this.#data.groups.length) {
-			groups_ms.multiSelect('addData', this.#data.groups)
-		}
+		groups_ms.multiSelect('addData', [...this.#data.groups, ...this.#data.groups_new]);
 
 		for (const [path, multiselect] of Object.entries({host: host_ms[0], groups: groups_ms[0]})) {
 			const wrapper = multiselect.closest('.<?= CMultiSelect::ZBX_STYLE_CLASS ?>');
@@ -596,8 +628,9 @@ window.host_wizard_edit = new class {
 						this.#activateFieldValidation(path);
 
 						const error = this.#validateField(path);
+						const alias_error = this.#validateFieldAliases(path);
 
-						if (error !== null) {
+						if (error !== null || alias_error !== null) {
 							this.#updateForm(path);
 						}
 					}
@@ -632,7 +665,7 @@ window.host_wizard_edit = new class {
 
 		const view = this.#view_templates.step_add_host_interface.evaluateToElement({
 			template_name: this.#getSelectedTemplate()?.name,
-			host_name: this.#data.host.isNew ? this.#data.host.id : this.#data.host.name,
+			host_name: this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name,
 			interfaces_long: interfaces_long.join(' / '),
 			interfaces_short: interfaces_short.join('/')
 		});
@@ -722,7 +755,7 @@ window.host_wizard_edit = new class {
 
 	#renderConfigurationFinish() {
 		const view = this.#view_templates.step_configuration_finish.evaluateToElement({
-			button_label: this.#data.host.isNew ? <?= json_encode(_('Create')) ?> : <?= json_encode(_('Update')) ?>
+			button_label: this.#data.host_new !== null ? <?= json_encode(_('Create')) ?> : <?= json_encode(_('Update')) ?>
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -730,8 +763,8 @@ window.host_wizard_edit = new class {
 
 	#renderComplete() {
 		const view = this.#view_templates.step_complete.evaluateToElement({
-			complete_message: this.#data.host.isNew
-				? sprintf(<?= json_encode(_('Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s).')) ?>, this.#data.host.name)
+			complete_message: this.#data.host_new !== null
+				? sprintf(<?= json_encode(_('Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s).')) ?>, this.#data.host_new.name)
 				: <?= json_encode(_('Click Finish to close the Host wizard.')) ?>
 		});
 
@@ -784,7 +817,7 @@ window.host_wizard_edit = new class {
 		const {templateid} = this.#getSelectedTemplate();
 		const hostid = this.#source_host !== null
 			? this.#source_host.hostid
-			: this.#data.host && !this.#data.host.isNew
+			: this.#data.host !== null
 				? this.#data.host.id
 				: null;
 
@@ -817,8 +850,7 @@ window.host_wizard_edit = new class {
 					this.#data.host = {
 						...this.#data.host,
 						id: this.#host.hostid,
-						name: this.#host.name,
-						isNew: false
+						name: this.#host.name
 					}
 				}
 
@@ -934,16 +966,19 @@ window.host_wizard_edit = new class {
 	#saveHost() {
 		const submit_url = new URL('zabbix.php', location.href);
 
-		submit_url.searchParams.set('action', this.#data.host.isNew ? 'host.wizard.create' : 'host.wizard.update');
+		submit_url.searchParams.set('action', this.#data.host_new !== null
+			? 'host.wizard.create'
+			: 'host.wizard.update'
+		);
 
 		return fetch(submit_url.href, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				[this.#data.host.isNew ? 'host' : 'hostid']: this.#data.host.id,
-				...(this.#data.groups.length && {
-					groups: this.#data.groups.map(ms_group => (ms_group.isNew ? {new: ms_group.id} : ms_group.id))
-				}),
+				...(this.#data.host && {hostid: this.#data.host.id}),
+				...(this.#data.host_new && {host: this.#data.host_new.id}),
+				...(this.#data.groups.length && {groups: this.#data.groups.map(group => group.id)}),
+				...(this.#data.groups_new.length && {groups_new: this.#data.groups_new.map(group => group.id)}),
 				templateid: this.#template.templateid,
 				...(this.#data.tls_required && {
 					tls_psk: this.#data.tls_psk,
@@ -967,9 +1002,9 @@ window.host_wizard_edit = new class {
 					throw {error: response.error};
 				}
 
-				if (this.#data.host.isNew) {
-					this.#data.host.name = this.#data.host.id
-					this.#data.host.id = response.hostid;
+				if (this.#data.host_new !== null) {
+					this.#data.host_new.name = this.#data.host_new.id
+					this.#data.host_new.id = response.hostid;
 				}
 
 				this.#ajaxSuccessHandler(response);
@@ -1082,7 +1117,7 @@ window.host_wizard_edit = new class {
 			},
 			{
 				label: <?= json_encode(_('Create or select a host')) ?>,
-				info: this.#data.host?.name,
+				info: this.#data.host_new !== null ? this.#data.host_new.name : this.#data.host?.name,
 				visible: this.#source_host === null,
 				steps: [this.STEP_CREATE_HOST]
 			},
@@ -1187,7 +1222,7 @@ window.host_wizard_edit = new class {
 						this.#data.groups.map(group => group.id)
 					);
 
-					if (this.#data.host !== null) {
+					if (this.#data.host !== null || this.#data.host_new !== null) {
 						this.#updateProgress();
 					}
 				}
@@ -1330,13 +1365,17 @@ window.host_wizard_edit = new class {
 		for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
 			const rule = this.#getValidationRule(path);
 
-			if (!rule?.active) {
+			if (!rule?.active || 'base_rule' in rule) {
 				continue;
 			}
 
-			this.#updateFieldMessages(this.#pathToInputName(path), 'error', error !== null ? [error] : []);
+			const alias_error = this.#getAliasError(path);
 
-			if (error === null) {
+			this.#updateFieldMessages(this.#pathToInputName(path), 'error',
+				error !== null ? [error] : (alias_error !== null ? [alias_error] : [])
+			);
+
+			if (error === null && alias_error === null) {
 				rule.active = false;
 			}
 		}
@@ -1392,7 +1431,7 @@ window.host_wizard_edit = new class {
 
 		switch (step) {
 			case this.STEP_CONFIGURATION_FINISH:
-				this.#next_button.innerText = this.#data.host.isNew
+				this.#next_button.innerText = this.#data.host_new !== null
 					? <?= json_encode(_('Create')) ?>
 					: <?= json_encode(_('Update')) ?>;
 				break;
@@ -1917,15 +1956,18 @@ window.host_wizard_edit = new class {
 		this.#activateFieldValidation(path);
 
 		const error = this.#validateField(path);
+		const alias_error = this.#validateFieldAliases(path);
 
-		if (error !== null) {
+		if (error !== null || alias_error !== null) {
 			this.#updateForm(path);
 		}
 	}
 
 	#activateStepValidation(step) {
 		for (const rule of Object.values(this.#validation_rules[step] || {})) {
-			rule.active = true;
+			if (!('base_rule' in rule)) {
+				rule.active = true;
+			}
 		}
 	}
 
@@ -1965,7 +2007,7 @@ window.host_wizard_edit = new class {
 				return <?= json_encode(_('This field cannot be empty.')) ?>;
 			}
 
-			if (rule.type === 'object' && rule.fields !== undefined) {
+			if (rule.type === 'object' && rule.fields !== undefined && value !== null) {
 				for (const name in rule.fields) {
 					const error = validate(rule.fields[name], value[name]);
 
@@ -2038,6 +2080,16 @@ window.host_wizard_edit = new class {
 		return error;
 	}
 
+	#validateFieldAliases(path) {
+		for (const [alias_path, rule] of Object.entries(this.#validation_rules[this.#getCurrentStep()] ?? {})) {
+			if (rule.base_path === path) {
+				return this.#validateField(alias_path);
+			}
+		}
+
+		return null;
+	}
+
 	#getValidationRule(path) {
 		for (const rules of Object.values(this.#validation_rules)) {
 			if (rules && path in rules) {
@@ -2046,12 +2098,24 @@ window.host_wizard_edit = new class {
 		}
 	}
 
+	#getAliasError(path) {
+		for (const [alias_path, rule] of Object.entries(this.#validation_rules[this.#getCurrentStep()])) {
+			const error = this.#validation_errors[this.#getCurrentStep()][alias_path];
+
+			if (rule.base_path === path && error) {
+				return error;
+			}
+		}
+
+		return null;
+	}
+
 	#hasErrors() {
 		const validation_errors = this.#validation_errors[this.#getCurrentStep()];
 
 		return validation_errors !== undefined
 			? (validation_errors === true || Object.entries(validation_errors).some(([path, error]) => {
-				return this.#getValidationRule(path)?.active && error !== null;
+				return this.#getValidationRule(path)?.active && (error !== null || this.#getAliasError(path) !== null);
 			}))
 			: false;
 	}

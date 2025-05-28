@@ -23,7 +23,8 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 	protected function checkInput(): bool {
 		$fields = [
 			'host' =>				'required|db hosts.host|not_empty',
-			'groups' =>				'required|array',
+			'groups' =>				'array',
+			'groups_new' =>			'array',
 			'templateid' =>			'required|db hosts.hostid',
 			'tls_psk_identity' =>	'db hosts.tls_psk_identity|not_empty',
 			'tls_psk' =>			'db hosts.tls_psk|not_empty',
@@ -97,9 +98,12 @@ class CControllerHostWizardCreate extends CControllerHostWizardUpdateGeneral {
 			}
 			unset($interface);
 
+			$groups = $this->getInput('groups', []);
+			$new_groups = $this->getInput('groups_new', []);
+
 			$host = [
 				'host' => $this->getInput('host'),
-				'groups' => $this->processHostGroups($this->getInput('groups')),
+				'groups' => $this->processHostGroups($groups, $new_groups),
 				'templates' => $this->processTemplates([[$this->getInput('templateid')]]),
 				'interfaces' => $this->processHostInterfaces($interfaces),
 				'macros' => $this->processUserMacros($this->getInput('macros', []))

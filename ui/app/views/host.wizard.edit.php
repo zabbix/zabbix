@@ -290,6 +290,7 @@ function stepCreateHost($form): CTemplateTag {
 						new CLabel(_('Host name')),
 						new CMultiSelect([
 							'name' => 'host',
+							'new_item_name' => 'host_new',
 							'object_name' => 'hosts',
 							'add_new' => true,
 							'multiple' => false,
@@ -315,6 +316,7 @@ function stepCreateHost($form): CTemplateTag {
 						new CLabel(_('Host groups')),
 						new CMultiSelect([
 							'name' => 'groups[]',
+							'new_item_name' => 'groups_new[]',
 							'object_name' => 'hostGroup',
 							'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 							'popup' => [
