@@ -171,7 +171,8 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table: %s age %d", table_name, age);
 
-		res = DBselect("select %s('%s', integer '%d')", COMPRESSION_POLICY_ADD, table_name, age);
+		res = DBselect("select %s('%s', integer '%d', if_not_exists => true)", COMPRESSION_POLICY_ADD,
+				table_name, age);
 
 		if (NULL == res)
 			zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
