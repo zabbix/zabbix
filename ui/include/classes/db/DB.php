@@ -236,6 +236,17 @@ class DB {
 	}
 
 	/**
+	 * Returns length of the field by schema.
+	 *
+	 * @param array $field_schema
+	 *
+	 * @return int
+	 */
+	public static function getFieldLengthBySchema(array $field_schema): int {
+		return $field_schema['length'];
+	}
+
+	/**
 	 * Returns length of the field.
 	 *
 	 * @param string $table_name
@@ -243,10 +254,8 @@ class DB {
 	 *
 	 * @return int
 	 */
-	public static function getFieldLength($table_name, $field_name) {
-		$schema = self::getSchema($table_name);
-
-		return $schema['fields'][$field_name]['length'];
+	public static function getFieldLength(string $table_name, string $field_name): int {
+		return self::getFieldLengthBySchema(self::getSchema($table_name)['fields'][$field_name]);
 	}
 
 	public static function getDefaults($table) {

@@ -616,6 +616,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -820,6 +821,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -1032,6 +1034,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -1165,6 +1168,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -2444,7 +2448,7 @@ class testDocumentationLinks extends CWebTest {
 				$element = CTestArrayHelper::get($action, 'element', null);
 				call_user_func_array([$this, $action['callback']], [$element]);
 
-				// $dialog->isValid() can be false if a widget is added.
+				// $dialog->isValid() can be false for $location variable if the widget is added too quickly.
 				if ($element === 'id:dashboard-add-widget') {
 					COverlayDialogElement::get('Add widget')->waitUntilReady();
 				}
@@ -2452,7 +2456,18 @@ class testDocumentationLinks extends CWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->one(false);
-		$location = ($dialog->isValid()) ? COverlayDialogElement::find()->all()->last()->waitUntilReady() : $this;
+		if ($dialog->isValid()) {
+			/*
+			 * Due to inline validation in some forms the 2nd order dialog takes longer to be generated. Therefore, in
+			 * these forms we need to look specifically for the 2nd dialog, otherwise the link is taken from the 1st dialog.
+			 */
+			$location = (CTestArrayHelper::get($data, 'second_dialog'))
+				? COverlayDialogElement::find(1)->waitUntilPresent()->one()->waitUntilReady()
+				: COverlayDialogElement::find()->all()->waitUntilReady()->last();
+		}
+		else {
+			$location = $this;
+		}
 
 		// Check all widget documentation links.
 		if (array_key_exists('widget_type', $data)) {

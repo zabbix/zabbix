@@ -57,10 +57,6 @@ form.dashboard-widget-item {
 
 		&.fields-group-change-indicator {
 			grid-template-columns: repeat(3, max-content 96px);
-
-			.input-color-picker {
-				display: block;
-			}
 		}
 	}
 }

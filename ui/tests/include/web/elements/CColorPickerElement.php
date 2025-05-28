@@ -47,34 +47,34 @@ class CColorPickerElement extends CElement {
 		if ($color === null) {
 			$overlay->query('button:Use default')->one()->click();
 		}
-		elseif ($overlay->query('class:color-picker-tabs')->one(false)->isValid()) {
+		else {
 			$overlay->asColorPicker()->selectTab('Solid color');
 			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
-		}
-		// TODO: remove the below else part and move elseif to else when DEV-4301 is ready.
-		else {
-			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
 		$apply_button = $overlay->query('button:Apply');
 
-		// TODO: remove the else part of this if -> else and remove the condition itself after DEV-4301 is ready.
-		if ($apply_button->exists()) {
-			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
-				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-				$overlay->waitUntilNotVisible();
-			}
-			else {
-				if (!$apply_button->one()->isAttributePresent('disabled')) {
-					throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
-				}
-			}
+		if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$overlay->waitUntilNotVisible();
 		}
 		else {
-			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+			if (!$apply_button->one()->isAttributePresent('disabled')) {
+				throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get text of selected color-picker tab.
+	 *
+	 * @return string
+	 */
+	public function getSelectedTab() {
+		return $this->query('xpath:.//ul[@class="color-picker-tabs"]'.
+			'//li[contains(@class, "color-picker-tab-selected")]/label')->waitUntilPresent()->one()->getText();
 	}
 
 	/**
@@ -84,9 +84,8 @@ class CColorPickerElement extends CElement {
 	 */
 	public function selectTab($name) {
 		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
-		$tab_element = $this->query($selector.'/..')->one();
 
-		if (!$tab_element->hasClass('color-picker-tab-selected')) {
+		if ($this->getSelectedTab() !== $name) {
 			$this->query($selector)->waitUntilPresent()->one()->click();
 			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
 		}
@@ -124,16 +123,8 @@ class CColorPickerElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		// TODO: remove the $button variable and the if part of the below if -> else after DEV-4301 is ready.
-		$button = $this->query('class:btn-overlay-close')->one(false);
-		if ($button->isValid()) {
-			$button->click()->waitUntilNotVisible();
-		}
-		else {
-			$dialog = (new CElementQuery('id:color_picker'))->one();
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
-			$dialog->waitUntilNotPresent();
-		}
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+		(new CElementQuery('id:color_picker'))->waitUntilNotVisible();
 	}
 
 	/**

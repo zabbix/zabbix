@@ -599,7 +599,7 @@ class CElementQuery implements IWaitable {
 				'/ul[contains(@class, "list-check-radio")]'
 			],
 			'CHostInterfaceElement'		=> [
-				'/div/div[contains(@class, "interface-container")]/../..'
+				'/div/div/div[contains(@class, "interface-container")]/../../..'
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
@@ -610,8 +610,6 @@ class CElementQuery implements IWaitable {
 				'/div[contains(@class, "calendar-control")]'
 			],
 			'CColorPickerElement'		=> [
-				// TODO: change the first selector to '/div[@id="color_picker"]' when DEV-4301 is ready.
-				'/div[contains(@class, "color-picker")]',
 				'/z-color-picker'
 			],
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',

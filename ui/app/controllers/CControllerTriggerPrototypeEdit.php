@@ -24,47 +24,24 @@ class CControllerTriggerPrototypeEdit extends CController {
 	private $trigger_prototype;
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'context' =>				'required|in '.implode(',', ['host', 'template']),
-			'hostid' =>					'db hosts.hostid',
-			'triggerid' =>				'db triggers.triggerid',
-			'name' =>					'string',
-			'expression' =>				'string',
-			'show_inherited_tags' =>	'in 0,1',
-			'form_refresh' =>			'in 0,1',
-			'parent_discoveryid' =>		'required|db items.itemid',
-			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
-			'correlation_tag' =>		'db triggers.correlation_tag',
-			'dependencies' =>			'array',
-			'description' =>			'db triggers.comments',
-			'event_name' =>				'db triggers.event_name',
-			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'opdata' =>					'db triggers.opdata',
-			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>	'string',
-			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
-			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
-			'tags' =>					'array',
-			'discover' =>				'db triggers.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
-			'type' =>					'db triggers.type|in 0,1',
-			'url' =>					'db triggers.url',
-			'url_name' =>				'db triggers.url_name'
-		];
+		$allow_any = [];
+		foreach (array_keys(CControllerTriggerPrototypeUpdate::getValidationRules()['fields']) as $name) {
+			$allow_any[$name] = [];
+		}
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'context' => ['string', 'required', 'in' => ['host', 'template']],
+			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
+			'form_refresh' => ['integer', 'in' => [0, 1]]
+		] + $allow_any]);
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
@@ -223,6 +200,10 @@ class CControllerTriggerPrototypeEdit extends CController {
 		$data['db_trigger'] = $this->trigger_prototype
 			? CTriggerGeneralHelper::convertApiInputForForm($this->trigger_prototype)
 			: [];
+
+		$data['js_validation_rules'] = $this->hasInput('triggerid')
+			? (new CFormValidator(CControllerTriggerPrototypeUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerTriggerPrototypeCreate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
