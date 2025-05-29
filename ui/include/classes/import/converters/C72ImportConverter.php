@@ -33,10 +33,6 @@ class C72ImportConverter extends CConverter {
 			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
 		}
 
-		if (array_key_exists('templates', $data['zabbix_export'])) {
-			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
-		}
-
 		return $data;
 	}
 
@@ -80,21 +76,5 @@ class C72ImportConverter extends CConverter {
 		unset($selement);
 
 		return $selements;
-	}
-
-	private static function convertTemplates(array $templates): array {
-		foreach ($templates as &$template) {
-			if (array_key_exists('macros', $template)) {
-				foreach ($template['macros'] as &$macro) {
-					$macro['config'] = [
-						'type' => CXmlConstantName::MACRO_CONFIG_TYPE_NOCONF
-					];
-				}
-				unset($macro);
-			}
-		}
-		unset($template);
-
-		return $templates;
 	}
 }
