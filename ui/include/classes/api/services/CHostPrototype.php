@@ -43,7 +43,6 @@ class CHostPrototype extends CHostBase {
 			'custom_interfaces', 'uuid'
 		];
 		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
-		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
 		$interface_fields = ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -66,7 +65,7 @@ class CHostPrototype extends CHostBase {
 			'selectParentHost' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectInterfaces' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
 			'selectTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
-			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hostmacro_fields), 'default' => null],
+			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHostPrototype()), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -218,6 +217,8 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
+
+		self::addRelatedMacros($options, $result);
 
 		$hostids = array_keys($result);
 
@@ -539,7 +540,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupPrototypes($hosts);
 		$this->updateTemplates($hosts);
 		$this->updateTags($hosts);
-		$this->updateMacros($hosts);
+		self::updateMacros($hosts);
 		self::updateHostInventories($hosts);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $hosts);
@@ -911,7 +912,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupPrototypes($hosts, $db_hosts, $upd_hostids);
 		$this->updateTemplates($hosts, $db_hosts, $upd_hostids);
 		$this->updateTags($hosts, $db_hosts, $upd_hostids);
-		$this->updateMacros($hosts, $db_hosts, $upd_hostids);
+		self::updateMacros($hosts, $db_hosts, $upd_hostids);
 		self::updateHostInventories($hosts, $db_hosts, $upd_hostids);
 
 		$hosts = array_intersect_key($hosts, $upd_hostids);
@@ -924,11 +925,13 @@ class CHostPrototype extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
+	private function addAffectedObjects(array $hosts, array &$db_hosts): void {
 		self::addAffectedInterfaces($hosts, $db_hosts);
 		self::addAffectedGroupLinks($hosts, $db_hosts);
 		self::addAffectedGroupPrototypes($hosts, $db_hosts);
-		parent::addAffectedObjects($hosts, $db_hosts);
+		$this->addAffectedTemplates($hosts, $db_hosts);
+		$this->addAffectedTags($hosts, $db_hosts);
+		self::addAffectedMacros($hosts, $db_hosts);
 	}
 
 	/**

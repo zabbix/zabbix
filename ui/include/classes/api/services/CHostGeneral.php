@@ -1223,17 +1223,6 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Add the existing host or template groups, templates, tags, macros.
-	 *
-	 * @param array $hosts
-	 * @param array $db_hosts
-	 */
-	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedGroups($hosts, $db_hosts);
-		parent::addAffectedObjects($hosts, $db_hosts);
-	}
-
-	/**
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */

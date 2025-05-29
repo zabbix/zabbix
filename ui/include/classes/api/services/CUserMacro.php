@@ -29,9 +29,25 @@ class CUserMacro extends CApiService {
 		'deleteglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	public const OUTPUT_FIELDS = ['hostmacroid', 'hostid', 'macro', 'value', 'type', 'description', 'automatic',
+		'config'
+	];
+
 	protected $tableName = 'hostmacro';
 	protected $tableAlias = 'hm';
 	protected $sortColumns = ['macro'];
+
+	public static function getOutputFieldsOnHost(): array {
+		return array_diff(self::OUTPUT_FIELDS, ['hostid', 'config']);
+	}
+
+	public static function getOutputFieldsOnHostPrototype(): array {
+		return array_diff(self::OUTPUT_FIELDS, ['hostid', 'automatic', 'config']);
+	}
+
+	public static function getOutputFieldsOnTemplate(): array {
+		return array_diff(self::OUTPUT_FIELDS, ['hostid', 'automatic']);
+	}
 
 	/**
 	 * Get UserMacros data.
@@ -670,46 +686,7 @@ class CUserMacro extends CApiService {
 	}
 
 	private function checkMacroConfig(array $hostmacros, ?array $db_hostmacros = null): void {
-		$api_macro_config_rules =
-			['type' => API_OBJECT, 'fields' => [
-				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])],
-				'priority' =>			['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
-					['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'priority')]
-				]],
-				'section_name' =>		['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'section_name')],
-					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'section_name')]
-				]],
-				'label' =>				['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hostmacro_config', 'label')],
-					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'label')]
-				]],
-				'description' =>		['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro_config', 'description')],
-					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'description')]
-				]],
-				'required' =>			['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST])], 'type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOT_REQUIRED, ZBX_WIZARD_FIELD_REQUIRED])],
-					['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hostmacro_config', 'required')]
-				]],
-				'regex' =>				['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_TEXT], 'type' => API_REGEX, 'length' => DB::getFieldLength('hostmacro_config', 'regex')],
-					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hostmacro_config', 'regex')]
-				]],
-				'options' =>			['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_LIST], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value', 'text']], 'fields' => [
-						'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-						'text' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-					]],
-					['if' => ['field' => 'type', 'in' => ZBX_WIZARD_FIELD_CHECKBOX], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 1, 'fields' => [
-						'checked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-						'unchecked' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
-					]],
-					['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-				]]
-			]
-		];
+		$api_macro_config_rules = CTemplate::getMacroConfigValidationRules();
 
 		$all_hostids = array_flip(array_column($hostmacros, 'hostid'));
 
@@ -932,7 +909,7 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacros as &$macro) {
 			if (array_key_exists('config', $macro) && array_key_exists('options', $macro['config'])) {
 				$macro['config']['options'] = $macro['config']['options']
-					? json_encode($macro['config']['options'], JSON_THROW_ON_ERROR)
+					? json_encode($macro['config']['options'])
 					: '';
 			}
 		}
@@ -942,7 +919,7 @@ class CUserMacro extends CApiService {
 			foreach ($db_hostmacros as &$db_macro) {
 				if (array_key_exists('config', $db_macro) && array_key_exists('options', $db_macro['config'])) {
 					$db_macro['config']['options'] = $db_macro['config']['options']
-						? json_encode($db_macro['config']['options'], JSON_THROW_ON_ERROR)
+						? json_encode($db_macro['config']['options'])
 						: '';
 				}
 			}
