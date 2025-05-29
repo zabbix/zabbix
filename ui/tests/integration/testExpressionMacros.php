@@ -1094,6 +1094,6 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		CDataHelper::call('trigger.delete', [self::$trigger_id]);
 		CDataHelper::call('action.delete', [self::$trigger_action_id]);
 		CDataHelper::call('item.delete', [self::$item_ids]);
-		CDataHelper::call('item.delete', [self::$host_id]);
+		CDataHelper::call('host.delete', [self::$host_id]);
 	}
 }
