@@ -567,13 +567,9 @@ class CMaintenance extends CApiService {
 		DB::update('hosts', [
 			'values' => ['maintenanceid' => 0],
 			'where' => ['maintenanceid' => $maintenanceids]
-		]);
+		], true);
 
-		DB::delete('maintenances_windows', ['maintenanceid' => $maintenanceids]);
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
-		DB::delete('maintenances_hosts', ['maintenanceid' => $maintenanceids]);
-		DB::delete('maintenances_groups', ['maintenanceid' => $maintenanceids]);
-		DB::delete('maintenance_tag', ['maintenanceid' => $maintenanceids]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);

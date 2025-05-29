@@ -591,7 +591,6 @@ class CHostInterface extends CApiService {
 		$this->checkMainInterfacesOnDelete($interfaceids);
 
 		DB::delete('interface', ['interfaceid' => $interfaceids]);
-		DB::delete('interface_snmp', ['interfaceid' => $interfaceids]);
 
 		return ['interfaceids' => $interfaceids];
 	}

@@ -991,13 +991,10 @@ class CUserDirectory extends CApiService {
 		DB::update('users', [[
 			'values' => ['userdirectoryid' => 0],
 			'where' => ['userdirectoryid' => $userdirectoryids]
-		]]);
+		]], true);
 
 		self::deleteAffectedProvisionGroups($userdirectoryids);
 
-		DB::delete('userdirectory_media', ['userdirectoryid' => $userdirectoryids]);
-		DB::delete('userdirectory_ldap', ['userdirectoryid' => $userdirectoryids]);
-		DB::delete('userdirectory_saml', ['userdirectoryid' => $userdirectoryids]);
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);

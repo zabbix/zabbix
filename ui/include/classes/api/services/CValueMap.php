@@ -299,7 +299,7 @@ class CValueMap extends CApiService {
 		DB::update('items', [[
 			'values' => ['valuemapid' => 0],
 			'where' => ['valuemapid' => $valuemapids]
-		]]);
+		]], true);
 
 		$this->deleteByIds($valuemapids);
 

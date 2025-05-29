@@ -2319,16 +2319,16 @@ class CMap extends CMapElement {
 		DB::delete('sysmaps_elements', [
 			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
-		]);
+		], true);
 		DB::delete('profiles', [
 			'idx' => 'web.maps.sysmapid',
 			'value_id' => $sysmapids
-		]);
+		], true);
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.sysmapids',
 			'source' => 'sysmapid',
 			'value_id' => $sysmapids
-		]);
+		], true);
 		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAP, $db_maps);

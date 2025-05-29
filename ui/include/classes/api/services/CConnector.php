@@ -574,7 +574,7 @@ class CConnector extends CApiService {
 
 		self::validateDelete($connectorids, $db_connectors);
 
-		DB::delete('connector_tag', ['connectorid' => $connectorids]);
+		DB::delete('connector_tag', ['connectorid' => $connectorids], true);
 		DB::delete('connector', ['connectorid' => $connectorids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_CONNECTOR, $db_connectors);
