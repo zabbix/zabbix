@@ -157,7 +157,8 @@ class CWidgetMap extends CWidget {
 	}
 
 	onReferredUpdate() {
-		if (Object.keys(this.#map_svg.elements).length === 0 || this.#selected_element_id !== null) {
+		if (this.#map_svg === null || Object.keys(this.#map_svg.elements).length === 0
+				|| this.#selected_element_id !== null) {
 			return;
 		}
 

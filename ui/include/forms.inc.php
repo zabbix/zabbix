@@ -354,6 +354,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 		->addClass('preprocessing-list')
 		->addClass(ZBX_STYLE_LIST_NUMBERED)
 		->setAttribute('data-readonly', $readonly)
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'preprocessing')
 		->addItem(
 			(new CListItem([
 				(new CDiv(_('Name')))->addClass('step-name'),
@@ -370,10 +372,15 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$i = 0;
 
 	foreach ($preprocessing as $step) {
+		$step = CItemGeneralHelper::normalizeFormDataPreprocessingStep($step);
+
 		// Create a select with preprocessing types.
 		$preproc_types_select = (new CSelect('preprocessing['.$i.'][type]'))
+			->setErrorLabel(_('Name'))
+			->setErrorContainer("preprocessing-$i-error-container")
 			->setId('preprocessing_'.$i.'_type')
 			->setValue($step['type'])
+			->setAttribute('data-prevent-validation-on-change', '')
 			->setReadonly($readonly)
 			->setWidthAuto();
 
@@ -392,17 +399,34 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 		// Depending on preprocessing type, display corresponding params field and placeholders.
 		$params = '';
 
-		if ($step['type'] != ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+		if (!in_array($step['type'], [ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED])) {
 			// Create a primary param text box, so it can be hidden if necessary.
-			$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
-			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
+			$step_param_0_value = array_key_exists('params', $step) && array_key_exists(0, $step['params'])
+				? $step['params'][0]
+				: '';
+			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params_0]', $step_param_0_value))
 				->setReadonly($readonly);
 
 			// Create a secondary param text box, so it can be hidden if necessary.
 			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
 				? $step['params'][1]
 				: '';
-			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
+			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params_1]', $step_param_1_value))
+				->setReadonly($readonly);
+		}
+		elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+			// Create a primary param text box, so it can be hidden if necessary.
+			$step_param_0_value = array_key_exists('params', $step) && array_key_exists(0, $step['params'])
+				? $step['params'][0]
+				: '';
+			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params_0_not_supported]', $step_param_0_value))
+				->setReadonly($readonly);
+
+			// Create a secondary param text box, so it can be hidden if necessary.
+			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+				? $step['params'][1]
+				: '';
+			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params_1_not_supported]', $step_param_1_value))
 				->setReadonly($readonly);
 		}
 
@@ -410,6 +434,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 				$params = $step_param_0
+					->setErrorLabel(_('Number'))
+					->setErrorContainer("preprocessing-$i-error-container")
 					->setAttribute('placeholder', _('number'))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
@@ -418,48 +444,79 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
 				$params = $step_param_0
+					->setAttribute('data-notrim', '')
+					->setErrorLabel(_('List of characters'))
+					->setErrorContainer("preprocessing-$i-error-container")
 					->setAttribute('placeholder', _('list of characters'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 				break;
 
 			case ZBX_PREPROC_XPATH:
 			case ZBX_PREPROC_ERROR_FIELD_XML:
-				$params = $step_param_0->setAttribute('placeholder', _('XPath'));
+				$params = $step_param_0
+					->setAttribute('placeholder', _('XPath'))
+					->setAttribute('data-notrim', '')
+					->setErrorLabel(_('XPath'))
+					->setErrorContainer("preprocessing-$i-error-container");
 				break;
 
 			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
-				$params = $step_param_0->setAttribute('placeholder', _('$.path.to.node'));
+				$params = $step_param_0
+					->setErrorLabel(_('JSON path'))
+					->setErrorContainer("preprocessing-$i-error-container")
+					->setAttribute('data-notrim', '')
+					->setAttribute('placeholder', _('$.path.to.node'));
 				break;
 
 			case ZBX_PREPROC_REGSUB:
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 				$params = [
-					$step_param_0->setAttribute('placeholder', _('pattern')),
-					$step_param_1->setAttribute('placeholder', _('output'))
+					$step_param_0
+						->setAttribute('data-notrim', '')
+						->setErrorLabel(_('Pattern'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('pattern')),
+					$step_param_1
+						->setAttribute('data-notrim', '')
+						->setErrorLabel(_('Output'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('output'))
 				];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
 				$params = [
-					$step_param_0->setAttribute('placeholder', _('min')),
-					$step_param_1->setAttribute('placeholder', _('max'))
+					$step_param_0
+						->setErrorLabel(_('Min'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('min')),
+					$step_param_1
+						->setErrorLabel(_('Max'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('max'))
 				];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_REGEX:
 			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-				$params = $step_param_0->setAttribute('placeholder', _('pattern'));
+				$params = $step_param_0
+					->setAttribute('data-notrim', '')
+					->setErrorLabel(_('Pattern'))
+					->setErrorContainer("preprocessing-$i-error-container")
+					->setAttribute('placeholder', _('pattern'));
 				break;
 
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				$params = $step_param_0
 					->setAttribute('placeholder', _('seconds'))
-					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH)
+					->setErrorLabel(_('Seconds'))
+					->setErrorContainer("preprocessing-$i-error-container");
 				break;
 
 			case ZBX_PREPROC_SCRIPT:
-				$params = new CMultilineInput($step_param_0->getName(), $step_param_0_value, [
+				$params = new CMultilineInput('preprocessing['.$i.'][params_0]', $step_param_0_value, [
 					'title' => _('JavaScript'),
 					'placeholder' => _('script'),
 					'placeholder_textarea' => 'return value',
@@ -470,6 +527,10 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					'maxlength' => $script_maxlength,
 					'readonly' => $readonly
 				]);
+				$params
+					->setErrorLabel(_('Script'))
+					->setErrorContainer("preprocessing-$i-error-container")
+					->setAttribute('data-notrim', '');
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
@@ -483,10 +544,12 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				}
 
 				$params = [
-					$step_param_0->setAttribute('placeholder',
-						_('<metric name>{<label name>="<label value>", ...} == <value>')
-					),
-					(new CSelect('preprocessing['.$i.'][params][1]'))
+					$step_param_0
+						->setErrorLabel(_('Pattern'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>')),
+					(new CSelect('preprocessing['.$i.'][params_1]'))
+						->setAttribute('data-prevent-validation-on-change', '')
 						->addOptions(CSelect::createOptionsFromArray([
 							ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
 							ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
@@ -499,7 +562,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->addClass('js-preproc-param-prometheus-pattern-function')
 						->setValue($step_param_1_value)
 						->setReadonly($readonly),
-					(new CTextBox('preprocessing['.$i.'][params][2]', $step_param_2_value))
+					(new CTextBox('preprocessing['.$i.'][params_2]', $step_param_2_value))
+						->setErrorLabel(_('Label'))
+						->setErrorContainer("preprocessing-$i-error-container")
 						->setTitle($step_param_2_value)
 						->setAttribute('placeholder', _('<label name>'))
 						->setEnabled($step_param_1_value === ZBX_PREPROC_PROMETHEUS_LABEL)
@@ -508,9 +573,10 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-				$params = $step_param_0->setAttribute('placeholder',
-					_('<metric name>{<label name>="<label value>", ...} == <value>')
-				);
+				$params = $step_param_0
+					->setErrorLabel(_('Pattern'))
+					->setErrorContainer("preprocessing-$i-error-container")
+					->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>'));
 				break;
 
 			case ZBX_PREPROC_CSV_TO_JSON:
@@ -520,14 +586,16 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 				$params = [
 					$step_param_0
+						->setAttribute('data-notrim', '')
 						->setAttribute('placeholder', _('delimiter'))
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
 					$step_param_1
+						->setAttribute('data-notrim', '')
 						->setAttribute('placeholder', _('qualifier'))
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
-					(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
+					(new CCheckBox('preprocessing['.$i.'][params_2]', ZBX_PREPROC_CSV_HEADER))
 						->setLabel(_('With header row'))
 						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
 						->setReadonly($readonly)
@@ -536,8 +604,16 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$params = [
-					$step_param_0->setAttribute('placeholder', _('search string')),
-					$step_param_1->setAttribute('placeholder', _('replacement'))
+					$step_param_0
+						->setAttribute('data-notrim', '')
+						->setErrorLabel(_('Search string'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('search string')),
+					$step_param_1
+						->setAttribute('data-notrim', '')
+						->setErrorLabel(_('Replacement'))
+						->setErrorContainer("preprocessing-$i-error-container")
+						->setAttribute('placeholder', _('replacement'))
 				];
 				break;
 
@@ -547,17 +623,21 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				}
 
 				$params = [
-					(new CSelect('preprocessing['.$i.'][params][0]'))
+					(new CSelect('preprocessing['.$i.'][params_0_not_supported]'))
 						->addOptions(CSelect::createOptionsFromArray([
 							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
 							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
 							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
 						]))
+							->setAttribute('data-prevent-validation-on-change', '')
 							->setAttribute('placeholder', _('error-matching'))
 							->addClass('js-preproc-param-error-matching')
 							->setValue($step_param_0_value)
 							->setReadonly($readonly),
 					$step_param_1
+						->setAttribute('data-notrim', '')
+						->setErrorLabel( _('Pattern'))
+						->setErrorContainer("preprocessing-$i-error-container")
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
 						->addClass(
@@ -569,8 +649,11 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$params = [
-					$step_param_0->setAttribute('placeholder', _('OID')),
-					(new CSelect('preprocessing['.$i.'][params][1]'))
+					$step_param_0
+						->setAttribute('placeholder', _('OID'))
+						->setErrorLabel(_('OID'))
+						->setErrorContainer("preprocessing-$i-error-container"),
+					(new CSelect('preprocessing['.$i.'][params_1]'))
 						->setValue($step_param_1_value)
 						->setAdaptiveWidth(202)
 						->addOptions([
@@ -588,22 +671,27 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				$count = count($step['params']);
 
 				for ($j = 0; $j < $count; $j += 3) {
+					$row = count($mapping_rows);
 					$mapping_rows[] = [
 						(new CRow([
 							new CCol(
-								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
+								(new CTextBox('preprocessing['.$i.'][params_set_snmp]['.$row.'][name]', $step['params'][$j]))
+									->setErrorLabel(_('Field name'))
+									->setErrorContainer("preprocessing-$i-params_set_snmp-$row-error-container")
 									->setReadonly($readonly)
 									->removeId()
 									->setAttribute('placeholder', _('Field name'))
 							),
 							new CCol(
-								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
+								(new CTextBox('preprocessing['.$i.'][params_set_snmp]['.$row.'][oid_prefix]', $step['params'][$j + 1]))
+									->setErrorLabel(_('OID prefix'))
+									->setErrorContainer("preprocessing-$i-params_set_snmp-$row-error-container")
 									->setReadonly($readonly)
 									->removeId()
 									->setAttribute('placeholder', _('OID prefix'))
 							),
 							new CCol(
-								(new CSelect('preprocessing['.$i.'][params][]'))
+								(new CSelect('preprocessing['.$i.'][params_set_snmp]['.$row.'][format]'))
 									->setValue($step['params'][$j + 2])
 									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
 									->addOptions([
@@ -619,7 +707,13 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 									->addClass('js-group-json-action-delete')
 									->setEnabled(!$readonly && $count > 3)
 							))->addClass(ZBX_STYLE_NOWRAP)
-						]))->addClass('group-json-row')
+						]))->setAttribute('data-index', $row)->addClass('group-json-row'),
+						(new CRow(
+							(new CCol())
+								->addClass(ZBX_STYLE_ERROR_CONTAINER)
+								->setId("preprocessing-$i-params_set_snmp-$row-error-container")
+								->setColSpan(4)
+						))
 					];
 				}
 
@@ -651,7 +745,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				break;
 
 			case ZBX_PREPROC_SNMP_GET_VALUE:
-				$params = (new CSelect('preprocessing['.$i.'][params][0]'))
+				$params = (new CSelect('preprocessing['.$i.'][params_0]'))
 					->setValue($step_param_0_value)
 					->setAdaptiveWidth(202)
 					->addOptions([
@@ -693,6 +787,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 		}
 
 		$error_handler = (new CSelect('preprocessing['.$i.'][error_handler]'))
+			->setAttribute('data-prevent-validation-on-change', '')
 			->setId('preprocessing-'.$i.'-error-handler')
 			->setFocusableElementId('label-preprocessing-'.$i.'-error-handler')
 			->setValue($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
@@ -708,7 +803,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 		$error_handler_params = (new CTextBox('preprocessing['.$i.'][error_handler_params]',
 			$step['error_handler_params'])
-		)->setTitle($step['error_handler_params']);
+		)->setErrorContainer("preprocessing-$i-error-container")->setTitle($step['error_handler_params']);
 
 		if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
 				|| $step['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE) {
@@ -716,6 +811,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				->setEnabled(false)
 				->addStyle('display: none;');
 		}
+
+		$error_handler_params->setErrorLabel(_('Error message'));
 
 		$on_fail_options = (new CDiv([
 			new CLabel(_('Custom on fail'), 'label-preprocessing-'.$i.'-error-handler'),
@@ -749,7 +846,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 							->removeId()
 					]))->addClass('step-action')
 				]))->addClass('preprocessing-step'),
-				$on_fail_options
+				$on_fail_options,
+				(new CDiv())->setId("preprocessing-$i-error-container")
 			]))
 				->addClass('preprocessing-list-item')
 				->setAttribute('data-step', $i)
@@ -898,25 +996,26 @@ function getTriggerMassupdateFormData() {
 	return $data;
 }
 
+
 /**
  * Renders tag table row.
  *
- * @param int|string $index
  * @param array	     $tag
- * @param string     $tag['tag']                      Tag name.
- * @param string     $tag['value']                    Tag value.
- * @param int        $tag['type']                     (optional) Tag ownership type.
- * @param int        $tag['automatic']                (optional) Tag automatic flag.
- * @param array      $tag['parent_templates']         (optional) List of templates that tags are inherited from.
+ * @param string     $tag['tag']                          Tag name.
+ * @param string     $tag['value']                        Tag value.
+ * @param int        $tag['type']                         (optional) Tag ownership type.
+ * @param int        $tag['automatic']                    (optional) Tag automatic flag.
+ * @param array      $tag['parent_templates']             (optional) List of templates that tags are inherited from.
  * @param array      $options
- * @param bool       $options['add_post_js']          (optional) Parameter passed to CTextAreaFlexible.
- * @param bool       $options['show_inherited_tags']  (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
- * @param bool       $options['with_automatic']       (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
- * @param string     $options['field_name']           (optional) Re-define default field name.
- * @param bool       $options['readonly']             (optional) Render row in read-only mode.
- * @param string     $options['source']               (optional) The origin of tag.
+ * @param bool       $options['add_post_js']              (optional) Parameter passed to CTextAreaFlexible.
+ * @param bool       $options['show_inherited_tags']      (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
+ * @param bool       $options['with_automatic']           (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
+ * @param string     $options['field_name']               (optional) Re-define default field name.
+ * @param bool       $options['readonly']                 (optional) Render row in read-only mode.
+ * @param string     $options['source']                   (optional) The origin of tag.
+ * @param bool       $options['has_inline_validation']    (optional)
  *
- * @return CRow
+ * @return array
  */
 function renderTagTableRow($index, array $tag, array $options = []) {
 	$options += [
@@ -924,6 +1023,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		'field_name' => 'tags',
 		'with_automatic' => false,
 		'show_inherited_tags' => false,
+		'has_inline_validation' => false,
 		'source' => null
 	];
 
@@ -939,6 +1039,8 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	];
 
 	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
+		->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
 		->setAttribute('placeholder', _('tag'));
 
@@ -953,6 +1055,8 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
 			$textarea_options
 		))
+		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
+		->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
@@ -979,7 +1083,16 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 				->setEnabled(!$options['readonly']);
 	}
 
-	return (new CRow([
+	if ($tag['type'] == ZBX_PROPERTY_INHERITED) {
+		$value_field->setAttribute('data-skip-from-submit', '');
+		$tag_field->setAttribute('data-skip-from-submit', '');
+
+		if ($type_field) {
+			$type_field->setAttribute('data-skip-from-submit', '');
+		}
+	}
+
+	$fields_row = (new CRow([
 		(new CCol([$tag_field, $type_field, $automatic_field]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($value_field))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($actions))
@@ -989,6 +1102,17 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 			? new CCol(makeParentTemplatesList($tag['parent_templates']))
 			: null
 	]))->addClass('form_row');
+
+	$error_container_row = $options['has_inline_validation']
+		? (new CRow(
+			(new CCol())
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('tag_'.$index.'_error_container')
+				->setColSpan($options['show_inherited_tags'] ? 4 : 3)
+		))
+		: null;
+
+	return array_filter([$fields_row, $error_container_row]);
 }
 
 /**
@@ -1033,6 +1157,9 @@ function makeParentTemplatesList(array $parent_templates): array {
  * @param array  $tags[]['tag']
  * @param array  $tags[]['value']
  * @param bool   $readonly         (optional)
+ * @param array  $options          (optional)
+ * @param bool   $options['with_automatic']
+ * @param string $options['field_name']
  *
  * @return CTable
  */

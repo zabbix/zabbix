@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.4.0rc1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7030032);
+define('ZABBIX_DB_VERSION',		7030035);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -125,6 +125,9 @@ define('TOTP_MAX_USED_CODES', 3);
 
 define('TOTP_SECRET_CONFIRMATION_REQUIRED', 0);
 define('TOTP_SECRET_CONFIRMED', 1);
+
+define('OAUTH_ACCESS_TOKEN_VALID',	1);
+define('OAUTH_REFRESH_TOKEN_VALID',	2);
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
@@ -899,7 +902,8 @@ define('SMTP_SECURITY_STARTTLS',	1);
 define('SMTP_SECURITY_SSL',			2);
 
 define('SMTP_AUTHENTICATION_NONE',		0);
-define('SMTP_AUTHENTICATION_NORMAL',	1);
+define('SMTP_AUTHENTICATION_PASSWORD',	1);
+define('SMTP_AUTHENTICATION_OAUTH',		2);
 
 define('ZBX_MEDIA_MESSAGE_FORMAT_TEXT',	0);
 define('ZBX_MEDIA_MESSAGE_FORMAT_HTML',	1);
@@ -1979,10 +1983,8 @@ define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
 define('ZBX_STYLE_CLOCK_HAND_SEC', 'clock-hand-sec');
 define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
-define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_COLLAPSIBLE', 'collapsible');
 define('ZBX_STYLE_COLLAPSED', 'collapsed');
-define('ZBX_STYLE_COLOR_PREVIEW_BOX', 'color-preview-box');
 define('ZBX_STYLE_COLOR_ICON', 'color-icon');
 define('ZBX_STYLE_COLOR_NEGATIVE', 'color-negative');
 define('ZBX_STYLE_COLOR_POSITIVE', 'color-positive');
@@ -2011,6 +2013,7 @@ define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
+define('ZBX_STYLE_ERROR_CONTAINER', 'error-container');
 define('ZBX_STYLE_VISIBILITY_HIDDEN', 'visibility-hidden');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');

@@ -34,6 +34,10 @@ const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
 const ZBX_STYLE_FORM_GRID = 'form-grid';
 
+const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
+
 const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
@@ -50,6 +54,10 @@ const ZBX_STYLE_LINK_ALT = 'link-alt';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';
+
+const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
+
+const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
 
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
@@ -110,6 +118,8 @@ const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
 const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
 const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
 const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+
+const ZBX_SECRET_MASK = '******';
 
 const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
 

@@ -5523,6 +5523,8 @@ class testDataDisplayInGraphs extends CWebTest {
 				$graph->waitUntilClassesNotPresent('is-loading', 60);
 			}
 
+			// TODO: sometimes test is unstable due to different image size.
+			sleep(1);
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
 			// Switch back to normal view to avoid impacting following scenarios.

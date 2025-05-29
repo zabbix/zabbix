@@ -67,7 +67,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 	public function getRowTemplate($row_num = '#{rowNum}', $color = '#{color}', $threshold = '#{threshold}'): CRow {
 		return (new CRow([
-			(new CColor($this->field->getName().'['.$row_num.'][color]', $color))->appendColorPickerJs(false),
+			(new CColorPicker($this->field->getName().'['.$row_num.'][color]'))->setColor($color),
 			(new CTextBox($this->field->getName().'['.$row_num.'][threshold]', $threshold, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),

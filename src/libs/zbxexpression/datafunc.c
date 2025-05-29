@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxexpression.h"
 #include "datafunc.h"
 #include "expression.h"
 
@@ -254,23 +253,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get item key, replace macros in the key.                          *
- *                                                                            *
- * Parameters: dc_item    - [IN] item information used in substitution        *
- *             replace_to - [OUT] string with item key with replaced macros   *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_substitute_macros_in_item_key(zbx_dc_item_t *dc_item, char **replace_to)
-{
-	char	*key = zbx_strdup(NULL, dc_item->key_orig);
-
-	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0);
-	zbx_free(*replace_to);
-	*replace_to = key;
-}
-
 int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **replace_to)
 {
 	int		ret = SUCCEED;
@@ -291,24 +273,6 @@ int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **replace_to)
 	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-int	expr_get_item_key(zbx_uint64_t itemid, char **replace_to)
-{
-	zbx_dc_item_t	dc_item;
-	int		ret = FAIL, errcode;
-
-	zbx_dc_config_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
-
-	if (SUCCEED == errcode)
-	{
-		zbx_substitute_macros_in_item_key(&dc_item, replace_to);
-		ret = SUCCEED;
-	}
-
-	zbx_dc_config_clean_items(&dc_item, &errcode, 1);
 
 	return ret;
 }

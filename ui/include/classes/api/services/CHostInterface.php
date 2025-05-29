@@ -823,10 +823,12 @@ class CHostInterface extends CApiService {
 	 * @param array $interface
 	 */
 	protected function checkPort(array $interface) {
+		$port_parser = new CPortParser(['usermacros' => true]);
+
 		if (!isset($interface['port']) || zbx_empty($interface['port'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 		}
-		elseif (!validatePortNumberOrMacro($interface['port'])) {
+		elseif ($port_parser->parse($interface['port']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect interface port "%1$s" provided.', $interface['port'])
 			);

@@ -43,16 +43,6 @@ class testDashboardCopyWidgets extends CWebTest {
 	const REPLACED_WIDGET_SIZE = [ 'width' => '21', 'height' => '3'];
 
 	/**
-	 * Callback executed before every test case.
-	 *
-	 * @before
-	 */
-	public function onBeforeTestCase() {
-		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
-	}
-
-	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
