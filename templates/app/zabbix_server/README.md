@@ -26,13 +26,13 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
+|{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
+|{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Default minimum threshold for the value cache utilization trigger.</p>|`95`|
 |{$PROXY.GROUP.AVAIL.PERCENT.MIN}|<p>Minimum threshold for the proxy group availability percentage triggers.</p>|`75`|
+|{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered proxy groups by their name.</p>|`.*`|
 |{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered proxy groups by their name.</p>|`CHANGE_IF_NEEDED`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
-|{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
-|{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for the value cache utilization trigger.</p>|`95`|
 
 ### Items
 
@@ -280,12 +280,12 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
-|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS of the remote Zabbix server (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of the remote Zabbix server (default is 10051).</p>||
 |{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expressions.</p>|`5m`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization triggers.</p>|`95`|
 
 ### Items
@@ -505,12 +505,12 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
-|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS of the remote Zabbix server (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of the remote Zabbix server (default is 10051).</p>||
 |{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expressions.</p>|`5m`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization triggers.</p>|`95`|
 
 ### Items
@@ -730,12 +730,12 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
-|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS of the remote Zabbix server (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of the remote Zabbix server (default is 10051).</p>||
 |{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expression.</p>|`5m`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization triggers.</p>|`95`|
 
 ### Items

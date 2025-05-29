@@ -82,23 +82,23 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PG.CACHE_HITRATIO.MIN.WARN}|<p>Minimum cache hit ratio percentage for trigger expression.</p>|`90`|
-|{$PG.CHECKPOINTS_REQ.MAX.WARN}|<p>Maximum required checkpoint occurrences for trigger expression.</p>|`5`|
-|{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
-|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
-|{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
-|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
-|{$PG.FROZENXID_PCT_STOP.MIN.HIGH}|<p>Minimum frozen XID before stop percentage for trigger expression.</p>|`75`|
 |{$PG.HOST}|<p>Hostname or IP of PostgreSQL host.</p>|`localhost`|
+|{$PG.PORT}|<p>PostgreSQL service port.</p>|`5432`|
+|{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
+|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>||
+|{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
 |{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$PG.LOCKS.MAX.WARN}|<p>Maximum number of locks for trigger expression.</p>|`100`|
 |{$PG.PING_TIME.MAX.WARN}|<p>Maximum time of connection response for trigger expression.</p>|`1s`|
-|{$PG.PORT}|<p>PostgreSQL service port.</p>|`5432`|
 |{$PG.QUERY_ETIME.MAX.WARN}|<p>Execution time limit for count of slow queries.</p>|`30`|
 |{$PG.REPL_LAG.MAX.WARN}|<p>Maximum replication lag time for trigger expression.</p>|`10m`|
 |{$PG.SLOW_QUERIES.MAX.WARN}|<p>Slow queries count threshold for a trigger.</p>|`5`|
-|{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
-|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>|`<Put the password here>`|
+|{$PG.CACHE_HITRATIO.MIN.WARN}|<p>Minimum cache hit ratio percentage for trigger expression.</p>|`90`|
+|{$PG.CHECKPOINTS_REQ.MAX.WARN}|<p>Maximum required checkpoint occurrences for trigger expression.</p>|`5`|
+|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
+|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
+|{$PG.FROZENXID_PCT_STOP.MIN.HIGH}|<p>Minimum frozen XID before stop percentage for trigger expression.</p>|`75`|
+|{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
 
 ### Items
 
