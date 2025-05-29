@@ -35,12 +35,12 @@ type activeConnection struct {
 }
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []error) {
-	upload := true
 
 	b, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
 		time.Second*time.Duration(c.timeout), data, c.tlsConfig)
 	if errs != nil {
-		return upload, errs
+
+		return false, errs
 	}
 
 	var response agentDataResponse
@@ -48,9 +48,11 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 	err := json.Unmarshal(b, &response)
 	if err != nil {
 		c.address.Next()
-		return upload, []error{err}
+
+		return false, []error{err}
 	}
 
+	upload := true
 	if response.HistoryUpload == "disabled" {
 		upload = false
 	}
@@ -59,10 +61,10 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 		c.address.Next()
 
 		if len(response.Info) != 0 {
-			return upload, []error{fmt.Errorf("%s", response.Info)}
+			return false, []error{fmt.Errorf("%s", response.Info)}
 		}
 
-		return upload, []error{errors.New("unsuccessful response")}
+		return false, []error{errors.New("unsuccessful response")}
 	}
 
 	return upload, nil
