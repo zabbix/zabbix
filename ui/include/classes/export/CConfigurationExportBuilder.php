@@ -66,7 +66,7 @@ class CConfigurationExportBuilder {
 			$default_value = (string) call_user_func($rule['ex_default'], $row);
 		}
 		elseif (array_key_exists('default', $rule)) {
-			$default_value = (string) $rule['default'];
+			$default_value = is_array($rule['default']) ? $rule['default'] : (string) $rule['default'];
 		}
 		else {
 			$default_value = null;
