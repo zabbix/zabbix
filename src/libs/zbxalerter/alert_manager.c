@@ -1121,14 +1121,6 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 			*replace_to = zbx_strdup(*replace_to, subject);
 		else if (0 == strcmp(p->macro, MVAR_ALERT_MESSAGE))
 			*replace_to = zbx_strdup(*replace_to, message);
-		else if (0 == strcmp(p->macro, MVAR_DATE))
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)time_ping, tz));
-		else if (0 == strcmp(p->macro, MVAR_TIME))
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)time_ping, tz));
-		else if (0 == strcmp(p->macro, MVAR_AGE))
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - time_ping));
-		else if (0 == strcmp(p->macro, MVAR_TIMESTAMP))
-			*replace_to = zbx_dsprintf(*replace_to, "%d", time_ping);
 	}
 
 	return ret;
