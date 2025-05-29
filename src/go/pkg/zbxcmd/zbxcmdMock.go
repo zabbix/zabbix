@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -15,30 +12,46 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package users
+package zbxcmd
 
 import (
-	"strconv"
 	"time"
 
-	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 )
 
-func (p *Plugin) getUsersNum(timeout int) (int, error) {
-	if p.executor == nil {
-		var err error
+var (
+	_ Executor = (*ZBXExecMock)(nil)
+)
 
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return 0, errs.Wrap(err, "command init failed")
-		}
+// ZBXExecMock mock for ZBX command execution.
+type ZBXExecMock struct {
+	Success bool
+}
+
+// Execute mock function.
+func (e *ZBXExecMock) Execute(string, time.Duration, string) (string, error) {
+	if !e.Success {
+		return "", errs.New("fail")
 	}
 
-	out, err := p.executor.Execute("who | wc -l", time.Second*time.Duration(timeout), "")
-	if err != nil {
-		return 0, errs.Wrap(err, "failed to execute command")
+	return "success", nil
+}
+
+// ExecuteStrict mock function.
+func (e *ZBXExecMock) ExecuteStrict(string, time.Duration, string) (string, error) {
+	if !e.Success {
+		return "", errs.New("fail")
 	}
 
-	return strconv.Atoi(out)
+	return "success", nil
+}
+
+// ExecuteBackground mock function.
+func (e *ZBXExecMock) ExecuteBackground(string) error {
+	if !e.Success {
+		return errs.New("fail")
+	}
+
+	return nil
 }

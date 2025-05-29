@@ -1,0 +1,1 @@
+...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
