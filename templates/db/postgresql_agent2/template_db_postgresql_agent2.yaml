@@ -49,9 +49,7 @@ zabbix_export:
         
         ## Setup
         
-        1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/7.4/manual/extensions/plugins/build).
-        
-        2. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
+        1. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
         
         ```sql
         CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;

@@ -54,13 +54,7 @@ zabbix_export:
       readme: |
         ## Setup
         
-        1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with version 7.4.0 of both Zabbix and the MSSQL plugin. For more information, see [MSSQL plugin documentation](https://git.zabbix.com/projects/AP/repos/mssql/browse).
-        
-        **Important!** Starting with version 7.4-1 of this template, the MSSQL plugin must be updated to a version equal to or above 7.4.0. (You can check the version of the template in its YAML file under the "vendor" section.)
-        
-        Loadable plugin requires installation of a separate package or binary file or [compilation from sources](https://www.zabbix.com/documentation/7.4/manual/extensions/plugins/build).
-        
-        2. Create an MSSQL user for monitoring. For example, "zbx_monitor".
+        1. Create an MSSQL user for monitoring. For example, "zbx_monitor".
         
         **View Server State** and **View Any Definition** permissions should be granted to the user.
         Grant this user read permissions to the `sysjobschedules`, `sysjobhistory`, and `sysjobs` tables.
@@ -82,9 +76,9 @@ zabbix_export:
         
         [Configure a User to Create and Manage SQL Server Agent Jobs](https://docs.microsoft.com/en-us/sql/ssms/agent/configure-a-user-to-create-and-manage-sql-server-agent-jobs?view=sql-server-ver16)
         
-        3. Set the username and password in the `MSSQL user` and `MSSQL password` host wizard configuration fields.
+        2. Set the username and password in the `MSSQL user` and `MSSQL password` host wizard configuration fields.
         
-        4. Set the connection string for the MSSQL instance in the `MSSQL URI` host wizard configuration field as a URI, such as `<protocol://host:port>`, or specify the named session - `<sessionname>`.
+        3. Set the connection string for the MSSQL instance in the `MSSQL URI` host wizard configuration field as a URI, such as `<protocol://host:port>`, or specify the named session - `<sessionname>`.
         
         The `Service's TCP port state` item uses the `MSSQL address` and `MSSQL TCP port` host wizard configuration fields to check the availability of the MSSQL instance, change these if necessary. Keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
         

@@ -3646,15 +3646,12 @@ zabbix_export:
         To use this template as manually linked to a host:
           1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
           2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
-          3. Create a new host
-          4. Set the host wizard configuration fields required for VMware authentication: `VMware URL`, `VMware username` and `VMware password`
-          5. To get the hypervisor UUID, enable access to the hypervisor via SSH and log in via SSH using a valid login and password.
-          6. Run the following command and specify the UUID in the `Hypervisor UUID` host wizard configuration field:
+          3. Set the host wizard configuration fields required for VMware authentication: `VMware URL`, `VMware username` and `VMware password`
+          4. To get the hypervisor UUID, enable access to the hypervisor via SSH and log in via SSH using a valid login and password.
+          5. Run the following command and specify the UUID in the `Hypervisor UUID` host wizard configuration field:
           ```text
           vim-cmd hostsvc/hostsummary | grep uuid
           ```
-          7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor
-          8. Link the template to the host created earlier
         
         Note: To enable discovery of hardware sensors of VMware hypervisors, set the host wizard configuration field `Monitoring of hardware sensors` to the selected state.
       vendor:

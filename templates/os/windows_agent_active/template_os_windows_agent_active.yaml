@@ -18,10 +18,6 @@ zabbix_export:
         ## Overview
         
         This is an official Windows template. It requires Zabbix agent 7.4 or newer.
-        
-        ## Setup
-        
-        Install Zabbix agent on Windows OS according to Zabbix [documentation](https://www.zabbix.com/documentation/7.4/manual/appendix/install/windows_agent).
       vendor:
         name: Zabbix
         version: 7.4-2

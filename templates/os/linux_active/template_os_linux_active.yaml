@@ -32,10 +32,6 @@ zabbix_export:
         - To mitigate potential disasters, FS usage triggers are based on the maximum available space.
           - Utilization formula: `pused = 100 - 100 * (available / total - free + available)`
         - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
-        
-        ## Setup
-        
-        Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/7.4/manual/concepts/agent#agent-on-unix-like-systems).
       vendor:
         name: Zabbix
         version: 7.4-2

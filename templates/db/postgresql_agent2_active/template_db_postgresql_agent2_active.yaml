@@ -49,16 +49,14 @@ zabbix_export:
         
         ## Setup
         
-        1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/7.4/manual/extensions/plugins/build).
-        
-        2. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
+        1. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
         
         ```sql
         CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
         GRANT pg_monitor TO zbx_monitor;
         ```
         
-        3. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. For example, you could add one of the following rows to allow local TCP connections from the same host:
+        2. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. For example, you could add one of the following rows to allow local TCP connections from the same host:
         
         ```bash
         # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -69,7 +67,7 @@ zabbix_export:
         
         For more information please read the PostgreSQL documentation `https://www.postgresql.org/docs/current/auth-pg-hba-conf.html`.
         
-        4. Set the connection string for the PostgreSQL instance in the `PostgreSQL connection string` host wizard configuration field as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
+        3. Set the connection string for the PostgreSQL instance in the `PostgreSQL connection string` host wizard configuration field as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
         
         **Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, certificate/key filepaths if needed etc.).
         
@@ -88,7 +86,7 @@ zabbix_export:
         
         Then set the `PostgreSQL connection string` field to `myconn` to use this named session.
         
-        5. Set the password that you specified in step 2 in the `PostgreSQL user password` field.
+        4. Set the password that you specified in step 2 in the `PostgreSQL user password` field.
       vendor:
         name: Zabbix
         version: 7.4-3

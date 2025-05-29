@@ -61,8 +61,6 @@ zabbix_export:
         ```
         
         Note that this template doesn't support https and redirects (limitations of web.page.get).
-        
-        Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.4/manual/installation/install_from_packages).
       vendor:
         name: Zabbix
         version: 7.4-1

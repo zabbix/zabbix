@@ -45,7 +45,7 @@ zabbix_export:
       readme: |
         ## Setup
         
-        1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
+        1. Install MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
         2. Copy the `template_db_mysql.conf` file with user parameters into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget to restart Zabbix agent.
         3. Create the MySQL user that will be used for monitoring (`<password>` at your discretion). For example:
         

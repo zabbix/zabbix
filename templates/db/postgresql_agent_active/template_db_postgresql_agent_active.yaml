@@ -63,7 +63,7 @@ zabbix_export:
         **Note:**
         - The template requires `pg_isready` and `psql` utilities to be installed on the same host with Zabbix agent.
         
-        1. Deploy Zabbix agent and create the PostgreSQL user for monitoring (`<password>` at your discretion) with proper access rights to your PostgreSQL instance.
+        1. Create the PostgreSQL user for monitoring (`<password>` at your discretion) with proper access rights to your PostgreSQL instance.
         
         For PostgreSQL version 10 and above:
         
