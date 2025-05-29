@@ -210,6 +210,7 @@ window.host_wizard_edit = new class {
 		[this.STEP_CREATE_HOST]: {
 			host: {
 				type: 'object',
+				asterisk: true,
 				required: () => this.#data.host_new === null
 			},
 			host_new: {
@@ -224,11 +225,13 @@ window.host_wizard_edit = new class {
 			},
 			groups: {
 				type: 'array',
+				asterisk: () => this.#data.host_new !== null,
 				required: () => this.#data.host_new !== null && !this.#data.groups_new.length
 			},
 			groups_new: {
 				base_path: 'groups',
 				type: 'array',
+				required: () => this.#data.host_new !== null && !this.#data.groups.length,
 				fields: {
 					id: {
 						regex: /^(?!\/)(?!.*\/$).+/,
@@ -1397,7 +1400,11 @@ window.host_wizard_edit = new class {
 	#updateFieldsAsterisk() {
 		const rules = this.#validation_rules[this.#getCurrentStep()] || {};
 
-		for (const [path, rule] of Object.entries(rules)) {
+		for (let [path, rule] of Object.entries(rules)) {
+			if ('base_path' in rule) {
+				continue;
+			}
+
 			const name = this.#pathToInputName(path);
 			const input = this.#dialogue.querySelector(`[name="${name}"], [data-name="${name}"]`);
 
@@ -1405,13 +1412,12 @@ window.host_wizard_edit = new class {
 				continue;
 			}
 
-			const required = typeof rule.required === 'function'
-				? rule.required(rule.row_index ?? null)
-				: rule.required;
+			const condition = rule.asterisk ?? rule.required;
+			const set_asterisk = typeof condition === 'function' ? condition(rule.row_index ?? null) : condition;
 
 			input
 				.closest(`.${ZBX_STYLE_FORM_FIELD}`)
-				?.querySelector('label').classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!required);
+				?.querySelector('label').classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!set_asterisk);
 		}
 	}
 
@@ -1470,7 +1476,9 @@ window.host_wizard_edit = new class {
 				break;
 
 			default:
-				field.value = value;
+				if (typeof value !== 'object') {
+					field.value = value;
+				}
 		}
 	}
 
