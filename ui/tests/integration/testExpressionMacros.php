@@ -36,8 +36,8 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  */
 class testExpressionMacros extends CIntegrationTest {
 
-	private static $hostid;
-	private static $triggerid;
+	private static $host_id;
+	private static $trigger_id;
 	private static $trigger_action_id;
 	private static $alert_response;
 	private static $event_response;
@@ -634,10 +634,10 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		self::$hostid = $response['result']['hostids'][0];
+		self::$host_id = $response['result']['hostids'][0];
 
 		$response = $this->call('usermacro.create', [
-			'hostid' => self::$hostid,
+			'hostid' => self::$host_id,
 			'macro' => '{$USER_MACRO_HOST}',
 			'value' => 'HOST_LEVEL_' . ALL_PRINTABLE_ASCII
 		]);
@@ -664,7 +664,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		// Get host interface ids.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
-			'hostids' => [self::$hostid],
+			'hostids' => [self::$host_id],
 			'selectInterfaces' => ['interfaceid']
 		]);
 
@@ -675,7 +675,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		$items = [];
 		for ($i = 1; $i < 3; $i++) {
 			$items[] = [
-				'hostid' => self::$hostid,
+				'hostid' => self::$host_id,
 				'name' => self::TRAPPER_ITEM_NAME.$i,
 				'key_' => self::TRAPPER_ITEM_KEY.$i,
 				'type' => ITEM_TYPE_TRAPPER,
@@ -714,7 +714,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
-		self::$triggerid = $response['result']['triggerids'][0];
+		self::$trigger_id = $response['result']['triggerids'][0];
 
 		// Create trigger action
 		$response = $this->call('action.create', [
@@ -726,7 +726,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 					[
 						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$triggerid
+						'value' => self::$trigger_id
 					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
@@ -879,7 +879,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
-			'hostids' => [self::$hostid]
+			'hostids' => [self::$host_id]
 		], 5, 2);
 		$this->assertCount(1, self::$event_response['result']);
 
@@ -1091,8 +1091,9 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			CDataHelper::call('usermacro.deleteglobal', self::$globalmacro_ids);
 		}
 
-		CDataHelper::call('trigger.delete', [self::$triggerid]);
+		CDataHelper::call('trigger.delete', [self::$trigger_id]);
 		CDataHelper::call('action.delete', [self::$trigger_action_id]);
 		CDataHelper::call('item.delete', [self::$item_ids]);
+		CDataHelper::call('item.delete', [self::$host_id]);
 	}
 }
