@@ -474,16 +474,14 @@ class CUserMacro extends CApiService {
 									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
-			]]
+			'config' => 		['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkMacroConfig($hostmacros);
+		$this->validateMacroConfig($hostmacros);
 		$this->checkHostPermissions(array_unique(array_column($hostmacros, 'hostid')));
 		$this->checkHostDuplicates($hostmacros);
 	}
@@ -534,9 +532,7 @@ class CUserMacro extends CApiService {
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
 			'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])],
-			'config' => 		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIZARD_FIELD_NOCONF, ZBX_WIZARD_FIELD_TEXT, ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])]
-			]]
+			'config' => 		['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
@@ -607,7 +603,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkMacroConfig($hostmacros, $db_hostmacros);
+		$this->validateMacroConfig($hostmacros, $db_hostmacros);
 		$this->checkHostDuplicates($hostmacros, $db_hostmacros);
 	}
 
@@ -685,8 +681,8 @@ class CUserMacro extends CApiService {
 		}
 	}
 
-	private function checkMacroConfig(array $hostmacros, ?array $db_hostmacros = null): void {
-		$api_macro_config_rules = CTemplate::getMacroConfigValidationRules();
+	private function validateMacroConfig(array $hostmacros, ?array $db_hostmacros = null): void {
+		$api_input_rules = CTemplate::getMacroConfigValidationRules();
 
 		$all_hostids = array_flip(array_column($hostmacros, 'hostid'));
 
@@ -726,7 +722,7 @@ class CUserMacro extends CApiService {
 				self::addRequiredFieldsByMacroConfigType($hostmacro['config'], $db_hostmacro['config']);
 			}
 
-			if (!CApiInputValidator::validate($api_macro_config_rules, $hostmacro['config'], $path, $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $hostmacro['config'], $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
@@ -743,12 +739,14 @@ class CUserMacro extends CApiService {
 		}
 	}
 
-	private static function addRequiredFieldsByMacroConfigType(array &$macro_config, array $db_macro_config): void {
-		if ($macro_config['type'] == ZBX_WIZARD_FIELD_TEXT) {
-			$macro_config += array_intersect_key($db_macro_config, array_flip(['label']));
-		}
-		if (in_array($macro_config['type'], [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])) {
-			$macro_config += array_intersect_key($db_macro_config, array_flip(['label','options']));
+	private static function addRequiredFieldsByMacroConfigType(array &$config, array $db_config): void {
+		if ($config['type'] != $db_config['type']) {
+			if ($config['type'] == ZBX_WIZARD_FIELD_TEXT) {
+				$config += array_intersect_key($db_config, array_flip(['label']));
+			}
+			if (in_array($config['type'], [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])) {
+				$config += array_intersect_key($db_config, array_flip(['label', 'options']));
+			}
 		}
 	}
 
@@ -1051,9 +1049,6 @@ class CUserMacro extends CApiService {
 
 				continue;
 			}
-
-			// Do not inherit config part of macro.
-			unset($hostmacro['config']);
 
 			if ($db_hostmacros) {
 				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
