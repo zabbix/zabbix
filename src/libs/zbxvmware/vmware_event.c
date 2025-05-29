@@ -1045,11 +1045,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != vmware_service_get_event_latestpage(service, easyhandle, event_session, &doc, error))
 		goto end_session;
 
-	if (0 < vmware_service_parse_event_data(events, last_key, last_ts, EVENT_TAG, doc,
+	if ((0 < vmware_service_parse_event_data(events, last_key, last_ts, EVENT_TAG, doc,
 			&service->eventlog, evt_severity, strpool_sz, NULL, skip_old) &&
-			(0 != *skip_old || LAST_KEY(events) == last_key + 1))
+			LAST_KEY(events) == last_key + 1) || 0 != *skip_old)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() latestPage events:%d", __func__, events->values_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() latestPage events:%d skip_old:%u", __func__,
+				events->values_num, *skip_old);
 
 		ret = SUCCEED;
 		goto end_session;
@@ -1277,14 +1278,15 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
 	zbx_vmware_eventlog_data_t	*evt_data;
-	int				ret = FAIL;
+	int				evt_num, ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
 	unsigned char			evt_pause = 0, evt_skip_old, evt_severity;
 	zbx_uint64_t			evt_last_key, events_sz = 0, shmem_free_sz = 0;
 	time_t				evt_last_ts, now = time(NULL), evt_query_interval = ZBX_EVT_QUERY_LIMIT;
 	char				msg[2 * VMWARE_SHORT_STR_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() service type:%u '%s'@'%s'", __func__, service->type, service->username,
+			service->url);
 
 	evt_data = (zbx_vmware_eventlog_data_t *)zbx_malloc(NULL, sizeof(zbx_vmware_eventlog_data_t));
 	evt_data->error = NULL;
@@ -1298,6 +1300,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	evt_last_ts = service->eventlog.last_ts;
 	evt_skip_old = service->eventlog.skip_old;
 	evt_severity = service->eventlog.severity;
+	evt_num = NULL == service->eventlog.data ? -1 : service->eventlog.data->events.values_num;
 
 	if (NULL != service->eventlog.data && 0 != service->eventlog.data->events.values_num && 0 == evt_skip_old &&
 			service->eventlog.data->events.values[0]->key > evt_last_key)
@@ -1327,6 +1330,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 				if (0 == service->eventlog.end_time && 0 != evt_last_ts)
 					service->eventlog.end_time = evt_last_ts;
 
+				/* esxi does not store events history after reboot */
+				if (ZBX_VMWARE_TYPE_VSPHERE == service->type && 0 == evt_num)
+					service->eventlog.end_time = 0;
+
 				if (0 != service->eventlog.end_time)
 				{
 					if (service->eventlog.end_time < now - evt_query_interval)
@@ -1350,10 +1357,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() state pause:%u end_time/delta:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T
 			" last_ts/delta:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " last_key:" ZBX_FS_UI64
 			" interval:" ZBX_FS_TIME_T " skip_old:%u severity:%u shmem_free_sz:" ZBX_FS_UI64
-			" req_sz:" ZBX_FS_UI64 " oom:%u", __func__, evt_pause, service->eventlog.end_time,
-			now - service->eventlog.end_time, evt_last_ts, now - evt_last_ts, evt_last_key,
-			evt_query_interval, evt_skip_old, evt_severity, shmem_free_sz, service->eventlog.req_sz,
-			service->eventlog.oom);
+			" req_sz:" ZBX_FS_UI64 " oom:%u service type:%u evt_num:%d", __func__, evt_pause,
+			service->eventlog.end_time, now - service->eventlog.end_time, evt_last_ts,
+			now - evt_last_ts, evt_last_key, evt_query_interval, evt_skip_old, evt_severity, shmem_free_sz,
+			service->eventlog.req_sz, service->eventlog.oom, service->type, evt_num);
 
 	if (0 != evt_pause)
 	{
@@ -1419,6 +1426,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		{
 			service->eventlog.end_time = now;
 			evt_skip_old = 0;
+			evt_last_key = 0;	/* there is reset id after esxi reboot */
 		}
 	}
 
@@ -1484,6 +1492,9 @@ out:
 		vmware_eventlog_data_shared_free(service->eventlog.data);
 		service->eventlog.data = vmware_shmem_eventlog_data_dup(evt_data);
 		service->eventlog.skip_old = evt_skip_old;
+
+		if (0 == evt_last_key && 0 != evt_data->events.values_num)
+			service->eventlog.last_key = evt_data->events.values[0]->key - 1;
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
