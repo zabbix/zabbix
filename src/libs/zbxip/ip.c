@@ -295,15 +295,16 @@ fail:
  *             ip             - [IN]                                          *
  *             port           - [IN]                                          *
  *                                                                            *
- * Return value: size_t - size of destination buffer after formatting         *
+ * Return value: pointer to hostport                                          *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_join_hostport(char *hostport, size_t hostport_sz, const char *ip, unsigned short port)
+char	*zbx_join_hostport(char *hostport, size_t hostport_sz, const char *ip, unsigned short port)
 {
 	const char	*format = "%s:%hu";
 #ifdef HAVE_IPV6
 	if (SUCCEED == zbx_is_ip6(ip))
 		format = "[%s]:%hu";
 #endif
-	return zbx_snprintf(hostport, hostport_sz, format, ip, port);
+	zbx_snprintf(hostport, hostport_sz, format, ip, port);
+	return hostport;
 }

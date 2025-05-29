@@ -27,7 +27,7 @@ int	zbx_ip_in_list(const char *list, const char *ip);
 int	zbx_parse_serveractive_element(const char *str, char **host, unsigned short *port,
 		unsigned short port_default);
 
-size_t zbx_join_hostport(char *hostport, size_t hostport_sz, const char *ip, unsigned short port);
+char	*zbx_join_hostport(char *hostport, size_t hostport_sz, const char *ip, unsigned short port);
 
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1

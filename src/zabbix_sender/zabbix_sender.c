@@ -27,6 +27,7 @@
 #include "zbxalgo.h"
 #include "zbxcomms.h"
 #include "zbxbincommon.h"
+#include "zbxip.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
@@ -550,8 +551,10 @@ static int	check_response(char *response, const char *server, unsigned short por
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info), NULL))
 	{
 		int	failed;
+		char	server_port[MAX_STRING_LEN];
 
-		printf("Response from \"%s:%hu\": \"%s\"\n", server, port, info);
+		printf("Response from \"%s\": \"%s\"\n", zbx_join_hostport(server_port, sizeof(server_port), server,
+				port), info);
 		fflush(stdout);
 
 		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
@@ -561,13 +564,19 @@ static int	check_response(char *response, const char *server, unsigned short por
 	if (FAIL == ret && SUCCEED == zbx_parse_redirect_response(&jp, &rhost, &redirect_port, &redirect_revision,
 			&redirect_reset))
 	{
+		char	server_port[MAX_STRING_LEN];
+
 		if (0 == redirect_reset)
 		{
-			printf("Response from \"%s:%hu\": \"Redirect to \"%s:%hu\"\n", server, port, rhost,
-					redirect_port);
+			char	rhost_port[MAX_STRING_LEN];
+
+			printf("Response from \"%s\": \"Redirect to \"%s\"\n",
+					zbx_join_hostport(server_port, sizeof(server_port), server, port),
+					zbx_join_hostport(rhost_port, sizeof(rhost_port), rhost, redirect_port));
 		}
 		else
-			printf("Response from \"%s:%hu\": \"Redirect reset\n", server, port);
+			printf("Response from \"%s\": \"Redirect reset\n", zbx_join_hostport(server_port,
+					sizeof(server_port), server, port));
 
 		fflush(stdout);
 		zbx_free(rhost);
@@ -650,9 +659,11 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 		if (FAIL == ret_resp)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
-					sendval_args->addrs->values[0]->ip, sendval_args->addrs->values[0]->port,
-					data);
+			char	ip_port[MAX_STRING_LEN];
+
+			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s\": [%s]",
+					zbx_join_hostport(ip_port, sizeof(ip_port), sendval_args->addrs->values[0]->ip,
+					sendval_args->addrs->values[0]->port), data);
 
 			zbx_addrs_failover(sendval_args->addrs);
 		}

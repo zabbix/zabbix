@@ -21,6 +21,7 @@
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
+#	include "zbxip.h"
 #endif
 
 /* number of characters per line when wrapping Base64 data in Email */
@@ -717,6 +718,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	CURL			*easyhandle;
 	CURLcode		err;
 	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "";
+	char			server_port[MAX_STRING_LEN];
 	size_t			url_offset= 0;
 	struct curl_slist	*recipients = NULL;
 	smtp_payload_status_t	payload_status;
@@ -745,7 +747,8 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	else
 		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtp://");
 
-	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s:%hu", smtp_server, smtp_port);
+	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s",
+			zbx_join_hostport(server_port, sizeof(server_port), smtp_server, smtp_port));
 
 	if ('\0' != *smtp_helo)
 	{

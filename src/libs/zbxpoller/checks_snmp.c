@@ -773,6 +773,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	{
 		char	*tmp_err_str;
 		int	snmp_err;
+		char	addr_port[MAX_STRING_LEN];
 
 		snmp_sess_error(ssp, NULL, &snmp_err, &tmp_err_str);
 
@@ -782,23 +783,28 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 					"key or duplicate engineID)");
 		}
 
-		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
-				interface->addr, interface->port, tmp_err_str);
+		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s\": %s.",
+				zbx_join_hostport(addr_port, sizeof(addr_port), interface->addr, interface->port),
+				tmp_err_str);
 		zbx_free(tmp_err_str);
 		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
+		char	addr_port[MAX_STRING_LEN];
+
 		if (0 == got_vars)
 		{
-			zbx_snprintf(error, max_error_len, "Timeout while connecting to \"%s:%hu\".",
-					interface->addr, interface->port);
+			zbx_snprintf(error, max_error_len, "Timeout while connecting to \"%s\".",
+					zbx_join_hostport(addr_port, sizeof(addr_port), interface->addr,
+					interface->port));
 			ret = NETWORK_ERROR;
 		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "Timeout while retrieving data from \"%s:%hu\".",
-					interface->addr, interface->port);
+			zbx_snprintf(error, max_error_len, "Timeout while retrieving data from \"%s\".",
+					zbx_join_hostport(addr_port, sizeof(addr_port), interface->addr,
+					interface->port));
 			ret = NOTSUPPORTED;
 		}
 	}

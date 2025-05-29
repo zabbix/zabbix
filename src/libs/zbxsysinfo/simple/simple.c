@@ -55,7 +55,10 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	if (NULL == (ldap = ldap_init(host, port)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%hu]", host, port);
+		char	host_port[MAX_STRING_LEN];
+
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s]", zbx_join_hostport(host_port,
+				sizeof(host_port), host, port));
 		goto lbl_ret;
 	}
 
@@ -216,8 +219,12 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 		*value_int = 1;
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s:%hu]: %s",
-				__func__, host, port, curl_easy_strerror(err));
+	{
+		char	host_port[MAX_STRING_LEN];
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s]: %s", __func__,
+				zbx_join_hostport(host_port, sizeof(host_port), host, port), curl_easy_strerror(err));
+	}
 clean:
 	zbx_free(error);
 	curl_easy_cleanup(easyhandle);
