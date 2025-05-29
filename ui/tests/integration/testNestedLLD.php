@@ -1900,7 +1900,7 @@ class testNestedLLD extends CIntegrationTest{
 
 	// Import host / template.
 	private function importData($name) {
-		$data = file_get_contents('integration/data/' . $name . '.yaml');
+		$data = file_get_contents('integration/data/nested_lld/' . $name . '.yaml');
 
 		$response = $this->call('configuration.import', [
 			'format' => 'yaml',
