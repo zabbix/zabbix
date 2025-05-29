@@ -231,7 +231,7 @@ window.host_wizard_edit = new class {
 				type: 'array',
 				fields: {
 					id: {
-						regex: /^(?!\/)(.*?)(?<!\/)$/,
+						regex: /^(?!\/)(?!.*\/$).+/,
 						maxlength: <?= DB::getFieldLength('hstgrp', 'name') ?>
 					}
 				}
