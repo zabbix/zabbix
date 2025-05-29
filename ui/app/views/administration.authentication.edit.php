@@ -800,15 +800,6 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 
-$certs_status = [];
-if ($data['saml_certs_editable']) {
-	$certs_status = [
-		'saml_idp_certificate_exists' => $data['idp_certificate_hash'] !== '',
-		'saml_sp_certificate_exists' => $data['sp_certificate_hash'] !== '',
-		'saml_sp_private_key_exists' => $data['sp_private_key_hash'] !== ''
-	];
-}
-
 (new CScriptTag(
 	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
@@ -819,8 +810,11 @@ if ($data['saml_certs_editable']) {
 		'templates' => $templates,
 		'mfa_methods' => $data['mfa_methods'],
 		'mfa_default_row_index' => $data['mfa_default_row_index'],
-		'is_http_auth_allowed' => $data['is_http_auth_allowed']
-	] + $certs_status).');'
+		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
+		'saml_idp_certificate_exists' => $data['saml_certs_editable'] && $data['idp_certificate_hash'] !== '',
+		'saml_sp_certificate_exists' => $data['saml_certs_editable'] && $data['sp_certificate_hash'] !== '',
+		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== ''
+	]).');'
 ))
 	->setOnDocumentReady()
 	->show();
