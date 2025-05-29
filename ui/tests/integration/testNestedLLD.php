@@ -2196,7 +2196,7 @@ class testNestedLLD extends CIntegrationTest{
 			$rulename = 'dep_drule[' . $elem . ']';
 			$itemname = 'master_item[' . $elem . ']';
 
-			$response = $this->callUntilDataIsPresent('discoveryrule.get', [
+			$response = $this->call('discoveryrule.get', [
 				'search' => [
 					'name' => $rulename
 				],
