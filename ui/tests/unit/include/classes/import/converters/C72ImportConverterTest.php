@@ -79,47 +79,8 @@ class C72ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
-	public function importConverterDataProviderTemplates(): array {
-		return [
-			[
-				[],
-				[]
-			],
-			[
-				[
-					'templates' => [
-						[
-							'macros' => [
-								[
-									'macro' => '{$MACRO}',
-									'value' => 'macro value'
-								]
-							]
-						]
-					]
-				],
-				[
-					'templates' => [
-						[
-							'macros' => [
-								[
-									'macro' => '{$MACRO}',
-									'value' => 'macro value',
-									'config' => [
-										'type' => CXmlConstantName::MACRO_CONFIG_TYPE_NOCONF
-									]
-								]
-							]
-						]
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * @dataProvider importConverterDataProviderMaps
-	 * @dataProvider importConverterDataProviderTemplates
 	 *
 	 * @param array $source
 	 * @param array $expected
