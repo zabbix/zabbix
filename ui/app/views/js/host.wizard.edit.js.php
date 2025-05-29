@@ -291,7 +291,7 @@ window.host_wizard_edit = new class {
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(true);
+				this.#updateForm(null);
 			}
 		});
 
@@ -1176,7 +1176,7 @@ window.host_wizard_edit = new class {
 		const step = this.#getCurrentStep();
 
 		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
-		const step_init = !path;
+		const step_init = path === undefined;
 
 		switch (step) {
 			case this.STEP_WELCOME:
@@ -1185,7 +1185,7 @@ window.host_wizard_edit = new class {
 			case this.STEP_SELECT_TEMPLATE:
 				if (step_init
 					|| ['template_search_query', 'data_collection', 'agent_mode', 'show_templates'].includes(path)
-					|| path.startsWith('selected_subclasses')
+					|| path?.startsWith('selected_subclasses')
 				) {
 					this.#dialogue.querySelectorAll('[name="agent_mode"]').forEach(input => {
 						input.disabled = Number(this.#data.data_collection) !== ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED
@@ -1550,7 +1550,6 @@ window.host_wizard_edit = new class {
 
 				if (this.#data.template_search_query !== '') {
 					return template.name.toLowerCase().includes(query)
-						|| template.description.toLowerCase().includes(query)
 						|| template.tags.some(({tag, value}) => {
 							return tag.toLowerCase().includes(query) || value.toLowerCase().includes(query);
 						});
