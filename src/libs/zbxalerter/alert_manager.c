@@ -1101,8 +1101,6 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 	const char			*sendto = va_arg(args, const char *);
 	const char			*subject = va_arg(args, const char *);
 	const char			*message = va_arg(args, const char *);
-	const int			time_ping = va_arg(args, const int);
-	const char			*tz = va_arg(args, const char *);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
@@ -1128,7 +1126,7 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 }
 
 static char	*am_substitute_mediatype_params(const char *mediatype_params, const char *sendto, const char *subject,
-		const char *message, int time_ping)
+		const char *message)
 {
 	char	*alert_params = NULL;
 
@@ -1141,23 +1139,20 @@ static char	*am_substitute_mediatype_params(const char *mediatype_params, const 
 		char			*buf = NULL;
 		size_t			buf_alloc = 0;
 		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
-		zbx_config_t		cfg;
 
 		zbx_json_initarray(&json, 1024);
 		zbx_json_open(mediatype_params, &jp);
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE);
 
 		for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
 		{
 			char	*value = zbx_strdup(NULL, buf);
 
 			zbx_substitute_macros(&value, NULL, 0, &mediatype_params_macro_resolv, um_handle, sendto,
-					subject, message, time_ping, cfg.default_timezone);
+					subject, message);
 
 			zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
 		}
 
-		zbx_config_clean(&cfg);
 		zbx_free(buf);
 		zbx_json_close(&json);
 
@@ -1175,7 +1170,7 @@ static char	*am_substitute_mediatype_params(const char *mediatype_params, const 
  * Purpose: queues 'database down' watchdog alerts                            *
  *                                                                            *
  ******************************************************************************/
-static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *db_config, int time_ping)
+static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *db_config)
 {
 	zbx_am_media_t		*media;
 	zbx_hashset_iter_t	iter;
@@ -1212,7 +1207,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 		}
 
 		alert_params = am_substitute_mediatype_params(media->mediatype_params, media->sendto, alert_subject,
-				alert_message, time_ping);
+				alert_message);
 
 		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject,
 				shared_str_new(alert_message), alert_params, mediatype->message_format, 0, 0, 0);
@@ -2466,7 +2461,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 			if (time_watchdog + ZBX_WATCHDOG_ALERT_FREQUENCY <= now)
 			{
-				am_queue_watchdog_alerts(&manager, alert_manager_args_in->db_config, time_ping);
+				am_queue_watchdog_alerts(&manager, alert_manager_args_in->db_config);
 				time_watchdog = now;
 			}
 		}
