@@ -46,7 +46,7 @@ class CControllerMiscConfigUpdate extends CController {
 		}
 
 		if (!$ret) {
-			switch ($this->getValidationError()) {
+			switch ($this->getValidationResult()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
 						(new CUrl('zabbix.php'))->setArgument('action', 'miscconfig.edit')
