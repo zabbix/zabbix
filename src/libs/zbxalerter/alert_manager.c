@@ -1096,8 +1096,6 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 	int	ret = SUCCEED;
 
 	/* Passed arguments */
-	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
-	const char			*sendto = va_arg(args, const char *);
 	const char			*subject = va_arg(args, const char *);
 	const char			*message = va_arg(args, const char *);
 
@@ -1107,15 +1105,7 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 
 	if (0 == p->indexed)
 	{
-		if ((ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type)))
-		{
-			zbx_dc_get_user_macro(um_handle, p->macro, NULL, 0, replace_to);
-
-			p->pos = (int)p->token.loc.r;
-		}
-		else if (0 == strcmp(p->macro, MVAR_ALERT_SENDTO))
-			*replace_to = zbx_strdup(*replace_to, sendto);
-		else if (0 == strcmp(p->macro, MVAR_ALERT_SUBJECT))
+		if (0 == strcmp(p->macro, MVAR_ALERT_SUBJECT))
 			*replace_to = zbx_strdup(*replace_to, subject);
 		else if (0 == strcmp(p->macro, MVAR_ALERT_MESSAGE))
 			*replace_to = zbx_strdup(*replace_to, message);
@@ -1124,8 +1114,7 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 	return ret;
 }
 
-static char	*am_substitute_mediatype_params(const char *mediatype_params, const char *sendto, const char *subject,
-		const char *message)
+static char	*am_substitute_mediatype_params(const char *mediatype_params, const char *subject, const char *message)
 {
 	char	*alert_params = NULL;
 
@@ -1137,7 +1126,6 @@ static char	*am_substitute_mediatype_params(const char *mediatype_params, const 
 		struct zbx_json_parse	jp;
 		char			*buf = NULL;
 		size_t			buf_alloc = 0;
-		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 
 		zbx_json_initarray(&json, 1024);
 		zbx_json_open(mediatype_params, &jp);
@@ -1146,16 +1134,13 @@ static char	*am_substitute_mediatype_params(const char *mediatype_params, const 
 		{
 			char	*value = zbx_strdup(NULL, buf);
 
-			zbx_substitute_macros(&value, NULL, 0, &mediatype_params_macro_resolv, um_handle, sendto,
-					subject, message);
+			zbx_substitute_macros(&value, NULL, 0, &mediatype_params_macro_resolv, subject, message);
 
 			zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
 		}
 
 		zbx_free(buf);
 		zbx_json_close(&json);
-
-		zbx_dc_close_user_macros(um_handle);
 
 		alert_params = zbx_strdup(NULL, json.buffer);
 		zbx_json_free(&json);
@@ -1205,8 +1190,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_config_dbhigh_
 			zbx_free(am_esc);
 		}
 
-		alert_params = am_substitute_mediatype_params(media->mediatype_params, media->sendto, alert_subject,
-				alert_message);
+		alert_params = am_substitute_mediatype_params(media->mediatype_params, alert_subject, alert_message);
 
 		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject,
 				shared_str_new(alert_message), alert_params, mediatype->message_format, 0, 0, 0);
