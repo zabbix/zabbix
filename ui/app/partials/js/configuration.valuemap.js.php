@@ -63,7 +63,11 @@ var AddValueMap = class {
 	render(edit) {
 		if (edit instanceof Element) {
 			edit.replaceWith(this.row);
-			this.row.querySelector(`input[value="${this.data.name}"] ~ a`).focus();
+
+			const name = this.escapeSpecialChars(this.data.name);
+			const selector = `input[value="${name}"] ~ a`;
+			const element = this.row.querySelector(selector);
+			element.focus();
 		}
 		else {
 			document.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`).append(this.row);
@@ -179,6 +183,16 @@ var AddValueMap = class {
 		input.value = value;
 
 		return input;
+	}
+
+	escapeSpecialChars(value) {
+		const escape_chars = {
+			"'": "\\'",
+			'"': '\\"',
+			'\\': '\\\\'
+		};
+
+		return value.replace(/['"\\]/g, match => escape_chars[match]);
 	}
 }
 
