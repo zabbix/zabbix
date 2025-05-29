@@ -659,7 +659,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			]
 		]);
 
-		array_push(self::$globalmacro_ids, $response['result']['globalmacroids']);
+		self::$globalmacro_ids = array_merge(self::$globalmacro_ids, $response['result']['globalmacroids']);
 
 		// Get host interface ids.
 		$response = $this->call('host.get', [
