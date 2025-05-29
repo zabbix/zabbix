@@ -2029,7 +2029,7 @@ abstract class CHostBase extends CApiService {
 		}
 		unset($host);
 
-		$internal_fields = ['hostid'];
+		$internal_fields = ['hostmacroid', 'hostid'];
 
 		$limit_selects_requested = (self::isHost() || self::isTemplate()) && $options['limitSelects'] !== null;
 
