@@ -672,9 +672,9 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
-		self::$item_ids = [];
+		$items = [];
 		for ($i = 1; $i < 3; $i++) {
-			self::$item_ids[] = [
+			$items[] = [
 				'hostid' => self::$hostid,
 				'name' => self::TRAPPER_ITEM_NAME.$i,
 				'key_' => self::TRAPPER_ITEM_KEY.$i,
@@ -683,7 +683,8 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			];
 		}
 
-		$response = $this->call('item.create', self::$item_ids);
+		$response = $this->call('item.create', $items);
+		self::$item_ids = $response['result']['itemids'];
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(count(self::$item_ids), count($response['result']['itemids']));
 
