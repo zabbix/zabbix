@@ -1083,6 +1083,8 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 	}
 
 	public static function clearData(): void {
+		CDataHelper::call('action.delete', [self::$trigger_action_id]);
+
 		if (!empty(self::$usermacro_ids)) {
 			CDataHelper::call('usermacro.delete', self::$usermacro_ids);
 		}
@@ -1092,8 +1094,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		}
 
 		CDataHelper::call('trigger.delete', [self::$trigger_id]);
-		CDataHelper::call('action.delete', [self::$trigger_action_id]);
-		CDataHelper::call('item.delete', [self::$item_ids]);
+		CDataHelper::call('item.delete', self::$item_ids);
 		CDataHelper::call('host.delete', [self::$host_id]);
 	}
 }
