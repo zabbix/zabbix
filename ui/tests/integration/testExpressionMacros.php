@@ -381,10 +381,6 @@ ACTION.NAME.uppercase() -> {{ACTION.NAME}.uppercase()} <-
 ACTION.NAME.urldecode() -> {{ACTION.NAME}.urldecode()} <-
 ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 
-	// regrepl should be:
-	//"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@*[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
-	// but integration tests use libpcre instead of libpcre2, so regrepl is resolved to *UNKNOWN*
-
 	const MACRO_FUNCS_RESOLVED = "ACTION.NAME.btoa() -> YWN0aW9uX25hbWVfICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj9AQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVpbXF1eX2BhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX4= <-" . "\n" .
 		"USER_MACRO_GLOBAL_DOUBLE.fmtnum(15) -> 0.123456789012346 <-" . "\n" . 	// NOTE last 12346, not 123456 !
 		"USER_MACRO_GLOBAL_TIME.fmttime(%H) -> 23 <-" . "\n" .
@@ -392,7 +388,7 @@ ACTION.NAME.urlencode() -> {{ACTION.NAME}.urlencode()} <-";
 		"ACTION.NAME.htmlencode() -> action_name_ !&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . 	// NOTE, \' -> \ disappears
 		"ACTION.NAME.iregsub(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"*\") -> * <-" . "\n" .
 		"ACTION.NAME.lowercase() -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" . // NOTE, \' -> \ disappears
-		"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> *UNKNOWN* <-" . "\n" .
+		"ACTION.NAME.regrepl(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"*\") -> action_name_ !\"#$%&'()*+,-./0123456789:;<=>?@*[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ <-" . "\n" .
 		"USER_MACRO_GLOBAL_TIME.regsub(\"^([0-9]+)\", \"\\1\") -> 23 <-" . "\n" .
 		"USER_MACRO_GLOBAL_DOUBLE.tr(0,a) -> a.123456789a123456789 <-" . "\n" .
 		"ACTION.NAME.uppercase() -> ACTION_NAME_ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~ <-" . "\n" .
