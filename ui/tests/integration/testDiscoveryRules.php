@@ -539,6 +539,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	public function testDiscoveryRules_snmpErrorViaServer(): void  {
 		$this->stopComponent(self::COMPONENT_SERVER);
 
+		sleep(300);
+
 		self::deleteAllActions();
 		self::deleteAllDrules();
 		$this->deleteAllHosts();
