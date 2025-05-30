@@ -234,7 +234,7 @@ window.host_wizard_edit = new class {
 				required: () => this.#data.host_new !== null && !this.#data.groups.length,
 				fields: {
 					id: {
-						regex: /^(?!\/)(?!.*\/$).+/,
+						regex: /^(?!\/)(?!.*\/\/)(?!.*\/$).+$/,
 						maxlength: <?= DB::getFieldLength('hstgrp', 'name') ?>
 					}
 				}
