@@ -183,10 +183,13 @@ class testSystemInformation extends CWebTest {
 		);
 
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
-		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".
-				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
-				"2. Incorrect DNS server configuration.\n".
-				"Failed to parse address \"".$DB['SERVER']."\"";
+		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" refused. Possible reasons:\n".
+				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override".
+				" in the \"zabbix.conf.php\";\n".
+				"2. Security environment (for example, SELinux) is blocking the connection;\n".
+				"3. Zabbix server daemon not running;\n".
+				"4. Firewall is blocking TCP connection.\n".
+				"Connection refused";
 		$messages = CMessageElement::find()->all();
 		foreach ($messages as $message) {
 			$this->assertTrue($message->hasLine($error_text));
