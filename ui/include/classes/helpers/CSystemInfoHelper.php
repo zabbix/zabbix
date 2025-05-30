@@ -68,7 +68,7 @@ class CSystemInfoHelper {
 
 		$ha_cluster_enabled = false;
 
-		$ha_nodes = API::HaNode()->get([
+		$ha_nodes = API::getApiService('hanode')->get([
 			'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
 			'sortfield' => 'status',
 			'sortorder' => 'DESC'
@@ -149,11 +149,9 @@ class CSystemInfoHelper {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$status['is_running'] = $server->canConnect(CSessionHelper::getId());
+		$status['is_running'] = $server->isRunning() && $server->canConnect(CSessionHelper::getId());
 
 		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			error($server->getError());
-
 			return $status;
 		}
 
@@ -166,7 +164,6 @@ class CSystemInfoHelper {
 
 		if ($server_status === false) {
 			error($server->getError());
-
 			return $status;
 		}
 
