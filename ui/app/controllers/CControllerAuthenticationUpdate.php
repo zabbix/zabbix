@@ -133,18 +133,6 @@ class CControllerAuthenticationUpdate extends CController {
 			return $is_valid;
 		}
 
-		if (array_key_exists('ldap_host', $ldap_auth_changed)
-				&& !array_key_exists('ldap_bind_password', $ldap_auth_changed)
-				&& $this->hasInput('change_bind_password') != 1) {
-
-			$error = _s('Invalid parameter "%1$s": %2$s.', 'ldap_bind_password',
-				_s('the parameter "%1$s" is missing', 'ldap_bind_password')
-			);
-
-			CMessageHelper::setErrorTitle($error);
-			$is_valid = false;
-		}
-
 		if ($this->getInput('ldap_bind_password', '') !== '') {
 			$ldap_fields[] = 'ldap_bind_dn';
 		}
