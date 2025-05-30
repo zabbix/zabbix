@@ -6260,7 +6260,7 @@ zabbix_export:
           
            * [Monitoring API](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/en/monitoring/20180401/).
                 
-        10. When the API endpoints are identified, you need to set them in in host wizard configuration fields (similarly to step #8):
+        10. When the API endpoints are identified, you need to set them in host wizard configuration fields (similarly to step #8):
         
             * `Core Services host` - Core Services API endpoint, for example, `iaas.eu-stockholm-1.oraclecloud.com`;
         
