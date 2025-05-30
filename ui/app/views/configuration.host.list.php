@@ -28,24 +28,28 @@ if ($data['uncheck']) {
 $html_page = (new CHtmlPage())
 	->setTitle(_('Hosts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_LIST))
-	->setControls((new CTag('nav', true, (new CList())
-			->addItem(
-				(new CSimpleButton(_('Create host')))
-					->addClass('js-create-host')
-			)
-			->addItem(
-				(new CButton('form', _('Import')))
-					->onClick(
-						'return PopUp("popup.import", {
-							rules_preset: "host", '.
-							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
-						'"}, {
-							dialogueid: "popup_import",
-							dialogue_class: "modal-popup-generic"
-						});'
-					)
-					->removeId()
-			)
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CSimpleButton(_('Host Wizard')))->addClass('js-host-wizard')
+				)
+				->addItem(
+					(new CSimpleButton(_('Create host')))->addClass('js-create-host')
+				)
+				->addItem(
+					(new CButton('form', _('Import')))
+						->onClick(
+							'return PopUp("popup.import", {
+								rules_preset: "host", '.
+								CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
+							'"}, {
+								dialogueid: "popup_import",
+								dialogue_class: "modal-popup-generic"
+							});'
+						)
+						->removeId()
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -213,6 +217,7 @@ $header_sortable_status = make_sorting_header(_('Status'), 'status', $data['sort
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader($header_checkbox))->addClass(ZBX_STYLE_CELL_WIDTH),
+		'',
 		$header_sortable_name,
 		_('Items'),
 		_('Triggers'),
@@ -495,6 +500,10 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
+		(new CButtonIcon(ZBX_ICON_MORE))
+			->setMenuPopup(
+				CMenuPopupHelper::getHost($host['hostid'])
+			),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),

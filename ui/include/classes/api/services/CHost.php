@@ -144,7 +144,6 @@ class CHost extends CHostGeneral {
 			'selectItems'						=> null,
 			'selectTriggers'					=> null,
 			'selectGraphs'						=> null,
-			'selectMacros'						=> null,
 			'selectDashboards'					=> null,
 			'selectInterfaces'					=> null,
 			'selectInventory'					=> null,
@@ -498,16 +497,12 @@ class CHost extends CHostGeneral {
 		}
 
 		/*
-		 * Cleaning the output from write-only properties.
+		 * Cleaning the output from write-only properties and normalize.
 		 */
 		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
-			$all_keys[] = 'inventory_mode';
-			$all_keys[] = 'active_available';
-			$all_keys[] = 'assigned_proxyid';
-			$options['output'] = array_diff($all_keys, $write_only_keys);
+			$options['output'] = array_diff(self::OUTPUT_FIELDS, $write_only_keys);
 		}
 		/*
 		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
@@ -516,6 +511,12 @@ class CHost extends CHostGeneral {
 		elseif (is_array($options['output']) && APP::getMode() === APP::EXEC_MODE_API) {
 			$options['output'] = array_diff($options['output'], $write_only_keys);
 		}
+		else {
+			$options['output'] = zbx_toArray($options['output']);
+		}
+
+		// TODO: Replace with strict validation eventually.
+		$options['output'] = array_intersect($options['output'], self::OUTPUT_FIELDS);
 
 		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -541,15 +542,6 @@ class CHost extends CHostGeneral {
 		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
 			return (string) count($result);
-		}
-
-		// Hosts share table with host prototypes. Therefore remove host unrelated fields.
-		if ($this->outputIsRequested('discover', $options['output'])) {
-			foreach ($result as &$row) {
-				unset($row['discover']);
-			}
-
-			unset($row);
 		}
 
 		if ($result) {
@@ -703,7 +695,7 @@ class CHost extends CHostGeneral {
 		$this->updateGroups($hosts);
 		$this->updateHgSets($hosts);
 		$this->updateTags($hosts);
-		$this->updateMacros($hosts);
+		self::updateMacros($hosts);
 
 		$hosts_rtdata = [];
 		$hosts_interfaces = [];
@@ -805,7 +797,7 @@ class CHost extends CHostGeneral {
 
 	public function updateForce(array $hosts, array $db_hosts): void {
 		$this->updateTags($hosts, $db_hosts);
-		$this->updateMacros($hosts, $db_hosts);
+		self::updateMacros($hosts, $db_hosts);
 
 		$inventories = [];
 		foreach ($hosts as &$host) {
@@ -1772,6 +1764,7 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedMacros($options, $result);
 		$this->addRelatedHostGroups($options, $result);
 
 		$hostids = array_keys($result);
@@ -1988,7 +1981,7 @@ class CHost extends CHostGeneral {
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
+			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHost()), 'default' => null],
 			'selectDiscoveryRule' => 	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::getOutputFieldsOnHost()), 'default' => null],
 			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
@@ -2650,11 +2643,11 @@ class CHost extends CHostGeneral {
 		}
 	}
 
-	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
+	private function addAffectedObjects(array $hosts, array &$db_hosts): void {
 		$this->addAffectedGroups($hosts, $db_hosts);
 		$this->addAffectedTemplates($hosts, $db_hosts);
 		$this->addAffectedTags($hosts, $db_hosts);
-		$this->addAffectedMacros($hosts, $db_hosts);
+		self::addAffectedMacros($hosts, $db_hosts);
 	}
 
 	/**

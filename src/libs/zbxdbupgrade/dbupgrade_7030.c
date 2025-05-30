@@ -578,6 +578,50 @@ static int	DBpatch_7030044(void)
 	return DBrename_field("host_discovery", "parent_itemid", &field);
 }
 
+
+static int	DBpatch_7030045(void)
+{
+	const zbx_db_field_t	field = {"wizard_ready", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_7030046(void)
+{
+	const zbx_db_field_t	field = {"readme", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_7030047(void)
+{
+	const zbx_db_table_t	table =
+			{"hostmacro_config", "hostmacroid", 0,
+				{
+					{"hostmacroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"priority", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"section_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"label", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"required", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"regex", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"options", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030048(void)
+{
+	const zbx_db_field_t	field = {"hostmacroid", NULL, "hostmacro", "hostmacroid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hostmacro_config", 1, &field);
+}
 #endif
 
 DBPATCH_START(7030)
@@ -629,5 +673,9 @@ DBPATCH_ADD(7030041, 0, 1)
 DBPATCH_ADD(7030042, 0, 1)
 DBPATCH_ADD(7030043, 0, 1)
 DBPATCH_ADD(7030044, 0, 1)
+DBPATCH_ADD(7030045, 0, 1)
+DBPATCH_ADD(7030046, 0, 1)
+DBPATCH_ADD(7030047, 0, 1)
+DBPATCH_ADD(7030048, 0, 1)
 
 DBPATCH_END()

@@ -72,6 +72,8 @@ function escapeHtml(string) {
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {
+	const old_value = obj.value;
+
 	if (obj != null) {
 		if (allowempty) {
 			if (obj.value.length == 0 || obj.value == null) {
@@ -99,6 +101,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 		if (obj.value < 0) {
 			obj.value = obj.value * -1;
 		}
+	}
+
+	if (old_value !== obj.value) {
+		obj.dispatchEvent(new Event('input', {bubbles: true}));
 	}
 }
 
@@ -628,8 +634,10 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	const classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'};
-	const aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')};
+	const classes = {good: 'msg-good', info: 'msg-info', warning: 'msg-warning', bad: 'msg-bad'};
+	const aria_labels = {good: t('Success message'), info: t('Info message'), warning: t('Warning message'),
+		bad: t('Error message')
+	};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';

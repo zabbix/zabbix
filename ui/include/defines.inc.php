@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.4.0rc1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7030044);
+define('ZABBIX_DB_VERSION',		7030048);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -431,6 +431,29 @@ define('MAINTENANCE_STATUS_EXPIRED',	2);
 
 define('HOST_GROUP_TYPE_HOST_GROUP', 		0);
 define('HOST_GROUP_TYPE_TEMPLATE_GROUP', 	1);
+
+// Host Wizard (used for templates).
+define('ZBX_WIZARD_NOT_READY', 0);
+define('ZBX_WIZARD_READY', 1);
+define('ZBX_WIZARD_FIELD_NOCONF', 0);
+define('ZBX_WIZARD_FIELD_TEXT', 1);
+define('ZBX_WIZARD_FIELD_LIST', 2);
+define('ZBX_WIZARD_FIELD_CHECKBOX', 3);
+
+define('ZBX_WIZARD_FIELD_NOT_REQUIRED', 0);
+define('ZBX_WIZARD_FIELD_REQUIRED', 1);
+
+define('ZBX_TEMPLATE_DATA_COLLECTION_ANY', -1);
+define('ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED', 0);
+define('ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS', 1);
+
+define('ZBX_TEMPLATE_AGENT_MODE_ANY', -1);
+define('ZBX_TEMPLATE_AGENT_MODE_ACTIVE', 0);
+define('ZBX_TEMPLATE_AGENT_MODE_PASSIVE', 1);
+
+define('ZBX_TEMPLATE_SHOW_ANY', -1);
+define('ZBX_TEMPLATE_SHOW_LINKED', 0);
+define('ZBX_TEMPLATE_SHOW_NOT_LINKED', 1);
 
 // Modules.
 define('MODULE_STATUS_DISABLED', 0);
@@ -2050,11 +2073,16 @@ define('ZBX_STYLE_FLH_INFO_BG', 'flh-info-bg');
 define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
 define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
+define('ZBX_STYLE_FORM_COLUMNS', 'form-columns');
+define('ZBX_STYLE_FORM_DESCRIPTION', 'form-description');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
+define('ZBX_STYLE_FORM_FIELDS_HINT', 'form-fields-hint');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
+define('ZBX_STYLE_FORMATED_GROUP', 'formated-group');
+define('ZBX_STYLE_FORMATED_TEXT', 'formated-text');
 define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
@@ -2117,10 +2145,12 @@ define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
 define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_LOGO', 'logo');
 define('ZBX_STYLE_MAP_AREA', 'map-area');
+define('ZBX_STYLE_MARKDOWN', 'markdown');
 define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
-define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
+define('ZBX_STYLE_MSG_GOOD', 'msg-good');
+define('ZBX_STYLE_MSG_INFO', 'msg-info');
 define('ZBX_STYLE_MSG_WARNING', 'msg-warning');
 define('ZBX_STYLE_MSG_GLOBAL', 'msg-global');
 define('ZBX_STYLE_MSG_GLOBAL_FOOTER', 'msg-global-footer');
@@ -2136,6 +2166,9 @@ define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
 define('ZBX_STYLE_WORDBREAK', 'wordbreak');
 define('ZBX_STYLE_ORANGE', 'orange');
+define('ZBX_STYLE_ORDERED_LIST', 'ordered-list');
+define('ZBX_STYLE_ORDERED_LIST_COUNTER', 'ordered-list-counter');
+define('ZBX_STYLE_ORDERED_LIST_ITEM', 'ordered-list-item');
 define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
 define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
@@ -2207,6 +2240,7 @@ define('ZBX_STYLE_TABLE_INITIAL_WIDTH', 'table-initial-width');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
+define('ZBX_STYLE_TAGS_LIST', 'tags-list');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
@@ -2231,6 +2265,7 @@ define('ZBX_STYLE_TOC_ITEM', 'toc-item');
 define('ZBX_STYLE_TOC_LIST', 'toc-list');
 define('ZBX_STYLE_TOC_ROW', 'toc-row');
 define('ZBX_STYLE_TOC_SUBLIST', 'toc-sublist');
+define('ZBX_STYLE_TOGGLE', 'toggle');
 define('ZBX_STYLE_TOP', 'top');
 define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
 define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
@@ -2258,6 +2293,11 @@ define('ZBX_STYLE_OVERLAY_DIALOGUE_HEADER', 'overlay-dialogue-header');
 define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');
 define('ZBX_STYLE_GRID_COLUMNS_2', 'columns-2');
 define('ZBX_STYLE_GRID_COLUMNS_3', 'columns-3');
+define('ZBX_STYLE_GRID_COLUMNS_4', 'columns-4');
+define('ZBX_STYLE_GRID_COLUMN', 'column');
+define('ZBX_STYLE_GRID_COLUMN_FIRST', 'column-first');
+define('ZBX_STYLE_GRID_COLUMN_LAST', 'column-last');
+define('ZBX_STYLE_GRID_COLUMN_FULL', 'column-full');
 
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 define('ZBX_STYLE_COLUMNS_NOWRAP', 'columns-nowrap');

@@ -168,7 +168,7 @@ class CControllerMenuPopup extends CController {
 
 		$db_hosts = $has_goto
 			? API::Host()->get([
-				'output' => ['hostid', 'status'],
+				'output' => ['hostid', 'status', 'flags'],
 				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectHttpTests' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
@@ -252,6 +252,7 @@ class CControllerMenuPopup extends CController {
 				$menu_data['showDashboards'] = (bool) getHostDashboards($data['hostid']);
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
 				$menu_data['isWriteable'] = $rw_hosts;
+				$menu_data['isDiscovered'] = $db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
 					$menu_data['severities'] = array_column(

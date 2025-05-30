@@ -217,6 +217,18 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// Configuration
 		if (options.allowed_ui_conf_hosts) {
+			// host wizard
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'host.wizard.edit');
+			url.setArgument('hostid', options.hostid);
+
+			configuration.push({
+				label: t('Host Wizard'),
+				disabled: !options.isWriteable || options.isDiscovered,
+				url: url.getUrl()
+			});
+
 			// host
 			url = new Curl('zabbix.php');
 			url.setArgument('action', 'popup');

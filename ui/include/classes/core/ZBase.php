@@ -410,6 +410,7 @@ class ZBase {
 		$config = new CConfigFile($configFile);
 
 		$this->config = $config->load();
+		$this->component_registry->config = $config;
 	}
 
 	/**

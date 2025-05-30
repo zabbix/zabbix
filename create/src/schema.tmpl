@@ -99,7 +99,9 @@ FIELD		|name_upper	|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|vendor_name	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|vendor_version	|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|proxy_groupid	|t_id		|	|NULL		|0			|4|proxy_group|	|RESTRICT
-FIELD		|monitored_by	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|monitored_by	|t_integer	|'0'|NOT NULL	|0
+FIELD		|wizard_ready	|t_integer	|'0'|NOT NULL	|0
+FIELD		|readme			|t_text		|''	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxyid
@@ -691,6 +693,17 @@ FIELD		|description	|t_text		|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|automatic	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,macro
+
+TABLE|hostmacro_config|hostmacroid|ZBX_TEMPLATE
+FIELD		|hostmacroid|t_id			|	|NOT NULL	|0	|1|hostmacro
+FIELD		|type		|t_integer		|'0'|NOT NULL	|0
+FIELD		|priority	|t_integer		|'0'|NOT NULL	|0
+FIELD		|section_name|t_varchar(255)|''	|NOT NULL	|0
+FIELD		|label		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description|t_text			|''	|NOT NULL	|0
+FIELD		|required	|t_integer		|'0'|NOT NULL	|0
+FIELD		|regex		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|options	|t_text			|''	|NOT NULL	|0
 
 TABLE|hosts_groups|hostgroupid|ZBX_TEMPLATE
 FIELD		|hostgroupid	|t_id		|	|NOT NULL	|0
@@ -2260,4 +2273,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7030044	|7030044
+ROW		|1		|7030048	|7030048

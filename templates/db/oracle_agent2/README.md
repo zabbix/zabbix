@@ -39,9 +39,9 @@ Test availability:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ORACLE.USER}|<p>Oracle username.</p>|`zabbix`|
-|{$ORACLE.PASSWORD}|<p>Oracle user's password.</p>|`zabbix_password`|
-|{$ORACLE.CONNSTRING}|<p>Oracle URI or a session name.</p>|`tcp://localhost:1521`|
+|{$ORACLE.USER}|<p>Oracle username.</p>||
+|{$ORACLE.PASSWORD}|<p>Oracle user's password.</p>||
+|{$ORACLE.CONNSTRING}|<p>Oracle URI or a session name.</p>||
 |{$ORACLE.SERVICE}|<p>Oracle Service Name.</p>|`ORA`|
 |{$ORACLE.DBNAME.MATCHES}|<p>Used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
 |{$ORACLE.DBNAME.NOT_MATCHES}|<p>Used in database discovery. It can be overridden on the host or linked template level.</p>|`PDB\$SEED`|

@@ -329,6 +329,11 @@ class CXmlConstantName {
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	const MACRO_TYPE_VAULT = 'VAULT';
 
+	const MACRO_CONFIG_TYPE_NOCONF = 'NOCONF';
+	const MACRO_CONFIG_TYPE_TEXT = 'TEXT';
+	const MACRO_CONFIG_TYPE_LIST = 'LIST';
+	const MACRO_CONFIG_TYPE_CHECKBOX = 'CHECKBOX';
+
 	// Constants for low-level discovery rules.
 	const LLD_DELETE_AFTER = 'DELETE_AFTER';
 	const LLD_DELETE_NEVER = 'DELETE_NEVER';
