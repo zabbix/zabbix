@@ -890,9 +890,10 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#conditions tbody .form_row > td > input.macro:not(:placeholder-shown):not([readonly])')
-			.length;
+		const form_rows = document
+			.querySelectorAll('#conditions tbody .form_row > td > input.macro:not(:placeholder-shown)');
+
+		return [...form_rows].filter((row) => !row.readOnly || row.dataset.discovered).length;
 	}
 
 	initObserver() {

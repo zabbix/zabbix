@@ -103,27 +103,28 @@ JAVASCRIPT;
 		];
 	}
 	/**
-	 * Add inherited from host and template tags to item tags.
+	 * Add tags inherited from host and template to item tags. An additional property 'type' is set for each returned
+	 * tag.
 	 *
-	 * @param int   $item_tags['itemid']
-	 * @param int   $item_tags['hostid']
-	 * @param int   $item_tags['templateid']
-	 * @param array $item_tags['discoveryRule']
-	 * @param int   $item_tags['discoveryRule']['templateid']
-	 * @param int   $item_tags['discoveryRule']['itemid']
-	 * @param array $item_tags
+	 * @param string $item['itemid']
+	 * @param string $item['hostid']
+	 * @param string $item['templateid']
+	 * @param array  $item['parent_lld'] 				(optional) Parent LLD for discovered item prototype.
+	 * @param string $item['parent_lld']['itemid']
+	 * @param string $item['parent_lld']['templateid']
+	 * @param int    $item['parent_lld']['flags']
+	 * @param array  $item_tags
 	 *
-	 * @return array of tags with inherited and additional property 'type' set for each tag.
+	 * @return array
 	 */
 	public static function addInheritedTags(array $item, array $item_tags): array {
+		self::findParentLldTemplateid($item);
+
 		$tags = [];
 
-		if (array_key_exists('discoveryRule', $item)) {
-			$parent_templates = getItemParentTemplates([$item['discoveryRule']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
-		}
-		else {
-			$parent_templates = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
-		}
+		$parent_templates = array_key_exists('parent_lld', $item)
+			? getItemParentTemplates([$item['parent_lld']], $item['parent_lld']['flags'])['templates']
+			: getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		unset($parent_templates[0]);
 
 		$db_templates = $parent_templates
@@ -219,7 +220,7 @@ JAVASCRIPT;
 			'valuemap' => [],
 			'master_item' => [],
 			'templated' => (bool) $item['templateid'],
-			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'discovered' => $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 			'http_authtype' => ZBX_HTTP_AUTH_NONE,
 			'http_username' => '',
 			'http_password' => '',
@@ -915,12 +916,13 @@ JAVASCRIPT;
 	/**
 	 * @param array  $src_items
 	 * @param array  $dst_hosts
+	 * @param int    $flags
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts): array {
+	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts, int $flags): array {
 		$dst_hostids = array_keys($dst_hosts);
 		$item_indexes = [];
 		$dst_master_itemids = [];
@@ -966,13 +968,57 @@ JAVASCRIPT;
 			}
 		}
 
+		$src_master_itemprototypes = [];
+		$dst_master_itemprototypes = [];
+
+		if ($flags == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+			$src_master_itemprototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($item_indexes),
+				'preservekeys' => true
+			]);
+			$dst_master_itemprototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'key_'],
+				'filter' => ['key_' => array_unique(array_column($src_master_itemprototypes, 'key_'))]
+			] + $host_filter);
+
+			foreach ($dst_master_itemprototypes as $dst_master_item) {
+				$_dst_master_itemids[$dst_master_item['key_']][$dst_master_item['hostid']] = $dst_master_item['itemid'];
+			}
+
+			foreach ($src_master_itemprototypes as $src_master_item) {
+				if (array_key_exists($src_master_item['key_'], $_dst_master_itemids)) {
+					foreach ($_dst_master_itemids[$src_master_item['key_']] as $dst_hostid => $dst_master_itemid) {
+						foreach ($item_indexes[$src_master_item['itemid']] as $src_itemid) {
+							$dst_master_itemids[$src_itemid][$dst_hostid] = $dst_master_itemid;
+						}
+					}
+				}
+			}
+		}
+
+		$missing_master_item = [
+			ZBX_FLAG_DISCOVERY_NORMAL => _('Cannot copy item with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => _('Cannot copy item prototype with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_RULE => _('Cannot copy LLD rule with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE => _('Cannot copy LLD rule prototype with key "%1$s" without its master item with key "%2$s".')
+		];
+
 		foreach ($dst_master_itemids as $src_itemid => $dst_host_master_itemids) {
 			foreach ($dst_host_master_itemids as $dst_hostid => $dst_master_itemid) {
 				if ($dst_master_itemid == 0) {
-					error(_s('Cannot copy item with key "%1$s" without its master item with key "%2$s".',
-						$src_items[$src_itemid]['key_'],
-						$src_master_items[$src_items[$src_itemid]['master_itemid']]['key_']
-					));
+					$src_item = $src_items[$src_itemid];
+					$error = array_key_exists($src_item['master_itemid'], $src_master_items)
+						? sprintf($missing_master_item[$src_item['flags']],
+							$src_item['key_'],
+							$src_master_items[$src_item['master_itemid']]['key_']
+						)
+						: _s('Cannot copy LLD rule prototype with key "%1$s" without its master item prototype with key "%2$s".',
+							$src_item['key_'],
+							$src_master_itemprototypes[$src_item['master_itemid']]['key_']
+						);
+
+					error($error);
 
 					throw new Exception();
 				}
@@ -980,5 +1026,35 @@ JAVASCRIPT;
 		}
 
 		return $dst_master_itemids;
+	}
+
+	public static function findParentLldTemplateid(array &$data): void {
+		if (!array_key_exists('parent_lld', $data)) {
+			return;
+		}
+
+		$lldruleid = $data['parent_lld']['itemid'];
+
+		while ($data['parent_lld']['templateid'] == 0) {
+			$options = [
+				'output' => ['itemid', 'templateid', 'flags'],
+				'selectDiscoveryRule' => ['itemid'],
+				'itemids' => $lldruleid,
+				'nopermissions' => true
+			];
+
+			$db_source = API::DiscoveryRule()->get($options)
+				?: API::DiscoveryRulePrototype()->get($options + ['selectDiscoveryRulePrototype' => ['itemid']]);
+
+			$data['parent_lld'] = reset($db_source) + ['discoveryRulePrototype' => []];
+
+			$parent_lld = $data['parent_lld']['discoveryRule'] ?: $data['parent_lld']['discoveryRulePrototype'];
+
+			if (!$parent_lld) {
+				break;
+			}
+
+			$lldruleid = $parent_lld['itemid'];
+		}
 	}
 }

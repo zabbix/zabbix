@@ -21,15 +21,23 @@
 
 $item = $data['item'];
 $readonly = $item['templated'] || $item['discovered'];
+$parent_lld_link = null;
 
 if ($item['discovered']) {
+	$parent_lld = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+
 	$discovered_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'item.prototype.edit')
 		->setArgument('context', $item['context'])
-		->setArgument('itemid', $item['itemDiscovery']['parent_itemid'])
-		->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+		->setArgument('parent_discoveryid', $item['discoveryData']['lldruleid'])
+		->setArgument('itemid', $item['discoveryData']['parent_itemid'])
 		->getUrl();
+
+	$parent_lld_link = [
+		new CLabel(_('Discovered by')),
+		(new CFormField(new CLink($parent_lld['name'], $discovered_url)))->addClass('js-parent-items')
+	];
 }
 
 $formgrid = (new CFormGrid())
@@ -40,10 +48,7 @@ $formgrid = (new CFormGrid())
 		]
 		: null
 	)
-	->addItem($item['discovered'] ? [
-		new CLabel(_('Discovered by')),
-		(new CFormField(new CLink($item['discoveryRule']['name'], $discovered_url)))->addClass('js-parent-items')
-	] : null)
+	->addItem($parent_lld_link)
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
@@ -870,13 +875,12 @@ $formgrid
 		)
 	]);
 
-
-$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('itemDiscovery', $item)
-		&& $item['itemDiscovery'] && $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
-	: null;
-
 if ($data['source'] === 'item') {
+	$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && $item['discovered']
+			&& $item['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
+
 	$formgrid->addItem([
 		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
@@ -902,13 +906,16 @@ else {
 			new CLabel(_('Create enabled'), 'status'),
 			new CFormField(
 				(new CCheckBox('status', ITEM_STATUS_ACTIVE))
-					->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
+					->setChecked($item['status'] == ITEM_STATUS_ACTIVE)
+					->setReadonly($item['discovered'])
+			)
 		])
 		->addItem([
 			new CLabel(_('Discover'), 'discover'),
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($item['discover'] == ZBX_PROTOTYPE_DISCOVER)
+					->setReadonly($item['discovered'])
 			)
 		]);
 }

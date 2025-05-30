@@ -47,14 +47,14 @@ INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50011,0,'a93383e7641547fe957
 -- discovered host groups
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50014,0,'31e39dc724624c97b2e93caba8517465','API group for host prototype');
-INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,400660);
+INSERT INTO host_discovery (hostid,parent_hostid,lldruleid) VALUES (50011,NULL,400660);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50108, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50109, 50011, '', 50014, NULL);
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (50015,0,'de6322aebbae4f53acfc87747da877d8','API discovery group {#HV.NAME}',4);
 INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name) VALUES (1, 50015, 50108, 'API discovery group {#HV.NAME}');
 -- host prototype for delete
 INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
-INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NULL,400660);
+INSERT INTO host_discovery (hostid,parent_hostid,lldruleid) VALUES (50015,NULL,400660);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50112, 50015, '', 50014, NULL);
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50028,50015,1,2,1,'127.0.0.1','','10050');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (50028, 2, 1, '{$SNMP_COMMUNITY}');
@@ -652,7 +652,7 @@ INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);
-INSERT INTO host_discovery (hostid, parent_itemid, host) VALUES (99011, 58735, '');
+INSERT INTO host_discovery (hostid, lldruleid, host) VALUES (99011, 58735, '');
 INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99012, 99011, '{#VALUE}');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50026, 99010, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');

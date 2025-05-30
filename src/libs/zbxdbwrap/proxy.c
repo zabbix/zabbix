@@ -1189,8 +1189,8 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
 	if (item->host.proxyid != *proxyid)
 		return FAIL;
 
-	/* don't process aggregate/calculated items coming from proxy */
-	if (ITEM_TYPE_CALCULATED == item->type)
+	/* don't process aggregate/calculated items and nested lld rules coming from proxy */
+	if (ITEM_TYPE_CALCULATED == item->type || ITEM_TYPE_NESTED_LLD == item->type)
 		return FAIL;
 
 	return SUCCEED;

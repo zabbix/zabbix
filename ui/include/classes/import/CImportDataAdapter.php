@@ -537,6 +537,16 @@ class CImportDataAdapter {
 								$operation['opinventory']['inventory_mode'] = $operation['inventory_mode'];
 							}
 							break;
+
+						case OPERATION_OBJECT_LLD_RULE_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
+
+							if (array_key_exists('delay', $operation) && $operation['delay'] !== '') {
+								$operation['opperiod']['delay'] = $operation['delay'];
+							}
+							break;
 					}
 
 					unset($operation['status'], $operation['discover'], $operation['delay'], $operation['history'],
