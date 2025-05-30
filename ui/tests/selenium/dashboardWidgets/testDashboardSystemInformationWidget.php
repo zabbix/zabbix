@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testSystemInformation.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../common/testSystemInformation.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup dashboard, ha_node, settings
@@ -121,8 +121,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on second widget name.
-		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshot($dashboard, 'widget_without_ha');
 	}
 
@@ -169,8 +167,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 */
 	public function testDashboardSystemInformationWidget_checkEnabledHA() {
 		$this->assertEnabledHACluster(self::$dashboardid);
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on second widget name.
-		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
 	}
 
@@ -296,6 +292,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			if ($action === 'update' && CTestArrayHelper::get($widget_data, 'not_last')) {
 				$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->waitUntilClickable()->one()->click();
 			}
+			$dashboard->waitUntilReady();
 		}
 	}
 }

@@ -14,7 +14,7 @@
 
 package proc
 
-func addNonNegative(dst *int64, val int64) () {
+func addNonNegative(dst *int64, val int64) {
 	if *dst == -1 {
 		return
 	}
@@ -28,7 +28,7 @@ func addNonNegative(dst *int64, val int64) () {
 	return
 }
 
-func addNonNegativeFloat(dst *float64, val float64) () {
+func addNonNegativeFloat(dst *float64, val float64) {
 	if *dst == -1.0 {
 		return
 	}
@@ -41,4 +41,3 @@ func addNonNegativeFloat(dst *float64, val float64) () {
 	*dst += val
 	return
 }
-

@@ -256,7 +256,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// graphs
-			url = new Curl('graphs.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'graph.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');

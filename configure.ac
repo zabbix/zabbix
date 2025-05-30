@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [7.4.0beta1])
+AC_INIT([Zabbix], [7.4.0rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1638,8 +1638,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	AC_SUBST(SNMP_CFLAGS)
 
-	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
-	LIBSSH2_CHECK_CONFIG([no])
+	dnl Check for LIBSSH2 [by default - skip]
+	LIBSSH2_CHECK_CONFIG([no],[1.8.0])
 	LIBSSH_CHECK_CONFIG([no])
 	if test "x$want_ssh2" = "xyes"; then
 		if test "x$want_ssh" != "xno"; then
@@ -1649,7 +1649,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		if test "x$found_ssh2" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library not found])
 		elif test "x$accept_ssh2_version" != "xyes"; then
-			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
+			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.8.0)])
 		else
 			have_ssh="yes (libssh2)"
 		fi

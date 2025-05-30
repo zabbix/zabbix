@@ -413,7 +413,7 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
  *             config_source_ip - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, unsigned char type,
+static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, unsigned char type, const char *name,
 		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
 		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
@@ -447,6 +447,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
 	mediatype->type = type;
 
 	zbx_free(mediatype->error);
+	ZBX_UPDATE_STR(mediatype->name, name);
 	ZBX_UPDATE_STR(mediatype->smtp_server, smtp_server);
 	ZBX_UPDATE_STR(mediatype->smtp_helo, smtp_helo);
 	ZBX_UPDATE_STR(mediatype->smtp_email, smtp_email);
@@ -539,6 +540,7 @@ static void	am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() mediatypeid:" ZBX_FS_UI64, __func__, mediatype->mediatypeid);
 
+	zbx_free(mediatype->name);
 	zbx_free(mediatype->smtp_server);
 	zbx_free(mediatype->smtp_helo);
 	zbx_free(mediatype->smtp_email);
@@ -1420,29 +1422,32 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	if (0 == access(*cmd, X_OK))
 	{
-		const char		*p;
-		struct zbx_json_parse	jp;
-		char			*buf = NULL;
-		size_t			buf_alloc = 0;
-
-		if (SUCCEED != zbx_json_open(alert->params, &jp))
+		if (NULL != alert->params)
 		{
-			*error = zbx_dsprintf(*error, "Cannot parse parameters: %s", zbx_json_strerror());
-			goto out;
+			const char		*p;
+			struct zbx_json_parse	jp;
+			char			*buf = NULL;
+			size_t			buf_alloc = 0;
+
+			if (SUCCEED != zbx_json_open(alert->params, &jp))
+			{
+				*error = zbx_dsprintf(*error, "Cannot parse parameters: %s", zbx_json_strerror());
+				goto out;
+			}
+
+			for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
+			{
+				char	*param_esc;
+
+				param_esc = zbx_dyn_escape_shell_single_quote(buf);
+
+				zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
+
+				zbx_free(param_esc);
+			}
+
+			zbx_free(buf);
 		}
-
-		for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
-		{
-			char	*param_esc;
-
-			param_esc = zbx_dyn_escape_shell_single_quote(buf);
-
-			zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
-
-			zbx_free(param_esc);
-		}
-
-		zbx_free(buf);
 
 		ret = SUCCEED;
 	}
@@ -1512,12 +1517,13 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 				message_format = mediatype->message_format;
 
 			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->mediatypeid,
-					p_eventid, alert->source, alert->object, alert->objectid, alert->sendto,
-					alert->subject, alert->message, mediatype->smtp_server, mediatype->smtp_port,
-					mediatype->smtp_helo, mediatype->smtp_email, mediatype->smtp_security,
-					mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
-					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
-					message_format, alert->expression, alert->recovery_expression);
+					mediatype->name, mediatype->maxattempts, p_eventid, alert->source,
+					alert->object, alert->objectid, alert->sendto, alert->subject, alert->message,
+					mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
+					mediatype->smtp_email, mediatype->smtp_security, mediatype->smtp_verify_peer,
+					mediatype->smtp_verify_host, mediatype->smtp_authentication,
+					mediatype->username, mediatype->passwd, message_format, alert->expression,
+					alert->recovery_expression);
 			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;
@@ -1714,11 +1720,11 @@ static void	am_update_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message, 
 	{
 		zbx_am_db_mediatype_t	*mt = mediatypes[i];
 
-		am_update_mediatype(manager, mt->mediatypeid, mt->type, mt->smtp_server, mt->smtp_helo, mt->smtp_email,
-				mt->exec_path, mt->gsm_modem, mt->username, mt->passwd, mt->smtp_port, mt->smtp_security,
-				mt->smtp_verify_peer, mt->smtp_verify_host, mt->smtp_authentication, mt->maxsessions,
-				mt->maxattempts, mt->attempt_interval, mt->message_format, mt->script, mt->timeout,
-				ZBX_AM_MEDIATYPE_FLAG_NONE, config_source_ip);
+		am_update_mediatype(manager, mt->mediatypeid, mt->type, mt->name, mt->smtp_server, mt->smtp_helo,
+				mt->smtp_email, mt->exec_path, mt->gsm_modem, mt->username, mt->passwd, mt->smtp_port,
+				mt->smtp_security, mt->smtp_verify_peer, mt->smtp_verify_host, mt->smtp_authentication,
+				mt->maxsessions, mt->maxattempts, mt->attempt_interval, mt->message_format, mt->script,
+				mt->timeout, ZBX_AM_MEDIATYPE_FLAG_NONE, config_source_ip);
 
 		zbx_am_db_mediatype_clear(mt);
 		zbx_free(mt);
@@ -1903,7 +1909,7 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 {
 	zbx_uint64_t	mediatypeid;
 	char		*sendto, *subject, *message, *params, *smtp_server, *smtp_helo, *smtp_email, *exec_path,
-			*gsm_modem, *username, *passwd, *attempt_interval, *script, *timeout;
+			*gsm_modem, *username, *passwd, *attempt_interval, *script, *timeout, *name;
 	unsigned short	smtp_port;
 	int		maxsessions, maxattempts;
 	unsigned char	type, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format;
@@ -1912,13 +1918,13 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &type, &smtp_server, &smtp_helo, &smtp_email, &exec_path,
-			&gsm_modem, &username, &passwd, &smtp_port, &smtp_security, &smtp_verify_peer,
+	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &type, &name, &smtp_server, &smtp_helo, &smtp_email,
+			&exec_path, &gsm_modem, &username, &passwd, &smtp_port, &smtp_security, &smtp_verify_peer,
 			&smtp_verify_host, &smtp_authentication, &maxsessions, &maxattempts, &attempt_interval,
 			&message_format, &script, &timeout, &sendto, &subject, &message, &params);
 
 	/* update with initial 'remove' flag so the mediatype is removed if it's not used by other alerts */
-	am_update_mediatype(manager, mediatypeid, type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem,
+	am_update_mediatype(manager, mediatypeid, type, name, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem,
 			username, passwd, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 			smtp_authentication, maxsessions, maxattempts, attempt_interval, message_format, script, timeout,
 			ZBX_AM_MEDIATYPE_FLAG_REMOVE, config_source_ip);
@@ -1932,6 +1938,7 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 		am_alert_free(alert);
 	}
 
+	zbx_free(name);
 	zbx_free(params);
 	zbx_free(smtp_server);
 	zbx_free(smtp_helo);
@@ -2052,11 +2059,11 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 
 	/* update with initial 'remove' flag so the mediatype is removed */
 	/* if it's not used by other test alerts/dispatches              */
-	am_update_mediatype(manager, mt.mediatypeid, mt.type, mt.smtp_server, mt.smtp_helo, mt.smtp_email, mt.exec_path,
-			mt.gsm_modem, mt.username, mt.passwd, mt.smtp_port, mt.smtp_security, mt.smtp_verify_peer,
-			mt.smtp_verify_host, mt.smtp_authentication, mt.maxsessions, mt.maxattempts,
-			mt.attempt_interval, mt.message_format, mt.script, mt.timeout, ZBX_AM_MEDIATYPE_FLAG_REMOVE,
-			config_source_ip);
+	am_update_mediatype(manager, mt.mediatypeid, mt.type, mt.name, mt.smtp_server, mt.smtp_helo, mt.smtp_email,
+			mt.exec_path, mt.gsm_modem, mt.username, mt.passwd, mt.smtp_port, mt.smtp_security,
+			mt.smtp_verify_peer, mt.smtp_verify_host, mt.smtp_authentication, mt.maxsessions,
+			mt.maxattempts, mt.attempt_interval, mt.message_format, mt.script, mt.timeout,
+			ZBX_AM_MEDIATYPE_FLAG_REMOVE, config_source_ip);
 
 	am_prepare_dispatch_message(dispatch, &mt, &message, &message_format);
 

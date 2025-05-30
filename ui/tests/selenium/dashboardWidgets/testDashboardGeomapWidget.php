@@ -13,16 +13,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup settings, widget
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardGeomapWidget extends CWebTest {
+class testDashboardGeomapWidget extends testWidgets {
 
 	/**
 	 * Id of the dashboard where geomap widget is created and updated.

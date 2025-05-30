@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -39,7 +39,7 @@ class testAlarmNotification extends CWebTest {
 	protected static $maintenanceid;
 	protected static $eventids;
 	protected static $hostid;
-	const DEFAULT_COLORPICKER = 'xpath:./following::div[@class="color-picker"]';
+	const DEFAULT_COLORPICKER = 'xpath:./following::z-color-picker';
 
 	/**
 	 * Trigger names.

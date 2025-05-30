@@ -26,6 +26,7 @@
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxlog.h"
 
 /******************************************************************************
  *                                                                            *
@@ -541,6 +542,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		{
 			pgm_update(&cache);
 			time_update = time_now;
+			zbx_handle_log();
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);

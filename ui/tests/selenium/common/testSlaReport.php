@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 class testSlaReport extends CWebTest {
 
@@ -602,7 +602,7 @@ class testSlaReport extends CWebTest {
 	 * @param boolean	$widget			flag that specified whether the check is made in the SLA report or SLA report widget
 	 */
 	public function checkDialogContents($dialog_data, $widget = false) {
-		$form_selector = ($widget) ? 'name:widget_dialogue_form' : 'name:zbx_filter';
+		$form_selector = ($widget) ? 'name:widget_form' : 'name:zbx_filter';
 		$form = $this->query($form_selector)->one()->asForm();
 		$form->getField($dialog_data['field'])->query('button:Select')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();

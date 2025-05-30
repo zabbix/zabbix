@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * The ignore browser errors annotation is required due to the errors coming from the URL opened in the URL widget.
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  * @dataSource DynamicItemWidgets
  * @onBefore prepareData
  */
-class testDashboardURLWidget extends CWebTest {
+class testDashboardURLWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -783,7 +783,9 @@ class testDashboardURLWidget extends CWebTest {
 		// Check that already created widget became invalid and returns error regarding invalid parameter.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget = $dashboard->getWidget(self::$default_widget)->getContent();
-		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
+		$this->assertEquals("Widget is not fully configured\nPlease update configuration",
+				$widget->query('class:no-data-message')->one()->getText()
+		);
 		$broken_form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		// Check that the widget URL field is empty.
@@ -823,7 +825,7 @@ class testDashboardURLWidget extends CWebTest {
 	 * @param string $expected		expected result after widget form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		foreach ($data as $scheme) {
 			$dashboard->getWidget(self::$default_widget)->edit();
 			COverlayDialogElement::find()->one()->waitUntilReady();

@@ -14,7 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
@@ -27,6 +28,17 @@ class testFormTemplate extends CLegacyWebTest {
 	public $template_edit_name = 'Template-layout-test-001';
 	public $template_clone = 'Linux by Zabbix agent';
 	public $template_full_delete = 'Inheritance test template';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	public static function create() {
 		return [
@@ -54,9 +66,8 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Selenium Test Template',
-					'error_msg' => 'Cannot add template',
-					'errors' => [
-						'Template with host name "Selenium Test Template" already exists.'
+					'inline_errors' => [
+						'Template name' => 'This object already exists.'
 					]
 
 				]
@@ -66,9 +77,8 @@ class testFormTemplate extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Existing visible name',
 					'visible_name' => 'Selenium Test template with visible name',
-					'error_msg' => 'Cannot add template',
-					'errors' => [
-						'Template with visible name "Selenium Test template with visible name" already exists.'
+					'inline_errors' => [
+						'Visible name' => 'This object already exists.'
 					]
 
 				]
@@ -77,9 +87,8 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => '',
-					'error_msg' => 'Cannot add template',
-					'errors' => [
-						'Incorrect value for field "template_name": cannot be empty.'
+					'inline_errors' => [
+						'Template name' => 'This field cannot be empty.'
 					]
 
 				]
@@ -89,9 +98,8 @@ class testFormTemplate extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Without groups',
 					'remove_group' => 'Templates',
-					'error_msg' => 'Cannot add template',
-					'errors' => [
-						'Field "groups" is mandatory.'
+					'inline_errors' => [
+						'Template groups' => 'This field cannot be empty.'
 					]
 
 				]
@@ -157,10 +165,7 @@ class testFormTemplate extends CLegacyWebTest {
 				break;
 
 		case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
+				$this->assertInlineError($this->query('id:templates-form')->asForm()->one(), $data['inline_errors']);
 				break;
 		}
 

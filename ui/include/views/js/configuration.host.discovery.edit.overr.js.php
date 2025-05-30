@@ -742,7 +742,7 @@
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
-				overlays_stack.end().centerDialog();
+				overlays_stack.end().fixPosition();
 			});
 
 		jQuery('#overrides-evaltype').change(function() {
@@ -754,7 +754,7 @@
 				that.updateExpression();
 			}
 
-			overlays_stack.end().centerDialog();
+			overlays_stack.end().fixPosition();
 		});
 
 		jQuery('#overrides-evaltype').trigger('change');

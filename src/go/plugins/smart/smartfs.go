@@ -34,7 +34,6 @@ import (
 const (
 	supportedSmartctl = 7.1
 
-	satType     = "sat"
 	nvmeType    = "nvme"
 	unknownType = "unknown"
 	ssdType     = "ssd"
@@ -66,12 +65,19 @@ const (
 	SCSI      = DeviceType("scsi")
 )
 
+const (
+	errFailedToExecute     = "failed to execute smartctl"
+	errSmartReturn         = "smartctl returned error"
+	errInvalidSmartVersion = "invalid smartctl version"
+)
+
 var (
 	lastVerCheck time.Time
 	versionMux   sync.Mutex
+)
 
-	// ErrNoSmartStatus error indicated that device has no smart status.
-	ErrNoSmartStatus = errs.New("smartctl returned no smart status")
+var (
+	errNoSmartStatus = errs.New("smartctl returned no smart status")
 )
 
 // SmartCtlDeviceData describes all data collected from smartctl for a particular
@@ -122,7 +128,7 @@ type healthLog struct {
 	PowerOnTime     int `json:"power_on_hours"`
 	CriticalWarning int `json:"critical_warning"`
 	MediaErrors     int `json:"media_errors"`
-	Percentage_used int `json:"percentage_used"`
+	PercentageUsed  int `json:"percentage_used"`
 }
 
 type temperature struct {
@@ -138,13 +144,15 @@ type singelRequestTables struct {
 }
 
 type singelRequestRaw struct {
-	Name string   `json:"name"`
-	Raw  rawField `json:"raw"`
+	Name            string   `json:"name"`
+	Raw             rawField `json:"raw"`
+	NormalizedValue *int     `json:"value"` // pointer type because it may not be present in raw json
 }
 
 type singleRequestAttribute struct {
-	Value int    `json:"value"`
-	Raw   string `json:"raw"`
+	Value           int    `json:"value"`
+	Raw             string `json:"raw"`
+	NormalizedValue *int   `json:"normalized_value,omitempty"` // if it isn't present in raw json, omit in the result
 }
 
 type rawField struct {
@@ -270,7 +278,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			default:
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
 				if err != nil {
-					if errors.Is(err, ErrNoSmartStatus) {
+					if errors.Is(err, errNoSmartStatus) {
 						p.Logger.Debugf("skipping device with no smart status: %q", name)
 
 						return nil
@@ -347,7 +355,7 @@ func (p *Plugin) checkVersion() error {
 
 	out, err := p.ctl.Execute("-j", "-V")
 	if err != nil {
-		return errs.Wrap(err, "failed to execute smartctl")
+		return errs.Wrap(err, errFailedToExecute)
 	}
 
 	body := &smartctl{}
@@ -379,7 +387,7 @@ func versionCheckNeeded() bool {
 // evaluateVersion checks version digits if they match the current allowed version or higher.
 func evaluateVersion(versionDigits []int) error {
 	if len(versionDigits) < 1 {
-		return errs.Errorf("invalid smartctl version")
+		return errs.Wrap(errs.Errorf("Incorrect smartctl version number"), errInvalidSmartVersion)
 	}
 
 	var version string
@@ -391,13 +399,13 @@ func evaluateVersion(versionDigits []int) error {
 
 	v, err := strconv.ParseFloat(version, 64)
 	if err != nil {
-		return errs.WrapConst(err, zbxerr.ErrorCannotParseResult)
+		return errs.Wrap(err, errInvalidSmartVersion)
 	}
 
 	if v < supportedSmartctl {
-		return errs.Errorf(
-			"Incorrect smartctl version, must be %v or higher",
-			supportedSmartctl,
+		return errs.Wrap(
+			errs.Errorf("incorrect smartctl version, must be %v or higher", supportedSmartctl),
+			errInvalidSmartVersion,
 		)
 	}
 
@@ -412,7 +420,7 @@ func cutPrefix(in string) string {
 func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-j")
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
+		return nil, errs.Wrap(err, errFailedToExecute)
 	}
 
 	dp := &deviceParser{}
@@ -424,11 +432,11 @@ func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDevice
 
 	err = dp.checkErr()
 	if err != nil {
-		return nil, errs.Wrap(err, "smartctl returned error")
+		return nil, errs.Wrap(err, errSmartReturn)
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, errs.Wrapf(ErrNoSmartStatus, "got no smart status for device %q", deviceName)
+		return nil, errs.Wrapf(errNoSmartStatus, "got no smart status for device %q", deviceName)
 	}
 
 	dp.Info.name = deviceName
@@ -448,7 +456,7 @@ func getAllDeviceInfoByType(
 ) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-d", deviceType, "-j")
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
+		return nil, errs.Wrap(err, errFailedToExecute)
 	}
 
 	dp := &deviceParser{}
@@ -460,11 +468,11 @@ func getAllDeviceInfoByType(
 
 	err = dp.checkErr()
 	if err != nil {
-		return nil, errs.Wrap(err, "smartctl returned error")
+		return nil, errs.Wrap(err, errSmartReturn)
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, ErrNoSmartStatus
+		return nil, errNoSmartStatus
 	}
 
 	dp.Info.Name = fmt.Sprintf("%s %s", deviceName, deviceType)

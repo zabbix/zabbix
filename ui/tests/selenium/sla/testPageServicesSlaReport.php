@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testSlaReport.php';
+require_once __DIR__.'/../common/testSlaReport.php';
 
 /**
  * @backup profiles
@@ -45,6 +45,10 @@ class testPageServicesSlaReport extends testSlaReport {
 		// Check that filter is collapsing/expanding on click.
 		foreach ([false, true] as $status) {
 			$filter->expand($status);
+			$this->assertTrue($filter->isExpanded($status));
+
+			// Refresh the page to make sure the filter state is still saved.
+			$this->page->refresh()->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($status));
 		}
 

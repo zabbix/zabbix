@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-02-22 07:48+0000\n"
+"PO-Revision-Date: 2025-05-15 20:22+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -14,6 +14,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1616170241.000000\n"
+
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
+msgid " or "
+msgstr ""
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -437,6 +442,12 @@ msgstr "<submenú/submenú/...>"
 msgctxt "abbreviation of severity level"
 msgid "A"
 msgstr "A"
+
+#: include/classes/helpers/CItemGeneralHelper.php:356
+#: include/classes/helpers/CItemGeneralHelper.php:399
+#: include/classes/helpers/CItemGeneralHelper.php:407
+msgid "A floating point value is expected."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1375,6 +1386,14 @@ msgstr "També emprat com a etiqueta de llegenda per als grups de dades agregade
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativament, podeu instal·lar-lo manualment:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr "Sempre"
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Quantitat de memòria física convidada que s'intercanvia a l'espai d'intercanvi, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
@@ -1392,6 +1411,12 @@ msgstr "La regla LLD amb la clau \"%1$s\" ja existeix a l'equip \"%2$s\"."
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
 msgstr "La regla LLD amb la clau \"%1$s\" ja existeix a la plantilla \"%2$s\"."
+
+#: include/classes/validators/CFormValidator.php:1064
+#: include/classes/validators/CFormValidator.php:1103
+#: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
+msgid "An array is expected."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1664,6 +1689,10 @@ msgstr "Cal triar, com a mínim, un dia de la setmana o un dia del mes."
 msgid "At least one host group or host must be selected."
 msgstr "S'ha de triar, com a mínim, almenys un grup d'equips o un equip."
 
+#: include/classes/helpers/CItemGeneralHelper.php:411
+msgid "At least one of \"min\" or \"max\" parameters should be specified."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
 msgstr "Com a mínim hauria d'admetre MySQL o PostgreSQL."
@@ -1815,6 +1844,26 @@ msgstr "Autor"
 msgid "Authorization"
 msgstr "Autorització"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr "Codi d'autorització"
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr "Punt final d'autorització"
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr "Paràmetres d'autorització"
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr "URL del servidor d'autorització per demanar l'autorització de l'usuari."
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr "URL del servidor d'autorització per bescanviar el codi d'autorització per un token d'accés."
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -1827,6 +1876,14 @@ msgstr "Automàtic"
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Automàtic"
+
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr "Ocultació automàtica"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1949,6 +2006,10 @@ msgstr "Color de fons"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Imatge de fons"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr "Escala de fons"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2207,6 +2268,10 @@ msgstr "CSV a JSON"
 msgid "CUID is expected"
 msgstr "S'espera un CUID"
 
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr "Error de CURL"
+
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
 msgid "Calculated"
@@ -2441,6 +2506,11 @@ msgstr "No es pot pas assignar el camp d'inventari \"%1$s\" a l'element de clau 
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
 msgstr "No es pot pas assignar el camp d'inventari \"%1$s\" a l'element de clau \"%2$s\" de la plantilla \"%3$s\", doncs ja és omplert amb l'element de clau \"%4$s\"."
+
+#: app/controllers/CControllerItem.php:206
+#: app/controllers/CControllerItemPrototype.php:208
+msgid "Cannot be less than or equal to \"Min\"."
+msgstr ""
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -3287,6 +3357,11 @@ msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MI
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descoberta \"%4$s\" a \"%5$s\"."
 
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat a l'enllaç del mapa \"%3$s\"."
+
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
@@ -3356,6 +3431,10 @@ msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat per l'element \"%
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'element \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
+
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr "No es pot pas obtindre el codi d'autorització."
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3722,6 +3801,10 @@ msgstr "No es pot pas actualitzar massivament el nom d'equip visible."
 #: jsLoader.php:435
 msgid "Cannot open URL"
 msgstr "No es pot obrir la URL"
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
+msgstr "No es pot obrir la finestra emergent d'autorització."
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4534,6 +4617,10 @@ msgstr "No es permet pas l'enllaç a plantilles circulars."
 msgid "Class %1$s not found for action %2$s."
 msgstr "No s'ha trobat la classe %1$s per a l'acció %2$s."
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr "Netejar"
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4754,6 +4841,10 @@ msgstr "Comunitat"
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
 msgstr "Vista compacta"
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
+msgstr "Acabeu l'autenticació per obtindre tokens."
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -4981,6 +5072,10 @@ msgstr "Actualització de la configuració"
 msgid "Configuration updated"
 msgstr "Configuració actualitzada"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr "Configurar"
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -4990,6 +5085,12 @@ msgstr "Configura la connexió de base de dades"
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "Configurar el provisionament JIT"
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
+msgstr "Configurat fa %1$s"
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -5361,6 +5462,14 @@ msgstr "Crear i editar manteniment"
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
 msgstr "Crear i editar mapes"
+
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr "Crear i editar suports propis"
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
+msgstr "Crear i editar suports d'usuaris"
 
 #: app/views/administration.image.list.php:60
 msgid "Create background"
@@ -5969,6 +6078,11 @@ msgstr "Xifratge TLS de bases de dades"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "Fitxer de claus TLS de la base de dades"
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
+msgstr "S'ha produït un error de base de dades."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6785,6 +6899,10 @@ msgstr "Descripció"
 msgid "Description size"
 msgstr "Mida de la descripció"
 
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr "URL de destí on redirigeix una autorització correcta."
+
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr "Llista en detall dels paquets instal·lats. Retorna text en format JSON"
@@ -7167,6 +7285,10 @@ msgstr "Objecte de descobriment"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descoberta de clústers de VMware, \"url\" - URL del servei de VMware. Retorna un JSON"
+
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Descoberta de magatzems de dades de VMware, \"url\" - URL del servei de VMware, \"filter_uuid\" - un hv uuid o vm uuid (buit per defecte). Retorna JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -7590,6 +7712,10 @@ msgstr "Edita l'element de l'arbre"
 msgid "Edit widget"
 msgstr "Editar el giny"
 
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr "No es pot pas editar altres objectes en el mode d'edició del tauler de control."
+
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
 msgstr "Data efectiva"
@@ -7981,6 +8107,11 @@ msgstr "Anglès (en_GB)"
 msgid "English (en_US)"
 msgstr "Anglès (en_US)"
 
+#: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
+#, c-format
+msgid "Entry \"%1$s\" is not unique."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
 #: app/partials/monitoring.latest.filter.php:114
@@ -8025,6 +8156,10 @@ msgstr "Error a la sol·licitud de cerca de la taula \"%1$s\"."
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
 msgstr "Missatge d'error"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
+msgstr "Text d'error"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -8286,6 +8421,13 @@ msgstr "Amplieu la barra lateral"
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
 msgstr "Ampliar el problema únic"
+
+#: app/controllers/CControllerHostCreate.php:195
+#: app/controllers/CControllerHostUpdate.php:200
+#: app/controllers/CControllerTemplateCreate.php:69
+#: app/controllers/CControllerTemplateUpdate.php:71
+msgid "Expected user macro format is \"{$MACRO}\"."
+msgstr ""
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -8896,6 +9038,12 @@ msgstr "Obtingueu el valor de l'equip"
 msgid "Given expression is not a macro"
 msgstr "L'expressió donada no és pas una macro"
 
+#: app/controllers/CControllerValueMapCheck.php:49
+#: app/controllers/CControllerValueMapEdit.php:95
+#: app/controllers/CControllerValueMapEdit.php:109
+msgid "Given valuemap name is already taken."
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
 #: include/views/configuration.item.edit.php:866
@@ -9051,6 +9199,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Gràfic esborrat"
 msgstr[1] "Gràfics esborrats"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr "Edició de gràfics"
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9097,6 +9249,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip de gràfic"
 msgstr[1] "S'han esborrat els prototips de gràfics"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr "Edició de prototip de gràfic"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -10605,6 +10761,11 @@ msgstr "Valor del tipus d'etiqueta %1$s incorrecte per al mapa \"%2$s\"."
 msgid "Incorrect API \"%1$s\"."
 msgstr "API \"%1$s\" incorrecta."
 
+#: app/controllers/CControllerHostCreate.php:65
+#: app/controllers/CControllerHostUpdate.php:69
+msgid "Incorrect DNS provided."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:602
 msgid "Incorrect SNMP OID."
 msgstr "SNMP OID incorrecte."
@@ -10744,6 +10905,16 @@ msgstr "Valor massiu incorrecte per a la interfície."
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "S'empren caràcters incorrectes per al nom d'equip \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:39
+#: app/controllers/CControllerHostUpdate.php:42
+msgid "Incorrect characters used for host name."
+msgstr ""
+
+#: app/controllers/CControllerTemplateCreate.php:35
+#: app/controllers/CControllerTemplateUpdate.php:36
+msgid "Incorrect characters used for template name."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "Paraula de pas actual incorrecta."
@@ -10852,6 +11023,11 @@ msgstr "El valor del paràmetre \"%1$s\" és incorrecte: %2$s."
 #: include/classes/api/services/CDRule.php:517
 msgid "Incorrect port range."
 msgstr "Interval de ports incorrecte."
+
+#: app/controllers/CControllerHostCreate.php:71
+#: app/controllers/CControllerHostUpdate.php:75
+msgid "Incorrect port."
+msgstr ""
 
 #: app/controllers/CControllerRegExTest.php:77
 #, c-format
@@ -11223,6 +11399,10 @@ msgstr "Augmentar en"
 msgid "Indefinitely"
 msgstr "Indefinidament"
 
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
+msgstr "Tipus d'indicador"
+
 #: widgets/tophosts/views/column.edit.php:184
 msgid "Indicators"
 msgstr "Indicadors"
@@ -11482,6 +11662,11 @@ msgstr "El mètode \"%2$s\" de l'api no és pas vàlid per a la funció d'usuari
 msgid "Invalid IP address \"%1$s\"."
 msgstr "L'adreça IP \"%1$s\" no és pas vàlida."
 
+#: app/controllers/CControllerHostCreate.php:57
+#: app/controllers/CControllerHostUpdate.php:61
+msgid "Invalid IP address."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSON no vàlid. S'ha produït un error al servidor en analitzar el text JSON."
@@ -11505,6 +11690,20 @@ msgstr "Configuració LDAP no vàlida"
 #: app/controllers/CControllerMfaEdit.php:48
 msgid "Invalid MFA configuration"
 msgstr "Configuració MFA no vàlida"
+
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr "Configuració d'OAuth no vàlida"
+
+#: include/classes/helpers/CItemGeneralHelper.php:456
+msgid "Invalid Prometheus label."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:441
+#: include/classes/helpers/CItemGeneralHelper.php:446
+msgid "Invalid Prometheus pattern."
+msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -11559,6 +11758,17 @@ msgstr "Entrada incorrecta"
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "L'interval \"%1$s\" no és vàlid."
+
+#: app/controllers/CControllerItemCreate.php:247
+#: app/controllers/CControllerItemCreate.php:252
+#: app/controllers/CControllerItemPrototypeCreate.php:255
+#: app/controllers/CControllerItemPrototypeCreate.php:260
+#: app/controllers/CControllerItemPrototypeUpdate.php:212
+#: app/controllers/CControllerItemPrototypeUpdate.php:217
+#: app/controllers/CControllerItemUpdate.php:212
+#: app/controllers/CControllerItemUpdate.php:217
+msgid "Invalid interval."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryCheckCheck.php:64
 #: include/classes/api/services/CDRule.php:586
@@ -11837,6 +12047,27 @@ msgstr "El paràmetre \"%1$s\" no és vàlid: %2$s."
 msgid "Invalid params."
 msgstr "Paràmetres no vàlids."
 
+#: app/controllers/CControllerItemCreate.php:257
+#: app/controllers/CControllerItemPrototypeCreate.php:265
+#: app/controllers/CControllerItemPrototypeUpdate.php:222
+#: app/controllers/CControllerItemUpdate.php:222
+msgid "Invalid period."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:167
+#: app/controllers/CControllerItemPrototypeCreate.php:171
+#: app/controllers/CControllerItemPrototypeUpdate.php:155
+#: app/controllers/CControllerItemUpdate.php:154
+msgid "Invalid range expression."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:228
+#: app/controllers/CControllerHostUpdate.php:233
+#: app/controllers/CControllerTemplateCreate.php:102
+#: app/controllers/CControllerTemplateUpdate.php:104
+msgid "Invalid range."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
 msgstr "Petició no vàlida."
@@ -11846,6 +12077,11 @@ msgstr "Petició no vàlida."
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Codi de resposta \"%1$s\" no vàlid."
+
+#: include/classes/validators/CFormValidator.php:1001
+#: include/classes/validators/CFormValidator.php:1007
+msgid "Invalid string."
+msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:82
 #: include/classes/export/CConfigurationExportBuilder.php:105
@@ -11980,6 +12216,10 @@ msgstr "Element"
 #: items.php:667
 msgid "Item added"
 msgstr "Element afegit"
+
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr "Tarja d'element"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -12234,6 +12474,10 @@ msgstr "Dades JSON"
 #: include/classes/validators/CApiInputValidator.php:3982
 msgid "JSON is expected"
 msgstr "S'espera JSON"
+
+#: include/forms.inc.php:466 include/views/js/item.preprocessing.js.php:135
+msgid "JSON path"
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -12725,6 +12969,10 @@ msgstr "Llistat de dades de configuració de grups de proxys Zabbix i dades en t
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Llista de dispositius de bloc i el seu tipus. Retorna un JSON"
 
+#: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
+msgid "List of characters"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr "Llista de CPU/nuclis de CPU detectats. Retorna un JSON"
@@ -12978,6 +13226,13 @@ msgstr "La macro \"%1$s\" ja existeix a \"%2$s\"."
 msgid "Macro \"%1$s\" already exists."
 msgstr "La macro \"%1$s\" ja existeix."
 
+#: app/controllers/CControllerHostCreate.php:180
+#: app/controllers/CControllerHostUpdate.php:185
+#: app/controllers/CControllerTemplateCreate.php:54
+#: app/controllers/CControllerTemplateUpdate.php:56
+msgid "Macro name is not unique."
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:511
 #: app/partials/massupdate.macros.tab.php:121
 #: app/views/administration.macros.edit.php:29
@@ -13218,6 +13473,13 @@ msgstr "Mapejat a"
 #: app/controllers/CControllerPopupGeneric.php:468
 msgid "Mapping"
 msgstr "Cartografia"
+
+#: app/controllers/CControllerHostCreate.php:208
+#: app/controllers/CControllerHostUpdate.php:213
+#: app/controllers/CControllerTemplateCreate.php:82
+#: app/controllers/CControllerTemplateUpdate.php:84
+msgid "Mapping type and value combination is not unique."
+msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
 #: app/views/administration.iconmap.edit.php:126
@@ -13653,6 +13915,10 @@ msgstr "No s'ha trobat pas el mètode."
 msgid "Methods"
 msgstr "Mètodes"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr "Mètriques"
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -13957,6 +14223,10 @@ msgstr "Múltiple"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Múltiples PROBLEM"
+
+#: include/classes/validators/CFormValidator.php:340
+msgid "Must be selected."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14335,6 +14605,14 @@ msgstr "Nou esdeveniment d'etiqueta de valors"
 msgid "New excluded downtime"
 msgstr "Nou temps d'inactivitat exclòs"
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr "Nou gràfic"
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr "Nou prototip de gràfic"
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr "Nou equip"
@@ -14357,6 +14635,10 @@ msgstr "Nou prototip d'element"
 msgid "New maintenance period"
 msgstr "Nou període de manteniment"
 
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr "Nou mitjà de suport"
+
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
 msgstr "Nou tipus de suport"
@@ -14364,6 +14646,10 @@ msgstr "Nou tipus de suport"
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
 msgstr "Nou mapatge del tipus de suport"
+
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
+msgstr "Nova oauth"
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -14499,6 +14785,10 @@ msgstr "No s'ha donat \"%1$s\" per al mapa."
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
 msgstr "Sense canvis."
+
+#: jsLoader.php:553
+msgid "No color"
+msgstr "Sense color"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -15130,6 +15420,10 @@ msgstr "Nov"
 msgid "November"
 msgstr "Novembre"
 
+#: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
+msgid "Number"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
 msgstr "Nombre de CPUs. Retorna un nombre enter"
@@ -15287,6 +15581,18 @@ msgstr "Numèric (enter)"
 msgid "Numeric (unsigned)"
 msgstr "Numèric (sense signar)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr "OAuth"
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr "Manquen els camps obligatoris a la resposta d'OAuth."
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr "Tokens d'OAuth"
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -15423,6 +15729,21 @@ msgstr "Un cop"
 #: app/views/mediatype.edit.php:445
 msgid "One"
 msgstr "Un"
+
+#: app/controllers/CControllerItem.php:166
+#: app/controllers/CControllerItemPrototype.php:168
+msgid "One \"Change\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:182
+#: app/controllers/CControllerItemPrototype.php:184
+msgid "One \"Prometheus\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:174
+#: app/controllers/CControllerItemPrototype.php:176
+msgid "One \"Throttling\" step allowed per item."
+msgstr ""
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -16019,6 +16340,21 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "Identitat PSK"
 
+#: app/controllers/CControllerHostCreate.php:162
+#: app/controllers/CControllerHostUpdate.php:167
+msgid "PSK must be an even number of characters."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:166
+#: app/controllers/CControllerHostUpdate.php:171
+msgid "PSK must be at least 32 characters long."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:170
+#: app/controllers/CControllerHostUpdate.php:175
+msgid "PSK must contain only hexadecimal characters."
+msgstr ""
+
 #: jsLoader.php:146
 #, c-format
 msgid "Page %1$d"
@@ -16041,6 +16377,15 @@ msgstr "La pàgina ha rebut dades incorrectes"
 msgctxt "page navigation"
 msgid "Pager"
 msgstr "Paginador"
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr "Paleta"
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
+msgstr "Paleta %1$d"
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -16489,6 +16834,11 @@ msgstr "Preprocessament"
 msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
 msgstr "El preprocessament és una transformació que es fa abans de desar el valor a la base de dades. Es pot definir una seqüència de passes de preprocessament, i aquestes s'executen en l'ordre establert."
 
+#: app/controllers/CControllerItem.php:190
+#: app/controllers/CControllerItemPrototype.php:192
+msgid "Preprocessing step with such Name and Parameters combination already exists."
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
 #: include/views/configuration.host.discovery.edit.php:1003
@@ -16762,6 +17112,10 @@ msgstr "Prometheus a JSON"
 msgid "Properties"
 msgstr "Propietats"
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr "Proporcionalment"
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr "Protocol"
@@ -16977,6 +17331,10 @@ msgstr "Fitxer de clau pública"
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
 msgstr "Empènyer"
+
+#: include/views/js/item.preprocessing.js.php:208
+msgid "Qualifier"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -17202,6 +17560,10 @@ msgstr "Hora de recuperació"
 msgid "Rectangle"
 msgstr "Rectangle"
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr "Punt final de redirecció"
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Atribut de referència"
@@ -17236,6 +17598,10 @@ msgstr "Actualitzar la configuració del servidor intermediari triat?"
 #: jsLoader.php:190
 msgid "Refresh interval"
 msgstr "Interval de recàrrega"
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
+msgstr "El token d'actualització no és vàlid o és obsolet."
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -17616,6 +17982,10 @@ msgstr "Tipus de petició"
 #: include/views/configuration.httpconf.edit.php:228
 msgid "Required"
 msgstr "Obligatori"
+
+#: include/classes/validators/CFormValidator.php:652 jsLoader.php:420
+msgid "Required field is missing."
+msgstr ""
 
 #: app/views/administration.script.edit.php:314
 msgid "Required host permissions"
@@ -18632,6 +19002,10 @@ msgstr "Tria un SLA per mostrar l'informe de l'SLA."
 msgid "Select prototype"
 msgstr "Tria el prototip"
 
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr "Trieu el mètode de recuperació: automàticament a través d'una pàgina de redirecció o manualment si la recuperació automàtica falla."
+
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
 msgid "Selected"
@@ -19105,6 +19479,12 @@ msgstr "Mostra la capçalera"
 msgid "Show hosts in maintenance"
 msgstr "Mostra els equips que són en manteniment"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr "Veure l'etiqueta"
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr "Mostra les etiquetes"
@@ -19122,6 +19502,14 @@ msgstr "Mostra la llegenda"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Mostra les línies"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr "Veure les etiquetes dels enllaços"
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr "Veure les etiquetes dels elements del mapa"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19421,6 +19809,10 @@ msgstr "Informació sobre l'arquitectura del programari. Retorna una cadena"
 msgid "Software update last checked"
 msgstr "Darrera verificació d'actualització del programari"
 
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr "Color sòlid"
+
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr "Part de l'historial d'aquest element pot estar comprimit; no es pot pas esborrar."
@@ -19579,6 +19971,10 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Estàtic"
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr "Enllaç estàtic"
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbix. Memòria cau: un dels valors (modes: all, float, uint, str, log, text, not supported), historial (modes: pfree, free, total, used, pused), índex (modes: pfree, free, total, used, pused), tendència (modes: pfree, free, total, used, pused)."
@@ -19586,6 +19982,10 @@ msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbi
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat del buffer de memòria proxy. Mode (modes: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Estadístiques dels valors rebuts pel gestor de preprocessament."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20075,6 +20475,21 @@ msgstr "Llistat d'etiquetes"
 msgid "Tag name"
 msgstr "Nom de l'etiqueta"
 
+#: app/controllers/CControllerHostCreate.php:129
+#: app/controllers/CControllerHostUpdate.php:133
+#: app/controllers/CControllerItemCreate.php:339
+#: app/controllers/CControllerItemPrototypeCreate.php:346
+#: app/controllers/CControllerItemPrototypeUpdate.php:301
+#: app/controllers/CControllerItemUpdate.php:302
+#: app/controllers/CControllerTemplateCreate.php:47
+#: app/controllers/CControllerTemplateUpdate.php:49
+#: app/controllers/CControllerTriggerCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeUpdate.php:61
+#: app/controllers/CControllerTriggerUpdate.php:61
+msgid "Tag name and value combination is not unique."
+msgstr ""
+
 #: include/actions.inc.php:68
 msgid "Tag value"
 msgstr "Valor de l'etiqueta"
@@ -20353,6 +20768,10 @@ msgstr "Plantilles \"%1$s\" desenllaçades dels equips \"%2$s\"."
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr "Les plantilles enllaçades pel descobriment de l'equip no es poden pas desenllaçar."
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr "Token temporal per bescanviar per un token d'accés."
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20472,6 +20891,10 @@ msgstr "El %1$s ja no es descobreix i %2$s, %3$s."
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr "Ja no es descobreix %1$s i %2$s."
 
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr "L'URL ha de complir amb la política del proveïdor d'OAuth."
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "La plantilla d'URL s'empra per carregar i mostrar la capa de mosaic als mapes geogràfics."
@@ -20488,6 +20911,14 @@ msgstr "El temps mitjà que triga una lectura del disc virtual, \"url\" - URL de
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr "El temps mitjà que triga una escriptura a disc virtual, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware, \"instance\" - instància del dispositiu de disc"
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr "L'identificador de client registrat al servidor d'autorització."
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
+msgstr "El secret del client registrat dins del servidor d'autorització."
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -20638,10 +21069,27 @@ msgstr[1] "Aquesta comprovació no es pot eliminar, ja que s'empra com a condici
 msgid "This day last week"
 msgstr "Aquest dia de la setmana passada"
 
+#: include/classes/validators/CFormValidator.php:929
+#: include/classes/validators/CFormValidator.php:1109
+#: include/classes/validators/CFormValidator.php:1158 jsLoader.php:427
+msgid "This field cannot be empty."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:263
+#: app/controllers/CControllerItemPrototypeCreate.php:271
+#: app/controllers/CControllerItemPrototypeUpdate.php:228
+#: app/controllers/CControllerItemUpdate.php:228
+msgid "This field cannot be set to \"0\" without defining custom intervals."
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "Aquest camp s'emplena automàticament amb l'element \"%1$s\"."
+
+#: include/classes/validators/CItemKeyValidator.php:42
+msgid "This field must contain at least one low-level discovery macro."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
 msgid "This is the test message from Zabbix"
@@ -20654,6 +21102,10 @@ msgstr "Aquest mes"
 #: include/func.inc.php:2575
 msgid "This month so far"
 msgstr "El que duem de mes"
+
+#: include/classes/validators/CFormValidator.php:1260 jsLoader.php:425
+msgid "This object already exists."
+msgstr ""
 
 #: widgets/item/views/widget.edit.php:229
 msgid "This setting applies only to numeric data."
@@ -20689,6 +21141,68 @@ msgstr "Aquest tipus d'informació pot no coincidir amb la clau."
 #: app/views/administration.user.edit.php:61
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
 msgstr "L'usuari és proveït per IdP. No s'admeten pas canvis manuals dels camps proveïts."
+
+#: include/classes/validators/CFormValidator.php:1442
+#: include/classes/validators/CFormValidator.php:1482 jsLoader.php:430
+#, c-format
+msgid "This value cannot be %1$s."
+msgid_plural "This value cannot be one of %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: jsLoader.php:429
+#, c-format
+msgid "This value cannot be one of %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
+msgid "This value does not match pattern."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
+msgid "This value is not a valid floating-point value."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:790 jsLoader.php:422
+msgid "This value is not a valid identifier."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:823 jsLoader.php:423
+msgid "This value is not a valid integer."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:923 jsLoader.php:426
+msgid "This value is not a valid string."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:940 jsLoader.php:428
+msgid "This value is too long."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1461 jsLoader.php:431
+#, c-format
+msgid "This value must be %1$s."
+msgid_plural "This value must be one of %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/validators/CFormValidator.php:847
+#: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
+#, c-format
+msgid "This value must be no greater than \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:841
+#: include/classes/validators/CFormValidator.php:892 jsLoader.php:432
+#, c-format
+msgid "This value must be no less than \"%1$s\"."
+msgstr ""
+
+#: jsLoader.php:434
+#, c-format
+msgid "This value must be one of %1$s."
+msgstr ""
 
 #: include/func.inc.php:2572
 msgid "This week"
@@ -20924,6 +21438,14 @@ msgstr "El que duem de dia"
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "Edició del token"
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr "Punt final del token"
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
+msgstr "Paràmetres del token"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21712,6 +22234,10 @@ msgstr "Sense canvis"
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr "Desfer el reconeixement del problema."
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr "Codi d'estat de resposta HTTP inesperat."
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -23117,6 +23643,18 @@ msgstr "Mapatge de valors"
 msgid "Value mappings"
 msgstr "Mapes de valors"
 
+#: include/classes/validators/CFormValidator.php:1028
+#: include/classes/validators/CFormValidator.php:1038
+#, c-format
+msgid "Value must be greater than %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1033
+#: include/classes/validators/CFormValidator.php:1042
+#, c-format
+msgid "Value must be smaller than %1$s."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1078
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'empren comodins, retorna els valors del tema en format JSON"
@@ -23495,6 +24033,10 @@ msgstr "Giny"
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "El giny a X:%3$d, Y:%4$d a la pàgina #%2$d del tauler \"%1$s\" és fora dels límits."
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
+msgstr "La configuració del giny es revertirà."
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
@@ -23980,7 +24522,7 @@ msgstr "El servidor Zabbix no s'està executant: és possible que la informació
 
 #: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
-msgstr "El servidor de Zabbix és executant-se"
+msgstr "Servidor Zabbix en marxa"
 
 #: include/classes/setup/CSetupWizard.php:711
 #: include/classes/setup/CSetupWizard.php:870
@@ -24101,6 +24643,10 @@ msgstr "un dels nombres és massa gran"
 #: include/classes/api/services/CDRule.php:338
 msgid "a numeric value is expected"
 msgstr "s'espera un valor numèric"
+
+#: include/classes/validators/CApiInputValidator.php:2884
+msgid "a port number is expected"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:193
 #: app/controllers/CControllerPopupItemTestSend.php:207
@@ -24364,6 +24910,18 @@ msgstr "ascii() - Retorna el codi ASCII del caràcter més a l'esquerra del valo
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - L'arc sinus d'un valor com a angle, expressat en radians"
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr "Cal destacar com a mínim 1 enllaç"
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr "Cal com a mínim 1 llindar d'enllaç"
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr "Cal com a mínim 1 trigger d'enllaç"
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24420,6 +24978,10 @@ msgstr "baselinewma() - Calcula la línia de base fent la mitjana de períodes d
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Comprova si un valor pertany a l'interval donat (1 - dins l'interval, 0 - en cas contrari)"
 
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr "L'element binari no és pas compatible"
+
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
 #: include/classes/screens/CScreenHistory.php:432
@@ -24467,6 +25029,14 @@ msgstr "bitxor() - O exclusiu per a bits"
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "blinking"
 msgstr "fent pampallugues"
+
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr "Cal especificar tant \"access_token\" com \"access_expires_in\" quan es marca el token d'accés com a vàlid."
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
+msgstr "tant \"access_token\" com \"access_expires_in\" haurien de ser presents o absents"
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -24938,6 +25508,10 @@ msgstr "existeix"
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - El nombre d'Euler a una potència d'un valor"
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr "S'espera un codi de color hexadecimal (6 símbols)"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - El nombre d'Euler a una potència d'un valor menys 1"
@@ -25062,6 +25636,10 @@ msgstr "grup d'equips"
 msgid "host group with the same UUID already exists"
 msgstr "ja existeix un grup d'equips amb el mateix UUID"
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr "S'espera l'ID de l'element equip"
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -25079,6 +25657,10 @@ msgstr "patrons d'equips"
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "ja existeix un prototip d'equip amb el mateix UUID"
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr "S'espera l'ID del trigger d'equip"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -25139,6 +25721,10 @@ msgstr "recompte d'elements incorrecta"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expressió incorrecta a partir de \"%1$s\""
+
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr "Tipus de valor d'element incorrecte"
 
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
@@ -25700,6 +26286,14 @@ msgstr "no hi a permisos per convertir el símptoma dels problemes en causes"
 msgid "no permissions to create and edit maps"
 msgstr "no hi ha permís per crear i editar mapes"
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr "no hi ha permís per crear i editar el propi suport"
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr "no hi ha permís per crear i suport d'usuaris"
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr "sense permís per esborrar problemes"
@@ -25827,6 +26421,12 @@ msgstr "tancat"
 #: include/classes/setup/CFrontendSetup.php:627
 msgid "on"
 msgstr "engegat"
+
+#: include/classes/validators/CFormValidator.php:1388
+#: include/classes/validators/CFormValidator.php:1433 jsLoader.php:438
+#, c-format
+msgid "one of %1$s"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
@@ -26161,6 +26761,10 @@ msgstr "ja existeix un grup de plantilles amb el mateix UUID"
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
 msgstr "ja existeix una plantilla amb el mateix UUID"
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
+msgstr "Cal especificar el paràmetre \"refresh_token\" quan es marca el token d'actualització com a vàlid."
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
@@ -26561,6 +27165,14 @@ msgstr[1] "els valors han d'ésser un d'entre %1$s"
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
 
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\" dígits després del punt decimal"
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "el valor ha d'ésser buit"
@@ -26682,6 +27294,18 @@ msgstr "no s'esborrarà pas"
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
 msgstr "no es desactivarà pas"
+
+#: include/classes/validators/CFormValidator.php:1393
+#: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
+#, c-format
+msgid "within range %1$s"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1394
+#: include/classes/validators/CFormValidator.php:1439 jsLoader.php:437
+#, c-format
+msgid "within ranges %1$s"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

@@ -836,12 +836,13 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
  * Parameters: manager    - [IN] preprocessing manager                        *
  *             message    - [IN] packed preprocessing request                 *
  *             direct_num - [OUT] number of directly flushed values           *
+ *             direct_sz  - [OUT] size of directly flushed values             *
  *                                                                            *
  *  Return value: The number of requests queued for preprocessing             *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
-		zbx_uint64_t *direct_num)
+		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz)
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
@@ -857,6 +858,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 	while (offset < message->size)
 	{
+		zbx_uint32_t		offset_prev = offset;
 		zbx_variant_t		var;
 		zbx_pp_value_opt_t	var_opt;
 		zbx_timespec_t		ts;
@@ -868,6 +870,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
 			(*direct_num)++;
+			*direct_sz += offset - offset_prev;
 			/* allow empty values */
 			preproc_flush_value_func_cb(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
@@ -923,6 +926,20 @@ static void	preprocessor_reply_queue_size(zbx_pp_manager_t *manager, zbx_ipc_cli
 	zbx_uint64_t	pending_num = manager->queue.pending_num;
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_QUEUE, (unsigned char *)&pending_num, sizeof(pending_num));
+}
+
+static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t *client, zbx_uint64_t queued_num,
+		zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
+{
+	unsigned char	*data;
+	zbx_uint32_t	data_len;
+	zbx_uint64_t	pending_num = manager->queue.pending_num;
+
+	data_len = zbx_preprocessor_pack_values_stats(&data, queued_num, queued_sz, direct_num, direct_sz, pending_num);
+
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_SIZE, data, data_len);
+
+	zbx_free(data);
 }
 
 /******************************************************************************
@@ -1005,18 +1022,17 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
  *                                                                            *
  * Purpose: respond to diagnostic information request                         *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             client  - [IN] request source                                  *
- *                                                                            *
  ******************************************************************************/
-static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
+static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
 {
 	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num;
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
 	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
-	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num);
+	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num,
+			queued_num, queued_sz, direct_num, direct_sz);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 
@@ -1213,7 +1229,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_vector_pp_task_ptr_t		tasks;
 	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
-						processing_num = 0;
+						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
+						counter_direct_num = 0, counter_direct_sz = 0;
 
 	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
 						(((zbx_thread_args_t *)args)->args);
@@ -1291,19 +1308,33 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 		if (NULL != message)
 		{
+			zbx_uint64_t	queued_once, direct_sz;
+
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
-					queued_num += preprocessor_add_request(manager, message, &direct_num);
+					direct_sz = 0;
+					queued_once = preprocessor_add_request(manager, message,
+							&direct_num, &direct_sz);
+					queued_num += queued_once;
+					counter_queued_num += queued_once;
+					counter_queued_sz += (zbx_uint64_t)message->size - direct_sz;
+					counter_direct_num += direct_num;
+					counter_direct_sz += direct_sz;
 					break;
 				case ZBX_IPC_PREPROCESSOR_QUEUE:
 					preprocessor_reply_queue_size(manager, client);
+					break;
+				case ZBX_IPC_PREPROCESSOR_SIZE:
+					preprocessor_reply_size(manager, client, counter_queued_num, counter_queued_sz,
+							counter_direct_num, counter_direct_sz);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TEST_REQUEST:
 					preprocessor_add_test_request(manager, client, message);
 					break;
 				case ZBX_IPC_PREPROCESSOR_DIAG_STATS:
-					preprocessor_reply_diag_info(manager, client);
+					preprocessor_reply_diag_info(manager, client, counter_queued_num,
+							counter_queued_sz, counter_direct_num, counter_direct_sz);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:

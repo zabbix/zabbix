@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @dataSource AllItemValueTypes
@@ -232,12 +232,10 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		if ($form->getField('Type')->getText() !== 'Graph prototype') {
-			$form->fill(['Type' => 'Graph prototype']);
-			$form->waitUntilReloaded();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
 		}
 		$this->page->removeFocus();
-		sleep(1);
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertScreenshot($dialog);
 		$dialog->close();
 	}

@@ -14,11 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemGeneral.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemPrototype.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
+require_once __DIR__.'/../../../include/classes/api/services/CItemPrototype.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -1162,9 +1162,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/key_": must contain at least one low-level discovery macro.'
+					'inline_errors' => [
+						'Key' => 'This field must contain at least one low-level discovery macro.'
 					]
 				]
 			],
@@ -1174,9 +1173,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown,{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'An item prototype with key "vfs.file.cksum[/sbin/shutdown,{#KEY}]" already exists on the host'
+					'inline_errors' => [
+						'Key' => 'This object already exists.'
 					]
 				]
 			],
@@ -1185,9 +1183,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'key' =>'item-name-missing[{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1196,9 +1193,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item name',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Incorrect value for field "key": cannot be empty.'
+					'inline_errors' => [
+						'Key' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1208,23 +1204,21 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test[{#KEY}]',
-					'delay' => 0,
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
+					'delay' => '',
+					'inline_errors' => [
+						'Update interval' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #6 Incorrect timedelay
+			// #6 Zero timedelay with no flexible intervals.
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test[{#KEY}]',
-					'delay' => '-30',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Incorrect value for field "delay": a time unit is expected'
+					'delay' => 0,
+					'inline_errors' => [
+						'Update interval' => 'This field cannot be set to "0" without defining custom intervals.'
 					]
 				]
 			],
@@ -1234,14 +1228,25 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test[{#KEY}]',
-					'delay' => 86401,
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/delay": value must be one of 0-86400.'
+					'delay' => '-30',
+					'inline_errors' => [
+						'Update interval' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #8 Empty time flex period
+			// #8 Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item delay',
+					'key' => 'item-delay-test[{#KEY}]',
+					'delay' => 86401,
+					'inline_errors' => [
+						'Update interval' => 'Value must be one of 0-86400.'
+					]
+				]
+			],
+			// #9 Empty time flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1250,24 +1255,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '']
 					],
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid interval "".'
-					]
-				]
-			],
-			// #9 Incorrect flex period
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
-					'flexPeriod' => [
-						['flexDelay' => 50, 'flexTime' => '1-11,00:00-24:00']
-					],
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid interval "1-11,00:00-24:00".'
+					'inline_errors' => [
+						'id:delay_flex_0_period' => 'Period: This field cannot be empty.'
 					]
 				]
 			],
@@ -1278,11 +1267,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'Item flex',
 					'key' => 'item-flex-test[{#KEY}]',
 					'flexPeriod' => [
-						['flexDelay' => 50, 'flexTime' => '1-7,00:00-25:00', 'instantCheck' => true]
+						['flexDelay' => 50, 'flexTime' => '1-11,00:00-24:00']
 					],
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid interval "1-7,00:00-25:00".'
+					'inline_errors' => [
+						'id:delay_flex_0_period' => 'Period: Invalid period.'
 					]
 				]
 			],
@@ -1293,11 +1281,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'Item flex',
 					'key' => 'item-flex-test[{#KEY}]',
 					'flexPeriod' => [
-						['flexDelay' => 50, 'flexTime' => '1-7,24:00-00:00']
+						['flexDelay' => 50, 'flexTime' => '1-7,00:00-25:00', 'instantCheck' => true]
 					],
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid interval "1-7,24:00-00:00".'
+					'inline_errors' => [
+						'id:delay_flex_0_period' => 'Period: Invalid period.'
 					]
 				]
 			],
@@ -1308,15 +1295,28 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'Item flex',
 					'key' => 'item-flex-test[{#KEY}]',
 					'flexPeriod' => [
-						['flexDelay' => 50, 'flexTime' => '1,00:00-24:00;2,00:00-24:00']
+						['flexDelay' => 50, 'flexTime' => '1-7,24:00-00:00']
 					],
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid interval "1,00:00-24:00;2,00:00-24:00".'
+					'inline_errors' => [
+						'id:delay_flex_0_period' => 'Period: Invalid period.'
 					]
 				]
 			],
-			// #13 Multiple flex periods
+			// #13 Incorrect flex period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test[{#KEY}]',
+					'flexPeriod' => [
+						['flexDelay' => 50, 'flexTime' => '1,00:00-24:00;2,00:00-24:00']
+					],
+					'inline_errors' => [
+						'id:delay_flex_0_period' => 'Period: Invalid period.'
+					]
+				]
+			],
+			// #14 Multiple flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1330,7 +1330,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #14 Delay combined with flex periods
+			// #15 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1351,7 +1351,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #15 Delay combined with flex periods
+			// #16 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1368,7 +1368,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #16 Delay combined with flex periods
+			// #17 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1390,7 +1390,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #17 Delay combined with flex periods
+			// #18 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1405,7 +1405,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #18 Delay combined with flex periods
+			// #19 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1421,7 +1421,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #19 Delay combined with flex periods
+			// #20 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1433,7 +1433,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #20 Delay combined with flex periods
+			// #21 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1445,7 +1445,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #21 Delay combined with flex periods
+			// #22 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1460,7 +1460,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #22 Delay combined with flex periods
+			// #23 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1471,7 +1471,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #23 Delay combined with flex periods
+			// #24 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1489,7 +1489,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #24 Delay combined with flex periods
+			// #25 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1507,7 +1507,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #25 Delay combined with flex periods
+			// #26 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1523,7 +1523,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #26 Delay combined with flex periods
+			// #27 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1539,7 +1539,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #27 Delay combined with flex periods
+			// #28 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1563,7 +1563,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #28 Delay combined with flex periods
+			// #29 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1575,7 +1575,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #29 Delay combined with flex periods
+			// #30 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1591,7 +1591,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #30 Seven flexfields - save OK
+			// #31 Seven flexfields - save OK
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1610,29 +1610,15 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #31 History
+			// #32 History
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-empty[{#KEY}]',
 					'history' => ' ',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/history": cannot be empty.'
-					]
-				]
-			],
-			// #32 History
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item history',
-					'key' => 'item-history-test[{#KEY}]',
-					'history' => 3599,
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+					'inline_errors' => [
+						'id:history' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1642,10 +1628,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test[{#KEY}]',
-					'history' => 788400001,
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+					'history' => 3599,
+					'inline_errors' => [
+						'id:history' => 'Value must be one of 3600-788400000.'
 					]
 				]
 			],
@@ -1655,23 +1640,21 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test[{#KEY}]',
-					'history' => '-1',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+					'history' => 788400001,
+					'inline_errors' => [
+						'id:history' => 'Value must be one of 3600-788400000.'
 					]
 				]
 			],
-			// #35 Trends
+			// #35 History
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Item trends',
-					'key' => 'item-trends-empty[{#KEY}]',
-					'trends' => ' ',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/trends": cannot be empty.'
+					'name' => 'Item history',
+					'key' => 'item-history-test[{#KEY}]',
+					'history' => '-1',
+					'inline_errors' => [
+						'id:history' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1680,11 +1663,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
-					'key' => 'item-trends-test[{#KEY}]',
-					'trends' => '-1',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+					'key' => 'item-trends-empty[{#KEY}]',
+					'trends' => ' ',
+					'inline_errors' => [
+						'id:trends' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1694,10 +1676,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test[{#KEY}]',
-					'trends' => 86399,
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+					'trends' => '-1',
+					'inline_errors' => [
+						'id:trends' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1707,14 +1688,25 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test[{#KEY}]',
-					'trends' => 788400001,
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+					'trends' => 86399,
+					'inline_errors' => [
+						'id:trends' => 'Value must be one of 86400-788400000.'
 					]
 				]
 			],
-			// #39
+			// #39 Trends
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item trends',
+					'key' => 'item-trends-test[{#KEY}]',
+					'trends' => 788400001,
+					'inline_errors' => [
+						'id:trends' => 'Value must be one of 86400-788400000.'
+					]
+				]
+			],
+			// #40
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1724,7 +1716,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #40
+			// #41
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1734,7 +1726,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'dbCheck' => true
 				]
 			],
-			// #41
+			// #42
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1743,7 +1735,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			//#42
+			//#43
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1754,7 +1746,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #43
+			// #44
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1764,7 +1756,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'dbCheck' => true,
 					'remove' => true]
 			],
-			// #44 List of all item types
+			// #45 List of all item types
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1775,7 +1767,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #45 Update and custom intervals are hidden if item key is mqtt.get
+			// #46 Update and custom intervals are hidden if item key is mqtt.get
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1786,7 +1778,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #46
+			// #47
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1797,7 +1789,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #47
+			// #48
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1808,7 +1800,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #48
+			// #49
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1820,7 +1812,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #49
+			// #50
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1831,7 +1823,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #50
+			// #51
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1842,7 +1834,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #51
+			// #52
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1853,7 +1845,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #52
+			// #53
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1865,7 +1857,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #53
+			// #54
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1877,7 +1869,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #54
+			// #55
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1888,7 +1880,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #55
+			// #56
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1900,7 +1892,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #56
+			// #57
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1912,7 +1904,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #57
+			// #58
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1924,7 +1916,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #58
+			// #59
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1937,7 +1929,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #59
+			// #60
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1950,7 +1942,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #60
+			// #61
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1962,7 +1954,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #61
+			// #62
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1973,20 +1965,19 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #62
+			// #63
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Script',
 					'name' => 'Empty script',
 					'key' => 'empty.script[{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/params": cannot be empty.'
+					'inline_errors' => [
+						'id:script' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #63
+			// #64
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1994,13 +1985,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'Browser item - empty script',
 					'key' => 'empty.script.browser.item[{#KEY}]',
 					'script' => '',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/params": cannot be empty.'
+					'inline_errors' => [
+						'id:browser_script' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #64
+			// #65
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2009,23 +1999,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'empty.parameter.script.item[{#KEY}]',
 					'script' => 'script',
 					'params_value' => 'value',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
-					]
-				]
-			],
-			// #65
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'Browser',
-					'name' => 'Empty parameter name - browser item',
-					'key' => 'empty.param.name.browser.item[{#KEY}]',
-					'params_value' => 'value',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:parameters[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -2033,12 +2008,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'IPMI agent',
-					'name' => 'IPMI agent error',
-					'key' => 'item-ipmi-agent-error[{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
+					'type' => 'Browser',
+					'name' => 'Empty parameter name - browser item',
+					'key' => 'empty.param.name.browser.item[{#KEY}]',
+					'params_value' => 'value',
+					'inline_errors' => [
+						'name:parameters[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -2046,12 +2021,11 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'SSH agent',
-					'name' => 'SSH agent error',
-					'key' => 'item-ssh-agent-error[{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/username": cannot be empty.'
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent error',
+					'key' => 'item-ipmi-agent-error[{#KEY}]',
+					'inline_errors' => [
+						'IPMI sensor' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -2059,16 +2033,27 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'TELNET agent',
-					'name' => 'TELNET agent error',
-					'key' => 'item-telnet-agent-error[{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/username": cannot be empty.'
+					'type' => 'SSH agent',
+					'name' => 'SSH agent error',
+					'key' => 'item-ssh-agent-error[{#KEY}]',
+					'inline_errors' => [
+						'User name' => 'This field cannot be empty.'
 					]
 				]
 			],
 			// #69
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent error',
+					'key' => 'item-telnet-agent-error[{#KEY}]',
+					'inline_errors' => [
+						'User name' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #70
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2080,7 +2065,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #70
+			// #71
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2093,41 +2078,27 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #71
+			// #72
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated[{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Invalid parameter "/1/params": cannot be empty.'
+					'inline_errors' => [
+						'Formula' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #72 Empty SQL query
+			// #73 Empty SQL query
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Check the key, please. Default example was passed.'
-					]
-				]
-			],
-			// #73 Default
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'Database monitor',
-					'name' => 'Database monitor',
-					'params_ap' => 'SELECT * FROM items',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Check the key, please. Default example was passed.'
+					'key' => 'item-db_monitor[{#KEY}]',
+					'inline_errors' => [
+						'SQL query' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -2135,13 +2106,11 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'SSH agent',
-					'name' => 'SSH agent',
-					'username' => 'zabbix',
-					'params_es' => 'script to be executed',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Check the key, please. Default example was passed.'
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'params_ap' => 'SELECT * FROM items',
+					'inline_errors' => [
+						'Key' => 'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2149,13 +2118,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'TELNET agent',
-					'name' => 'TELNET agent',
+					'type' => 'SSH agent',
+					'name' => 'SSH agent',
 					'username' => 'zabbix',
 					'params_es' => 'script to be executed',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Check the key, please. Default example was passed.'
+					'inline_errors' => [
+						'Key' => 'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2163,12 +2131,24 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'inline_errors' => [
+						'Key' => 'Check the key, please. Default example was passed.'
+					]
+				]
+			],
+			// #77 Default
+			[
+				[
+					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Incorrect value for field "key": cannot be empty.'
+					'inline_errors' => [
+						'Key' => 'This field cannot be empty.'
 					]
 				]
 			]
@@ -2336,7 +2316,15 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 				case TEST_BAD:
 					$this->zbxTestCheckTitle('Configuration of item prototypes');
-					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
+
+					if (array_key_exists('inline_errors', $data)) {
+						$dialog->waitUntilReady();
+						$this->assertInlineError($form, $data['inline_errors']);
+					}
+					else {
+						$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
+					}
+
 					$this->zbxTestTextPresent(['Name', 'Type', 'Key']);
 
 					if (isset($data['formula'])) {

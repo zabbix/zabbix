@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * Base class for Macros tests.
@@ -541,6 +541,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param int        $lld_id	    points to LLD rule id where host prototype belongs
 	 */
 	public function checkMacros($data, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
+		$inline_validation = in_array($host_type, ['host', 'template']);
+
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
@@ -621,7 +623,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->fillMacros($data['macros']);
 
-		if ($host_type === 'host' && $data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
+		if ($inline_validation && $data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -644,7 +646,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
-				if ($host_type === 'host' && array_key_exists('inline_error', $data)) {
+				if ($inline_validation && array_key_exists('inline_error', $data)) {
 					$this->assertInlineError($form, $data['inline_error']);
 				}
 				else {
@@ -1643,7 +1645,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form->invalidate();
 		$form->submit();
 
-		if ($source === 'host') {
+		if (in_array($source, ['host', 'template'])) {
 			COverlayDialogElement::ensureNotPresent();
 		}
 
@@ -2280,11 +2282,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $name		source name
 	 */
 	public function createVaultMacros($data, $url, $source, $name = null) {
+		$inline_valiation = (in_array($source, ['hosts', 'templates']));
+
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
 
-		if ($source === 'hosts'&& $data['expected'] == TEST_BAD) {
+		if ($inline_valiation && $data['expected'] == TEST_BAD) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -2292,7 +2296,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		if ($data['expected'] == TEST_BAD) {
-			if ($source === 'hosts') {
+			if ($inline_valiation) {
 				$inline_error = [];
 				$key = array_key_first($data['inline_error']);
 
@@ -2312,7 +2316,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			}
 		}
 		else {
-			if ($source === 'hosts') {
+			if (in_array($source, ['hosts', 'templates'])) {
 				COverlayDialogElement::ensureNotPresent();
 			}
 
@@ -2326,7 +2330,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
 
-		if ($source === 'hosts' || $source === 'templates') {
+		if (in_array($source, ['hosts', 'templates'])) {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -2530,7 +2534,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->fillMacros([$hashicorp['fields']]);
 
-		if ($source === 'hosts') {
+		if (in_array($source, ['hosts', 'templates'])) {
 			$form->getField(array_key_first($hashicorp['inline_error']))->click();
 			$this->page->removeFocus();
 			$this->assertInlineError($form, $hashicorp['inline_error']);
@@ -2541,8 +2545,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			CMessageElement::find()->one()->close();
 		}
 
-		// Hosts in edit view opens in overlay and need to be closed manually.
-		if ($source === 'hosts' || $source === 'templates') {
+		// Hosts and templates in edit view opens in overlay and need to be closed manually.
+		if (in_array($source, ['hosts', 'templates'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 

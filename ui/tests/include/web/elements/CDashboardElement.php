@@ -15,7 +15,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../CElement.php';
+require_once __DIR__.'/../CElement.php';
 
 use Facebook\WebDriver\Exception\TimeoutException;
 
@@ -132,7 +132,7 @@ class CDashboardElement extends CElement {
 		$this->checkIfEditable();
 		$this->getControls()->query('id:dashboard-add-widget')->one()->click();
 
-		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_form"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 

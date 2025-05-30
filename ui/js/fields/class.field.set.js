@@ -212,21 +212,21 @@ class CFieldSet extends CField {
 						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
 
-					missing_field_errors = {...missing_field_errors, ...this.#fields[key_full].getGlobalErrors()};
+					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};
 				}
 			}
 			else if (errors[key] !== '') {
 				// Field is not present in fields, display generic error.
-				const extended_name = this.getName() + key;
-				const missing_errors = field_errors.filter(error => error.message !== '').map(error => error.message);
+				let extended_name = this.getName() + key;
+				extended_name = '/' + extended_name.replaceAll('[', '/').replaceAll(']', '');
 
-				if (missing_errors.length != 0) {
-					missing_field_errors[extended_name] = missing_errors;
-				}
+				field_errors.forEach(error => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + extended_name + '": ' + error.message);
+					}
+				});
 			}
 		}
-
-		this._global_errors = {...this._global_errors, ...missing_field_errors};
 	}
 
 	focusErrorField() {

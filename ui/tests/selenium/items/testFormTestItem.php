@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testItemTest.php';
+require_once __DIR__.'/../common/testItemTest.php';
 
 /**
  * "Test item" function tests.

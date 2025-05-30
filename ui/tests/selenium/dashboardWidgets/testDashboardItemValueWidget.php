@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * Test for checking Item Value Widget.
@@ -52,6 +52,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
 	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
+	const INDICATOR_CHANGE_HOST = 'Host for checking widget without show value option';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -78,6 +79,20 @@ class testDashboardItemValueWidget extends testWidgets {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
+
+		// Add 2 values of data for items, to check that there are no errors without show value option selected.
+		$items_data = [
+			'Indicator - Numeric (float)' => 0.1,
+			'Indicator - Character' => 1,
+			'Indicator - Numeric (unsigned)' => 1,
+			'Indicator - Text' => 1,
+			'Indicator - Log' => 1
+		];
+
+		foreach ($items_data as $name => $value) {
+			CDataHelper::addItemData(self::$itemids[$name], $value, time());
+			CDataHelper::addItemData(self::$itemids[$name], $value + 1, time() + 1);
+		}
 
 		CDataHelper::call('usermacro.createglobal', [
 			[
@@ -151,7 +166,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:desc_v_pos',
 			'id:desc_size',
 			'id:desc_bold',
-			'xpath:.//input[@id="desc_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"desc_color"]'
 		];
 
 		$values = [
@@ -161,7 +176,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:value_size',
 			'id:value_v_pos',
 			'id:value_bold',
-			'xpath:.//input[@id="value_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"value_color"]'
 		];
 
 		$units = [
@@ -169,7 +184,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:units_pos',
 			'id:units_size',
 			'id:units_bold',
-			'xpath:.//input[@id="units_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"units_color"]'
 		];
 
 		$time = [
@@ -177,19 +192,19 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:time_v_pos',
 			'id:time_size',
 			'id:time_bold',
-			'xpath:.//input[@id="time_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"time_color"]'
 		];
 
 		$indicator_colors = [
-			'xpath:.//input[@id="up_color"]/..',
-			'xpath:.//input[@id="down_color"]/..',
-			'xpath:.//input[@id="updown_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"up_color"]',
+			self::PATH_TO_COLOR_PICKER.'"down_color"]',
+			self::PATH_TO_COLOR_PICKER.'"updown_color"]'
 		];
 
 		$sparkline = [
 			'id:sparkline_width',
 			'id:sparkline_fill',
-			'xpath:.//input[@id="sparkline_color"]/..',
+			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]',
 			'id:sparkline_time_period_data_source',
 			'id:sparkline_time_period_from',
 			'id:sparkline_time_period_to',
@@ -255,7 +270,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:time_bold' => false,
 					'id:sparkline_width' => 1,
 					'id:sparkline_fill' => 3,
-					'id:sparkline_color' => '42A5F5',
+					self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '42A5F5',
 					'id:sparkline_time_period_data_source' => 'Custom',
 					'id:sparkline_time_period_reference' => '',
 					'id:sparkline_time_period_from' => 'now-1h',
@@ -415,7 +430,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:thresholds_0_threshold' => [
 						'maxlength' => 255
 					],
-					'xpath:.//input[@id="thresholds_0_color"]/..' => [
+					self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => [
 						'color' => 'E65660'
 					],
 					'id:time_period_from' => [
@@ -821,51 +836,15 @@ class testDashboardItemValueWidget extends testWidgets {
 						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
-						['threshold' => '1', 'color' => '']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/color": cannot be empty.'
-					]
-				]
-			],
-			// #16.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Advanced configuration' => true
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'thresholds' => [
-						['threshold' => '1', 'color' => 'AABBCC'],
-						['threshold' => '2', 'color' => '']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/2/color": cannot be empty.'
-					]
-				]
-			],
-			// #17.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Advanced configuration' => true
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'thresholds' => [
-						['threshold' => 'a', 'color' => 'AABBCC']
+						['threshold' => 'a', 'color' => '']
 					],
 					'error' => [
 						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #18.
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -886,7 +865,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -908,7 +887,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #20.
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -929,7 +908,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -950,7 +929,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -971,7 +950,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -995,7 +974,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #24.
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1016,7 +995,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1037,7 +1016,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1062,13 +1041,14 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #27.
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'id:show_5' => true,
 						'Advanced configuration' => true,
+						self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFFFFG',
 						'id:sparkline_time_period_from' => '',
 						'id:sparkline_time_period_to' => '',
 						'Aggregation function' => 'avg',
@@ -1084,16 +1064,18 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Invalid parameter "Sparkline: Time period/To": cannot be empty.',
 						'Invalid parameter "Time period/From": cannot be empty.',
 						'Invalid parameter "Time period/To": cannot be empty.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #28.
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'id:show_5' => true,
 						'Advanced configuration' => true,
+						self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '',
 						'id:sparkline_time_period_data_source' => 'Widget',
 						'Aggregation function' => 'min',
 						'Time period' => 'Widget'
@@ -1104,44 +1086,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.',
 						'Invalid parameter "Time period/Widget": cannot be empty.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #29.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'id:show_5' => true,
-						'Advanced configuration' => true,
-						'xpath:.//input[@id="sparkline_color"]/..' => 'FFFFFG'
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'error' => [
-						'Invalid parameter "Sparkline: Colour": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #30.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'id:show_5' => true,
-						'Advanced configuration' => true,
-						'xpath:.//input[@id="sparkline_color"]/..' => ''
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'error' => [
-						'Invalid parameter "Sparkline: Colour": cannot be empty.'
-					]
-				]
-			],
-			// #31.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1152,7 +1101,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #32.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1165,7 +1114,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #33.
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1202,7 +1151,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #34.
+			// #30.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1234,7 +1183,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #35.
+			// #31.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1292,7 +1241,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #36.
+			// #32.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1318,20 +1267,20 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:units_size' => '99',
 						'id:units_bold' => true,
 						'Background colour' => 'FFAAAA',
-						'xpath:.//input[@id="desc_color"]/..' => 'AABBCC',
-						'xpath:.//input[@id="value_color"]/..' => 'CC11CC',
-						'xpath:.//input[@id="units_color"]/..' => 'BBCC55',
-						'xpath:.//input[@id="time_color"]/..' => '11AA00',
-						'xpath:.//input[@id="up_color"]/..' => '00FF00',
-						'xpath:.//input[@id="down_color"]/..' => 'FF0000',
-						'xpath:.//input[@id="sparkline_color"]/..' => 'AB47BC'
+						self::PATH_TO_COLOR_PICKER.'"desc_color"]' => 'AABBCC',
+						self::PATH_TO_COLOR_PICKER.'"value_color"]' => 'CC11CC',
+						self::PATH_TO_COLOR_PICKER.'"units_color"]' => 'BBCC55',
+						self::PATH_TO_COLOR_PICKER.'"time_color"]' => '11AA00',
+						self::PATH_TO_COLOR_PICKER.'"up_color"]' => '00FF00',
+						self::PATH_TO_COLOR_PICKER.'"down_color"]' => 'FF0000',
+						self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'AB47BC'
 					],
 					'item' => [
 						'Simple form test host' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".'
 					]
 				]
 			],
-			// #37.
+			// #33.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1348,7 +1297,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #38.
+			// #34.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1365,7 +1314,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #39.
+			// #35.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1387,7 +1336,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'trim' => true
 				]
 			],
-			// #40.
+			// #36.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1402,7 +1351,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #41.
+			// #37.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1419,7 +1368,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #42.
+			// #38.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1436,7 +1385,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #43.
+			// #39.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1454,7 +1403,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #44.
+			// #40.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1472,7 +1421,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #45.
+			// #41.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1490,7 +1439,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #46.
+			// #42.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1507,7 +1456,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #47.
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1523,7 +1472,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #48.
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1538,7 +1487,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #49.
+			// #45.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1554,7 +1503,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #50.
+			// #46.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1570,7 +1519,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #51.
+			// #47.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1588,7 +1537,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #52.
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1606,7 +1555,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #53.
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1624,7 +1573,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #54.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1639,7 +1588,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #55.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1655,7 +1604,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #56.
+			// #52.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1686,6 +1635,81 @@ class testDashboardItemValueWidget extends testWidgets {
 					],
 					'trim' => true
 				]
+			],
+			// #53 Check that there is no errors, when show value option is unchecked (for each data type).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - float',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (float)'
+					]
+				]
+			],
+			// #54.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - character',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Character'
+					]
+				]
+			],
+			// #55.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - log',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Log'
+					]
+				]
+			],
+			// #56.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - numeric (unsigned)',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (unsigned)'
+					]
+				]
+			],
+			// #57.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - text',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Text'
+					]
+				]
 			]
 		];
 	}
@@ -1701,7 +1725,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	public static function getWidgetUpdateData() {
 		return [
-			// #57.
+			// #62.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1720,7 +1744,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #58.
+			// #63.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1781,6 +1805,8 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		if (array_key_exists('thresholds', $data)) {
 			$this->getThresholdTable()->fill($data['thresholds']);
+
+			$this->checkColorPickerState($data);
 		}
 
 		if ($expected === TEST_GOOD) {
@@ -1863,7 +1889,9 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->cancelEditing();
+			// Change dashboard from cancelEditing() to save() to check deadlock issue.
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Write new name to update widget for update scenario.
 			if ($update) {
@@ -1936,7 +1964,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD]);
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$form = $create
@@ -3162,11 +3190,12 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
-			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertTrue($filter->isExpanded(false));
 
 			// Check zoom filter layout.
 			if (array_key_exists('filter_layout', $data)) {
-				$filter = CFilterElement::find()->one();
+				$filter->open();
 				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
 				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
@@ -3194,7 +3223,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isVisible());
 		}
 
 		// Clear particular dashboard for next test case.
@@ -3257,6 +3286,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min',
+						'Decimal places' => '0',
 						'Time period' => 'Custom'
 					],
 					'item_data' => [
@@ -3281,6 +3311,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Item' => 'Value mapping',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
+						'Decimal places' => '2',
 						'Time period' => 'Custom',
 						'id:time_period_from' => 'now-2h',
 						'id:time_period_to' => 'now-1h'
@@ -3300,7 +3331,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3322,7 +3353,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)'
+					'expected_value' => 'Up (1.00)'
 				]
 			],
 			// Item with value mapping, aggregation function 'avg' and Custom time period.
@@ -3431,7 +3462,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],
@@ -3461,7 +3492,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Down (0)'
+					'expected_value' => 'Down (0.00)'
 				]
 			],
 			// Item with value mapping and aggregation function 'not used'.
@@ -3487,7 +3518,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						]
 					],
 					'value_mapping' => true,
-					'expected_value' => 'Up (1)',
+					'expected_value' => 'Up (1.00)',
 					'arrow' => 'up-down'
 				]
 			],

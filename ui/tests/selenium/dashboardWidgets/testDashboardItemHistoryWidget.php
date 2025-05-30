@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup dashboard
@@ -454,7 +454,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$defaults = [
 			'Name' => ['value' => '', 'maxlength' => 255],
 			'Item' => ['value' => ''],
-			'xpath://input[@id="base_color"]/..' => ['value' => ''],
+			self::PATH_TO_COLOR_PICKER.'"base_color"]' => ['value' => ''],
 			'Display' => ['value' => 'As is', 'lables' => ['As is', 'HTML', 'Single line']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
@@ -1164,7 +1164,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									'context' => ['values' => 'Host for all item value types']
 								]
 							],
-							'xpath://input[@id="base_color"]/..' => '90CAF9',
+							self::PATH_TO_COLOR_PICKER.'"base_color"]/..' => '90CAF9',
 							'Show thumbnail' => true
 						]
 					]
@@ -1184,17 +1184,17 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									'values' => 'Character item',
 									'context' => ['values' => 'Host for all item value types']
 								],
-								'xpath://input[@id="base_color"]/..' => 'AFB42B',
+								self::PATH_TO_COLOR_PICKER.'"base_color"]' => 'AFB42B',
 								'Display' => 'HTML',
 								'Use monospace font' => true
 							],
 							'Highlights' => [
 								[
-									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]' => '00ACC1',
 									'id:highlights_0_pattern' => 'pattern_1'
 								],
 								[
-									'xpath://input[@id="highlights_1_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[1][color]"]' => '00ACC1',
 									'id:highlights_1_pattern' => 12345
 								]
 							]
@@ -1220,11 +1220,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Highlights' => [
 								[
-									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]' => '00ACC1',
 									'id:highlights_0_pattern' => 'pattern_1'
 								],
 								[
-									'xpath://input[@id="highlights_1_color"]/..' => '0288D1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[1][color]"]' => '0288D1',
 									'id:highlights_1_pattern' => 'pattern_1'
 								]
 							]
@@ -1252,7 +1252,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Highlights' => [
 								[
-									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1'
+									self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]' => '00ACC1'
 								]
 							]
 						]
@@ -1569,15 +1569,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Thresholds' => [
 								[
-									'xpath://input[@id="thresholds_0_color"]/..' => '039BE5',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => '039BE5',
 									'id:thresholds_0_threshold' => -12
 								],
 								[
-									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[1][color]"]' => '039BE5',
 									'id:thresholds_1_threshold' => -500.99
 								],
 								[
-									'xpath://input[@id="thresholds_2_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[2][color]"]' => '00ACC1',
 									'id:thresholds_2_threshold' => 20.0099
 								]
 							]
@@ -1606,11 +1606,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Thresholds' => [
 								[
-									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => 'E91E63',
 									'id:thresholds_0_threshold' => 158
 								],
 								[
-									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[1][color]"]' => '039BE5',
 									'id:thresholds_1_threshold' => 19.20
 								]
 							]
@@ -1635,7 +1635,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Thresholds' => [
 								[
-									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63'
+									self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => 'E91E63'
 								]
 							]
 						]
@@ -2031,7 +2031,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		if (array_key_exists('Items', $data)) {
 			foreach ($data['Items'] as $column) {
 				$form->getFieldContainer('Items')->query('button:Add')->one()->waitUntilClickable()->click();
-				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay = COverlayDialogElement::get('New column');
 				$column_overlay_form = $column_overlay->asForm();
 				$column_overlay_form->fill($column['fields']);
 
@@ -2052,7 +2052,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				}
 
 				$column_overlay->waitUntilNotVisible();
-				$form->waitUntilReloaded();
+				$form = COverlayDialogElement::get($update ? 'Edit widget' : 'Add widget')->asForm();
 			}
 		}
 
@@ -2079,12 +2079,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 
 			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
-			$dialogs = COverlayDialogElement::find()->all();
-			$dialog_count = $dialogs->count();
-
-			for ($i = $dialog_count - 1; $i >= 0; $i--) {
-				$dialogs->get($i)->close(true);
-			}
+			COverlayDialogElement::closeAll(true);
 
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -2206,10 +2201,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
 			$form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+			$overlay_title = 'Edit widget';
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
+			$overlay_title = 'Add widget';
 		}
 
 		$form->fill([
@@ -2218,7 +2215,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		]);
 
 		$form->getFieldContainer('Items')->query('button:Add')->waitUntilClickable()->one()->click();
-		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$column_overlay = COverlayDialogElement::get('New column');
 		$column_overlay->asForm()->fill([
 			'Item' => [
 				'values' => 'Test Item history',
@@ -2227,10 +2224,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		]);
 		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay->waitUntilNotVisible();
-		$form->waitUntilReloaded();
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
+			// Initialize $form again after reload and name change.
+			$form = COverlayDialogElement::get($overlay_title)->asForm();
 			$form->submit();
 
 			// Check that changes took place on the unsaved dashboard.
@@ -2825,7 +2823,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$container->query('button:Add')->one()->click();
 		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
 		$this->assertTrue($input->isVisible());
-		$this->assertEquals('E65660', $container->query('xpath:.//div[@class="color-picker"]')
+		$this->assertEquals('E65660', $container->query('xpath:.//z-color-picker')
 				->asColorPicker()->one()->getValue()
 		);
 		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')

@@ -22,6 +22,7 @@
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
+#define ZBX_DB_RONLY	-3
 
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"

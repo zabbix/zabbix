@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup, prepareUserData
@@ -362,7 +362,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// #28.
 			[[
-				'url' => 'graphs.php?context=host',
+				'url' => 'zabbix.php?action=graph.list&context=host',
 				'title' =>	'Configuration of graphs',
 				'header' => 'Graphs',
 				'users' => [

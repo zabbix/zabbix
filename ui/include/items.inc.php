@@ -532,10 +532,11 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ * @param bool   $set_title         Adds a title attribute to the created element.
  *
  * @return array|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links, bool $set_title = false) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -572,6 +573,10 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	}
 	else {
 		$name = new CSpan($template['name']);
+	}
+
+	if ($set_title) {
+		$name->setTitle($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -797,11 +802,19 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  */
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
+	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
+
 	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
 
 	if ($is_numeric_data) {
-		$display_value = $value;
+		$converted_value = convertUnitsRaw([
+			'value' => $value,
+			'units' => $units
+		] + $convert_options);
+
+		$display_value = $converted_value['value'].
+			($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '');
 	}
 	else {
 		switch ($item['value_type']) {
@@ -833,14 +846,7 @@ function formatAggregatedHistoryValueRaw($value, array $item, int $function, boo
 		}
 	}
 
-	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
-
 	if ($is_numeric_data) {
-		$converted_value = convertUnitsRaw([
-			'value' => $value,
-			'units' => $units
-		] + $convert_options);
-
 		return [
 			'value' => $converted_value['value'],
 			'units' => $converted_value['units'],
@@ -897,18 +903,19 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			if ($mapped_value !== false) {
-				return [
-					'value' => $mapped_value.' ('.$value.')',
-					'units' => '',
-					'is_mapped' => true
-				];
-			}
-
 			$converted_value = convertUnitsRaw([
 				'value' => $value,
 				'units' => $item['units']
 			] + $convert_options);
+
+			if ($mapped_value !== false) {
+				return [
+					'value' => $mapped_value.' ('.$converted_value['value'].
+						($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '').')',
+					'units' => '',
+					'is_mapped' => true
+				];
+			}
 
 			return [
 				'value' => $converted_value['value'],
@@ -1753,6 +1760,8 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
  */
 function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	foreach ($preprocessing as &$step) {
+		$step = CItemGeneralHelper::normalizeFormDataPreprocessingStep($step);
+
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
@@ -2440,7 +2449,10 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
-		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+		'filter' => [
+			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMP],
+			'status' => ITEM_STATUS_ACTIVE
+		]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];

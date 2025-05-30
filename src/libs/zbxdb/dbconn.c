@@ -255,11 +255,8 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, const PGresult *pg_resu
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == db->config->read_only_recoverable &&
-			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
-	{
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
-	}
 
 	return FAIL;
 }
@@ -632,6 +629,26 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+
+	zbx_db_free_result(result);
+
+	result = dbconn_select(db, "show default_transaction_read_only");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
 
 	zbx_db_free_result(result);
 
@@ -1116,8 +1133,16 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
+		zbx_err_codes_t	errcode;
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result->pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
+		else
+			errcode = ERR_Z3005;
+
 		db_get_postgresql_error(&error, result->pg_result);
-		dbconn_errlog(db, ERR_Z3005, 0, error, sql);
+		dbconn_errlog(db, errcode, 0, error, sql);
+
 		zbx_free(error);
 
 		if (SUCCEED == dbconn_is_recoverable_error(db, result->pg_result))
@@ -1303,7 +1328,11 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  ******************************************************************************/
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
+#define ZBX_DB_WAIT_RETRY_COUNT	6
 	int	err;
+#if defined(HAVE_POSTGRESQL)
+	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
@@ -1318,7 +1347,13 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	while (ZBX_DB_OK != (err = dbconn_open(db)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
+		{
+#if defined(HAVE_POSTGRESQL)
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
+#endif
 			break;
+		}
 
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
 		{
@@ -1326,7 +1361,24 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == db->config->read_only_recoverable && 0 >= retries--)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
+
 		db->connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
@@ -1335,11 +1387,15 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		db->connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		db->last_db_errcode = 0;
+#endif
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
+#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 /******************************************************************************

@@ -28,6 +28,7 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
+#include "zbxlog.h"
 
 static sigset_t			orig_mask;
 
@@ -100,7 +101,7 @@ static void	db_trigger_queue_cleanup(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 {
-	int			sleeptime = -1;
+	int			sleeptime = -1, running = 1;
 	double			sec, total_sec = 0.0;
 	time_t			last_stat_time;
 	char			*stats = NULL;
@@ -119,6 +120,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, (process_name = get_process_type_string(process_type)), process_num);
+
+	zbx_hc_acquire();
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -158,7 +161,10 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zabbix_report_log_level_change();
 
 		if (0 != sleeptime)
+		{
+			zbx_handle_log();
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
+		}
 
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())
@@ -179,7 +185,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 		total_sec += zbx_time() - sec;
 
-		sleeptime = (ZBX_SYNC_MORE == sync_stats.more ? 0 : dbsyncer_args->config_histsyncer_frequency);
+		sleeptime = (ZBX_SYNC_MORE == sync_stats.more || !ZBX_IS_RUNNING()  ? 0 :
+				dbsyncer_args->config_histsyncer_frequency);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
@@ -231,9 +238,11 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		{
 			switch (rtc_cmd)
 			{
+				case ZBX_RTC_SHUTDOWN:
+					zbx_set_exiting_with_succeed();
+					ZBX_FALLTHROUGH;
 				case ZBX_RTC_HISTORY_SYNC_NOTIFY:
 					sleeptime = 0;
-				case ZBX_RTC_SHUTDOWN:
 				default:
 					break;
 			}
@@ -242,22 +251,37 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		if (ZBX_SYNC_MORE == sync_stats.more)
 			continue;
 
-		if (!ZBX_IS_RUNNING())
+		/* always check if there are values to sync when stopping */
+		if (0 == running)
 			break;
+
+		if (!ZBX_IS_RUNNING())
+			running = 0;
 	}
 
-	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
-		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);
 	if (SUCCEED != zbx_db_trigger_queue_locked())
 		zbx_db_flush_timer_queue();
 
+	if (0 != zbx_hc_release())
+	{
+		struct timespec	poll_delay = {0, 1e8};
+
+		while (0 != zbx_hc_refcount_peek())
+			nanosleep(&poll_delay, NULL);
+	}
+
+	zbx_log_sync_history_cache_progress();
+
+	zbx_dc_sync_trends(dbsyncer_args->config_syncer_num);
+
 	zbx_db_close();
 	zbx_unblock_signals(&orig_mask);
 
-	zbx_log_sync_history_cache_progress();
+	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
+		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		zbx_export_deinit(history_export);
