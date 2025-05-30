@@ -504,16 +504,12 @@ class CHost extends CHostGeneral {
 		}
 
 		/*
-		 * Cleaning the output from write-only properties.
+		 * Cleaning the output from write-only properties and normalize.
 		 */
 		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
-			$all_keys[] = 'inventory_mode';
-			$all_keys[] = 'active_available';
-			$all_keys[] = 'assigned_proxyid';
-			$options['output'] = array_diff($all_keys, $write_only_keys);
+			$options['output'] = array_diff(self::OUTPUT_FIELDS, $write_only_keys);
 		}
 		/*
 		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
@@ -522,6 +518,12 @@ class CHost extends CHostGeneral {
 		elseif (is_array($options['output']) && APP::getMode() === APP::EXEC_MODE_API) {
 			$options['output'] = array_diff($options['output'], $write_only_keys);
 		}
+		else {
+			$options['output'] = zbx_toArray($options['output']);
+		}
+
+		// TODO: Replace with strict validation eventually.
+		$options['output'] = array_intersect($options['output'], self::OUTPUT_FIELDS);
 
 		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -547,14 +549,6 @@ class CHost extends CHostGeneral {
 		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
 			return (string) count($result);
-		}
-
-		// Hosts share table with host prototypes. Therefore remove host unrelated fields.
-		if ($this->outputIsRequested('discover', $options['output'])) {
-			foreach ($result as &$row) {
-				unset($row['discover']);
-			}
-			unset($row);
 		}
 
 		if ($result) {
