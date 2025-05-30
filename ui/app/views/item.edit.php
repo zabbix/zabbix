@@ -106,7 +106,7 @@ if ($item['itemid']) {
 		'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 		'keepOpen' => true,
 		'isSubmit' => false,
-		'action' => 'item_edit_form.test();'
+		'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
 	];
 
 	if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -145,7 +145,7 @@ else {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'item_edit_form.test();'
+			'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
 		]
 	];
 }
@@ -174,7 +174,8 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'item',
 			'tabs_id' => $tabsid,
 			'tags' => $item['tags'],
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'has_inline_validation' => true
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -197,6 +198,7 @@ $return_url = (new CUrl('zabbix.php'))
 $form
 	->addItem($tabs)
 	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'actions' => [
 				'form' => 'item.edit',
 				'update' => 'item.update',

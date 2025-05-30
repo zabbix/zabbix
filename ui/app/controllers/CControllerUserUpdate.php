@@ -48,23 +48,23 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$result = $this->getValidationResult();
 
 		if (CWebUser::$data['userid'] == $this->getInput('userid')
 				&& CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
 			if ($ret && !$this->validateCurrentPassword()) {
-				$error = self::VALIDATION_ERROR;
+				$result = self::VALIDATION_ERROR;
 				$ret = false;
 			}
 		}
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
-			$error = self::VALIDATION_ERROR;
+			$result = self::VALIDATION_ERROR;
 			$ret = false;
 		}
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($result) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
 						(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')

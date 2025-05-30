@@ -624,3 +624,13 @@ void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size)
 {
 	self->batch_size = batch_size;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of rows to be inserted                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_get_row_count(zbx_db_insert_t *self)
+{
+	return self->rows.values_num;
+}

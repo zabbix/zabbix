@@ -97,35 +97,6 @@ $this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$main_filter_form = null;
-
-if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])
-		|| array_key_exists(CWidgetsData::DATA_TYPE_HOST_IDS, $data['broadcast_requirements'])) {
-	$main_filter_form = (new CForm('get'))
-		->setAttribute('name', 'dashboard_filter')
-		->setAttribute('aria-label', _('Main filter'))
-		->addVar('action', 'dashboard.view')
-		->addItem([
-			(new CLabel(_('Host'), 'dashboard_hostid_ms'))->addStyle('margin-right: 5px;'),
-			(new CMultiSelect([
-				'name' => 'dashboard_hostid',
-				'object_name' => 'hosts',
-				'data' => $data['dashboard_host'] ? [$data['dashboard_host']] : [],
-				'multiple' => false,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'hosts',
-						'srcfld1' => 'hostid',
-						'dstfrm' => 'dashboard_filter',
-						'dstfld1' => 'dashboard_hostid',
-						'monitored_hosts' => true,
-						'with_items' => true
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		]);
-}
-
 $html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
@@ -133,54 +104,91 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CList())
 			->setId('dashboard-control')
-			->addItem($main_filter_form)
-			->addItem((new CTag('nav', true,
-				(new CList())
-					->addItem(
-						(new CButton('dashboard-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
-							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
-					)
-					->addItem(
-						(new CSimpleButton())
-							->addClass(ZBX_STYLE_BTN_ACTION)
-							->addClass(ZBX_ICON_MENU)
-							->setId('dashboard-actions')
-							->setTitle(_('Actions'))
-							->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
-							->setAttribute('aria-haspopup', true)
-							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
-								$data['dashboard']['editable'], $data['has_related_reports'],
-								$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
-								$data['can_create_reports']
-							))
-					)
-					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-			))->setAttribute('aria-label', _('Content controls')))
-			->addItem((new CListItem(
-				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))
-						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_COG_FILLED),
-					(new CList())
-						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem(
-							(new CButton('dashboard-add-widget', _('Add')))
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_ICON_PLUS_SMALL)
-						)
-						->addItem(
-							(new CButton('dashboard-add'))
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
-						),
-					(new CButton('dashboard-save', _('Save changes'))),
-					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
-					''
-				])))
-					->setAttribute('aria-label', _('Content controls'))
-					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
-			))->addStyle('display: none'))
+			->addItem(
+				(new CListItem(
+					(new CForm('get'))
+						->setAttribute('name', 'dashboard_filter')
+						->setAttribute('aria-label', _('Main filter'))
+						->addVar('action', 'dashboard.view')
+						->addItem([
+							(new CLabel(_('Host'), 'dashboard_hostid_ms'))->addStyle('margin-right: 5px;'),
+							(new CMultiSelect([
+								'name' => 'dashboard_hostid',
+								'object_name' => 'hosts',
+								'data' => $data['dashboard_host'] !== null ? [$data['dashboard_host']] : [],
+								'multiple' => false,
+								'popup' => [
+									'parameters' => [
+										'srctbl' => 'hosts',
+										'srcfld1' => 'hostid',
+										'dstfrm' => 'dashboard_filter',
+										'dstfld1' => 'dashboard_hostid',
+										'monitored_hosts' => true,
+										'with_items' => true
+									]
+								]
+							]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						])
+				))
+					->addClass('js-control-host-override')
+					->addStyle('display: none;')
+			)
+			->addItem(
+				(new CListItem(
+					(new CTag('nav', true,
+						(new CList())
+							->addItem(
+								(new CButton('dashboard-edit', _('Edit dashboard')))
+									->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
+									->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+							)
+							->addItem(
+								(new CSimpleButton())
+									->addClass(ZBX_STYLE_BTN_ACTION)
+									->addClass(ZBX_ICON_MENU)
+									->setId('dashboard-actions')
+									->setTitle(_('Actions'))
+									->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
+									->setAttribute('aria-haspopup', true)
+									->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
+										$data['dashboard']['editable'], $data['has_related_reports'],
+										$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
+										$data['can_create_reports']
+									))
+							)
+							->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+
+					))->setAttribute('aria-label', _('Content controls'))
+				))->addClass('js-control-view-actions')
+			)
+			->addItem(
+				(new CListItem(
+					(new CTag('nav', true, new CList([
+						(new CButton('dashboard-config'))
+							->addClass(ZBX_STYLE_BTN_ICON)
+							->addClass(ZBX_ICON_COG_FILLED),
+						(new CList())
+							->addClass(ZBX_STYLE_BTN_SPLIT)
+							->addItem(
+								(new CButton('dashboard-add-widget', _('Add')))
+									->addClass(ZBX_STYLE_BTN_ALT)
+									->addClass(ZBX_ICON_PLUS_SMALL)
+							)
+							->addItem(
+								(new CButton('dashboard-add'))
+									->addClass(ZBX_STYLE_BTN_ALT)
+									->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
+							),
+						(new CButton('dashboard-save', _('Save changes'))),
+						(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
+						''
+					])))
+						->setAttribute('aria-label', _('Content controls'))
+						->addClass(ZBX_STYLE_DASHBOARD_EDIT)
+				))
+					->addClass('js-control-edit-actions')
+					->addStyle('display: none')
+			)
 	)
 	->setKioskModeControls(
 		count($data['dashboard']['pages']) > 1
@@ -292,7 +300,6 @@ $html_page
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
 		'configuration_hash' => $data['configuration_hash'],
-		'broadcast_requirements' => $data['broadcast_requirements'],
 		'dashboard_host' => $data['dashboard_host'],
 		'dashboard_time_period' => $data['dashboard_time_period'],
 		'web_layout_mode' => $web_layout_mode,

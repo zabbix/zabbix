@@ -1,0 +1,71 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: lld_drule_proto_elem_update 
+      name: lld_drule_proto_elem_update 
+      groups:
+        - name: 'Discovered hosts'
+      interfaces:
+        - interface_ref: if1
+      discovery_rules:
+        - name: main_drule
+          type: TRAP
+          key: main_drule
+          item_prototypes:
+            - name: 'item[{#PARENTNAME}]'
+              type: TRAP
+              key: 'item[{#PARENTNAME}]'
+              trigger_prototypes:
+                - expression: 'last(/lld_drule_proto_elem_update/item[{#PARENTNAME}])>1'
+                  name: 'trigger[{#PARENTNAME}]'
+          graph_prototypes:
+            - name: 'graph[{#PARENTNAME}]'
+              yaxismax: '0'
+              graph_items:
+                - color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: lld_drule_proto_elem_update 
+                    key: 'item[{#PARENTNAME}]'
+          host_prototypes:
+            - host: 'tc.update.host{#PARENTNAME}'
+              name: 'tc.update.host{#PARENTNAME}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+        - name: 'nested[{#PARENTNAME}]'
+          type: NESTED
+          key: 'nested[{#PARENTNAME}]'
+          item_prototypes:
+            - name: 'item.update.nested[{#PARENTNAME},{#NAME}]'
+              type: TRAP
+              key: 'item.update.nested[{#PARENTNAME},{#NAME}]'
+              trigger_prototypes:
+                - expression: 'last(/lld_drule_proto_elem_update/item.update.nested[{#PARENTNAME},{#NAME}])>2'
+                  name: 'item.update.nested[{#PARENTNAME},{#NAME}]'
+          graph_prototypes:
+            - name: 'graph.update.nested[{#PARENTNAME},{#NAME}]'
+              yaxismax: '0'
+              graph_items:
+                - color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: lld_drule_proto_elem_update 
+                    key: 'item.update.nested[{#PARENTNAME},{#NAME}]'
+          host_prototypes:
+            - host: 'tc.update.host.nested_{#PARENTNAME}_{#NAME}'
+              name: 'tc.update.host.nested_{#PARENTNAME}_{#NAME}'
+              templates:
+                - name: 'lld_test_dbs_template'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+          parent_discovery_rule:
+            key: main_drule
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nested

@@ -16,10 +16,7 @@
 
 class CControllerGraphPrototypeList extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $discovery_rule = [];
+	private array $parent_discovery = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -44,17 +41,20 @@ class CControllerGraphPrototypeList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'hostid'],
+		$options = [
+			'output' => ['itemid', 'name', 'hostid', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
 
-		$this->discovery_rule = reset($discovery_rule);
+		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-		if (!$discovery_rule) {
+		if (!$this->parent_discovery) {
 			return false;
 		}
+
+		$this->parent_discovery = reset($this->parent_discovery);
 
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -73,20 +73,21 @@ class CControllerGraphPrototypeList extends CController {
 		CProfile::update($prefix.'graph.prototype.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update($prefix.'graph.prototype.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$hostid = $this->discovery_rule['hostid'];
+		$hostid = $this->parent_discovery['hostid'];
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		$graphs = API::GraphPrototype()->get([
 			'output' => ['graphid', 'name', 'graphtype'],
 			'templated' => $context === 'template',
-			'discoveryids' => $this->discovery_rule['itemid'],
+			'discoveryids' => $this->parent_discovery['itemid'],
 			'editable' => true,
 			'limit' => $limit
 		]);
 
 		$data = [
 			'graphs' => $graphs,
-			'hostid' => $hostid
+			'hostid' => $hostid,
+			'is_parent_discovered' => $this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 		];
 
 		if ($context === 'host') {
@@ -100,9 +101,10 @@ class CControllerGraphPrototypeList extends CController {
 		}
 
 		if ($sort_field === 'graphtype') {
-			foreach ($data['graphs'] as $gnum => $graph) {
-				$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+			foreach ($data['graphs'] as &$graph) {
+				$graph['graphtype'] = graphType($graph['graphtype']);
 			}
+			unset($graph);
 		}
 
 		order_result($data['graphs'], $sort_field, $sort_order);
@@ -114,27 +116,32 @@ class CControllerGraphPrototypeList extends CController {
 		$paging = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'graph.prototype.list')
 			->setArgument('context', $context)
-			->setArgument('parent_discoveryid', $this->discovery_rule['itemid'])
+			->setArgument('parent_discoveryid', $this->parent_discovery['itemid'])
 		);
 
 		// Get graphs after paging.
-		$options = [
-			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'graphids' => array_column($data['graphs'], 'graphid'),
-			'preservekeys' => true
-		];
+		$data['graphs'] = API::GraphPrototype()->get([
+			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover', 'flags'],
+			'selectDiscoveryData' => ['parent_graphid'],
+			'graphids' => array_column($data['graphs'], 'graphid')
+		]);
 
-		$data['graphs'] = API::GraphPrototype()->get($options);
-
-		foreach ($data['graphs'] as $gnum => $graph) {
-			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+		if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$data['source_link_data'] = [
+				'parent_itemid' => $this->parent_discovery['discoveryData']['parent_itemid'],
+				'name' => $this->parent_discovery['name']
+			];
 		}
+
+		foreach ($data['graphs'] as &$graph) {
+			$graph['graphtype'] = graphType($graph['graphtype']);
+		}
+		unset($graph);
 
 		order_result($data['graphs'], $sort_field, $sort_order);
 
 		$data += [
-			'parent_discoveryid' => $this->discovery_rule['itemid'],
+			'parent_discoveryid' => $this->parent_discovery['itemid'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'profileIdx' => $prefix.'graph.prototype.list.filter',

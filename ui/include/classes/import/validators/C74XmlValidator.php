@@ -305,7 +305,8 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER,
+		CXmlConstantValue::ITEM_TYPE_NESTED => CXmlConstantName::NESTED
 	];
 
 	private $ITEM_TYPE_DELAY_SUBSET = [
@@ -477,17 +478,20 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE,
-		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE,
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE
 	];
 
 	private $OPERATION_OBJECT_TARGETS = [
 		'status' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE
 		],
 		'delay' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE
 		],
 		'history' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
@@ -1461,6 +1465,16 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]]
 								]]
+							]],
+							'parent_discovery_rule' =>	['type' => XML_MULTIPLE, 'rules' => [
+								['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_ARRAY, 'rules' => [
+									'key' =>				['type' => XML_STRING | XML_REQUIRED]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'discover' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
@@ -2675,6 +2689,16 @@ class C74XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]]
 								]]
+							]],
+							'parent_discovery_rule' =>	['type' => XML_MULTIPLE, 'rules' => [
+								['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_ARRAY, 'rules' => [
+									'key' =>				['type' => XML_STRING | XML_REQUIRED]
+								]],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'discover' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => static fn(array $data): bool => array_key_exists('parent_discovery_rule', $data), 'type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],

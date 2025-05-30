@@ -270,6 +270,7 @@ switch ($data['method']) {
 
 				if ($data['object_name'] === 'graph_prototypes') {
 					$options['selectDiscoveryRule'] = ['hostid'];
+					$options['selectDiscoveryRulePrototype'] = ['hostid'];
 
 					$records = API::GraphPrototype()->get($options);
 				}
@@ -289,7 +290,8 @@ switch ($data['method']) {
 					}
 					else {
 						$host_names = array_column($record['hosts'], 'name', 'hostid');
-						$host_name = $host_names[$record['discoveryRule']['hostid']];
+						$parent_lld = $record['discoveryRule'] ?: $record['discoveryRulePrototype'];
+						$host_name = $host_names[$parent_lld['hostid']];
 					}
 
 					$result[] = [

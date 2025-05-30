@@ -104,7 +104,7 @@ class CActionCondValidator extends CValidator {
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				elseif (!$ip_range_parser->parse($condition['value'])) {
+				elseif ($ip_range_parser->parse($condition['value']) != CParser::PARSE_SUCCESS) {
 					$this->setError(_s('Invalid action condition: %1$s.', $ip_range_parser->getError()));
 				}
 				break;
@@ -119,10 +119,12 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case ZBX_CONDITION_TYPE_DSERVICE_PORT:
+				$port_range_parser = new CPortRangeParser();
+
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				elseif (!validate_port_list($condition['value'])) {
+				elseif ($port_range_parser->parse($condition['value']) != CParser::PARSE_SUCCESS) {
 					$this->setError(_s('Incorrect action condition port "%1$s".', $condition['value']));
 				}
 				break;
