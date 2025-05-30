@@ -1808,6 +1808,14 @@ static void	am_update_watchdog(zbx_am_t *manager, zbx_ipc_message_t *message)
 	int		medias_num;
 
 	zbx_alerter_deserialize_medias(message->data, &medias, &medias_num);
+
+	if (0 == medias_num)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "watchdog is not expected to receive 0 medias");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
 	am_sync_watchdog(manager, medias, medias_num);
 
 	for (int i = 0; i < medias_num; i++)
