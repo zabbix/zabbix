@@ -618,6 +618,8 @@ class CUserDirectory extends CApiService {
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
+
+		self::checkLdapHostChanged($userdirectories, $db_userdirectories);
 	}
 
 	private static function addRequiredFieldsByType(array &$userdirectories, array $db_userdirectories): void {
@@ -942,6 +944,21 @@ class CUserDirectory extends CApiService {
 				));
 			}
 		}
+	}
+
+	private static function checkLdapHostChanged(array $userdirectories, array $db_userdirectories): void {
+		foreach ($userdirectories as $userdirectory) {
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+			if(array_key_exists('host', $userdirectory) && !array_key_exists('bind_password', $userdirectory)){
+				if($userdirectory['host'] !== $db_userdirectory['host']){
+					$error = _s('Invalid parameter "%1$s": %2$s.', 'bind_password',
+						_s('the parameter "%1$s" is missing', 'bind_password')
+					);
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
+
 	}
 
 	private static function addFieldDefaultsByType(array &$userdirectories, array $db_userdirectories): void {

@@ -81,6 +81,7 @@ window.ldap_edit_popup = new class {
 
 		if (document.getElementById('bind-password-btn') !== null) {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
+			document.getElementById('host').addEventListener('change', this.showPasswordFieldWithWarning.bind(this));
 		}
 	}
 
@@ -111,7 +112,9 @@ window.ldap_edit_popup = new class {
 	}
 
 	showPasswordField(e) {
-		const form_field = e.target.parentNode;
+		const target = e?.target || document.getElementById('bind-password-btn');
+
+		const form_field = target.parentNode;
 		const password_field = form_field.querySelector('[name="bind_password"][type="password"]');
 		const password_var = form_field.querySelector('[name="bind_password"][type="hidden"]');
 
@@ -121,7 +124,19 @@ window.ldap_edit_popup = new class {
 		if (password_var !== null) {
 			form_field.removeChild(password_var);
 		}
-		form_field.removeChild(e.target);
+		form_field.removeChild(target);
+	}
+
+	showPasswordFieldWithWarning() {
+		const form_field = document.getElementById('bind-password-btn');
+
+		if (form_field){
+			this.showPasswordField();
+
+			const warning_icon = document.querySelector('.js-bind-password-warning');
+
+			warning_icon.style.display = ''
+		}
 	}
 
 	openTestPopup() {
