@@ -16,6 +16,11 @@ msgstr ""
 "X-POOTLE-MTIME: 1453472100.000000\n"
 "X-Poedit-Basepath: ../../\n"
 
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
+msgid " or "
+msgstr ""
+
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
@@ -421,6 +426,12 @@ msgstr "<하위 메뉴/하위 메뉴/...>"
 msgctxt "abbreviation of severity level"
 msgid "A"
 msgstr "A"
+
+#: include/classes/helpers/CItemGeneralHelper.php:356
+#: include/classes/helpers/CItemGeneralHelper.php:399
+#: include/classes/helpers/CItemGeneralHelper.php:407
+msgid "A floating point value is expected."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1379,6 +1390,12 @@ msgstr "\"%1$s\" 키가 있는 LLD 규칙이 호스트 \"%2$s\"에 이미 있습
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
 msgstr "\"%1$s\" 키가 있는 LLD 규칙이 템플릿 \"%2$s\"에 이미 있습니다."
 
+#: include/classes/validators/CFormValidator.php:1064
+#: include/classes/validators/CFormValidator.php:1103
+#: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
+msgid "An array is expected."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
@@ -1647,6 +1664,10 @@ msgstr "최소 하루의 요일 또는 날짜를 지정해야 합니다."
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "적어도 1개의 호스트 그룹 혹은 호스트가 선택되어 있을 필요가 있습니다."
+
+#: include/classes/helpers/CItemGeneralHelper.php:411
+msgid "At least one of \"min\" or \"max\" parameters should be specified."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2460,6 +2481,11 @@ msgstr "호스트 \"%3$s\"의 \"%2$s\" 키가 있는 항목에 인벤토리 필�
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
 msgstr "템플릿 \"%3$s\"의 \"%2$s\" 키가 있는 항목에 인벤토리 필드 \"%1$s\"을(를) 할당할 수 없습니다. 키가 \"%4$s\"인 항목으로 이미 채워져 있기 때문입니다."
+
+#: app/controllers/CControllerItem.php:206
+#: app/controllers/CControllerItemPrototype.php:208
+msgid "Cannot be less than or equal to \"Min\"."
+msgstr ""
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -7970,6 +7996,11 @@ msgstr "영어(en_GB)"
 msgid "English (en_US)"
 msgstr "영어 (en_US)"
 
+#: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
+#, c-format
+msgid "Entry \"%1$s\" is not unique."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
 #: app/partials/monitoring.latest.filter.php:114
@@ -8275,6 +8306,13 @@ msgstr "사이드바 확장"
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
 msgstr "장애가 1개일때 상세 정보를 열기"
+
+#: app/controllers/CControllerHostCreate.php:195
+#: app/controllers/CControllerHostUpdate.php:200
+#: app/controllers/CControllerTemplateCreate.php:69
+#: app/controllers/CControllerTemplateUpdate.php:71
+msgid "Expected user macro format is \"{$MACRO}\"."
+msgstr ""
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -8884,6 +8922,12 @@ msgstr "호스트로부터 값을 확인"
 #: include/triggers.inc.php:767
 msgid "Given expression is not a macro"
 msgstr "설정한 조건식은 매크로가 아닙니다"
+
+#: app/controllers/CControllerValueMapCheck.php:49
+#: app/controllers/CControllerValueMapEdit.php:95
+#: app/controllers/CControllerValueMapEdit.php:109
+msgid "Given valuemap name is already taken."
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
@@ -10589,6 +10633,11 @@ msgstr "맵 \"%2$s\"의 라벨타입의 값 %1$s이 올바르지 않습니다."
 msgid "Incorrect API \"%1$s\"."
 msgstr "API\"%1$s\"가 올바르지 않습니다."
 
+#: app/controllers/CControllerHostCreate.php:65
+#: app/controllers/CControllerHostUpdate.php:69
+msgid "Incorrect DNS provided."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:602
 msgid "Incorrect SNMP OID."
 msgstr "SNMP OID의 값이 올바르지 않습니다."
@@ -10728,6 +10777,16 @@ msgstr "인터페이스의 bulk의 값이 올바르지 않습니다."
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "호스트 이름 \"%1$s\"에 잘못된 문자가 사용되었습니다."
 
+#: app/controllers/CControllerHostCreate.php:39
+#: app/controllers/CControllerHostUpdate.php:42
+msgid "Incorrect characters used for host name."
+msgstr ""
+
+#: app/controllers/CControllerTemplateCreate.php:35
+#: app/controllers/CControllerTemplateUpdate.php:36
+msgid "Incorrect characters used for template name."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "현재 암호가 잘못됨."
@@ -10836,6 +10895,11 @@ msgstr "잘못된 매개변수 \"%1$s\" 값: %2$s."
 #: include/classes/api/services/CDRule.php:517
 msgid "Incorrect port range."
 msgstr "포트의 범위가 올바르지 않습니다."
+
+#: app/controllers/CControllerHostCreate.php:71
+#: app/controllers/CControllerHostUpdate.php:75
+msgid "Incorrect port."
+msgstr ""
 
 #: app/controllers/CControllerRegExTest.php:77
 #, c-format
@@ -11470,6 +11534,11 @@ msgstr "사용자 역할 \"%1$s\"에 대한 API 메서드 \"%2$s\"이(가) 잘�
 msgid "Invalid IP address \"%1$s\"."
 msgstr "IP주소 \"%1$s\"가 올바르지 않습니다."
 
+#: app/controllers/CControllerHostCreate.php:57
+#: app/controllers/CControllerHostUpdate.php:61
+msgid "Invalid IP address."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSON데이터가 올바르지 않습니다. JSON 텍스트의 Parse중 서버에서 에러가 발생하였습니다."
@@ -11497,6 +11566,15 @@ msgstr "잘못된 MFA 구성"
 #: app/controllers/CControllerOauthCheck.php:44
 #: app/controllers/CControllerOauthEdit.php:43
 msgid "Invalid OAuth configuration"
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:456
+msgid "Invalid Prometheus label."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:441
+#: include/classes/helpers/CItemGeneralHelper.php:446
+msgid "Invalid Prometheus pattern."
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
@@ -11552,6 +11630,17 @@ msgstr "잘못된 입력"
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "갱신간격 \"%1$s\"가 올바르지 않습니다."
+
+#: app/controllers/CControllerItemCreate.php:247
+#: app/controllers/CControllerItemCreate.php:252
+#: app/controllers/CControllerItemPrototypeCreate.php:255
+#: app/controllers/CControllerItemPrototypeCreate.php:260
+#: app/controllers/CControllerItemPrototypeUpdate.php:212
+#: app/controllers/CControllerItemPrototypeUpdate.php:217
+#: app/controllers/CControllerItemUpdate.php:212
+#: app/controllers/CControllerItemUpdate.php:217
+msgid "Invalid interval."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryCheckCheck.php:64
 #: include/classes/api/services/CDRule.php:586
@@ -11830,6 +11919,27 @@ msgstr "파라미터 \"%1$s\"가 올바르지 않습니다 : %2$s."
 msgid "Invalid params."
 msgstr "파라미터가 올바르지 않습니다."
 
+#: app/controllers/CControllerItemCreate.php:257
+#: app/controllers/CControllerItemPrototypeCreate.php:265
+#: app/controllers/CControllerItemPrototypeUpdate.php:222
+#: app/controllers/CControllerItemUpdate.php:222
+msgid "Invalid period."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:167
+#: app/controllers/CControllerItemPrototypeCreate.php:171
+#: app/controllers/CControllerItemPrototypeUpdate.php:155
+#: app/controllers/CControllerItemUpdate.php:154
+msgid "Invalid range expression."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:228
+#: app/controllers/CControllerHostUpdate.php:233
+#: app/controllers/CControllerTemplateCreate.php:102
+#: app/controllers/CControllerTemplateUpdate.php:104
+msgid "Invalid range."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
 msgstr "잘못된 요청."
@@ -11839,6 +11949,11 @@ msgstr "잘못된 요청."
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "레스폰스 코드 \"%1$s\"가 올바르지 않습니다."
+
+#: include/classes/validators/CFormValidator.php:1001
+#: include/classes/validators/CFormValidator.php:1007
+msgid "Invalid string."
+msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:82
 #: include/classes/export/CConfigurationExportBuilder.php:105
@@ -12224,6 +12339,10 @@ msgstr "JSON 데이터"
 #: include/classes/validators/CApiInputValidator.php:3982
 msgid "JSON is expected"
 msgstr "JSON이 필요합니다."
+
+#: include/forms.inc.php:466 include/views/js/item.preprocessing.js.php:135
+msgid "JSON path"
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -12709,6 +12828,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "블록 장치 및 유형 목록. 반환 JSON"
 
+#: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
+msgid "List of characters"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr "감지된 CPU/CPU 코어 목록입니다. 반환 JSON"
@@ -12962,6 +13085,13 @@ msgstr "매크로 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Macro \"%1$s\" already exists."
 msgstr "매크로 \"%1$s\"는 이미 존재합니다."
 
+#: app/controllers/CControllerHostCreate.php:180
+#: app/controllers/CControllerHostUpdate.php:185
+#: app/controllers/CControllerTemplateCreate.php:54
+#: app/controllers/CControllerTemplateUpdate.php:56
+msgid "Macro name is not unique."
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:511
 #: app/partials/massupdate.macros.tab.php:121
 #: app/views/administration.macros.edit.php:29
@@ -13201,6 +13331,13 @@ msgstr "매핑문자열"
 #: app/controllers/CControllerPopupGeneric.php:468
 msgid "Mapping"
 msgstr "매핑"
+
+#: app/controllers/CControllerHostCreate.php:208
+#: app/controllers/CControllerHostUpdate.php:213
+#: app/controllers/CControllerTemplateCreate.php:82
+#: app/controllers/CControllerTemplateUpdate.php:84
+msgid "Mapping type and value combination is not unique."
+msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
 #: app/views/administration.iconmap.edit.php:126
@@ -13935,6 +14072,10 @@ msgstr "복수"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "장애이벤트를 계속해서 생성"
+
+#: include/classes/validators/CFormValidator.php:340
+msgid "Must be selected."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15127,6 +15268,10 @@ msgstr "11월"
 msgid "November"
 msgstr "11월"
 
+#: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
+msgid "Number"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
 msgstr "CPU 수. integer를 리턴."
@@ -15432,6 +15577,21 @@ msgstr "한번"
 #: app/views/mediatype.edit.php:445
 msgid "One"
 msgstr "1개"
+
+#: app/controllers/CControllerItem.php:166
+#: app/controllers/CControllerItemPrototype.php:168
+msgid "One \"Change\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:182
+#: app/controllers/CControllerItemPrototype.php:184
+msgid "One \"Prometheus\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:174
+#: app/controllers/CControllerItemPrototype.php:176
+msgid "One \"Throttling\" step allowed per item."
+msgstr ""
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -16027,6 +16187,21 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "PSK 아이덴티티"
 
+#: app/controllers/CControllerHostCreate.php:162
+#: app/controllers/CControllerHostUpdate.php:167
+msgid "PSK must be an even number of characters."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:166
+#: app/controllers/CControllerHostUpdate.php:171
+msgid "PSK must be at least 32 characters long."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:170
+#: app/controllers/CControllerHostUpdate.php:175
+msgid "PSK must contain only hexadecimal characters."
+msgstr ""
+
 #: jsLoader.php:146
 #, c-format
 msgid "Page %1$d"
@@ -16505,6 +16680,11 @@ msgstr "보존하기 전의 처리"
 #: include/views/configuration.item.prototype.edit.php:950
 msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
 msgstr "전처리는 값을 데이터베이스에 저장하기 전의 변환입니다. 일련의 전처리 단계를 정의할 수 있으며, 이는 설정된 순서대로 실행됩니다."
+
+#: app/controllers/CControllerItem.php:190
+#: app/controllers/CControllerItemPrototype.php:192
+msgid "Preprocessing step with such Name and Parameters combination already exists."
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -16996,6 +17176,10 @@ msgstr "공개키 파일"
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
 msgstr "푸시"
+
+#: include/views/js/item.preprocessing.js.php:208
+msgid "Qualifier"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -17642,6 +17826,10 @@ msgstr "리퀘스트 타입"
 #: include/views/configuration.httpconf.edit.php:228
 msgid "Required"
 msgstr "요구 문자열"
+
+#: include/classes/validators/CFormValidator.php:652 jsLoader.php:420
+msgid "Required field is missing."
+msgstr ""
 
 #: app/views/administration.script.edit.php:314
 msgid "Required host permissions"
@@ -20123,6 +20311,21 @@ msgstr "태그 목록"
 msgid "Tag name"
 msgstr "태그 명"
 
+#: app/controllers/CControllerHostCreate.php:129
+#: app/controllers/CControllerHostUpdate.php:133
+#: app/controllers/CControllerItemCreate.php:339
+#: app/controllers/CControllerItemPrototypeCreate.php:346
+#: app/controllers/CControllerItemPrototypeUpdate.php:301
+#: app/controllers/CControllerItemUpdate.php:302
+#: app/controllers/CControllerTemplateCreate.php:47
+#: app/controllers/CControllerTemplateUpdate.php:49
+#: app/controllers/CControllerTriggerCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeUpdate.php:61
+#: app/controllers/CControllerTriggerUpdate.php:61
+msgid "Tag name and value combination is not unique."
+msgstr ""
+
 #: include/actions.inc.php:68
 msgid "Tag value"
 msgstr "태그 값"
@@ -20696,10 +20899,27 @@ msgstr[0] ""
 msgid "This day last week"
 msgstr "저번주의 오늘"
 
+#: include/classes/validators/CFormValidator.php:929
+#: include/classes/validators/CFormValidator.php:1109
+#: include/classes/validators/CFormValidator.php:1158 jsLoader.php:427
+msgid "This field cannot be empty."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:263
+#: app/controllers/CControllerItemPrototypeCreate.php:271
+#: app/controllers/CControllerItemPrototypeUpdate.php:228
+#: app/controllers/CControllerItemUpdate.php:228
+msgid "This field cannot be set to \"0\" without defining custom intervals."
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "이 필드는 \"%1$s\" 항목에 의해 자동으로 채워집니다."
+
+#: include/classes/validators/CItemKeyValidator.php:42
+msgid "This field must contain at least one low-level discovery macro."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
 msgid "This is the test message from Zabbix"
@@ -20712,6 +20932,10 @@ msgstr "이번 달"
 #: include/func.inc.php:2575
 msgid "This month so far"
 msgstr "이번 달의 지금까지"
+
+#: include/classes/validators/CFormValidator.php:1260 jsLoader.php:425
+msgid "This object already exists."
+msgstr ""
 
 #: widgets/item/views/widget.edit.php:229
 msgid "This setting applies only to numeric data."
@@ -20747,6 +20971,66 @@ msgstr "이러한 유형의 정보는 키와 일치하지 않을 수 있습니�
 #: app/views/administration.user.edit.php:61
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
 msgstr "이 사용자는 IdP가 프로비저닝되었습니다. 프로비저닝된 필드에 대한 수동 변경은 허용되지 않습니다."
+
+#: include/classes/validators/CFormValidator.php:1442
+#: include/classes/validators/CFormValidator.php:1482 jsLoader.php:430
+#, c-format
+msgid "This value cannot be %1$s."
+msgid_plural "This value cannot be one of %1$s."
+msgstr[0] ""
+
+#: jsLoader.php:429
+#, c-format
+msgid "This value cannot be one of %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
+msgid "This value does not match pattern."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
+msgid "This value is not a valid floating-point value."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:790 jsLoader.php:422
+msgid "This value is not a valid identifier."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:823 jsLoader.php:423
+msgid "This value is not a valid integer."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:923 jsLoader.php:426
+msgid "This value is not a valid string."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:940 jsLoader.php:428
+msgid "This value is too long."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1461 jsLoader.php:431
+#, c-format
+msgid "This value must be %1$s."
+msgid_plural "This value must be one of %1$s."
+msgstr[0] ""
+
+#: include/classes/validators/CFormValidator.php:847
+#: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
+#, c-format
+msgid "This value must be no greater than \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:841
+#: include/classes/validators/CFormValidator.php:892 jsLoader.php:432
+#, c-format
+msgid "This value must be no less than \"%1$s\"."
+msgstr ""
+
+#: jsLoader.php:434
+#, c-format
+msgid "This value must be one of %1$s."
+msgstr ""
 
 #: include/func.inc.php:2572
 msgid "This week"
@@ -23174,6 +23458,18 @@ msgstr "값 매핑"
 msgid "Value mappings"
 msgstr "값 매핑"
 
+#: include/classes/validators/CFormValidator.php:1028
+#: include/classes/validators/CFormValidator.php:1038
+#, c-format
+msgid "Value must be greater than %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1033
+#: include/classes/validators/CFormValidator.php:1042
+#, c-format
+msgid "Value must be smaller than %1$s."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1078
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr "MQTT 주제의 값입니다. 반환된 데이터의 형식은 주제 콘텐츠에 따라 다릅니다. 와일드카드를 사용하는 경우 JSON 형식의 주제 값을 반환합니다."
@@ -24159,6 +24455,10 @@ msgstr "숫자가 너무 큽니다"
 #: include/classes/api/services/CDRule.php:338
 msgid "a numeric value is expected"
 msgstr "숫자로 지정해주세요"
+
+#: include/classes/validators/CApiInputValidator.php:2884
+msgid "a port number is expected"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:193
 #: app/controllers/CControllerPopupItemTestSend.php:207
@@ -25935,6 +26235,12 @@ msgstr "off"
 msgid "on"
 msgstr "on"
 
+#: include/classes/validators/CFormValidator.php:1388
+#: include/classes/validators/CFormValidator.php:1433 jsLoader.php:438
+#, c-format
+msgid "one of %1$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
 msgid "only one object can exist within the combinations of %1$s"
@@ -26799,6 +27105,18 @@ msgstr "삭제되지 않음"
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
 msgstr "비활성화되지 않음"
+
+#: include/classes/validators/CFormValidator.php:1393
+#: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
+#, c-format
+msgid "within range %1$s"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1394
+#: include/classes/validators/CFormValidator.php:1439 jsLoader.php:437
+#, c-format
+msgid "within ranges %1$s"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

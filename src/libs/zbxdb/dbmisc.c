@@ -818,6 +818,13 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != config->dbsocket && 0 != config->dbport)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
+				"them can be defined, or neither.");
+		exit(EXIT_FAILURE);
+	}
 }
 #endif
 

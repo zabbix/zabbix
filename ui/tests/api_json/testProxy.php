@@ -1405,7 +1405,7 @@ class testProxy extends CAPITest {
 					'local_address' => 'localhost',
 					'local_port' => -1
 				],
-				'expected_error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+				'expected_error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 			],
 			'Test proxy.create: invalid "local_port" (too large)' => [
 				'proxy' => [
@@ -1414,7 +1414,7 @@ class testProxy extends CAPITest {
 					'local_address' => 'localhost',
 					'local_port' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+				'expected_error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 			],
 			'Test proxy.create: invalid "local_port" (too long)' => [
 				'proxy' => [
@@ -1639,7 +1639,7 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test proxy.create: invalid "port" (not in range) for passive proxy' => [
 				'proxy' => [
@@ -1648,7 +1648,7 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => self::INVALID_NUMBER
 				],
-				'expected_error' =>	'Invalid parameter "/1/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
+				'expected_error' =>	'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test proxy.create: invalid "port" (not empty int) for active proxy' => [
 				'proxy' => [
@@ -3949,7 +3949,7 @@ class testProxy extends CAPITest {
 					'proxyid' => 'passive_defaults',
 					'port' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test proxy.update: invalid "port" (boolean) for passive proxy' => [
 				'proxy' => [
@@ -3970,7 +3970,7 @@ class testProxy extends CAPITest {
 					'proxyid' => 'passive_defaults',
 					'port' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test proxy.update: invalid "port" (not empty int for active proxy)' => [
 				'proxy' => [
