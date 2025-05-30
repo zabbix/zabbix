@@ -215,6 +215,7 @@ class CControllerTriggerList extends CController {
 		if ($filter_tags) {
 			$options['evaltype'] = $filter_evaltype;
 			$options['tags'] = $filter_tags;
+			$options['inheritedTags'] = true;
 		}
 
 		$prefetched_triggers = API::Trigger()->get($options);
