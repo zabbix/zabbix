@@ -52,6 +52,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
 	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
+	const INDICATOR_CHANGE_HOST = 'Host for checking widget without show value option';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -78,6 +79,20 @@ class testDashboardItemValueWidget extends testWidgets {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
+
+		// Add 2 values of data for items, to check that there are no errors without show value option selected.
+		$items_data = [
+			'Indicator - Numeric (float)' => 0.1,
+			'Indicator - Character' => 1,
+			'Indicator - Numeric (unsigned)' => 1,
+			'Indicator - Text' => 1,
+			'Indicator - Log' => 1
+		];
+
+		foreach ($items_data as $name => $value) {
+			CDataHelper::addItemData(self::$itemids[$name], $value, time());
+			CDataHelper::addItemData(self::$itemids[$name], $value + 1, time() + 1);
+		}
 
 		CDataHelper::call('usermacro.createglobal', [
 			[
@@ -1363,6 +1378,81 @@ class testDashboardItemValueWidget extends testWidgets {
 					],
 					'trim' => true
 				]
+			],
+			// #45 Check that there is no errors, when show value option is unchecked (for each data type).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - float',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (float)'
+					]
+				]
+			],
+			// #46.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - character',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Character'
+					]
+				]
+			],
+			// #47.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - log',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Log'
+					]
+				]
+			],
+			// #48.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - numeric (unsigned)',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Numeric (unsigned)'
+					]
+				]
+			],
+			// #49.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - text',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - Text'
+					]
+				]
 			]
 		];
 	}
@@ -1378,7 +1468,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	public static function getWidgetUpdateData() {
 		return [
-			// #45.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1397,7 +1487,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #46.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1540,7 +1630,9 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->cancelEditing();
+			// Change dashboard from cancelEditing() to save() to check deadlock issue.
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Write new name to update widget for update scenario.
 			if ($update) {

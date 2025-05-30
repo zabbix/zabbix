@@ -433,9 +433,10 @@ zabbix_export:
         	}
         }
         
-        Telegram.prototype.getMessageID = function () {
-        	if (CParamValidator.isDefined(this.params.event_tags['__telegram_msg_id_' + this.params.api_chat_id])) {
-        		return this.params.event_tags['__telegram_msg_id_' + this.params.api_chat_id];
+        Telegram.prototype.getMessageID = function (chat_id, message_thread_id) {
+        	const tag_key = '__telegram_msg_id_' + chat_id + (message_thread_id ? '_' + message_thread_id : '');
+        	if (CParamValidator.isDefined(this.params.event_tags[tag_key])) {
+        		return this.params.event_tags[tag_key];
         	}
         	return null;
         }
@@ -455,13 +456,20 @@ zabbix_export:
         		disable_web_page_preview: true,
         		disable_notification: false
         	};
-        	this.data['chat_id'] = this.params.api_chat_id;
+        	const match = this.params.api_chat_id.match(/^(-?\d+|@[a-zA-Z0-9_]+)(?::(\d+))?$/);
+        	if (!match) {
+        		throw 'Invalid format for api_chat_id: "' + this.params.api_chat_id + '". Must be a numeric group ID or @GroupName, optionally followed by :message_thread_id.';
+        	}
+        	this.data['chat_id'] = match[1];
+        	if (CParamValidator.isDefined(match[2])) {
+        		this.data['message_thread_id'] = match[2];
+        	}
         	this.data['text'] = ((this.params.alert_subject !== '') ? this.params.alert_subject + '\n' : '') + this.params.alert_message;
         	if (['markdown', 'html', 'markdownv2'].indexOf(this.params.api_parse_mode.toLowerCase()) !== -1) {
         		this.data['parse_mode'] = this.params.api_parse_mode.toLowerCase();
         		this.data['text'] = escapeMarkup(this.data['text'], this.data['parse_mode']);
         	}
-        	const reply_to_message_id = this.getMessageID();
+        	const reply_to_message_id = this.getMessageID(this.data['chat_id'], this.data['message_thread_id']);
         	if (reply_to_message_id !== null) {
         		this.data['reply_to_message_id'] = reply_to_message_id;
         	}
@@ -483,8 +491,8 @@ zabbix_export:
         		}
         	}
         
-        	if (CParamValidator.isDefined(response.result.message_id) && this.getMessageID() === null) {
-        		this.result.tags['__telegram_msg_id_' + this.params.api_chat_id] = response.result.message_id;
+        	if (CParamValidator.isDefined(response.result.message_id) && this.getMessageID(this.data['chat_id'], this.data['message_thread_id']) === null) {
+        		this.result.tags['__telegram_msg_id_' + this.data['chat_id'] + (this.data['message_thread_id'] ? '_' + this.data['message_thread_id'] : '')] = response.result.message_id;
         	}
         
         	return this.result;
@@ -499,22 +507,62 @@ zabbix_export:
         	Logger.log(Logger.WARN, 'notification failed: ' + error);
         	throw 'Sending failed: ' + error;
         }
-      timeout: 10s
       process_tags: 'YES'
       description: |
-        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram
+        This media type integrates your Zabbix installation with Telegram using the Zabbix webhook feature.
         
-        1. Register bot: send "/newbot" to @BotFather and follow instructions
-        2. Copy and paste the obtained token into the "Token" field above
-        3. If you want to send personal notifications, you need to get chat id of the user you want to send messages to:
-            3.1. Send "/getid" to "@myidbot" in Telegram messenger
-            3.2. Copy returned chat id and save it in the "Telegram Webhook" media for the user
-            3.3. Ask the user to send "/start" to your bot (Telegram bot won't send anything to the user without it)
-        4. If you want to send group notifications, you need to get group id of the group you want to send messages to:
-            4.1. Add "@myidbot" to your group
-            4.2. Send "/getgroupid@myidbot" in your group
-            4.3. Copy returned group id save it in the "Telegram Webhook" media for the user you created for  group notifications
-            4.4. Send "/start@your_bot_name_here" in your group (Telegram bot won't send anything to the group without it)
+        Telegram configuration:
+        
+        1. Register a new Telegram bot: send "/newbot" to "@BotFather" and follow the instructions. The token provided by "@BotFather" in the final step will be needed for configuring the Zabbix webhook.
+        
+        2. Set up personal or group notifications:
+        
+        2.1 Personal notifications:
+        
+        2.1.1 Retrieve the chat ID of the user the bot should send messages to. The user should send "/getid" to "@myidbot" in the Telegram messenger.
+        
+        2.1.2 The user should also send "/start" to the bot created in step 1. If you skip this step, the Telegram bot won't be able to send messages to the user (bots cannot initiate conversations with users).
+        
+        2.2 Group notifications:
+        
+        2.2.1 Retrieve the group ID of the group that the bot should send messages to. Add "@myidbot" and the bot created in step 1 to your group.
+        
+        2.2.2 In the group chat, send: "/getgroupid@myidbot".
+        
+        2.2.3 If the bot is added to a supergroup and you want the bot to send messages to a specific topic instead of the default "General" channel, right-click any message in that topic and click "Copy Message Link". The copied link will have the following format: "https://t.me/c/<short_group_id>/<topic_id>/<message_id>", for example: "https://t.me/c/1234567890/2/1". In this example, the topic ID is "2".
+        
+        Note:
+        - The group ID is a negative number, for example: "-1234567890".
+        - The supergroup ID is a negative number prefixed with "-100", for example: "-1001234567890"
+        - The public group or supergroup ID can also be specified in media type properties as a name prefixed by "@", for example: "@MyGroupName".
+        
+        3. Depending on where you want to send notifications, copy and save the bot token, personal chat ID or group ID, and topic ID (if you want to send messages to a specific supergroup topic), as you will need these later to set up the media type in Zabbix.
+        
+        Zabbix configuration:
+        
+        1. Set the following webhook parameters:
+        - "api_parse_mode" - the formatting mode applied for messages (possible values: "markdown", "html", "markdownv2")
+        - "api_token" - the token of the bot used to send messages
+        
+        Learn more about message formatting options in Telegram Bot API documentation:
+        - Markdown: https://core.telegram.org/bots/api#markdown-style
+        - HTML: https://core.telegram.org/bots/api#html-style
+        - MarkdownV2: https://core.telegram.org/bots/api#markdownv2-style
+        
+        Note: Your Telegram-related actions should be separated from other notification types (e.g., SMS); otherwise, if you use Markdown or HTML in the alert subject or body, you may receive plain-text alerts with raw tags.
+        
+        2. Click the "Enabled" checkbox to enable the media type and click the "Update" button to save the webhook settings.
+        
+        3. Create a Zabbix user and add media:
+        - To create a new user, go to the "Users" → "Users" section, click the "Create user" button in the top right corner. In the "User" tab, fill in all required fields (marked with red asterisks).
+        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to Zammad.
+        - In the "Media" tab, click "Add" and select the type "Telegram" from the drop-down list.
+        - In the "Send to" field, specify the Telegram user chat ID or group ID that you retrieved during Telegram setup. To send notifications to a specific topic within a supergroup, specify the topic ID after the semicolon delimiter in the format "<group_id>:<topic_id>", for example: "-1001234567890:2", "@MyGroupName:2".
+        
+        4. Done! You can now start using this media type in actions and create tickets.
+        
+        You can find the latest version of this media and additional information in the official Zabbix repository:
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM

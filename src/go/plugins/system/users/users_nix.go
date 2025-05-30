@@ -22,13 +22,22 @@ import (
 	"time"
 
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
+	"golang.zabbix.com/sdk/errs"
 )
 
-func (p *Plugin) getUsersNum(timeout int) (num int, err error) {
-	var out string
-	out, err = zbxcmd.Execute("who | wc -l", time.Second*time.Duration(timeout), "")
+func (p *Plugin) getUsersNum(timeout int) (int, error) {
+	if p.executor == nil {
+		var err error
+
+		p.executor, err = zbxcmd.InitExecutor()
+		if err != nil {
+			return 0, errs.Wrap(err, "command init failed")
+		}
+	}
+
+	out, err := p.executor.Execute("who | wc -l", time.Second*time.Duration(timeout), "")
 	if err != nil {
-		return
+		return 0, errs.Wrap(err, "failed to execute command")
 	}
 
 	return strconv.Atoi(out)
