@@ -742,7 +742,7 @@ class CZabbixServer {
 
 		// Common names ordered according to "RFC 4514", remaining names appended in alphabetical order.
 		ksort($attributes, SORT_NATURAL);
-		$sequence = ['CN', 'L', 'ST', 'O', 'OU', 'C', 'STREET', 'DC', 'UID'];
+		$sequence = ['CN', 'OU', 'O', 'L', 'ST', 'C'];
 
 		$result_ordered = [];
 		foreach ($sequence as $name) {
@@ -754,6 +754,7 @@ class CZabbixServer {
 			$values = array_reverse($attributes[$name]);
 
 			foreach ($values as $value) {
+				$value = addcslashes($value, ',+');
 				$result_ordered[] = "{$name}={$value}";
 			}
 
@@ -765,6 +766,7 @@ class CZabbixServer {
 			$values = array_reverse($attributes[$name]);
 
 			foreach ($values as $value) {
+				$value = addcslashes($value, ',+');
 				$result_ordered[] = "{$name}={$value}";
 			}
 		}
