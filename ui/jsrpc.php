@@ -62,6 +62,7 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		$message = '';
 		$status = true;
+		$tls_error = false;
 
 		if (!CSessionHelper::has('serverCheckResult') || !CSessionHelper::has('serverCheckTime')
 			|| ((int) CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
@@ -79,8 +80,9 @@ switch ($data['method']) {
 				$is_running = $zabbix_server->isRunning();
 				$can_connect = $zabbix_server->canConnect(CSessionHelper::getId());
 				$status = $is_running && $can_connect;
+				$tls_error = $zabbix_server->getErrorCode() === CZabbixServer::ERROR_CODE_TLS;
 
-				if (!$can_connect && $zabbix_server->getErrorCode() == CZabbixServer::ERROR_CODE_TLS) {
+				if (!$can_connect && $tls_error) {
 					$message = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
 				}
 				elseif (!$status) {
@@ -89,12 +91,16 @@ switch ($data['method']) {
 			}
 
 			CSessionHelper::set('serverCheckResult', $status);
+			CSessionHelper::set('serverCheckResultTlsError', $tls_error);
 			CSessionHelper::set('serverCheckTime', time());
 		}
 		else {
 			$status = (bool) CSessionHelper::get('serverCheckResult');
 
-			if (!$status) {
+			if (CSessionHelper::get('serverCheckResultTlsError') === true) {
+				$message = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+			}
+			elseif (!$status) {
 				$message = _('Zabbix server is not running: the information displayed may not be current.');
 			}
 		}
