@@ -308,7 +308,7 @@ ITEM.LOG.TIME -> *UNKNOWN* <-
 TRIGGER.TEMPLATE.NAME -> *UNKNOWN* <-";
 
 	/* These macros are not resolved. */
-	const BUILTIN_MACROS_NON_EXPANDABLE = "{ALERT.MESSAGE}
+	const BUILTIN_MACROS_NON_RESOLVABLE = "{ALERT.MESSAGE}
 {ALERT.SENDTO}
 {ALERT.SUBJECT}
 {DISCOVERY.DEVICE.IPADDRESS}
@@ -750,7 +750,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 							'===3===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
+							self::BUILTIN_MACROS_NON_RESOLVABLE . "\n" .
 							'===5===' . "\n" .
 							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===6===' . "\n" .
@@ -788,7 +788,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 							'===4===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===5===' . "\n" .
-							self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
+							self::BUILTIN_MACROS_NON_RESOLVABLE . "\n" .
 							'===6===' . "\n" .
 							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 							'===7===' . "\n" .
@@ -834,7 +834,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 							'===3===' . "\n" .
 							self::BUILTIN_MACROS_UNKNOWN . "\n" .
 							'===4===' . "\n" .
-							self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
+							self::BUILTIN_MACROS_NON_RESOLVABLE . "\n" .
 							'===5===' . "\n" .
 							'USER_MACRO_HOST -> {$USER_MACRO_HOST} <-' . "\n" .
 							'===6===' . "\n" .
@@ -913,7 +913,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			'===3===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
+			self::BUILTIN_MACROS_NON_RESOLVABLE . "\n" .
 			'===5===' . "\n" .
 			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 			'===6===' . "\n" .
@@ -951,7 +951,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			'===4===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===5===' . "\n" .
-			self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
+			self::BUILTIN_MACROS_NON_RESOLVABLE . "\n" .
 			'===6===' . "\n" .
 			self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_ONLY_RECOVERY . "\n" .
 			'===7===' . "\n" .
@@ -1066,7 +1066,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			'===3===' . "\n" .
 			self::BUILTIN_MACROS_UNKNOWN_RESOLVED . "\n" .
 			'===4===' . "\n" .
-			self::BUILTIN_MACROS_NON_EXPANDABLE . "\n" .
+			self::BUILTIN_MACROS_NON_RESOLVABLE . "\n" .
 			'===5===' . "\n" .
 			'USER_MACRO_HOST -> HOST_LEVEL_' . ALL_PRINTABLE_ASCII . " <-\n" .
 			'===6===' . "\n" .
