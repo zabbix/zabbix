@@ -94,7 +94,7 @@ class testExpressionMacros extends CIntegrationTest {
 	const INVENTORY_OOB_ROUTER = "127.0.0.1";
 
 	/* COMMON means common between 1) operations 2) recovery operations 3) update operations               */
-	/* That does NOT mean that all macroses resolved to the same values for different operations.          */
+	/* That does NOT mean that all macros resolved to the same values for different operations.            */
 	/* That means they all get resolved for all operations - to something consistent that can be compared. */
 	const BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON = "ACTION.NAME -> {ACTION.NAME} <-
 EVENT.ACK.STATUS -> {EVENT.ACK.STATUS} <-
