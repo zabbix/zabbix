@@ -204,7 +204,7 @@ class CControllerAuthenticationEdit extends CController {
 					'sp_private_key_hash' => $userdirectory['sp_private_key_hash'],
 					'show_idp_certificate_input' => $userdirectory['idp_certificate_hash'] === '' || $this->hasInput('idp_certificate'),
 					'show_sp_certificate_input' => $userdirectory['sp_certificate_hash'] === '' || $this->hasInput('sp_certificate'),
-					'show_sp_private_key_input' => $userdirectory['sp_private_key_hash'] === '' || $this->hasInput('sp_private_key'),
+					'show_sp_private_key_input' => $userdirectory['sp_private_key_hash'] === '' || $this->hasInput('sp_private_key')
 				];
 			}
 
