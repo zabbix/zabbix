@@ -38,7 +38,7 @@ class CApiTagHelper {
 			string $parent_alias, string $field): string {
 		$sql_where = [];
 
-		foreach (self::groupValuesByTags($tags) as $tag => $filters) {
+		foreach (self::groupTagsForFiltering($tags) as $tag => $filters) {
 			// The tag operator TAG_OPERATOR_EXISTS overrides explicit values of the same tag and NOT EXISTS statements.
 			if (array_key_exists('EXISTS', $filters) && array_key_exists('tag', $filters['EXISTS'])
 					&& $filters['EXISTS']['tag'] === true) {
@@ -46,67 +46,103 @@ class CApiTagHelper {
 			}
 
 			$where = [];
+			$tag_condition = 'tag.tag='.zbx_dbstr($tag);
 
 			foreach ($filters as $prefix => $filter) {
-				$where_value_conditions = '';
-
 				foreach ($filter as $type => $conditions) {
+					$tag_conditions = $tag_condition;
+
 					if ($type === 'value') {
-						$conditions = array_unique($conditions);
-						$where_value_conditions .= count($conditions) == 1
-							? ' AND '.$conditions[0]
-							: ' AND ('.implode(' OR ', $conditions).')';
-					}
-				}
+						$value_conditions = array_unique($conditions);
+						$value_conditions = count($value_conditions) == 1
+							? ' AND '.$value_conditions[0]
+							: ' AND ('.implode(' OR ', $value_conditions).')';
 
-				$_where = $prefix.' ('.
-					'SELECT NULL'.
-					' FROM '.$table.' tag'.
-					' WHERE '.$parent_alias.'.'.$field.'=tag.'.$field.
-						' AND tag.tag='.zbx_dbstr($tag).
-						$where_value_conditions.
-				')';
-
-				if ($with_inherited_tags) {
-					$sql = 'SELECT NULL';
-
-					switch ($table) {
-						case 'host_tag':
-							$sql .= ' FROM host_template_cache htc'.
-									' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
-									' WHERE '.$parent_alias.'.'.$field.'=htc.'.$field;
-							break;
-
-						case 'httptest_tag':
-							$sql .= ' FROM httptest_template_cache htc'.
-									' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
-									' WHERE '.$parent_alias.'.'.$field.'=htc.'.$field;
-							break;
-
-						case 'item_tag':
-							$sql .= ' FROM item_template_cache itc'.
-									' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
-									' WHERE '.$parent_alias.'.'.$field.'=itc.'.$field;
-							break;
-
-						case 'trigger_tag':
-							$sql .= ' FROM item_template_cache itc'.
-									' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
-									' WHERE f.itemid=itc.itemid';
-							break;
+						$tag_conditions .= $value_conditions;
 					}
 
-					$sql .= ' AND tag.tag='.zbx_dbstr($tag).
-							$where_value_conditions;
+					if ($with_inherited_tags) {
+						switch ($table) {
+							case 'host_tag':
+								$where[] = $prefix.' ('.
+									'SELECT NULL'.
+									' FROM host_template_cache htc'.
+									' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
+									' WHERE h.hostid=htc.hostid'.
+										' AND '.$tag_conditions.
+								')';
+								break;
 
-					$_where .= ($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
-						$sql.
-					')';
+							case 'httptest_tag':
+								$where[] = '('.
+									$prefix.' ('.
+										'SELECT NULL'.
+										' FROM httptest_tag tag'.
+										' WHERE ht.httptestid=tag.httptestid'.
+											' AND '.$tag_conditions.
+									')'.
+									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
+										'SELECT NULL'.
+										' FROM httptest_template_cache htc'.
+										' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
+										' WHERE ht.httptestid=htc.httptestid'.
+											' AND '.$tag_conditions.
+									')'.
+								')';
+								break;
 
-					$_where = '('.$_where.')';
+							case 'item_tag':
+								$where[] = '('.
+									$prefix.' ('.
+										'SELECT NULL'.
+										' FROM item_tag tag'.
+										' WHERE i.itemid=tag.itemid'.
+											' AND '.$tag_conditions.
+									')'.
+									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
+										'SELECT NULL'.
+										' FROM item_template_cache itc'.
+										' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
+										' WHERE i.itemid=itc.itemid'.
+											' AND '.$tag_conditions.
+									')'.
+								')';
+								break;
+
+							case 'trigger_tag':
+								$where[] = '('.
+									$prefix.' ('.
+										'SELECT NULL'.
+										' FROM trigger_tag tag'.
+										' WHERE t.triggerid=tag.triggerid'.
+											' AND '.$tag_conditions.
+									')'.
+									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
+										'SELECT NULL'.
+										' FROM item_tag tag'.
+										' WHERE f.itemid=tag.itemid'.
+											' AND '.$tag_conditions.
+									')'.
+									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
+										'SELECT NULL'.
+										' FROM item_template_cache itc'.
+										' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
+										' WHERE f.itemid=itc.itemid'.
+											' AND '.$tag_conditions.
+									')'.
+								')';
+								break;
+						}
+					}
+					else {
+						$where[] = $prefix.' ('.
+							'SELECT NULL'.
+							' FROM '.$table.' tag'.
+							' WHERE '.$parent_alias.'.'.$field.'=tag.'.$field.
+								' AND '.$tag_conditions.
+						')';
+					}
 				}
-
-				$where[] = $_where;
 			}
 
 			if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
@@ -128,7 +164,7 @@ class CApiTagHelper {
 			: implode($evaltype_glue, $sql_where);
 	}
 
-	private static function groupValuesByTags(array $tags): array {
+	private static function groupTagsForFiltering(array $tags): array {
 		$values_by_tags = [];
 
 		foreach ($tags as $tag) {
