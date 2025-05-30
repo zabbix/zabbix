@@ -421,6 +421,7 @@ class CRouter {
 		'chart7.php'					=> [CLegacyAction::class, null, null],
 		'history.php'					=> [CLegacyAction::class, null, null],
 		'host_discovery.php'			=> [CLegacyAction::class, null, null],
+		'host_discovery_prototypes.php'	=> [CLegacyAction::class, null, null],
 		'host_prototypes.php'			=> [CLegacyAction::class, null, null],
 		'hostinventories.php'			=> [CLegacyAction::class, null, null],
 		'hostinventoriesoverview.php'	=> [CLegacyAction::class, null, null],

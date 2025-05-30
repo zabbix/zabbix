@@ -361,6 +361,7 @@ class CControllerMenuPopup extends CController {
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => ['name', 'key_'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid']
@@ -368,6 +369,7 @@ class CControllerMenuPopup extends CController {
 
 		if ($db_item_prototypes) {
 			$db_item_prototype = $db_item_prototypes[0];
+			$parent_lld = $db_item_prototype['discoveryRule'] ?: $db_item_prototype['discoveryRulePrototype'];
 
 			$menu_data = [
 				'type' => 'item_prototype',
@@ -377,7 +379,7 @@ class CControllerMenuPopup extends CController {
 				'key' => $db_item_prototype['key_'],
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
-				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
+				'parent_discoveryid' => $parent_lld['itemid'],
 				'trigger_prototypes' => $db_item_prototype['triggers']
 			];
 

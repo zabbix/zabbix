@@ -70,12 +70,10 @@ class CTemplate extends CHostGeneral {
 			'selectTemplates'			=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
-			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
-			'selectTags'				=> null,
 			'selectValueMaps'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -288,12 +286,15 @@ class CTemplate extends CHostGeneral {
 		return $result;
 	}
 
-	private static function validateGet(array &$options) {
+	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Output.
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])],
+			'selectDiscoveries' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
+			'selectDiscoveryRules' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnTemplate()), 'default' => null],
 			// Sort and limit.
 			'limitSelects' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
@@ -713,7 +714,7 @@ class CTemplate extends CHostGeneral {
 
 		// delete the discovery rules first
 		$db_lld_rules = DB::select('items', [
-			'output' => ['itemid', 'name'],
+			'output' => ['itemid', 'name', 'flags'],
 			'filter' => [
 				'hostid' => $templateids,
 				'flags' => ZBX_FLAG_DISCOVERY_RULE
@@ -1200,6 +1201,8 @@ class CTemplate extends CHostGeneral {
 
 		self::addRelatedMacros($options, $result);
 		$this->addRelatedTemplateGroups($options, $result);
+		self::addRelatedChildDiscoveries($options, $result);
+		self::addRelatedChildDiscoveryRules($options, $result);
 
 		$templateids = array_keys($result);
 

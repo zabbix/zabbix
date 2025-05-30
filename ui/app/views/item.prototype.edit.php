@@ -78,6 +78,7 @@ if ($item['itemid']) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
+			'enabled' => !$item['discovered'],
 			'action' => 'item_edit_form.update()'
 		],
 		[
@@ -85,6 +86,7 @@ if ($item['itemid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
+			'enabled' => !$item['discovered'],
 			'action' => 'item_edit_form.clone()'
 		],
 		[

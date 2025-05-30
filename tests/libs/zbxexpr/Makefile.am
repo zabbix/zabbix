@@ -21,6 +21,7 @@ BINARIES_tests = \
 	zbx_function_param_quote \
 	zbx_make_hostname \
 	zbx_check_hostname \
+	zbx_check_prototype_hostname \
 	zbx_parse_host_key \
 	zbx_uint64match_condition \
 	zbx_get_function_type \
@@ -432,6 +433,21 @@ zbx_check_hostname_LDADD += @SERVER_LIBS@
 zbx_check_hostname_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_check_hostname_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+#zbx_check_prototype_hostname
+
+zbx_check_prototype_hostname_SOURCES = \
+	zbx_check_prototype_hostname.c \
+	$(COMMON_SRC_FILES)
+
+zbx_check_prototype_hostname_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_check_prototype_hostname_LDADD += @SERVER_LIBS@
+
+zbx_check_prototype_hostname_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_check_prototype_hostname_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 #zbx_parse_host_key
 

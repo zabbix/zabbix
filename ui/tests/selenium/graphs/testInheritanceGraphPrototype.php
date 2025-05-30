@@ -33,7 +33,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 
 	public static function update() {
 		return CDBHelper::getDataProvider(
-			'SELECT DISTINCT g.graphid,id.parent_itemid'.
+			'SELECT DISTINCT g.graphid,id.lldruleid'.
 			' FROM graphs g,graphs_items gi,item_discovery id'.
 			' WHERE g.graphid=gi.graphid'.
 				' AND gi.itemid=id.itemid'.
@@ -57,7 +57,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid='.
-				$data['parent_itemid'].'&graphid='.$data['graphid']);
+				$data['lldruleid'].'&graphid='.$data['graphid']);
 		$this->zbxTestCheckTitle('Graph prototype edit');
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();

@@ -664,7 +664,6 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
-				'uuid' => $discoveryRule['uuid'],
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -717,11 +716,11 @@ class CConfigurationExportBuilder {
 				unset($data['filter']);
 			}
 
-			if (isset($discoveryRule['interface_ref'])) {
-				$data['interface_ref'] = $discoveryRule['interface_ref'];
-			}
+			$data += array_intersect_key($discoveryRule, array_flip([
+				'uuid', 'interface_ref', 'parent_discovery_rule', 'discover'
+			]));
 
-			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
+			$data['master_item'] = $discoveryRule['type'] == ITEM_TYPE_DEPENDENT
 				? ['key' => $discoveryRule['master_item']['key_']]
 				: [];
 

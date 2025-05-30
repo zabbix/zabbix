@@ -1326,20 +1326,22 @@ UNIQUE		|1		|name
 TABLE|item_discovery|itemdiscoveryid|ZBX_TEMPLATE
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
-FIELD		|parent_itemid	|t_id		|	|NOT NULL	|0			|2|items	|itemid
+FIELD		|parent_itemid	|t_id		|	|NULL		|0			|2|items	|itemid
 FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|disable_source	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_disable	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|lldruleid	|t_id		|	|NULL		|0 			|3|items	|itemid		|RESTRICT
 UNIQUE		|1		|itemid,parent_itemid
 INDEX		|2		|parent_itemid
+INDEX		|3		|lldruleid
 
 TABLE|host_discovery|hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|parent_hostid	|t_id		|	|NULL		|0			|2|hosts	|hostid		|RESTRICT
-FIELD		|parent_itemid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
+FIELD		|lldruleid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
@@ -1347,7 +1349,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|disable_source	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_disable	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|parent_hostid
-INDEX		|2		|parent_itemid
+INDEX		|2		|lldruleid
 
 TABLE|interface_discovery|interfaceid|0
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0			|1|interface
@@ -2260,8 +2262,15 @@ INDEX		|3		|value_hostgroupid
 INDEX		|4		|value_userdirectoryid
 INDEX		|5		|value_mfaid
 
+TABLE|lld_macro_export|lld_macro_exportid|0
+FIELD		|lld_macro_exportid|t_id		|	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
+FIELD		|lld_macro	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_text		|''	|NOT NULL	|0
+INDEX		|1		|itemid
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7030039	|7030039
+ROW		|1		|7030048	|7030048

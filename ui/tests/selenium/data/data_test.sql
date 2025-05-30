@@ -176,23 +176,23 @@ INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15029, 15001, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3[{#KEY}]'    , '30s', 3, '', '', 2, 15000,'', 15024, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15030, 15001, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4[{#KEY}]'    , '30s', 3, '', '', 2, 15000,'', 15025, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15096, 15001, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing[{#KEY}]', '30s', 3, '', '', 2, 15000,'', 15095, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15021, 15021, 15011);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15022, 15022, 15011);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15023, 15023, 15011);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15024, 15024, 15011);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15025, 15025, 15011);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15026, 15026, 15016);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15027, 15027, 15016);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15028, 15028, 15016);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15029, 15029, 15016);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15030, 15030, 15016);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15031, 15095, 15011);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15032, 15096, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15021, 15021, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15022, 15022, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15023, 15023, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15024, 15024, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15025, 15025, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15026, 15026, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15027, 15027, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15028, 15028, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15029, 15029, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15030, 15030, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15031, 15095, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15032, 15096, 15016);
 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15083, 15002, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '','', 2, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15084, 15001, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '', 2, 15000,'', 15083, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15083, 15083, 15081);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15084, 15084, 15082);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15083, 15083, 15081);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (15084, 15084, 15082);
 
 -- testFormItemPrototype.Preprocessing
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (147,15095,1,1,'123');
@@ -481,17 +481,17 @@ INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,
 
 -- testFormItemPrototype.SimpleUpdate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype1', 'item-prototype-form1[{#KEY}]', 40001, 3, 23800, 2, 5, '', '','', 40011, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (501, 23800, 133800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (501, 23800, 133800);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype2', 'item-prototype-form2[{#KEY}]', 40001, 3, 23801, 2, 5, '', '','', 40011, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (502, 23801, 133800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (502, 23801, 133800);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype3', 'item-prototype-form3[{#KEY}]', 40001, 3, 23802, 2, 5, '', '','', 40011, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (503, 23802, 133800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (503, 23802, 133800);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype4', 'item-prototype-form4[{#KEY}]', 40001, 3, 23803, 2, 5, '', '','', 40011, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504, 23803, 133800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (504, 23803, 133800);
 
 -- testFormTriggerPrototype.SimpleCreate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemReuse', 'item-prototype-reuse[{#KEY}]', 40001, 3, 23804, 2, 5, '', '','', 40011, '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 133800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (505, 23804, 133800);
 
 -- testFormTriggerPrototype.SimpleUpdate
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99518,'{99947}=0','testFormTriggerPrototype1','',0,0,0,0,'','',NULL,0,0,2);
@@ -589,11 +589,11 @@ INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400390, 'Item ZBX6663 Second', 'ITEM ZBX6663 SECOND');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400420, 'Item ZBX6663', 'ITEM ZBX6663');
 
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (507,400480,400450,'',0,0);
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (508,400490,400460,'',0,0);
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (509,400500,400470,'',0,0);
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (510,400520,400460,'',0,0);
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (512,400540,400470,'',0,0);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (507,400480,400450,'',0,0);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (508,400490,400460,'',0,0);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (509,400500,400470,'',0,0);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (510,400520,400460,'',0,0);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (512,400540,400470,'',0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100008,'{100008}=0','Trigger ZBX6663 Second','',0,0,0,0,'','',NULL,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100009,'{100009}=0','Trigger ZBX6663 Second','',0,0,0,0,'','',100008,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100010,'{100010}=0','Trigger ZBX6663 Second','',0,0,0,0,'','',100008,0,0,0);
@@ -686,9 +686,9 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400580,0,50006,'Discovery-rule-layout-test-001','drule-layout-test001','30s','90d','365d',1,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'','50d','','');
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400590,0,50007,'Discovery-rule-layout-test-002','drule-layout-test002','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'','30','','');
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,query_fields, description,posts,headers) VALUES ('Item-proto-layout-test-001', 'item-proto-layout-test001', 50006, 3, 400600, 2, 5, '','', '','','');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (513, 400600, 400580);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (513, 400600, 400580);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,query_fields, description,posts,headers) VALUES ('Item-proto-layout-test-002', 'item-proto-layout-test002', 50007, 3, 400610, 2, 5, '','', '','','');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (514, 400610, 400590);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (514, 400610, 400590);
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400620,0,50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50020,'',0,'','30','','');
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400630,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'{{$A}}',0,'','30','','');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400630, 'Item-layout-test-002', 'ITEM-LAYOUT-TEST-002');
@@ -846,17 +846,17 @@ INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUE
 INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUES (90010, 'Host prototype {#9}', 'Host prototype {#9}', 0, '', 2, '');
 INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUES (90011, 'Host prototype {#10}', 'Host prototype {#10}', 0, '', 2, '');
 INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUES (90012, 'Host prototype {#33}', 'Host prototype visible name', 0, '', 2, '');
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90002, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90003, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90004, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90012, 90001);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90005, 90002);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90006, 90002);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90007, 90002);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90008, 90003);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90009, 90003);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90010, 90003);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90002, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90003, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90004, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90012, 90001);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90005, 90002);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90006, 90002);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90007, 90002);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90008, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90009, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90010, 90003);
+INSERT INTO host_discovery (hostid, lldruleid) VALUES (90011, 90003);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1019, 90003, '{#FSNAME}', NULL, NULL);
@@ -880,8 +880,8 @@ INSERT INTO hstgrp (groupid, name, type) VALUES (50019, 'Inheritance test', 0);
 INSERT INTO hstgrp (groupid, name, type) VALUES (50023, 'Inheritance test', 1);
 INSERT INTO hosts (hostid, host, name, flags, templateid, description, readme) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, '', '');
 INSERT INTO hosts (hostid, host, name, flags, templateid, description, readme) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, '', '');
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1010, 99000, '', 50019, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 1010);
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99006, 'Inheritance test template with host prototype', 'Inheritance test template with host prototype', 3, '', '');
@@ -889,10 +889,10 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99006, 99006, 50
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers,query_fields, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '','', 1);
 INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUES (99007, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 2, '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1012, 99007, '', 50019, NULL);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUES (99009, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 2, '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1013, 99009, '', 50019, NULL);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99009, NULL, 99083, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99009, NULL, 99083, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99004, 'Host for inheritance host prototype tests', 'Host for inheritance host prototype tests', 0, '', '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10026,99004,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99004, 99004, 50019);
@@ -900,20 +900,20 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15004, 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, templateid,query_fields, flags) VALUES (99084, 99004, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 99083,'', 1);
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags, readme) VALUES (99008, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 99007, 2, '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1014, 99008, '', 50019, 1002);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags, readme) VALUES (99010, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 99009, 2, '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1015, 99010, '', 50019, 1004);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99010, NULL, 99084, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99010, NULL, 99084, '', 0, 0);
 
 INSERT INTO hosts (hostid, host, name, status, description, flags, readme) VALUES (99060, 'Host prototype for Clone {#TEST}', 'Host prototype for Clone {#TEST}', 1, '', 2, '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1023, 99060, '', 50019, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1024, 99060, '{#GROUP_PROTO}',NULL, NULL);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99060, NULL, 99083, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99060, NULL, 99083, '', 0, 0);
 
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags, readme) VALUES (99055, 'Host prototype for Clone {#TEST}', 'Host prototype for Clone {#TEST}', 1, '', 99060, 2, '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1025, 99055, '', 50019, 1024);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1026, 99055, '{#GROUP_PROTO}',NULL, 1023);
-INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99055, NULL, 99084, '', 0, 0);
+INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99055, NULL, 99084, '', 0, 0);
 
 -- testPageProblems_TagPriority
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','','99252');
@@ -1283,7 +1283,7 @@ INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) VALUES 
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99095, 2, 99062, 'Discovery rule for triggers filtering', '', 'lld', NULL, 1,'','','','');
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99096, 2, 99062, 'Discovered item {#TEST}', '', 'lld[{#TEST}]', NULL, 2,'', '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, lastcheck, ts_delete) VALUES (15085, 99096, 99095, 0, 0);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid, lastcheck, ts_delete) VALUES (15085, 99096, 99095, 0, 0);
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99097, 2, 99062, 'Discovered item one', '', 'lld[one]', NULL, 4,'', '', '', '');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99097, 'Discovered item one', 'DISCOVERED ITEM ONE');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) values (15086, 99097, 99096, 'lld[one]');

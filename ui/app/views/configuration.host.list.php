@@ -265,7 +265,7 @@ foreach ($data['hosts'] as $host) {
 					(new CUrl('host_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
-						->setArgument('hostid', $host['hostDiscovery']['parent_hostid'])
+						->setArgument('hostid', $host['discoveryData']['parent_hostid'])
 						->setArgument('context', 'host')
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
@@ -395,13 +395,13 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	$disable_source = $host['status'] == HOST_STATUS_NOT_MONITORED && $host['hostDiscovery']
-		? $host['hostDiscovery']['disable_source']
+	$disable_source = $host['status'] == HOST_STATUS_NOT_MONITORED && $host['discoveryData']
+		? $host['discoveryData']['disable_source']
 		: '';
 
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-		$info_icons[] = getLldLostEntityIndicator($current_time, $host['hostDiscovery']['ts_delete'],
-			$host['hostDiscovery']['ts_disable'], $disable_source, $host['status'] == HOST_STATUS_NOT_MONITORED,
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getLldLostEntityIndicator($current_time, $host['discoveryData']['ts_delete'],
+			$host['discoveryData']['ts_disable'], $disable_source, $host['status'] == HOST_STATUS_NOT_MONITORED,
 			_('host')
 		);
 	}
@@ -542,7 +542,7 @@ foreach ($data['hosts'] as $host) {
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')
 			),
-			CViewHelper::showNum($host['discoveries'])
+			CViewHelper::showNum($host['discoveryRules'])
 		],
 		[
 			new CLink(_('Web'),

@@ -40,7 +40,9 @@ ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
 					"escalations", "autoreg_host", "event_suppress", "trigger_queue",
-					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy"};
+					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy",
+					"lld_macro_export"
+};
 
 #define ZBX_IDS_SIZE	ARRSIZE(idcache_tables)
 

@@ -225,24 +225,33 @@ abstract class CControllerItemPrototype extends CController {
 		$ret = true;
 
 		if ($this->hasInput('itemid')) {
-			$ret = (bool) API::ItemPrototype()->get([
+			$options = [
 				'output' => ['itemid'],
 				'itemids' => [$this->getInput('itemid')],
 				'editable' => true
-			]);
+			];
+
+			if ($this->hasInput('parent_discoveryid')) {
+				$options['discoveryids'] = $this->getInput('parent_discoveryid');
+			}
+
+			$ret = (bool) API::ItemPrototype()->get($options);
 		}
 
 		if ($ret && $this->hasInput('parent_discoveryid')) {
-			$lld = API::DiscoveryRule()->get([
+			$options = [
 				'output' => ['itemid'],
 				'selectHosts' => ['status'],
 				'itemids' => [$this->getInput('parent_discoveryid')]
-			]);
-			$ret = (bool) $lld;
+			];
+
+			$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+			$ret = (bool) $parent_discovery;
 
 			if ($ret) {
 				$context = $this->getInput('context');
-				$is_template_lld = $lld[0]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
+				$is_template_lld = $parent_discovery[0]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
 				$ret = ($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld);
 			}
 		}
