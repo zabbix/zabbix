@@ -539,7 +539,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	public function testDiscoveryRules_snmpErrorViaServer(): void  {
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		sleep(500);
+		sleep(2000);
 
 		self::deleteAllActions();
 		self::deleteAllDrules();
@@ -581,7 +581,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		sleep(300);
+		sleep(700);
 
 	}
 
