@@ -739,6 +739,7 @@ zbx_uint32_t	zbx_alerter_serialize_results(unsigned char **data, zbx_am_result_t
 void	zbx_alerter_deserialize_results(const unsigned char *data, zbx_am_result_t ***results, int *results_num)
 {
 	zbx_uint32_t	len;
+
 	data += zbx_deserialize_value(data, results_num);
 
 	/* *results num can be 0 in the message, when request for results is sent */
