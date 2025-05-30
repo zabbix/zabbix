@@ -15,8 +15,8 @@
 #ifndef ZABBIX_AUDIT_ITEM_H
 #define ZABBIX_AUDIT_ITEM_H
 
-#include "zbxalgo.h"
 #include "zbxaudit.h"
+#include "zbxalgo.h"
 
 int	zbx_audit_item_resource_is_only_item(int resource_type);
 int	zbx_audit_item_resource_is_only_item_prototype(int resource_type);
