@@ -497,7 +497,8 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-					decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
+					if (NULL != value->str)
+						decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
 					if (NULL != value->str)
 						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
