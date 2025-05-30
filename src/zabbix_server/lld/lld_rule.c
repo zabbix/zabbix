@@ -268,7 +268,7 @@ static void	lld_flush_exported_macros(zbx_hashset_t *lld_rules)
 		}
 	}
 
-	zbx_db_flush_overflowed_sql(sql, sql_offset);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != deleted_ids.values_num)
 		zbx_db_execute_multiple_query("delete from lld_macro_export where", "lld_macro_exportid", &deleted_ids);

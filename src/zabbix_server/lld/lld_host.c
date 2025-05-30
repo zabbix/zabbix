@@ -6349,7 +6349,7 @@ static void	lld_group_prototypes_save(zbx_vector_lld_host_ptr_t *hosts)
 		}
 	}
 
-	zbx_db_flush_overflowed_sql(sql, sql_offset);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_db_insert_autoincrement(&db_insert, "group_prototypeid");
 	zbx_db_insert_execute(&db_insert);
