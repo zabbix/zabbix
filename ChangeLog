@@ -1,3 +1,12 @@
+Changes for 6.0.41rc1
+
+New features:
+........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
+
+Bug fixes:
+...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.40
 
 6.0.40rc1 was released as 6.0.40 without any changes
@@ -3443,12 +3452,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.47
+
+5.0.47rc1 was released as 5.0.47 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.47rc1
 
-New features:
-
 Bug fixes:
-...G...PS. [ZBX-26080] fixed old file descriptors being hold when external log rotation is used (dgoloscapov)
+...G...PS. [ZBX-26080] fixed old file descriptors being held when external log rotation is used (dgoloscapov)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
 
 --------------------------------------------------------------------------------

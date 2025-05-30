@@ -60,7 +60,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Graph prototype' => [
 							'values' => 'testFormGraphPrototype1',
 							'context' => [
