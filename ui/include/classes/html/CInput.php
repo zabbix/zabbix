@@ -62,6 +62,41 @@ class CInput extends CTag {
 	}
 
 	/**
+	 * Disable this field to be validated using inline validator.
+	 */
+	public function disableInlineValidation() {
+		$this->removeAttribute('data-field-type');
+
+		return $this;
+	}
+
+	/**
+	 * Specify ID of error container.
+	 *
+	 * @param string|null $container_id    ID of form element where to display field errors.
+	 *
+	 * @return static
+	 */
+	public function setErrorContainer(?string $container_id): self {
+		$this->setAttribute('data-error-container', $container_id);
+
+		return $this;
+	}
+
+	/**
+	 * Specify the field label used for error message.
+	 *
+	 * @param string|null $label    Field label used in error message.
+	 *
+	 * @return static
+	 */
+	public function setErrorLabel(?string $label): self {
+		$this->setAttribute('data-error-label', $label);
+
+		return $this;
+	}
+
+	/**
 	 * Enable or disable the element.
 	 *
 	 * @param bool $value

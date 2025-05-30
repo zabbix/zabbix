@@ -30,7 +30,7 @@ class CControllerGeomapsUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
+			switch ($this->getValidationResult()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
 						(new CUrl('zabbix.php'))->setArgument('action', 'geomaps.edit')

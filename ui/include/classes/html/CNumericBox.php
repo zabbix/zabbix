@@ -21,6 +21,7 @@ class CNumericBox extends CInput {
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);
 		$this->setAttribute('maxlength', $maxlength);
+		$this->setAttribute('data-field-type', 'text-box');
 		$this->onChange(
 			'validateNumericBox(this, '.($allowempty ? 'true' : 'false').', '.($allownegative ? 'true' : 'false').');'
 		);
