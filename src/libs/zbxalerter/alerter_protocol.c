@@ -61,6 +61,7 @@ void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert)
 void	zbx_am_media_clear(zbx_am_media_t *media)
 {
 	zbx_free(media->sendto);
+	zbx_free(media->mediatype_params);
 }
 
 void	zbx_am_media_free(zbx_am_media_t *media)
