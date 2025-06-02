@@ -78,7 +78,7 @@ class CControllerHostWizardEdit extends CController {
 			'selectTemplateGroups' => ['name'],
 			'selectTags' => ['tag', 'value'],
 			'selectItems' => ['type'],
-			'selectDiscoveries' => ['type'],
+			'selectDiscoveryRules' => ['type'],
 			'filter' => ['wizard_ready' => ZBX_WIZARD_READY],
 			'sortfield' => 'name'
 		]);
@@ -105,14 +105,14 @@ class CControllerHostWizardEdit extends CController {
 
 			$items = array_merge(
 				$template['items'],
-				$template['discoveries'],
+				$template['discoveryRules'],
 				$item_prototypes_by_templateid[$template['templateid']] ?? []
 			);
 
 			$unique_types = array_keys(array_column($items, null, 'type'));
 
 			// Remove unnecessary template data.
-			unset($template['items'], $template['discoveries'], $template['vendor_version']);
+			unset($template['items'], $template['discoveryRules'], $template['vendor_version']);
 
 			$template['data_collection'] = null;
 			$template['agent_mode'] = [];

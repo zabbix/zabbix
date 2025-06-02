@@ -1627,12 +1627,13 @@ abstract class CHostBase extends CApiService {
 						}
 					}
 					elseif (array_key_exists('config', $macro)) {
-						$db_macro = $db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
-
 						$macros[] = $macro;
-						$db_macros[$macro['hostmacroid']] = $db_macro;
+						$db_macros[$macro['hostmacroid']] =
+							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
 
-						self::prepareMacroConfigOptionsForAuditlog($macro, $db_macro);
+						self::prepareMacroConfigOptionsForAuditlog($macro,
+							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']]
+						);
 					}
 				}
 				unset($macro);
@@ -1688,15 +1689,10 @@ abstract class CHostBase extends CApiService {
 					else {
 						CUserMacro::addMacroConfigFieldDefaultsByType($macro['config'], $db_macro['config']);
 
-						$upd_hostmacro_config =
-							DB::getUpdatedValues('hostmacro_config', $macro['config'], $db_macro['config']);
-
-						if ($upd_hostmacro_config) {
-							$upd_hostmacro_configs[] = [
-								'values' => $upd_hostmacro_config,
-								'where' => ['hostmacroid' => $macro['hostmacroid']]
-							];
-						}
+						$upd_hostmacro_configs[] = [
+							'values' => DB::getUpdatedValues('hostmacro_config', $macro['config'], $db_macro['config']),
+							'where' => ['hostmacroid' => $macro['hostmacroid']]
+						];
 					}
 				}
 				elseif ($macro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
