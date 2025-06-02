@@ -19,7 +19,7 @@ require_once __DIR__.'/../include/CIntegrationTest.php';
 
 class testTlsRequest extends TlsCaseBase {
 	public function configPairsSetupDataProvider() {
-		// Tuples where first entry is in fromat for cert generation, second in format for Zabbix issuer/subject checks.
+		// Tuples where first entry is in format for cert generation, second in format for Zabbix issuer/subject checks.
 
 		// Simple case.
 		yield [
@@ -116,7 +116,7 @@ class testTlsRequest extends TlsCaseBase {
 		[
 			'ca' => [$ca_key, $ca_crt],
 			'server' => [$server_key, $server_crt],
-			'agent' => [$agent_key, $agent_crt],
+			'agent' => [$agent_key, $agent_crt]
 		] = self::generateCerts(
 			ca_subject: $issuer_ca[0],
 			server_subject: $issuer_server[0],
