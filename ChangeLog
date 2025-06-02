@@ -1,8 +1,24 @@
 Changes for 7.0.14rc1
 
 New features:
+.........T [ZBXNEXT-9942] added preprocessor throughput to Zabbix server health templates (aiantsen)
+.........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
+.......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
+.......PS. [ZBX-25968] added configuration validation of DBPort and DBSocket (rtrizna)
+...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
+.......PS. [ZBX-25175] increased retry to 5 for asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
+..F....... [ZBX-26092] fixed Office 365 relay media type domain formatting to replace all dash symbols with dot (msnihach)
+.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
+.......PS. [ZBX-26387] fixed newline being truncated in SNMP "get[" check (dgoloscapov)
+A.F....... [ZBX-26372] fixed long-running TimescaleDB queries when requesting historical data (gcalenko, Sasha)
+.......PS. [ZBX-26339] fixed user macro resolving order in templates so that in case of conflict import order of templates takes precedence over the linking order (askolmeisters)
+.........T [ZBX-18703] removed preprocessing step for mounted fs discovery in VMware Guest template (akotsegubov)
+..F....... [ZBX-25713] fixed the map navigation tree widget selection issue (wczerneha)
+..F....... [ZBX-26466] added ability for generic users to open the templates popup (Sasha)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
 ...G...... [ZBX-26114] improved Zabbix agent 2 accept rate on high RTT (sjurgensons)
 ...G...... [ZBX-25526] made Zabbix agent 2 proc.num, proc.cpu.util, proc.get and proc.mem items behave consistently with Zabbix agent when non-existing user is specified (arimdjonoks)
@@ -3537,6 +3553,7 @@ New features:
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
 
 --------------------------------------------------------------------------------
