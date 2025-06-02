@@ -124,7 +124,7 @@ abstract class CControllerItemPrototype extends CController {
 
 		$delay_flex = $this->getInput('delay_flex', []);
 
-		if ($delay_flex && !isValidCustomIntervals($delay_flex)) {
+		if ($delay_flex && !isValidCustomIntervals($delay_flex, true)) {
 			$ret = false;
 		}
 
