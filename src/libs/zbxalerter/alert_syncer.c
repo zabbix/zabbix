@@ -927,15 +927,10 @@ static void	get_mediatype_params(zbx_uint64_t mediatypeid, int mediatype_type, c
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		char	*name = zbx_strdup(NULL, row[0]), *value = zbx_strdup(NULL, row[1]);
-
 		if (MEDIA_TYPE_EXEC == mediatype_type)
-			zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, NULL, row[1], ZBX_JSON_TYPE_STRING);
 		else
-			zbx_json_addstring(&json, name, value, ZBX_JSON_TYPE_STRING);
-
-		zbx_free(name);
-		zbx_free(value);
+			zbx_json_addstring(&json, row[0], row[1], ZBX_JSON_TYPE_STRING);
 	}
 
 	zbx_json_close(&json);
