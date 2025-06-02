@@ -65,7 +65,7 @@ switch ($data['method']) {
 		$tls_error = false;
 
 		if (!CSessionHelper::has('serverCheckResult') || !CSessionHelper::has('serverCheckTime')
-			|| ((int) CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
+				|| ((int) CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
 
 			if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
 				$status = false;
