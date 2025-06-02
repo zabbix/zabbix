@@ -120,7 +120,7 @@ class testTlsRequest extends TlsCaseBase {
 		] = self::generateCerts(
 			ca_subject: $issuer_ca[0],
 			server_subject: $issuer_server[0],
-			agent_subject: $issuer_agent[0],
+			agent_subject: $issuer_agent[0]
 		);
 
 		if (defined('PHPUNIT_BINARY_DIR')) {
@@ -172,7 +172,7 @@ class testTlsRequest extends TlsCaseBase {
 			'KEY_FILE' => $agent_key,
 			'CERT_FILE' => $agent_crt,
 			'CERTIFICATE_ISSUER' =>  $issuer_ca[1],
-			'CERTIFICATE_SUBJECT' => $issuer_server[1],
+			'CERTIFICATE_SUBJECT' => $issuer_server[1]
 		];
 		$zabbix_server = new CZabbixServer('localhost', '10051', 10, 10, 0, $tls_config);
 		$result = $zabbix_server->testItem(self::testItemRequest($issuer_ca[1], $issuer_agent[1]), $sid);
@@ -206,7 +206,7 @@ class testTlsRequest extends TlsCaseBase {
 				'interface' => [
 					'address' => '127.0.0.1',
 					'port' => '10050',
-					'type' => 0,
+					'type' => 0
 				],
 				'tls_connect' => '4',
 				'tls_issuer' => $issuer_ca,

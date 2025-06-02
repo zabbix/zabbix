@@ -174,7 +174,10 @@ class CShellExec {
 		}
 
 		$config = self::config($config);
-		$cmd = implode(' ', array_map(escapeshellarg(...), [self::agentBin(), '--foreground', '--config', $config]));
+		$cmd = implode(' ', array_map(
+			static fn ($arg) => escapeshellarg($arg),
+			[self::agentBin(), '--foreground', '--config', $config])
+		);
 		$cmd .= " > $temp_stdout 2> $temp_stderr &";
 		exec($cmd, $output, $status);
 
