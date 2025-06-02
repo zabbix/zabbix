@@ -473,6 +473,9 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	zbx_tls_parameter_not_empty(&(config_tls->cipher_psk), config_tls);
 	zbx_tls_parameter_not_empty(&(config_tls->cipher_all), config_tls);
 	zbx_tls_parameter_not_empty(&(config_tls->cipher_cmd), config_tls);
+	zbx_tls_parameter_not_empty(&(config_tls->frontend_accept), config_tls);
+	zbx_tls_parameter_not_empty(&(config_tls->frontend_cert_issuer), config_tls);
+	zbx_tls_parameter_not_empty(&(config_tls->frontend_cert_subject), config_tls);
 
 	if (NULL != config_tls->tls_listen && 0 != strcmp(config_tls->tls_listen, "required"))
 	{
@@ -481,7 +484,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	}
 
 	/* parse and validate 'TLSFrontendAccept' parameter (in zabbix_server.conf ) */
-	if (NULL != config_tls->frontend_accept)
+	if (NULL != config_tls->frontend_accept && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		config_tls->frontend_accept_modes = tls_config_parse_accept(config_tls, &(config_tls->frontend_accept));
 
@@ -490,6 +493,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept), NULL,
 					config_tls);
 		}
+	} else {
+		config_tls->frontend_accept_modes = 0;
 	}
 
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
@@ -524,6 +529,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	/* parse and validate 'TLSAccept' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
 	if (NULL != config_tls->accept)
 		config_tls->accept_modes = tls_config_parse_accept(config_tls, &(config_tls->accept));
+	else
+		config_tls->accept_modes = 0;
 
 	/* either both a certificate and a private key must be defined or none of them */
 
@@ -733,14 +740,14 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 		}
 	}
 
-	/* Frontend certificate issuer is optional but must be defined only when TLSFrontendAccept contain cert */
+	/* Frontend certificate issuer is optional but must be defined only when TLSFrontendAccept contains cert */
 	if (0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL != config_tls->frontend_cert_issuer)
 	{
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(config_tls->frontend_cert_issuer),
 				&(config_tls->frontend_accept), config_tls);
 	}
 
-	/* Frontend certificate subject is optional but must be defined only when TLSFrontendAccept contain cert */
+	/* Frontend certificate subject is optional but must be defined only when TLSFrontendAccept contains cert */
 	if (0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) &&
 			NULL != config_tls->frontend_cert_subject)
 	{
@@ -762,7 +769,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 				&(config_tls->cert_file), config_tls);
 	}
 
-	if (0 != (config_tls->frontend_accept_modes == ZBX_TCP_SEC_TLS_CERT) && NULL == config_tls->cert_file)
+	if (0 != (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT) &&
+		0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) && NULL == config_tls->cert_file)
 	{
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(config_tls->frontend_accept),
 				&(config_tls->cert_file), config_tls);
@@ -784,7 +792,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	}
 
 	if (NULL != config_tls->tls_listen && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) &&
-		0 == (config_tls->frontend_accept_modes & ZBX_TCP_SEC_TLS_CERT))
+		ZBX_TCP_SEC_TLS_CERT != config_tls->frontend_accept_modes)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
 			" connection but it conflicts with unencrypted config of parameter \"TLSFrontendAccept\"");
