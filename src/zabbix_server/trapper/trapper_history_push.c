@@ -781,21 +781,27 @@ out:
  *                                                                            *
  * Purpose: processes history push request                                    *
  *                                                                            *
- * Parameters: sock    - [IN] client socket                                   *
- *             jp      - [IN] history push request in json format             *
- *             timeout - [IN] communication timeout                           *
+ * Parameters: sock       - [IN] client socket                                *
+ *             jp         - [IN] history push request in json format          *
+ *             timeout    - [IN] communication timeout                        *
+ *             config_tls - [IN]                                              *
+ *             config_frontend_allowed_ip - [IN]                              *
  *                                                                            *
  * Return value: SUCCEED - values were pushed to history                      *
  *               FAIL    - parsing/authentication failure                     *
  *                                                                            *
  ******************************************************************************/
-int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout)
+int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout,
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 	char		*error = NULL;
-	int		ret;
+	int		ret = FAIL;
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
 
 	zbx_json_init(&j, 1024);
 
@@ -808,7 +814,7 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 		zbx_tcp_send(sock, j.buffer);
 
 	zbx_json_clean(&j);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

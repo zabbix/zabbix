@@ -143,11 +143,15 @@ out:
 	return ret;
 }
 
-int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
+int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 	char		*error = NULL;
 	int		ret;
 	struct zbx_json	json;
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		return FAIL;
 
 	zbx_json_init(&json, 1024);
 
