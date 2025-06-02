@@ -1592,7 +1592,7 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *             tls_accept     - [IN] TLS configuration                        *
  *             poll_timeout   - [IN] milliseconds to wait for connection      *
  *                                  0 - don't wait, -1 - wait forever         *
- *             tls_listen     - [IN] allow unencrtpted inbound                *
+ *             tls_listen     - [IN] allow unencrypted inbound                *
  *             unencrypted_allowed_ip - [IN]                                  *
  *                                                                            *
  * Return value: SUCCEED       - success                                      *
