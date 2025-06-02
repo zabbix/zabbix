@@ -1106,11 +1106,9 @@ static char	*am_create_db_alert_message(const zbx_db_config_t *db_config)
 static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen)
 {
-	int	ret = SUCCEED;
-
 	/* Passed arguments */
-	const char			*subject = va_arg(args, const char *);
-	const char			*message = va_arg(args, const char *);
+	const char	*subject = va_arg(args, const char *);
+	const char	*message = va_arg(args, const char *);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
@@ -1124,7 +1122,7 @@ static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list arg
 			*replace_to = zbx_strdup(*replace_to, message);
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 static char	*am_substitute_mediatype_params(const char *mediatype_params, const char *subject, const char *message)
@@ -1425,9 +1423,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 		if (NULL != zbx_hashset_search(&mediaids, &media->mediaid))
 			continue;
 
-		zbx_free(media->sendto);
-		zbx_free(media->mediatype_params);
-
+		zbx_am_media_clear(media);
 
 		zbx_hashset_iter_remove(&iter);
 	}
