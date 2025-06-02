@@ -1693,7 +1693,7 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 	zbx_db_insert_t		db_insert, db_insert_data[LLD_OVERRIDE_DATA_COUNT];
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		overrideid, data_flags = 0;
+	zbx_uint64_t		overrideid = 0, data_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

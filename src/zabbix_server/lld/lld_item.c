@@ -970,8 +970,6 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					continue;
 				}
 
-				item = items->values[index];
-
 				sync_row = zbx_sync_rowset_add_row(&items->values[index]->overrides, row[0], row[2],
 						row[3], row[4], row[5], row[6]);
 
@@ -3391,7 +3389,6 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DISCOVER))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdiscover=%d", d, item->discover);
-		d = ",";
 		zbx_audit_item_update_json_update_discover(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, item->discover_orig, item->discover);
 	}
