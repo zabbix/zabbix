@@ -1,6 +1,8 @@
 Changes for 7.4.0rc1
 
 New features:
+..F....PS. [ZBXNEXT-8698] added support for TLS connection from web interface to Zabbix server (rgontarski, sboidenko)
+..F....... [ZBXNEXT-9990] removed preview from SVG graph widget (dfofanovs)
 A.F.I....T [ZBXNEXT-9827] implemented Host Wizard (abakaldin, ashubin, esekace, Ivo, vmurzins)
 A.F....PS. [ZBXNEXT-1527] implemented support for cascaded (nested) low-level discovery workflows (dfofanovs, dgoloscapov, dpankins, jfreibergs, solonkins, vmaksimovs, vso, wczerneha, wiper)
 .........T [ZBXNEXT-9942] added preprocessor throughput to Zabbix server health templates (aiantsen)
@@ -11,6 +13,10 @@ A.F....PS. [ZBXNEXT-9805] added OAuth support for email media type (askolmeister
 ..F....... [ZBXNEXT-8919] implemented new color picker in Graph and Pie chart widgets, added palette feature (apoga)
 
 Bug fixes:
+A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API; changed permission check when requesting non-editable template dashboards based on access to template dashboards themself instead of their host access rights (jfreibergs, vmaksimovs)
+...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+.......P.. [ZBX-26469] fixed Zabbix proxy crash in discovery manager process (Andris, MVekslers)
+..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
 ..F....... [ZBX-26473] fixed map element not setting correct icons for "Problem", "Maintenance" and "Disabled" dropdowns (Ivo)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
@@ -200,6 +206,8 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
 ...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
@@ -689,6 +697,8 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
 .......PS. [ZBX-25968] added configuration validation of DBPort and DBSocket (rtrizna)
@@ -4237,6 +4247,7 @@ New features:
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
 
