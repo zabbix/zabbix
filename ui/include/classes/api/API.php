@@ -251,6 +251,13 @@ class API {
 	}
 
 	/**
+	 * @return CHostDashboard
+	 */
+	public static function HostDashboard() {
+		return self::getApi('hostdashboard');
+	}
+
+	/**
 	 * @return CHostPrototype
 	 */
 	public static function HostPrototype() {

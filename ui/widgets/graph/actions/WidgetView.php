@@ -98,22 +98,30 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->fields_values['override_hostid'] && $resourceid) {
 			// Find same simple-graph item in the overridden host.
 			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$src_items = API::Item()->get([
-					'output' => ['key_'],
-					'itemids' => $resourceid,
-					'webitems' => true
-				]);
-
-				$items = API::Item()->get([
+				$options = [
 					'output' => ['itemid', 'name_resolved'],
 					'selectHosts' => ['name'],
 					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
-						'key_' => $src_items[0]['key_'],
 						'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
 					],
 					'webitems' => true
-				]);
+				];
+
+				if ($this->isTemplateDashboard()) {
+					$options['itemids'] = $resourceid;
+				}
+				else {
+					$src_items = API::Item()->get([
+						'output' => ['key_'],
+						'itemids' => $resourceid,
+						'webitems' => true
+					]);
+
+					$options['filter']['key_'] = $src_items[0]['key_'];
+				}
+
+				$items = API::Item()->get($options);
 				$item = reset($items);
 
 				if ($item) {
@@ -146,15 +154,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 				// If all items are from one host we change them, or set calculated if not exist on that host.
 				if ($graph && count($graph['hosts']) == 1) {
 					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
-						$new_dynamic = getSameGraphItemsForHost(
-							[['itemid' => $graph['ymax_itemid']]],
-							$this->fields_values['override_hostid'][0],
-							false
-						);
-						$new_dynamic = reset($new_dynamic);
+						$ymax_item = ['itemid' => $graph['ymax_itemid']];
 
-						if ($new_dynamic && array_key_exists('itemid', $new_dynamic) && $new_dynamic['itemid'] > 0) {
-							$graph['ymax_itemid'] = $new_dynamic['itemid'];
+						if (!$this->isTemplateDashboard()) {
+							$ymax_items = getSameGraphItemsForHost([$ymax_item],
+								$this->fields_values['override_hostid'][0], false
+							);
+							$ymax_item = reset($ymax_items);
+						}
+
+						if ($ymax_item && $ymax_item['itemid'] > 0) {
+							$graph['ymax_itemid'] = $ymax_item['itemid'];
 						}
 						else {
 							$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
@@ -162,15 +172,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 
 					if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
-						$new_dynamic = getSameGraphItemsForHost(
-							[['itemid' => $graph['ymin_itemid']]],
-							$this->fields_values['override_hostid'][0],
-							false
-						);
-						$new_dynamic = reset($new_dynamic);
+						$ymin_item = ['itemid' => $graph['ymin_itemid']];
 
-						if ($new_dynamic && array_key_exists('itemid', $new_dynamic) && $new_dynamic['itemid'] > 0) {
-							$graph['ymin_itemid'] = $new_dynamic['itemid'];
+						if (!$this->isTemplateDashboard()) {
+							$ymin_items = getSameGraphItemsForHost([$ymin_item],
+								$this->fields_values['override_hostid'][0], false
+							);
+							$ymin_item = reset($ymin_items);
+						}
+
+						if ($ymin_item && $ymin_item['itemid'] > 0) {
+							$graph['ymin_itemid'] = $ymin_item['itemid'];
 						}
 						else {
 							$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
@@ -181,19 +193,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if ($graph) {
 					$graph['hosts'] = $hosts;
 
-					// Search if there are any items available for the overridden host.
-					$new_dynamic = getSameGraphItemsForHost($graph['gitems'],
-						$this->fields_values['override_hostid'][0], false
-					);
+					$items = $graph['gitems'];
 
-					if ($new_dynamic) {
-						// Add destination host data required by CMacrosResolver::resolveGraphNames().
-						foreach ($new_dynamic as &$item) {
+					if (!$this->isTemplateDashboard()) {
+						$items = getSameGraphItemsForHost($items, $this->fields_values['override_hostid'][0], false);
+					}
+
+					if ($items) {
+						foreach ($items as &$item) {
 							$item['host'] = $host['host'];
 						}
 						unset($item);
 
-						$graph['name'] = CMacrosResolverHelper::resolveGraphName($graph['name'], $new_dynamic);
+						$graph['name'] = CMacrosResolverHelper::resolveGraphName($graph['name'], $items);
 					}
 					else {
 						$is_resource_available = false;

@@ -1,0 +1,1 @@
+A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API; changed permission check when requesting non-editable template dashboards based on access to template dashboards themself instead of their host access rights (jfreibergs, vmaksimovs)
