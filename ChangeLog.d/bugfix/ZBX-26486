@@ -1,1 +1,1 @@
-........S. [ZBX-26486] fixed errors in server log on second and subsequent server starts with TimescaleDB (mprihodko)
+........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
