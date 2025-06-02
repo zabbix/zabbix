@@ -345,10 +345,10 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfa
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (400710, 2, 120004, 'Item {#NAME}', '', 'item[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2);
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30001,'{99000}>0','Trigger {#NAME}', 2, 2, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99000, 400710, 30001, 'last', '$');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14045, 400710, 400700, '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34045, 400710, 400700, '');
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (400720, 2, 120004,' Item eth0', '', 'item[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14046, 400720, 400710, 'item[{#NAME}]');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34046, 400720, 400710, 'item[{#NAME}]');
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30002,'{99001}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99001, 400720, 30002, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001);
@@ -356,10 +356,10 @@ INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (400730, 18, 120004, 'Item_child {#NAME}', '', 'item_child[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2, 400710);
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30003,'{99002}>0','Trigger {#NAME}', 2, 2, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99002, 400730, 30003, 'last', '$');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14047, 400730, 400700, '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34047, 400730, 400700, '');
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (400740, 18, 120004,' Item_child eth0', '', 'item_child[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4, 400720);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14048, 400740, 400730, 'item[{#NAME}]');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34048, 400740, 400730, 'item[{#NAME}]');
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30004,'{99003}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99003, 400740, 30004, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
@@ -685,14 +685,14 @@ INSERT INTO hstgrp (groupid, type, uuid, name, flags) VALUES (50026, 0, '5421d5c
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '', '');
 INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99012, 'discovered', 'discovered', 0, 4, '', '');
-INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params,query_fields, description, posts, headers) VALUES (58735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '','', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params,query_fields, description, posts, headers) VALUES (158735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '','', '', '', '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (50110, 99011, 'host group {#VALUE}');
 INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (50111, 99011, 50025);
 INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name) VALUES (2, 50026, 50110, 'host group {#VALUE}');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);
-INSERT INTO host_discovery (hostid, lldruleid, host) VALUES (99011, 58735, '');
+INSERT INTO host_discovery (hostid, lldruleid, host) VALUES (99011, 158735, '');
 INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99012, 99011, '{#VALUE}');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50026, 99010, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');
@@ -778,22 +778,22 @@ INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3011, 99025, 'Brows
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3012, 99026, 'OS', 'Ubuntu Bionic Beaver');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3013, 99025, 'Webbrowser', 'Mozilla');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3014, 99027, 'office', 'Riga');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '','', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '','', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50172, 'trigger1', '{50232}=1', '', '1');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 158736, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100001, 50172, 'tag1', 'value1');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100002, 50172, 'tag2', '');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100003, 50172, 'tag3', 'value3');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100004, 50172, 'tag3', 'value4');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50173, 'trigger2', '{50233}=1', '', '1');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50233, 50173, 58736, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50233, 50173, 158736, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100005, 50173, 'tag1', 'value5');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100006, 50173, 'tag2', 'value6');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50174, 'trigger3', '{50234}=1', '', '1');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50234, 50174, 58736, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50234, 50174, 158736, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (100007, 50174, 'tag1', 'value7');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50175, 'trigger4', '{50235}=1', '', '1');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50235, 50175, 58736, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50235, 50175, 158736, 'last', '$');
 INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns, name, severity) VALUES (5000, 0, 0, 50172, 1610000000, 1, 0, 0, 'trigger1', 0);
 INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (1000, 5000, 'tag1', 'value1');
 INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (1001, 5000, 'tag2', '');
@@ -840,14 +840,14 @@ INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50029, 0, '7466f5cb569f48
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50030, 1, '38da8a76c4a742479292151c2e404dae', 'Trigger validation test host group');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50038, 99028, 50029);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50039, 99029, 50030);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58737, 99028, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '','', '', '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58738, 99029, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '','', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158737, 99028, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '','', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158738, 99029, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '','', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50176, 'test-trigger-1', '{50236}=0', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50236, 50176, 58737, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50236, 50176, 158737, 'last', '$');
 INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50177, 'test-trigger-2', '{50237}=0', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50237, 50177, 58737, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50237, 50177, 158737, 'last', '$');
 INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50178, 'template-trigger', '{50238}=0', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 58738, 'last', '$');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 158738, 'last', '$');
 
 -- services
 INSERT INTO services (serviceid, name, description) VALUES (1, 'API Service for delete', '');
@@ -871,6 +871,6 @@ INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('z-node','192.1
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','192.168.1.13','10051','3','ckuo7i1nw000h0sajj3l3hh8u');
 
 -- binary value type
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58739, 99013, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '','', '', '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, master_itemid, posts, headers) VALUES (58740, 99013, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', 58739, '', '');
-INSERT INTO history_bin (itemid, clock, value, ns) VALUES (58740, 1549350962, 'This should be binary', 594538048);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158739, 99013, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '','', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, master_itemid, posts, headers) VALUES (158740, 99013, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', 158739, '', '');
+INSERT INTO history_bin (itemid, clock, value, ns) VALUES (158740, 1549350962, 'This should be binary', 594538048);
