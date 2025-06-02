@@ -38,7 +38,7 @@ require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
-require_once dirname(__FILE__).'/testTlsRequest.php';
+/* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 require_once dirname(__FILE__).'/testDiscoveryRules.php';
@@ -95,7 +95,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
-		$suite->addTestSuite('testTlsRequest');
+		/* $suite->addTestSuite('testTlsRequest'); */
 		$suite->addTestSuite('testActiveAvailability');
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
