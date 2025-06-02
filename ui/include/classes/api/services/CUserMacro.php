@@ -872,33 +872,34 @@ class CUserMacro extends CApiService {
 			return;
 		}
 
+		$field_defaults = DB::getDefaults('hostmacro_config');
+		$field_defaults['options'] = [];
+
 		foreach ($hostmacros as &$macro) {
 			if (array_key_exists($macro['hostmacroid'], $db_hostmacros)
 				&& array_key_exists('config', $macro)
 				&& array_key_exists('type', $macro['config'])
 				&& $macro['config']['type'] != $db_hostmacros[$macro['hostmacroid']]['config']['type']
 			) {
-				self::addMacroConfigFieldDefaultsByType($macro['config'],
-					$db_hostmacros[$macro['hostmacroid']]['config']
-				);
+				$field_names = [];
+
+				if ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+					$field_names = ['priority', 'section_name', 'label', 'description', 'required', 'regex', 'options'];
+				}
+				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_TEXT) {
+					$field_names = ['options'];
+				}
+				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_LIST) {
+					$field_names = ['regex'];
+				}
+				elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_CHECKBOX) {
+					$field_names = ['required', 'regex'];
+				}
+
+				$macro['config'] += array_intersect_key($field_defaults, array_flip($field_names));
 			}
 		}
 		unset($macro);
-	}
-
-	public static function addMacroConfigFieldDefaultsByType(array &$config, array $db_config): void {
-		$type_fields = [
-			ZBX_WIZARD_FIELD_NOCONF => ['priority', 'section_name', 'label', 'description', 'required', 'regex',
-				'options'
-			],
-			ZBX_WIZARD_FIELD_TEXT => ['priority', 'section_name', 'label', 'description', 'required', 'regex'],
-			ZBX_WIZARD_FIELD_LIST => ['priority', 'section_name', 'label', 'description', 'required', 'options'],
-			ZBX_WIZARD_FIELD_CHECKBOX => ['priority', 'section_name', 'label', 'description', 'options']
-		];
-
-		$config += array_intersect_key(DB::getDefaults('hostmacro_config'),
-			array_flip(array_diff($type_fields[$db_config['type']], $type_fields[$config['type']]))
-		);
 	}
 
 	private static function prepareMacroConfigOptionsForDb(array &$hostmacros, ?array &$db_hostmacros = null): void {
