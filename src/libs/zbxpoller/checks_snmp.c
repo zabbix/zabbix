@@ -771,9 +771,8 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	}
 	else if (STAT_ERROR == status)
 	{
-		char	*tmp_err_str;
+		char	*tmp_err_str, addr_port[MAX_STRING_LEN];
 		int	snmp_err;
-		char	addr_port[MAX_STRING_LEN];
 
 		snmp_sess_error(ssp, NULL, &snmp_err, &tmp_err_str);
 
