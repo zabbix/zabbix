@@ -96,7 +96,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
 		ITEM_TYPE_DEPENDENT => _('Dependent item'),
 		ITEM_TYPE_SCRIPT => _('Script'),
-		ITEM_TYPE_BROWSER => _('Browser')
+		ITEM_TYPE_BROWSER => _('Browser'),
+		ITEM_TYPE_NESTED => _('Nested')
 	];
 
 	if ($type === null) {
@@ -425,31 +426,46 @@ function getItemParentTemplates(array $items, $flag) {
 
 	$all_parent_itemids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-			$db_items = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids)
-			]);
+		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$db_items = API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids),
+					'selectDiscoveryRule' => ['itemid'],
+					'selectDiscoveryRulePrototype' => ['itemid'],
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_items = API::DiscoveryRule()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids)
+				]);
+			}
 		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$db_items = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids),
-				'selectDiscoveryRule' => ['itemid']
-			]);
-		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids),
-				'webitems' => true
-			]);
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$db_items = API::ItemPrototype()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids),
+					'selectDiscoveryRule' => ['itemid'],
+					'selectDiscoveryRulePrototype' => ['itemid']
+				]);
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$db_items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'templateid'],
+					'itemids' => array_keys($parent_itemids),
+					'webitems' => true
+				]);
+			}
 		}
 
 		$all_parent_itemids += $parent_itemids;
@@ -459,8 +475,9 @@ function getItemParentTemplates(array $items, $flag) {
 			$data['templates'][$db_item['hostid']] = [];
 			$hostids[$db_item['itemid']] = $db_item['hostid'];
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$parent_lld = $db_item['discoveryRule'] ?: $db_item['discoveryRulePrototype'];
+				$lld_ruleids[$db_item['itemid']] = $parent_lld['itemid'];
 			}
 
 			if ($db_item['templateid'] != 0) {
@@ -479,7 +496,7 @@ function getItemParentTemplates(array $items, $flag) {
 			? $hostids[$parent_item['itemid']]
 			: 0;
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
 				? $lld_ruleids[$parent_item['itemid']]
 				: 0;
@@ -532,10 +549,11 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ * @param bool   $set_title         Adds a title attribute to the created element.
  *
  * @return array|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links, bool $set_title = false) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -547,31 +565,44 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-			$url = (new CUrl('host_discovery.php'))
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', 'template');
+		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setArgument('context', 'template');
+			}
+			else {
+				$url = (new CUrl('host_discovery.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
+					->setArgument('context', 'template');
+			}
 		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'item.prototype.list')
-				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-				->setArgument('context', 'template');
-		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'item.list')
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', 'template');
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
+					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setArgument('context', 'template');
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
+					->setArgument('context', 'template');
+			}
 		}
 
 		$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
 		$name = new CSpan($template['name']);
+	}
+
+	if ($set_title) {
+		$name->setTitle($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -595,36 +626,42 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-				$url = (new CUrl('host_discovery.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', 'template');
-				$name = new CLink($template['name'], $url);
+			if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
+				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$url = (new CUrl('host_discovery_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+						->setArgument('context', 'template');
+				}
+				else {
+					$url = (new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+						->setArgument('context', 'template');
+				}
 			}
-			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$item_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'popup')
-					->setArgument('popup', 'item.prototype.edit')
-					->setArgument('context', 'template')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->getUrl();
-
-				$name = new CLink($template['name'], $item_url);
-			}
-			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$item_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'popup')
-					->setArgument('popup', 'item.edit')
-					->setArgument('context', 'template')
-					->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->getUrl();
-
-				$name = new CLink($template['name'], $item_url);
+				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'item.prototype.edit')
+						->setArgument('context', 'template')
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid']);
+				}
+				// ZBX_FLAG_DISCOVERY_NORMAL
+				else {
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'item.edit')
+						->setArgument('context', 'template')
+						->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
+				}
 			}
+
+			$name = new CLink($template['name'], $url);
 		}
 		else {
 			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -1626,7 +1663,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 
 	if ($master_itemids) {
 		$options = [
-			'output' => ['itemid', 'type', 'name'],
+			'output' => ['itemid', 'type', 'name', 'flags'],
 			'itemids' => $master_itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1652,10 +1689,10 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_itemid = $item['master_itemid'];
 			$items_index = array_search($master_itemid, $itemids);
-			$item['master_item'] = array_fill_keys(['name', 'type', 'source'], '');
-			$item['master_item'] = ($items_index === false)
-				? array_intersect_key($master_items[$master_itemid], $item['master_item'])
-				: array_intersect_key($items[$items_index], $item['master_item']);
+
+			$master_item = $items_index === false ? $master_items[$master_itemid] : $items[$items_index];
+
+			$item['master_item'] = array_intersect_key($master_item, array_flip(['name', 'type', 'source', 'flags']));
 			$item['master_item']['itemid'] = $master_itemid;
 		}
 	}
@@ -1755,6 +1792,8 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
  */
 function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	foreach ($preprocessing as &$step) {
+		$step = CItemGeneralHelper::normalizeFormDataPreprocessingStep($step);
+
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
@@ -2119,7 +2158,7 @@ function prepareItemParameters(array $parameters): array {
 function getSanitizedItemFields(array $input): array {
 	$field_names = getMainItemFieldNames($input);
 
-	if ($input['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	if (!($input['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
 		$field_names = array_merge($field_names, getTypeItemFieldNames($input));
 		$field_names = getConditionalItemFieldNames($field_names, $input);
 	}
@@ -2166,6 +2205,25 @@ function getMainItemFieldNames(array $input): array {
 
 			return $field_names;
 
+		case ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE:
+			if ($input['templateid'] == 0) {
+				$field_names = ['name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime','description', 'status', 'discover', 'preprocessing', 'lld_macro_paths',
+					'overrides'
+				];
+			}
+			else {
+				$field_names = ['lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime', 'description',
+					'status', 'discover'
+				];
+			}
+
+			if (array_key_exists('itemid', $input) || $input['filter']['conditions']) {
+				$field_names[] = 'filter';
+			}
+
+			return $field_names;
+
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 			if ($input['templateid'] == 0) {
 				return ['name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid', 'logtimefmt',
@@ -2177,6 +2235,7 @@ function getMainItemFieldNames(array $input): array {
 			}
 
 		case ZBX_FLAG_DISCOVERY_CREATED:
+		case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 			return ['status'];
 	}
 }
@@ -2275,6 +2334,9 @@ function getTypeItemFieldNames(array $input): array {
 			return $input['templateid'] == 0
 				? ['parameters', 'params', 'timeout', 'delay']
 				: ['delay'];
+
+		case ITEM_TYPE_NESTED:
+			return [];
 	}
 }
 
@@ -2442,7 +2504,10 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
-		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+		'filter' => [
+			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMP],
+			'status' => ITEM_STATUS_ACTIVE
+		]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];

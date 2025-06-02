@@ -8,6 +8,7 @@ libzbxexpr_a_SOURCES = \
 	function.c \
 	expr.c \
 	interval.c \
+	key.c \
 	token.c \
 	substitute.c \
 	urlencode.c \

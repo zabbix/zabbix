@@ -34,14 +34,24 @@ else {
 			$data['readonly'] ? null : (new CTableColumn())->addClass('table-col-action')
 		]);
 
+	if ($data['has_inline_validation']) {
+		$table
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'macros');
+	}
+
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
+		$value = array_key_exists('value', $macro) ? $macro['value'] : null;
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', $value, false))
+			->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
 			->setReadonly($data['readonly']
 				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
-			);
+			)
+			->setErrorLabel(_('Value'));
 
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
+				->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
 				->setReadonly($data['readonly']
 					|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
 				)
@@ -49,6 +59,7 @@ else {
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
 				->disableSpellcheck()
+				->setErrorLabel($data['has_inline_validation'] ? _('Macro'): null)
 		];
 
 		if (!$data['readonly']) {
@@ -74,10 +85,6 @@ else {
 			}
 		}
 
-		if (array_key_exists('value', $macro)) {
-			$macro_value->setAttribute('value', $macro['value']);
-		}
-
 		if (!$data['readonly']) {
 			$action_column = [];
 
@@ -101,13 +108,14 @@ else {
 			}
 		}
 
-		$table->addRow([
+		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol($macro_value))
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 				->addClass(ZBX_STYLE_NOWRAP),
 			(new CCol(
 				(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
+					->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 					->setReadonly($data['readonly']
@@ -116,7 +124,17 @@ else {
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			$data['readonly'] ? null : new CCol(new CHorList($action_column))
-		], 'form_row');
+		];
+
+		$table
+			->addRow($row, 'form_row')
+			->addRow($data['has_inline_validation']
+				? (new CCol())
+					->setId('macros_'.$i.'_error_container')
+					->setAttribute('colspan', count($row))
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				: null
+			);
 	}
 
 	if (!$data['readonly']) {

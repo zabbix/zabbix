@@ -671,12 +671,12 @@ jQuery(document).ready(function($) {
 											break;
 									}
 
-									overlays_stack.end().centerDialog();
+									overlays_stack.end().fixPosition();
 								}).trigger('change');
 								break;
 						}
 
-						overlays_stack.end().centerDialog();
+						overlays_stack.end().fixPosition();
 					}).trigger('change');
 				<?php endif ?>
 			}

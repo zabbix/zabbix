@@ -211,11 +211,11 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ORACLE.DRIVER}|<p>Oracle driver path. For example: `/usr/lib/oracle/21/client64/lib/libsqora.so.21.1`</p>|`<Put path to oracle driver here>`|
-|{$ORACLE.SERVICE}|<p>Oracle Service Name.</p>|`<Put oracle service name here>`|
-|{$ORACLE.USER}|<p>Oracle username.</p>|`<Put your username here>`|
-|{$ORACLE.PASSWORD}|<p>Oracle user's password.</p>|`<Put your password here>`|
-|{$ORACLE.HOST}|<p>The hostname or IP address of the Oracle DB instance.</p>|`<Put oracle host here>`|
+|{$ORACLE.DRIVER}|<p>Oracle driver path. For example: `/usr/lib/oracle/21/client64/lib/libsqora.so.21.1`</p>||
+|{$ORACLE.SERVICE}|<p>Oracle Service Name.</p>||
+|{$ORACLE.USER}|<p>Oracle username.</p>||
+|{$ORACLE.PASSWORD}|<p>Oracle user's password.</p>||
+|{$ORACLE.HOST}|<p>The hostname or IP address of the Oracle DB instance.</p>||
 |{$ORACLE.PORT}|<p>Oracle Database TCP port.</p>|`1521`|
 |{$ORACLE.DBNAME.MATCHES}|<p>Used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
 |{$ORACLE.DBNAME.NOT_MATCHES}|<p>Used in database discovery. It can be overridden on the host or linked template level.</p>|`PDB\$SEED`|

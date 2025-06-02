@@ -108,6 +108,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.edit&context=template&hostid='.$this->templateid);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));
@@ -119,7 +120,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Add')->one()->click();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

@@ -16,10 +16,7 @@
 
 class CControllerTriggerPrototypeList extends CController {
 
-	/**
-	 * @var array
-	 */
-	private array $discovery_rule;
+	private array $parent_discovery = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -45,17 +42,21 @@ class CControllerTriggerPrototypeList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
+		$options = [
+			'output' => ['itemid', 'name', 'hostid', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid'],
+			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
 
-		if (!$discovery_rule) {
+		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+		if (!$this->parent_discovery) {
 			return false;
 		}
 
-		$this->discovery_rule = reset($discovery_rule);
+		$this->parent_discovery = reset($this->parent_discovery);
 
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -65,12 +66,13 @@ class CControllerTriggerPrototypeList extends CController {
 	protected function doAction() {
 		$data = [
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
-			'discovery_rule' => $this->discovery_rule,
-			'hostid' => $this->discovery_rule['hostid'],
+			'discovery_rule' => $this->parent_discovery,
+			'hostid' => $this->parent_discovery['hostid'],
 			'triggers' => [],
 			'dependency_triggers' => [],
 			'context' => $this->getInput('context'),
-			'uncheck' => $this->hasInput('uncheck')
+			'uncheck' => $this->hasInput('uncheck'),
+			'is_parent_discovered' => $this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED
 		];
 
 		$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';
@@ -88,26 +90,26 @@ class CControllerTriggerPrototypeList extends CController {
 			'sortorder' => $sort_order
 		];
 
-		[$lld] = API::DiscoveryRule()->get([
-			'output' => ['hostid'],
-			'selectHosts' => ['status'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
+		$is_template_lld = $this->parent_discovery['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
 
-		$context = $this->getInput('context');
-		$is_template_lld = $lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
-
-		if (($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld)) {
+		if (($data['context'] === 'template' && $is_template_lld)
+				|| ($data['context'] === 'host' && !$is_template_lld)) {
 			$options = [
-				'editable' => true,
 				'output' => ['triggerid', $sort_field],
 				'discoveryids' => $data['parent_discoveryid'],
 				'sortfield' => $sort_field,
-				'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+				'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+				'editable' => true
 			];
 
 			$data['triggers'] = API::TriggerPrototype()->get($options);
+
+			if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$data['source_link_data'] = [
+					'parent_itemid' => $this->parent_discovery['discoveryData']['parent_itemid'],
+					'name' => $this->parent_discovery['name']
+				];
+			}
 		}
 
 		order_result($data['triggers'], $sort_field, $sort_order);
@@ -116,16 +118,20 @@ class CControllerTriggerPrototypeList extends CController {
 		CPagerHelper::savePage('trigger.prototype.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['triggers'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'trigger.prototype.list')
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
 		);
 
 		$data['triggers'] = API::TriggerPrototype()->get([
 			'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
-				'recovery_expression', 'opdata', 'discover'
+				'recovery_expression', 'opdata', 'discover', 'flags'
 			],
 			'selectHosts' => ['hostid', 'host'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectTags' => ['tag', 'value'],
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
+			'selectDiscoveryData' => ['parent_triggerid'],
 			'triggerids' => array_column($data['triggers'], 'triggerid')
 		]);
 
@@ -147,9 +153,7 @@ class CControllerTriggerPrototypeList extends CController {
 				'output' => ['triggerid', 'description', 'status', 'flags'],
 				'selectHosts' => ['hostid', 'name'],
 				'triggerids' => $dep_trigger_ids,
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
-				],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'preservekeys' => true
 			]);
 

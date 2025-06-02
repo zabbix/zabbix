@@ -347,7 +347,7 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
 
-	addresses, err := serverconnector.ParseServerActive()
+	addresses, err := agent.ParseServerActive(agent.Options.ServerActive)
 	if err != nil {
 		return errs.Wrap(err, "cannot parse the \"ServerActive\" parameter")
 	}
@@ -796,7 +796,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	switch len(params) {
 	case 0:
 		return errors.New("Empty command")
-	case 2: //nolint:gomnd
+	case 2: //nolint:mnd
 		return errors.New("Too many commands")
 	default:
 	}

@@ -18,7 +18,7 @@
 #include "zbxcommon.h"
 
 int	zbx_is_hostname_char(unsigned char c);
-int	zbx_is_key_char(unsigned char c);
+int	zbx_is_key_char(int c);
 int	zbx_is_function_char(unsigned char c);
 int	zbx_is_macro_char(unsigned char c);
 int	zbx_is_discovery_macro(const char *name);
@@ -27,6 +27,7 @@ int	zbx_parse_key(const char **exp);
 int	zbx_parse_host_key(char *exp, char **host, char **key);
 void	zbx_make_hostname(char *host);
 int	zbx_check_hostname(const char *hostname, char **error);
+int	zbx_check_prototype_hostname(const char *hostname, char **error);
 
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
@@ -84,7 +85,7 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 #define ZBX_TOKEN_REFERENCE		0x00040
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 #define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
-#define ZBX_TOKEN_USER_FUNC_MACRO	0x00200
+#define ZBX_TOKEN_USER_FUNC_MACRO	0x00200	/* e.g. {{$TEST_1}.fmtnum(2)} */
 #define ZBX_TOKEN_VAR_MACRO		0x00400
 #define ZBX_TOKEN_VAR_FUNC_MACRO	0x00800
 
@@ -290,5 +291,10 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 
 void	zbx_url_encode(const char *source, char **result);
 int	zbx_url_decode(const char *source, char **result);
+
+typedef int (*zbx_subst_func_t)(const char *data, int level, int num, int quoted, char **param, va_list args);
+
+int	zbx_substitute_snmp_oid_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...);
+int	zbx_substitute_item_key_params(char **data, char *error, size_t maxerrlen, zbx_subst_func_t cb, ...);
 
 #endif /* ZABBIX_EXPR_H */

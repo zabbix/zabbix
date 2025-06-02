@@ -168,7 +168,7 @@ class CControllerMenuPopup extends CController {
 
 		$db_hosts = $has_goto
 			? API::Host()->get([
-				'output' => ['hostid', 'status'],
+				'output' => ['hostid', 'status', 'flags'],
 				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectHttpTests' => API_OUTPUT_COUNT,
 				'selectDashboards' => API_OUTPUT_COUNT,
@@ -253,6 +253,7 @@ class CControllerMenuPopup extends CController {
 				$menu_data['showDashboards'] = (bool) $db_host['dashboards'];
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
 				$menu_data['isWriteable'] = $rw_hosts;
+				$menu_data['isDiscovered'] = $db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
 					$menu_data['severities'] = array_column(
@@ -361,6 +362,7 @@ class CControllerMenuPopup extends CController {
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => ['name', 'key_'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid']
@@ -368,6 +370,7 @@ class CControllerMenuPopup extends CController {
 
 		if ($db_item_prototypes) {
 			$db_item_prototype = $db_item_prototypes[0];
+			$parent_lld = $db_item_prototype['discoveryRule'] ?: $db_item_prototype['discoveryRulePrototype'];
 
 			$menu_data = [
 				'type' => 'item_prototype',
@@ -377,7 +380,7 @@ class CControllerMenuPopup extends CController {
 				'key' => $db_item_prototype['key_'],
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
-				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
+				'parent_discoveryid' => $parent_lld['itemid'],
 				'trigger_prototypes' => $db_item_prototype['triggers']
 			];
 

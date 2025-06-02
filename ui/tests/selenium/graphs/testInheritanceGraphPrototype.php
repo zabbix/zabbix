@@ -33,7 +33,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 
 	public static function update() {
 		return CDBHelper::getDataProvider(
-			'SELECT DISTINCT g.graphid,id.parent_itemid'.
+			'SELECT DISTINCT g.graphid,id.lldruleid'.
 			' FROM graphs g,graphs_items gi,item_discovery id'.
 			' WHERE g.graphid=gi.graphid'.
 				' AND gi.itemid=id.itemid'.
@@ -57,7 +57,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid='.
-				$data['parent_itemid'].'&graphid='.$data['graphid']);
+				$data['lldruleid'].'&graphid='.$data['graphid']);
 		$this->zbxTestCheckTitle('Graph prototype edit');
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -105,7 +105,6 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid='.
 				$this->discoveryRuleId
 		);
-
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
@@ -117,7 +116,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 				$this->zbxTestClickLinkTextWait($item['itemName']);
 				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
-			$dialog->getFooter()->query('button', 'Add')->waitUntilClickable()->one()->click();
+			$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
 
 		switch ($data['expected']) {

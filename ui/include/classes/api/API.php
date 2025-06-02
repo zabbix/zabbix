@@ -181,6 +181,13 @@ class API {
 	}
 
 	/**
+	 * @return CDiscoveryRulePrototype
+	 */
+	public static function DiscoveryRulePrototype() {
+		return self::getApi('discoveryruleprototype');
+	}
+
+	/**
 	 * @return CDRule
 	 */
 	public static function DRule() {

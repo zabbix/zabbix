@@ -43,6 +43,7 @@ $options = [
 	'mapid' => $map_data['id'],
 	'canvas' => $map_data['canvas'],
 	'background' => $map_data['background'],
+	'background_scale' => $map_data['background_scale'],
 	'elements' => $map_data['elements'],
 	'links' => $map_data['links'],
 	'duplicated_links' => $map_data['duplicated_links'],

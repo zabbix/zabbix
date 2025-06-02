@@ -38,10 +38,10 @@ class C72ImportConverter extends CConverter {
 
 	private static function convertMaps(array $maps): array {
 		$drawtypes = [
-			DRAWTYPE_LINE => CXmlConstantName::SINGLE_LINE,
-			DRAWTYPE_BOLD_LINE => CXmlConstantName::BOLD_LINE,
-			DRAWTYPE_DOT => CXmlConstantName::DOTTED_LINE,
-			DRAWTYPE_DASHED_LINE => CXmlConstantName::DASHED_LINE
+			CXmlConstantValue::SINGLE_LINE => CXmlConstantName::SINGLE_LINE,
+			CXmlConstantValue::BOLD_LINE => CXmlConstantName::BOLD_LINE,
+			CXmlConstantValue::DOTTED_LINE => CXmlConstantName::DOTTED_LINE,
+			CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE
 		];
 
 		foreach ($maps as &$map) {
@@ -60,9 +60,21 @@ class C72ImportConverter extends CConverter {
 				}
 			}
 			unset($link);
+
+			$map['selements'] = self::convertMapElements($map['selements']);
 		}
 		unset($map);
 
 		return $maps;
+	}
+
+	private static function convertMapElements(array $selements): array {
+		$i = 0;
+		foreach ($selements as &$selement) {
+			$selement['zindex'] = (string) $i++;
+		}
+		unset($selement);
+
+		return $selements;
 	}
 }

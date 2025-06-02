@@ -28,10 +28,40 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
-$this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget.create-placeholder.js');
+$this->addJsFile('class.widget-field.js');
+$this->addJsFile('class.widget-edit.dialogue.js');
+$this->addJsFile('class.widget-edit.sandbox.js');
+$this->addJsFile('class.widget-edit.validator.js');
+$this->addJsFile('class.widget-field.checkbox.js');
 $this->addJsFile('class.widget-field.checkbox-list.js');
+$this->addJsFile('class.widget-field.color.js');
+$this->addJsFile('class.widget-field.date-picker.js');
 $this->addJsFile('class.widget-field.multiselect.js');
+$this->addJsFile('class.widget-field.pattern-select.js');
+$this->addJsFile('class.widget-field.radio-button-list.js');
+$this->addJsFile('class.widget-field.range-control.js');
+
+// Keep loading order for the following file group:
+$this->addJsFile('class.widget-field.select.js');
+$this->addJsFile('class.widget-field.time-zone.js');
+
+$this->addJsFile('class.widget-field.severities.js');
+$this->addJsFile('class.widget-field.tags.js');
+$this->addJsFile('class.widget-field.text-area.js');
+
+// Keep loading order for the following file group:
+$this->addJsFile('class.widget-field.text-box.js');
+$this->addJsFile('class.widget-field.lat-lng.js');
+$this->addJsFile('class.widget-field.numeric-box.js');
+$this->addJsFile('class.widget-field.integer-box.js');
+
+$this->addJsFile('class.widget-field.thresholds.js');
 $this->addJsFile('class.widget-field.time-period.js');
+$this->addJsFile('class.widget-field.url.js');
+$this->addJsFile('class.widget-field-event.js');
+$this->addJsFile('class.widget-form.js');
+$this->addJsFile('class.widget-form-event.js');
 $this->addJsFile('class.widget-select.popup.js');
 
 if (array_key_exists('error', $data)) {
@@ -45,8 +75,14 @@ $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.coverride.js');
 $this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('class.csvggraph.js');
-$this->addJsFile('class.svg.canvas.js');
-$this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.imagecache.js');
+$this->addJsFile('class.svgcanvas.js');
+$this->addJsFile('class.svgtextarea.js');
+$this->addJsFile('class.svgelement.js');
+$this->addJsFile('class.svgmap.js');
+$this->addJsFile('class.svgmapelement.js');
+$this->addJsFile('class.svgmaplink.js');
+$this->addJsFile('class.svgmapshape.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('layout.mode.js');
@@ -61,35 +97,6 @@ $this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$main_filter_form = null;
-
-if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])
-		|| array_key_exists(CWidgetsData::DATA_TYPE_HOST_IDS, $data['broadcast_requirements'])) {
-	$main_filter_form = (new CForm('get'))
-		->setAttribute('name', 'dashboard_filter')
-		->setAttribute('aria-label', _('Main filter'))
-		->addVar('action', 'dashboard.view')
-		->addItem([
-			(new CLabel(_('Host'), 'dashboard_hostid_ms'))->addStyle('margin-right: 5px;'),
-			(new CMultiSelect([
-				'name' => 'dashboard_hostid',
-				'object_name' => 'hosts',
-				'data' => $data['dashboard_host'] ? [$data['dashboard_host']] : [],
-				'multiple' => false,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'hosts',
-						'srcfld1' => 'hostid',
-						'dstfrm' => 'dashboard_filter',
-						'dstfld1' => 'dashboard_hostid',
-						'monitored_hosts' => true,
-						'with_items' => true
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		]);
-}
-
 $html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
@@ -97,54 +104,91 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CList())
 			->setId('dashboard-control')
-			->addItem($main_filter_form)
-			->addItem((new CTag('nav', true,
-				(new CList())
-					->addItem(
-						(new CButton('dashboard-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
-							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
-					)
-					->addItem(
-						(new CSimpleButton())
-							->addClass(ZBX_STYLE_BTN_ACTION)
-							->addClass(ZBX_ICON_MENU)
-							->setId('dashboard-actions')
-							->setTitle(_('Actions'))
-							->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
-							->setAttribute('aria-haspopup', true)
-							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
-								$data['dashboard']['editable'], $data['has_related_reports'],
-								$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
-								$data['can_create_reports']
-							))
-					)
-					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-			))->setAttribute('aria-label', _('Content controls')))
-			->addItem((new CListItem(
-				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))
-						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_COG_FILLED),
-					(new CList())
-						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem(
-							(new CButton('dashboard-add-widget', _('Add')))
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_ICON_PLUS_SMALL)
-						)
-						->addItem(
-							(new CButton('dashboard-add'))
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
-						),
-					(new CButton('dashboard-save', _('Save changes'))),
-					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
-					''
-				])))
-					->setAttribute('aria-label', _('Content controls'))
-					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
-			))->addStyle('display: none'))
+			->addItem(
+				(new CListItem(
+					(new CForm('get'))
+						->setAttribute('name', 'dashboard_filter')
+						->setAttribute('aria-label', _('Main filter'))
+						->addVar('action', 'dashboard.view')
+						->addItem([
+							(new CLabel(_('Host'), 'dashboard_hostid_ms'))->addStyle('margin-right: 5px;'),
+							(new CMultiSelect([
+								'name' => 'dashboard_hostid',
+								'object_name' => 'hosts',
+								'data' => $data['dashboard_host'] !== null ? [$data['dashboard_host']] : [],
+								'multiple' => false,
+								'popup' => [
+									'parameters' => [
+										'srctbl' => 'hosts',
+										'srcfld1' => 'hostid',
+										'dstfrm' => 'dashboard_filter',
+										'dstfld1' => 'dashboard_hostid',
+										'monitored_hosts' => true,
+										'with_items' => true
+									]
+								]
+							]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						])
+				))
+					->addClass('js-control-host-override')
+					->addStyle('display: none;')
+			)
+			->addItem(
+				(new CListItem(
+					(new CTag('nav', true,
+						(new CList())
+							->addItem(
+								(new CButton('dashboard-edit', _('Edit dashboard')))
+									->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
+									->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+							)
+							->addItem(
+								(new CSimpleButton())
+									->addClass(ZBX_STYLE_BTN_ACTION)
+									->addClass(ZBX_ICON_MENU)
+									->setId('dashboard-actions')
+									->setTitle(_('Actions'))
+									->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
+									->setAttribute('aria-haspopup', true)
+									->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
+										$data['dashboard']['editable'], $data['has_related_reports'],
+										$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
+										$data['can_create_reports']
+									))
+							)
+							->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+
+					))->setAttribute('aria-label', _('Content controls'))
+				))->addClass('js-control-view-actions')
+			)
+			->addItem(
+				(new CListItem(
+					(new CTag('nav', true, new CList([
+						(new CButton('dashboard-config'))
+							->addClass(ZBX_STYLE_BTN_ICON)
+							->addClass(ZBX_ICON_COG_FILLED),
+						(new CList())
+							->addClass(ZBX_STYLE_BTN_SPLIT)
+							->addItem(
+								(new CButton('dashboard-add-widget', _('Add')))
+									->addClass(ZBX_STYLE_BTN_ALT)
+									->addClass(ZBX_ICON_PLUS_SMALL)
+							)
+							->addItem(
+								(new CButton('dashboard-add'))
+									->addClass(ZBX_STYLE_BTN_ALT)
+									->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
+							),
+						(new CButton('dashboard-save', _('Save changes'))),
+						(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
+						''
+					])))
+						->setAttribute('aria-label', _('Content controls'))
+						->addClass(ZBX_STYLE_DASHBOARD_EDIT)
+				))
+					->addClass('js-control-edit-actions')
+					->addStyle('display: none')
+			)
 	)
 	->setKioskModeControls(
 		count($data['dashboard']['pages']) > 1
@@ -190,10 +234,8 @@ $html_page = (new CHtmlPage())
 					->setId('dashboard-direct-link')
 			)
 			->addClass(ZBX_STYLE_SELECTED)
-	])));
-
-if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requirements'])) {
-	$html_page->addItem(
+	])))
+	->addItem(
 		(new CFilter())
 			->setProfile($data['dashboard_time_period']['profileIdx'], $data['dashboard_time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -201,8 +243,9 @@ if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requi
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 			->preventHistoryUpdates()
+			->setManualSetup()
+			->setHidden()
 	);
-}
 
 $dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 
@@ -257,7 +300,6 @@ $html_page
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
 		'configuration_hash' => $data['configuration_hash'],
-		'broadcast_requirements' => $data['broadcast_requirements'],
 		'dashboard_host' => $data['dashboard_host'],
 		'dashboard_time_period' => $data['dashboard_time_period'],
 		'web_layout_mode' => $web_layout_mode,
