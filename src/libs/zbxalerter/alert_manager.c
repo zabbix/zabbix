@@ -1216,6 +1216,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 		am_push_mediatype(manager, mediatype);
 
 		zbx_free(alert_message);
+		zbx_free(alert_params);
 	}
 }
 
