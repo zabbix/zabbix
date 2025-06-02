@@ -5,6 +5,8 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
 .......PS. [ZBX-25968] added configuration validation of DBPort and DBSocket (rtrizna)
@@ -3553,6 +3555,7 @@ New features:
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
 
