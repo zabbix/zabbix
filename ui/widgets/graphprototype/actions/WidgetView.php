@@ -70,7 +70,7 @@ class WidgetView extends CControllerWidgetIterator {
 			'selectDiscoveryRulePrototype' => ['hostid']
 		];
 
-		if ($this->fields_values['override_hostid']) {
+		if (!$this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
@@ -209,7 +209,7 @@ class WidgetView extends CControllerWidgetIterator {
 			'selectDiscoveryRulePrototype' => ['hostid']
 		];
 
-		if ($this->fields_values['override_hostid']) {
+		if (!$this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
