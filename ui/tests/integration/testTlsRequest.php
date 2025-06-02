@@ -20,11 +20,77 @@ require_once __DIR__.'/../include/CIntegrationTest.php';
 class testTlsRequest extends TlsCaseBase {
 	public function configPairsSetupDataProvider() {
 		// Tuples where first entry is in fromat for cert generation, second in format for Zabbix issuer/subject checks.
+
 		// Simple case.
 		yield [
 			'issuer_ca' => ['/ST=CA/C=LV', 'C=LV,ST=CA'],
 			'issuer_agent' => ['/ST=AGENT/C=LV', 'C=LV,ST=AGENT'],
-			'issuer_server' => ['/ST=SERVER/C=LV', 'C=LV,ST=SERVER'],
+			'issuer_server' => ['/ST=SERVER/C=LV', 'C=LV,ST=SERVER']
+		];
+
+		// DC attribute
+		yield [
+			'issuer_ca' => ['/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1'],
+			'issuer_agent' => ['/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1'],
+			'issuer_server' => ['/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1']
+		];
+
+		// DC attribute thrise
+		yield [
+			'issuer_ca' => ['/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3'],
+			'issuer_agent' => ['/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3'],
+			'issuer_server' => ['/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3']
+		];
+
+		// "L" attribute
+		yield [
+			'issuer_ca' => ['/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1'],
+			'issuer_agent' => ['/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1'],
+			'issuer_server' => ['/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1']
+		];
+
+		// "O" attribute
+		yield [
+			'issuer_ca' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1'],
+			'issuer_agent' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1'],
+			'issuer_server' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1']
+		];
+
+		// "OU" attribute
+		yield [
+			'issuer_ca' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1'],
+			'issuer_agent' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1'],
+			'issuer_server' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1']
+		];
+
+		// "UID" attribute
+		yield [
+			'issuer_ca' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'],
+			'issuer_agent' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'],
+			'issuer_server' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1']
+		];
+
+		// "CN" attribute
+		yield [
+			'issuer_ca' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'],
+			'issuer_agent' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'],
+			'issuer_server' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1']
+		];
+
+		// Docs case.
+		yield [
+			'issuer_ca' => [
+				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=CA',
+				'ST=CA,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
+			],
+			'issuer_agent' => [
+				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=AGENT',
+				'ST=AGENT,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
+			],
+			'issuer_server' => [
+				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=SERVER',
+				'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
+			]
 		];
 	}
 
@@ -60,7 +126,7 @@ class testTlsRequest extends TlsCaseBase {
 			'TLSCertFile' => $server_crt,
 			'TLSKeyFile' => $server_key
 		]);
-		self::assertTrue($ready, 'Expected server be running.');
+		self::assertTrue($ready, 'Expected server be running.'.CShellExec::logs());
 
 		[$ready] = CShellExec::agent([
 			'TLSAccept' => 'cert',
@@ -77,9 +143,10 @@ class testTlsRequest extends TlsCaseBase {
 		$zabbix_server = self::serverApi('localhost:10051', $ca_crt, $agent_key, $agent_crt, $sid);
 		$result = $zabbix_server->testItem(self::testItemRequest($issuer_ca[1], $issuer_agent[1]), $sid);
 
-		self::assertTrue(array_key_exists('data', $result), 'Expected minimal client to work.');
-		self::assertTrue(array_key_exists('item', $result['data']), 'Expected minimal client to work.');
-		self::assertTrue(array_key_exists('result', $result['data']['item']), 'Expected minimal client to work.');
+		self::assertTrue(array_key_exists('data', $result), 'Expected minimal client to work.'.CShellExec::logs());
+		self::assertTrue(array_key_exists('item', $result['data']), 'Expected minimal client to work.'.CShellExec::logs());
+		$error = $result['data']['item']['error'] ?? '';
+		self::assertTrue(array_key_exists('result', $result['data']['item']), 'Expected minimal client to work.'.PHP_EOL.$error.CShellExec::logs());
 
 		// Once all this succeed, same must now succeed from current FE client with issuer checks using same values as
 		// in agent configuration.
@@ -116,9 +183,9 @@ class testTlsRequest extends TlsCaseBase {
 						'type' => '20',
 						'error_handler' => '0',
 						'error_handler_params' => '',
-						'params' => '1d',
-					],
-				],
+						'params' => '1d'
+					]
+				]
 			],
 			'host' =>  [
 				'interface' => [

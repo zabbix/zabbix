@@ -43,7 +43,7 @@ class CShellExec {
 	private static string $server_bin = '';
 	private static string $agent_bin = '';
 
-	public static array $resouces = [
+	public static array $resources = [
 		'server_pid' => null,
 		'server_stdout' => null,
 		'agent_stdout' => null,
@@ -80,10 +80,23 @@ class CShellExec {
 		return $temp_config;
 	}
 
+	public static function logs(): string {
+		$result = [];
+
+		foreach (self::$resources as $key => $resource) {
+			if (is_resource($resource)) {
+				$result[] = "Logs '$key':\n";
+				$result[] = stream_get_contents($resource);
+			}
+		}
+
+		return implode(PHP_EOL, $result);
+	}
+
 	public static function serverTick(): array {
 		$events = [];
 
-		if ($resource = self::$resouces['server_logs']) {
+		if ($resource = self::$resources['server_logs']) {
 			$data = stream_get_contents($resource);
 			foreach (explode(PHP_EOL, $data) as $line) {
 				$errors = [
@@ -102,13 +115,13 @@ class CShellExec {
 				}
 			}
 		}
-		if ($resource = self::$resouces['server_stderr']) {
+		if ($resource = self::$resources['server_stderr']) {
 			$data = stream_get_contents($resource);
 			if ($data) {
 				throw new RuntimeException(sprintf("[Server stderr]:\n %s.", $data));
 			}
 		}
-		if ($resource = self::$resouces['server_stdout']) {
+		if ($resource = self::$resources['server_stdout']) {
 			$data = stream_get_contents($resource);
 		}
 
@@ -118,7 +131,7 @@ class CShellExec {
 	public static function agentTick(): array {
 		$events = [];
 
-		if ($resource = self::$resouces['agent_logs']) {
+		if ($resource = self::$resources['agent_logs']) {
 			$data = stream_get_contents($resource);
 			foreach (explode(PHP_EOL, $data) as $line) {
 				$errors = [];
@@ -133,13 +146,13 @@ class CShellExec {
 				}
 			}
 		}
-		if ($resource = self::$resouces['agent_stderr']) {
+		if ($resource = self::$resources['agent_stderr']) {
 			$data = stream_get_contents($resource);
 			if ($data) {
 				throw new RuntimeException(sprintf("[Agent stderr]:\n %s.", $data));
 			}
 		}
-		if ($resource = self::$resouces['agent_stdout']) {
+		if ($resource = self::$resources['agent_stdout']) {
 			$data = stream_get_contents($resource);
 		}
 
@@ -169,9 +182,9 @@ class CShellExec {
 			throw new RuntimeException(sprintf("[Server exit (%s) stderr]:\n %s.", $status, $output));
 		}
 
-		self::$resouces['agent_logs'] = fopen($temp_log, 'r');
-		self::$resouces['agent_stdout'] = fopen($temp_stdout, 'r');
-		self::$resouces['agent_stderr'] = fopen($temp_stderr, 'r');
+		self::$resources['agent_logs'] = fopen($temp_log, 'r');
+		self::$resources['agent_stdout'] = fopen($temp_stdout, 'r');
+		self::$resources['agent_stderr'] = fopen($temp_stderr, 'r');
 
 		$ready = false;
 		$exited = false;
@@ -214,9 +227,9 @@ class CShellExec {
 			throw new RuntimeException(sprintf("[Server exit (%s) stderr]:\n %s.", $status, $output));
 		}
 
-		self::$resouces['server_logs'] = fopen($temp_log, 'r');
-		self::$resouces['server_stdout'] = fopen($temp_stdout, 'r');
-		self::$resouces['server_stderr'] = fopen($temp_stderr, 'r');
+		self::$resources['server_logs'] = fopen($temp_log, 'r');
+		self::$resources['server_stdout'] = fopen($temp_stdout, 'r');
+		self::$resources['server_stderr'] = fopen($temp_stderr, 'r');
 
 		$ready = false;
 		$exited = false;
