@@ -59,6 +59,7 @@ function getLocales(): array {
 		'sv_SE' => ['name' => _('Swedish (sv_SE)'),	'display' => false],
 		'tr_TR' => ['name' => _('Turkish (tr_TR)'),	'display' => true],
 		'uk_UA' => ['name' => _('Ukrainian (uk_UA)'),	'display' => true],
+		'uz_UZ' => ['name' => _('Uzbek (uz_UZ)'),	'display' => true],
 		'vi_VN' => ['name' => _('Vietnamese (vi_VN)'),	'display' => true]
 	];
 }

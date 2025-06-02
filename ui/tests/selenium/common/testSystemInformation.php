@@ -181,17 +181,6 @@ class testSystemInformation extends CWebTest {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
-
-		// Check and hide the text of messages, because they contain ip addresses of the current host.
-		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".
-				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
-				"2. Incorrect DNS server configuration.\n".
-				"Failed to parse address \"".$DB['SERVER']."\"";
-		$messages = CMessageElement::find()->all();
-		foreach ($messages as $message) {
-			$this->assertTrue($message->hasLine($error_text));
-			self::$skip_fields[] = $message;
-		}
 	}
 
 	/**

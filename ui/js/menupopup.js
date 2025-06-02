@@ -217,6 +217,18 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// Configuration
 		if (options.allowed_ui_conf_hosts) {
+			// host wizard
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'host.wizard.edit');
+			url.setArgument('hostid', options.hostid);
+
+			configuration.push({
+				label: t('Host Wizard'),
+				disabled: !options.isWriteable || options.isDiscovered,
+				url: url.getUrl()
+			});
+
 			// host
 			url = new Curl('zabbix.php');
 			url.setArgument('action', 'popup');
@@ -1271,6 +1283,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
+		disabled: options.is_binary_value_type,
 		clickCallback: function() {
 			ZABBIX.PopupManager.open('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,

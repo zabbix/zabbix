@@ -298,23 +298,23 @@ void	zbx_oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const cha
 
 		if (data->old_tokens_status != data->tokens_status)
 		{
-			zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.tokens_status",
-					data->old_tokens_status, data->tokens_status);
+			zbx_audit_entry_update_int(entry, "tokens_status", data->old_tokens_status,
+					data->tokens_status);
 		}
 
 		if (SUCCEED == fetch_result)
 		{
-			zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_token",
-					ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);
-			zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_expires_in",
-					data->old_access_expires_in, data->access_expires_in);
-			zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.access_token_updated",
-					(int)data->old_access_token_updated, (int)data->access_token_updated);
+			zbx_audit_entry_update_string(entry, "access_token", ZBX_MACRO_SECRET_MASK,
+					ZBX_MACRO_SECRET_MASK);
+			zbx_audit_entry_update_int(entry, "access_expires_in", data->old_access_expires_in,
+					data->access_expires_in);
+			zbx_audit_entry_update_int(entry, "access_token_updated", (int)data->old_access_token_updated,
+					(int)data->access_token_updated);
 
 			if (NULL != data->old_refresh_token)
 			{
-				zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, "mediatype.refresh_token",
-						ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);
+				zbx_audit_entry_update_string(entry, "refresh_token", ZBX_MACRO_SECRET_MASK,
+						ZBX_MACRO_SECRET_MASK);
 			}
 		}
 

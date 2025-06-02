@@ -854,11 +854,12 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 		}
 
 		zbx_free(sql);
+
+		zbx_free(results);
 	}
 
 	zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
 	zbx_vector_events_tags_destroy(&update_events_tags);
-	zbx_free(results);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
 
@@ -984,12 +985,16 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb, uint64_t alert_usrgrpid)
 			zbx_free(data);
 		}
 	}
+	if (0 == medias.values_num)
+		goto out;
 
 	data_len = zbx_alerter_serialize_medias(&data, (zbx_am_media_t **)medias.values, medias.values_num);
+
 	if (FAIL == zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_WATCHDOG, data, data_len))
 		zabbix_log(LOG_LEVEL_ERR, "failed to update watchdog recipients");
-	zbx_free(data);
 
+	zbx_free(data);
+out:
 	medias_num = medias.values_num;
 
 	zbx_vector_am_media_ptr_clear_ext(&medias, zbx_am_media_free);

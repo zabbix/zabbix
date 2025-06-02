@@ -1,0 +1,57 @@
+.markdown {
+	line-height: 1.5;
+	white-space: initial;
+
+	h1 {
+		font-size: 24px;
+	}
+
+	h2 {
+		font-size: 18px;
+		line-height: 18px;
+	}
+
+	h4 {
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 18px;
+	}
+
+	h1, h2, h3, h4 {
+		&:not(:first-child) {
+			margin-top: 24px;
+		}
+	}
+
+	ol, ul, p, pre, li {
+		margin-bottom: 0;
+
+		&:not(:first-child) {
+			margin-top: 16px;
+		}
+	}
+
+	ol, ul {
+		list-style-position: outside;
+		padding-left: 1.5em;
+
+		li {
+			padding-bottom: 0;
+		}
+	}
+
+	p, pre {
+		overflow: hidden;
+	}
+
+	pre {
+		padding: 5px;
+		background: $form-dark-bg-color;
+		border: 1px solid $form-border-color;
+		border-radius: 2px;
+	}
+
+	a {
+		@extend .link-external;
+	}
+}

@@ -41,6 +41,7 @@ JAVASCRIPT;
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
 		'limited' => false,
+		'discovered_lld' => false,
 		'interfaceid' => getRequest('interfaceid', 0),
 		'name' => getRequest('name', ''),
 		'description' => getRequest('description', ''),
@@ -154,15 +155,26 @@ JAVASCRIPT;
 
 	// hostid
 	if ($data['parent_discoveryid'] != 0) {
-		$discoveryRule = API::DiscoveryRule()->get([
+		$db_parent_discovery = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'selectHosts' => ['flags'],
 			'itemids' => $data['parent_discoveryid'],
 			'editable' => true
 		]);
-		$discoveryRule = reset($discoveryRule);
-		$data['hostid'] = $discoveryRule['hostid'];
-		$data['host'] = $discoveryRule['hosts'][0];
+
+		if (!$db_parent_discovery) {
+			$db_parent_discovery = API::DiscoveryRulePrototype()->get([
+				'output' => ['hostid'],
+				'selectHosts' => ['flags'],
+				'itemids' => $data['parent_discoveryid'],
+				'editable' => true
+			]);
+		}
+
+		$db_parent_discovery = reset($db_parent_discovery);
+
+		$data['hostid'] = $db_parent_discovery['hostid'];
+		$data['host'] = $db_parent_discovery['hosts'][0];
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);
@@ -188,10 +200,12 @@ JAVASCRIPT;
 		$data['limited'] = ($data['item']['templateid'] != 0);
 		$data['interfaceid'] = $item['interfaceid'];
 
-		// discovery rule
-		$flag = ZBX_FLAG_DISCOVERY_RULE;
-		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		// Check for a discovered prototype
+		$data['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			&& ($item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE || $item['flags'] & ZBX_FLAG_DISCOVERY_RULE);
+
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $item['flags']),
+			$item['flags'], CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 
@@ -270,10 +284,15 @@ JAVASCRIPT;
 				if ($data['delay'][0] !== '{') {
 					$delay = timeUnitToSeconds($data['delay']);
 
-					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
-							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
-						$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+					if ($delay == 0) {
+						$is_default_delay = in_array($data['type'],
+							[ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED]
+						);
+
+						if ($is_default_delay || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0)) {
+							$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+						}
 					}
 				}
 

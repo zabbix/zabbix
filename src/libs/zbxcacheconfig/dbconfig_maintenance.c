@@ -1504,7 +1504,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 				continue;
 			}
 
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot process event for trigger prototype"
 						" (triggerid:" ZBX_FS_UI64 ")", trigger->triggerid);

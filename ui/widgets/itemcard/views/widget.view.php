@@ -120,13 +120,13 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 			$error_text = makeErrorIcon($item['error']);
 		}
 
-		$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['itemDiscovery']
-			? $item['itemDiscovery']['disable_source']
+		$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['discoveryData']
+			? $item['discoveryData']['disable_source']
 			: '';
 
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$item_discovery = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
-				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$item_discovery = getLldLostEntityIndicator(time(), $item['discoveryData']['ts_delete'],
+				$item['discoveryData']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
 				_('item')
 			);
 		}

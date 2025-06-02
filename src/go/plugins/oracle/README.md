@@ -9,12 +9,6 @@ You can extend it or create your own template to cater specific needs.
 
 **Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the licence required for using this management pack.**
 
-## Requirements
-
-* Zabbix Agent 2
-* Go >= 1.21 (required only to build from source)
-* Oracle Instant Client >= 12
-
 ## Supported versions
 
 * Oracle Database 12c2 and newer

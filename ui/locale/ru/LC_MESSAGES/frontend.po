@@ -16,6 +16,11 @@ msgstr ""
 "X-POOTLE-MTIME: 1642029102.000000\n"
 "X-Poedit-Basepath: ../../\n"
 
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
+msgid " or "
+msgstr ""
+
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
@@ -455,6 +460,12 @@ msgstr "<подменю/подменю/...>"
 msgctxt "abbreviation of severity level"
 msgid "A"
 msgstr "Ср"
+
+#: include/classes/helpers/CItemGeneralHelper.php:356
+#: include/classes/helpers/CItemGeneralHelper.php:399
+#: include/classes/helpers/CItemGeneralHelper.php:407
+msgid "A floating point value is expected."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1425,6 +1436,12 @@ msgstr "LLD правило с ключом \"%1$s\" уже существует 
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
 msgstr "LLD правило с ключом \"%1$s\" уже существует у шаблона \"%2$s\"."
 
+#: include/classes/validators/CFormValidator.php:1064
+#: include/classes/validators/CFormValidator.php:1103
+#: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
+msgid "An array is expected."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
@@ -1697,6 +1714,10 @@ msgstr "Должен быть указан хотя бы один день не�
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "Должна быть выбрана по крайней мере одна группа узлов сети или узел сети."
+
+#: include/classes/helpers/CItemGeneralHelper.php:411
+msgid "At least one of \"min\" or \"max\" parameters should be specified."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2512,6 +2533,11 @@ msgstr "Не удалось назначить поле инвентарных �
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
 msgstr "Не удалось назначить поле инвентарных данных \"%1$s\" элементу данных с ключом \"%2$s\" шаблона \"%3$s\", так как это поле уже заполняется элементом данных с ключом \"%4$s\"."
+
+#: app/controllers/CControllerItem.php:206
+#: app/controllers/CControllerItemPrototype.php:208
+msgid "Cannot be less than or equal to \"Min\"."
+msgstr ""
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -8195,6 +8221,11 @@ msgstr "Английский (en_GB)"
 msgid "English (en_US)"
 msgstr "Английский (en_US)"
 
+#: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
+#, c-format
+msgid "Entry \"%1$s\" is not unique."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
 #: app/partials/monitoring.latest.filter.php:114
@@ -8508,6 +8539,13 @@ msgstr "Расширить боковую панель"
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
 msgstr "Развертывание одиночной проблемы"
+
+#: app/controllers/CControllerHostCreate.php:195
+#: app/controllers/CControllerHostUpdate.php:200
+#: app/controllers/CControllerTemplateCreate.php:69
+#: app/controllers/CControllerTemplateUpdate.php:71
+msgid "Expected user macro format is \"{$MACRO}\"."
+msgstr ""
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -9117,6 +9155,12 @@ msgstr "Получить значение с узла сети"
 #: include/triggers.inc.php:767
 msgid "Given expression is not a macro"
 msgstr "Заданное выражение не является макросом"
+
+#: app/controllers/CControllerValueMapCheck.php:49
+#: app/controllers/CControllerValueMapEdit.php:95
+#: app/controllers/CControllerValueMapEdit.php:109
+msgid "Given valuemap name is already taken."
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
@@ -10848,6 +10892,11 @@ msgstr "Некорректное значение %1$s типа подписи �
 msgid "Incorrect API \"%1$s\"."
 msgstr "Некорректный API \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:65
+#: app/controllers/CControllerHostUpdate.php:69
+msgid "Incorrect DNS provided."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:602
 msgid "Incorrect SNMP OID."
 msgstr "Некорректный SNMP OID."
@@ -10987,6 +11036,16 @@ msgstr "Некорректное значение массового опрос�
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:39
+#: app/controllers/CControllerHostUpdate.php:42
+msgid "Incorrect characters used for host name."
+msgstr ""
+
+#: app/controllers/CControllerTemplateCreate.php:35
+#: app/controllers/CControllerTemplateUpdate.php:36
+msgid "Incorrect characters used for template name."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "Некорректный текущий пароль."
@@ -11095,6 +11154,11 @@ msgstr "Некорректное значение \"%1$s\" параметра: %
 #: include/classes/api/services/CDRule.php:517
 msgid "Incorrect port range."
 msgstr "Некорректный диапазон портов."
+
+#: app/controllers/CControllerHostCreate.php:71
+#: app/controllers/CControllerHostUpdate.php:75
+msgid "Incorrect port."
+msgstr ""
 
 #: app/controllers/CControllerRegExTest.php:77
 #, c-format
@@ -11729,6 +11793,11 @@ msgstr "Ошибочный API метод \"%2$s\" для роли пользо�
 msgid "Invalid IP address \"%1$s\"."
 msgstr "Не верный IP адрес \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:57
+#: app/controllers/CControllerHostUpdate.php:61
+msgid "Invalid IP address."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Ошибочный JSON. На сервере произошла ошибка при разборе текста JSON."
@@ -11756,6 +11825,15 @@ msgstr "Некорректные настройки MFA"
 #: app/controllers/CControllerOauthCheck.php:44
 #: app/controllers/CControllerOauthEdit.php:43
 msgid "Invalid OAuth configuration"
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:456
+msgid "Invalid Prometheus label."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:441
+#: include/classes/helpers/CItemGeneralHelper.php:446
+msgid "Invalid Prometheus pattern."
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
@@ -11811,6 +11889,17 @@ msgstr "Ошибочный ввод"
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Некорректный интервал \"%1$s\"."
+
+#: app/controllers/CControllerItemCreate.php:247
+#: app/controllers/CControllerItemCreate.php:252
+#: app/controllers/CControllerItemPrototypeCreate.php:255
+#: app/controllers/CControllerItemPrototypeCreate.php:260
+#: app/controllers/CControllerItemPrototypeUpdate.php:212
+#: app/controllers/CControllerItemPrototypeUpdate.php:217
+#: app/controllers/CControllerItemUpdate.php:212
+#: app/controllers/CControllerItemUpdate.php:217
+msgid "Invalid interval."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryCheckCheck.php:64
 #: include/classes/api/services/CDRule.php:586
@@ -12089,6 +12178,27 @@ msgstr "Ошибочный параметр \"%1$s\": %2$s."
 msgid "Invalid params."
 msgstr "Ошибочные параметры."
 
+#: app/controllers/CControllerItemCreate.php:257
+#: app/controllers/CControllerItemPrototypeCreate.php:265
+#: app/controllers/CControllerItemPrototypeUpdate.php:222
+#: app/controllers/CControllerItemUpdate.php:222
+msgid "Invalid period."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:167
+#: app/controllers/CControllerItemPrototypeCreate.php:171
+#: app/controllers/CControllerItemPrototypeUpdate.php:155
+#: app/controllers/CControllerItemUpdate.php:154
+msgid "Invalid range expression."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:228
+#: app/controllers/CControllerHostUpdate.php:233
+#: app/controllers/CControllerTemplateCreate.php:102
+#: app/controllers/CControllerTemplateUpdate.php:104
+msgid "Invalid range."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
 msgstr "Ошибочный запрос."
@@ -12098,6 +12208,11 @@ msgstr "Ошибочный запрос."
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Ошибочный код ответа \"%1$s\"."
+
+#: include/classes/validators/CFormValidator.php:1001
+#: include/classes/validators/CFormValidator.php:1007
+msgid "Invalid string."
+msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:82
 #: include/classes/export/CConfigurationExportBuilder.php:105
@@ -12497,6 +12612,10 @@ msgstr "JSON данные"
 #: include/classes/validators/CApiInputValidator.php:3982
 msgid "JSON is expected"
 msgstr "ожидался JSON"
+
+#: include/forms.inc.php:466 include/views/js/item.preprocessing.js.php:135
+msgid "JSON path"
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -12994,6 +13113,10 @@ msgstr "Список данных конфигурации и данных в р
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Список блочных устройств и их типы. Возвращает JSON"
 
+#: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
+msgid "List of characters"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr "Список обнаруженных CPU / ядер CPU. Возвращает JSON"
@@ -13247,6 +13370,13 @@ msgstr "Макрос \"%1$s\" уже существует у \"%2$s\"."
 msgid "Macro \"%1$s\" already exists."
 msgstr "Макрос \"%1$s\" уже существует."
 
+#: app/controllers/CControllerHostCreate.php:180
+#: app/controllers/CControllerHostUpdate.php:185
+#: app/controllers/CControllerTemplateCreate.php:54
+#: app/controllers/CControllerTemplateUpdate.php:56
+msgid "Macro name is not unique."
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:511
 #: app/partials/massupdate.macros.tab.php:121
 #: app/views/administration.macros.edit.php:29
@@ -13488,6 +13618,13 @@ msgstr "Преобразование в"
 #: app/controllers/CControllerPopupGeneric.php:468
 msgid "Mapping"
 msgstr "Соответствие"
+
+#: app/controllers/CControllerHostCreate.php:208
+#: app/controllers/CControllerHostUpdate.php:213
+#: app/controllers/CControllerTemplateCreate.php:82
+#: app/controllers/CControllerTemplateUpdate.php:84
+msgid "Mapping type and value combination is not unique."
+msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
 #: app/views/administration.iconmap.edit.php:126
@@ -14240,6 +14377,10 @@ msgstr "Множественный"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Множественные события ПРОБЛЕМА"
+
+#: include/classes/validators/CFormValidator.php:340
+msgid "Must be selected."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15434,6 +15575,10 @@ msgstr "Нбр."
 msgid "November"
 msgstr "Ноябрь"
 
+#: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
+msgid "Number"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
 msgstr "Количество CPU. Возвращает целое число"
@@ -15739,6 +15884,21 @@ msgstr "Один раз"
 #: app/views/mediatype.edit.php:445
 msgid "One"
 msgstr "Одна"
+
+#: app/controllers/CControllerItem.php:166
+#: app/controllers/CControllerItemPrototype.php:168
+msgid "One \"Change\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:182
+#: app/controllers/CControllerItemPrototype.php:184
+msgid "One \"Prometheus\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:174
+#: app/controllers/CControllerItemPrototype.php:176
+msgid "One \"Throttling\" step allowed per item."
+msgstr ""
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -16336,6 +16496,21 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "Идентификатор PSK"
 
+#: app/controllers/CControllerHostCreate.php:162
+#: app/controllers/CControllerHostUpdate.php:167
+msgid "PSK must be an even number of characters."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:166
+#: app/controllers/CControllerHostUpdate.php:171
+msgid "PSK must be at least 32 characters long."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:170
+#: app/controllers/CControllerHostUpdate.php:175
+msgid "PSK must contain only hexadecimal characters."
+msgstr ""
+
 #: jsLoader.php:146
 #, c-format
 msgid "Page %1$d"
@@ -16814,6 +16989,11 @@ msgstr "Предобработка"
 #: include/views/configuration.item.prototype.edit.php:950
 msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
 msgstr "Предварительная обработка - преобразование до сохранения значения в базу данных. Можно задать последовательность шагов предварительной обработки, и они будут выполнены в заданном порядке."
+
+#: app/controllers/CControllerItem.php:190
+#: app/controllers/CControllerItemPrototype.php:192
+msgid "Preprocessing step with such Name and Parameters combination already exists."
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -17309,6 +17489,10 @@ msgstr "Файл публичного ключа"
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
 msgstr "Push"
+
+#: include/views/js/item.preprocessing.js.php:208
+msgid "Qualifier"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -17957,6 +18141,10 @@ msgstr "Тип запроса"
 #: include/views/configuration.httpconf.edit.php:228
 msgid "Required"
 msgstr "Требуется"
+
+#: include/classes/validators/CFormValidator.php:652 jsLoader.php:420
+msgid "Required field is missing."
+msgstr ""
 
 #: app/views/administration.script.edit.php:314
 msgid "Required host permissions"
@@ -20454,6 +20642,21 @@ msgstr "Список тегов"
 msgid "Tag name"
 msgstr "Имя тега"
 
+#: app/controllers/CControllerHostCreate.php:129
+#: app/controllers/CControllerHostUpdate.php:133
+#: app/controllers/CControllerItemCreate.php:339
+#: app/controllers/CControllerItemPrototypeCreate.php:346
+#: app/controllers/CControllerItemPrototypeUpdate.php:301
+#: app/controllers/CControllerItemUpdate.php:302
+#: app/controllers/CControllerTemplateCreate.php:47
+#: app/controllers/CControllerTemplateUpdate.php:49
+#: app/controllers/CControllerTriggerCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeUpdate.php:61
+#: app/controllers/CControllerTriggerUpdate.php:61
+msgid "Tag name and value combination is not unique."
+msgstr ""
+
 #: include/actions.inc.php:68
 msgid "Tag value"
 msgstr "Значение тега"
@@ -21039,10 +21242,27 @@ msgstr[2] "Эту проверку нельзя удалить, так как о
 msgid "This day last week"
 msgstr "Этот день прошлой недели"
 
+#: include/classes/validators/CFormValidator.php:929
+#: include/classes/validators/CFormValidator.php:1109
+#: include/classes/validators/CFormValidator.php:1158 jsLoader.php:427
+msgid "This field cannot be empty."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:263
+#: app/controllers/CControllerItemPrototypeCreate.php:271
+#: app/controllers/CControllerItemPrototypeUpdate.php:228
+#: app/controllers/CControllerItemUpdate.php:228
+msgid "This field cannot be set to \"0\" without defining custom intervals."
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "Это поле автоматически заполняется \"%1$s\" элементом данных."
+
+#: include/classes/validators/CItemKeyValidator.php:42
+msgid "This field must contain at least one low-level discovery macro."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
 msgid "This is the test message from Zabbix"
@@ -21055,6 +21275,10 @@ msgstr "Этот месяц"
 #: include/func.inc.php:2575
 msgid "This month so far"
 msgstr "В этом месяце"
+
+#: include/classes/validators/CFormValidator.php:1260 jsLoader.php:425
+msgid "This object already exists."
+msgstr ""
 
 #: widgets/item/views/widget.edit.php:229
 msgid "This setting applies only to numeric data."
@@ -21090,6 +21314,70 @@ msgstr "Этот тип информации может не соответст�
 #: app/views/administration.user.edit.php:61
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
 msgstr "Этот пользователь инициализирован IdP. Внесение изменений вручную в поля заполненные при инициализации не допускается."
+
+#: include/classes/validators/CFormValidator.php:1442
+#: include/classes/validators/CFormValidator.php:1482 jsLoader.php:430
+#, c-format
+msgid "This value cannot be %1$s."
+msgid_plural "This value cannot be one of %1$s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: jsLoader.php:429
+#, c-format
+msgid "This value cannot be one of %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
+msgid "This value does not match pattern."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
+msgid "This value is not a valid floating-point value."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:790 jsLoader.php:422
+msgid "This value is not a valid identifier."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:823 jsLoader.php:423
+msgid "This value is not a valid integer."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:923 jsLoader.php:426
+msgid "This value is not a valid string."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:940 jsLoader.php:428
+msgid "This value is too long."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1461 jsLoader.php:431
+#, c-format
+msgid "This value must be %1$s."
+msgid_plural "This value must be one of %1$s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/validators/CFormValidator.php:847
+#: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
+#, c-format
+msgid "This value must be no greater than \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:841
+#: include/classes/validators/CFormValidator.php:892 jsLoader.php:432
+#, c-format
+msgid "This value must be no less than \"%1$s\"."
+msgstr ""
+
+#: jsLoader.php:434
+#, c-format
+msgid "This value must be one of %1$s."
+msgstr ""
 
 #: include/func.inc.php:2572
 msgid "This week"
@@ -23543,6 +23831,18 @@ msgstr "Преобразование значений"
 msgid "Value mappings"
 msgstr "Преобразования значений"
 
+#: include/classes/validators/CFormValidator.php:1028
+#: include/classes/validators/CFormValidator.php:1038
+#, c-format
+msgid "Value must be greater than %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1033
+#: include/classes/validators/CFormValidator.php:1042
+#, c-format
+msgid "Value must be smaller than %1$s."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1078
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr "Значение темы MQTT. Формат возвращаемых данных зависит от содержимого темы. Если используются шаблоны, значения темы возвращаются в JSON"
@@ -24534,6 +24834,10 @@ msgstr "число слишком большое"
 #: include/classes/api/services/CDRule.php:338
 msgid "a numeric value is expected"
 msgstr "ожидается цифровое значение"
+
+#: include/classes/validators/CApiInputValidator.php:2884
+msgid "a port number is expected"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:193
 #: app/controllers/CControllerPopupItemTestSend.php:207
@@ -26309,6 +26613,12 @@ msgstr "выкл"
 msgid "on"
 msgstr "в"
 
+#: include/classes/validators/CFormValidator.php:1388
+#: include/classes/validators/CFormValidator.php:1433 jsLoader.php:438
+#, c-format
+msgid "one of %1$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
 msgid "only one object can exist within the combinations of %1$s"
@@ -27177,6 +27487,18 @@ msgstr "не будет удалено"
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
 msgstr "не будет деактивировано"
+
+#: include/classes/validators/CFormValidator.php:1393
+#: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
+#, c-format
+msgid "within range %1$s"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1394
+#: include/classes/validators/CFormValidator.php:1439 jsLoader.php:437
+#, c-format
+msgid "within ranges %1$s"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

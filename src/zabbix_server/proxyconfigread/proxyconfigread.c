@@ -756,7 +756,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_has
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s where", table->table);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values,
 				hostids->values_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and flags<>%d and type<>%d",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and flags&%d=0 and type<>%d",
 				ZBX_FLAG_DISCOVERY_PROTOTYPE, ITEM_TYPE_CALCULATED);
 
 		if (NULL == (result = zbx_db_select("%s", sql)))

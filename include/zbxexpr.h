@@ -27,6 +27,7 @@ int	zbx_parse_key(const char **exp);
 int	zbx_parse_host_key(char *exp, char **host, char **key);
 void	zbx_make_hostname(char *host);
 int	zbx_check_hostname(const char *hostname, char **error);
+int	zbx_check_prototype_hostname(const char *hostname, char **error);
 
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
