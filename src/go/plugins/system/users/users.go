@@ -20,9 +20,7 @@
 package users
 
 import (
-	"errors"
-	"fmt"
-
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -31,7 +29,8 @@ var impl Plugin
 
 type Plugin struct {
 	plugin.Base
-	options Options
+	options  Options
+	executor zbxcmd.Executor
 }
 
 type Options struct {
@@ -39,30 +38,32 @@ type Options struct {
 }
 
 func init() {
-	err := plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+	err := plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of users logged in.")
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 
+// Configure loads options.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	p.options.Timeout = global.Timeout
 }
 
-func (p *Plugin) Validate(options interface{}) error {
+// Validate empty validate so the plugin implements the configurator.
+func (*Plugin) Validate(_ any) error {
 	return nil
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (any, error) {
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters.")
+		return nil, errs.New("too many parameters")
 	}
 
-	result, err = p.getUsersNum()
+	result, err := p.getUsersNum()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get logged in user count: %s.", err.Error())
+		return nil, errs.Errorf("failed to get logged in user count: %s", err.Error())
 	}
 
-	return
+	return result, nil
 }

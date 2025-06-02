@@ -90,7 +90,8 @@ var chassisTypes = []string{
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
+	executor zbxcmd.Executor
+	options  Options
 }
 
 // Options -
@@ -279,10 +280,24 @@ func clen(n []byte) int {
 func (p *Plugin) exportDevices(params []string) (result interface{}, err error) {
 	cmd, err := getDeviceCmd(params)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	return zbxcmd.ExecuteStrict(cmd, time.Second*time.Duration(p.options.Timeout), "")
+	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
+	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
+	if p.executor == nil {
+		p.executor, err = zbxcmd.InitExecutor()
+		if err != nil {
+			return nil, errs.Wrap(err, "command init failed")
+		}
+	}
+
+	out, err := p.executor.ExecuteStrict(cmd, time.Second*time.Duration(p.options.Timeout), "")
+	if err != nil {
+		return "", errs.New("command exec failed")
+	}
+
+	return out, nil
 }
 
 func getDeviceCmd(params []string) (string, error) {

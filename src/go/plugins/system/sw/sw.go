@@ -41,7 +41,8 @@ var impl Plugin
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
+	options  Options
+	executor zbxcmd.Executor
 }
 
 // Options -
@@ -111,6 +112,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		regex = params[0]
 	}
 
+	if p.executor == nil {
+		var err error
+
+		p.executor, err = zbxcmd.InitExecutor()
+		if err != nil {
+			return nil, errs.Wrap(err, "command init failed")
+		}
+	}
+
 	managers := getManagers()
 
 	for _, m := range managers {
@@ -118,12 +128,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			continue
 		}
 
-		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(p.options.Timeout), "")
+		test, err := p.executor.Execute(m.testCmd, time.Second*time.Duration(p.options.Timeout), "")
 		if err != nil || test == "" {
 			continue
 		}
 
-		tmp, err := zbxcmd.Execute(m.cmd, time.Second*time.Duration(p.options.Timeout), "")
+		tmp, err := p.executor.Execute(m.cmd, time.Second*time.Duration(p.options.Timeout), "")
 		if err != nil {
 			p.Errf("Failed to execute command '%s', err: %s", m.cmd, err.Error())
 

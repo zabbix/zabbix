@@ -43,6 +43,7 @@ type UserParameterPlugin struct {
 	parameters           map[string]*parameterInfo
 	unsafeUserParameters int
 	userParameterDir     string
+	executor             zbxcmd.Executor
 }
 
 var userParameter UserParameterPlugin
@@ -111,7 +112,7 @@ func (p *UserParameterPlugin) Export(
 	key string,
 	params []string,
 	ctx plugin.ContextProvider,
-) (result interface{}, err error) {
+) (any, error) {
 	s, err := p.cmd(key, params)
 	if err != nil {
 		return nil, err
@@ -119,9 +120,20 @@ func (p *UserParameterPlugin) Export(
 
 	p.Debugf("executing command:'%s'", s)
 
-	stdoutStderr, err := zbxcmd.Execute(s, time.Second*time.Duration(Options.Timeout), p.userParameterDir)
+	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
+	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
+	if p.executor == nil {
+		p.executor, err = zbxcmd.InitExecutor()
+		if err != nil {
+			return nil, errs.Wrap(err, "command init failed")
+		}
+	}
+
+	stdoutStderr, err := p.executor.Execute(
+		s, time.Second*time.Duration(Options.Timeout), p.userParameterDir,
+	)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to execute command")
 	}
 
 	p.Debugf(
