@@ -258,7 +258,8 @@ class CShellExec {
 }
 
 class CZabbixServerClient {
-	public const string HEADER = "ZBXD\1";
+	const HEADER = "ZBXD\1";
+
 	public function __construct(
 		public string $address,
 		public string $ca_file,

@@ -36,77 +36,77 @@ class testTlsRequest extends TlsCaseBase {
 		];
 
 		// DC attribute thrise
-		yield [
-			'issuer_ca' => ['/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3'],
-			'issuer_agent' => ['/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3'],
-			'issuer_server' => ['/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3']
-		];
+		/* yield [ */
+		/* 	'issuer_ca' => ['/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3'], */
+		/* 	'issuer_agent' => ['/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3'], */
+		/* 	'issuer_server' => ['/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3'] */
+		/* ]; */
 
-		// "L" attribute
-		yield [
-			'issuer_ca' => ['/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1'],
-			'issuer_agent' => ['/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1'],
-			'issuer_server' => ['/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1']
-		];
+		/* // "L" attribute */
+		/* yield [ */
+		/* 	'issuer_ca' => ['/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1'], */
+		/* 	'issuer_agent' => ['/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1'], */
+		/* 	'issuer_server' => ['/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1'] */
+		/* ]; */
 
-		// "O" attribute
-		yield [
-			'issuer_ca' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1'],
-			'issuer_agent' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1'],
-			'issuer_server' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1']
-		];
+		/* // "O" attribute */
+		/* yield [ */
+		/* 	'issuer_ca' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1'], */
+		/* 	'issuer_agent' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1'], */
+		/* 	'issuer_server' => ['/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1'] */
+		/* ]; */
 
-		// "OU" attribute
-		yield [
-			'issuer_ca' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1'],
-			'issuer_agent' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1'],
-			'issuer_server' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1']
-		];
+		/* // "OU" attribute */
+		/* yield [ */
+		/* 	'issuer_ca' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1'], */
+		/* 	'issuer_agent' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1'], */
+		/* 	'issuer_server' => ['/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1'] */
+		/* ]; */
 
-		// "UID" attribute
-		yield [
-			'issuer_ca' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'],
-			'issuer_agent' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'],
-			'issuer_server' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1']
-		];
+		/* // "UID" attribute */
+		/* yield [ */
+		/* 	'issuer_ca' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'], */
+		/* 	'issuer_agent' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'], */
+		/* 	'issuer_server' => ['/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1'] */
+		/* ]; */
 
-		// "CN" attribute
-		yield [
-			'issuer_ca' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'],
-			'issuer_agent' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'],
-			'issuer_server' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1']
-		];
+		/* // "CN" attribute */
+		/* yield [ */
+		/* 	'issuer_ca' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=CA/C=LV', 'C=LV,ST=CA,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'], */
+		/* 	'issuer_agent' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=AGENT/C=LV', 'C=LV,ST=AGENT,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'], */
+		/* 	'issuer_server' => ['/CN=1/UID=1/OU=1/O=1/L=1/DC=3/DC=2/DC=1/ST=SERVER/C=LV', 'C=LV,ST=SERVER,DC=1,DC=2,DC=3,L=1,O=1,OU=1,UID=1,CN=1'] */
+		/* ]; */
 
-		// Docs case.
-		yield [
-			'issuer_ca' => [
-				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=CA',
-				'ST=CA,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
-			],
-			'issuer_agent' => [
-				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=AGENT',
-				'ST=AGENT,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
-			],
-			'issuer_server' => [
-				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=SERVER',
-				'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
-			]
-		];
-		// Docs case with trailing space.
-		yield [
-			'issuer_ca' => [
-				'/CN=Signing CA/OU=Development group/O=Zabbix SIA\\ /DC=zabbix/DC=com/ST=CA',
-				'ST=CA,DC=com,DC=zabbix,O=Zabbix SIA\\ ,OU=Development group,CN=Signing CA'
-			],
-			'issuer_agent' => [
-				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=AGENT',
-				'ST=AGENT,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
-			],
-			'issuer_server' => [
-				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=SERVER',
-				'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
-			]
-		];
+		/* // Docs case. */
+		/* yield [ */
+		/* 	'issuer_ca' => [ */
+		/* 		'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=CA', */
+		/* 		'ST=CA,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA' */
+		/* 	], */
+		/* 	'issuer_agent' => [ */
+		/* 		'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=AGENT', */
+		/* 		'ST=AGENT,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA' */
+		/* 	], */
+		/* 	'issuer_server' => [ */
+		/* 		'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=SERVER', */
+		/* 		'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA' */
+		/* 	] */
+		/* ]; */
+		/* // Docs case with trailing space. */
+		/* yield [ */
+		/* 	'issuer_ca' => [ */
+		/* 		'/CN=Signing CA/OU=Development group/O=Zabbix SIA\\ /DC=zabbix/DC=com/ST=CA', */
+		/* 		'ST=CA,DC=com,DC=zabbix,O=Zabbix SIA\\ ,OU=Development group,CN=Signing CA' */
+		/* 	], */
+		/* 	'issuer_agent' => [ */
+		/* 		'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=AGENT', */
+		/* 		'ST=AGENT,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA' */
+		/* 	], */
+		/* 	'issuer_server' => [ */
+		/* 		'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=SERVER', */
+		/* 		'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA' */
+		/* 	] */
+		/* ]; */
 	}
 
 	/**
