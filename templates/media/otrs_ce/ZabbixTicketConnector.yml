@@ -1,0 +1,45 @@
+---
+Debugger:
+  DebugThreshold: error
+  TestMode: '0'
+Description: Zabbix Ticket Connector
+FrameworkVersion: 6.0.27
+Provider:
+  Operation:
+    TicketCreate:
+      Description: Creates a Ticket
+      MappingInbound: {}
+      MappingOutbound: {}
+      Type: Ticket::TicketCreate
+    TicketGet:
+      Description: Retrieves Ticket data
+      MappingInbound: {}
+      MappingOutbound: {}
+      Type: Ticket::TicketGet
+    TicketUpdate:
+      Description: Updates a Ticket
+      MappingInbound: {}
+      MappingOutbound: {}
+      Type: Ticket::TicketUpdate
+  Transport:
+    Config:
+      KeepAlive: ''
+      MaxLength: '100000000'
+      RouteOperationMapping:
+        TicketCreate:
+          RequestMethod:
+          - POST
+          Route: /Ticket
+        TicketGet:
+          RequestMethod:
+          - GET
+          Route: /Ticket/:TicketID
+        TicketUpdate:
+          RequestMethod:
+          - PUT
+          Route: /Ticket/:TicketID
+    Type: HTTP::REST
+RemoteSystem: ''
+Requester:
+  Transport:
+    Type: ''

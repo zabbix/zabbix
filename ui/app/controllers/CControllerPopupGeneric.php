@@ -160,7 +160,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'templates' => [
 				'title' => _('Templates'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'hostid,host',
 				'form' => [
 					'name' => 'templateform',
