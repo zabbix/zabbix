@@ -50,7 +50,7 @@ class CShellExec {
 		'server_stderr' => null,
 		'agent_stderr' => null,
 		'server_logs' => null,
-		'agent_logs' => null,
+		'agent_logs' => null
 	];
 
 	public static function agentBin(string $path = ''): string {
@@ -423,7 +423,7 @@ class TlsCaseBase extends TestCase {
 		return [
 			'ca' => [$ca_key, $ca_crt],
 			'server' => [$server_key, $server_crt],
-			'agent' => [$agent_key, $agent_crt],
+			'agent' => [$agent_key, $agent_crt]
 		];
 	}
 }
