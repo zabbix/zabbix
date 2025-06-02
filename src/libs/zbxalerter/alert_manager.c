@@ -1358,20 +1358,12 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 	{
 		if (NULL == (media = (zbx_am_media_t *)zbx_hashset_search(&manager->watchdog, &medias[i]->mediaid)))
 		{
-			zbx_am_media_t	media_local;
+			zbx_am_media_t	media_local = {0};
 
 			media_local.mediaid = medias[i]->mediaid;
-			media_local.mediatypeid = 0;
-			media_local.sendto = NULL;
-			media_local.mediatype_type = 0;
-			media_local.mediatype_params = NULL;
 
 			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local,
 					sizeof(media_local));
-
-			media->sendto = NULL;
-			media->mediatype_params = NULL;
-
 			zbx_vector_am_media_ptr_append(&media_new, media);
 		}
 
