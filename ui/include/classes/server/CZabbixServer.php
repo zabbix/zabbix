@@ -747,6 +747,10 @@ class CZabbixServer {
 			$multivalue = [];
 			foreach ($values as $value) {
 				$value = addcslashes($value, ',+');
+				$value = preg_replace_callback('/(^\s+)|(\s+$)/', function($matches) {
+					return str_replace(' ', '\\ ', $matches[0]);
+				}, $value);
+
 				$multivalue[] = "{$name}={$value}";
 			}
 			$result[] = implode(',', $multivalue);

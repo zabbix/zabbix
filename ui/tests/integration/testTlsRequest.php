@@ -92,6 +92,21 @@ class testTlsRequest extends TlsCaseBase {
 				'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
 			]
 		];
+		// Docs case with trailing space.
+		yield [
+			'issuer_ca' => [
+				'/CN=Signing CA/OU=Development group/O=Zabbix SIA\\ /DC=zabbix/DC=com/ST=CA',
+				'ST=CA,DC=com,DC=zabbix,O=Zabbix SIA\\ ,OU=Development group,CN=Signing CA'
+			],
+			'issuer_agent' => [
+				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=AGENT',
+				'ST=AGENT,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
+			],
+			'issuer_server' => [
+				'/CN=Signing CA/OU=Development group/O=Zabbix SIA/DC=zabbix/DC=com/ST=SERVER',
+				'ST=SERVER,DC=com,DC=zabbix,O=Zabbix SIA,OU=Development group,CN=Signing CA'
+			]
+		];
 	}
 
 	/**
