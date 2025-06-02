@@ -768,6 +768,12 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 				&(config_tls->cert_file), config_tls);
 	}
 
+	if (NULL != config_tls->tls_listen && NULL == config_tls->cert_file)
+	{
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(config_tls->tls_listen),
+				&(config_tls->cert_file), config_tls);
+	}
+
 	if (NULL != config_tls->tls_listen && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) &&
 		0 == (config_tls->accept_modes & (ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_TLS_CERT)))
 	{
