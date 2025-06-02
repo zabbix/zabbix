@@ -44,6 +44,12 @@ static const char	*zbx_tls_parameter_name(int type, char * const *param, const z
 	if (&(config_tls->accept) == param)
 		return "TLSAccept";
 
+	if (&(config_tls->frontend_cert_issuer) == param)
+		return "TLSFrontendCertIssuer";
+
+	if (&(config_tls->frontend_cert_subject) == param)
+		return "TLSFrontendCertSubject";
+
 	if (&(config_tls->tls_listen) == param)
 		return "TLSListen";
 
