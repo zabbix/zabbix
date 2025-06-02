@@ -63,7 +63,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				->setArgument('hostids', [$host['hostid']])
 				->setArgument('filter_set', '1')
 		)
-		: null;
+		: (new CDiv())->addClass(ZBX_STYLE_DISABLED);
 
 	$total_problem_count = 0;
 
@@ -73,16 +73,12 @@ foreach ($data['hosts'] as $hostid => $host) {
 				|| (!$data['filter']['severities'] && $count > 0)) {
 			$total_problem_count += $count;
 
-			$problems_span = (new CSpan($count))
+			$problems->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(CSeverityHelper::getStatusStyle($severity))
-				->setAttribute('title', CSeverityHelper::getName($severity));
-
-			$problems = $data['allowed_ui_problems']
-				? $problems->addItem($problems_span)
-				: $problems_span->addClass(ZBX_STYLE_DISABLED);
+				->setAttribute('title', CSeverityHelper::getName($severity))
+			);
 		}
-
 	}
 
 	if ($total_problem_count == 0) {
