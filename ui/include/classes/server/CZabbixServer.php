@@ -139,7 +139,7 @@ class CZabbixServer {
 		$this->connect_timeout = $connect_timeout;
 		$this->timeout = $timeout;
 		$this->total_bytes_limit = $total_bytes_limit;
-		$this->tls_config = $tls_config ?: ZBase::getConfig()['ZBX_SERVER_TLS'];
+		$this->tls_config = $tls_config ?: APP::getConfig()['ZBX_SERVER_TLS'];
 		$this->error_code = self::ERROR_CODE_NONE;
 	}
 
