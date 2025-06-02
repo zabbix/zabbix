@@ -350,7 +350,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 		}
 
 		if (FAIL == res)
-			zabbix_log(LOG_LEVEL_WARNING, "cannot add compression policy to table \"%s\" table_name);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot add compression policy to table \"%s\"", table_name);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
