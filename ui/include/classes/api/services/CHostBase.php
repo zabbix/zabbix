@@ -1627,12 +1627,13 @@ abstract class CHostBase extends CApiService {
 						}
 					}
 					elseif (array_key_exists('config', $macro)) {
-						$db_macro = $db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
-
 						$macros[] = $macro;
-						$db_macros[$macro['hostmacroid']] = $db_macro;
+						$db_macros[$macro['hostmacroid']] =
+							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
 
-						self::prepareMacroConfigOptionsForAuditlog($macro, $db_macro);
+						self::prepareMacroConfigOptionsForAuditlog($macro,
+							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']]
+						);
 					}
 				}
 				unset($macro);
@@ -1686,17 +1687,12 @@ abstract class CHostBase extends CApiService {
 						$del_hostmacroids[] = $macro['hostmacroid'];
 					}
 					else {
-						CUserMacro::addMacroConfigFieldDefaultsByType($macro['config'], $db_macro['config']);
+						self::addMacroConfigFieldDefaultsByType($macro['config'], $db_macro['config']);
 
-						$upd_hostmacro_config =
-							DB::getUpdatedValues('hostmacro_config', $macro['config'], $db_macro['config']);
-
-						if ($upd_hostmacro_config) {
-							$upd_hostmacro_configs[] = [
-								'values' => $upd_hostmacro_config,
-								'where' => ['hostmacroid' => $macro['hostmacroid']]
-							];
-						}
+						$upd_hostmacro_configs[] = [
+							'values' => DB::getUpdatedValues('hostmacro_config', $macro['config'], $db_macro['config']),
+							'where' => ['hostmacroid' => $macro['hostmacroid']]
+						];
 					}
 				}
 				elseif ($macro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
@@ -1727,6 +1723,18 @@ abstract class CHostBase extends CApiService {
 		if ($ins_hostmacro_configs) {
 			DB::insert('hostmacro_config', $ins_hostmacro_configs, false);
 		}
+	}
+
+	public static function addMacroConfigFieldDefaultsByType(array &$config, array $db_config): void {
+		$type_fields = [
+			ZBX_WIZARD_FIELD_TEXT => ['priority', 'section_name', 'label', 'description', 'required', 'regex'],
+			ZBX_WIZARD_FIELD_LIST => ['priority', 'section_name', 'label', 'description', 'required', 'options'],
+			ZBX_WIZARD_FIELD_CHECKBOX => ['priority', 'section_name', 'label', 'description', 'options']
+		];
+
+		$config += array_intersect_key(DB::getDefaults('hostmacro_config'),
+			array_flip(array_diff($type_fields[$db_config['type']], $type_fields[$config['type']]))
+		);
 	}
 
 	private static function prepareMacroConfigOptionsForAuditlog(array &$macro, ?array &$db_macro = null): void {
