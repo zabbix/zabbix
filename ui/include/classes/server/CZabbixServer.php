@@ -739,39 +739,20 @@ class CZabbixServer {
 	protected static function implodeDn(array $attributes): string {
 		// Correcting the mixed type from openssl extension, where multivalue RDN is list of values.
 		$attributes = array_map(fn (string|array $value) => (array) $value, $attributes);
+		$attributes = array_map(fn (array $value) => array_reverse($value), $attributes);
+		$attributes = array_reverse($attributes, true);
 
-		// Common names ordered according to "RFC 4514", remaining names appended in alphabetical order.
-		ksort($attributes, SORT_NATURAL);
-		$sequence = ['CN', 'OU', 'O', 'L', 'ST', 'C'];
-
-		$result_ordered = [];
-		foreach ($sequence as $name) {
-			if (!array_key_exists($name, $attributes)) {
-				continue;
-			}
-
-			// Field values are reversed as per Zabbix documentation.
-			$values = array_reverse($attributes[$name]);
-
-			foreach ($values as $value) {
-				$value = addcslashes($value, ',+');
-				$result_ordered[] = "{$name}={$value}";
-			}
-
-			unset($attributes[$name]);
-		}
-
+		$result = [];
 		foreach ($attributes as $name => $values) {
-			// Field values are reversed as per Zabbix documentation.
-			$values = array_reverse($attributes[$name]);
-
+			$multivalue = [];
 			foreach ($values as $value) {
 				$value = addcslashes($value, ',+');
-				$result_ordered[] = "{$name}={$value}";
+				$multivalue[] = "{$name}={$value}";
 			}
+			$result[] = implode(',', $multivalue);
 		}
 
-		return implode(',', $result_ordered);
+		return implode(',', $result);
 	}
 
 	protected function validatePeerCertificate($socket): bool {
