@@ -166,11 +166,13 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 
 	/* application_name is like 'Columnstore Policy%' in the newer TimescaleDB versions. */
 	/* application_name is like 'Compression%' in the older TimescaleDB versions before around TimescaleDB 2.18. */
-	result = zbx_db_select("select extract(epoch from (config::json->>'%s')::interval) from"
-			" timescaledb_information.jobs where"
-			" (application_name like 'Columnstore Policy%%' or"
-			" application_name like 'Compression%%') and"
-			" hypertable_schema='%s' and hypertable_name='%s'", field, zbx_db_get_schema_esc(), table_name);
+	result = zbx_db_select(
+			"select extract(epoch from (config::json->>'%s')::interval)"
+			" from timescaledb_information.jobs"
+			" where (application_name like 'Columnstore Policy%%'"
+				" or application_name like 'Compression%%')"
+				" and hypertable_schema='%s' and hypertable_name='%s'",
+			field, zbx_db_get_schema_esc(),	table_name);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
