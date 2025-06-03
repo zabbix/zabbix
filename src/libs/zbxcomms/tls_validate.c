@@ -499,8 +499,6 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept), NULL,
 					config_tls);
 		}
-	} else {
-		config_tls->frontend_accept_modes = 0;
 	}
 
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
