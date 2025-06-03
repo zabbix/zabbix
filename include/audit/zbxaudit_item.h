@@ -252,6 +252,8 @@ const char	*zbx_audit_lldrule_override_operation_optag(zbx_uint64_t overrideid, 
 		zbx_uint64_t optagid, const char *field, char *key, size_t key_size);
 const char	*zbx_audit_lldrule_override_operation_optemplate(zbx_uint64_t overrideid, zbx_uint64_t operationid,
 		zbx_uint64_t optemplateid, const char *field, char *key, size_t key_size);
+const char	*zbx_audit_item_query_fields(int index, const char *field, char *key, size_t key_size);
+const char	*zbx_audit_item_headers(int index, const char *field, char *key, size_t key_size);
 
 void	zbx_audit_audit_entry_update_json_delete_lld_macro_path(zbx_audit_entry_t *audit_entry,
 		zbx_uint64_t lld_macro_pathid);
@@ -286,5 +288,7 @@ void	zbx_audit_entry_update_json_add_lld_override(zbx_audit_entry_t *audit_entry
 		const char *name, int step, int stop);
 void	zbx_audit_entry_update_json_add_lld_override_filter(zbx_audit_entry_t *audit_entry, zbx_uint64_t overrideid,
 		int evaltype, const char *formula);
+void	zbx_audit_entry_update_json_add_query_fields_json(zbx_audit_entry_t *audit_entry, const char *val);
+void	zbx_audit_entry_update_json_add_headers(zbx_audit_entry_t* audit_entry, const char *val);
 
 #endif	/* ZABBIX_AUDIT_ITEM_H */
