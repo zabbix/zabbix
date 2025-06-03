@@ -5,7 +5,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
-...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+...G.....T [ZBX-25944] replaced container name with container ID where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
 ..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
@@ -14,7 +14,7 @@ Bug fixes:
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 .......PS. [ZBX-25175] increased retry to 5 for asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
 ..F....... [ZBX-26092] fixed Office 365 relay media type domain formatting to replace all dash symbols with dot (msnihach)
-.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
+.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering wrong type (dgoloscapov)
 .......PS. [ZBX-26387] fixed newline being truncated in SNMP "get[" check (dgoloscapov)
 A.F....... [ZBX-26372] fixed long-running TimescaleDB queries when requesting historical data (gcalenko, Sasha)
 .......PS. [ZBX-26339] fixed user macro resolving order in templates so that in case of conflict import order of templates takes precedence over the linking order (askolmeisters)
