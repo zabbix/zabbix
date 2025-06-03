@@ -1,0 +1,34 @@
+---
+test case: "str varinat - suffix"
+in:
+  variant_type: "STR"
+  data:
+  - "12K"
+  - "5M"
+  - "1"
+out:
+  return: SUCCEED
+  result:
+  - 12288.000000
+  - 5242880.000000
+---
+test case: "str variant - not nummeric data "
+in:
+  variant_type: "STR"
+  data:
+  - "hello"
+  - "world"
+out:
+  return: FAIL
+---
+test case: "ui64 variant"
+in:
+  variant_type: "UI64"
+  data:
+  - 1
+  - 23
+out:
+  return: SUCCEED
+  result:
+  - 1.000000
+  - 23.000000
