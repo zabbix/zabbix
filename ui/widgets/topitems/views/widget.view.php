@@ -30,7 +30,7 @@ use Widgets\TopItems\Widget;
 $table = new CTableInfo();
 
 if ($data['error'] !== null) {
-	$table->setNoDataMessage($data['error']);
+	$table->setNoDataMessage($data['error'], null, ZBX_ICON_SEARCH_LARGE);
 }
 else {
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
