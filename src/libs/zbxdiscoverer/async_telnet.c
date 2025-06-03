@@ -186,6 +186,7 @@ static int	async_task_process_task_telnet_cb(short event, void *data, int *fd, z
 	short				event_new = 0;
 	zbx_async_task_state_t		state;
 	zbx_telnet_protocol_step_t	rc;
+	char				ip_port[MAX_STRING_LEN];
 
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
@@ -218,8 +219,6 @@ static int	async_task_process_task_telnet_cb(short event, void *data, int *fd, z
 	{
 		case ZABBIX_TELNET_STEP_CONNECT_INIT:
 			/* initialization */
-			char	ip_port[MAX_STRING_LEN];
-
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d itemid:" ZBX_FS_UI64 " [%s]", __func__,
 					get_telnet_step_string(telnet_context->step), event,
 					telnet_context->item.itemid,
