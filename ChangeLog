@@ -8,13 +8,13 @@ A.F....PS. [ZBXNEXT-1527] implemented support for cascaded (nested) low-level di
 .........T [ZBXNEXT-9942] added preprocessor throughput to Zabbix server health templates (aiantsen)
 A.F....... [ZBXNEXT-7410] implemented inline form validation for host, item, template, trigger forms (ashubin, esekace, miks, talbergs, vmurzins)
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
-.........T [ZBXNEXT-9784] added support multiple websites in Website certificate by Zabbix agent 2 template (abakaldin)
+.........T [ZBXNEXT-9784] added support of multiple websites in Website certificate by Zabbix agent 2 template (abakaldin)
 A.F....PS. [ZBXNEXT-9805] added OAuth support for email media type (askolmeisters, gcalenko)
 ..F....... [ZBXNEXT-8919] implemented new color picker in Graph and Pie chart widgets, added palette feature (apoga)
 
 Bug fixes:
-A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API; changed permission check when requesting non-editable template dashboards based on access to template dashboards themself instead of their host access rights (jfreibergs, vmaksimovs)
-...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+A.F....... [ZBX-23167] fixed issues with host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API; changed permission check when requesting non-editable template dashboards based on access to template dashboards themselves instead of their host access rights (jfreibergs, vmaksimovs)
+...G.....T [ZBX-25944] replaced container name with container ID where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
 .......P.. [ZBX-26469] fixed Zabbix proxy crash in discovery manager process (Andris, MVekslers)
 ..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
@@ -45,7 +45,7 @@ A.F....... [ZBX-26372] fixed long-running TimescaleDB queries when requesting hi
 ..F....... [ZBX-26377] added the "parent_discoveryid" argument into paging data (msnihach)
 ........S. [ZBX-26256] fixed scheduled report not being created when start date is set in the future and beyond the current cycle (askolmeisters)
 ..F....... [ZBX-26064] enabled the "Remove" link for LDAP users manually added media (rgontarski)
-.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
+.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering wrong type (dgoloscapov)
 ..F....... [ZBX-26263] fixed field focus on label click (msnihach)
 .......PS. [ZBX-25984] improved handling of NoSuchObject and NoSuchInstance responses in SNMP checks (dgoloscapov)
 ........S. [ZBX-26259] fixed issue of event created from trigger prototypes missing tags inherited from templates (arimdjonoks)
@@ -206,7 +206,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
-...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+...G.....T [ZBX-25944] replaced container name with container ID where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
 ..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
@@ -215,7 +215,7 @@ Bug fixes:
 .......PS. [ZBX-25175] increased retry to 5 for asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
 .......PS. [ZBX-25968] added configuration validation of DBPort and DBSocket (rtrizna)
 ..F....... [ZBX-26092] fixed Office 365 relay media type domain formatting to replace all dash symbols with dot (msnihach)
-.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
+.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering wrong type (dgoloscapov)
 .......PS. [ZBX-26387] fixed newline being truncated in SNMP "get[" check (dgoloscapov)
 A.F....... [ZBX-26372] fixed long-running TimescaleDB queries when requesting historical data (gcalenko, Sasha)
 .......PS. [ZBX-26339] fixed user macro resolving order in templates so that in case of conflict import order of templates takes precedence over the linking order (askolmeisters)
@@ -697,7 +697,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
-...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
+...G.....T [ZBX-25944] replaced container name with container ID where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
 ..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
 .......PS. [ZBX-26116] fixed overload in history cache by vmware.eventlog item (MVekslers)
@@ -706,7 +706,7 @@ Bug fixes:
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 .......PS. [ZBX-25175] increased retry to 5 for asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
 ..F....... [ZBX-26092] fixed Office 365 relay media type domain formatting to replace all dash symbols with dot (msnihach)
-.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering Wrong Type (dgoloscapov)
+.......PS. [ZBX-26313] fixed SNMP preprocessing causing item to be unsupported when encountering wrong type (dgoloscapov)
 .......PS. [ZBX-26387] fixed newline being truncated in SNMP "get[" check (dgoloscapov)
 A.F....... [ZBX-26372] fixed long-running TimescaleDB queries when requesting historical data (gcalenko, Sasha)
 .......PS. [ZBX-26339] fixed user macro resolving order in templates so that in case of conflict import order of templates takes precedence over the linking order (askolmeisters)
