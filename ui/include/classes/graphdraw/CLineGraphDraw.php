@@ -560,9 +560,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$history = Manager::History()->getLastValues($items);
 
 				if ($history) {
-					return $history[$items[0]['itemid']][0]['value'] > 1000
-						? floor($history[$items[0]['itemid']][0]['value'] / 10) * 10
-						: floor($history[$items[0]['itemid']][0]['value']);
+					return $history[$items[0]['itemid']][0]['value'];
 				}
 			}
 			else {
@@ -641,9 +639,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$history = Manager::History()->getLastValues($items);
 
 				if ($history) {
-					return $history[$items[0]['itemid']][0]['value'] > 1000
-						? ceil($history[$items[0]['itemid']][0]['value'] / 10) * 10
-						: ceil($history[$items[0]['itemid']][0]['value']);
+					return $history[$items[0]['itemid']][0]['value'];
 				}
 			}
 			else {
@@ -1204,7 +1200,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
 				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $this->power[$side], 10
+				$this->intervals[$side], $units, $this->power[$side], 2
 			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
