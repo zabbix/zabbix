@@ -5,6 +5,8 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+.......P.. [ZBX-26469] fixed Zabbix proxy crash in discovery manager process (Andris, MVekslers)
+...G...... [ZBX-26187] fixed response to wmi.getall from Zabbix agent 2 does not return array-type values (mprihodko)
 ...G.....T [ZBX-25944] replaced container name with container ID where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
 ..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
