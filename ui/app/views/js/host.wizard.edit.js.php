@@ -109,7 +109,6 @@ window.host_wizard_edit = new class {
 	/** @type {Map<number, object>} */
 	#templates;
 	#linked_templates;
-	#agent_script_server_host;
 
 	#source_host = null;
 	#host = null;
@@ -196,6 +195,7 @@ window.host_wizard_edit = new class {
 		groups: [],
 		groups_new: [],
 		templates: [],
+		agent_script_server_host: null,
 		tls_psk: null,
 		tls_psk_identity: null,
 		ipmi_authtype: null,
@@ -276,8 +276,8 @@ window.host_wizard_edit = new class {
 		this.#linked_templates = linked_templates;
 		this.#data.do_not_show_welcome = wizard_show_welcome === 1 ? 0 : 1;
 		this.#source_host = source_host;
-		this.#agent_script_server_host = agent_script_server_host;
 		this.#csrf_token = csrf_token;
+		this.#data.agent_script_server_host = agent_script_server_host;
 
 		this.#initViewTemplates();
 
@@ -1264,8 +1264,8 @@ window.host_wizard_edit = new class {
 				let server_host = '';
 
 				if (this.#data.monitoring_os === 'linux') {
-					server_host = this.#agent_script_server_host !== ''
-						? `--server-host ${this.#agent_script_server_host}`
+					server_host = this.#data.agent_script_server_host !== ''
+						? `--server-host ${this.#data.agent_script_server_host}`
 						: `--server-host-stdin`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
@@ -1278,8 +1278,8 @@ window.host_wizard_edit = new class {
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
-					server_host = this.#agent_script_server_host !== ''
-						? `-serverHost ${this.#agent_script_server_host}`
+					server_host = this.#data.agent_script_server_host !== ''
+						? `-serverHost ${this.#data.agent_script_server_host}`
 						: `-serverHostSTDIN`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''

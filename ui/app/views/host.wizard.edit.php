@@ -362,6 +362,38 @@ function stepInstallAgent($agent_script_data): array {
 
 				(new CSection())
 					->addItem(
+						(new CDiv([
+							new CTag('h6', true, [_('1. Verify Zabbix server, proxy, or cluster address')]),
+							(new CFormField([
+								new CTextBox('agent_script_server_host'),
+								(new CDiv(
+									_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
+								))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+							]))->addClass('js-agent-script-server-host-input')
+						]))
+							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+					)
+					->addItem(
+						(new CDiv([
+							new CTag('p', true, [
+								_('Example:'), BR(),
+								'192.0.2.0:10051, [2001:db8::]:10051, zbx1.local:10051;zbx2.local:10051'
+							]),
+							new CTag('p', true,
+								_('Zabbix agent must be able to connect to the specified address or list of addresses.')
+							),
+							new CTag('p', true, _('Use:')),
+							new CList([
+								_('Colon to separate IP/DNS address from port'),
+								_('Comma to separate multiple Zabbix servers, proxies, or clusters'),
+								_('Semicolon to separate clusters (one or more server addresses)'),
+								_('Brackets to specify IPv6 addresses'),
+							])
+						]))
+							->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+							->addClass(ZBX_STYLE_MARKDOWN)
+					)
+					->addItem(
 						(new CList([
 							(new CListItem())
 								->addItem(
