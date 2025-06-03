@@ -160,10 +160,13 @@ my $tsdb_compress_sql = <<'HEREDOC'
 			timescaledb.orderby='%COMPRESS_ORDERBY'
 		);
 
+		-- application_name is like 'Columnstore Policy%' in the newer TimescaleDB versions.
+		-- application_name is like 'Compression%' in the older TimescaleDB versions
+		-- before around TimescaleDB 2.18.
 		SELECT extract(epoch FROM (config::json->>'compress_after')::interval)::integer
 		INTO compress_after
 		FROM timescaledb_information.jobs
-		WHERE application_name LIKE 'Compression%%'
+		WHERE (application_name LIKE 'Columnstore Policy%%' OR application_name LIKE 'Compression%%')
 			AND hypertable_schema = 'public'
 			AND hypertable_name = '%HISTTBL_old';
 
@@ -173,7 +176,7 @@ my $tsdb_compress_sql = <<'HEREDOC'
 		SELECT job_id
 		INTO jobid
 		FROM timescaledb_information.jobs
-		WHERE application_name LIKE 'Compression%%'
+		WHERE (application_name LIKE 'Columnstore Policy%%' OR application_name LIKE 'Compression%%')
 			AND hypertable_schema = 'public'
 			AND hypertable_name = '%HISTTBL';
 	ELSE
