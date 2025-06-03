@@ -276,17 +276,21 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	queue->pending_num++;
 
-	zbx_pp_item_tasks_t	item_tasks_local, *item_tasks;
-	int			tasks_num = queue->tasks.num_data;
+	/* track input value order to have the same output order for non sequential tasks */
+	if (ZBX_PP_TASK_VALUE == task->type)
+	{
+		zbx_pp_item_tasks_t	item_tasks_local, *item_tasks;
+		int			tasks_num = queue->tasks.num_data;
 
-	item_tasks_local.itemid = task->itemid;
-	item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_insert(&queue->tasks, &item_tasks_local,
-			sizeof(item_tasks_local));
+		item_tasks_local.itemid = task->itemid;
+		item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_insert(&queue->tasks, &item_tasks_local,
+				sizeof(item_tasks_local));
 
-	if (tasks_num != queue->tasks.num_data)
-		zbx_list_create(&item_tasks->tasks);
+		if (tasks_num != queue->tasks.num_data)
+			zbx_list_create(&item_tasks->tasks);
 
-	zbx_list_append(&item_tasks->tasks, task, NULL);
+		zbx_list_append(&item_tasks->tasks, task, NULL);
+	}
 
 	if (ITEM_TYPE_INTERNAL != d->preproc->type)
 	{
