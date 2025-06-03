@@ -190,7 +190,7 @@ static zbx_pp_task_t	*pp_task_queue_add_sequence(zbx_pp_queue_t *queue, zbx_pp_t
 		sequence = (zbx_pp_item_task_sequence_t *)zbx_hashset_insert(&queue->sequences, &sequence_local,
 				sizeof(sequence_local));
 
-		sequence->task = pp_task_sequence_create(task->itemid);
+		sequence->task = pp_task_sequence_create(0);
 		new_task = sequence->task;
 	}
 	else
@@ -498,12 +498,12 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 	{
 		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
 		stat->tasks_num = 0;
-		stat->itemid = sequence->itemid;
 
 		zbx_pp_task_sequence_t	*d_seq = (zbx_pp_task_sequence_t *)PP_TASK_DATA(sequence->task);
 
 		if (NULL != d_seq->tasks.head)
 		{
+			stat->itemid = ((zbx_pp_task_t *)d_seq->tasks.head->data)->itemid;
 			zbx_list_iterator_init(&d_seq->tasks, &li);
 
 			do
@@ -512,6 +512,8 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 			}
 			while (SUCCEED == zbx_list_iterator_next(&li));
 		}
+		else
+			stat->itemid = 0;
 
 		zbx_vector_pp_top_stats_ptr_append(stats, stat);
 	}
