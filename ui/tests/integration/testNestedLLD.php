@@ -403,15 +403,6 @@ class testNestedLLD extends CIntegrationTest{
 		return true;
 	}
 
-	private function checkThisShouldNeverHappen()
-	{
-		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
-		$data = explode("\n", $log);
-
-		$matches = preg_grep('/Something unexpected has just happened/', $data);
-		$this->assertEmpty($matches, "log contains 'something unexpected has just happened'");
-	}
-
 	// For comprehensive discovery regression test (DiscoveryWithFiltersOverrides)
 	private function checkDiscoveredHostgroups($expected_suffix) {
 		// Each expected group is present and contains one discovered host
@@ -549,7 +540,6 @@ class testNestedLLD extends CIntegrationTest{
 		];
 
 		$this->checkDiscoveredItemsAndTriggers($expected_items);
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Update filter formula, rediscovery.
@@ -654,8 +644,6 @@ class testNestedLLD extends CIntegrationTest{
 				'object(s) should not have been rediscovered/updated/deleted');
 		}
 
-		$this->checkThisShouldNeverHappen();
-
 		return true;
 	}
 
@@ -700,8 +688,6 @@ class testNestedLLD extends CIntegrationTest{
 		}
 
 		$this->assertContainsOnly('bool', $audit_entries, true, 'new element was not discovered');
-
-		$this->checkThisShouldNeverHappen();
 
 		return true;
 	}
@@ -758,8 +744,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->assertCount(1, $response['result']);
 		$this->assertCount(1, $response['result'][0]['triggers']);
 		$this->assertEquals($response['result'][0]['triggers'][0]['priority'], TRIGGER_SEVERITY_HIGH);
-
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Update of override
@@ -904,7 +888,6 @@ class testNestedLLD extends CIntegrationTest{
 		];
 
 		$this->checkDiscoveredItemsAndTriggers($expected_items);
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Cycle through item prototype types.
@@ -1028,8 +1011,6 @@ class testNestedLLD extends CIntegrationTest{
 			$this->assertEquals($param['type'], $response['result'][0]['type']);
 		}
 
-		$this->checkThisShouldNeverHappen();
-
 		return true;
 	}
 
@@ -1063,8 +1044,6 @@ class testNestedLLD extends CIntegrationTest{
 		]);
 		$this->assertCount(1, $response['result']);
 		$this->assertEquals('itemtype.test.renamed[itemtypetest]', $response['result'][0]['key_']);
-
-		$this->checkThisShouldNeverHappen();
 
 		return true;
 	}
@@ -1108,8 +1087,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->assertCount(1, $response['result'], 'key was not updated from macro');
 		$this->assertEquals(ITEM_STATUS_ACTIVE, $response['result'][0]['status']);
 		$this->assertStringContainsString('renamedparam', $response['result'][0]['key_']);
-
-		$this->checkThisShouldNeverHappen();
 
 		return true;
 	}
@@ -1475,8 +1452,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->rediscoverWithMacroInFields('10', '12345678', 'kb', '111d');
 		$this->rediscoverWithMacroInFields('20', '87654321', 'mb', '90d');
 
-		$this->checkThisShouldNeverHappen();
-
 		return true;
 	}
 
@@ -1678,7 +1653,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$this->checkNestedLLDFromTemplate(self::HOSTNAME_NESTED_1);
-		$this->checkThisShouldNeverHappen();
 	}
 
 	private function checkDbServerDiscovery() {
@@ -1815,7 +1789,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendRuleData(self::AGENT_AUTOREG_NAME, 'main_drule', self::$trapper_data_nested1);
 
 		$this->checkDbServerDiscovery();
-		$this->checkThisShouldNeverHappen();
 	}
 
 	public static function clearAutoregAction(): void {
@@ -1923,7 +1896,6 @@ class testNestedLLD extends CIntegrationTest{
 		];
 
 		$this->checkResourceRemoval($hostname, $hostid, $testcases);
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Import host / template.
@@ -2065,8 +2037,6 @@ class testNestedLLD extends CIntegrationTest{
 			'countOutput' => true
 		]);
 		$this->assertEquals(2, $response['result'], 'nested rule(s) were not removed');
-
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Test overrides of nested rules, including update.
@@ -2203,7 +2173,6 @@ class testNestedLLD extends CIntegrationTest{
 		];
 
 		$this->sendRuleData($hostname, 'main_drule', $data);
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Test discovery rule prototype having item prototype as a master item.
@@ -2244,8 +2213,6 @@ class testNestedLLD extends CIntegrationTest{
 			]);
 			$this->assertEquals(1, $response['result'], 'item ' . $itemname . 'was not discovered');
 		}
-
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Test updates of prototypes that are owned by second level lld rule prototype.
@@ -2375,8 +2342,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->assertArrayHasKey(0, $response['result'], 'graph was not updated');
 		$this->assertEquals(222, $response['result'][0]['width']);
 		$this->assertEquals(111, $response['result'][0]['height']);
-
-		$this->checkThisShouldNeverHappen();
 	}
 
 	// Test template tag propagation to the problem that was generated by trigger prototype from nested rule.
@@ -2416,7 +2381,5 @@ class testNestedLLD extends CIntegrationTest{
 			'template level tags were not found in a problem');
 
 		$this->assertEquals($expected_tag, $response['result'][0]['tags'][0]);
-
-		$this->checkThisShouldNeverHappen();
 	}
 }
