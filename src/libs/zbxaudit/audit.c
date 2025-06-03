@@ -819,7 +819,7 @@ void	zbx_audit_entry_delete(zbx_audit_entry_t *entry, const char *name)
 void	zbx_audit_entry_add_int(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
 		int value1)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
@@ -846,7 +846,7 @@ void	zbx_audit_entry_add_int(zbx_audit_entry_t *entry, const char *table, const 
  ******************************************************************************/
 void	zbx_audit_entry_update_int(zbx_audit_entry_t *entry, const char *name, int value1, int value2)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
@@ -864,7 +864,7 @@ void	zbx_audit_entry_update_int(zbx_audit_entry_t *entry, const char *name, int 
 void	zbx_audit_entry_add_uint64(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
 		zbx_uint64_t value1)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
@@ -892,7 +892,7 @@ void	zbx_audit_entry_add_uint64(zbx_audit_entry_t *entry, const char *table, con
 void	zbx_audit_entry_update_uint64(zbx_audit_entry_t *entry, const char *name, zbx_uint64_t value1,
 		zbx_uint64_t value2)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
@@ -910,7 +910,7 @@ void	zbx_audit_entry_update_uint64(zbx_audit_entry_t *entry, const char *name, z
 void	zbx_audit_entry_add_string(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
 		const char *value1)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
@@ -932,7 +932,7 @@ void	zbx_audit_entry_add_string(zbx_audit_entry_t *entry, const char *table, con
 void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, const char *value1,
 		const char *value2)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
@@ -950,7 +950,7 @@ void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, c
 void	zbx_audit_entry_add_secret(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
 		const char *value1)
 {
-	char	key[AUDIT_MAX_KEY_LEN];
+	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	/* auditlog has been disabled */
 	if (NULL == entry)
