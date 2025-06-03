@@ -500,7 +500,6 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 					config_tls);
 		}
 	}
-
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
 	/* parameter (in zabbix_get and zabbix_sender) */
 
