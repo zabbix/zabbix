@@ -124,7 +124,7 @@ static int	oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_n
 out:
 	zbx_db_free_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): error:%s", __func__, ZBX_NULL2STR(*error));
 
 	return ret;
 #undef CHECK_FOR_NULL
