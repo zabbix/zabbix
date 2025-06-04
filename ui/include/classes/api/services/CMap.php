@@ -901,7 +901,7 @@ class CMap extends CMapElement {
 					if (mb_strlen($map[$label_data['string']]) > $max_label_name_length) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'%1$s label may not be longer than %2$s characters.',
-							ucfirst($label_data['typeName']),
+							mb_ucfirst($label_data['typeName']),
 							$max_label_name_length
 						));
 					}
@@ -1386,7 +1386,7 @@ class CMap extends CMapElement {
 					if (mb_strlen($map[$labelData['string']]) > $max_label_name_length) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'%1$s label may not be longer than %2$s characters.',
-							ucfirst($labelData['typeName']),
+							mb_ucfirst($labelData['typeName']),
 							$max_label_name_length
 						));
 					}
