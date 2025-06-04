@@ -3025,7 +3025,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 	zbx_hashset_iter_reset(&prototype_rules, &iter);
 	while (NULL != (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_lld_item_prototype_t	*item_prototype = prules->prototype;
+		const zbx_lld_item_prototype_t	*item_prototype = prules->prototype;
 
 		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &prules->lld_rows, error, &lifetime,
 				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index))
