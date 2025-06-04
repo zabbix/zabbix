@@ -168,10 +168,11 @@ foreach ($data['graphs'] as $graph) {
 			}
 		}
 	}
-
-	$flag = ZBX_FLAG_DISCOVERY_NORMAL;
+	
 	$name = [];
-	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($graph['discoveryRule']) {
 		$name[] = (new CLink($graph['discoveryRule']['name'],
