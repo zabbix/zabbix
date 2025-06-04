@@ -933,7 +933,9 @@ out:
 	ZBX_UNUSED(smtp_security);
 	ZBX_UNUSED(smtp_verify_peer);
 	ZBX_UNUSED(smtp_verify_host);
-	ZBX_UNUSED(auth);
+	ZBX_UNUSED(smtp_authentication);
+	ZBX_UNUSED(smtp_username);
+	ZBX_UNUSED(smtp_password);
 	ZBX_UNUSED(message_format);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
