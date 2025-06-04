@@ -284,6 +284,22 @@ static int	DBpatch_7000019(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000020(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name in ('time_size','date_size','tzone_size')"
+				" and widgetid in (select widgetid from widget where type='clock')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -310,5 +326,6 @@ DBPATCH_ADD(7000016, 0, 0)
 DBPATCH_ADD(7000017, 0, 0)
 DBPATCH_ADD(7000018, 0, 0)
 DBPATCH_ADD(7000019, 0, 0)
+DBPATCH_ADD(7000020, 0, 0)
 
 DBPATCH_END()
