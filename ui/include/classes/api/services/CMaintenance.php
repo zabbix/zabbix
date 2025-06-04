@@ -30,7 +30,7 @@ class CMaintenance extends CApiService {
 	protected $tableAlias = 'm';
 	protected $sortColumns = ['maintenanceid', 'name', 'maintenance_type', 'active_till', 'active_since'];
 
-	private const TIMEPERIOD_LENGHT_LIMIT = 999 * SEC_PER_DAY + 23 * SEC_PER_HOUR + 59 * SEC_PER_MIN;
+	private const MAX_TIMEPERIOD = 999 * SEC_PER_DAY + 23 * SEC_PER_HOUR + 59 * SEC_PER_MIN;
 
 	/**
 	 * Get maintenances data.
@@ -275,7 +275,7 @@ class CMaintenance extends CApiService {
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, self::TIMEPERIOD_LENGHT_LIMIT]), 'default' => SEC_PER_HOUR],
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, self::MAX_TIMEPERIOD]), 'default' => SEC_PER_HOUR],
 				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
@@ -472,7 +472,7 @@ class CMaintenance extends CApiService {
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, self::TIMEPERIOD_LENGHT_LIMIT]), 'default' => SEC_PER_HOUR],
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, self::MAX_TIMEPERIOD]), 'default' => SEC_PER_HOUR],
 				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
