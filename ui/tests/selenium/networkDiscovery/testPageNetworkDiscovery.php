@@ -108,6 +108,10 @@ class testPageNetworkDiscovery extends CWebTest {
 		foreach (['Enable', 'Disable', 'Delete'] as $buttons) {
 			$this->assertTrue($this->query('button:'.$buttons)->one()->isEnabled());
 		}
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter_tab->isExpanded());
+
 	}
 
 	/**

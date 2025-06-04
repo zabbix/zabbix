@@ -135,7 +135,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		zbx_prof_update(get_process_type_string(process_type), sec);
 
 		if (0 != sleeptime)
+		{
+			zbx_handle_log();
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
+		}
 
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())

@@ -109,6 +109,10 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$filter_tab->expand($status);
 			$this->assertTrue($filter_tab->isExpanded($status));
 		}
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter_tab->isExpanded());
 	}
 
 	public function getCheckFiltersData() {
@@ -203,7 +207,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 
 		// Test Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->hoverMouse()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.

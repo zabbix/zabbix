@@ -352,6 +352,11 @@ class testPageEventCorrelation extends CWebTest {
 		foreach ([false, true] as $status) {
 			$filter->expand($status);
 			$this->assertTrue($filter->isExpanded($status));
+			CElementQuery::wait()->until(function () use ($status) {
+				return (CDBHelper::getCount('SELECT NULL FROM profiles'.
+						' WHERE idx='.zbx_dbstr('web.correlation.filter.active').' AND userid=1') === ($status ? 0 : 1));
+				}, 'Failed to wait for a record in the DB that filter is '.($status ? 'open' : 'close')
+			);
 		}
 
 		// Check filter labels and default values.
@@ -383,6 +388,10 @@ class testPageEventCorrelation extends CWebTest {
 
 		// Check Event correlation table content.
 		$this->assertTableHasData($data);
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public function getFilterData() {

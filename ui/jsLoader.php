@@ -72,6 +72,7 @@ $available_js = [
 	'leaflet.markercluster.js' => 'vendors/Leaflet.markercluster/',
 	// classes
 	'component.z-bar-gauge.js' => '',
+	'component.z-vertical.js' => '',
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
@@ -438,6 +439,7 @@ if (empty($_GET['files'])) {
 		'jquery-ui.js',
 		'common.js',
 		'component.z-bar-gauge.js',
+		'component.z-vertical.js',
 		'component.z-select.js',
 		'class.base-component.js',
 		'class.cdebug.js',

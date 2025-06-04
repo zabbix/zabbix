@@ -30,6 +30,8 @@ require_once dirname(__FILE__).'/CastableTrait.php';
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Interactions\WebDriverActions;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 /**
  * Generic web page element.
@@ -811,6 +813,16 @@ class CElement extends CBaseElement implements IWaitable {
 	public function hoverMouse() {
 		$mouse = CElementQuery::getDriver()->getMouse();
 		$mouse->mouseMove($this->getCoordinates());
+
+		return $this;
+	}
+
+	/**
+	 * Moves the mouse to the element.
+	 */
+	public function moveMouse() {
+		$actions = new WebDriverActions(CElementQuery::getDriver());
+		$actions->moveToElement($this)->perform();
 
 		return $this;
 	}

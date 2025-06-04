@@ -1246,9 +1246,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING())
 	{
-		if (EINTR != errno)
+		__zbx_update_env(zbx_time());
+		zbx_sleep(1);
+
+		ret = waitpid((pid_t)-1, &i, WNOHANG);
+
+		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			sig_exiting = ZBX_EXIT_FAILURE;

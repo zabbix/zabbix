@@ -166,11 +166,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 	// append row
 	$mediaTypeTable->addRow([
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
-		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		media_type2str($mediaType['typeid']),
 		$status,
-		(new CCol($actionLinks))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($details))->addClass(ZBX_STYLE_WORDBREAK),
+		$actionLinks,
+		$details,
 		$test_link
 	]);
 }

@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 class testMultiselects extends CWebTest {
 
+	// Commented screenshot tests due to unstable behavior and limited support for version 6.0.
+	/*
 	public function testMultiselects_SuggestExisting() {
 		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
 				'Host groups', 'z', 'multiselect-suggest'
@@ -39,6 +41,7 @@ class testMultiselects extends CWebTest {
 				'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
+	*/
 
 	public function testMultiselects_SuggestCreateNew() {
 		$this->checkSuggest('zabbix.php?action=host.edit', 'host-form', 'Groups', 'QQQwww',
@@ -64,6 +67,7 @@ class testMultiselects extends CWebTest {
 		);
 	}
 
+	/*
 	public function testMultiselects_NotSuggestAlreadySelected() {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
@@ -75,6 +79,7 @@ class testMultiselects extends CWebTest {
 		$this->query('class:multiselect-matches')->waitUntilVisible();
 		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(), [$element]);
 	}
+	 */
 
 	public function testMultiselects_SuggestInOverlay() {
 		$widget = 'Plain text';

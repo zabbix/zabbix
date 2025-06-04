@@ -129,13 +129,11 @@ if ($data['correlations']) {
 
 		$table->addRow([
 			new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
-			(new CCol(
-				new CLink($correlation['name'], (new CUrl('zabbix.php'))
-					->setArgument('correlationid', $correlation['correlationid'])
-					->setArgument('action', 'correlation.edit')
-				)
-			))->addClass(ZBX_STYLE_WORDBREAK),
-			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+			new CLink($correlation['name'], (new CUrl('zabbix.php'))
+				->setArgument('correlationid', $correlation['correlationid'])
+				->setArgument('action', 'correlation.edit')
+			),
+			$conditions,
 			$operations,
 			$status
 		]);

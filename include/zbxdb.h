@@ -26,6 +26,7 @@
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
+#define ZBX_DB_RONLY	-3
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -86,8 +87,7 @@ void	zbx_db_deinit(void);
 void	zbx_db_init_autoincrement_options(void);
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13,
-			int read_only_recoverable);
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
@@ -101,6 +101,7 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+void	zbx_db_clear_last_errcode(void);
 char	*zbx_tsdb_get_license(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 int	zbx_tsdb_table_has_compressed_chunks(const char *table_names);

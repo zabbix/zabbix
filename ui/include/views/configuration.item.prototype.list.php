@@ -177,7 +177,7 @@ foreach ($data['items'] as $item) {
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDWRAP),
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],

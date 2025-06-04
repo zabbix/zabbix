@@ -599,7 +599,7 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -638,7 +638,7 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

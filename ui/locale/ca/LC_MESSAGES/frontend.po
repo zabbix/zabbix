@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-03-11 09:21+0000\n"
+"PO-Revision-Date: 2025-03-17 08:08+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -20426,7 +20426,7 @@ msgstr "El servidor Zabbix no s'està executant: és possible que la informació
 
 #: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
-msgstr "El servidor de Zabbix és executant-se"
+msgstr "Servidor Zabbix en marxa"
 
 #: include/classes/setup/CSetupWizard.php:620
 #: include/classes/setup/CSetupWizard.php:751

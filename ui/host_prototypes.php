@@ -291,7 +291,7 @@ elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscov
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -321,7 +321,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

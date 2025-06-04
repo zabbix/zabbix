@@ -53,7 +53,9 @@ class CControllerProxyUpdate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'proxy.edit')
+					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update proxy'));
 					$this->setResponse($response);

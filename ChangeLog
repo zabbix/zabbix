@@ -1,3 +1,42 @@
+Changes for 6.0.41rc1
+
+New features:
+........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
+
+Bug fixes:
+...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
+...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.40
+
+6.0.40rc1 was released as 6.0.40 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.40rc1
+
+New features:
+.........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
+
+Bug fixes:
+.......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
+A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
+........S. [ZBX-26038] added 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
+...G...PS. [ZBX-26080] fixed old file descriptors being held when external log rotation is used (dgoloscapov)
+..F....... [ZBX-26061] fixed vertical text rotation for Chinese, Korean, and Japanese languages (dfofanovs)
+.......PS. [ZBX-26006] made PSK comparison case-insensitive during autoregistration (arimdjonoks)
+...G...... [ZBX-22900] fixed Zabbix agent crash on Windows while executing runaway regular expression (mprihodko)
+...G...... [ZBX-25436] updated Zabbix agent 2 server description in configuration file (esneiders)
+.......PS. [ZBX-26109] fixed crash on HTTP checks with empty data (sboidenko)
+...G...... [ZBX-25798] fixed error with converting empty string to UTF-8 (MVekslers)
+........S. [ZBX-25365] fixed map element deletion during LLD and action operation processing via Zabbix server (asestakovs)
+....I..... [ZBX-26108] fixed Zabbix agent build on Windows with PCRE2 installed with vcpkg (mprihodko)
+.........T [ZBX-26029] added device retrieval loop error exception handling to Meraki template (abiba)
+..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.39
 
 6.0.39rc1 was released as 6.0.39 without any changes
@@ -11,6 +50,7 @@ New features:
 .........T [ZBXNEXT-9654] added Azure SQL Managed Instance by HTTP template (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-26253] fixed large data transfers being uncompressed without authorization (vso)
 A.F.....S. [ZBX-23760] fixed ability to enable disabled action with invalid custom formula due to missing action conditions (agriscenko, dgoloscapov)
 A......... [ZBX-18432] fixed inability to view certain problems and events by users with specific permissions on tags when permissions on all tags are given to specific host group (dpankins)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
@@ -41,6 +81,8 @@ Changes for 6.0.38
 Changes for 6.0.38rc1
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A......... [ZBX-26258] restricted access to user related fields using user.get, alert.get, role.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 ..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
 ..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
 ...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
@@ -70,6 +112,7 @@ New features:
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+..F....... [ZBX-26254] fixed reflected XSS in valuemap export URL (talbergs)
 ........S. [ZBX-25542] added SQL_ATTR_QUERY_TIMEOUT timeout for ODBC monitoring (sboidenko)
 ..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
 ...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
@@ -3411,11 +3454,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.47
+
+5.0.47rc1 was released as 5.0.47 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.47rc1
 
-New features:
-
 Bug fixes:
+...G...PS. [ZBX-26080] fixed old file descriptors being held when external log rotation is used (dgoloscapov)
 A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
 
 --------------------------------------------------------------------------------
@@ -3427,6 +3474,8 @@ Changes for 5.0.46
 Changes for 5.0.46rc1
 
 Bug fixes:
+A......... [ZBX-26255] introduced clamping for mitigation of timing attacks (jfreibergs, vmaksimovs)
+A......... [ZBX-26258] restricted access to user related fields using user.get, alert.get API methods for users of User and Admin types (vmaksimovs, wczerneha)
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 

@@ -180,6 +180,11 @@ class testPageLatestData extends CWebTest {
 					->one(false)->isValid()
 			);
 			$filter_tab->click();
+			CElementQuery::wait()->until(function () use ($status) {
+				return (CDBHelper::getValue('SELECT value_int FROM profiles'.
+						' WHERE idx='.zbx_dbstr('web.monitoring.latest.expanded').' AND userid=1') === ($status ? '1' : '0'));
+				}, 'Failed to wait for a record in the DB that filter is '.($status ? 'open' : 'close')
+			);
 		}
 	}
 

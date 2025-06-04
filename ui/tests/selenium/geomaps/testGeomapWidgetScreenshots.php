@@ -294,8 +294,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
 		$widgets = [
-			// TODO: temporarily commented out due to mouse pointer on first widget in Jenkins
-//			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
 			'Geomap for screenshots, no zoom',
@@ -331,7 +330,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		foreach ($widgets as $widget) {
 			CDashboardElement::find()->one()->getWidget($widget)->waitUntilReady();
 			$id = $widget.' '.$data['Tile provider'];
-			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
+			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
 
 			$count = count($this->errors);

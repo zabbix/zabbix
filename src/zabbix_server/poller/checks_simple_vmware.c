@@ -3473,7 +3473,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 			break;
 	}
 
-	if (NULL == fs)
+	if (i == vm->file_systems.values_num)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown file system path."));
 		goto unlock;

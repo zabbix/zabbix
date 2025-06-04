@@ -69,6 +69,9 @@ class testFormTagsItemPrototype extends testFormTags {
 
 	/**
 	 * Test host full cloning with Item prototype.
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4232
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTagsItemPrototype_HostFullClone() {
 		$this->host = 'Host with tags for cloning';

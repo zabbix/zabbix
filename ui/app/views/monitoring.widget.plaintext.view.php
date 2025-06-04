@@ -34,11 +34,9 @@ else {
 
 	if ($names_at_top) {
 		foreach ($data['items'] as $item) {
-			$table_header[] = (new CSpan(
-				($data['same_host'] ? '' : $item['hosts'][0]['name'].NAME_DELIMITER).$item['name']
-			))
-				->addClass(ZBX_STYLE_TEXT_VERTICAL)
-				->setTitle($item['name']);
+			$table_header[] = (new CVertical(
+				($data['same_host'] ? '' : $item['hosts'][0]['name'].NAME_DELIMITER).$item['name'])
+			)->setTitle($item['name']);
 		}
 	}
 	else {
