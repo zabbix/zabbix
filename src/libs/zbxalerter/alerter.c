@@ -385,6 +385,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	time_stat = zbx_time();
 
+	/* alerter should not have access to database */
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -421,11 +423,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
-		zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
-
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 		zbx_update_env(get_process_type_string(process_type), time_read);
@@ -448,9 +445,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
-
-		zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
-		zbx_db_close();
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
