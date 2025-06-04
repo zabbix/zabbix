@@ -1606,7 +1606,7 @@ abstract class CHostBase extends CApiService {
 
 		if (self::isTemplate()) {
 			$macros = [];
-			$db_macros = $db_hosts !== null ? [] : null;
+			$db_macros = [];
 
 			foreach ($hosts as &$host) {
 				if (!array_key_exists('macros', $host)) {
@@ -1618,12 +1618,9 @@ abstract class CHostBase extends CApiService {
 						$macro['hostmacroid'] = array_shift($hostmacroids);
 
 						if (array_key_exists('config', $macro)) {
-							self::prepareMacroConfigOptionsForAuditlog($macro);
+							$macros[] = $macro;
 
-							if ($db_hosts !== null) {
-								$macros[] = $macro;
-								$db_macros[$macro['hostmacroid']] = ['config' => DB::getDefaults('hostmacro_config')];
-							}
+							self::prepareMacroConfigOptionsForAuditlog($macro);
 						}
 					}
 					elseif (array_key_exists('config', $macro)) {
@@ -1661,7 +1658,7 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	private static function updateMacroConfigs(array $macros, ?array $db_macros): void {
+	private static function updateMacroConfigs(array $macros, array $db_macros): void {
 		$ins_hostmacro_configs = [];
 		$upd_hostmacro_configs = [];
 		$del_hostmacroids = [];
