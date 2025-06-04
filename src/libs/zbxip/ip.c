@@ -288,14 +288,14 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: combines IP and Port into a network address of the form "IP:Port" *
+ * Purpose: combines host and port into a network address "host:port"         *
  *                                                                            *
  * Parameters: hostport       - [IN/OUT] string formatting buffer pointer     *
  *             hostport_sz    - [IN] size of buffer                           *
  *             host           - [IN]                                          *
  *             port           - [IN]                                          *
  *                                                                            *
- * Return value: pointer to hostport                                          *
+ * Return value: pointer to hostport buffer                                   *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_join_hostport(char *hostport, size_t hostport_sz, const char *host, unsigned short port)
