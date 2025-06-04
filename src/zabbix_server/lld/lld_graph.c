@@ -1368,8 +1368,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_DISCOVER))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d,
-						(int)ymax_type);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, discover_proto);
 
 				zbx_audit_graph_update_json_update_discover(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						dflags, (int)graph->discover_orig, (int)discover_proto);
