@@ -2826,7 +2826,7 @@ typedef struct
 	zbx_uint64_t			itemid;
 	zbx_hashset_t			rule_index;
 	zbx_vector_lld_row_ptr_t	lld_rows;
-	zbx_lld_item_prototype_t	*prototype;
+	const zbx_lld_item_prototype_t	*prototype;
 }
 zbx_lld_prototype_rules_t;
 
