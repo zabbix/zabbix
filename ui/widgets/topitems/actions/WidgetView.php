@@ -59,6 +59,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Editing template dashboard?
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data found');
+			$data['layout'] = $this->fields_values['layout'];
 		}
 		else {
 			$data += $this->getData();
@@ -70,6 +71,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getData(): array {
 		$db_hosts = $this->getHosts();
+
+		if (!$db_hosts) {
+			return [
+				'error' => _('No data found'),
+				'layout' => $this->fields_values['layout']
+			];
+		}
 
 		$db_items = [];
 		$column_tables = [];
@@ -106,6 +114,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$table = self::concatenateTables($column_tables);
+
+		if (!$table) {
+			return [
+				'error' => _('No data found'),
+				'layout' => $this->fields_values['layout']
+			];
+		}
 
 		$this->applyHostOrdering($table, $db_hosts);
 		$this->applyHostOrderingLimit($table);

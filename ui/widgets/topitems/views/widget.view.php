@@ -31,6 +31,11 @@ $table = new CTableInfo();
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error'], null, ZBX_ICON_SEARCH_LARGE);
+	$header[] = $data['layout'] == WidgetForm::LAYOUT_VERTICAL
+		? new CColHeader(_('Items'))
+		: new CColHeader(_('Hosts'));
+
+	$table->setHeader($header);
 }
 else {
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
