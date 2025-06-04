@@ -44,33 +44,29 @@ else {
 		if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
 			$header[] = new CColHeader(_('Items'));
 
-			if ($data['rows']) {
-				foreach ($data['rows'][0] as $cell) {
-					$hostid = $cell[Widget::CELL_HOSTID];
-					$title = $data['db_hosts'][$hostid]['name'];
-					['is_view_value_in_row' => $is_view_value] = $cell[Widget::CELL_METADATA];
-					$header[] = (new CColHeader(
-						($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-							? (new CVertical($title))
-							: (new CSpan($title))
-						)->setTitle($title)
-					))->setColSpan($is_view_value ? 2 : 1);
-				}
+			foreach ($data['rows'][0] as $cell) {
+				$hostid = $cell[Widget::CELL_HOSTID];
+				$title = $data['db_hosts'][$hostid]['name'];
+				['is_view_value_in_row' => $is_view_value] = $cell[Widget::CELL_METADATA];
+				$header[] = (new CColHeader(
+					($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+						? (new CVertical($title))
+						: (new CSpan($title))
+					)->setTitle($title)
+				))->setColSpan($is_view_value ? 2 : 1);
 			}
 		}
 		else {
 			$header[] = new CColHeader(_('Hosts'));
 
-			if ($data['rows']) {
-				foreach ($data['rows'][0] as $cell) {
-					['name' => $title, 'is_view_value_in_column' => $is_view_value] = $cell[Widget::CELL_METADATA];
-					$header[] = (new CColHeader(
-						($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-							? (new CVertical($title))
-							: (new CSpan($title))
-						)->setTitle($title)
-					))->setColSpan($is_view_value ? 2 : 1);
-				}
+			foreach ($data['rows'][0] as $cell) {
+				['name' => $title, 'is_view_value_in_column' => $is_view_value] = $cell[Widget::CELL_METADATA];
+				$header[] = (new CColHeader(
+					($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+						? (new CVertical($title))
+						: (new CSpan($title))
+					)->setTitle($title)
+				))->setColSpan($is_view_value ? 2 : 1);
 			}
 		}
 
