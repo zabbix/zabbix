@@ -1329,7 +1329,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 			if (mediatype->passwd_expires - ZBX_WATCHDOG_EXPIRE_FREQUENCY < time(NULL))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "In %s(): watchdog oauth expires in %d s - renew", __func__,
-						time(NULL) - mediatype->passwd_expires);
+						(int)time(NULL) - mediatype->passwd_expires);
 
 				zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
