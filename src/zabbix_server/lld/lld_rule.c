@@ -2830,7 +2830,20 @@ typedef struct
 }
 zbx_lld_prototype_rules_t;
 
-static void	lld_prototype_items_clear(void *v)
+ZBX_PTR_VECTOR_DECL(lld_prototype_rules_ptr, zbx_lld_prototype_rules_t *)
+ZBX_PTR_VECTOR_IMPL(lld_prototype_rules_ptr, zbx_lld_prototype_rules_t *)
+
+static int	lld_prototype_rules_compare(const void *v1, const void *v2)
+{
+	const zbx_lld_prototype_rules_t        *pi1 = *(const zbx_lld_prototype_rules_t * const *)v1;
+	const zbx_lld_prototype_rules_t        *pi2 = *(const zbx_lld_prototype_rules_t * const *)v2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(pi1->itemid, pi2->itemid);
+
+	return 0;
+}
+
+static void	lld_prototype_rules_clear(void *v)
 {
 	zbx_lld_prototype_rules_t	*pi = (zbx_lld_prototype_rules_t *)v;
 
@@ -2960,14 +2973,17 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
 		char **error, int lastcheck, zbx_hashset_t *items_index)
 {
-	int				ret = SUCCEED;
-	zbx_hashset_t			prototype_rules;
-	zbx_hashset_iter_t		iter;
+	int					ret = SUCCEED;
+	zbx_hashset_t				prototype_rules;
+	zbx_hashset_iter_t			iter;
+	zbx_vector_lld_prototype_rules_ptr_t	prototype_rules_sorted;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_lld_prototype_rules_ptr_create(&prototype_rules_sorted);
+
 	zbx_hashset_create_ext(&prototype_rules, (size_t)item_prototypes->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, lld_prototype_items_clear,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, lld_prototype_rules_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	lld_rule_export_lld_macros(items);
@@ -3000,6 +3016,8 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 			prules->prototype = item_index->item->prototype;
 			zbx_vector_lld_row_ptr_create(&prules->lld_rows);
 			zbx_vector_lld_row_ptr_reserve(&prules->lld_rows, (size_t)lld_rows->values_num);
+
+			zbx_vector_lld_prototype_rules_ptr_append(&prototype_rules_sorted, prules);
 		}
 
 		row_ruleid_local.ruleid = item_index->item->itemid;
@@ -3020,11 +3038,11 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 
 	zbx_lld_lifetime_t		lifetime = {ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY, 0},
 					enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
-	zbx_lld_prototype_rules_t	*prules;
 
-	zbx_hashset_iter_reset(&prototype_rules, &iter);
-	while (NULL != (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_iter_next(&iter)))
+	zbx_vector_lld_prototype_rules_ptr_sort(&prototype_rules_sorted, lld_prototype_rules_compare);
+	for (int i = 0; i < prototype_rules_sorted.values_num; i++)
 	{
+		zbx_lld_prototype_rules_t	*prules = prototype_rules_sorted.values[i];
 		const zbx_lld_item_prototype_t	*item_prototype = prules->prototype;
 
 		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &prules->lld_rows, error, &lifetime,
@@ -3060,6 +3078,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 	ret = SUCCEED;
 out:
 	zbx_hashset_destroy(&prototype_rules);
+	zbx_vector_lld_prototype_rules_ptr_destroy(&prototype_rules_sorted);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
