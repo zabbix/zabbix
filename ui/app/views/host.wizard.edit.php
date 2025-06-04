@@ -950,7 +950,7 @@ function stepReadme(): CTemplateTag {
 function stepConfigureHost(): array {
 	return [
 		new CTemplateTag('host-wizard-step-configure-host',
-			(new CDiv([
+			(new CDiv(
 				(new CSection())
 					->addItem(
 						(new CDiv([
@@ -966,14 +966,27 @@ function stepConfigureHost(): array {
 							->addClass(ZBX_STYLE_FORMATED_TEXT)
 					)
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
-					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
-				(new CSection())
-					->addItem(
-						(new CDiv())->addClass('host-macro-list')
-					)
-					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-			]))->addClass('step-form-body')
+
+			))->addClass('step-form-body')
+		),
+		new CTemplateTag('host-wizard-step-configure-host-macros-section',
+			(new CSection())
+				->addItem(
+					(new CDiv())->addClass('host-macro-list')
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		),
+		new CTemplateTag('host-wizard-step-configure-host-macros-collapsible-section',
+			(new CSectionCollapsible())
+				->setToggleLabel(_('#{section_name}'))
+				->addItem(
+					(new CDiv())->addClass('host-macro-list')
+				)
+				->setExpanded(false)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		),
 		new CTemplateTag('host-wizard-macro-field-checkbox',
 			(new CFormField([

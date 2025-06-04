@@ -411,6 +411,8 @@ window.host_wizard_edit = new class {
 			step_add_host_interface_jmx: tmpl('host-wizard-step-add-host-interface-jmx'),
 			step_readme: tmpl('host-wizard-step-readme'),
 			step_configure_host: tmpl('host-wizard-step-configure-host'),
+			step_configure_host_macros_section: tmpl('host-wizard-step-configure-host-macros-section'),
+			step_configure_host_macros_collapsible_section: tmpl('host-wizard-step-configure-host-macros-collapsible-section'),
 			step_configuration_finish: tmpl('host-wizard-step-configuration-finish'),
 			step_complete: tmpl('host-wizard-step-complete'),
 			cancel_screen: tmpl('host-wizard-cancel-screen'),
@@ -698,12 +700,24 @@ window.host_wizard_edit = new class {
 		const view = this.#view_templates.step_configure_host.evaluateToElement();
 		const substep_counter = this.#steps_queue.includes(this.STEP_README)
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
-		const macros_list = view.querySelector('.host-macro-list');
+
+		const sections = new Map([['', this.#view_templates.step_configure_host_macros_section.evaluateToElement()]]);
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		Object.entries(this.#data.macros).forEach(([row_index, macro]) => {
 			const {field, description} = this.#makeMacroField(macro, row_index);
+
+			if (!sections.has(macro.section_name)) {
+				sections.set(macro.section_name,
+					this.#view_templates.step_configure_host_macros_collapsible_section.evaluateToElement({
+						section_name: macro.section_name
+					})
+				);
+			}
+
+			const section = sections.get(macro.section_name);
+			const macros_list = section.querySelector('.host-macro-list');
 
 			if (field !== null) {
 				macros_list.appendChild(field);
@@ -713,6 +727,10 @@ window.host_wizard_edit = new class {
 					macros_list.appendChild(description);
 				}
 			}
+		});
+
+		sections.forEach(section => {
+			view.appendChild(section)
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -952,6 +970,7 @@ window.host_wizard_edit = new class {
 					};
 
 					return [row_index, {
+						section_name: template_macro.config.section_name,
 						type: Number(template_macro.type),
 						macro: template_macro.macro,
 						value,
@@ -1361,6 +1380,16 @@ window.host_wizard_edit = new class {
 					this.#updateFieldMessages(this.#pathToInputName(path), 'warning', []);
 
 					delete this.#macro_reset_list[path];
+				}
+
+				if (this.#hasErrors()) {
+					for (const field of this.#dialogue.querySelectorAll('.field-has-error')) {
+						const section = field.closest(`.${ZBX_STYLE_COLLAPSED}`);
+
+						if (section !== null) {
+							toggleSection(section.querySelector('.toggle'));
+						}
+					}
 				}
 				break;
 		}
