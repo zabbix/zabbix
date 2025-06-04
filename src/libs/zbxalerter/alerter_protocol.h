@@ -21,6 +21,8 @@
 #include "zbxdbhigh.h"
 
 #define ZBX_WATCHDOG_ALERT_FREQUENCY	(15 * SEC_PER_MIN)
+#define ZBX_DB_PING_FREQUENCY		SEC_PER_MIN
+#define ZBX_WATCHDOG_EXPIRE_FREQUENCY	(ZBX_WATCHDOG_ALERT_FREQUENCY + ZBX_DB_PING_FREQUENCY)
 #define ZBX_ALERT_NO_DEBUG		0
 #define ZBX_ALERT_DEBUG			1
 
@@ -50,6 +52,7 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
+	int			passwd_expires;
 	char			*script;
 	char			*script_bin;
 	char			*error;

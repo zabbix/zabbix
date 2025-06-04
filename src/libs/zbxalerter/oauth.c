@@ -21,7 +21,36 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
-int	zbx_oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name, zbx_oauth_data_t *data,
+/* For token status, bit mask */
+#define ZBX_OAUTH_TOKEN_INVALID		0
+#define ZBX_OAUTH_TOKEN_ACCESS_VALID	1
+#define ZBX_OAUTH_TOKEN_REFRESH_VALID	2
+
+#define ZBX_OAUTH_TOKEN_VALID		(ZBX_OAUTH_TOKEN_ACCESS_VALID | ZBX_OAUTH_TOKEN_REFRESH_VALID)
+
+typedef struct
+{
+	char	*token_url;
+	char	*client_id;
+	char	*client_secret;
+
+	char	*old_refresh_token;
+	char	*refresh_token;
+
+	unsigned char	old_tokens_status;
+	unsigned char	tokens_status;
+
+	char	*old_access_token;
+	char	*access_token;
+
+	time_t	old_access_token_updated;
+	time_t	access_token_updated;
+
+	int	old_access_expires_in;
+	int	access_expires_in;
+} zbx_oauth_data_t;
+
+static int	oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_name, zbx_oauth_data_t *data,
 		char **error)
 {
 #define SET_ERROR(message) 										\
@@ -102,7 +131,7 @@ out:
 #undef SET_ERROR
 }
 
-int	zbx_oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name, long timeout,
+static int	oauth_access_refresh(zbx_oauth_data_t *data, const char *mediatype_name, long timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, char **error)
 {
 #ifndef HAVE_LIBCURL
@@ -250,7 +279,7 @@ out:
 #endif
 }
 
-void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result)
+static void	oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result)
 {
 	if (SUCCEED != fetch_result)
 	{
@@ -286,7 +315,7 @@ void	zbx_oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetc
 	}
 }
 
-void	zbx_oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
+static void	oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const char *mediatype_name,
 		const zbx_oauth_data_t *data, int fetch_result)
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -322,7 +351,7 @@ void	zbx_oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const cha
 	}
 }
 
-void	zbx_oauth_clean(zbx_oauth_data_t *data)
+static void	oauth_clean(zbx_oauth_data_t *data)
 {
 	zbx_free(data->token_url);
 	zbx_free(data->client_id);
@@ -331,4 +360,64 @@ void	zbx_oauth_clean(zbx_oauth_data_t *data)
 	zbx_free(data->refresh_token);
 	zbx_free(data->old_access_token);
 	zbx_free(data->access_token);
+}
+
+/*****************************************************************************************
+ *                                                                                       *
+ * Purpose: get OAuth authorization OAuthBearer used as password                         *
+ *                                                                                       *
+ * Parameters: mediatypeid            - [IN]                                             *
+ *             mediatype_name         - [IN]                                             *
+ *             timeout                - [IN] refresh request timeout                     *
+ *             maxattempts            - [IN] max attempts on refresh request             *
+ *             expire_offset          - [IN] offset before renew access token for OAuth2 *
+ *             config_source_ip       - [IN]                                             *
+ *             config_ssl_ca_location - [IN]                                             *
+ *             oauthbearer            - [OUT]                                            *
+ *             expires                - [OU]                                             *
+ *             error                  - [IN/OUT]                                         *
+ *                                                                                       *
+ * Return value: media type object or NULL if not found                                  *
+ *                                                                                       *
+ *****************************************************************************************/
+int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int timeout, int maxattempts,
+		int expire_offset, const char *config_source_ip, const char *config_ssl_ca_location,
+		char **oauthbearer, int *expires, char **error)
+{
+	int			ret;
+	zbx_oauth_data_t	data = {0};
+
+	if (SUCCEED != (ret = oauth_fetch_from_db(mediatypeid, mediatype_name, &data, error)))
+				goto out;
+
+	if (data.access_token_updated + data.access_expires_in - expire_offset < time(NULL))
+	{
+		char	*suberror = NULL;
+
+		do
+		{
+			zbx_free(suberror);	/* clear last error */
+
+			ret = oauth_access_refresh(&data, mediatype_name, timeout, config_source_ip,
+					config_ssl_ca_location, &suberror);
+		}
+		while (0 < maxattempts-- && NETWORK_ERROR == ret);
+
+		oauth_update(mediatypeid, &data, ret);
+		oauth_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
+
+		if (SUCCEED != ret)
+		{
+			*error = suberror;
+			goto out;
+		}
+	}
+
+	*oauthbearer = zbx_strdup(*oauthbearer, data.access_token);
+	*expires = data.access_token_updated + data.access_expires_in;
+out:
+	oauth_clean(&data);
+
+	return ret;
+#undef EXPIRE_OFFSET
 }
