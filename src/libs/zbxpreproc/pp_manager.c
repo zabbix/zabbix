@@ -690,6 +690,9 @@ static void	zbx_pp_manager_get_values_stats(zbx_pp_manager_t *manager, int is_nu
 		zbx_int64_t		num;
 		zbx_pp_top_stats_t	*stat;
 
+		if (NULL ==  item->preproc)
+			continue;
+
 		num = 0 == is_num ? (zbx_int64_t)item->preproc->values_sz : (zbx_int64_t)item->preproc->values_num;
 
 		if (0 == num)
@@ -1144,6 +1147,9 @@ static void	zbx_pp_manager_items_preproc_values_stats_reset(zbx_pp_manager_t *ma
 
 	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
 	{
+		if (NULL ==  item->preproc)
+			continue;
+
 		item->preproc->values_num = 0;
 		item->preproc->values_sz = 0;
 	}
