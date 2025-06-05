@@ -1283,8 +1283,8 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		disabled: options.is_binary_value_type,
-		clickCallback: function() {
+		disabled: options.is_binary_value_type || options.is_discovered_prototype,
+		clickCallback: () => {
 			ZABBIX.PopupManager.open('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,
 				name: options.name,
@@ -1297,6 +1297,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create dependent item'),
+		disabled: options.is_discovered_prototype,
 		clickCallback: () => {
 			ZABBIX.PopupManager.open('item.prototype.edit', {
 				context: options.context,
