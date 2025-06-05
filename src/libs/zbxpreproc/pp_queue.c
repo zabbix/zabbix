@@ -31,6 +31,13 @@ typedef struct
 }
 zbx_pp_item_task_sequence_t;
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_list_t	tasks;
+}
+zbx_pp_item_tasks_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize task queue                                             *
@@ -55,6 +62,7 @@ int	pp_task_queue_init(zbx_pp_queue_t *queue, char **error)
 	zbx_list_create(&queue->finished);
 
 	zbx_hashset_create(&queue->sequences, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&queue->tasks, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
 	{
@@ -114,6 +122,7 @@ void	pp_task_queue_destroy(zbx_pp_queue_t *queue)
 	zbx_list_destroy(&queue->finished);
 
 	zbx_hashset_destroy(&queue->sequences);
+	zbx_hashset_destroy(&queue->tasks);
 
 	queue->init_flags = PP_TASK_QUEUE_INIT_NONE;
 }
@@ -267,6 +276,22 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	queue->pending_num++;
 
+	/* track input value order to have the same output order for non sequential tasks */
+	if (ZBX_PP_TASK_VALUE == task->type)
+	{
+		zbx_pp_item_tasks_t	item_tasks_local, *item_tasks;
+		int			tasks_num = queue->tasks.num_data;
+
+		item_tasks_local.itemid = task->itemid;
+		item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_insert(&queue->tasks, &item_tasks_local,
+				sizeof(item_tasks_local));
+
+		if (tasks_num != queue->tasks.num_data)
+			zbx_list_create(&item_tasks->tasks);
+
+		zbx_list_append(&item_tasks->tasks, task, NULL);
+	}
+
 	if (ITEM_TYPE_INTERNAL != d->preproc->type)
 	{
 		(void)zbx_list_append(&queue->pending, task, NULL);
@@ -344,9 +369,26 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
  ******************************************************************************/
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
+	zbx_pp_item_tasks_t	*item_tasks;
 	queue->finished_num++;
 	queue->processing_num--;
-	(void)zbx_list_append(&queue->finished, task, NULL);
+	task->state = ZBX_PP_TASK_FINISHED;
+
+	if (NULL != (item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_search(&queue->tasks, &task->itemid)))
+	{
+		while (SUCCEED == zbx_list_peek(&item_tasks->tasks, (void **)&task))
+		{
+			if (ZBX_PP_TASK_FINISHED != task->state)
+				return;
+
+			zbx_list_pop(&item_tasks->tasks, NULL);
+			(void)zbx_list_append(&queue->finished, task, NULL);
+		}
+
+		zbx_hashset_remove_direct(&queue->tasks, item_tasks);
+	}
+	else
+		(void)zbx_list_append(&queue->finished, task, NULL);
 }
 
 /******************************************************************************
