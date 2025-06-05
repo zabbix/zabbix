@@ -132,6 +132,7 @@ function stepSelectTemplate($old_template_count): array {
 							_('See'),
 							' ',
 							(new CLink(_('how to update them'), CDocHelper::getUrl(CDocHelper::TEMPLATES_OUT_OF_THE_BOX)))
+								->addClass(ZBX_STYLE_LINK_EXTERNAL)
 								->setTarget('_blank'),
 							'. ',
 							_('Custom templates are not supported.')
