@@ -32,6 +32,7 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_macros
+ * @backup events
  * @onAfter clearData
  */
 class testExpressionMacros extends CIntegrationTest {
