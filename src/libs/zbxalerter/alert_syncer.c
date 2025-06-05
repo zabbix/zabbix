@@ -1048,8 +1048,8 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	sleeptime = ZBX_POLL_INTERVAL;
 
-	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
-		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
+	if (ZBX_WATCHDOG_ALERT_PERIOD < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
+		freq_watchdog = ZBX_WATCHDOG_ALERT_PERIOD;
 
 	zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 

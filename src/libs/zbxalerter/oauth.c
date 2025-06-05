@@ -22,7 +22,6 @@
 #include "zbxstr.h"
 
 /* For token status, bit mask */
-#define ZBX_OAUTH_TOKEN_INVALID		0
 #define ZBX_OAUTH_TOKEN_ACCESS_VALID	1
 #define ZBX_OAUTH_TOKEN_REFRESH_VALID	2
 
@@ -388,7 +387,7 @@ int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int time
 	zbx_oauth_data_t	data = {0};
 
 	if (SUCCEED != (ret = oauth_fetch_from_db(mediatypeid, mediatype_name, &data, error)))
-				goto out;
+		goto out;
 
 	if (data.access_token_updated + data.access_expires_in - expire_offset < time(NULL))
 	{
@@ -414,7 +413,7 @@ int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int time
 	}
 
 	*oauthbearer = zbx_strdup(*oauthbearer, data.access_token);
-	*expires = data.access_token_updated + data.access_expires_in;
+	*expires = (int)data.access_token_updated + data.access_expires_in;
 out:
 	oauth_clean(&data);
 

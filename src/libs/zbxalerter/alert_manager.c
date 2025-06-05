@@ -1326,7 +1326,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 		if (SMTP_AUTHENTICATION_OAUTH == mediatype->smtp_authentication)
 		{
 			/* make sure that in case of database down we will have valid OAuth bearer */
-			if (mediatype->passwd_expires - ZBX_WATCHDOG_EXPIRE_FREQUENCY < time(NULL))
+			if (mediatype->passwd_expires - ZBX_WATCHDOG_EXPIRE_PERIOD < time(NULL))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "In %s(): watchdog oauth expires in %d s - renew", __func__,
 						(int)time(NULL) - mediatype->passwd_expires);
@@ -1334,7 +1334,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 				zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
 				zbx_oauth_get(mediatype->mediatypeid, mediatype->name, mediatype->timeout,
-					mediatype->maxattempts, ZBX_WATCHDOG_EXPIRE_FREQUENCY, config_source_ip,
+					mediatype->maxattempts, ZBX_WATCHDOG_EXPIRE_PERIOD, config_source_ip,
 					config_ssl_ca_location, &mediatype->passwd, &mediatype->passwd_expires,
 					&mediatype->error);
 
@@ -2406,7 +2406,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		time_now = zbx_time();
 		now = (int)time_now;
 
-		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
+		if ((time_ping + ZBX_DB_PING_PERIOD) < now)
 		{
 			manager.dbstatus = am_check_dbstatus();
 			time_ping = now;
@@ -2416,7 +2416,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			if (0 == time_watchdog)
 				zabbix_log(LOG_LEVEL_ERR, "database connection lost");
 
-			if (time_watchdog + ZBX_WATCHDOG_ALERT_FREQUENCY <= now)
+			if (time_watchdog + ZBX_WATCHDOG_ALERT_PERIOD <= now)
 			{
 				am_queue_watchdog_alerts(&manager, alert_manager_args_in->db_config);
 				time_watchdog = now;
