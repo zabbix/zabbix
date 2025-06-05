@@ -373,10 +373,11 @@ static void	oauth_clean(zbx_oauth_data_t *data)
  *             config_source_ip       - [IN]                                             *
  *             config_ssl_ca_location - [IN]                                             *
  *             oauthbearer            - [OUT]                                            *
- *             expires                - [OU]                                             *
+ *             expires                - [OUT]                                            *
  *             error                  - [IN/OUT]                                         *
  *                                                                                       *
- * Return value: media type object or NULL if not found                                  *
+ * Return value: SUCCEED - function got valid access token successfull     y             *
+ *               FAIL    - otherwise                                                     *
  *                                                                                       *
  *****************************************************************************************/
 int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int timeout, int maxattempts,
@@ -400,7 +401,7 @@ int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int time
 			ret = oauth_access_refresh(&data, mediatype_name, timeout, config_source_ip,
 					config_ssl_ca_location, &suberror);
 		}
-		while (0 < maxattempts-- && NETWORK_ERROR == ret);
+		while (0 < --maxattempts && NETWORK_ERROR == ret);
 
 		oauth_update(mediatypeid, &data, ret);
 		oauth_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
