@@ -378,7 +378,7 @@ function stepInstallAgent($agent_script_data): array {
 									(new CDiv([
 										(new CDiv(
 											new CTag('p', true,
-												_('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.')
+												_('Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method.')
 											)
 										))->addClass(ZBX_STYLE_FORMATED_TEXT),
 										(new CDiv(
