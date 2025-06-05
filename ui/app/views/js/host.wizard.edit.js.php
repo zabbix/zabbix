@@ -43,7 +43,9 @@ window.host_wizard_edit = new class {
 	TEMPLATE_SHOW_LINKED = <?= ZBX_TEMPLATE_SHOW_LINKED ?>;
 	TEMPLATE_SHOW_NOT_LINKED = <?= ZBX_TEMPLATE_SHOW_LINKED ?>;
 
+	HOST_ENCRYPTION_NONE = <?= HOST_ENCRYPTION_NONE ?>;
 	HOST_ENCRYPTION_PSK = <?= HOST_ENCRYPTION_PSK ?>;
+	HOST_ENCRYPTION_CERTIFICATE = <?= HOST_ENCRYPTION_CERTIFICATE ?>;
 
 	INTERFACE_TYPE_AGENT = <?= INTERFACE_TYPE_AGENT ?>;
 	INTERFACE_TYPE_SNMP = <?= INTERFACE_TYPE_SNMP ?>;
@@ -144,6 +146,7 @@ window.host_wizard_edit = new class {
 	#data = {
 		do_not_show_welcome: 0,
 		tls_required: true,
+		tls_warning: false,
 		install_agent_required: true,
 		template_search_query: '',
 		selected_template: null,
@@ -867,7 +870,17 @@ window.host_wizard_edit = new class {
 				this.#data.install_agent_required = response.install_agent_required;
 				this.#data.tls_required = this.#data.install_agent_required
 					&& (this.#host === null
-						|| (this.#host.tls_connect !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
+						|| (Number(this.#host.tls_connect) !== this.HOST_ENCRYPTION_PSK && !this.#host.tls_in_psk));
+
+				this.#data.tls_warning = false;
+
+				if (this.#host !== null) {
+					const no_encryption = Number(this.#host.tls_connect) === this.HOST_ENCRYPTION_NONE
+						&& this.#host.tls_in_none && !this.#host.tls_in_psk && !this.#host.tls_in_cert;
+					const psk_encryption = Number(this.#host.tls_connect) === this.HOST_ENCRYPTION_PSK
+						&& !this.#host.tls_in_none && this.#host.tls_in_psk && !this.#host.tls_in_cert;
+					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
+				}
 
 				this.#data.tls_psk_identity = '';
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
@@ -1233,6 +1246,9 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_INSTALL_AGENT:
+				this.#dialogue.querySelector('.js-agent-encryption-overwrite')
+					.style.display = this.#data.tls_required && this.#data.tls_warning ? '' : 'none';
+
 				for (const element of this.#dialogue.querySelectorAll('.js-tls-exists')) {
 					element.style.display = !this.#data.tls_required ? '' : 'none';
 				}

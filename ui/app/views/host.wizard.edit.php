@@ -369,6 +369,10 @@ function stepInstallAgent($agent_script_data): array {
 	return [
 		new CTemplateTag('host-wizard-step-install-agent',
 			(new CDiv([
+				(makeMessageBox(ZBX_STYLE_MSG_WARNING, [],
+					_('This configuration will overwrite all existing encryption settings on the host.'), false
+				))->addClass('js-agent-encryption-overwrite'),
+
 				(new CSection())
 					->addItem(
 						(new CDiv([
