@@ -70,21 +70,18 @@ class CControllerTriggerMassupdate extends CController {
 		$options = [
 			'output' => ['triggerid', 'templateid'],
 			'triggerids' => $this->getInput('ids'),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'editable' => true,
 			'preservekeys' => true
 		];
 
-		if ($this->hasInput('mass_update_tags')
-				&& in_array($this->getInput('mass_update_tags'), [ZBX_ACTION_ADD, ZBX_ACTION_REMOVE])) {
+		if (array_key_exists('tags', $this->getInput('visible', []))) {
 			$options['selectTags'] = ['tag', 'value'];
 		}
 
 		if ($parent_lld) {
 			$options['discoveryids'] = $this->getInput('parent_discoveryid');
 			$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE];
-		}
-		else {
-			$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
 		}
 
 		$this->triggers = $parent_lld ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
@@ -94,7 +91,6 @@ class CControllerTriggerMassupdate extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('update')) {
-			$triggers_count = count($this->triggers);
 			$visible = $this->getInput('visible', []);
 			$tags = $this->getInput('tags', []);
 
@@ -132,18 +128,25 @@ class CControllerTriggerMassupdate extends CController {
 				}
 
 				if (array_key_exists('tags', $visible)) {
-					$mass_update_tags = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
+					$tags_action = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
 
-					if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
+					if ($tags && $tags_action == ZBX_ACTION_ADD) {
 						$upd_trigger['tags'] = self::getUniqueTags(array_merge($trigger['tags'], $tags));
 					}
-					elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
+					elseif ($tags_action == ZBX_ACTION_REPLACE) {
 						$upd_trigger['tags'] = $tags;
 					}
-					elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
-						$upd_trigger['tags'] = array_udiff($trigger['tags'], $tags, static function ($a, $b) {
-							return $a['tag'] === $b['tag'] && $a['value'] === $b['value'] ? 0 : 1;
-						});
+					elseif ($tags && $tags_action == ZBX_ACTION_REMOVE) {
+						$upd_trigger['tags'] =
+							array_filter($trigger['tags'], static function (array $tag) use ($tags): bool {
+								foreach ($tags as $_tag) {
+									if ($tag['tag'] === $_tag['tag'] && $tag['value'] === $_tag['value']) {
+										return false;
+									}
+								}
+
+								return true;
+							});
 					}
 				}
 
@@ -157,6 +160,8 @@ class CControllerTriggerMassupdate extends CController {
 			$result = $this->hasInput('prototype')
 				? API::TriggerPrototype()->update($triggers_to_update)
 				: API::Trigger()->update($triggers_to_update);
+
+			$triggers_count = count($this->triggers);
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
