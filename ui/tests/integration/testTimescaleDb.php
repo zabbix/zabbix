@@ -32,12 +32,14 @@ class testTimescaleDb extends CIntegrationTest {
 		storing old data deep in the past - 20 days, which is way longer that the minimum 7days,
 		and must be guaranteed to be compressed
 	*/
-	private const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
+	private const TEST_DATA_OLDER_THAN = 20 * 24 * 3600;
 	private static $db_extension = null;
 	private static $hostid;
 	private static $itemid;
 	private static $tsdbVersion = null;
 	private static $dbChunkTimeInterval = null;
+	private static $defaultCompressOlder = null;
+	private static $currentCompressOlder;
 
 	/**
 	 * Component configuration provider.
@@ -94,17 +96,20 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Generates some mock historical data and sends it using trapper so that TimescaleDB could generate
 	 * chunks in the past.
+	 *
+	 * Requires the running server.
+	 * Requires disabled compression. This may be changed in future.
 	 */
-	private function generateHistoryData() {
+	private function generateHistoryData($data_older_than) {
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
 		/* data for 3 chunks in the past old enough to be compressed */
 		$input = [
 			/* start clock, value count */
-			[time() - self::COMPRESSION_OLDER_THAN - 1 * self::getChunkTimeInterval(), 100],
-			[time() - self::COMPRESSION_OLDER_THAN - 2 * self::getChunkTimeInterval(), 100],
-			[time() - self::COMPRESSION_OLDER_THAN - 3 * self::getChunkTimeInterval(), 100]
+			[time() - $data_older_than - 1 * self::getChunkTimeInterval(), 100],
+			[time() - $data_older_than - 2 * self::getChunkTimeInterval(), 100],
+			[time() - $data_older_than - 3 * self::getChunkTimeInterval(), 100]
 		];
 
 		$sender_data = [];
@@ -113,7 +118,7 @@ class testTimescaleDb extends CIntegrationTest {
 			$clock = $item[0];
 			$cnt = $item[1];
 
-			for ($i = 0, $ns = 0; $i < $cnt; $i++, $ns += 10, $clock++) {
+			for ($i = 0, $ns = 0; $i < $cnt; $i++, $ns += 10, $clock--) {
 				$sender_data[] = [
 					'value' => $clock,
 					'clock' => $clock,
@@ -176,6 +181,50 @@ class testTimescaleDb extends CIntegrationTest {
 	}
 
 	/**
+	 * Gets compress older value using Zabbix API.
+	 *
+	 * Returns integer value in seconds.
+	 */
+	private function compressOlderTimescaleGet() : int {
+		$sql = "SELECT config ->> 'compress_after' AS compress_after
+			FROM timescaledb_information.jobs
+			WHERE proc_name = 'policy_compression'
+				AND hypertable_name='".self::TABLENAME."'";
+
+		$res = DBfetch(DBselect($sql));
+		$this->assertArrayHasKey('compress_after', $res);
+		return intval($res['compress_after']);
+	}
+
+	/**
+	 * Gets compress older value using TimescaleDB.
+	 *
+	 * Returns integer value in seconds.
+	 */
+	private function compressOlderAPIGet() : int {
+		$response = $this->call('housekeeping.get', [
+			'output' => 'extend'
+		]);
+		$this->assertArrayHasKey('result', $response, 'Failed to get housekeeping properties');
+		$this->assertArrayHasKey('compress_older', $response['result'], 'Failed to get compress_older');
+		$compress_older = $this->timeToSeconds($response['result']['compress_older']);
+		$this->assertNotEquals(-1, self::$defaultCompressOlder, 'Invalid compress_older value');
+		return $compress_older;
+	}
+
+	/**
+	 * Sets compress older value using Zabbix API.
+	 *
+	 * Zabbix server configures TimescaleDB compression on the the next Zabbix server start.
+	 */
+	private function compressOlderSet($compress_older) {
+		$response = $this->call('housekeeping.update', [
+			'compress_older' => $compress_older
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+	}
+
+	/**
 	 * Sets compression on/off using Zabbix API.
 	 *
 	 * Zabbix server configures TimescaleDB compression on the the next Zabbix server start.
@@ -185,6 +234,38 @@ class testTimescaleDb extends CIntegrationTest {
 			'compression_status' => $compression_status
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
+	}
+
+	/**
+	 * Converts time with optional suffixes to seconds.
+	 * If no suffix is given, the time is in seconds.
+	 *
+	 * Returns -1 on failure.
+	 *
+	 */
+	private function timeToSeconds($input) {
+		$units = [
+			'd' => 24 * 60 * 60,  /* days to seconds */
+			'h' => 60 * 60,       /* hours to seconds */
+			'm' => 60,            /* minutes to seconds */
+			's' => 1              /* seconds */
+		];
+
+		$lastChar = strtolower(substr($input, -1));
+
+		/* If the last character is a known unit. */
+		if (isset($units[$lastChar])) {
+			$value = (int)substr($input, 0, -1);
+			return $value * $units[$lastChar];
+		}
+
+		/* If the input is a pure number (no unit), treat it as seconds. */
+		if (ctype_digit($input)) {
+			return (int)$input;
+		}
+
+		/* Invalid input. */
+		return -1;
 	}
 
 	/**
@@ -213,10 +294,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemid = $response['result']['itemids'][0];
 
-		/* disable compression for the compression test of specific chunks */
-		$this->compressionSet(self::COMPRESSION_STATUS_OFF);
-
-		self::clearChunks();
+		self::$defaultCompressOlder = self::$currentCompressOlder = $this->compressOlderAPIGet();
 
 		return true;
 	}
@@ -242,15 +320,36 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Test compression of specific chunks by TimescaleDB.
 	 *
-	 * Compression is expected to be disabled in Zabbix.
+	 */
+	public function testTimescaleDb_compressionOfSpecificChunks1() {
+		/* Disable compression for data generation in the next test case. */
+		$this->compressionSet(self::COMPRESSION_STATUS_OFF);
+	}
+
+	/**
+	 * Test compression of specific chunks by TimescaleDB.
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testTimescaleDb_compressionOfSpecificChunks() {
-		/* requires the running server */
-		$this->generateHistoryData();
+	public function testTimescaleDb_compressionOfSpecificChunks2() {
+		self::clearChunks();
 
+		/* Requires the running server. */
+		/* Requires disabled compression. This may be changed in future. */
+		$this->generateHistoryData(self::TEST_DATA_OLDER_THAN);
+
+		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
+		$this->compressionSet(self::COMPRESSION_STATUS_ON);
+	}
+
+	/**
+	 * Test compression of specific chunks by TimescaleDB.
+
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testTimescaleDb_compressionOfSpecificChunks3() {
 		/* There should be no compressed chunks at this stage yet. */
 		if ($this->getTimescaleDBVersion() >= 21800) {
 			/* hypertable_columnstore_stats is available since TimescaleDB 2.18. */
@@ -316,14 +415,24 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Test TimescaleDB compression policy.
 	 *
+	 */
+	public function testTimescaleDb_compressionPolicy1() {
+		/* Disable compression for data generation in the next test case. */
+		$this->compressionSet(self::COMPRESSION_STATUS_OFF);
+	}
+
+	/**
+	 * Test TimescaleDB compression policy.
+	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testTimescaleDb_compressionPolicy1() {
+	public function testTimescaleDb_compressionPolicy2() {
 		self::clearChunks();
 
-		/* requires running Zabbix server and disabled compression */
-		$this->generateHistoryData();
+		/* Requires the running server. */
+		/* Requires disabled compression. This may be changed in future. */
+		$this->generateHistoryData(self::TEST_DATA_OLDER_THAN);
 
 		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);
@@ -335,7 +444,29 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testTimescaleDb_compressionPolicy2() {
+	public function testTimescaleDb_compressionPolicy3() {
+		/* Test if the compression value was configured to TimescaleDB successfully. */
+		/* The configuration value + 2 hours are configured in TimescaleDB. */
+		$this->assertEquals(self::$currentCompressOlder + 2 * 3600, $this->compressOlderTimescaleGet(),
+				"Unexpected actual compress older value configured in TimescaleDB");
+
+		/* Set a new value without disabling compression. */
+		/* It was a real case discovered during testing ZBXNEXT-9770. */
+		self::$currentCompressOlder = self::$defaultCompressOlder + 3 * 24 * 3600;
+		$this->compressOlderSet(self::$currentCompressOlder);
+	}
+
+	/**
+	 * Test TimescaleDB compression policy.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testTimescaleDb_compressionPolicy4() {
+		/* The configuration value + 2 hours are configured in TimescaleDB. */
+		$this->assertEquals(self::$currentCompressOlder + 2 * 3600, $this->compressOlderTimescaleGet(),
+				"Unexpected actual compress older value configured in TimescaleDB");
+
 		/* make sure that compression settings had enough time to be applied */
 		$maxAttempts = 5;
 
@@ -408,8 +539,14 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Delete all created data after test.
 	 */
 	public static function clearData(): void {
-		CDataHelper::call('housekeeping.update', ['compression_status' => 1]); /* on */
 		CDataHelper::call('item.delete', [self::$itemid]);
 		CDataHelper::call('host.delete', [self::$hostid]);
+		$housekeeping = [
+			'compression_status' => self::COMPRESSION_STATUS_ON
+		];
+		if (self::$defaultCompressOlder != null) {
+			$housekeeping['compress_older'] = self::$defaultCompressOlder;
+		}
+		CDataHelper::call('housekeeping.update', $housekeeping);
 	}
 }
