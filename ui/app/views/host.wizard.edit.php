@@ -162,7 +162,14 @@ function stepSelectTemplate($old_template_count): array {
 					->addItem(
 						(new CDiv([
 							new CFormField([
-								new CLabel(_('Data collection')),
+								new CLabel([
+									_('Data collection'),
+									helpHint([
+										[bold(_('Agent-based')), ' - ', _('Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target.')],
+										BR(),
+										[bold(_('Agentless')), ' - ', _('Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH).')]
+									])
+								]),
 								(new CRadioButtonList('data_collection'))
 									->addValue(_('All'), ZBX_TEMPLATE_DATA_COLLECTION_ANY)
 									->addValue(_('Agent-based'), ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED)
@@ -170,7 +177,14 @@ function stepSelectTemplate($old_template_count): array {
 									->setModern()
 							]),
 							new CFormField([
-								new CLabel(_('Agent mode')),
+								new CLabel([
+									_('Agent mode'),
+									helpHint([
+										[bold(_('Active')), ' - ', _('Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall.')],
+										BR(),
+										[bold(_('Passive')), ' - ', _('Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports.')]
+									])
+								]),
 								(new CRadioButtonList('agent_mode'))
 									->addValue(_('All'), ZBX_TEMPLATE_AGENT_MODE_ANY)
 									->addValue(_('Active'), ZBX_TEMPLATE_AGENT_MODE_ACTIVE)
@@ -1061,4 +1075,10 @@ function cancelScreen(): CTemplateTag {
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
 	);
+}
+
+function helpHint(mixed $help_text): CButtonIcon {
+	return (new CButtonIcon(ZBX_ICON_CIRCLE_QUESTION))
+		->setSmall()
+		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }

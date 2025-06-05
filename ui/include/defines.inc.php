@@ -2391,6 +2391,7 @@ define('ZBX_ICON_CHEVRON_LEFT', 'zi-chevron-left');
 define('ZBX_ICON_CHEVRON_RIGHT', 'zi-chevron-right');
 define('ZBX_ICON_CHEVRON_UP', 'zi-chevron-up');
 define('ZBX_ICON_CIRCLE_INFO', 'zi-circle-info');
+define('ZBX_ICON_CIRCLE_QUESTION', 'zi-circle-question');
 define('ZBX_ICON_CIRCLE_QUESTION_FILLED', 'zi-circle-question-filled');
 define('ZBX_ICON_CLOCK', 'zi-clock');
 define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');

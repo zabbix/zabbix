@@ -379,6 +379,12 @@
 		}
 	}
 
+	.zi-circle-question {
+		&::before {
+			font-size: 16px;
+		}
+	}
+
 	.pre-shared-key-field {
 		display: grid;
 		grid-template-columns: 1fr max-content;
