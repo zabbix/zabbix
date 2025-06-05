@@ -362,45 +362,45 @@ function stepInstallAgent($agent_script_data): array {
 
 				(new CSection())
 					->addItem(
-						(new CDiv([
-							new CTag('h6', true, [_('1. Verify Zabbix server, proxy, or cluster address')]),
-							(new CFormField([
-								new CTextBox('agent_script_server_host'),
-								(new CDiv(
-									_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
-								))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-							]))->addClass('js-agent-script-server-host-input')
-						]))
-							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-					)
-					->addItem(
-						(new CDiv([
-							new CTag('p', true, [
-								_('Example:'), BR(),
-								'192.0.2.0:10051, [2001:db8::]:10051, zbx1.local:10051;zbx2.local:10051'
-							]),
-							new CTag('p', true,
-								_('Zabbix agent must be able to connect to the specified address or list of addresses.')
-							),
-							new CTag('p', true, _('Use:')),
-							new CList([
-								_('Colon to separate IP/DNS address from port'),
-								_('Comma to separate multiple Zabbix servers, proxies, or clusters'),
-								_('Semicolon to separate clusters (one or more server addresses)'),
-								_('Brackets to specify IPv6 addresses'),
-							])
-						]))
-							->addClass(ZBX_STYLE_FORM_DESCRIPTION)
-							->addClass(ZBX_STYLE_MARKDOWN)
-					)
-					->addItem(
 						(new CList([
-							(new CListItem())
-								->addItem(
+							(new CListItem([
+								(new CDiv([
+									(new CTag('h6', true, [_('Verify Zabbix server, proxy, or cluster address')]))
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
+									(new CFormField([
+										new CTextBox('agent_script_server_host'),
+										(new CDiv(
+											_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+									]))->addClass('js-agent-script-server-host-input')
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST),
+								(new CDiv([
+									new CTag('p', true, [
+										_('Example:'), BR(),
+										'192.0.2.0:10051, [2001:db8::]:10051, zbx1.local:10051;zbx2.local:10051'
+									]),
+									new CTag('p', true,
+										_('Zabbix agent must be able to connect to the specified address or list of addresses.')
+									),
+									new CTag('h4', true, _('Use:')),
+									new CList([
+										_('Colon to separate IP/DNS address from port'),
+										_('Comma to separate multiple Zabbix servers, proxies, or clusters'),
+										_('Semicolon to separate clusters (one or more server addresses)'),
+										_('Brackets to specify IPv6 addresses'),
+									])
+								]))
+									->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+									->addClass(ZBX_STYLE_MARKDOWN)
+							]))
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+							(new CListItem(
+								(new CDiv([
 									(new CTag('h6', true, [_('Configure encryption')]))
-										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-								)
-								->addItem(
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									(new CDiv([
 										(new CDiv(
 											new CTag('p', true,
@@ -419,9 +419,7 @@ function stepInstallAgent($agent_script_data): array {
 												->addClass(ZBX_STYLE_BTN_ALT)
 												->addClass('js-tls-key-change')
 										))->addClass('js-tls-exists')
-									]))->addClass(ZBX_STYLE_FORMATED_GROUP)
-								)
-								->addItem(
+									]))->addClass(ZBX_STYLE_FORMATED_GROUP),
 									(new CFormField([
 										new CLabel(_('Pre-shared key identity')),
 										(new CTextBox('tls_psk_identity', '', false,
@@ -430,9 +428,7 @@ function stepInstallAgent($agent_script_data): array {
 										(new CDiv(
 											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-									]))->addClass('js-tls-input')
-								)
-								->addItem(
+									]))->addClass('js-tls-input'),
 									(new CFormField([
 										new CLabel(_('Pre-shared key')),
 										(new CDiv([
@@ -449,14 +445,16 @@ function stepInstallAgent($agent_script_data): array {
 											_('Generate a secret pre-shared key hexadecimal string.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 									]))->addClass('js-tls-input')
-								)
-								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-							(new CListItem())
-								->addItem(
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							))
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+							(new CListItem(
+								(new CDiv([
 									(new CTag('h6', true, [_('Select the OS of your monitoring target')]))
-										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-								)
-								->addItem(
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									new CFormField(
 										(new CRadioCardList('monitoring_os', 'linux'))
 											->addValue([
@@ -472,9 +470,7 @@ function stepInstallAgent($agent_script_data): array {
 												'value' => 'other'
 											])
 											->addClass(ZBX_STYLE_GRID_COLUMNS)
-									)
-								)
-								->addItem(
+									),
 									(new CFormField([
 										new CLabel(_('Select the OS distribution'), 'windows-new'),
 										(new CRadioCardList('monitoring_os_distribution'))
@@ -488,17 +484,23 @@ function stepInstallAgent($agent_script_data): array {
 											])
 											->addClass(ZBX_STYLE_GRID_COLUMNS)
 									]))->addClass('js-windows-distribution-select')
-								)
-								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-							(new CListItem())
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							))
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
-								->addclass('js-install-agent-readme')
-						]))
-							->addClass(ZBX_STYLE_ORDERED_LIST)
-							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+							(new CListItem(
+								(new CDiv())
+									->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+									->addclass('js-install-agent-readme')
+							))
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+
+						]))->addClass(ZBX_STYLE_ORDERED_LIST)
 					)
-					->addClass(ZBX_STYLE_GRID_COLUMNS)
-					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 			]))->addClass('step-form-body')
 		),
 

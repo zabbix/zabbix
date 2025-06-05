@@ -127,6 +127,8 @@
 		--counter-width: 2ch;
 
 		.ordered-list-item {
+			gap: 12px 48px;
+
 			.formated-text,
 			.form-field {
 				&:not(:first-child) {

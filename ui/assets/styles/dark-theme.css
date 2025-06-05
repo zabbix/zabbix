@@ -2739,13 +2739,17 @@ div[data-field-type="set"].has-error {
     line-height: 18px; }
   .markdown h1:not(:first-child), .modal-popup-host-wizard .formated-text h1:not(:first-child), .markdown h2:not(:first-child), .modal-popup-host-wizard .formated-text h2:not(:first-child), .markdown h3:not(:first-child), .modal-popup-host-wizard .formated-text h3:not(:first-child), .markdown h4:not(:first-child), .modal-popup-host-wizard .formated-text h4:not(:first-child) {
     margin-top: 24px; }
-  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre, .markdown li, .modal-popup-host-wizard .formated-text li {
+  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
+    margin-top: 16px;
     margin-bottom: 0; }
-    .markdown ol:not(:first-child), .modal-popup-host-wizard .formated-text ol:not(:first-child), .markdown ul:not(:first-child), .modal-popup-host-wizard .formated-text ul:not(:first-child), .markdown p:not(:first-child), .modal-popup-host-wizard .formated-text p:not(:first-child), .markdown pre:not(:first-child), .modal-popup-host-wizard .formated-text pre:not(:first-child), .markdown li:not(:first-child), .modal-popup-host-wizard .formated-text li:not(:first-child) {
-      margin-top: 16px; }
+    .markdown ol:first-child, .modal-popup-host-wizard .formated-text ol:first-child, .markdown ul:first-child, .modal-popup-host-wizard .formated-text ul:first-child, .markdown p:first-child, .modal-popup-host-wizard .formated-text p:first-child, .markdown pre:first-child, .modal-popup-host-wizard .formated-text pre:first-child {
+      margin-top: 0; }
+  .markdown h4 + ul, .modal-popup-host-wizard .formated-text h4 + ul, .markdown h4 + ol, .modal-popup-host-wizard .formated-text h4 + ol {
+    margin-top: 0; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
+    list-style-type: initial;
     list-style-position: outside;
-    padding-left: 1.5em; }
+    padding-left: 2em; }
     .markdown ol li, .modal-popup-host-wizard .formated-text ol li, .markdown ul li, .modal-popup-host-wizard .formated-text ul li {
       padding-bottom: 0; }
   .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
@@ -5968,15 +5972,17 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     color: #acbbc2; }
   .modal-popup-host-wizard .ordered-list {
     --counter-width: 2ch; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text:not(:first-child),
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .form-field:not(:first-child) {
-      margin-top: 8px; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text + .form-field {
-      margin-top: 16px; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-group + .form-field {
-      margin-top: 16px; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item:not(:first-child) {
-      margin-top: 24px; }
+    .modal-popup-host-wizard .ordered-list .ordered-list-item {
+      gap: 12px 48px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text:not(:first-child),
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .form-field:not(:first-child) {
+        margin-top: 8px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text + .form-field {
+        margin-top: 16px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-group + .form-field {
+        margin-top: 16px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item:not(:first-child) {
+        margin-top: 24px; }
   .modal-popup-host-wizard .progress {
     display: grid;
     grid-auto-flow: column;
