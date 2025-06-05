@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-29 08:45+0000\n"
+"PO-Revision-Date: 2025-06-04 08:01+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -44,7 +44,7 @@ msgstr "\"%2$s\"ではなく\"%1$s\"が設定されています。"
 #: include/classes/import/validators/C62XmlValidator.php:2054
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" で指定してください。"
+msgstr "\"%1$s\"で指定してください"
 
 #: include/classes/api/services/CReport.php:220
 #: include/classes/api/services/CReport.php:615
@@ -56,7 +56,7 @@ msgstr "\"%1$s\"は空白か\"%2$s\"よりも大きい値を設定してくだ�
 #: include/classes/import/validators/C10XmlValidator.php:382
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
-msgstr "\"host:key\"のペアで指定してください。"
+msgstr "\"host:key\"のペアで指定してください"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -3290,7 +3290,7 @@ msgstr "キーはテンプレート\"%4$s\"上でユニークでなければな�
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
@@ -3305,17 +3305,17 @@ msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに�
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:807
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3325,12 +3325,12 @@ msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに�
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:808
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
@@ -3340,147 +3340,147 @@ msgstr "キーはホスト\"%4$s\"上でユニークでなければならない�
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "同じキーを持つアイテムプロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"を持つアイテムプロトタイプをホスト\"%4$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがLLDルール\"%5$s\"にすでに属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"のアイテムプロトタイプをホスト\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemPrototype.php:1221
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "同じキーを持つアイテムプロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"を持つアイテムプロトタイプをテンプレート\"%4$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがLLDルール\"%5$s\"にすでに属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"のアイテムプロトタイプをテンプレート\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"を持つアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "タイプが\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
+msgstr "タイプ\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムプロトタイプをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーを持つLLDルールがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをホスト \"%3$s\" に継承できません。同じキーを持つアイテム プロトタイプが既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムプロトタイプをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr "同じキーを持つアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムプロトタイプをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーを持つ検出された項目が既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つ LLD ルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのLLDルールがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。同じキーを持つ項目プロトタイプが既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムプロトタイプをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr "同じキーを持つ項目が既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:683
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ項目プロトタイプを継承できません。"
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムプロトタイプを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "テンプレート \"%4$s\" ではキーが一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ項目プロトタイプを継承できません。"
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムプロトタイプを継承できません。"
 
 #: include/classes/api/services/CItem.php:1465
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムと、テンプレート \"%4$s\" のキー \"%3$s\" を持つアイテムをホスト \"%5$s\" に継承することはできません。同じインベントリ フィールド \"%6$s\" に入力されるためです。"
+msgstr "同じインベントリフィールド\"%6$s\"に入力されるため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムと、テンプレート\"%4$s\"のキー\"%3$s\"のアイテムをホスト\"%5$s\"に継承できません。"
 
 #: include/classes/api/services/CItem.php:1464
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムとテンプレート \"%4$s\" のキー \"%3$s\" を持つアイテムをテンプレート \"%5$s\" に継承することはできません。同じインベントリ フィールド \"%6$s\" に値が設定されるためです。"
+msgstr "同じインベントリフィールド\"%6$s\"に入力されるため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムと、テンプレート\"%4$s\"のキー\"%3$s\"のアイテムをテンプレート\"%5$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1226
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "タイプ \"%4$s\" のホスト インターフェースが必要なため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をホスト \"%3$s\" に継承できません。"
+msgstr "タイプ\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つ LLD ルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーのLLDルールがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:791
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じキーを持つアイテムプロトタイプが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:868
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をホスト \"%3$s\" に継承できません。同じキーを持つ項目が既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItem.php:1519
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。そのインベントリ フィールド \"%4$s\" には、キー \"%5$s\" を持つアイテムが既に入力されています。"
+msgstr "インベントリフィールド\"%4$s\"にはキー\"%5$s\"のアイテムがすでに入力されているため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:798
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのLLDルールがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:792
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じキーを持つ項目プロトタイプが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をテンプレート \"%3$s\" に継承できません。同じキーを持つ項目が既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItem.php:1518
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。そのインベントリ フィールド \"%4$s\" には、キー \"%5$s\" を持つアイテムが既に入力されています。"
+msgstr "インベントリフィールド\"%4$s\"にはキー\"%5$s\"のアイテムがすでに入力されているため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" および \"%3$s\" テンプレートの両方のキー \"%1$s\" を持つ項目を継承できません。"
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:678
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "テンプレート \"%4$s\" ではキーが一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ項目を継承できません。"
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムを継承できません。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1263
 #: app/controllers/CControllerPopupTriggerExpr.php:1644
@@ -17567,7 +17567,7 @@ msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスのJSO
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
-msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効な値：agent、active_agent、snmp、ipmi、jmx。"
+msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効なタイプ: agent、active_agent、snmp、ipmi、jmx。"
 
 #: include/classes/data/CItemData.php:2666
 msgid "Returns current maintenance status of the host."
@@ -22226,11 +22226,11 @@ msgstr "ユーザー名とパスワード"
 
 #: include/classes/vaults/CVaultCyberArk.php:112
 msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
-msgstr "ユーザー名とパスワードは、Vaultの秘密鍵\"UserName\"と\"Content\"に保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"UserName\"と\"Content\"に保存してください。"
 
 #: include/classes/vaults/CVaultHashiCorp.php:101
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
-msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"username\"と\"password\"に保存してください。"
 
 #: app/views/administration.authentication.edit.php:323
 msgid "Username attribute"
@@ -22851,7 +22851,7 @@ msgstr "Vaultへの接続に失敗しました。"
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Vault prefix"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23754,7 +23754,7 @@ msgstr "文字列か数字か空文字列で指定してください"
 
 #: include/classes/api/services/CDiscoveryRule.php:1726
 msgid "a template ID is expected"
-msgstr ""
+msgstr "テンプレートIDを指定してください"
 
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
@@ -23869,7 +23869,7 @@ msgstr "IPアドレスを指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2807
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "IPアドレスかDNS名を指定してください"
 
 #: include/classes/api/services/CDRule.php:495
 #: include/classes/api/services/CDRule.php:502
@@ -23900,7 +23900,7 @@ msgstr "配列かオブジェクトで指定してください"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr ""
+msgstr "メールアドレスを指定してください"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -23930,13 +23930,13 @@ msgstr "整数で指定してください"
 #: include/classes/api/services/CItemGeneral.php:2064
 #: include/classes/api/services/CItemGeneral.php:2167
 msgid "an item ID is expected"
-msgstr "アイテム ID が必要です"
+msgstr "アイテムIDが必要です"
 
 #: include/classes/api/services/CItemGeneral.php:2042
 #: include/classes/api/services/CItemGeneral.php:2063
 #: include/classes/api/services/CItemGeneral.php:2166
 msgid "an item/item prototype ID is expected"
-msgstr "アイテム/アイテム プロトタイプ ID が必要です"
+msgstr "アイテム/アイテムプロトタイプIDが必要です"
 
 #: include/classes/validators/CApiInputValidator.php:833
 #: include/classes/validators/CApiInputValidator.php:3353
@@ -24277,7 +24277,7 @@ msgstr "リンクを削除できません"
 
 #: include/classes/api/services/CDiscoveryRule.php:3034
 msgid "cannot delete inherited LLD rule"
-msgstr "継承された LLD ルールを削除できません"
+msgstr "継承されたLLDルールを削除できません"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -25778,12 +25778,12 @@ msgstr "同じUUIDのテンプレートがすでに存在します"
 #: include/classes/api/services/CItemGeneral.php:1849
 #: include/classes/api/services/CItemGeneral.php:1889
 msgid "the host interface ID is expected"
-msgstr "ホスト インターフェイス ID が必要です"
+msgstr "ホストインターフェースIDが必要です"
 
 #: include/classes/api/services/CItemGeneral.php:1905
 #, c-format
 msgid "the host interface ID of type \"%1$s\" is expected"
-msgstr ""
+msgstr "タイプ\"%1$s\"のホストインターフェースIDが必要です"
 
 #: include/classes/validators/CApiInputValidator.php:3284
 msgid "the last new line feed is missing"
