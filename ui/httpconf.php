@@ -130,20 +130,13 @@ if (hasRequest('httptestid')) {
 	if (!$httptests) {
 		access_deny();
 	}
-}
-elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
-	access_deny();
-}
 
-// Validate hostid.
-if (hasRequest('hostid')) {
-	$host = API::Host()->get([
-		'hostids' => getRequest('hostid')
-	]);
-
-	if (!$host) {
+	if (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 		access_deny();
 	}
+}
+elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
 }
 
 // Validate backurl.
