@@ -463,15 +463,16 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_compressionPolicy4() {
-		/* The configuration value + 2 hours are configured in TimescaleDB. */
-		$this->assertEquals(self::$currentCompressOlder + 2 * 3600, $this->compressOlderTimescaleGet(),
-				"Unexpected actual compress older value configured in TimescaleDB");
-
 		/* make sure that compression settings had enough time to be applied */
 		$maxAttempts = 5;
 
 		for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
 			try {
+				/* The configuration value + 2 hours are configured in TimescaleDB. */
+				$this->assertEquals(self::$currentCompressOlder + 2 * 3600,
+					$this->compressOlderTimescaleGet(),
+					"Unexpected actual compress older value configured in TimescaleDB");
+
 				/* get compression job id */
 				$sql = "select job_id
 					from timescaledb_information.jobs
