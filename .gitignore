@@ -240,6 +240,7 @@ tests/libs/zbxip/zbx_iprange_uniq_iter
 tests/libs/zbxip/zbx_iprange_uniq_next
 tests/libs/zbxip/zbx_parse_serveractive_element
 tests/libs/zbxip/zbx_portrange_uniq_next
+tests/libs/zbxip/zbx_join_hostport
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
