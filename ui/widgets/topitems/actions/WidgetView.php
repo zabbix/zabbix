@@ -60,6 +60,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data found');
 			$data['layout'] = $this->fields_values['layout'];
+			$data['show_column_header'] = $this->fields_values['show_column_header'];
 		}
 		else {
 			$data += $this->getData();
@@ -75,7 +76,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$db_hosts) {
 			return [
 				'error' => _('No data found'),
-				'layout' => $this->fields_values['layout']
+				'layout' => $this->fields_values['layout'],
+				'show_column_header' => $this->fields_values['show_column_header']
 			];
 		}
 
@@ -118,7 +120,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$table) {
 			return [
 				'error' => _('No data found'),
-				'layout' => $this->fields_values['layout']
+				'layout' => $this->fields_values['layout'],
+				'show_column_header' => $this->fields_values['show_column_header']
 			];
 		}
 
