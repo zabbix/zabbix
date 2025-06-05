@@ -23,6 +23,15 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormUserProfile extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	protected static $old_password = 'zabbix';
 
 	public function testFormUserProfile_SimpleUpdate() {
@@ -138,6 +147,8 @@ class testFormUserProfile extends CLegacyWebTest {
 						'"User settings"]')->exists()
 				);
 				self::$old_password = $data['password1'];
+				// Following test ThemeChange fails on Jenkins with error access denied for Admin to dahsboard page. Wait may help
+				CDashboardElement::find()->waitUntilReady();
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
@@ -151,14 +162,13 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = "select * from users where username<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->page->login();
-		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'User updated');
 		$this->zbxTestCheckHeader('Global view');
-
 		$row = DBfetch(DBselect("select theme from users where username='".PHPUNIT_LOGIN_NAME."'"));
 		$this->assertEquals('blue-theme', $row['theme']);
 

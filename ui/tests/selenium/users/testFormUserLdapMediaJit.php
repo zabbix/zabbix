@@ -1247,7 +1247,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_mapping_form = COverlayDialogElement::find()->all()->last()->asForm();
 
 		$media_mapping_form->fill($data['mapping']);
-		$media_mapping_form->submit();
+		$media_mapping_form->submit()->waitUntilNotVisible();
 		$dialog->query('button:Update')->one()->click();
 		$form->submit();
 
