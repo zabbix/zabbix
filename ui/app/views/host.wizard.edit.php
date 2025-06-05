@@ -127,11 +127,14 @@ function stepSelectTemplate($old_template_count): array {
 				$old_template_count > 0
 					? makeMessageBox(ZBX_STYLE_MSG_INFO, [],
 						[
-							_s('Some templates (%1$s) are incompatible with the Host Wizard. See', $old_template_count),
+							_s('Some templates (%1$s) are incompatible with the Host Wizard.', $old_template_count),
+							' ',
+							_('See'),
 							' ',
 							(new CLink(_('how to update them'), CDocHelper::getUrl(CDocHelper::TEMPLATES_OUT_OF_THE_BOX)))
 								->setTarget('_blank'),
-							_('. Custom templates are not supported.')
+							'. ',
+							_('Custom templates are not supported.')
 						],
 						false
 					)
