@@ -278,7 +278,7 @@ out:
 #endif
 }
 
-static void	oauth_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result)
+static void	oauth_db_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, int fetch_result)
 {
 	if (SUCCEED != fetch_result)
 	{
@@ -376,7 +376,7 @@ static void	oauth_clean(zbx_oauth_data_t *data)
  *             expires                - [OUT]                                            *
  *             error                  - [IN/OUT]                                         *
  *                                                                                       *
- * Return value: SUCCEED - function got valid access token successfull     y             *
+ * Return value: SUCCEED - function got valid access token successfully                  *
  *               FAIL    - otherwise                                                     *
  *                                                                                       *
  *****************************************************************************************/
@@ -403,7 +403,7 @@ int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int time
 		}
 		while (0 < --maxattempts && NETWORK_ERROR == ret);
 
-		oauth_update(mediatypeid, &data, ret);
+		oauth_db_update(mediatypeid, &data, ret);
 		oauth_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
 
 		if (SUCCEED != ret)
@@ -419,5 +419,4 @@ out:
 	oauth_clean(&data);
 
 	return ret;
-#undef EXPIRE_OFFSET
 }
