@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-30 21:36+0000\n"
+"PO-Revision-Date: 2025-06-03 22:00+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -374,7 +374,7 @@ msgstr "1 minut"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Instal·lar Java Gateway a la mateixa màquina on s'executa el servidor Zabbix seguint les instruccions de"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -388,7 +388,7 @@ msgstr "12 hores"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. Configureu l'aplicació Java per admetre el monitoratge remot de JMX. Per exemple:"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -453,7 +453,7 @@ msgstr "A"
 
 #: app/views/js/host.wizard.edit.js.php:1143
 msgid "A few more steps"
-msgstr ""
+msgstr "Unes quantes passes més"
 
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
