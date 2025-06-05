@@ -117,7 +117,7 @@ static void	hk_compression_policy_enable(const char *table_name, const char *seg
 					table_name, segmentby, orderby))
 
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "failed to enable compression policy for table '%s'",
+				zabbix_log(LOG_LEVEL_WARNING, "cannot enable compression policy for table \"%s\"",
 						table_name);
 			}
 		}
@@ -132,7 +132,7 @@ static void	hk_compression_policy_enable(const char *table_name, const char *seg
 						"timescaledb.compress_orderby='%s')",
 					table_name, segmentby, orderby))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "failed to enable compression policy for table '%s'",
+				zabbix_log(LOG_LEVEL_WARNING, "cannot enable compression policy for table \"%s\"",
 						table_name);
 			}
 		}
@@ -164,9 +164,15 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
-	result = zbx_db_select("select extract(epoch from (config::json->>'%s')::interval) from"
-			" timescaledb_information.jobs where application_name like 'Compression%%' and"
-			" hypertable_schema='%s' and hypertable_name='%s'", field, zbx_db_get_schema_esc(), table_name);
+	/* application_name is like 'Columnstore Policy%' in the newer TimescaleDB versions. */
+	/* application_name is like 'Compression%' in the older TimescaleDB versions before around TimescaleDB 2.18. */
+	result = zbx_db_select(
+			"select extract(epoch from (config::json->>'%s')::interval)"
+			" from timescaledb_information.jobs"
+			" where (application_name like 'Columnstore Policy%%'"
+				" or application_name like 'Compression%%')"
+				" and hypertable_schema='%s' and hypertable_name='%s'",
+			field, zbx_db_get_schema_esc(),	table_name);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -206,7 +212,7 @@ static void	hk_compression_policy_remove(const char *table_name)
 		/* remove_columnstore_policy() is available since TimescaleDB 2.18.0 */
 		if (ZBX_DB_OK > zbx_db_execute("call remove_columnstore_policy('%s')", table_name))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to remove compression policy from table '%s'",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot remove compression policy from table \"%s\"",
 					table_name);
 		}
 	}
@@ -217,7 +223,7 @@ static void	hk_compression_policy_remove(const char *table_name)
 		/* remove_compression_policy() is deprecated since TimescaleDB 2.18.0 */
 		if (NULL == (result = zbx_db_select("select remove_compression_policy('%s')", table_name)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to remove compression policy from table '%s'",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot remove compression policy from table \"%s\"",
 					table_name);
 		}
 
@@ -324,7 +330,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 {
 	int	compress_after;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table:%s age:%d, compression_policy %d", __func__, table_name, age,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table:%s age:%d, compression_policy:%d", __func__, table_name, age,
 			compression_policy);
 
 	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)) && -1 != compress_after)
@@ -350,7 +356,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 		}
 
 		if (FAIL == res)
-			zabbix_log(LOG_LEVEL_WARNING, "failed to add compression policy to table '%s'", table_name);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot add compression policy to table \"%s\"", table_name);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -474,7 +480,7 @@ void	hk_history_compression_init(void)
 		disable_compression = 1;
 
 	if (0 != disable_compression && ZBX_DB_OK > zbx_db_execute("update config set compression_status=0"))
-		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");
+		zabbix_log(LOG_LEVEL_ERR, "cannot set database compression status");
 
 	zbx_config_clean(&cfg);
 
