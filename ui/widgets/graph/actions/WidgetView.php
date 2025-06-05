@@ -125,6 +125,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$resourceid = $item['itemid'];
 						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
 					}
+					else {
+						$resourceid = null;
+						$is_resource_available = false;
+					}
 				}
 			}
 			// Find requested host and change graph details.
