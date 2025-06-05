@@ -1493,6 +1493,16 @@ static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_var
 		if (NULL != output)
 			zbx_variant_set_str(value, output);
 
+		if (ZBX_MEBIBYTE < zbx_es_total_alloc(es))
+		{
+			if (SUCCEED != zbx_es_destroy_env(es, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING,
+						"Cannot destroy embedded scripting engine environment: %s", error);
+				zbx_free(error);
+			}
+		}
+
 		return SUCCEED;
 	}
 fail:
