@@ -129,60 +129,6 @@ int	vmware_shared_is_ready(void)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: getting size of shared memory available for events of VC instance *
- *                                                                            *
- ******************************************************************************/
-float	vmware_shared_evtpart_size(const int num)
-{
-#	define	DEFAULT_FACTOR(n)	((float)1/n)
-	int	i, total = 0, vc_active = 0;
-
-	for (i = 0; i < vmware->services.values_num; i++)
-	{
-		if (0 != (vmware->services.values[i]->state & ZBX_VMWARE_STATE_FAILED))
-			continue;
-
-		vc_active++;
-	}
-
-	if (1 >= vc_active)
-		return 1;
-
-	if (0 == num)
-		return DEFAULT_FACTOR(vc_active);
-
-	for (i = 0; i < vmware->services.values_num; i++)
-	{
-		if (0 == (vmware->services.values[i]->state & ZBX_VMWARE_STATE_SHMEM_READY))
-			return DEFAULT_FACTOR(vc_active);
-
-		if (NULL == vmware->services.values[i]->eventlog.data)
-			return DEFAULT_FACTOR(vc_active);
-
-		total += vmware->services.values[i]->eventlog.expect_num;
-	}
-
-	if (0 != total)
-	{
-#		define	MIN_FACTOR	(((float)1 / vc_active) / 4)
-		float	factor = (float)num / total;
-
-		if (factor < MIN_FACTOR)
-			factor = MIN_FACTOR;
-		else if (factor > (1 - MIN_FACTOR * (vc_active - 1)))
-			factor = 1 - MIN_FACTOR * (vc_active - 1);
-
-		return factor;
-#		undef	MIN_FACTOR
-	}
-	else
-		return DEFAULT_FACTOR(vc_active);
-
-#	undef	DEFAULT_FACTOR
-}
-
 /* the vmware resource pool chunk */
 typedef struct
 {
@@ -427,8 +373,12 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 	{
 		if (NULL != val)
 		{
-			zbx_free(*error);
-			*error = val;
+			if (NULL != error)
+			{
+				zbx_free(*error);
+				*error = val;
+			}
+
 			ret = FAIL;
 		}
 
@@ -1160,6 +1110,8 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	tmp[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'@'%s'", __func__, service->username, service->url);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT,
 			get_vmware_service_objects()[service->type].session_manager);
@@ -2316,7 +2268,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 		ZBX_POST_VSPHERE_FOOTER
 
 	size_t	offset;
-	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
+	char	*error = NULL, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
 	int	count = 0;
 	xmlDoc	*doc = NULL;
 
@@ -2869,7 +2821,7 @@ static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *serv
  ******************************************************************************/
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password)
 {
-	int			now;
+	time_t			now;
 	zbx_vmware_service_t	*service = NULL;
 	zbx_vmware_t		*vmw = zbx_vmware_get_vmware();
 
@@ -2915,7 +2867,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->eventlog.job_revision = 0;
-	service->eventlog.expect_num = 0;
+	service->eventlog.end_time = 0;
 	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;

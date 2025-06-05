@@ -30,8 +30,8 @@ import (
 	"syscall"
 	"time"
 
-	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/agent2/util"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -629,127 +629,156 @@ func getParams(params []string, maxparams int) (regex string, manager string, sh
 	return
 }
 
-func (p *Plugin) systemSwPackages(params []string, timeout int) (result string, err error) {
+func (p *Plugin) systemSwPackages(params []string, timeout int) (string, error) {
 	var regex, manager string
 	var short bool
 
-	regex, manager, short, err = getParams(params, 3)
+	regex, manager, short, err := getParams(params, 3)
 	if err != nil {
-		return
+		return "", err
 	}
 
 	managers := getManagers()
-	manager_found := false
+
+	var (
+		managerFound bool
+		result       string
+	)
 
 	for _, m := range managers {
-		if manager != "all" && m.name != manager {
-			continue
-		}
-
-		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(timeout), "")
-		if err != nil || test == "" {
-			continue
-		}
-
-		tmp, err := zbxcmd.Execute(m.listCmd, time.Second*time.Duration(timeout), "")
+		//nolint: gosec
+		out, err := p.handleManager(&m, manager, regex, timeout, short)
 		if err != nil {
-			p.Errf("Failed to execute command '%s', err: %s", m.listCmd, err.Error())
+			p.Tracef("failed to handle manager %s, %s", err.Error())
 
 			continue
 		}
 
-		var s []string
-
-		if tmp != "" {
-			s, err = m.listParser(strings.Split(tmp, "\n"), regex)
-			if err != nil {
-				p.Errf("Failed to parse '%s' output, err: %s", m.listCmd, err.Error())
-
-				continue
-			}
-		}
-
-		sort.Strings(s)
-
-		var out string
-
-		if short {
-			out = strings.Join(s, ", ")
-		} else {
-			if len(s) != 0 {
-				out = fmt.Sprintf("[%s] %s", m.name, strings.Join(s, ", "))
-			} else {
-				out = fmt.Sprintf("[%s]", m.name)
-			}
-		}
-
-		if !manager_found {
-			manager_found = true
+		if !managerFound {
+			managerFound = true
 			result = out
 		} else if out != "" {
 			result = fmt.Sprintf("%s\n%s", result, out)
 		}
 	}
 
-	if !manager_found {
-		err = errors.New("Cannot obtain package information.")
+	if !managerFound {
+		return "", errs.New("cannot obtain package information")
 	}
 
-	return
+	return result, nil
 }
 
-func (p *Plugin) systemSwPackagesGet(params []string, timeout int) (result string, err error) {
-	var regex, manager string
+func (p *Plugin) handleManager(m *manager, targetName, regex string, timeout int, short bool) (string, error) {
+	if targetName != "all" && m.name != targetName {
+		return "", errs.New("manager not found")
+	}
 
-	regex, manager, _, err = getParams(params, 2)
+	test, err := p.executor.Execute(m.testCmd, time.Second*time.Duration(timeout), "")
+	if err != nil || test == "" {
+		return "", errs.New("failed test execution")
+	}
+
+	tmp, err := p.executor.Execute(m.listCmd, time.Second*time.Duration(timeout), "")
 	if err != nil {
-		return
+		p.Errf("Failed to execute command '%s', err: %s", m.listCmd, err.Error())
+
+		return "", errs.New("failed tmp execution")
+	}
+
+	var s []string
+
+	if tmp != "" {
+		s, err = m.listParser(strings.Split(tmp, "\n"), regex)
+		if err != nil {
+			p.Errf("Failed to parse '%s' output, err: %s", m.listCmd, err.Error())
+
+			return "", errs.New("failed to get output")
+		}
+	}
+
+	sort.Strings(s)
+
+	if short {
+		return strings.Join(s, ", "), nil
+	}
+
+	if len(s) != 0 {
+		return fmt.Sprintf("[%s] %s", m.name, strings.Join(s, ", ")), nil
+	}
+
+	return fmt.Sprintf("[%s]", m.name), nil
+}
+
+func (p *Plugin) systemSwPackagesGet(params []string, timeout int) (string, error) {
+	regex, manager, _, err := getParams(params, 2)
+	if err != nil {
+		return "", err
 	}
 
 	managers := getManagers()
-	manager_found := false
+
+	var (
+		result       string
+		managerFound bool
+	)
 
 	for _, m := range managers {
-		if manager != "all" && m.name != manager {
-			continue
-		}
-
-		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(timeout), "")
-		if err != nil || test == "" {
-			continue
-		}
-
-		tmp, err := zbxcmd.Execute(m.detailsCmd, time.Second*time.Duration(timeout), "")
+		//nolint: gosec
+		jsonStr, err := p.handleGetManager(&m, manager, regex, timeout)
 		if err != nil {
-			p.Errf("Failed to execute command '%s', err: %s", m.listCmd, err.Error())
+			p.Tracef("failed to handle manager %s, %s", err.Error())
 
 			continue
 		}
 
-		var json string
-
-		if tmp != "" {
-			json, err = m.detailsParser(m.name, strings.Split(tmp, "\n"), regex)
-			if err != nil {
-				p.Errf("Failed to parse '%s' output, err: %s", m.listCmd, err.Error())
-
-				continue
-			}
+		// Maybe first found is enough and we can break the loop and not check other manager since
+		// the manager name is checked in handleManagers
+		if !managerFound {
+			managerFound = true
 		}
 
-		if !manager_found {
-			manager_found = true
-			result = json
-		} else if json != "" {
-			result = json
+		if jsonStr != "" {
+			result = jsonStr
 		}
 	}
 
-	if !manager_found {
-		err = errors.New("Cannot obtain package information.")
+	if !managerFound {
+		return "", errs.New("cannot obtain package information")
 	}
 
-	return
+	return result, nil
+}
+
+func (p *Plugin) handleGetManager(m *manager, targetName, regex string, timeout int) (string, error) {
+	if targetName != "all" && m.name != targetName {
+		return "", errs.New("manager not found")
+	}
+
+	test, err := p.executor.Execute(m.testCmd, time.Second*time.Duration(timeout), "")
+	if err != nil || test == "" {
+		return "", errs.New("failed test execution")
+	}
+
+	tmp, err := p.executor.Execute(m.detailsCmd, time.Second*time.Duration(timeout), "")
+	if err != nil {
+		p.Errf("Failed to execute command '%s', err: %s", m.listCmd, err.Error())
+
+		return "", errs.New("failed tmp execution")
+	}
+
+	var result string
+
+	if tmp != "" {
+		result, err = m.detailsParser(m.name, strings.Split(tmp, "\n"), regex)
+		if err != nil {
+			p.Errf("Failed to parse '%s' output, err: %s", m.listCmd, err.Error())
+
+			return "", errs.New("failed to get output")
+		}
+	}
+
+	return result, nil
 }
 
 func charArray2String(chArr []int8) (result string) {
