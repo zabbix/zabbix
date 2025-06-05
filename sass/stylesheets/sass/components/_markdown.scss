@@ -17,7 +17,12 @@
 		line-height: 18px;
 	}
 
-	h1, h2, h3, h4 {
+	h5 {
+		font-size: 12px;
+		line-height: 18px;
+	}
+
+	h1, h2, h3, h4, h5 {
 		&:not(:first-child) {
 			margin-top: 24px;
 		}
@@ -32,11 +37,8 @@
 		}
 	}
 
-	h4 {
-		& + ul,
-		& + ol {
-			margin-top: 0;
-		}
+	h5 + * {
+		margin-top: 0;
 	}
 
 	ol, ul {

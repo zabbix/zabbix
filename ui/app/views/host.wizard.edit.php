@@ -375,14 +375,14 @@ function stepInstallAgent($agent_script_data): array {
 									]))->addClass('js-agent-script-server-host-input')
 								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST),
 								(new CDiv([
-									new CTag('p', true, [
-										_('Example:'), BR(),
+									new CTag('h5', true, _('Example:')),
+									new CTag('p', true,
 										'192.0.2.0:10051, [2001:db8::]:10051, zbx1.local:10051;zbx2.local:10051'
-									]),
+									),
 									new CTag('p', true,
 										_('Zabbix agent must be able to connect to the specified address or list of addresses.')
 									),
-									new CTag('h4', true, _('Use:')),
+									new CTag('h5', true, _('Use:')),
 									new CList([
 										_('Colon to separate IP/DNS address from port'),
 										_('Comma to separate multiple Zabbix servers, proxies, or clusters'),
