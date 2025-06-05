@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-05-27 05:54+0000\n"
+"PO-Revision-Date: 2025-06-04 08:01+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -44,7 +44,7 @@ msgstr "\"%2$s\"ではなく\"%1$s\"が設定されています"
 #: include/classes/import/validators/C60XmlValidator.php:2047
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" で指定してください"
+msgstr "\"%1$s\"で指定してください"
 
 #: include/classes/api/services/CReport.php:220
 #: include/classes/api/services/CReport.php:615
@@ -15195,7 +15195,7 @@ msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスのJSO
 
 #: include/classes/data/CItemData.php:1654
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
-msgstr "ホスト上の特定のチェック種別の稼働状況を返す。このアイテムの値がホストリストの稼働状況アイコンに対応する。有効なtypes： agent, snmp, ipmi, jmx。"
+msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効なタイプ: agent、snmp、ipmi、jmx。"
 
 #: include/classes/data/CItemData.php:1650
 msgid "Returns current maintenance status of the host."
@@ -19156,7 +19156,7 @@ msgstr "ユーザー名とパスワード"
 #: include/classes/setup/CSetupWizard.php:208
 #: include/classes/setup/CSetupWizard.php:806
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
-msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"username\"と\"password\"に保存してください。"
 
 #: app/views/administration.authentication.edit.php:254
 msgid "Username attribute"
