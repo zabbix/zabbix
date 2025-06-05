@@ -515,7 +515,7 @@ function stepInstallAgent($agent_script_data): array {
 			(new CListItem())
 				->addItem(
 					(new CTag('h6', true,
-						_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')
+						_('Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below.')
 					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
@@ -538,7 +538,7 @@ function stepInstallAgent($agent_script_data): array {
 			(new CListItem())
 				->addItem(
 					(new CTag('h6', true,
-						_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')
+						_('Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below.')
 					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
