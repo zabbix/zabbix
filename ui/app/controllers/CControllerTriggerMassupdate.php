@@ -14,9 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/forms.inc.php';
+require_once __DIR__.'/../../include/forms.inc.php';
 
 class CControllerTriggerMassupdate extends CController {
+
+	private array $triggers = [];
 
 	protected function checkInput() {
 		$fields = [
@@ -49,43 +51,52 @@ class CControllerTriggerMassupdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		$parent_lld = [];
+
 		if ($this->hasInput('prototype')) {
-			$discoveryRule = API::DiscoveryRule()->get([
+			$options = [
 				'output' => [],
 				'itemids' => [$this->getInput('parent_discoveryid', 0)],
-				'editable' => true
-			]);
+				'nopermissions' => true
+			];
 
-			if (!$discoveryRule) {
+			$parent_lld = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+			if (!$parent_lld) {
 				return false;
 			}
+		}
+
+		$options = [
+			'output' => ['triggerid', 'templateid'],
+			'triggerids' => $this->getInput('ids'),
+			'editable' => true,
+			'preservekeys' => true
+		];
+
+		if ($this->hasInput('mass_update_tags')
+				&& in_array($this->getInput('mass_update_tags'), [ZBX_ACTION_ADD, ZBX_ACTION_REMOVE])) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
+
+		if ($parent_lld) {
+			$options['discoveryids'] = $this->getInput('parent_discoveryid');
+			$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE];
 		}
 		else {
-			$trigger = API::Trigger()->get([
-				'output' => [],
-				'triggerids' => $this->getInput('ids', []),
-				'editable' => true
-			]);
-
-			if (!$trigger) {
-				return false;
-			}
+			$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
 		}
 
-		return true;
+		$this->triggers = $parent_lld ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+
+		return (bool) $this->triggers;
 	}
 
 	protected function doAction() {
 		if ($this->hasInput('update')) {
-			$output = [];
-			$triggerids = $this->getInput('ids', []);
-			$triggers_count = count($triggerids);
+			$triggers_count = count($this->triggers);
 			$visible = $this->getInput('visible', []);
-			$tags = array_filter($this->getInput('tags', []),
-				function (array $tag): bool {
-					return ($tag['tag'] !== '' || $tag['value'] !== '');
-				}
-			);
+			$tags = $this->getInput('tags', []);
 
 			foreach ($tags as $key => $tag) {
 				// Remove empty new tag lines.
@@ -103,110 +114,49 @@ class CControllerTriggerMassupdate extends CController {
 				}
 			}
 
-			$result = true;
+			if (array_key_exists('tags', $visible)) {
+				$tags = self::getUniqueTags($tags);
+			}
 
 			$triggers_to_update = [];
 
-			$options = [
-				'output' => ['triggerid', 'templateid'],
-				'triggerids' => $triggerids,
-				'preservekeys' => true
-			];
+			foreach ($this->triggers as $triggerid => $trigger) {
+				$upd_trigger = ['triggerid' => $triggerid];
 
-			if (!$this->hasInput('prototype')) {
-				$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
-			}
-
-			if (array_key_exists('tags', $visible)) {
-				$mass_update_tags = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
-
-				if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
-					$options['selectTags'] = ['tag', 'value'];
+				if (array_key_exists('priority', $visible)) {
+					$upd_trigger['priority'] = $this->getInput('priority');
 				}
 
-				$unique_tags = [];
-
-				foreach ($tags as $tag) {
-					$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+				if (array_key_exists('dependencies', $visible)) {
+					$upd_trigger['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 				}
 
-				$tags = array_values($unique_tags);
-			}
+				if (array_key_exists('tags', $visible)) {
+					$mass_update_tags = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
 
-			if ($this->hasInput('prototype')) {
-				$triggers = API::TriggerPrototype()->get($options);
-			}
-			else {
-				$triggers = API::Trigger()->get($options);
-			}
-
-
-			if ($triggers) {
-				foreach ($triggerids as $triggerid) {
-					if (array_key_exists($triggerid, $triggers)) {
-						$trigger = ['triggerid' => $triggerid];
-
-						if (array_key_exists('priority', $visible)) {
-							$trigger['priority'] = $this->getInput('priority');
-						}
-
-						if (array_key_exists('dependencies', $visible)) {
-							$trigger['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
-						}
-
-						if (array_key_exists('tags', $visible)) {
-							if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
-								$unique_tags = [];
-
-								foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
-									$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-								}
-
-								$trigger['tags'] = array_values($unique_tags);
-							}
-							elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
-								$trigger['tags'] = $tags;
-							}
-							elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
-								$diff_tags = [];
-
-								foreach ($triggers[$triggerid]['tags'] as $a) {
-									foreach ($tags as $b) {
-										if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-											continue 2;
-										}
-									}
-
-									$diff_tags[] = $a;
-								}
-
-								$trigger['tags'] = $diff_tags;
-							}
-						}
-
-						if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
-							$trigger['manual_close'] = $this->getInput('manual_close');
-						}
-
-						$triggers_to_update[] = $trigger;
+					if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
+						$upd_trigger['tags'] = self::getUniqueTags(array_merge($trigger['tags'], $tags));
+					}
+					elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
+						$upd_trigger['tags'] = $tags;
+					}
+					elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
+						$upd_trigger['tags'] = array_udiff($trigger['tags'], $tags, static function ($a, $b) {
+							return $a['tag'] === $b['tag'] && $a['value'] === $b['value'] ? 0 : 1;
+						});
 					}
 				}
+
+				if ($trigger['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+					$upd_trigger['manual_close'] = $this->getInput('manual_close');
+				}
+
+				$triggers_to_update[] = $upd_trigger;
 			}
 
-			if ($this->hasInput('prototype')) {
-				$result = (bool) API::TriggerPrototype()->update($triggers_to_update);
-			}
-			else {
-				$result = (bool) API::Trigger()->update($triggers_to_update);
-			}
-
-			if (!$result) {
-				CMessageHelper::setErrorTitle(
-					$this->hasInput('prototype')
-						? _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $triggers_count)
-						: _n('Cannot update trigger', 'Cannot update triggers', $triggers_count)
-				);
-			}
+			$result = $this->hasInput('prototype')
+				? API::TriggerPrototype()->update($triggers_to_update)
+				: API::Trigger()->update($triggers_to_update);
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
@@ -214,11 +164,18 @@ class CControllerTriggerMassupdate extends CController {
 					? _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count)
 					: _n('Trigger updated', 'Triggers updated', $triggers_count)
 				];
+
 				if (count($messages)) {
 					$output['messages'] = array_column($messages, 'message');
 				}
 			}
 			else {
+				CMessageHelper::setErrorTitle(
+					$this->hasInput('prototype')
+						? _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $triggers_count)
+						: _n('Cannot update trigger', 'Cannot update triggers', $triggers_count)
+				);
+
 				$output = [
 					'error' => [
 						'title' => CMessageHelper::getTitle(),
@@ -257,5 +214,15 @@ class CControllerTriggerMassupdate extends CController {
 
 			$this->setResponse(new CControllerResponseData($data));
 		}
+	}
+
+	private static function getUniqueTags(array $tags): array {
+		$unique_tags = [];
+
+		foreach ($tags as $tag) {
+			$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+		}
+
+		return array_values($unique_tags);
 	}
 }
