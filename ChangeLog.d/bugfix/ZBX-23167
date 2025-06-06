@@ -1,1 +1,1 @@
-A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API (dpankins, jfreibergs, vmaksimovs)
+A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API (jfreibergs, vmaksimovs)
