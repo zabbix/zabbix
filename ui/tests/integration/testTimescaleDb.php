@@ -28,6 +28,7 @@ class testTimescaleDb extends CIntegrationTest {
 	private const TABLENAME = 'history_uint';
 	private const COMPRESSION_STATUS_OFF = 0;
 	private const COMPRESSION_STATUS_ON = 1;
+	private const MAX_ATTEMPTS = 10;
 	/*
 		storing old data deep in the past - 20 days, which is way longer that the minimum 7days,
 		and must be guaranteed to be compressed
@@ -104,12 +105,14 @@ class testTimescaleDb extends CIntegrationTest {
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
+		$now = time();
+
 		/* data for 3 chunks in the past old enough to be compressed */
 		$input = [
 			/* start clock, value count */
-			[time() - $data_older_than - 1 * self::getChunkTimeInterval(), 100],
-			[time() - $data_older_than - 2 * self::getChunkTimeInterval(), 100],
-			[time() - $data_older_than - 3 * self::getChunkTimeInterval(), 100]
+			[$now - $data_older_than - 0 * self::getChunkTimeInterval(), 100],
+			[$now - $data_older_than - 2 * self::getChunkTimeInterval(), 100],
+			[$now - $data_older_than - 4 * self::getChunkTimeInterval(), 100]
 		];
 
 		$sender_data = [];
@@ -361,17 +364,33 @@ class testTimescaleDb extends CIntegrationTest {
 					FROM hypertable_compression_stats('".self::TABLENAME."')";
 		}
 
-		$res = DBfetch(DBselect($sql_num_compressed));
-		$this->assertArrayHasKey('number_compressed_chunks', $res);
-		$number_compressed_chunks0 = $res['number_compressed_chunks'];
-		$this->assertEquals(0, $number_compressed_chunks0,
-				"It is expected that there are no compressed chunks in the beginning.");
+		/* Allow enough time to TimescaleDB settings to be applied */
+		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
+			try {
+				/* Get number of compressed chunks */
+				$res = DBfetch(DBselect($sql_num_compressed));
+				$this->assertArrayHasKey('number_compressed_chunks', $res);
+				$number_compressed_chunks0 = $res['number_compressed_chunks'];
+				$this->assertEquals(0, $number_compressed_chunks0,
+						"It is expected that there are no compressed chunks in the beginning.");
 
-		/* Get all chunk names. */
-		$res = DBfetchArray(DBselect("SELECT show_chunks('".self::TABLENAME."')"));
-		$chunks = array_column($res, 'show_chunks');
-		$total_chunks = count($chunks);
-		$this->assertGreaterThan(0, $total_chunks);
+				/* Get all chunk names. */
+				$res = DBfetchArray(DBselect("SELECT show_chunks('".self::TABLENAME."')"));
+				$chunks = array_column($res, 'show_chunks');
+				$total_chunks0 = count($chunks);
+				/* 3 history chunks and 1 current chunk. */
+				$this->assertEquals(3+1, $total_chunks0);
+
+				/* no exceptions till this point mean success */
+				break;
+			} catch (Throwable $e) {
+				if ($attempt === self::MAX_ATTEMPTS) {
+					throw $e;
+				}
+			}
+
+			sleep(1);
+		}
 
 		/* Compress specific chunks by names without using a compression policy. */
 		/* It is called convert to columnstore since TimescaleDB 2.18. */
@@ -386,11 +405,29 @@ class testTimescaleDb extends CIntegrationTest {
 			}
 		}
 
-		/* All chunks are expected to be compressed. */
-		$res = DBfetch(DBselect($sql_num_compressed));
-		$this->assertArrayHasKey('number_compressed_chunks', $res);
-		$number_compressed_chunks1 = $res['number_compressed_chunks'];
-		$this->assertEquals($total_chunks, $number_compressed_chunks1, "Not all chunks were compressed");
+		/* Allow enough time for chunks to be compressed. */
+		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
+			try {
+				/* All chunks are expected to be compressed. */
+				$res = DBfetch(DBselect($sql_num_compressed));
+				$this->assertArrayHasKey('number_compressed_chunks', $res);
+				$number_compressed_chunks1 = $res['number_compressed_chunks'];
+
+				/* 3 history chunks and 1 current chink should be also compressed since they were */
+				/* compressed explicitly. */
+				$this->assertEquals(3+1, $number_compressed_chunks1,
+						"Not all history chunks were compressed");
+
+				/* no exceptions till this point mean success */
+				break;
+			} catch (Throwable $e) {
+				if ($attempt === self::MAX_ATTEMPTS) {
+					throw $e;
+				}
+			}
+
+			sleep(1);
+		}
 
 		/* Decompress specific chunks by names. */
 		/* It is called convert to rowstore since TimescaleDB 2.18. */
@@ -405,11 +442,25 @@ class testTimescaleDb extends CIntegrationTest {
 			}
 		}
 
-		/* All chunks are expected to be decompressed now. */
-		$res = DBfetch(DBselect($sql_num_compressed));
-		$this->assertArrayHasKey('number_compressed_chunks', $res);
-		$number_compressed_chunks2 = $res['number_compressed_chunks'];
-		$this->assertEquals(0, $number_compressed_chunks2, "Not all chunks were decompressed");
+		/* Allow enough time for chunks to be decompressed. */
+		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
+			try {
+				/* All chunks are expected to be decompressed now. */
+				$res = DBfetch(DBselect($sql_num_compressed));
+				$this->assertArrayHasKey('number_compressed_chunks', $res);
+				$number_compressed_chunks2 = $res['number_compressed_chunks'];
+				$this->assertEquals(0, $number_compressed_chunks2, "Not all chunks were decompressed");
+
+				/* no exceptions till this point mean success */
+				break;
+			} catch (Throwable $e) {
+				if ($attempt === self::MAX_ATTEMPTS) {
+					throw $e;
+				}
+			}
+
+			sleep(1);
+		}
 	}
 
 	/**
@@ -445,10 +496,25 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_compressionPolicy3() {
-		/* Test if the compression value was configured to TimescaleDB successfully. */
-		/* The configuration value + 2 hours are configured in TimescaleDB. */
-		$this->assertEquals(self::$currentCompressOlder + 2 * 3600, $this->compressOlderTimescaleGet(),
-				"Unexpected actual compress older value configured in TimescaleDB");
+		/* Allow enough time for compression configuration */
+		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
+			try {
+				/* Test if the compression value was configured to TimescaleDB successfully. */
+				/* The configuration value + 2 hours are configured in TimescaleDB. */
+				$this->assertEquals(self::$currentCompressOlder + 2 * 3600,
+						$this->compressOlderTimescaleGet(),
+						"Unexpected actual compress older value configured in TimescaleDB");
+
+				/* no exceptions till this point mean success */
+				break;
+			} catch (Throwable $e) {
+				if ($attempt === self::MAX_ATTEMPTS) {
+					throw $e;
+				}
+			}
+
+			sleep(1);
+		}
 
 		/* Set a new value without disabling compression. */
 		/* It was a real case discovered during testing ZBXNEXT-9770. */
@@ -463,10 +529,8 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_compressionPolicy4() {
-		/* make sure that compression settings had enough time to be applied */
-		$maxAttempts = 5;
-
-		for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+		/* Make sure that compression settings had enough time to be applied. */
+		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
 			try {
 				/* The configuration value + 2 hours are configured in TimescaleDB. */
 				$this->assertEquals(self::$currentCompressOlder + 2 * 3600,
@@ -485,7 +549,7 @@ class testTimescaleDb extends CIntegrationTest {
 				/* no exceptions till this point mean success */
 				break;
 			} catch (Throwable $e) {
-				if ($attempt === $maxAttempts) {
+				if ($attempt === self::MAX_ATTEMPTS) {
 					throw $e;
 				}
 			}
@@ -508,10 +572,8 @@ class testTimescaleDb extends CIntegrationTest {
 
 		}
 
-		/* make sure that compression job has enough time to finish */
-		$maxAttempts = 5;
-
-		for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+		/* Make sure that compression has enough time to finish. */
+		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
 			try {
 				/* get compression job id */
 				$res = DBfetch(DBselect($sql));
@@ -520,14 +582,14 @@ class testTimescaleDb extends CIntegrationTest {
 				$total_chunks = $res['total_chunks'];
 				$num_compressed_chunks = $res['number_compressed_chunks'];
 
-				/* All of the chunks old enough for compression are expected to be compressed. */
-				/* One current chunk cannot be compressed. */
-				$this->assertEquals($total_chunks -1, $num_compressed_chunks, "Not all chunks were compressed");
+				/* 3 of the chunks old enough for compression are expected to be compressed. */
+				/* 1 current chunk should not be compressed. */
+				$this->assertEquals(3, $num_compressed_chunks, "Not all chunks were compressed");
 
 				/* no exceptions till this point mean success */
 				break;
 			} catch (Throwable $e) {
-				if ($attempt === $maxAttempts) {
+				if ($attempt === self::MAX_ATTEMPTS) {
 					throw $e;
 				}
 			}
