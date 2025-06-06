@@ -81,6 +81,12 @@ static int	oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_n
 			" from media_type_oauth"
 			" where mediatypeid="ZBX_FS_UI64, mediatypeid);
 
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result)
+	{
+		*error = zbx_dsprintf(NULL, "cannot fetch access token: database not available");
+		goto out1;
+	}
+
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
 		*error = zbx_dsprintf(NULL, "Access token fetch failed: mediatype \"%s\" requires"
@@ -122,7 +128,7 @@ static int	oauth_fetch_from_db(zbx_uint64_t mediatypeid, const char *mediatype_n
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
-
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): error:%s", __func__, ZBX_NULL2STR(*error));
 
 	return ret;
