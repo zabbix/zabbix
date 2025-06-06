@@ -46,8 +46,11 @@ func isKeyChar(c byte, wildcard bool) bool {
 // the parsed parameter (including quotes, but without whitespace outside quotes)
 // and the data after the parameter (skipping also whitespace after closing quotes).
 func parseQuotedParam(data []byte) ([]byte, []byte, error) {
-	var last byte
-	var param []byte
+	var (
+		last  byte
+		param []byte
+	)
+
 	for i, c := range data[1:] {
 		if c == '"' && last != '\\' {
 			i += 2
@@ -55,7 +58,9 @@ func parseQuotedParam(data []byte) ([]byte, []byte, error) {
 			for ; i < len(data) && data[i] == ' '; i++ {
 			}
 
-			return param, data[i:], nil // param, remainder, err
+			remainder := data[i:]
+
+			return param, remainder, nil // param, remainder, err
 		}
 		last = c
 	}
@@ -80,7 +85,38 @@ func parseUnquotedParam(data []byte) ([]byte, []byte, error) {
 	return param, remainder, errs.New("unterminated parameter")
 }
 
+// parseNextArrayElement parses a single element from within an array.
+// It handles quoted and unquoted parameters and returns the remainder of the
+// slice after the element and any error.
+func parseNextArrayElement(
+	data []byte,
+) ([]byte, error) {
+	var err error
+	// This switch contains the logic for parsing one element.
+	switch data[0] {
+	case '"':
+		// The parameter is quoted.
+		_, data, err = parseQuotedParam(data)
+	case '[':
+		// Nested arrays are not allowed.
+		return nil, errs.New("nested arrays are not supported")
+	default:
+		// The parameter is unquoted. This also handles empty parameters
+		// like in "[,p2]" or "[p1,,p3]".
+		_, data, err = parseUnquotedParam(data)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
 // parseArrayParam parses item key array parameter [...] and returns.
+// returns parameter, remainder and error
+//
+//nolint:cyclop
 func parseArrayParam(data []byte) ([]byte, []byte, error) {
 	if len(data) == 0 || data[0] != '[' {
 		return nil, nil, errs.New("invalid array parameter: must start with '['")
@@ -100,7 +136,10 @@ func parseArrayParam(data []byte) ([]byte, []byte, error) {
 		if remaining[0] == ']' {
 			pos := len(data) - len(remaining)
 
-			return data[:pos+1], remaining[1:], nil // param, remainder, err
+			param := data[:pos+1]
+			remainder := remaining[1:]
+
+			return param, remainder, nil // param, remainder, err
 		}
 
 		// If we're not at the end, we must be at the start of a new parameter.
@@ -108,18 +147,7 @@ func parseArrayParam(data []byte) ([]byte, []byte, error) {
 		// here, it implies an empty parameter (e.g., `[,p2]` or `[p1,,p3]`).
 		// This is valid and will be handled by parseUnquotedParam.
 		var err error
-		switch remaining[0] {
-		case '"':
-			// The parameter is quoted.
-			_, remaining, err = parseQuotedParam(remaining)
-		case '[':
-			// Nested arrays are not allowed.
-			return nil, nil, errs.New("nested arrays are not supported")
-		default:
-			// The parameter is unquoted.
-			_, remaining, err = parseUnquotedParam(remaining)
-		}
-		if err != nil {
+		if remaining, err = parseNextArrayElement(remaining); err != nil {
 			return nil, nil, err
 		}
 
@@ -129,15 +157,17 @@ func parseArrayParam(data []byte) ([]byte, []byte, error) {
 			return nil, nil, errs.New("unterminated array parameter")
 		}
 
-		// If we found a comma, consume it and continue to the next parameter.
-		if remaining[0] == ',' {
+		switch remaining[0] {
+		case ',':
 			remaining = remaining[1:]
-			// Continue to next iteration - the ']' check will happen at the top
-		} else if remaining[0] != ']' {
+
+			continue
+		case ']':
+			continue
+		default:
 			return nil, nil, errs.New("expected ',' or ']' after array parameter")
 		}
 	}
-
 }
 
 // unquoteParam unquotes quoted parameter by removing enclosing double quotes '"' and
@@ -164,6 +194,7 @@ func unquoteParam(data []byte) []byte {
 		}
 		last = c
 	}
+
 	return param
 }
 
@@ -201,7 +232,9 @@ func expandArray(data []byte) []byte {
 // parseParam parses single item key parameter.
 func parseParam(data []byte) ([]byte, []byte, error) {
 	var param, remainder []byte
+
 	var err error
+
 	for i, c := range data {
 		switch c {
 		case ' ':
@@ -408,8 +441,8 @@ func ParseAlias(text string) (string, string, error) {
 		return "", "", errInvalidAlias
 	}
 
-	// test if key is valid (without : in the beginning)
-	if _, _, err := parseKey(remainder[1:], false); err != nil {
+	// test if key is valid (without ':' in the beginning)
+	if _, _, err = parseKey(remainder[1:], false); err != nil {
 		return "", "", err
 	}
 
