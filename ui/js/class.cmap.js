@@ -607,7 +607,9 @@ ZABBIX.apps.map = (function($) {
 						that.clearSelection();
 					}
 					else if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
+						that.clearSelection();
 						that.selectElements([item_data], false, true);
+						that.toggleForm();
 					}
 
 					can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0);
