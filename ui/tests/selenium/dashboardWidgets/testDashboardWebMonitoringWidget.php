@@ -23,11 +23,11 @@ require_once __DIR__.'/../common/testWidgets.php';
  */
 class testDashboardWebMonitoringWidget extends testWidgets {
 
+	const DEFAULT_DASHBOARD = 'Dashboard for Web monitoring widget test';
+	const DASHBOARD_FOR_WIDGET_ACTIONS = 'Dashboard for Web monitoring widget create/update test';
 	protected static $dashboardid;
 	protected static $groupids;
 	protected static $update_widget = 'Update Web monitoring widget';
-	const DEFAULT_DASHBOARD = 'Dashboard for Web monitoring widget test';
-	const DASHBOARD_FOR_WIDGET_ACTIONS = 'Dashboard for Web monitoring widget create/update test';
 
 	/**
 	 * Attach MessageBehavior and TagBehavior to the test.
@@ -75,6 +75,14 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 								'type' => 'web',
 								'x' => 18,
 								'y' => 0,
+								'width' => 18,
+								'height' => 4
+							],
+							[
+								'name' => 'reference',
+								'type' => 'web',
+								'x' => 18,
+								'y' => 4,
 								'width' => 18,
 								'height' => 4
 							]
@@ -232,10 +240,15 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 
 	public static function getWidgetData() {
 		return [
-			// #0 Name and show header.
+			// #0 Empty massive.
 			[
 				[
-					'check_dialog_properties' => true,
+					'fields' => []
+				]
+			],
+			// #1 Name and show header.
+			[
+				[
 					'fields' => [
 						'Show header' => true,
 						'Name' => 'Name and show header name',
@@ -243,7 +256,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #1 Empty fields and refresh interval.
+			// #2 Empty fields and refresh interval.
 			[
 				[
 					'fields' => [
@@ -251,7 +264,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #2 Tag OR selector and spaces.
+			// #3 Tag OR selector and spaces.
 			[
 				[
 					'fields' => [
@@ -261,7 +274,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #3 Show Maintenance and trimming applied.
+			// #4 Show Maintenance and trimming applied.
 			[
 				[
 					'fields' => [
@@ -273,15 +286,15 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					],
 					'tags' => [
 						[
-						'name' => '  Trim THIS   ️',
-						'operator' => 'Equals',
-						'value' => ' Warning ⚠ ️'
+							'name' => '  Trim THIS   ️',
+							'operator' => 'Equals',
+							'value' => ' Warning ⚠ ️'
 						]
 					],
-					'trim' => ['id:name', 'id:tags_0_tag', 'id:tags_0_value']
+					'trim' => ['Name', 'id:tags_0_tag', 'id:tags_0_value']
 				]
 			],
-			// #4 Special symbols in name and no maintenance.
+			// #5 Special symbols in name and no maintenance.
 			[
 				[
 					'fields' => [
@@ -291,7 +304,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #5 No refresh.
+			// #6 No refresh.
 			[
 				[
 					'fields' => [
@@ -300,7 +313,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #6 Host groups.
+			// #7 Host groups.
 			[
 				[
 					'fields' => [
@@ -312,7 +325,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #7 Host group and exclude host group.
+			// #8 Host group and exclude host group.
 			[
 				[
 					'fields' => [
@@ -322,7 +335,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #8 Hosts.
+			// #9 Hosts.
 			[
 				[
 					'fields' => [
@@ -334,7 +347,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Hosts and host groups.
+			// #10 Hosts and host groups.
 			[
 				[
 					'fields' => [
@@ -352,7 +365,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					]
 				]
 			],
-			// #10 Tags.
+			// #11 Tags.
 			[
 				[
 					'fields' => [
@@ -360,18 +373,18 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 						'Refresh interval' => 'Default (1 minute)'
 					],
 					'tags' => [
-							['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
-							['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
-							['name' => 'Check host tag with operator - Equals ⚠️', 'operator' => 'Equals',
-								'value' => 'Warning ⚠️'],
-							['name' => 'Check host tag with operator - Exists', 'operator' => 'Exists'],
-							['name' => 'Check host tag with operator - Contains ❌', 'operator' => 'Contains', 'value' =>
-								'tag value ❌'],
-							['name' => 'Check host tag with operator - Does not exist', 'operator' => 'Does not exist'],
-							['name' => 'Check host tag with operator - Does not equal', 'operator' => 'Does not equal',
-								'value' => 'Average'],
-							['name' => 'Check host tag with operator - Does not contain', 'operator' => 'Does not contain',
-								'value' => 'Disaster']
+						['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+						['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
+						['name' => 'Check host tag with operator - Equals ⚠️', 'operator' => 'Equals',
+							'value' => 'Warning ⚠️'],
+						['name' => 'Check host tag with operator - Exists', 'operator' => 'Exists'],
+						['name' => 'Check host tag with operator - Contains ❌', 'operator' => 'Contains', 'value' =>
+							'tag value ❌'],
+						['name' => 'Check host tag with operator - Does not exist', 'operator' => 'Does not exist'],
+						['name' => 'Check host tag with operator - Does not equal', 'operator' => 'Does not equal',
+							'value' => 'Average'],
+						['name' => 'Check host tag with operator - Does not contain', 'operator' => 'Does not contain',
+							'value' => 'Disaster']
 					]
 				]
 			]
@@ -386,6 +399,13 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 	 */
 	public function testDashboardWebMonitoringWidget_Create($data) {
 		$this->checkWidgetForm($data);
+	}
+
+	/**
+	 * @dataProvider getWidgetData
+	 */
+	public function testDashboardWebMonitoringWidget_Update($data) {
+		$this->checkWidgetForm($data, true);
 	}
 
 	/**
@@ -421,6 +441,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 		if (CTestArrayHelper::get($data, 'trim', false)) {
 			$data = CTestArrayHelper::trim($data);
 		}
+
 		// If name is empty string it is replaced by default widget name "Web monitoring".
 		$header = ($data['fields']['Name'] === '') ? 'Web monitoring' : $data['fields']['Name'];
 		if ($update) {
@@ -455,13 +476,6 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 		// Close widget window and cancel editing the dashboard.
 		COverlayDialogElement::find()->one()->close();
 		$dashboard->cancelEditing();
-	}
-
-	/**
-	 * @dataProvider getWidgetData
-	 */
-	public function testDashboardWebMonitoringWidget_Update($data) {
-		$this->checkWidgetForm($data, true);
 	}
 
 	/**
@@ -581,6 +595,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_widget)->edit()->getValues());
 			COverlayDialogElement::find()->one()->close();
 		}
+
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
