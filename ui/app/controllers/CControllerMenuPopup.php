@@ -171,6 +171,7 @@ class CControllerMenuPopup extends CController {
 				'output' => ['hostid', 'status'],
 				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectHttpTests' => API_OUTPUT_COUNT,
+				'selectDashboards' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
 			])
 			: API::Host()->get([
@@ -249,7 +250,7 @@ class CControllerMenuPopup extends CController {
 
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
-				$menu_data['showDashboards'] = (bool) getHostDashboards($data['hostid']);
+				$menu_data['showDashboards'] = (bool) $db_host['dashboards'];
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
 				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
