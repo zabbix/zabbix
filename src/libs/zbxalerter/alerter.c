@@ -176,31 +176,26 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 			&smtp_authentication, &smtp_username, &smtp_password, &message_format, &expression,
 			&recovery_expression);
 
-	switch (smtp_authentication)
+	if (SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 	{
-		case SMTP_AUTHENTICATION_PASSWORD:
-		{
-			/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
+		/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
 
-			zbx_db_event	event = {.eventid = eventid, .source = source, .object = object,
-					.objectid = objectid};
+		zbx_db_event	event = {.eventid = eventid, .source = source, .object = object, .objectid = objectid};
 
-			memset(&event.trigger, 0, sizeof(zbx_db_trigger));
-			event.trigger.expression = expression;
-			expression = NULL;
-			event.trigger.recovery_expression = recovery_expression;
-			recovery_expression = NULL;
-			zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+		memset(&event.trigger, 0, sizeof(zbx_db_trigger));
+		event.trigger.expression = expression;
+		expression = NULL;
+		event.trigger.recovery_expression = recovery_expression;
+		recovery_expression = NULL;
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &smtp_username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
-			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &smtp_password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &smtp_username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &smtp_password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
 
-			zbx_dc_close_user_macros(um_handle);
-			zbx_db_trigger_clean(&event.trigger);
-			break;
-		}
+		zbx_dc_close_user_macros(um_handle);
+		zbx_db_trigger_clean(&event.trigger);
 	}
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
@@ -383,7 +378,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	time_stat = zbx_time();
 
-	/* alerter should not have access to database */
+	/* alerter should not have access to database to be able to send "DB down" alerts */
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 

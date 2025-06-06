@@ -477,8 +477,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
 
 	if (MEDIA_TYPE_WEBHOOK == mediatype->type)
 		zbx_am_update_webhook(manager, mediatype, script, timeout, config_source_ip);
-
-	if (MEDIA_TYPE_EMAIL == mediatype->type && SMTP_AUTHENTICATION_OAUTH == mediatype->smtp_authentication)
+	else if (MEDIA_TYPE_EMAIL == mediatype->type && SMTP_AUTHENTICATION_OAUTH == mediatype->smtp_authentication)
 	{
 		zbx_oauth_get(mediatype->mediatypeid, mediatype->name, mediatype->timeout, mediatype->maxattempts,
 				SEC_PER_MIN, config_source_ip, config_ssl_ca_location, &mediatype->passwd,
