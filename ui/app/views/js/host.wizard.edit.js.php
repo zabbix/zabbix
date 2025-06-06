@@ -829,9 +829,15 @@ window.host_wizard_edit = new class {
 
 				if (this.#host !== null) {
 					const no_encryption = Number(this.#host.tls_connect) === <?= HOST_ENCRYPTION_NONE ?>
-						&& this.#host.tls_in_none && !this.#host.tls_in_psk && !this.#host.tls_in_cert;
+						&& this.#host.tls_in_none
+						&& !this.#host.tls_in_psk
+						&& !this.#host.tls_in_cert;
+
 					const psk_encryption = Number(this.#host.tls_connect) === <?= HOST_ENCRYPTION_PSK ?>
-						&& !this.#host.tls_in_none && this.#host.tls_in_psk && !this.#host.tls_in_cert;
+						&& !this.#host.tls_in_none
+						&& this.#host.tls_in_psk
+						&& !this.#host.tls_in_cert;
+
 					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
 				}
 
