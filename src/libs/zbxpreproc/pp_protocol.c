@@ -1004,8 +1004,7 @@ void	zbx_preprocessor_flush(void)
 {
 	if (0 < cached_message.size)
 	{
-		for (int i = 0; i < 1000000; i++)
-			preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, cached_message.data, cached_message.size, NULL);
+		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, cached_message.data, cached_message.size, NULL);
 
 		zbx_ipc_message_clean(&cached_message);
 		zbx_ipc_message_init(&cached_message);
