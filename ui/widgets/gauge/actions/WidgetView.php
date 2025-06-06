@@ -86,9 +86,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data['vars']['url'] = $this->getHistoryUrl($item);
 
-		$show = array_flip($this->fields_values['show']);
-
-		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
+		if (in_array(Widget::SHOW_DESCRIPTION, $this->fields_values['show'])) {
 			$data['vars']['description'] = $this->getDescription($item);
 		}
 
