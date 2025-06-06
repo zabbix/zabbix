@@ -16,9 +16,12 @@ package itemutil
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
+
+	"golang.zabbix.com/sdk/errs"
 )
+
+var errInvalidKey = errs.New("Invalid item key format.")
+var errInvalidAlias = errs.New("Invalid item alias format.")
 
 func isKeyChar(c byte, wildcard bool) bool {
 	if c >= 'a' && c <= 'z' {
@@ -42,96 +45,111 @@ func isKeyChar(c byte, wildcard bool) bool {
 // parseQuotedParam parses item key quoted parameter "..." and returns
 // the parsed parameter (including quotes, but without whitespace outside quotes)
 // and the data after the parameter (skipping also whitespace after closing quotes).
-func parseQuotedParam(data []byte) (param []byte, left []byte, err error) {
+func parseQuotedParam(data []byte) ([]byte, []byte, error) {
 	var last byte
+	var param []byte
 	for i, c := range data[1:] {
 		if c == '"' && last != '\\' {
 			i += 2
 			param = data[:i]
 			for ; i < len(data) && data[i] == ' '; i++ {
 			}
-			left = data[i:]
-			return
+
+			return param, data[i:], nil // param, remainder, err
 		}
 		last = c
 	}
-	err = errors.New("unterminated quoted string")
-	return
+
+	return nil, nil, errs.New("unterminated quoted string")
 }
 
 // parseUnquotedParam parses item key normal parameter (any combination of any characters except ',' and ']',
 // including trailing whitespace) and returns the parsed parameter and the data after the parameter.
-func parseUnquotedParam(data []byte) (param []byte, left []byte, err error) {
+func parseUnquotedParam(data []byte) ([]byte, []byte, error) {
+	var param, remainder []byte
+
 	for i, c := range data {
 		if c == ',' || c == ']' {
 			param = data[:i]
-			left = data[i:]
-			return
+			remainder = data[i:]
+
+			return param, remainder, nil
 		}
 	}
-	err = errors.New("unterminated parameter")
-	return
+
+	return param, remainder, errs.New("unterminated parameter")
 }
 
 // parseArrayParam parses item key array parameter [...] and returns.
-func parseArrayParam(data []byte) (param []byte, left []byte, err error) {
-	var pos int
-	b := data[1:]
+func parseArrayParam(data []byte) ([]byte, []byte, error) {
+	if len(data) == 0 || data[0] != '[' {
+		return nil, nil, errs.New("invalid array parameter: must start with '['")
+	}
 
-	for len(b) > 0 {
-	loop:
-		for i, c := range b {
-			switch c {
-			case ' ':
-				continue
-			case '"':
-				if _, b, err = parseQuotedParam(b[i:]); err != nil {
-					return
-				}
-				break loop
-			case '[':
-				err = errors.New("nested arrays are not supported")
-				return
-			default:
-				if _, b, err = parseUnquotedParam(b[i:]); err != nil {
-					return
-				}
-				break loop
-			}
+	remaining := data[1:]
+
+	for {
+		remaining = bytes.TrimLeft(remaining, " ")
+
+		// If we've run out of bytes without finding the closing ']', it's an error.
+		if len(remaining) == 0 {
+			return nil, nil, errs.New("unterminated array parameter")
 		}
-		if len(b) == 0 {
-			err = errors.New("unterminated array parameter")
-			return
+
+		// Check if we're at the end of the array. This also handles an empty array "[]".
+		if remaining[0] == ']' {
+			pos := len(data) - len(remaining)
+
+			return data[:pos+1], remaining[1:], nil // param, remainder, err
 		}
-		if b[0] == ']' {
-			pos = cap(data) - cap(b)
-			left = b[1:]
-			break
+
+		// If we're not at the end, we must be at the start of a new parameter.
+		// After parsing a parameter, we expect a comma, so if we find a comma
+		// here, it implies an empty parameter (e.g., `[,p2]` or `[p1,,p3]`).
+		// This is valid and will be handled by parseUnquotedParam.
+		var err error
+		switch remaining[0] {
+		case '"':
+			// The parameter is quoted.
+			_, remaining, err = parseQuotedParam(remaining)
+		case '[':
+			// Nested arrays are not allowed.
+			return nil, nil, errs.New("nested arrays are not supported")
+		default:
+			// The parameter is unquoted.
+			_, remaining, err = parseUnquotedParam(remaining)
 		}
-		if b[0] != ',' {
-			err = errors.New("unterminated array parameter")
-			return
+		if err != nil {
+			return nil, nil, err
 		}
-		b = b[1:]
+
+		// Handle what comes after the parameter
+		remaining = bytes.TrimLeft(remaining, " ")
+		if len(remaining) == 0 {
+			return nil, nil, errs.New("unterminated array parameter")
+		}
+
+		// If we found a comma, consume it and continue to the next parameter.
+		if remaining[0] == ',' {
+			remaining = remaining[1:]
+			// Continue to next iteration - the ']' check will happen at the top
+		} else if remaining[0] != ']' {
+			return nil, nil, errs.New("expected ',' or ']' after array parameter")
+		}
 	}
-	if left == nil {
-		err = errors.New("unterminated array parameter X")
-		return
-	}
-	param = data[:pos+1]
-	return
+
 }
 
 // unquoteParam unquotes quoted parameter by removing enclosing double quotes '"' and
 // unescaping '\"' escape sequences.
-func unquoteParam(data []byte) (param []byte) {
-	param = make([]byte, 0, len(data))
+func unquoteParam(data []byte) []byte {
+	param := make([]byte, 0, len(data))
 	var last byte
 	for _, c := range data[1:] {
 		switch c {
 		case '"':
 			if last != '\\' {
-				return
+				return param
 			}
 			param = append(param, c)
 		case '\\':
@@ -146,13 +164,13 @@ func unquoteParam(data []byte) (param []byte) {
 		}
 		last = c
 	}
-	return
+	return param
 }
 
 // expandArray expands array parameter by removing enclosing brackets '[]' and,
 // removing whitespace before normal array items and around quoted items.
-func expandArray(data []byte) (param []byte) {
-	param = make([]byte, 0, len(data))
+func expandArray(data []byte) []byte {
+	param := make([]byte, 0, len(data))
 	var p []byte
 	b := data[1:]
 	for len(b) > 0 {
@@ -176,152 +194,229 @@ func expandArray(data []byte) (param []byte) {
 		param = append(param, ',')
 		b = b[1:]
 	}
-	return
+
+	return param
 }
 
-// parseParams parses single item key parameter.
-func parseParam(data []byte) (param []byte, left []byte, err error) {
+// parseParam parses single item key parameter.
+func parseParam(data []byte) ([]byte, []byte, error) {
+	var param, remainder []byte
+	var err error
 	for i, c := range data {
 		switch c {
 		case ' ':
 			continue
 		case '"':
-			if param, left, err = parseQuotedParam(data[i:]); err == nil {
+			if param, remainder, err = parseQuotedParam(data[i:]); err == nil {
 				param = unquoteParam(param)
 			}
-			return
 		case '[':
-			if param, left, err = parseArrayParam(data[i:]); err == nil {
+			if param, remainder, err = parseArrayParam(data[i:]); err == nil {
 				param = expandArray(param)
 			}
-			return
 		case ']', ',':
-			return data[i:i], data[i:], nil
+			param = data[i:i]
+			remainder = data[i:]
 		default:
-			param, left, err = parseUnquotedParam(data[i:])
-			return
+			param, remainder, err = parseUnquotedParam(data[i:])
 		}
+
+		return param, remainder, err
 	}
-	err = errors.New("unterminated parameter list")
-	return
+
+	return param, remainder, errs.New("unterminated parameter list")
 }
 
-// parseParams parses item key parameters.
-func parseParams(data []byte) (params []string, left []byte, err error) {
-	if data[0] != '[' {
-		err = fmt.Errorf("key name must be followed by '['")
-		return
+// parseParams parses item key parameters and returns parameters, remainder and error.
+// Format: key[param1,param2,param3]remainder.
+func parseParams(data []byte) ([]string, []byte, error) {
+	const (
+		paramListStart = '['
+		paramListEnd   = ']'
+		paramSeparator = ','
+	)
+
+	// Validate opening bracket
+	if data[0] != paramListStart {
+		return nil, nil, errs.New("key name must be followed by '['")
 	}
 	if len(data) == 1 {
-		err = fmt.Errorf("unterminated parameter list")
-		return
+		return nil, nil, errs.New("unterminated parameter list")
 	}
-	var param []byte
-	b := data[1:]
-	for len(b) > 0 {
-		if param, b, err = parseParam(b); err != nil {
-			return
+
+	var (
+		remainder []byte
+		param     []byte
+		err       error
+		params    []string
+	)
+
+	// Skip opening bracket
+	currentRemainder := data[1:]
+
+	for len(currentRemainder) > 0 {
+		// Parse next parameter
+		param, currentRemainder, err = parseParam(currentRemainder)
+		if err != nil {
+			return nil, nil, err
 		}
-		if len(b) == 0 {
-			err = errors.New("key parameters ended unexpectedly")
-			return
+		// Add new parameter to total parameters list
+		params = append(params, string(param))
+
+		if len(currentRemainder) == 0 {
+			return nil, nil, errs.New("key parameters ended unexpectedly")
 		}
-		if b[0] == ']' {
-			if len(b) > 1 {
-				left = b[1:]
+
+		// Check for end of parameter list
+		if currentRemainder[0] == paramListEnd {
+			// Save remainder after closing bracket
+			if len(currentRemainder) > 1 {
+				remainder = currentRemainder[1:]
 			}
 			break
 		}
-		if b[0] != ',' {
-			err = errors.New("invalid parameter separator")
-			return
+
+		// Expect parameter separator after previous param
+		if currentRemainder[0] != paramSeparator {
+			return nil, nil, errs.New("invalid parameter separator")
 		}
-		b = b[1:]
-		params = append(params, string(param))
+
+		// Remove separator
+		currentRemainder = currentRemainder[1:]
 	}
-	if len(b) == 0 {
-		err = fmt.Errorf("unterminated parameter list")
+
+	// Check if we failed to find a closing bracket
+	if len(currentRemainder) == 0 {
+		return nil, nil, errs.New("unterminated parameter list")
 	}
-	params = append(params, string(param))
-	return
+
+	return params, remainder, nil
 }
 
-func newKeyError() (err error) {
-	return errors.New("Invalid item key format.")
-}
-
-func parseKey(data []byte, wildcard bool) (key string, params []string, left []byte, err error) {
+// parseKey accepts raw key (f.e. some.key[arg1, arg2]) and returns key, arguments and error.
+func parseKey(data []byte, wildcard bool) (string, []string, error) {
+	// iterating over key to find arguments and verify that it is a somewhat valid key
 	for i, c := range data {
-		if !isKeyChar(c, wildcard) {
-			if i == 0 {
-				err = newKeyError()
-				return
-			}
-			if c != '[' {
-				key = string(data[:i])
-				left = data[i:]
-				return
-			}
-			if params, left, err = parseParams(data[i:]); err != nil {
-				err = newKeyError()
-				return
-			}
-			key = string(data[:i])
-			return
+		// searching for invalid char (that cannot be part of the key)
+		if isKeyChar(c, wildcard) {
+			continue
 		}
+
+		// key has to consist of at least one valid character, mostly useless check, just saves some computing power
+		if i == 0 {
+			return "", nil, errInvalidKey
+		}
+
+		// finishing parsing if found some non-compliant character that does not start argument list
+		if c != '[' {
+			return "", nil, errInvalidKey
+		}
+
+		// argument list start was found, and it has to end with a closing bracket without any remainder
+		if data[len(data)-1] != ']' {
+			return "", nil, errInvalidKey
+		}
+
+		// we found a start of arguments list [arg1, arg2] part '['
+		params, remainder, err := parseParams(data[i:])
+		if err != nil || len(remainder) > 0 {
+			return "", params, errInvalidKey
+		}
+
+		key := string(data[:i])
+
+		return key, params, nil
 	}
-	key = string(data)
-	return
+
+	key := string(data)
+
+	return key, nil, nil
 }
 
-func parseMetricKey(text string, wildcard bool) (key string, params []string, err error) {
+// parseAlias searches for invalid structure in the first part of name[arg]:key pattern.
+func parseAlias(data []byte, wildcard bool) ([]byte, error) {
+	// iterating over key to find arguments and verify that it is a somewhat valid key
+	for i, c := range data {
+		// searching for invalid char (that cannot be part of the key)
+		if isKeyChar(c, wildcard) {
+			continue
+		}
+
+		// key has to consist of at least one valid character, mostly useless check, just saves some computing power
+		if i == 0 {
+			return nil, errInvalidKey
+		}
+
+		// finishing parsing if found some non-compliant character that does not separate alias from the key
+		if c == ':' {
+			remainder := data[i:]
+
+			return remainder, nil
+		}
+
+		// we found a start of arguments list [arg1, arg2] part '[' and search if the key is valid
+		if c == '[' {
+			_, remainder, err := parseParams(data[i:])
+			if err != nil {
+				return remainder, errInvalidKey
+			}
+
+			return remainder, nil
+		}
+
+		// we stumbled into unknown character
+		return nil, errInvalidKey
+	}
+
+	return nil, errInvalidKey
+}
+
+func parseMetricKey(text string, wildcard bool) (string, []string, error) {
 	if text == "" {
-		err = newKeyError()
-		return
+		return "", nil, errInvalidKey
 	}
-	var left []byte
-	if key, params, left, err = parseKey([]byte(text), wildcard); err != nil {
-		return
+
+	key, params, err := parseKey([]byte(text), wildcard)
+	if err != nil {
+		return "", nil, err
 	}
-	if len(left) > 0 {
-		err = newKeyError()
-	}
-	return
+
+	return key, params, nil
 }
 
 // ParseKey parses item key in format key[param1, param2, ...] and returns
 // the parsed key and parameters.
-func ParseKey(text string) (key string, params []string, err error) {
+func ParseKey(text string) (string, []string, error) {
 	return parseMetricKey(text, false)
 }
 
 // ParseWildcardKey parses item key in format key[param1, param2, ...] and returns
 // the parsed key and parameters.
-func ParseWildcardKey(text string) (key string, params []string, err error) {
+func ParseWildcardKey(text string) (string, []string, error) {
 	return parseMetricKey(text, true)
 }
 
 // ParseAlias parses Alias in format name:key and returns the name
 // and the key separately without changes
-func ParseAlias(text string) (key1, key2 string, err error) {
-	var left, left2 []byte
-	if _, _, left, err = parseKey([]byte(text), false); err != nil {
-		return
+func ParseAlias(text string) (string, string, error) {
+	remainder, err := parseAlias([]byte(text), false)
+	if err != nil {
+		return "", "", err
 	}
-	if len(left) < 2 || left[0] != ':' {
-		err = fmt.Errorf("syntax error")
-		return
+
+	if len(remainder) < 2 {
+		return "", "", errInvalidAlias
 	}
-	key1 = text[:len(text)-len(left)]
-	if _, _, left2, err = parseKey(left[1:], false); err != nil {
-		return
+
+	// test if key is valid (without : in the beginning)
+	if _, _, err := parseKey(remainder[1:], false); err != nil {
+		return "", "", err
 	}
-	if len(left2) != 0 {
-		err = fmt.Errorf("syntax error")
-		return
-	}
-	key2 = string(left[1:])
-	return
+
+	alias := text[:len(text)-len(remainder)] // keeping the alias without the key
+	key := string(remainder[1:])             // remove ":" from the key
+
+	return alias, key, nil
 }
 
 func mustQuote(param string) bool {
