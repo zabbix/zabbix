@@ -336,6 +336,8 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_compressionOfSpecificChunks2() {
+		/* Allow some time for compression to turn off at TimescaleDB. This is done on Zabbix server start. */
+		sleep(3);
 		self::clearChunks();
 
 		/* Requires the running server. */
@@ -577,9 +579,7 @@ class testTimescaleDb extends CIntegrationTest {
 			try {
 				/* get compression job id */
 				$res = DBfetch(DBselect($sql));
-				$this->assertArrayHasKey('total_chunks', $res);
 				$this->assertArrayHasKey('number_compressed_chunks', $res);
-				$total_chunks = $res['total_chunks'];
 				$num_compressed_chunks = $res['number_compressed_chunks'];
 
 				/* 3 of the chunks old enough for compression are expected to be compressed. */
