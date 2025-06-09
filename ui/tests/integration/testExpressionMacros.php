@@ -32,7 +32,6 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_macros
- * @backup events
  * @onAfter clearData
  */
 class testExpressionMacros extends CIntegrationTest {
@@ -55,6 +54,7 @@ class testExpressionMacros extends CIntegrationTest {
 	private static $event_name;
 	private static $event_name_resolved;
 	private static $BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED;
+	private static $eventids;
 
 	const TRAPPER_ITEM_NAME = 'trap' . ALL_PRINTABLE_ASCII;
 	const TRAPPER_ITEM_KEY = 'trap';
@@ -899,6 +899,9 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 			'sortfield' => 'alertid'
 		], 5, 2);
 		$this->assertCount(4, self::$alert_response['result']);
+
+		foreach (self::$alert_response['result'] as $n)
+			self::$eventids[] = $n['eventid'];
 	}
 
 	/**
@@ -1097,5 +1100,7 @@ INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 		CDataHelper::call('trigger.delete', [self::$trigger_id]);
 		CDataHelper::call('item.delete', self::$item_ids);
 		CDataHelper::call('host.delete', [self::$host_id]);
+
+		DB::delete('events', ['eventid' => self::$eventids]);
 	}
 }
