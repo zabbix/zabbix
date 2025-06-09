@@ -1284,7 +1284,7 @@ window.host_wizard_edit = new class {
 
 				if (this.#data.monitoring_os === 'linux') {
 					server_host = this.#data.agent_script_server_host !== ''
-						? `--server-host ${this.#data.agent_script_server_host}`
+						? `--server-host '${this.#data.agent_script_server_host}'`
 						: `--server-host-stdin`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
@@ -1298,7 +1298,7 @@ window.host_wizard_edit = new class {
 
 				if (this.#data.monitoring_os === 'windows') {
 					server_host = this.#data.agent_script_server_host !== ''
-						? `-serverHost ${this.#data.agent_script_server_host}`
+						? `-serverHost '${this.#data.agent_script_server_host}'`
 						: `-serverHostSTDIN`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
