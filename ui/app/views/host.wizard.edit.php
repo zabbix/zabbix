@@ -254,7 +254,9 @@ function stepSelectTemplate($old_template_count): array {
 							(new CInput('radio', null, '#{category}:#{templateid}'))
 								->setAttribute('name', 'selected_template')
 						))->addClass(CRadioCardList::ZBX_STYLE_CLASS_SELECTOR)
-					]))->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
+					]))
+						->setTitle('#{title}')
+						->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
 				)
 				->addItem(
 					(new CDiv([

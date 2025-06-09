@@ -3299,6 +3299,7 @@ output {
     padding: 16px;
     border: 1px solid #666666;
     border-radius: 2px;
+    min-width: 0;
     white-space: normal; }
     .radio-card-list .radio-card:has(input[type="radio"]:checked) {
       border-color: #ffffff; }
@@ -6075,12 +6076,29 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         background: #dddddd;
         color: #000000; }
   .modal-popup-host-wizard .templates-card-list .radio-card {
-    grid-template-rows: repeat(2, max-content) 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
     max-height: 360px; }
+  .modal-popup-host-wizard .templates-card-list .radio-card-label,
+  .modal-popup-host-wizard .templates-card-list .template-tag,
+  .modal-popup-host-wizard .templates-card-list .template-info-toggle-container {
+    flex: 0 0 auto; }
+  .modal-popup-host-wizard .templates-card-list .template-info {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto; }
   .modal-popup-host-wizard .templates-card-list .radio-card-label {
+    display: -webkit-box;
     font-size: 14px;
-    line-height: 21px; }
+    line-height: 21px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 2;
+    white-space: normal;
+    word-break: break-all;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; }
   .modal-popup-host-wizard .templates-card-list .template-tags label {
     color: #cacaca; }
   .modal-popup-host-wizard .templates-card-list .template-tags .tags-list {
@@ -6098,8 +6116,6 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .templates-card-list .template-tags .btn-icon::before {
       font-size: 16px; }
   .modal-popup-host-wizard .templates-card-list .template-info {
-    overflow-x: hidden;
-    overflow-y: auto;
     line-height: 1.5; }
   .modal-popup-host-wizard .templates-card-list .template-info-item .title {
     color: #cacaca; }
