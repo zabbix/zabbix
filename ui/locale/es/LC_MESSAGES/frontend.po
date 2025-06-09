@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-24 15:06+0000\n"
+"PO-Revision-Date: 2025-06-04 21:06+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
 msgid " or "
-msgstr ""
+msgstr " o "
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -375,7 +375,7 @@ msgstr "1 minuto"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Instale Java Gateway en la misma máquina que ejecuta el servidor Zabbix siguiendo las instrucciones en"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -389,7 +389,7 @@ msgstr "12-horas"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. Configure su aplicación Java para que admita la monitorización remota de JMX. Por ejemplo:"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -454,17 +454,17 @@ msgstr "A"
 
 #: app/views/js/host.wizard.edit.js.php:1143
 msgid "A few more steps"
-msgstr ""
+msgstr "Unos pocos pasos más"
 
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
-msgstr ""
+msgstr "Se espera un valor de punto flotante."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Una plantilla es un conjunto de configuraciones predefinidas (métricas a recopilar, condiciones para generar alertas, etc.) diseñadas para su objetivo de monitoreo."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1016,7 +1016,7 @@ msgstr "Agregar equipo"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "Agregar interfaz de equipo"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1136,7 +1136,7 @@ msgstr "Reglas adicionales"
 
 #: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
 msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
-msgstr ""
+msgstr "Además, asegúrese de completar la instalación del agente como se describe en este paso, luego regrese a esta pantalla para continuar con el siguiente paso."
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
@@ -1218,7 +1218,7 @@ msgstr "Agente (pasivo)"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "Dirección del agente"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1238,7 +1238,7 @@ msgstr "Nombre de host del agente. Devuelve una cadena"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "Interfaz del agente"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1246,11 +1246,11 @@ msgstr "Interfaces del agente"
 
 #: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
 msgid "Agent mode"
-msgstr ""
+msgstr "Modo del agente"
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "Puerto del agente"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1258,11 +1258,11 @@ msgstr "Chequeo de variante del agente. Devuelve 1 - para agente Zabbix; 2 - par
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "Basado en agentes"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "Sin agente"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1454,12 +1454,12 @@ msgstr "Cantidad de memoria física del host consumida para respaldar las págin
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Ya existe un prototipo de regla LLD con la clave \"%1$s\" en el equipo \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Ya existe un prototipo de regla LLD con la clave \"%1$s\" en la plantilla \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1475,7 +1475,7 @@ msgstr "Ya existe una regla LLD con la clave \"%1$s\" en la plantilla \"%2$s\"."
 #: include/classes/validators/CFormValidator.php:1103
 #: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
 msgid "An array is expected."
-msgstr ""
+msgstr "Se espera una matriz."
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1585,7 +1585,7 @@ msgstr "Se eliminarán todas las entidades de plantilla existentes que no estén
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache, AWS, MySQL, etc."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1754,7 +1754,7 @@ msgstr "Debe ser seleccionado al menos un equipo o grupo de equipos."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
-msgstr ""
+msgstr "Se debe especificar al menos uno de los parámetros \"min\" o \"max\"."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2390,7 +2390,7 @@ msgstr "Cancelar"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "¿Cancelar el Asistente de Equipo?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2421,7 +2421,7 @@ msgstr "No se puede añadir la página al tablero: se han añadido el número m�
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "No se puede agregar el prototipo de descubrimiento"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2581,7 +2581,7 @@ msgstr "No se puede asignar el campo de inventario \"%1$s\" a la métrica con la
 #: app/controllers/CControllerItem.php:206
 #: app/controllers/CControllerItemPrototype.php:208
 msgid "Cannot be less than or equal to \"Min\"."
-msgstr ""
+msgstr "No puede ser menor o igual a \"Min\"."
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -2640,17 +2640,17 @@ msgstr "No se pueden convertir datos POST:"
 #: include/classes/helpers/CItemGeneralHelper.php:1016
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "No se puede copiar el prototipo de regla LLD con clave \"%1$s\" sin su prototipo maestro de métrica  con clave \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1004
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "No se puede copiar el prototipo de regla LLD con clave \"%1$s\" sin su métrica maestra con clave \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1003
 #, c-format
 msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "No se puede copiar la regla LLD con clave \"%1$s\" sin su métrica maestra con clave \"%2$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -2859,8 +2859,8 @@ msgstr "No se puede eliminar la comprobacion de descubrimiento \"%1$s\" de la re
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
 msgid "Cannot delete discovery prototype"
 msgid_plural "Cannot delete discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el prototipo de descubrimiento"
+msgstr[1] "No se pueden eliminar los prototipos de descubrimiento"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3185,8 +3185,8 @@ msgstr[1] "No se pueden desactivar los conectores"
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede deshabilitar el prototipo de descubrimiento"
+msgstr[1] "No se pueden deshabilitar los prototipos de descubrimiento"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
@@ -3281,8 +3281,8 @@ msgstr[1] "No se pueden activar los conectores"
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede habilitar el prototipo de descubrimiento"
+msgstr[1] "No se pueden habilitar los prototipos de descubrimiento"
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
@@ -3364,7 +3364,7 @@ msgstr "No pude expandir las macros."
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "No se puede encontrar \"parent_discovery_rule\" con la clave \"%1$s\" utilizada para el prototipo de regla LLD con la clave \"%2$s\" en \"%3$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3409,7 +3409,7 @@ msgstr "No se pudo encontrar el grupo de equipos \"%1$s\" para el prototipo de e
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No se puede encontrar el grupo de equipos \"%1$s\" para el prototipo de equipo \"%2$s\" del prototipo de regla de descubrimiento \"%3$s\" en \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3454,7 +3454,7 @@ msgstr "No se puede encontrar la interfaz \"%1$s\" usada por el prototipo de mé
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No se puede encontrar la interfaz \"%1$s\" utilizada para el prototipo de métrica \"%2$s\" del prototipo de regla de descubrimiento \"%3$s\" en \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -5176,7 +5176,7 @@ msgstr "Configuración de estadísticas de memoria caché. Caché - memoria temp
 
 #: app/views/host.wizard.edit.php:1024
 msgid "Configuration complete"
-msgstr ""
+msgstr "Configuración completada"
 
 #: include/classes/setup/CSetupWizard.php:1061
 #, c-format
@@ -5206,7 +5206,7 @@ msgstr "Configuración de tableros"
 
 #: host_discovery_prototypes.php:22
 msgid "Configuration of discovery prototypes"
-msgstr ""
+msgstr "Configuración de prototipos de descubrimiento"
 
 #: app/controllers/CControllerDiscoveryEdit.php:144
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
@@ -5376,13 +5376,13 @@ msgstr "Configurar el aprovisionamiento JIT"
 
 #: app/views/host.wizard.edit.php:368
 msgid "Configure encryption"
-msgstr ""
+msgstr "Configurar el cifrado"
 
 #: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
 #: app/views/host.wizard.edit.php:1006
 #: app/views/js/host.wizard.edit.js.php:1138
 msgid "Configure host"
-msgstr ""
+msgstr "Configurar el equipo"
 
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
@@ -5739,7 +5739,7 @@ msgstr "Recuento de valores en la cola de preprocesamiento."
 #: app/views/js/host.wizard.edit.js.php:761
 #: app/views/js/host.wizard.edit.js.php:1441
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #: app/views/administration.token.list.php:109
 #: app/views/administration.user.token.list.php:76
@@ -5803,7 +5803,7 @@ msgstr "Crear deshabilitado"
 
 #: include/views/configuration.host.discovery.prototype.list.php:34
 msgid "Create discovery prototype"
-msgstr ""
+msgstr "Crear un prototipo de descubrimiento"
 
 #: app/views/configuration.discovery.list.php:35
 #: include/views/configuration.host.discovery.list.php:39
@@ -5943,7 +5943,7 @@ msgstr "Crear nuevo informe"
 
 #: app/views/host.wizard.edit.php:273 app/views/js/host.wizard.edit.js.php:1122
 msgid "Create or select a host"
-msgstr ""
+msgstr "Crear o seleccionar un equipo"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6735,7 +6735,7 @@ msgstr "¿Eliminar tablero?"
 
 #: include/views/configuration.host.discovery.prototype.edit.php:1086
 msgid "Delete discovery prototype?"
-msgstr ""
+msgstr "¿Eliminar prototipo de descubrimiento?"
 
 #: app/views/configuration.discovery.edit.php:264
 #: include/views/configuration.host.discovery.edit.php:1032
@@ -7699,7 +7699,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.prototype.list.php:25
 #: include/views/configuration.host.discovery.prototype.list.php:241
 msgid "Discovery prototypes"
-msgstr ""
+msgstr "Prototipos de descubrimiento"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -7866,7 +7866,7 @@ msgstr "Denominador de la división"
 
 #: app/views/host.wizard.edit.php:114
 msgid "Do not show welcome screen"
-msgstr ""
+msgstr "No mostrar la pantalla de bienvenida"
 
 #: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
 #: app/views/popup.massupdate.item.php:315
@@ -8208,7 +8208,7 @@ msgstr "Activar autenticación HTTP para todos los usuarios."
 
 #: app/views/host.wizard.edit.php:811
 msgid "Enable IPMI checks on Zabbix server"
-msgstr ""
+msgstr "Habilitar comprobaciones de IPMI en el servidor Zabbix"
 
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
@@ -8287,7 +8287,7 @@ msgstr "Habilitar la autenticación multifactor"
 
 #: app/views/host.wizard.edit.php:859
 msgid "Enable remote JMX monitoring"
-msgstr ""
+msgstr "Habilitar la monitorización remota de JMX"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -8325,11 +8325,11 @@ msgstr "¿Activar los conectores seleccionados?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:259
 msgid "Enable selected discovery prototype?"
-msgstr ""
+msgstr "¿Habilitar prototipo de descubrimiento seleccionado?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:260
 msgid "Enable selected discovery prototypes?"
-msgstr ""
+msgstr "¿Habilitar prototipos de descubrimiento seleccionados?"
 
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
@@ -8482,7 +8482,7 @@ msgstr "Cifrar"
 #: include/classes/setup/CSetupWizard.php:846
 #: include/classes/setup/CSetupWizard.php:1075
 msgid "Encrypt connections from Web interface"
-msgstr ""
+msgstr "Cifrar conexiones desde la interfaz web"
 
 #: app/partials/configuration.host.edit.html.php:513
 #: app/views/administration.proxy.list.php:88
@@ -9312,7 +9312,7 @@ msgstr "Tamaño de la fuente"
 
 #: app/views/host.wizard.edit.php:816 app/views/host.wizard.edit.php:873
 msgid "For more details, see"
-msgstr ""
+msgstr "Para más detalles, véase"
 
 #: app/views/webscenario.step.edit.php:106
 msgid "Form data"
@@ -9417,11 +9417,11 @@ msgstr "Zabbix"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Generate a secret pre-shared key hexadecimal string."
-msgstr ""
+msgstr "Generar una cadena hexadecimal de clave precompartida secreta."
 
 #: app/views/host.wizard.edit.php:411
 msgid "Generate new"
-msgstr ""
+msgstr "Generar nuevo"
 
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:98
@@ -9478,7 +9478,7 @@ msgstr "La expresión dada no es una macro"
 #: app/controllers/CControllerValueMapEdit.php:95
 #: app/controllers/CControllerValueMapEdit.php:109
 msgid "Given valuemap name is already taken."
-msgstr ""
+msgstr "El nombre del mapa de valores dado ya está tomado."
 
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
@@ -10738,7 +10738,7 @@ msgstr "IPMI"
 
 #: app/views/host.wizard.edit.php:759
 msgid "IPMI address"
-msgstr ""
+msgstr "Dirección IPMI"
 
 #: include/items.inc.php:96
 msgid "IPMI agent"
@@ -10746,7 +10746,7 @@ msgstr "Agente IPMI"
 
 #: app/views/host.wizard.edit.php:818
 msgid "IPMI checks"
-msgstr ""
+msgstr "Comprobaciones de IPMI"
 
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
@@ -10754,7 +10754,7 @@ msgstr "Interfaces IPMI"
 
 #: app/views/host.wizard.edit.php:765
 msgid "IPMI port"
-msgstr ""
+msgstr "Puerto IPMI"
 
 #: disc_prototypes.php:116 host_discovery.php:106
 #: include/views/configuration.host.discovery.edit.php:569
@@ -11505,7 +11505,7 @@ msgstr "Rango de puertos incorrecto."
 #: app/controllers/CControllerHostCreate.php:71
 #: app/controllers/CControllerHostUpdate.php:75
 msgid "Incorrect port."
-msgstr ""
+msgstr "Puerto incorrecto."
 
 #: app/controllers/CControllerRegExTest.php:77
 #, c-format
@@ -13468,7 +13468,7 @@ msgstr "Vínculos"
 
 #: app/views/host.wizard.edit.php:431
 msgid "Linux"
-msgstr ""
+msgstr "Linux"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -13504,7 +13504,7 @@ msgstr "Lista de dispositivos de bloques y su tipo. Devuelve JSON"
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
-msgstr ""
+msgstr "Lista de caracteres"
 
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
@@ -13739,7 +13739,7 @@ msgstr "Configuración de MFA"
 
 #: app/views/host.wizard.edit.php:550
 msgid "Mac OS"
-msgstr ""
+msgstr "Mac OS"
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -13766,7 +13766,7 @@ msgstr "La macro \"%1$s\" ya existe."
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:63
 #, c-format
 msgid "Macro \"%1$s\" is missing."
-msgstr ""
+msgstr "Falta la macro \"%1$s\"."
 
 #: app/controllers/CControllerHostCreate.php:180
 #: app/controllers/CControllerHostUpdate.php:185
@@ -15271,7 +15271,7 @@ msgstr "Nuevos valores"
 
 #: app/views/host.wizard.edit.php:59 app/views/js/host.wizard.edit.js.php:1450
 msgid "Next"
-msgstr ""
+msgstr "Siguiente"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -15924,7 +15924,7 @@ msgstr "No hay métricas heredadas"
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
-msgstr ""
+msgstr "No vinculado"
 
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
@@ -15985,7 +15985,7 @@ msgstr "Noviembre"
 
 #: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
 msgid "Number"
-msgstr ""
+msgstr "Número"
 
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
@@ -16276,7 +16276,7 @@ msgstr "Antiguo nombre de etiqueta"
 
 #: app/views/host.wizard.edit.php:454
 msgid "Older version"
-msgstr ""
+msgstr "Versión anterior"
 
 #: include/views/monitoring.sysmap.constructor.php:51
 #: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
@@ -16300,7 +16300,7 @@ msgstr "Uno"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr ""
+msgstr "Se permite un paso de “Cambio” por métrica."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
@@ -16411,7 +16411,7 @@ msgstr "Abrir registro"
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
-msgstr ""
+msgstr "La extensión OpenSSL no está disponible."
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -16614,7 +16614,7 @@ msgstr "Otras configuraciones"
 
 #: app/views/host.wizard.edit.php:556
 msgid "Other OS"
-msgstr ""
+msgstr "Otros sistemas operativos"
 
 #: app/controllers/CControllerMiscConfigEdit.php:112
 #: app/views/administration.miscconfig.edit.php:30
@@ -20137,7 +20137,7 @@ msgstr "Mostrar leyenda"
 
 #: app/views/js/host.wizard.edit.js.php:1507
 msgid "Show less"
-msgstr ""
+msgstr "Mostrar menos"
 
 #: widgets/actionlog/includes/WidgetForm.php:91
 #: widgets/plaintext/includes/WidgetForm.php:55
@@ -20155,7 +20155,7 @@ msgstr "Mostrar etiquetas de elementos del mapa"
 
 #: app/views/host.wizard.edit.php:247 app/views/js/host.wizard.edit.js.php:1508
 msgid "Show more"
-msgstr ""
+msgstr "Mostrar más"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -20221,7 +20221,7 @@ msgstr "Mostrar errores técnicos"
 
 #: app/views/host.wizard.edit.php:171
 msgid "Show templates"
-msgstr ""
+msgstr "Mostrar plantillas"
 
 #: widgets/plaintext/includes/WidgetForm.php:62
 msgid "Show text as HTML"
@@ -24843,11 +24843,11 @@ msgstr "Anchura"
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: app/views/host.wizard.edit.php:450
 msgid "Windows 10/Server 2016 or later"
-msgstr ""
+msgstr "Windows 10/Server 2016 o posterior"
 
 #: app/controllers/CControllerLatest.php:554
 msgid "With data"
@@ -25167,7 +25167,7 @@ msgstr "No has iniciado sesión"
 
 #: app/views/host.wizard.edit.php:103
 msgid "You can always access Host Wizard from Data collection > Hosts."
-msgstr ""
+msgstr "Siempre puede acceder al Asistente de equipo desde Recopilación de datos > Equipos."
 
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
@@ -25254,7 +25254,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
-msgstr ""
+msgstr "Documentación de Zabbix"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -27234,7 +27234,7 @@ msgstr "conectado"
 #: include/classes/validators/CFormValidator.php:1433 jsLoader.php:438
 #, c-format
 msgid "one of %1$s"
-msgstr ""
+msgstr "uno de %1$s"
 
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
@@ -28107,13 +28107,13 @@ msgstr "no será deshabilitado"
 #: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
 #, c-format
 msgid "within range %1$s"
-msgstr ""
+msgstr "dentro del rango %1$s"
 
 #: include/classes/validators/CFormValidator.php:1394
 #: include/classes/validators/CFormValidator.php:1439 jsLoader.php:437
 #, c-format
 msgid "within ranges %1$s"
-msgstr ""
+msgstr "dentro de los rangos %1$s"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

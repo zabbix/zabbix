@@ -174,7 +174,4 @@ void	zbx_audit_entry_update_string(zbx_audit_entry_t *entry, const char *name, c
 void	zbx_audit_entry_add_secret(zbx_audit_entry_t *entry, const char *table, const char *field, const char *name,
 		const char *value1);
 
-/* maximum length of object property that's being logged, for example discoveryruleprototype.params */
-#define AUDIT_MAX_KEY_LEN       256
-
 #endif	/* ZABBIX_ZBXAUDIT_H */

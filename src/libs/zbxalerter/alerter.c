@@ -192,8 +192,9 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 			memset(&event.trigger, 0, sizeof(zbx_db_trigger));
 			event.trigger.expression = expression;
+			expression = NULL;
 			event.trigger.recovery_expression = recovery_expression;
-
+			recovery_expression = NULL;
 			zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,

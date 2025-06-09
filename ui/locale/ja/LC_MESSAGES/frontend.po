@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-30 07:09+0000\n"
+"PO-Revision-Date: 2025-06-05 05:50+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -49,7 +49,7 @@ msgstr "\"%2$s\"ではなく\"%1$s\"が設定されています"
 #: include/classes/import/validators/C62XmlValidator.php:2054
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" で指定してください"
+msgstr "\"%1$s\"で指定してください"
 
 #: include/classes/api/services/CReport.php:220
 #: include/classes/api/services/CReport.php:615
@@ -358,7 +358,7 @@ msgstr "1分"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Zabbixサーバーが稼働している同じマシンにJava Gatewayをインストールします。"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -372,7 +372,7 @@ msgstr "12時間表示"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. リモートJMX監視をサポートするようにJavaアプリケーションを設定します。例："
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -447,7 +447,7 @@ msgstr "浮動小数点の値で指定してください。"
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "テンプレートとは、監視対象に合わせて設計された、事前定義された構成 (収集するメトリック、アラートを生成する条件など) のセットです。"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -993,7 +993,7 @@ msgstr "ホストを追加"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "ホストインターフェースを追加"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1113,7 +1113,7 @@ msgstr "追加のルール"
 
 #: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
 msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
-msgstr ""
+msgstr "さらに、この手順で説明されているようにエージェントのインストールを完了したら、この画面に戻って次の手順に進みます。"
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
@@ -1195,7 +1195,7 @@ msgstr "エージェント（パッシブ）"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "エージェントのアドレス"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1215,7 +1215,7 @@ msgstr "エージェントのホスト名。文字列値を返す。"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "エージェントのインターフェース"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1223,11 +1223,11 @@ msgstr "エージェントのインターフェース"
 
 #: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
 msgid "Agent mode"
-msgstr ""
+msgstr "エージェントモード"
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "エージェントのポート"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1235,11 +1235,11 @@ msgstr "エージェント種別チェック。返り値: 1 - Zabbixエージェ
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "エージェントベース"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "エージェントレス"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1431,12 +1431,12 @@ msgstr "ゲストの物理メモリページのバックアップに消費され
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "キー \"%1$s\" のLLD ルール プロトタイプはホスト \"%2$s\" に既に存在します。"
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "キー \"%1$s\" の LLD ルール のプロトタイプはテンプレート \"%2$s\" に既に存在します。"
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1562,7 +1562,7 @@ msgstr "インポートファイルに含まれない既存のテンプレート
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache、AWS、MySQL など"
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1729,7 +1729,7 @@ msgstr "少なくとも1つのホストグループまたはホストが選択�
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
-msgstr ""
+msgstr "パラメータ\"min\"または\"max\"のうち、少なくともどちらか 1 つを指定する必要があります。"
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2365,7 +2365,7 @@ msgstr "キャンセル"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "ホストウィザードをキャンセルしますか?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2396,7 +2396,7 @@ msgstr "ダッシュボードページが追加できません： 最大数%1$d�
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "ディスカバリプロトタイプを追加できません。"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2555,7 +2555,7 @@ msgstr "キー\"%4$s\"のアイテムによってすでに取り込まれてい�
 #: app/controllers/CControllerItem.php:206
 #: app/controllers/CControllerItemPrototype.php:208
 msgid "Cannot be less than or equal to \"Min\"."
-msgstr ""
+msgstr "\"Min\"以下にはできません。"
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -4775,7 +4775,7 @@ msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
 
 #: jsLoader.php:551
 msgid "Clear"
-msgstr ""
+msgstr "クリア"
 
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
@@ -5005,7 +5005,7 @@ msgstr "通信"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr ""
+msgstr "Zabbixエージェントとサーバー/プロキシ間の通信は、一意のユーザー定義の事前共有キー識別子と、それにリンクされた秘密の事前共有キーによって保護されます。"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -5256,7 +5256,7 @@ msgstr "設定を更新しました"
 
 #: app/views/mediatype.edit.php:184
 msgid "Configure"
-msgstr ""
+msgstr "設定"
 
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
@@ -5270,19 +5270,19 @@ msgstr "JITプロビジョニングの設定"
 
 #: app/views/host.wizard.edit.php:368
 msgid "Configure encryption"
-msgstr ""
+msgstr "暗号化の設定"
 
 #: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
 #: app/views/host.wizard.edit.php:1006
 #: app/views/js/host.wizard.edit.js.php:1138
 msgid "Configure host"
-msgstr ""
+msgstr "ホストの設定"
 
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
 #, c-format
 msgid "Configured %1$s ago"
-msgstr ""
+msgstr "%1$s 前に設定されました"
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -5691,7 +5691,7 @@ msgstr "自動生成無効"
 
 #: include/views/configuration.host.discovery.prototype.list.php:34
 msgid "Create discovery prototype"
-msgstr ""
+msgstr "ディスカバリのプロトタイプの作成"
 
 #: app/views/configuration.discovery.list.php:35
 #: include/views/configuration.host.discovery.list.php:39
@@ -5831,7 +5831,7 @@ msgstr "新規レポートの作成"
 
 #: app/views/host.wizard.edit.php:273 app/views/js/host.wizard.edit.js.php:1122
 msgid "Create or select a host"
-msgstr ""
+msgstr "ホストの作成または選択"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6205,11 +6205,11 @@ msgstr "Data from %1$s. Generated in %2$s sec."
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
-msgstr ""
+msgstr "データは、監視対象にインストールされる軽量ソフトウェアコンポーネントであるZabbixエージェントによって収集されます。"
 
 #: app/views/js/host.wizard.edit.js.php:90
 msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
-msgstr ""
+msgstr "データは、標準プロトコル(SNMP、ICMPなど)、またはリモートアクセスメソッド(SSHなど)を使用して、Zabbixサーバーまたはプロキシによって収集されます。"
 
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
@@ -6622,7 +6622,7 @@ msgstr "ダッシュボードを削除しますか？"
 
 #: include/views/configuration.host.discovery.prototype.edit.php:1086
 msgid "Delete discovery prototype?"
-msgstr ""
+msgstr "ディスカバリのプロトタイプを削除しますか？"
 
 #: app/views/configuration.discovery.edit.php:264
 #: include/views/configuration.host.discovery.edit.php:1032
@@ -6727,11 +6727,11 @@ msgstr "選択したダッシュボードを削除しますか？"
 
 #: include/views/configuration.host.discovery.prototype.list.php:280
 msgid "Delete selected discovery prototype?"
-msgstr ""
+msgstr "選択したディスカバリのプロトタイプを削除しますか？"
 
 #: include/views/configuration.host.discovery.prototype.list.php:281
 msgid "Delete selected discovery prototypes?"
-msgstr ""
+msgstr "選択したディスカバリのプロトタイプを削除しますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
@@ -7273,11 +7273,11 @@ msgstr "選択したコネクタを無効にしますか？"
 
 #: include/views/configuration.host.discovery.prototype.list.php:265
 msgid "Disable selected discovery prototype?"
-msgstr ""
+msgstr "選択したディスカバリのプロトタイプを無効にしますか？"
 
 #: include/views/configuration.host.discovery.prototype.list.php:266
 msgid "Disable selected discovery prototypes?"
-msgstr ""
+msgstr "選択したディスカバリのプロトタイプを無効にしますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
@@ -7552,11 +7552,11 @@ msgstr "VMware仮想マシンの検出。\"url\" - VMwareサービスURL。JSON�
 #: include/views/configuration.host.discovery.prototype.edit.php:1051
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:156
 msgid "Discovery prototype"
-msgstr ""
+msgstr "ディスカバリのプロトタイプ"
 
 #: host_discovery_prototypes.php:515
 msgid "Discovery prototype created"
-msgstr ""
+msgstr "ディスカバリのプロトタイプを作成しました"
 
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:604
 msgid "Discovery prototype deleted"
@@ -7575,7 +7575,7 @@ msgstr[0] ""
 
 #: host_discovery_prototypes.php:523 host_discovery_prototypes.php:547
 msgid "Discovery prototype updated"
-msgstr ""
+msgstr "ディスカバリのプロトタイプを更新しました"
 
 #: include/html.inc.php:645
 #: include/views/configuration.host.discovery.list.php:389
@@ -7583,7 +7583,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.prototype.list.php:25
 #: include/views/configuration.host.discovery.prototype.list.php:241
 msgid "Discovery prototypes"
-msgstr ""
+msgstr "ディスカバリのプロトタイプ"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -8089,7 +8089,7 @@ msgstr "すべてのユーザーでHTTP認証を有効にします。"
 
 #: app/views/host.wizard.edit.php:811
 msgid "Enable IPMI checks on Zabbix server"
-msgstr ""
+msgstr "ZabbixサーバーでIPMIチェックを有効にする"
 
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
@@ -8398,19 +8398,19 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
-msgstr ""
+msgstr "監視対象にインストールされているZabbixエージェントのIP/DNSアドレスとポートを入力してください。"
 
 #: app/views/host.wizard.edit.php:771
 msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
-msgstr ""
+msgstr "IPMI対応の監視対象のIP/DNSアドレスとポートを入力してください。"
 
 #: app/views/host.wizard.edit.php:847
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
-msgstr ""
+msgstr "JMX対応の監視対象のIP/DNSアドレスとポートを入力してください。"
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
-msgstr ""
+msgstr "SNMP対応の監視対象のIP/DNSアドレス、ポート、および認証の詳細を入力してください。"
 
 #: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
 #, c-format
@@ -8728,7 +8728,7 @@ msgstr "障害が1件のときにトリガー名を表示"
 #: app/controllers/CControllerTemplateCreate.php:69
 #: app/controllers/CControllerTemplateUpdate.php:71
 msgid "Expected user macro format is \"{$MACRO}\"."
-msgstr ""
+msgstr "想定されるユーザーマクロの形式は\"{$MACRO}\"です。"
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -10604,7 +10604,7 @@ msgstr "IPMI"
 
 #: app/views/host.wizard.edit.php:759
 msgid "IPMI address"
-msgstr ""
+msgstr "IPMIアドレス"
 
 #: include/items.inc.php:96
 msgid "IPMI agent"
@@ -10612,7 +10612,7 @@ msgstr "IPMIエージェント"
 
 #: app/views/host.wizard.edit.php:818
 msgid "IPMI checks"
-msgstr ""
+msgstr "IPMIチェック"
 
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
@@ -10620,7 +10620,7 @@ msgstr "IPMIインターフェース"
 
 #: app/views/host.wizard.edit.php:765
 msgid "IPMI port"
-msgstr ""
+msgstr "IPMIポート"
 
 #: disc_prototypes.php:116 host_discovery.php:106
 #: include/views/configuration.host.discovery.edit.php:569
@@ -10904,7 +10904,7 @@ msgstr "値の範囲"
 
 #: app/views/host.wizard.edit.php:813
 msgid "In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value."
-msgstr ""
+msgstr "Zabbixサーバーの設定ファイル(zabbix_server.conf)で、StartIPMIPollersパラメータを0以外の値に設定してください。"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectSla.php:31
 msgid "Inaccessible SLA"
@@ -11886,11 +11886,11 @@ msgstr "インストール"
 
 #: app/views/host.wizard.edit.php:351 app/views/js/host.wizard.edit.js.php:1128
 msgid "Install Zabbix agent"
-msgstr ""
+msgstr "Zabbixエージェントをインストール"
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "以下のインストール手順に従って、監視対象にZabbixエージェント2とそのプラグインをインストールしてください。"
 
 #: setup.php:163
 msgid "Installation"
@@ -11914,7 +11914,7 @@ msgstr "インテグレーション"
 
 #: app/views/js/host.wizard.edit.js.php:98
 msgid "Intelligent Platform Management Interface (IPMI)"
-msgstr ""
+msgstr "Intelligent Platform Management Interface (IPMI)"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:208 app/views/popup.proxy.edit.php:68
@@ -15782,7 +15782,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
-msgstr ""
+msgstr "エージェントのインストール中は、PSK IDとPSKの両方を設定する必要があります。手順1で設定したPSK IDとPSKが一致していることを確認してください。"
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
@@ -18490,7 +18490,7 @@ msgstr "初期表示にリセット"
 
 #: app/views/administration.miscconfig.edit.php:103
 msgid "Resolve secret vault macros by"
-msgstr ""
+msgstr "Vaultシークレットマクロを解決する"
 
 #: jsLoader.php:283
 msgid "Resolved"
@@ -18644,7 +18644,7 @@ msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスのJSO
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
-msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効な値：agent、active_agent、snmp、ipmi、jmx。"
+msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効なタイプ: agent、active_agent、snmp、ipmi、jmx。"
 
 #: include/classes/data/CItemData.php:2666
 msgid "Returns current maintenance status of the host."
@@ -18930,7 +18930,7 @@ msgstr "SNMP OID"
 
 #: app/views/host.wizard.edit.php:630
 msgid "SNMP address"
-msgstr ""
+msgstr "SNMPアドレス"
 
 #: app/views/administration.timeouts.edit.php:65
 #: app/views/popup.proxy.edit.php:228 include/items.inc.php:89
@@ -18954,7 +18954,7 @@ msgstr "SNMPインターフェース"
 
 #: app/views/host.wizard.edit.php:636
 msgid "SNMP port"
-msgstr ""
+msgstr "SNMPポート"
 
 #: include/items.inc.php:90
 msgid "SNMP trap"
@@ -20141,7 +20141,7 @@ msgstr "標準"
 
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
-msgstr ""
+msgstr "Simple Network Management Protocol (SNMP) インターフェース"
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -23650,11 +23650,11 @@ msgstr "ユーザー名とパスワード"
 
 #: include/classes/vaults/CVaultCyberArk.php:112
 msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
-msgstr "ユーザー名とパスワードは、Vaultの秘密鍵\"UserName\"と\"Content\"に保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"UserName\"と\"Content\"に保存してください。"
 
 #: include/classes/vaults/CVaultHashiCorp.php:101
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
-msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"username\"と\"password\"に保存してください。"
 
 #: app/views/administration.authentication.edit.php:323
 msgid "Username attribute"
@@ -24299,7 +24299,7 @@ msgstr "Vaultへの接続に失敗しました。"
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Vault prefix"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -24646,11 +24646,11 @@ msgstr "幅"
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: app/views/host.wizard.edit.php:450
 msgid "Windows 10/Server 2016 or later"
-msgstr ""
+msgstr "Windows 10/Server 2016以降"
 
 #: app/controllers/CControllerLatest.php:554
 msgid "With data"
@@ -25442,13 +25442,13 @@ msgstr "整数で指定してください"
 #: include/classes/api/services/CItemGeneral.php:2064
 #: include/classes/api/services/CItemGeneral.php:2167
 msgid "an item ID is expected"
-msgstr "アイテム ID が必要です"
+msgstr "アイテムIDが必要です"
 
 #: include/classes/api/services/CItemGeneral.php:2042
 #: include/classes/api/services/CItemGeneral.php:2063
 #: include/classes/api/services/CItemGeneral.php:2166
 msgid "an item/item prototype ID is expected"
-msgstr "アイテム/アイテム プロトタイプ ID が必要です"
+msgstr "アイテム/アイテムプロトタイプIDが必要です"
 
 #: include/classes/validators/CApiInputValidator.php:833
 #: include/classes/validators/CApiInputValidator.php:3353
@@ -26244,7 +26244,7 @@ msgstr "同じUUIDのホストグループがすでに存在します"
 
 #: include/classes/api/services/CMap.php:1967
 msgid "host item ID is expected"
-msgstr ""
+msgstr "ホストアイテムIDが必要です"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
@@ -26266,7 +26266,7 @@ msgstr "同じUUIDのホストプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CMap.php:2198
 msgid "host trigger ID is expected"
-msgstr ""
+msgstr "ホストトリガーIDが必要です"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -27382,12 +27382,12 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1849
 #: include/classes/api/services/CItemGeneral.php:1889
 msgid "the host interface ID is expected"
-msgstr "ホスト インターフェイス ID が必要です"
+msgstr "ホストインターフェースIDが必要です"
 
 #: include/classes/api/services/CItemGeneral.php:1905
 #, c-format
 msgid "the host interface ID of type \"%1$s\" is expected"
-msgstr ""
+msgstr "タイプ\"%1$s\"のホストインターフェースIDが必要です"
 
 #: include/classes/validators/CApiInputValidator.php:3284
 msgid "the last new line feed is missing"
