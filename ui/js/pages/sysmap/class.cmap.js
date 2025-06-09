@@ -514,18 +514,25 @@ class CMap {
 		// Open context menu for map element or shape.
 		this.container[0].addEventListener('contextmenu', (e) => {
 			const element = e.target,
-				item_data = {...element.dataset},
 				can_paste = this.copypaste_buffer.items && this.copypaste_buffer.items.length > 0;
 
-			let can_copy = false,
+			let item_data = {...element.dataset},
+				can_copy = false,
 				can_remove = false,
 				can_reorder = false;
+
+			// right-click on a border of a sysmap shape
+			if (item_data.id === undefined && $(element).closest('.sysmap_shape').length) {
+				item_data = $(element).closest('.sysmap_shape')[0].dataset
+			}
 
 			if (item_data.id === undefined) {
 				this.#clearSelection();
 			}
 			else if (item_data.type && this.selection[item_data.type][item_data.id] === undefined) {
+				this.#clearSelection()
 				this.#selectElements([item_data], false, true);
+				this.#toggleForm();
 			}
 
 			can_copy = this.selection.count.shapes > 0 || this.selection.count.selements > 0;
