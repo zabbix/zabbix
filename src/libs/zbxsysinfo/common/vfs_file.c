@@ -1284,13 +1284,12 @@ static char	*get_print_time(time_t st_raw)
 		char	*tmp;							\
 										\
 		if (0 <= time)							\
-		{								\
 			tmp = get_print_time((time_t)time);			\
-			zbx_json_addstring(j, tag, tmp, ZBX_JSON_TYPE_STRING);	\
-			zbx_free(tmp);						\
-		}								\
 		else								\
-			zbx_json_addstring(j, tag, NULL, ZBX_JSON_TYPE_STRING);	\
+			tmp = get_print_time(0);				\
+										\
+		zbx_json_addstring(j, tag, tmp, ZBX_JSON_TYPE_STRING);		\
+		zbx_free(tmp);							\
 	} while (0)
 
 #define VFS_FILE_ADD_TS(time, tag)						\
@@ -1299,7 +1298,7 @@ static char	*get_print_time(time_t st_raw)
 		if (0 <= time)							\
 			zbx_json_adduint64(j, tag, (zbx_uint64_t)time);		\
 		else								\
-			zbx_json_addstring(j, tag, NULL, ZBX_JSON_TYPE_STRING);	\
+			zbx_json_adduint64(j, tag, 0);				\
 	} while (0)
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
