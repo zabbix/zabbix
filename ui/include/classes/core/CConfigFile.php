@@ -326,14 +326,17 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$HISTORY[\'types\'] = [\'uint\', \'text\'];
 
 // Used for SAML authentication.
+
 // Uncomment to set extra settings.
-//$SSO[\'SETTINGS\']	= [];
-// Comment out or set value to \'file\' if you are using file storage.
-$SSO[\'CERT_STORAGE\']	= \'database\';
-// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates if you are using file storage.
+//$SSO[\'SETTINGS\']		= [];
+
+// Set to \'file\' to store the private key and certificates on the file system.
+$SSO[\'CERT_STORAGE\']		= \'database\';
+
+// Uncomment to override the default paths for the private key and certificates, if stored on the file system.
 //$SSO[\'SP_KEY\']		= \'conf/certs/sp.key\';
 //$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
-//$SSO[\'IDP_CERT\']	= \'conf/certs/idp.crt\';
+//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
