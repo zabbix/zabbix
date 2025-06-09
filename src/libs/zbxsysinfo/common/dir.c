@@ -942,7 +942,7 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 		{
 			char		*path;
 			int		match;
-			zbx_uint64_t	file_ft;
+			time_t		file_ft;
 
 			if (0 == wcscmp(data.cFileName, L".") || 0 == wcscmp(data.cFileName, L".."))
 				continue;
@@ -969,9 +969,9 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 			if (max_size < DW2UI64(data.nFileSizeHigh, data.nFileSizeLow))
 				match = 0;
 
-			file_ft = DW2UI64(data.ftLastWriteTime.dwHighDateTime, data.ftLastWriteTime.dwLowDateTime);
+			file_ft = FT2UT(data.ftLastWriteTime);
 
-			if (0 != file_ft && min_time >= FT2UT(data.ftLastWriteTime))
+			if (0 <= file_ft && min_time >= file_ft)
 				match = 0;
 
 			if (max_time < FT2UT(data.ftLastWriteTime))
