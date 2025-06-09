@@ -327,7 +327,7 @@
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
 				if (auth_type != this.db_authentication_type) {
 					warnings.push(<?= json_encode(
-					_('Switching authentication method will reset all except this session!')
+					_('Changing the authentication method will reset all sessions, except the current one.')
 				) ?>);
 			}
 
@@ -335,7 +335,7 @@
 			if (this.saml_idp_certificate_exists && !idp_certificate_input.disabled
 					&& idp_certificate_input.value === '') {
 				warnings.push(<?= json_encode(
-					_('You are about to erase existing IdP certificate.')
+					_('Current IdP certificate will be deleted.')
 				) ?>);
 			}
 
@@ -343,7 +343,7 @@
 			if (this.saml_sp_certificate_exists && !sp_certificate_input.disabled
 					&& sp_certificate_input.value === '') {
 				warnings.push(<?= json_encode(
-					_('You are about to erase existing SP certificate.')
+					_('Current SP certificate will be deleted.')
 				) ?>);
 			}
 
@@ -351,7 +351,7 @@
 			if (this.saml_sp_private_key_exists && !sp_private_key_input.disabled
 					&& sp_private_key_input.value === '') {
 				warnings.push(<?= json_encode(
-					_('You are about to erase existing SP private key.')
+					_('Current SP private key will be deleted.')
 				) ?>);
 			}
 
