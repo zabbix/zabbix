@@ -422,3 +422,19 @@ int	query_macro_resolver(zbx_token_type_t type, char **value, char **error, va_l
 	}
 	return SUCCEED;
 }
+
+void	extract_yaml_values_dbl(zbx_mock_handle_t hdata, zbx_vector_dbl_t *values)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	hvalue;
+
+	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hdata, &hvalue))
+	{
+		double	value;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_float(hvalue, &value)))
+			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
+
+		zbx_vector_dbl_append(values, value);
+	}
+}
