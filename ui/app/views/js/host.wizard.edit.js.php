@@ -1382,12 +1382,22 @@ window.host_wizard_edit = new class {
 					delete this.#macro_reset_list[path];
 				}
 
-				if (this.#hasErrors()) {
-					for (const field of this.#dialogue.querySelectorAll('.field-has-error')) {
-						const section = field.closest(`.${ZBX_STYLE_COLLAPSED}`);
+				if (step_init && this.#hasErrors()) {
+					for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
+						if (error === null) {
+							continue;
+						}
 
-						if (section !== null) {
-							toggleSection(section.querySelector('.toggle'));
+						const input = this.#dialogue.querySelector(`[name="${this.#pathToInputName(path)}"]`);
+
+						if (input === null) {
+							continue;
+						}
+
+						const section = input.closest(`.${ZBX_STYLE_COLLAPSIBLE}`);
+
+						if (section !== null && section.classList.contains(ZBX_STYLE_COLLAPSED)) {
+							toggleSection(section.querySelector(`.${ZBX_STYLE_TOGGLE}`));
 						}
 					}
 				}

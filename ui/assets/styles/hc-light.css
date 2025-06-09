@@ -5898,6 +5898,11 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       margin-top: 16px; }
       .modal-popup-host-wizard section.collapsible .section-body > div:not(:first-child) {
         margin-top: 16px; }
+    .modal-popup-host-wizard section.collapsible .toggle {
+      grid-column: 1 / -1;
+      justify-self: start;
+      min-width: 0;
+      max-width: 100%; }
     .modal-popup-host-wizard section.grid-columns {
       gap: 12px 48px; }
       .modal-popup-host-wizard section.grid-columns .section-head,
