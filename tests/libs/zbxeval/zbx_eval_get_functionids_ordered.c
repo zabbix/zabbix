@@ -23,7 +23,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			returned_ret;
+	int			returned_ret, status;
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
@@ -33,7 +33,11 @@ void	zbx_mock_test_entry(void **state)
 
 	rules = mock_eval_read_rules("in.rules");
 	zbx_vector_uint64_create(&functionids);
+	zbx_eval_init(&ctx);
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
+	status = zbx_eval_status(&ctx);
+
+	zbx_mock_assert_int_eq("eval status return value", SUCCEED, status);
 
 	if (SUCCEED != returned_ret)
 		printf("ERROR: %s\n", error);

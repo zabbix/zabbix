@@ -743,7 +743,7 @@ int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error)
 {
 	double	value;
 	int	i;
-
+printf("values num %d\n", values->values_num);
 	if (0 == values->values_num)
 	{
 		*error = zbx_strdup(*error, "no data (at least one value is required)");

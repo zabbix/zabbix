@@ -89,6 +89,8 @@ zbx_uint64_t	mock_eval_read_rules(const char *path)
 			rules |= ZBX_EVAL_TOKEN_ARG_QUERY;
 		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_FUNCTION_ARGS"))
 			rules |= ZBX_EVAL_PARSE_FUNCTION_ARGS;
+		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_CALC_EXPRESSION"))
+			rules |= ZBX_EVAL_PARSE_CALC_EXPRESSION;
 		else
 			fail_msg("Unsupported flag: %s", flag);
 
