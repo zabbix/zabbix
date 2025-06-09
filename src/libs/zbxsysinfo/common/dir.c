@@ -971,7 +971,7 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 
 			file_ft = FT2UT(data.ftLastWriteTime);
 
-			if (0 <= file_ft && min_time >= file_ft)
+			if (0 <= file_ft && min_time > file_ft)
 				match = 0;
 
 			if (max_time < FT2UT(data.ftLastWriteTime))
