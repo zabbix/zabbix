@@ -40,6 +40,8 @@ zabbix_export:
           value: '{EVENT.TAGS.__zbx_otrs_ticket_id}'
         - name: otrs_ticket_state
           value: new
+        - name: otrs_ticket_type
+          value: Unclassified
         - name: otrs_time_unit
           value: '0'
         - name: otrs_url
@@ -457,7 +459,7 @@ zabbix_export:
         	CParamValidator.validate({alert_subject: {type: 'string'}, alert_message: {type: 'string'},
         		event_nseverity: {type: 'integer', default: -1}, otrs_url: {type: 'string', url: true}, otrs_auth_user: {type: 'string'},
         		otrs_auth_password: {type: 'string'}, otrs_customer: {type: 'string'}, otrs_default_priority_id: {type: 'integer', min: 1, max: 5},
-        		otrs_queue: {type: 'string'}, otrs_ticket_state: {type: 'string'}, otrs_time_unit: {type: 'integer'},
+        		otrs_queue: {type: 'string'}, otrs_ticket_type: {type: 'string'}, otrs_ticket_state: {type: 'string'}, otrs_time_unit: {type: 'integer'},
         		otrs_closed_state_id: {type: 'integer', default: 0}, zabbix_url: {type: 'string', url: true}}, this.params);
         	this.params.entrypoint = '/nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket';
         
@@ -526,6 +528,7 @@ zabbix_export:
         	this.data['Ticket'] = {
         		Title: this.params.alert_subject,
         		Queue: this.params.otrs_queue,
+        		Type: this.params.otrs_ticket_type,
         		State: this.params.otrs_ticket_state,
         		PriorityID: this.priority.toString(),
         		CustomerUser: this.params.otrs_customer
@@ -618,13 +621,62 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_otrs_ticketlink}'
       event_menu_name: '((OTRS)) CE: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
       description: |
-        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/otrs_ce
+        This media type integrates your Zabbix installation with your Zammad installation using the Zabbix webhook feature.
         
-        1. Import ZabbixTicketConnector.yml on OTRS CE web interface page Admin > Web Services.
-        2. Create a new user for a Zabbix alerter with an email address.
-        3. In the Zabbix web interface go to Administration → Macros section. Setup the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend. 
-        4. On this page set OTRS CE parameters as otrs_auth_user, otrs_auth_password, etc.
-        5. To receive Zabbix notifications in OTRS CE, you need to create a Zabbix user and add Media with the OTRS CE media type. Make sure this user has access to all hosts for which you would like problem notifications to be sent to OTRS CE.
+        ((OTRS)) CE configuration:
+        
+        1. Create a new web service. To do so, navigate to "Admin" → "Web services" and import the "ZabbixTicketConnector.yml" file (it can be found in the official Zabbix repository next to the media type file).
+        
+        2. Create a new customer.
+        
+        3. Create a new customer user. Select the ID of the customer that you created in the previous step.
+        
+        4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the "RW" permission for the group that this ticket queue belongs to. In the example below, if you want to use the "Misc" queue, you must set the "RW" permission for the group "users".
+        
+        Zabbix configuration:
+        
+        1. Before you can start using the ((OTRS)) CE webhook, set the global macro "{$ZABBIX.URL}":
+        - In the Zabbix web interface, go to "Administration" → "Macros" in the top-left dropdown menu.
+        - Set the global macro "{$ZABBIX.URL}" to the URL of the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or localhost.
+        - Specifying a protocol is mandatory, whereas the port is optional. Depending on the web server configuration, you might also need to append "/zabbix" to the end of URL. Good examples:
+          - http://zabbix.com
+          - https://zabbix.lan/zabbix
+          - http://server.zabbix.lan/
+          - http://localhost
+          - http://127.0.0.1:8080
+        - Bad examples:
+          - zabbix.com
+          - http://zabbix/
+        
+        2. Set the following webhook parameters:
+        - otrs_auth_user - the username of the agent
+        - otrs_auth_password - the password of the agent
+        - otrs_customer - the email of the customer user
+        - otrs_queue - the queue that will be used for tickets created by the webhook
+        - otrs_url - the frontend URL of your ((OTRS)) CE installation (for example, "https://otrs.example.com/otrs")
+        
+        3. If you want to prioritize issues according to the severity values in Zabbix, you can define mapping parameters (create them as additional webhook parameters):
+        - severity_<name> - the ((OTRS)) CE priority ID (<name> in the parameter name can be one of the following values: "not_classified", "information", "warning", "average", "high", "disaster")
+        
+        4. If you have dynamic fields in ((OTRS)) CE and want them to be filled with values from Zabbix, add webhook parameters in the format "dynamicfield_<((OTRS)) CE dynamic field name>", similarly to the previous step. Dynamic fields can only be of the types "text", "textarea", "checkbox", or "date".
+        
+        5. If you want the webhook to close tickets related to **resolved** problems in Zabbix, you can change the following parameter value:
+        - otrs_closed_state_id - ((OTRS)) CE state ID for closed tasks (possible values: 0 - Disable tickets closing, >0 - State ID from the State Management page).
+        
+        6. If you use the ticket type feature, you can change the type of the created tickets:
+        - otrs_ticket_type - ((OTRS)) CE ticket type (set to "Unclassified" by default; present on fresh installations).
+        
+        7. Click the "Enabled" checkbox to enable the mediatype and click the "Update" button to save the webhook settings.
+        
+        8. Create a Zabbix user and add media:
+        - To create a new user, go to the "Users" → "Users" section, click the "Create user" button in the top right corner. In the "User" tab, fill in all required fields (marked with red asterisks).
+        - In the "Media" tab, click "Add" and select the type "Zammad" from the drop-down list. Add any value in the "Send to" field: it is not used in the webhook, but is required.
+        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to Zammad.
+        
+        9. Done! You can now start using this media type in actions and create tickets.
+        
+        You can find the latest version of this media and additional information in the official Zabbix repository:
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/otrs_ce
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
