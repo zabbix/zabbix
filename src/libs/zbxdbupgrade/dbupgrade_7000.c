@@ -307,8 +307,7 @@ static int	DBpatch_7000021(void)
 
 static int	DBpatch_7000022(void)
 {
-	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-			0};
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBadd_foreign_key("event_recovery", 2, &field);
 }
