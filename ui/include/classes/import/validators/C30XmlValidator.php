@@ -17,7 +17,7 @@
 /**
  * Validate import data from Zabbix 3.0.x.
  */
-class C30XmlValidator extends CXmlValidatorGeneral {
+class C30XmlValidator extends CImportValidatorGeneral {
 
 	/**
 	 * Legacy screen resource types.
