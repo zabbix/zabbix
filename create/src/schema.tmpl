@@ -1543,7 +1543,7 @@ INDEX		|2		|groupid
 
 TABLE|event_recovery|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
-FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
+FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid	|RESTRICT
 FIELD		|c_eventid	|t_id		|	|NULL		|0			|3|events	|eventid
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
 FIELD		|userid		|t_id		|	|NULL		|0			|-|users
@@ -2330,4 +2330,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7000000	|7000019
+ROW		|1		|7000000	|7000021
