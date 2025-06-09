@@ -18,64 +18,40 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerTriggerPrototypeEdit extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $trigger_prototype;
+	private array $trigger_prototype = [];
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'context' =>				'required|in '.implode(',', ['host', 'template']),
-			'hostid' =>					'db hosts.hostid',
-			'triggerid' =>				'db triggers.triggerid',
-			'name' =>					'string',
-			'expression' =>				'string',
-			'show_inherited_tags' =>	'in 0,1',
-			'form_refresh' =>			'in 0,1',
-			'parent_discoveryid' =>		'required|db items.itemid',
-			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
-			'correlation_tag' =>		'db triggers.correlation_tag',
-			'dependencies' =>			'array',
-			'description' =>			'db triggers.comments',
-			'event_name' =>				'db triggers.event_name',
-			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'opdata' =>					'db triggers.opdata',
-			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>	'string',
-			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
-			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
-			'tags' =>					'array',
-			'discover' =>				'db triggers.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
-			'type' =>					'db triggers.type|in 0,1',
-			'url' =>					'db triggers.url',
-			'url_name' =>				'db triggers.url_name'
-		];
+		$allow_any = [];
+		foreach (array_keys(CControllerTriggerPrototypeUpdate::getValidationRules()['fields']) as $name) {
+			$allow_any[$name] = [];
+		}
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'context' => ['string', 'required', 'in' => ['host', 'template']],
+			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
+			'form_refresh' => ['integer', 'in' => [0, 1]]
+		] + $allow_any]);
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
+		$options = [
+			'output' => ['itemid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
+
+		$discovery_rule = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
 		if (!$discovery_rule) {
 			return false;
@@ -107,8 +83,11 @@ class CControllerTriggerPrototypeEdit extends CController {
 					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name', 'discover'
 				],
 				'selectHosts' => ['hostid'],
-				'selectDiscoveryRule' => ['itemid', 'templateid'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'templateid', 'flags'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name', 'templateid', 'flags'],
+				'selectDiscoveryData' => ['parent_triggerid'],
 				'triggerids' => $this->getInput('triggerid'),
+				'discoveryids' => $this->getInput('parent_discoveryid'),
 				'selectItems' => ['itemid', 'templateid', 'flags'],
 				'selectDependencies' => ['triggerid'],
 				'selectTags' => ['tag', 'value']
@@ -119,9 +98,6 @@ class CControllerTriggerPrototypeEdit extends CController {
 			}
 
 			$this->trigger_prototype = reset($trigger_prototypes);
-		}
-		else {
-			$this->trigger_prototype = null;
 		}
 
 		return true;
@@ -154,7 +130,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'parent_discoveryid' => 0,
 			'discover' => $this->hasInput('form_refresh') ? ZBX_PROTOTYPE_NO_DISCOVER : ZBX_PROTOTYPE_DISCOVER,
 			'url' => '',
-			'url_name' => ''
+			'url_name' => '',
+			'is_discovered_prototype' => false
 		];
 
 		$this->getInputs($data, array_keys($data));
@@ -187,24 +164,51 @@ class CControllerTriggerPrototypeEdit extends CController {
 		}
 
 		if ($this->trigger_prototype) {
-			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger_prototype, $data);
+			if ($this->trigger_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_parent = API::TriggerPrototype()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
+					'triggerids' => $this->trigger_prototype['discoveryData']['parent_triggerid'],
+					'nopermissions' => true
+				]);
+				$db_parent = reset($db_parent);
+
+				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+				$this->trigger_prototype['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+			}
+			else {
+				$parent_lld =
+					$this->trigger_prototype['discoveryRule'] ?: $this->trigger_prototype['discoveryRulePrototype'];
+			}
+
+			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData(
+				$this->trigger_prototype + ['parent_lld' => $parent_lld],
+				$data
+			);
 
 			if ($data['form_refresh']) {
 				if ($data['show_inherited_tags']) {
 					$data['tags'] = $trigger['tags'];
 				}
 
-				$data = array_merge($data, [
-					'templateid' => $trigger['templateid'],
-					'limited' => $trigger['limited'],
-					'flags' => $trigger['flags'],
-					'templates' => $trigger['templates'],
-					'hostid' => $trigger['hostid']
-				]);
+				$data = array_intersect_key($trigger, array_flip([
+					'templateid',
+					'limited',
+					'flags',
+					'templates',
+					'hostid',
+					'discoveryRule',
+					'discoveryRulePrototype',
+					'discoveryData'
+				])) + $data;
 			}
 			else {
 				$data = $trigger;
 			}
+
+			$data['is_discovered_prototype'] = $trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& $trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		CTriggerGeneralHelper::getDependencies($data);
@@ -223,6 +227,10 @@ class CControllerTriggerPrototypeEdit extends CController {
 		$data['db_trigger'] = $this->trigger_prototype
 			? CTriggerGeneralHelper::convertApiInputForForm($this->trigger_prototype)
 			: [];
+
+		$data['js_validation_rules'] = $this->hasInput('triggerid')
+			? (new CFormValidator(CControllerTriggerPrototypeUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerTriggerPrototypeCreate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

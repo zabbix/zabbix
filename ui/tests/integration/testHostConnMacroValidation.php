@@ -593,7 +593,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	public function testHostConnMacroValidation_testInvalidMacroAutoregistration() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$c = new CAutoregClient('localhost', self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051), 3, 3,
-			ZBX_SOCKET_BYTES_LIMIT
+			ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => '0']
 		);
 		$c->sendRequest(self::HOST_NAME, '127.250.250.250;uname');
 

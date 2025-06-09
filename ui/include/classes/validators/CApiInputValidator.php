@@ -1562,7 +1562,7 @@ class CApiInputValidator {
 	 * API output validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL, API_NORMALIZE
 	 * @param string $rule['in']      (optional) comma-delimited field names, for example: 'hostid,name'
 	 * @param mixed  $data
 	 * @param string $path
@@ -1591,7 +1591,15 @@ class CApiInputValidator {
 		if (is_string($data)) {
 			$in = ($flags & API_ALLOW_COUNT) ? implode(',', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]) : API_OUTPUT_EXTEND;
 
-			return self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error);
+			if (!self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error)) {
+				return false;
+			}
+
+			if ($data === API_OUTPUT_EXTEND && array_key_exists('in', $rule) && $flags & API_NORMALIZE) {
+				$data = explode(',', $rule['in']);
+			}
+
+			return true;
 		}
 
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
@@ -2734,7 +2742,7 @@ class CApiInputValidator {
 			'macros' => array_key_exists('macros', $rule) ? $rule['macros'] : []
 		]);
 
-		if (!$ip_range_parser->parse($data)) {
+		if ($ip_range_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());
 			return false;
 		}
@@ -2875,23 +2883,13 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$macro_parsers = [];
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$macro_parsers[] = new CUserMacroParser();
-			$macro_parsers[] = new CUserMacroFunctionParser();
-		}
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$macro_parsers[] = new CLLDMacroParser();
-			$macro_parsers[] = new CLLDMacroFunctionParser();
-		}
+		$port_parser = new CPortParser([
+			'usermacros' => $flags & API_ALLOW_USER_MACRO,
+			'lldmacros' => $flags & API_ALLOW_LLD_MACRO
+		]);
 
-		foreach ($macro_parsers as $macro_parser) {
-			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
-		}
-
-		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
+		if ($port_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a port number is expected'));
 			return false;
 		}
 

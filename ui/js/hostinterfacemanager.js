@@ -45,9 +45,10 @@ class HostInterfaceManager {
 	static ZBX_STYLE_LIST_ACCORDION_ITEM = 'list-accordion-item';
 	static ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED = 'list-accordion-item-opened';
 
-	constructor(data, host_interface_row_tmpl) {
+	constructor(data, host_interface_row_tmpl, host_interface_row_snmp_tmpl) {
 		// Constants.
 		this.TEMPLATE = new Template(host_interface_row_tmpl);
+		this.TEMPLATE_SNMP = new Template(host_interface_row_snmp_tmpl);
 		this.DEFAULT_PORTS = {
 			agent: 10050,
 			snmp: 161,
@@ -119,9 +120,7 @@ class HostInterfaceManager {
 
 	setSnmpFields(elem, iface) {
 		if (iface.type != HostInterfaceManager.INTERFACE_TYPE_SNMP) {
-			return elem
-				.querySelector('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS)
-				.remove();
+			return;
 		}
 
 		elem
@@ -271,12 +270,13 @@ class HostInterfaceManager {
 		const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 		iface.type_name = this.INTERFACE_NAMES[iface.type];
+		const template = iface.type == HostInterfaceManager.INTERFACE_TYPE_SNMP ? this.TEMPLATE_SNMP : this.TEMPLATE;
 
 		/*
 		 * New line break css selector :empty. Trim used to avoid this.
 		 * Template added with new line. Because template <script> tag it contain for code readability.
 		 */
-		container.insertAdjacentHTML('beforeend', this.TEMPLATE.evaluate({iface: iface}).trim());
+		container.insertAdjacentHTML('beforeend', template.evaluate({iface: iface}).trim());
 
 		const elem = document.getElementById(`interface_row_${iface.interfaceid}`);
 
@@ -380,6 +380,11 @@ class HostInterfaceManager {
 					document
 						.getElementById(`interface_main_${type_interfaces.main}`)
 						.checked = true;
+
+					document.getElementById('main_interface_' + type).value = type_interfaces.main;
+				}
+				else {
+					document.getElementById('main_interface_' + type).value = 0;
 				}
 			}
 		}
@@ -395,6 +400,8 @@ class HostInterfaceManager {
 		if (id != old) {
 			this.data[id].main = HostInterfaceManager.INTERFACE_PRIMARY;
 			this.data[old].main = HostInterfaceManager.INTERFACE_SECONDARY;
+
+			document.getElementById('main_interface_' + type).value = id;
 		}
 
 		return true;

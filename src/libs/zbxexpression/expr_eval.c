@@ -2212,7 +2212,7 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
 				-1 != (func_num = zbx_expr_macro_index(query->ref.key)))
 		{
-			resolve_expression_query_macro(trigger, &expr_get_item_key, "item key", func_num, query,
+			resolve_expression_query_macro(trigger, &zbx_dc_get_item_key, "item key", func_num, query,
 					&query->ref.key, &item_keys);
 		}
 	}

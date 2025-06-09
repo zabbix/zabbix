@@ -459,7 +459,7 @@ class CMultifieldTableElement extends CTableElement {
 	 *        This will add row "tag4:4", will update row with index 1 to "new tag2:new 2", will remove rows by index 2
 	 *        and rows by tag name "tag1".
 	 *
-	 * @param array $data    data array to be set.
+	 * @param array	$data	data array to be set.
 	 *
 	 * @throws Exception
 	 *
@@ -470,7 +470,7 @@ class CMultifieldTableElement extends CTableElement {
 			$data = [$data];
 		}
 
-		// If the first row  already presents in multifield table no need to press Add.
+		// If the first row is already present in multifield table, then there is no need to press Add button.
 		$rows = $this->getRows()->count();
 		if (count($data) >= 1 && CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
 			if ($this->mapping === null) {

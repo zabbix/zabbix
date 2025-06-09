@@ -139,10 +139,29 @@ class CControllerItemEdit extends CControllerItem {
 			}
 		}
 
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$db_parent = API::ItemPrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'nopermissions' => true
+			]);
+			$db_parent = reset($db_parent);
+
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+		}
+
 		$data = [
+			'js_test_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
+			))->getRules(),
+			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
+				? (new CFormValidator(CControllerItemCreate::getValidationRules()))->getRules()
+				: (new CFormValidator(CControllerItemUpdate::getValidationRules()))->getRules(),
 			'item' => $item,
 			'host' => $host,
-			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
+			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST, ITEM_TYPE_NESTED])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'executable_item_types' => checkNowAllowedTypes(),
 			'inherited_timeouts' => $inherited_timeouts,
@@ -273,8 +292,8 @@ class CControllerItemEdit extends CControllerItem {
 		if ($this->hasInput('itemid')) {
 			[$item] = API::Item()->get([
 				'output' => [
-					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'name_resolved', 'key_', 'delay', 'history', 'trends',
+					'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
 					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 					'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
@@ -283,7 +302,7 @@ class CControllerItemEdit extends CControllerItem {
 				],
 				'selectDiscoveryRule' => ['name', 'templateid'],
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],
-				'selectItemDiscovery' => ['parent_itemid', 'disable_source'],
+				'selectDiscoveryData' => ['parent_itemid', 'disable_source'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => [$this->getInput('itemid')]

@@ -114,8 +114,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 
 		// Checking Title, Header and Column names.
-		$headers = ['', 'Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts',
-				'Key', 'Interval', 'Type', 'Status', 'Info'];
+		$headers = ['', 'Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Discovery rules', 'Key', 'Interval',
+				'Type', 'Status', 'Info'];
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->page->assertHeader('Discovery rules');
 		$table = $this->query(self::SELECTOR)->asTable()->one();

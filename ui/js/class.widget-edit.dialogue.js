@@ -217,12 +217,6 @@ class CWidgetEditDialogue extends EventTarget {
 		const is_submit = e.detail.close_by === Overlay.prototype.CLOSE_BY_SCRIPT;
 
 		if (!is_submit) {
-			if (!this.#is_new && this.#is_unsaved && !confirm(t('Widget configuration will be reverted.'))) {
-				e.preventDefault();
-
-				return;
-			}
-
 			this.#sandbox.cancel();
 		}
 

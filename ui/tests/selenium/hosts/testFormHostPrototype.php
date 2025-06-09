@@ -117,14 +117,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Write macros rows from Frontend to array.
-		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
-		$count = $table->getRows()->count() - 1;
+		$rows = $this->query('id:tbl_macros')->waitUntilVisible()->asMultifieldTable()->one()->getRows();
+
+		$count = $rows->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
-			$row = $table->getRow($i);
-			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/textarea')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
-			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
 			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
 
 			$macros['frontend'][] = $macro;
@@ -541,7 +541,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				' WHERE hostid IN ('.
 				'SELECT hostid'.
 				' FROM host_discovery'.
-				' WHERE parent_itemid='.self::DISCOVERY_RULE_ID.
+				' WHERE lldruleid='.self::DISCOVERY_RULE_ID.
 				')'.
 				'LIMIT 2';
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
@@ -1026,7 +1026,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				' WHERE hostid IN ('.
 				'SELECT hostid'.
 				' FROM host_discovery'.
-				' WHERE parent_itemid='.self::DISCOVERY_RULE_ID.
+				' WHERE lldruleid='.self::DISCOVERY_RULE_ID.
 				')'.
 				'LIMIT 1';
 
