@@ -887,17 +887,13 @@ static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t it
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
-		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz)
+		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_vector_pp_task_ptr_t *tasks)
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
 	zbx_uint64_t			queued_num;
-	zbx_vector_pp_task_ptr_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_pp_task_ptr_create(&tasks);
-	zbx_vector_pp_task_ptr_reserve(&tasks, ZBX_PREPROCESSING_BATCH_SIZE);
 
 	preprocessor_sync_configuration(manager);
 
@@ -927,7 +923,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 			zbx_pp_value_opt_clear(&var_opt);
 		}
 		else
-			zbx_vector_pp_task_ptr_append(&tasks, task);
+			zbx_vector_pp_task_ptr_append(tasks, task);
 
 		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &value.itemid)))
 		{
@@ -938,11 +934,11 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		preproc_item_value_clear(&value);
 	}
 
-	if (0 != tasks.values_num)
-		zbx_pp_manager_queue_value_preproc(manager, &tasks);
+	if (0 != tasks->values_num)
+		zbx_pp_manager_queue_value_preproc(manager, tasks);
 
-	queued_num = tasks.values_num;
-	zbx_vector_pp_task_ptr_destroy(&tasks);
+	queued_num = tasks->values_num;
+	zbx_vector_pp_task_ptr_clear(tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -1341,6 +1337,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_create(&tasks);
+	zbx_vector_pp_task_ptr_reserve(&tasks, ZBX_PREPROCESSING_BATCH_SIZE);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -1389,8 +1386,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
 					direct_sz = 0;
-					queued_once = preprocessor_add_request(manager, message,
-							&direct_num, &direct_sz);
+					queued_once = preprocessor_add_request(manager, message, &direct_num,
+							&direct_sz, &tasks);
 					queued_num += queued_once;
 					counter_queued_num += queued_once;
 					counter_queued_sz += (zbx_uint64_t)message->size - direct_sz;
@@ -1476,7 +1473,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		}
 
 		/* release memory in case of peak periods */
-		if (SEC_PER_DAY <= sec - time_trim)
+		if (SEC_PER_HOUR <= sec - time_trim)
 		{
 #ifdef	HAVE_MALLOC_TRIM
 			malloc_trim(128 * ZBX_MEBIBYTE);
