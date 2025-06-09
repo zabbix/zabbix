@@ -23,6 +23,8 @@ abstract class CTriggerGeneral extends CApiService {
 		'disable_source'
 	];
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	private static function isTrigger(): bool {
 		return static::class === 'CTrigger';
 	}
@@ -30,8 +32,6 @@ abstract class CTriggerGeneral extends CApiService {
 	private static function isTriggerPrototype(): bool {
 		return static::class === 'CTriggerPrototype';
 	}
-
-	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
 
 	/**
 	 * @abstract
