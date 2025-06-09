@@ -173,7 +173,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'monitored' => true
 			]);
 
-			$host['dashboard_count'] = count(getHostDashboards($host['hostid']));
+			$host['dashboard_count'] = API::HostDashboard()->get([
+				'countOutput' => true,
+				'hostids' => $host['hostid']
+			]);
 			$host['item_count'] = $db_items_count;
 			$host['graph_count'] = $host['graphs'];
 			$host['web_scenario_count'] = $host['httpTests'];

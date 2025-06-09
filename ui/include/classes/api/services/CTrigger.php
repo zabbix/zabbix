@@ -26,8 +26,6 @@ class CTrigger extends CTriggerGeneral {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
-
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname'];
@@ -113,7 +111,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectItems'					=> null,
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
-			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
 			'selectInheritedTags'			=> null,
@@ -126,16 +123,10 @@ class CTrigger extends CTriggerGeneral {
 			'limit'							=> null,
 			'limitSelects'					=> null
 		];
+
 		$options = zbx_array_merge($defOptions, $options);
 
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'inheritedTags' =>			['type' => API_BOOLEAN],
-			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS)]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
+		self::validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -539,6 +530,22 @@ class CTrigger extends CTriggerGeneral {
 		return $result;
 	}
 
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			// Filters.
+			'inheritedTags' =>			['type' => API_BOOLEAN],
+			// Output.
+			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS)]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
 	/**
 	 * Add triggers.
 	 *
@@ -784,35 +791,6 @@ class CTrigger extends CTriggerGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		// adding discoveryrule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$discoveryRules = [];
-			$relationMap = new CRelationMap();
-			$dbRules = DBselect(
-				'SELECT id.parent_itemid,td.triggerid'.
-				' FROM trigger_discovery td,item_discovery id,functions f'.
-				' WHERE '.dbConditionInt('td.triggerid', $triggerids).
-					' AND td.parent_triggerid=f.triggerid'.
-					' AND f.itemid=id.itemid'
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$relationMap->addRelation($rule['triggerid'], $rule['parent_itemid']);
-			}
-
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$discoveryRules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $related_ids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-		}
-
 		// adding last event
 		if ($options['selectLastEvent'] !== null) {
 			foreach ($result as $triggerId => $trigger) {
@@ -883,35 +861,33 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		// adding trigger discovery
-		if ($options['selectTriggerDiscovery'] !== null && $options['selectTriggerDiscovery'] !== API_OUTPUT_COUNT) {
-			foreach ($result as &$trigger) {
-				$trigger['triggerDiscovery'] = [];
-			}
-			unset($trigger);
-
-			$sql_select = ['triggerid'];
-			foreach (['parent_triggerid', 'status', 'ts_delete', 'ts_disable', 'disable_source'] as $field) {
-				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
-					$sql_select[] = $field;
-				}
-			}
-
-			$trigger_discoveries = DBselect(
-				'SELECT '.implode(',', $sql_select).
-				' FROM trigger_discovery'.
-				' WHERE '.dbConditionInt('triggerid', $triggerids)
-			);
-
-			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
-				$triggerid = $trigger_discovery['triggerid'];
-				unset($trigger_discovery['triggerid']);
-
-				$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
-			}
-		}
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedTriggerDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
+	}
+
+	private static function addRelatedTriggerDiscovery(array $options, array &$result): void {
+		if ($options['selectTriggerDiscovery'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['triggerDiscovery'] = [];
+		}
+		unset($trigger);
+
+		$_options = [
+			'output' => array_merge(['triggerid'], $options['selectTriggerDiscovery']),
+			'triggerids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('trigger_discovery', $_options));
+
+		while ($trigger_discovery = DBfetch($resource)) {
+			$result[$trigger_discovery['triggerid']]['triggerDiscovery'] =
+				array_diff_key($trigger_discovery, array_flip(['triggerid']));
+		}
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
@@ -1097,5 +1073,34 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $triggers;
+	}
+
+	/**
+	 * Inherit template triggers to hosts.
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public function linkTemplateObjects(array $templateids, array $hostids) {
+		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url_name', 'url',
+			'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name'
+		];
+
+		$triggers = $this->get([
+			'output' => $output,
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $templateids,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		if ($triggers) {
+			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$this->inherit($triggers, $hostids);
+		}
 	}
 }

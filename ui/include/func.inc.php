@@ -1607,8 +1607,9 @@ function makeMessageBox(string $class, array $messages, ?string $title = null, b
 
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD => _('Success message'),
-		ZBX_STYLE_MSG_BAD => _('Error message'),
-		ZBX_STYLE_MSG_WARNING => _('Warning message')
+		ZBX_STYLE_MSG_INFO => _('Info message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message'),
+		ZBX_STYLE_MSG_BAD => _('Error message')
 	];
 
 	$message_box = (new CTag('output', true))

@@ -57,13 +57,24 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
+if ($data['is_discovered_prototype']) {
+	$discovered_url = (new CUrl('host_prototypes.php'))
+		->setArgument('form', 'update')
+		->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
+		->setArgument('hostid', $host_prototype['discoveryData']['parent_hostid'])
+		->setArgument('context', $data['context'])
+		->getUrl();
+
+	$host_tab->addRow(_('Discovered by'), (new CLink($data['source_link_data']['name'], $discovered_url)));
+}
+
 if ($data['templates']) {
 	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
 }
 
 $host_tab->addRow(
 	(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
-	(new CTextBox('host', $host_prototype['host'], (bool) $host_prototype['templateid']))
+	(new CTextBox('host', $host_prototype['host'], $data['readonly']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 		->setAriaRequired()
@@ -74,7 +85,7 @@ $name = ($host_prototype['name'] != $host_prototype['host']) ? $host_prototype['
 
 $host_tab->addRow(
 	_('Visible name'),
-	(new CTextBox('name', $name, (bool) $host_prototype['templateid']))
+	(new CTextBox('name', $name, $data['readonly']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 );
@@ -147,6 +158,7 @@ else {
 						->onClick('
 							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
 						')
+						->setEnabled(!$data['is_discovered_prototype'])
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]);
 		}
@@ -158,6 +170,7 @@ else {
 		'name' => 'add_templates[]',
 		'object_name' => 'templates',
 		'data' => $host_prototype['add_templates'],
+		'readonly' => $data['is_discovered_prototype'],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'templates',
@@ -184,7 +197,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'readonly' => (bool) $host_prototype['templateid'],
+		'readonly' => $data['readonly'],
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [
@@ -213,7 +226,9 @@ $host_tab->addRow(
 					->setId('row_new_group_prototype')
 					->addItem(
 						(new CCol(
-							(new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButton('group_prototype_add', _('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->setEnabled(!$data['is_discovered_prototype'])
 						))->setAttribute('colspan', 5)
 					)
 			)
@@ -223,7 +238,7 @@ $host_tab->addRow(
 $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 	(new CRow([
 		new CCol([
-			(new CTextBox('group_prototypes[#{i}][name]', '#{name}'))
+			(new CTextBox('group_prototypes[#{i}][name]', '#{name}', $data['is_discovered_prototype']))
 				->addStyle('width: 448px')
 				->setAttribute('placeholder', '{#MACRO}'),
 			new CInput('hidden', 'group_prototypes[#{i}][group_prototypeid]', '#{group_prototypeid}')
@@ -232,6 +247,7 @@ $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 			(new CButtonLink(_('Remove')))
 				->setAttribute('name', 'remove')
 				->addClass('group-prototype-remove')
+				->setEnabled(!$data['is_discovered_prototype'])
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]))->addClass('form_row')
 );
@@ -277,7 +293,7 @@ $host_tab->addRow(
 			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
 			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
 			->setModern()
-			->setReadonly($host_prototype['templateid'] != 0),
+			->setReadonly($data['readonly']),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
 			->setId('interfaces-table')
 			->addClass(ZBX_STYLE_HOST_INTERFACES),
@@ -307,7 +323,7 @@ $host_tab->addRow(
 					? null
 					: 'display: none'
 				)
-				->setEnabled($host_prototype['templateid'] == 0)
+				->setEnabled(!$data['readonly'])
 		)
 	]
 );
@@ -369,11 +385,13 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 $host_tab->addRow(_('Create enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))
 		->setChecked(HOST_STATUS_MONITORED == $host_prototype['status'])
+		->setReadonly($data['is_discovered_prototype'])
 );
 $host_tab->addRow(_('Discover'),
 	(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 		->setChecked($host_prototype['discover'] == ZBX_PROTOTYPE_DISCOVER)
 		->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
+		->setReadonly($data['is_discovered_prototype'])
 );
 
 $tabs->addTab('hostTab', _('Host'), $host_tab);
@@ -443,7 +461,7 @@ $macro_tab = (new CFormList('macrosFormList'))
 			[
 				'macros' => $data['macros'],
 				'parent_hostid' => $data['parent_host']['hostid'],
-				'readonly' => $data['templates'],
+				'readonly' => $data['templates'] || $data['is_discovered_prototype'],
 				'has_inline_validation' => false
 			]
 		),
@@ -538,7 +556,7 @@ $tabs->addTab('inventoryTab', _('Inventory'),
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setReadonly($host_prototype['templateid'] != 0)
+				->setReadonly($data['readonly'])
 				->setModern()
 		),
 	TAB_INDICATOR_INVENTORY
@@ -596,14 +614,14 @@ $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_E
 
 if ($host_prototype['hostid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('update', _('Update')))->setEnabled(!$data['is_discovered_prototype']),
 		[
-			new CSubmit('clone', _('Clone')),
+			(new CSubmit('clone', _('Clone')))->setEnabled(!$data['is_discovered_prototype']),
 			(new CButtonDelete(
 				_('Delete selected host prototype?'),
 				url_params(['form', 'hostid', 'parent_discoveryid', 'context']).'&'.CSRF_TOKEN_NAME.
 				'='.CCsrfTokenHelper::get('host_prototypes.php'), 'context'
-			))->setEnabled($host_prototype['templateid'] == 0),
+			))->setEnabled(!$host_prototype['templateid']),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));

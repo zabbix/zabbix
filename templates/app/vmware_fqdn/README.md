@@ -40,8 +40,8 @@ Set the host macros (on the host or template level) required for VMware authenti
 Note: To enable discovery of hardware sensors of VMware hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the discovered host level.
 
 Additional resources:
-- How to [create a custom performance counter](https://www.zabbix.com/documentation/7.2/manual/vm_monitoring/vmware_keys#footnotes)
-- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/7.2/manual/appendix/items/perf_counters)
+- How to [create a custom performance counter](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring/vmware_keys#footnotes)
+- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/7.4/manual/appendix/items/perf_counters)
 
 ### Macros used
 
@@ -51,12 +51,12 @@ Additional resources:
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
+|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
+|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$VMWARE.VM.POWERSTATE}|<p>Possibility to filter out VMs by power state.</p>|`poweredOn\|poweredOff\|suspended`|
-|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
-|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 
 ### Items
 
@@ -323,12 +323,12 @@ To use this template as manually linked to a host:
 |{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk).</p>||
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
-|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set to "true"/"false" to enable or disable the monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
+|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
+|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable the monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
-|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
-|{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
 
 ### Items
 

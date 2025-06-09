@@ -84,10 +84,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'selectHosts' => ['hostid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
-			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-			'selectItemDiscovery' => ['itemdiscoveryid', 'itemid', 'parent_itemid', 'status', 'ts_delete', 'ts_disable',
-				'disable_source'
-			],
+			'selectDiscoveryRule' => ['itemid', 'name', 'templateid', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTriggers' => ['triggerid'],
 			'webitems' => true
 		];
@@ -193,6 +191,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($item['discoveryRule']);
 		}
 		else {
+			$item['parent_lld'] = $item['discoveryRule'];
 			$item['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => $item['discoveryRule']['itemid'],

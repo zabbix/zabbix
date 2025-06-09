@@ -88,7 +88,10 @@ abstract class CItemType {
 	 * @return array
 	 */
 	final protected static function getCreateFieldRule(string $field_name, array $item): array {
-		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$api_allow_lld_macro =
+			in_array($item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+				? API_ALLOW_LLD_MACRO
+				: 0;
 
 		switch ($field_name) {
 			case 'interfaceid':
@@ -150,7 +153,7 @@ abstract class CItemType {
 			case 'params':
 				switch (static::TYPE) {
 					case ITEM_TYPE_CALCULATED:
-						return ['type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
+						return ['type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'params')];
 
 					default:
 						return ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')];
@@ -162,7 +165,7 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'icmpping', 8) != 0 && strncmp($data['key_'], 'vmware.', 7) != 0;
-							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
+							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
 
@@ -170,12 +173,12 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['snmp_oid'], 'get[', 4) == 0 || strncmp($data['snmp_oid'], 'walk[', 5) == 0;
-							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
+							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
 
 					default:
-						return ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')];
+						return ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')];
 				}
 
 			case 'delay':
@@ -184,12 +187,12 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) != 0;
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
+							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'delay')],
 							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
-						return ['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')];
+						return ['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'delay')];
 				}
 
 			case 'trapper_hosts':
@@ -219,7 +222,10 @@ abstract class CItemType {
 	 * @return array
 	 */
 	final protected static function getUpdateFieldRule(string $field_name, array $db_item): array {
-		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$api_allow_lld_macro =
+			in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+				? API_ALLOW_LLD_MACRO
+				: 0;
 
 		switch ($field_name) {
 			case 'interfaceid':
@@ -268,7 +274,7 @@ abstract class CItemType {
 			case 'params':
 				switch (static::TYPE) {
 					case ITEM_TYPE_CALCULATED:
-						return ['type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
+						return ['type' => API_CALC_FORMULA, 'flags' => $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'params')];
 
 					default:
 						return ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')];
@@ -280,7 +286,7 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'icmpping', 8) != 0 && strncmp($data['key_'], 'vmware.', 7) != 0;
-							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
+							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
 
@@ -288,12 +294,12 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['snmp_oid'], 'get[', 4) == 0 || strncmp($data['snmp_oid'], 'walk[', 5) == 0;
-							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
+							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
 
 					default:
-						return ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')];
+						return ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')];
 				}
 
 			case 'delay':
@@ -302,7 +308,7 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) != 0;
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
+							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'delay')],
 							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
@@ -310,7 +316,7 @@ abstract class CItemType {
 						return ['type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')];
 
 					default:
-						return ['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')];
+						return ['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'delay')];
 				}
 
 			case 'trapper_hosts':
@@ -340,7 +346,10 @@ abstract class CItemType {
 	 * @return array
 	 */
 	final protected static function getUpdateFieldRuleInherited(string $field_name, array $db_item): array {
-		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$api_allow_lld_macro =
+			in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE])
+				? API_ALLOW_LLD_MACRO
+				: 0;
 
 		switch ($field_name) {
 			case 'interfaceid':
@@ -383,7 +392,7 @@ abstract class CItemType {
 			case 'params':
 				switch (static::TYPE) {
 					case ITEM_TYPE_CALCULATED:
-						return ['type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
+						return ['type' => API_CALC_FORMULA, 'flags' => $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'params')];
 
 					case ITEM_TYPE_SCRIPT:
 					case ITEM_TYPE_BROWSER:
@@ -402,12 +411,12 @@ abstract class CItemType {
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) != 0;
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
+							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'delay')],
 							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
-						return ['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')];
+						return ['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'length' => DB::getFieldLength('items', 'delay')];
 				}
 
 			case 'trapper_hosts':

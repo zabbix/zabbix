@@ -65,14 +65,14 @@ Then set the `{$PG.CONNSTRING.AGENT2}` macro to `myconn` to use this named sessi
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>|`<Put the password here>`|
 |{$PG.CONNSTRING.AGENT2}|<p>URI or named session of the PostgreSQL instance.</p>|`tcp://localhost:5432`|
 |{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
-|{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
-|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
+|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>||
 |{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
-|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
+|{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$PG.LLD.FILTER.APPLICATION}|<p>Filter of discoverable applications.</p>|`.+`|
+|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
+|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
 |{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
 |{$PG.QUERY_ETIME.MAX.WARN}|<p>Execution time limit for count of slow queries.</p>|`30`|
 |{$PG.SLOW_QUERIES.MAX.WARN}|<p>Slow queries count threshold for a trigger.</p>|`5`|

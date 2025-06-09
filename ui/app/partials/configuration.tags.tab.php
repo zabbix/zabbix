@@ -19,7 +19,7 @@
  * @var array    $data
  */
 
-$data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
+$data += ['readonly' => false];
 
 if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');

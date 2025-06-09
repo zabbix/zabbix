@@ -17,10 +17,7 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerGraphPrototypeEdit extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $discovery_rule = [];
+	private array $parent_discovery = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -79,17 +76,19 @@ class CControllerGraphPrototypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
+		$options = [
 			'output' => ['itemid', 'hostid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
-		]);
+		];
 
-		if (!$discovery_rule) {
+		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+		if (!$this->parent_discovery) {
 			return false;
 		}
 
-		$this->discovery_rule = reset($discovery_rule);
+		$this->parent_discovery = reset($this->parent_discovery);
 
 		if ($this->hasInput('graphid')) {
 			$graphid = $this->getInput('graphid');
@@ -98,6 +97,7 @@ class CControllerGraphPrototypeEdit extends CController {
 				$graph_prototype = (bool) API::GraphPrototype()->get([
 					'output' => [],
 					'graphids' => $graphid,
+					'discoveryids' => $this->parent_discovery['itemid'],
 					'editable' => true
 				]);
 
@@ -116,31 +116,47 @@ class CControllerGraphPrototypeEdit extends CController {
 		$data = [
 			'graphid' => $this->getInput('graphid', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
-			'hostid' => $this->discovery_rule['hostid'],
+			'hostid' => $this->parent_discovery['hostid'],
 			'context' => $this->getInput('context'),
 			'normal_only' => $this->getInput('normal_only', 0),
-			'readonly' => $this->getInput('readonly', 0)
+			'readonly' => $this->getInput('readonly', 0),
+			'discovered' => false,
+			'is_discovered_prototype' => false
 		];
 
 		if ($data['graphid'] != 0) {
 			$options = [
-				'output' => API_OUTPUT_EXTEND,
+				'output' => ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'yaxismin',
+					'ymax_itemid', 'yaxismax', 'show_work_period', 'show_triggers', 'graphtype', 'show_legend',
+					'show_3d', 'percent_left', 'percent_right', 'templateid', 'discover', 'flags'
+				],
 				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+				'selectDiscoveryData' => ['parent_graphid'],
 				'graphids' => $data['graphid']
 			];
 
 			$graph = API::GraphPrototype()->get($options);
 			$graph = reset($graph);
 
-			$fields = ['name', 'width', 'height', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid',
-				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'templateid', 'discover'
-			];
+			if ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_parent = API::GraphPrototype()->get([
+					'graphids' => $graph['discoveryData']['parent_graphid'],
+					'selectDiscoveryRule' => ['itemid'],
+					'selectDiscoveryRulePrototype' => ['itemid'],
+					'nopermissions' => true
+				]);
+				$db_parent = reset($db_parent);
 
-			foreach ($fields as $field) {
-				$data[$field] = $graph[$field];
+				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+				$graph['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 			}
 
+			$data += $graph;
+
+			$data['discovered'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED;
+			$data['is_discovered_prototype'] = $data['discovered'] && $graph['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
 			$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 
@@ -156,6 +172,9 @@ class CControllerGraphPrototypeEdit extends CController {
 				'graphids' => $data['graphid'],
 				'sortfield' => 'gitemid'
 			]);
+
+			$data['is_discovered_prototype'] = $graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+				&& $graph['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		else {
 			$data['name'] = $this->getInput('name', '');
@@ -232,14 +251,17 @@ class CControllerGraphPrototypeEdit extends CController {
 			unset($items);
 		}
 
-		// items
+		$item_flags = [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED
+		];
+
 		if ($data['items']) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'flags'],
 				'selectHosts' => ['hostid', 'name'],
 				'itemids' => array_column($data['items'], 'itemid'),
 				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+					'flags' => $item_flags
 				],
 				'webitems' => true,
 				'preservekeys' => true
@@ -268,7 +290,7 @@ class CControllerGraphPrototypeEdit extends CController {
 				'selectHosts' => ['name'],
 				'itemids' => array_filter([$data['ymin_itemid'], $data['ymax_itemid']]),
 				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+					'flags' => $item_flags
 				],
 				'webitems' => true,
 				'preservekeys' => true

@@ -212,7 +212,7 @@ class CControllerTemplateEdit extends CController {
 					'output' => ['host', 'name', 'description', 'vendor_name', 'vendor_version'],
 					'selectTemplateGroups' => ['groupid'],
 					'selectParentTemplates' => ['templateid'],
-					'selectMacros' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type', 'automatic'],
+					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 					'selectTags' => ['tag', 'value'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 					'templateids' => $templateid

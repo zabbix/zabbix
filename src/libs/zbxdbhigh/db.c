@@ -401,7 +401,7 @@ char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const c
 			"select %s"
 			" from hosts"
 			" where %s like '%s%%' escape '%c'"
-				" and flags<>%d"
+				" and flags&%d=0"
 				" and status in (%d,%d,%d)",
 				field_name, field_name, host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,

@@ -2214,13 +2214,11 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
 {
 	size_t	sql_offset = 0;
 
-	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select i.itemid,id.parent_itemid"
 			" from item_discovery id,items i"
 			" where id.itemid=i.itemid"
-				" and i.flags=%d"
-				" and",
-			ZBX_FLAG_DISCOVERY_CREATED);
+				" and");
 
 	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "i.itemid",
 			objectids_tmp->values, objectids_tmp->values_num);

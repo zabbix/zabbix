@@ -76,15 +76,20 @@ $hostid = getRequest('hostid', 0);
 
 // permissions
 if (getRequest('parent_discoveryid')) {
-	$discoveryRule = API::DiscoveryRule()->get([
+	$options = [
+		'output' => ['itemid', 'name', 'hostid', 'flags'],
+		'selectDiscoveryData' => ['parent_itemid'],
 		'itemids' => getRequest('parent_discoveryid'),
-		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
-	]);
-	$discoveryRule = reset($discoveryRule);
-	if (!$discoveryRule) {
+	];
+
+	$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+	if (!$parent_discovery) {
 		access_deny();
 	}
+
+	$parent_discovery = reset($parent_discovery);
 
 	if ($hostid != 0) {
 		$hostPrototype = API::HostPrototype()->get([
@@ -96,13 +101,19 @@ if (getRequest('parent_discoveryid')) {
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+			'selectDiscoveryData' => ['parent_hostid'],
 			'hostids' => $hostid,
+			'discoveryids' => $parent_discovery['itemid'],
 			'editable' => true
 		]);
-		$hostPrototype = reset($hostPrototype);
+
 		if (!$hostPrototype) {
 			access_deny();
 		}
+
+		$hostPrototype = reset($hostPrototype);
 	}
 }
 else {
@@ -151,7 +162,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	$result = DBend($result);
 
 	if ($result) {
-		uncheckTableRows($discoveryRule['itemid']);
+		uncheckTableRows($parent_discovery['itemid']);
 	}
 	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
 
@@ -283,7 +294,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		uncheckTableRows($discoveryRule['itemid']);
+		uncheckTableRows($parent_discovery['itemid']);
 	}
 }
 elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscover') {
@@ -321,7 +332,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 	$updated = count($update);
 
 	if ($result) {
-		uncheckTableRows($discoveryRule['itemid']);
+		uncheckTableRows($parent_discovery['itemid']);
 
 		CMessageHelper::setSuccessTitle(_n('Host prototype updated', 'Host prototypes updated', $updated));
 	}
@@ -340,7 +351,7 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 	$result = DBend($result);
 
 	if ($result) {
-		uncheckTableRows($discoveryRule['itemid']);
+		uncheckTableRows($parent_discovery['itemid']);
 	}
 
 	$host_prototypes_count = count(getRequest('group_hostid'));
@@ -356,7 +367,7 @@ if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
 		'hostids' => getRequest('group_hostid'),
 		'editable' => true
 	]);
-	uncheckTableRows($discoveryRule['itemid'], zbx_objectValues($host_prototypes, 'hostid'));
+	uncheckTableRows($parent_discovery['itemid'], zbx_objectValues($host_prototypes, 'hostid'));
 }
 
 /*
@@ -368,10 +379,10 @@ if (hasRequest('form')) {
 
 	$data = [
 		'form_refresh' => getRequest('form_refresh', 0),
-		'discovery_rule' => $discoveryRule,
+		'discovery_rule' => $parent_discovery,
 		'host_prototype' => [
 			'hostid' => $hostid,
-			'templateid' => ($hostid == 0) ? 0 : $hostPrototype['templateid'],
+			'templateid' => $hostid == 0 ? 0 : $hostPrototype['templateid'],
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
@@ -387,7 +398,8 @@ if (hasRequest('form')) {
 			'interfaces' => $interfaces
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
+		'is_discovered_prototype' => $hostid != 0 && $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			&& $hostPrototype['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE,
 		'groups' => [],
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
@@ -395,6 +407,14 @@ if (hasRequest('form')) {
 		// Parent discovery rules.
 		'templates' => []
 	];
+	$data['readonly'] = $data['host_prototype']['templateid'] !=0 || $data['is_discovered_prototype'];
+
+	if ($parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$data['source_link_data'] = [
+			'parent_itemid' => $parent_discovery['discoveryData']['parent_itemid'],
+			'name' => $parent_discovery['name']
+		];
+	}
 
 	// Add already linked and new templates.
 	$templates = [];
@@ -425,7 +445,7 @@ if (hasRequest('form')) {
 			'ipmi_username', 'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
 		],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'hostids' => $discoveryRule['hostid'],
+		'hostids' => $parent_discovery['hostid'],
 		'templated_hosts' => true
 	]);
 	$parentHost = reset($parentHost);
@@ -592,7 +612,8 @@ else {
 	$data = [
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'discovery_rule' => $discoveryRule,
+		'discovery_rule' => $parent_discovery,
+		'is_parent_discovered' => $parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'context' => getRequest('context')
@@ -601,15 +622,23 @@ else {
 	// get items
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['hostPrototypes'] = API::HostPrototype()->get([
-		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
 		'selectTags' => ['tag', 'value'],
 		'selectInheritedTags' => ['tag', 'value'],
-		'editable' => true,
+		'selectDiscoveryData' => ['parent_hostid'],
+		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortField,
-		'limit' => $limit
+		'limit' => $limit,
+		'editable' => true
 	]);
+
+	if ($parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$data['source_link_data'] = [
+			'parent_itemid' => $parent_discovery['discoveryData']['parent_itemid'],
+			'name' => $parent_discovery['name']
+		];
+	}
 
 	order_result($data['hostPrototypes'], $sortField, $sortOrder);
 

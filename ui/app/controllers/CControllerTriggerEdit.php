@@ -75,7 +75,7 @@ class CControllerTriggerEdit extends CController {
 				'triggerids' => $this->getInput('triggerid'),
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-				'selectTriggerDiscovery' => ['parent_triggerid', 'disable_source'],
+				'selectDiscoveryData' => ['parent_triggerid', 'disable_source'],
 				'selectDependencies' => ['triggerid'],
 				'selectTags' => ['tag', 'value'],
 				'editable' => true
@@ -156,7 +156,24 @@ class CControllerTriggerEdit extends CController {
 		}
 
 		if ($this->trigger) {
-			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
+			$parent_lld = [];
+
+			if ($this->trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_parent = API::TriggerPrototype()->get([
+					'triggerids' => $this->trigger['discoveryData']['parent_triggerid'],
+					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
+					'nopermissions' => true
+				]);
+				$db_parent = reset($db_parent);
+
+				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+				$this->trigger['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+			}
+
+			$trigger = $parent_lld
+				? CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger + ['parent_lld' => $parent_lld], $data)
+				: CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
 
 			if ($data['form_refresh']) {
 				if ($data['show_inherited_tags']) {
@@ -169,7 +186,7 @@ class CControllerTriggerEdit extends CController {
 					'flags' => $trigger['flags'],
 					'templates' => $trigger['templates'],
 					'discoveryRule' => $trigger['discoveryRule'],
-					'triggerDiscovery' => $trigger['triggerDiscovery']
+					'discoveryData' => $trigger['discoveryData']
 				]);
 			}
 			else {

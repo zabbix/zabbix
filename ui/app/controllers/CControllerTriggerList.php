@@ -244,7 +244,7 @@ class CControllerTriggerList extends CController {
 				'selectHosts' => ['hostid', 'host', 'name', 'status'],
 				'selectDependencies' => ['triggerid', 'description'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
-				'selectTriggerDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
+				'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 				'selectTags' => ['tag', 'value'],
 				'selectInheritedTags' => ['tag', 'value'],
 				'triggerids' => array_keys($prefetched_triggers),

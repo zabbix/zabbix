@@ -411,6 +411,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'wizard_ready' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'readme' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],
@@ -3033,6 +3045,66 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'hostmacro_config' => [
+		'key' => 'hostmacroid',
+		'fields' => [
+			'hostmacroid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hostmacro',
+				'ref_field' => 'hostmacroid'
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'priority' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'section_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'label' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'required' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'regex' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'options' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],
@@ -5910,7 +5982,7 @@ return [
 				'ref_field' => 'itemid'
 			],
 			'parent_itemid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'items',
@@ -5951,6 +6023,13 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'lldruleid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
 			]
 		]
 	],
@@ -5971,7 +6050,7 @@ return [
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
 			],
-			'parent_itemid' => [
+			'lldruleid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -10114,6 +10193,35 @@ return [
 				'length' => 20,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
+			]
+		]
+	],
+	'lld_macro_export' => [
+		'key' => 'lld_macro_exportid',
+		'fields' => [
+			'lld_macro_exportid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'lld_macro' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],

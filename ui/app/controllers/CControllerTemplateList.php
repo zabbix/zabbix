@@ -136,7 +136,7 @@ class CControllerTemplateList extends CController {
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectDiscoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveryRules' => API_OUTPUT_COUNT,
 			'selectDashboards' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],

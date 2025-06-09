@@ -36,7 +36,6 @@ const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
 const ZBX_STYLE_BTN_GREY = <?= json_encode(ZBX_STYLE_BTN_GREY) ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
-const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 const ZBX_STYLE_FORM_INPUT_MARGIN = <?= json_encode(ZBX_STYLE_FORM_INPUT_MARGIN) ?>;
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE) ?>;
 
@@ -884,7 +883,7 @@ window.item_edit_form = new class {
 			dstfrm: this.form_element.getAttribute('name'),
 			dstfld1: 'master_itemid',
 			parent_discoveryid: this.form_data.parent_discoveryid,
-			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : [],
+			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : []
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});

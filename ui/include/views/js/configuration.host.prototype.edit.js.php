@@ -301,7 +301,7 @@
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
-					if (data.submit.success.action === 'delete') {
+					if (data.submit.success?.action === 'delete') {
 						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', 'template');
