@@ -702,7 +702,6 @@ window.trigger_edit_popup = new class {
 		let form_fields = {
 			dependencies: [],
 			discover: String(<?= TRIGGER_NO_DISCOVER ?>),
-			manual_close: String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>),
 			status: String(<?= TRIGGER_STATUS_DISABLED ?>),
 			...this.#getFormFields()
 		}
