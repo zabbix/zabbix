@@ -330,7 +330,7 @@ if ($data['saml_certs_editable']) {
 						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['show_idp_certificate_input'] ? '' : 'display:none')
+					->addStyle($data['show_idp_certificate_input'] ? '' : 'display: none')
 			]))
 		])
 		->addItem([
@@ -356,7 +356,7 @@ if ($data['saml_certs_editable']) {
 						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['show_sp_private_key_input'] ? '' : 'display:none')
+					->addStyle($data['show_sp_private_key_input'] ? '' : 'display: none')
 			]))
 		])
 		->addItem([
@@ -382,7 +382,7 @@ if ($data['saml_certs_editable']) {
 						->addClass('saml-enabled')
 				]))
 					->addClass('js-saml-cert-input')
-					->addStyle($data['show_sp_certificate_input'] ? '' : 'display:none')
+					->addStyle($data['show_sp_certificate_input'] ? '' : 'display: none')
 			]))
 		]);
 }
