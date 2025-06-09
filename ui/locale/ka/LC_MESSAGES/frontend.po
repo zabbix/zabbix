@@ -355,6 +355,10 @@ msgstr "0 ან 1"
 msgid "1 minute"
 msgstr "1 წუთი"
 
+#: app/views/host.wizard.edit.php:861
+msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
+msgstr ""
+
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
 msgid "10 seconds"
@@ -364,6 +368,10 @@ msgstr "10 წამი"
 #: widgets/clock/includes/WidgetForm.php:116
 msgid "12-hour"
 msgstr "12-სთ"
+
+#: app/views/host.wizard.edit.php:867
+msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -426,10 +434,18 @@ msgctxt "abbreviation of severity level"
 msgid "A"
 msgstr "A"
 
+#: app/views/js/host.wizard.edit.js.php:1143
+msgid "A few more steps"
+msgstr ""
+
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:139
+msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
 msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
@@ -974,6 +990,10 @@ msgstr "ნიმუშიდან დამატება"
 msgid "Add host"
 msgstr "ჰოსტის დამატება"
 
+#: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
+msgid "Add host interface"
+msgstr ""
+
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
 msgstr "ჰოსტის ჭეების დამატება"
@@ -1090,6 +1110,10 @@ msgstr "დამატებითი წესი"
 msgid "Additional rules"
 msgstr "დამატებითი წესები"
 
+#: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
+msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
+msgstr ""
+
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
 #: app/partials/administration.ha.nodes.php:28
@@ -1168,6 +1192,10 @@ msgstr "აგენტი (აქტიური)"
 msgid "Agent (passive)"
 msgstr "აგენტი (პასიური)"
 
+#: app/views/host.wizard.edit.php:597
+msgid "Agent address"
+msgstr ""
+
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "აგენტის ხელმისაწვდომობის შემოწმება. თუ არაფერს აბრუნებს - მიუწვდომელია; 1 - ხელმისაწვდომია"
@@ -1184,13 +1212,33 @@ msgstr "აგენტის ჰოსტის მეტამონაცე�
 msgid "Agent host name. Returns string"
 msgstr "აგენტის ჰოსტის სახელი. აბრუნებს სტრიქონს"
 
+#: app/views/js/host.wizard.edit.js.php:96
+msgid "Agent interface"
+msgstr ""
+
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
 msgstr "აგენტის ინტერფეისები"
 
+#: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
+msgid "Agent mode"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:603
+msgid "Agent port"
+msgstr ""
+
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
 msgstr "აგენტის ვარიანტის შემოწმება. აბრუნებს მნიშვნელობას 1 - Zabbix agent-სთვის და 2 - Zabbix agent 2-სთვის"
+
+#: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
+msgid "Agent-based"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
+msgid "Agentless"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1379,6 +1427,16 @@ msgstr ""
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:1913
+#, c-format
+msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1912
+#, c-format
+msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
@@ -1499,6 +1557,10 @@ msgstr ""
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:148
+msgid "Apache, AWS, MySQL, etc."
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:225
@@ -2300,6 +2362,10 @@ msgstr "უკუგამოძახება"
 msgid "Cancel"
 msgstr "გაუქმება"
 
+#: app/views/host.wizard.edit.php:1042
+msgid "Cancel Host Wizard?"
+msgstr ""
+
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
 msgid "Cannot add API token"
@@ -2325,6 +2391,10 @@ msgstr "მოქმედების დამატება ვერ მო
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
+msgstr ""
+
+#: host_discovery_prototypes.php:518
+msgid "Cannot add discovery prototype"
 msgstr ""
 
 #: host_discovery.php:540
@@ -2540,6 +2610,21 @@ msgstr "ვერ მოხერხდა მონაცემთა ბაზ
 msgid "Cannot convert POST data:"
 msgstr "POST მონაცემების გადაყვანა შეუძლებელია:"
 
+#: include/classes/helpers/CItemGeneralHelper.php:1016
+#, c-format
+msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:1004
+#, c-format
+msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:1003
+#, c-format
+msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
@@ -2735,6 +2820,11 @@ msgstr ".ნაგულისხმევი მომხმარებლი�
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
 msgstr ""
+
+#: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
+msgid "Cannot delete discovery prototype"
+msgid_plural "Cannot delete discovery prototypes"
+msgstr[0] ""
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3023,6 +3113,11 @@ msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
 msgstr[0] "დამკავშირებლის გათიშვა შეუძლებელია"
 
+#: host_discovery_prototypes.php:586
+msgid "Cannot disable discovery prototype"
+msgid_plural "Cannot disable discovery prototypes"
+msgstr[0] ""
+
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
@@ -3100,6 +3195,11 @@ msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
 msgstr[0] "დამკავშირებლის ჩართვა შეუძლებელია"
 
+#: host_discovery_prototypes.php:585
+msgid "Cannot enable discovery prototype"
+msgid_plural "Cannot enable discovery prototypes"
+msgstr[0] ""
+
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
@@ -3168,6 +3268,11 @@ msgstr "სკრიპტის შესრულება შეუძლე�
 msgid "Cannot expand macros."
 msgstr "მაკროების ჩამოშლა შეუძლებელია."
 
+#: include/classes/import/CConfigurationImport.php:1159
+#, c-format
+msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
@@ -3206,6 +3311,11 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1435
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1326
+#, c-format
+msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
@@ -3248,6 +3358,11 @@ msgstr ""
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: include/classes/import/CConfigurationImport.php:1220
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
@@ -3258,6 +3373,11 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
+#: include/classes/import/CConfigurationImport.php:1515
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
@@ -3266,6 +3386,11 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1597
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1490
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
 msgstr ""
 
 #: include/classes/import/importers/CMapImporter.php:244
@@ -3281,6 +3406,11 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1639
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1540
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
 msgstr ""
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
@@ -3313,6 +3443,11 @@ msgstr ""
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: include/classes/import/CConfigurationImport.php:1353
+#, c-format
+msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
@@ -3341,6 +3476,11 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1340
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1243
+#, c-format
+msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
 #: app/views/oauth.edit.php:230
@@ -3378,6 +3518,76 @@ msgstr ""
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:1000
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1001
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:926
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1358
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:969
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:921
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:914
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:907
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:970
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:922
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:915
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:908
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:717
+#, c-format
+msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:718
+#, c-format
+msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
@@ -3386,6 +3596,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:897
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:874
@@ -3406,6 +3621,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:898
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:875
@@ -3443,6 +3663,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:856
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
@@ -3451,6 +3676,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:869
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:835
@@ -3471,6 +3701,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:870
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:836
@@ -3508,6 +3743,11 @@ msgstr ""
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:891
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
@@ -3516,6 +3756,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1226
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:785
@@ -3541,6 +3786,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:798
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:842
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:786
@@ -4033,6 +4283,10 @@ msgstr "კონფიგურაციის განახლება შ�
 msgid "Cannot update connector"
 msgstr "დამკავშირებლის განახლება შეუძლებელია"
 
+#: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
+msgid "Cannot update discovery prototype"
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
 msgid "Cannot update discovery rule"
@@ -4353,6 +4607,10 @@ msgstr "პაროლის შეცვლა"
 msgid "Change per second"
 msgstr "ცვლილება წამში"
 
+#: app/views/host.wizard.edit.php:386
+msgid "Change pre-shared key"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
 msgstr "პრობლემის რანგის შეცვლა"
@@ -4546,6 +4804,20 @@ msgstr ""
 msgid "Clear when unlinking"
 msgstr "გასუფთავება მოხსნისას"
 
+#: app/views/host.wizard.edit.php:1007
+#, c-format
+msgid "Click %1$s to complete the setup."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:771
+msgid "Click Finish to close the Host wizard."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:770
+#, c-format
+msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
+msgstr ""
+
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
 msgstr "დააწკაპუნეთ და გადაათრიეთ სასურველ ზომამდე."
@@ -4730,6 +5002,10 @@ msgstr "ბრძანებები"
 msgid "Communication"
 msgstr "ურთიერთობა"
 
+#: app/views/host.wizard.edit.php:375
+msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
+msgstr ""
+
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
@@ -4791,6 +5067,10 @@ msgstr "გამართვა"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:1024
+msgid "Configuration complete"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:1061
 #, c-format
 msgid "Configuration file \"%1$s\" created."
@@ -4816,6 +5096,10 @@ msgstr "ავთენტიკაციის მორგება"
 #: app/controllers/CControllerTemplateDashboardList.php:93
 msgid "Configuration of dashboards"
 msgstr "სამუშაო დაფების მორგება"
+
+#: host_discovery_prototypes.php:22
+msgid "Configuration of discovery prototypes"
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:144
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
@@ -4982,6 +5266,16 @@ msgstr "ბაზასთან მიერთების მორგებ�
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
 msgstr "JIT ინიციალიზაციის მორგება"
+
+#: app/views/host.wizard.edit.php:368
+msgid "Configure encryption"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
+#: app/views/host.wizard.edit.php:1006
+#: app/views/js/host.wizard.edit.js.php:1138
+msgid "Configure host"
+msgstr ""
 
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
@@ -5318,6 +5612,11 @@ msgstr ""
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
+#: app/views/js/host.wizard.edit.js.php:761
+#: app/views/js/host.wizard.edit.js.php:1441
+msgid "Create"
+msgstr ""
+
 #: app/views/administration.token.list.php:109
 #: app/views/administration.user.token.list.php:76
 msgid "Create API token"
@@ -5377,6 +5676,10 @@ msgstr "დამოკიდებული ელემენტის შე�
 #: include/views/configuration.item.prototype.list.php:211
 msgid "Create disabled"
 msgstr "გათიშულის შექმნა"
+
+#: include/views/configuration.host.discovery.prototype.list.php:34
+msgid "Create discovery prototype"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:35
 #: include/views/configuration.host.discovery.list.php:39
@@ -5512,6 +5815,10 @@ msgstr "ახლის შექმნა"
 
 #: jsLoader.php:372
 msgid "Create new report"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:273 app/views/js/host.wizard.edit.js.php:1122
+msgid "Create or select a host"
 msgstr ""
 
 #: app/views/administration.proxy.list.php:239
@@ -5882,6 +6189,14 @@ msgstr "მონაცემების შეგროვება"
 #: include/classes/graphdraw/CPieGraphDraw.php:793
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:89
+msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:90
+msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
 msgstr ""
 
 #: app/views/js/webscenario.step.edit.js.php:297
@@ -6293,6 +6608,10 @@ msgstr "წავშალო მიმდინარე ქმედება?
 msgid "Delete dashboard?"
 msgstr "წავშალო სამუშაო დაფა?"
 
+#: include/views/configuration.host.discovery.prototype.edit.php:1086
+msgid "Delete discovery prototype?"
+msgstr ""
+
 #: app/views/configuration.discovery.edit.php:264
 #: include/views/configuration.host.discovery.edit.php:1032
 msgid "Delete discovery rule?"
@@ -6393,6 +6712,14 @@ msgstr "წავშალო მონიშნული სამუშაო 
 #: app/views/monitoring.dashboard.list.php:126
 msgid "Delete selected dashboards?"
 msgstr "წავშალო მონიშნული სამუშაო დაფები?"
+
+#: include/views/configuration.host.discovery.prototype.list.php:280
+msgid "Delete selected discovery prototype?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:281
+msgid "Delete selected discovery prototypes?"
+msgstr ""
 
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
@@ -6932,6 +7259,14 @@ msgstr "გავთიშო მონიშნული დამკავშ�
 msgid "Disable selected connectors?"
 msgstr "გავთიშო მონიშნული დამკავშირებლები?"
 
+#: include/views/configuration.host.discovery.prototype.list.php:265
+msgid "Disable selected discovery prototype?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:266
+msgid "Disable selected discovery prototypes?"
+msgstr ""
+
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
 msgid "Disable selected discovery rule?"
@@ -7201,6 +7536,43 @@ msgstr ""
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
+#: app/views/popup.lldoperation.php:49
+#: include/views/configuration.host.discovery.prototype.edit.php:1051
+#: include/views/js/configuration.host.discovery.edit.overr.js.php:156
+msgid "Discovery prototype"
+msgstr ""
+
+#: host_discovery_prototypes.php:515
+msgid "Discovery prototype created"
+msgstr ""
+
+#: host_discovery_prototypes.php:313 host_discovery_prototypes.php:604
+msgid "Discovery prototype deleted"
+msgid_plural "Discovery prototypes deleted"
+msgstr[0] ""
+
+#: host_discovery_prototypes.php:579
+msgid "Discovery prototype disabled"
+msgid_plural "Discovery prototypes disabled"
+msgstr[0] ""
+
+#: host_discovery_prototypes.php:578
+msgid "Discovery prototype enabled"
+msgid_plural "Discovery prototypes enabled"
+msgstr[0] ""
+
+#: host_discovery_prototypes.php:523 host_discovery_prototypes.php:547
+msgid "Discovery prototype updated"
+msgstr ""
+
+#: include/html.inc.php:645
+#: include/views/configuration.host.discovery.list.php:389
+#: include/views/configuration.host.discovery.prototype.edit.php:25
+#: include/views/configuration.host.discovery.prototype.list.php:25
+#: include/views/configuration.host.discovery.prototype.list.php:241
+msgid "Discovery prototypes"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
 #: app/views/monitoring.discovery.view.php:50 include/actions.inc.php:54
@@ -7360,6 +7732,10 @@ msgstr "პარამეტრების ჩვენება"
 #: app/controllers/CControllerPopupTriggerExpr.php:841
 msgid "Division denominator"
 msgstr "მნიშვნელი"
+
+#: app/views/host.wizard.edit.php:114
+msgid "Do not show welcome screen"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
 #: app/views/popup.massupdate.item.php:315
@@ -7699,6 +8075,10 @@ msgstr "HTTP ავტორიზაციის ჩართვა"
 msgid "Enable HTTP authentication for all users."
 msgstr "HTTP ავტორიზაციის ჩართვა ყველა მომხმარებლისთვის."
 
+#: app/views/host.wizard.edit.php:811
+msgid "Enable IPMI checks on Zabbix server"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
 msgid "Enable JIT provisioning"
@@ -7774,6 +8154,10 @@ msgstr ""
 msgid "Enable multi-factor authentication"
 msgstr "MFA-ის ჩართვა"
 
+#: app/views/host.wizard.edit.php:859
+msgid "Enable remote JMX monitoring"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7807,6 +8191,14 @@ msgstr "ჩავრთო მონიშნული დამკავში�
 #: app/views/js/connector.list.js.php:87
 msgid "Enable selected connectors?"
 msgstr "ჩავრთო მონიშნული დამკავშირებლები?"
+
+#: include/views/configuration.host.discovery.prototype.list.php:259
+msgid "Enable selected discovery prototype?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:260
+msgid "Enable selected discovery prototypes?"
+msgstr ""
 
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
@@ -7956,6 +8348,11 @@ msgstr "ჩართულია"
 msgid "Encrypt"
 msgstr "დაშიფრვა"
 
+#: include/classes/setup/CSetupWizard.php:846
+#: include/classes/setup/CSetupWizard.php:1075
+msgid "Encrypt connections from Web interface"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:513
 #: app/views/administration.proxy.list.php:88
 #: app/views/popup.massupdate.host.php:291 app/views/popup.proxy.edit.php:308
@@ -7982,6 +8379,26 @@ msgstr "ინგლისური (en_GB)"
 #: include/locales.inc.php:34
 msgid "English (en_US)"
 msgstr "ინგლისური (en_US)"
+
+#: app/views/host.wizard.edit.php:399
+msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:609
+msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:771
+msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:847
+msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:642
+msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
 #, c-format
@@ -8758,6 +9175,10 @@ msgstr "ფონტის ფერი"
 msgid "Font size"
 msgstr "ფონტის ზომა"
 
+#: app/views/host.wizard.edit.php:816 app/views/host.wizard.edit.php:873
+msgid "For more details, see"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:106
 msgid "Form data"
 msgstr "ფორმის მონაცემები"
@@ -8858,6 +9279,14 @@ msgstr "მზომი"
 #: include/classes/helpers/CRoleHelper.php:507
 msgid "General"
 msgstr "ზოგადი"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Generate a secret pre-shared key hexadecimal string."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:411
+msgid "Generate new"
+msgstr ""
 
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:98
@@ -9084,6 +9513,11 @@ msgstr ""
 #: widgets/graphprototype/Widget.php:29
 msgid "Graph prototype"
 msgstr "გრაფიკის პროტოტიპი"
+
+#: include/classes/api/services/CGraphGeneral.php:1354
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on \"%2$s\" as a discovered graph prototype."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
@@ -9610,6 +10044,11 @@ msgstr ""
 msgid "Host IP"
 msgstr "ჰოსტის IP"
 
+#: app/controllers/CControllerPopup.php:49
+#: app/views/configuration.host.list.php:35
+msgid "Host Wizard"
+msgstr ""
+
 #: app/views/administration.script.list.php:99
 msgid "Host access"
 msgstr "ჰოსტზე წვდომა"
@@ -9617,6 +10056,10 @@ msgstr "ჰოსტზე წვდომა"
 #: app/controllers/CControllerHostCreate.php:127
 msgid "Host added"
 msgstr "ჰოსტი დაემატა"
+
+#: app/controllers/CControllerHostWizardCreate.php:142
+msgid "Host added successfully"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1351
 #: app/views/popup.itemtestedit.view.php:99
@@ -9968,6 +10411,10 @@ msgid "Host updated"
 msgid_plural "Hosts updated"
 msgstr[0] "ჰოსტი განახლდა"
 
+#: app/controllers/CControllerHostWizardUpdate.php:147
+msgid "Host updated successfully"
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
 msgid "Host with ID \"%1$s\" is not available."
@@ -10040,6 +10487,10 @@ msgstr "ჰოსტი ხილული სახელით \"%1$s\" უკ
 #: widgets/web/includes/WidgetForm.php:52
 msgid "Hosts"
 msgstr "ჰოსტები"
+
+#: app/views/host.wizard.edit.php:278
+msgid "Hosts are organized into host groups for easier management and access control."
+msgstr ""
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -10139,13 +10590,25 @@ msgstr ""
 msgid "IPMI"
 msgstr "IPMI"
 
+#: app/views/host.wizard.edit.php:759
+msgid "IPMI address"
+msgstr ""
+
 #: include/items.inc.php:96
 msgid "IPMI agent"
 msgstr "IPMI აგენტი"
 
+#: app/views/host.wizard.edit.php:818
+msgid "IPMI checks"
+msgstr ""
+
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
 msgstr "IPMI ინტერფეისები"
+
+#: app/views/host.wizard.edit.php:765
+msgid "IPMI port"
+msgstr ""
 
 #: disc_prototypes.php:116 host_discovery.php:106
 #: include/views/configuration.host.discovery.edit.php:569
@@ -10312,6 +10775,10 @@ msgstr ""
 msgid "If weight of child services with %1$s status or below is less than %2$s"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:380
+msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
+msgstr ""
+
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -10422,6 +10889,10 @@ msgstr "პროცესშია"
 #: include/items.inc.php:1602
 msgid "In range"
 msgstr "შუალედშია"
+
+#: app/views/host.wizard.edit.php:813
+msgid "In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value."
+msgstr ""
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectSla.php:31
 msgid "Inaccessible SLA"
@@ -11249,6 +11720,13 @@ msgstr "არასწორი მნიშვნელობა ველი�
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "არასწორი მნიშვნელობა ველისთვის \"%1$s\": %2$s."
 
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:81
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:87
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:107
+#, c-format
+msgid "Incorrect value for macro \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
 msgstr "ზრდის ბიჯი"
@@ -11304,6 +11782,10 @@ msgstr "ინფორმაცია"
 
 #: include/classes/data/CItemData.php:2002
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/func.inc.php:1610
+msgid "Info message"
 msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
@@ -11390,6 +11872,14 @@ msgstr "გამოსახულების ჩასმა"
 msgid "Install"
 msgstr "დაყენება"
 
+#: app/views/host.wizard.edit.php:351 app/views/js/host.wizard.edit.js.php:1128
+msgid "Install Zabbix agent"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
+msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
 #: setup.php:163
 msgid "Installation"
 msgstr "დაყენება"
@@ -11409,6 +11899,10 @@ msgstr "მთელი რიცხვი BITS-დან"
 #: include/classes/helpers/CMenuHelper.php:431
 msgid "Integrations"
 msgstr "ინტეგრაციები"
+
+#: app/views/js/host.wizard.edit.js.php:98
+msgid "Intelligent Platform Management Interface (IPMI)"
+msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:208 app/views/popup.proxy.edit.php:68
@@ -12293,6 +12787,10 @@ msgstr "ელემენტების მდებარეობა"
 msgid "JMX"
 msgstr "JMX"
 
+#: app/views/host.wizard.edit.php:835
+msgid "JMX address"
+msgstr ""
+
 #: include/items.inc.php:99
 msgid "JMX agent"
 msgstr "JMX აგენტი"
@@ -12307,6 +12805,14 @@ msgstr "JMX ბოლოწერტილი"
 #: include/views/inventory.host.view.php:66
 msgid "JMX interfaces"
 msgstr "JMX ინტერფეისები"
+
+#: app/views/host.wizard.edit.php:874
+msgid "JMX monitoring"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:841
+msgid "JMX port"
+msgstr ""
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
@@ -12357,6 +12863,10 @@ msgstr "იანვარი"
 #: include/locales.inc.php:51
 msgid "Japanese (ja_JP)"
 msgstr "იაპონური (ja_JP)"
+
+#: app/views/js/host.wizard.edit.js.php:99
+msgid "Java Management Extensions (JMX) interface"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:235
 #: app/views/administration.script.edit.php:241
@@ -12479,6 +12989,14 @@ msgstr "LLD მაკროები"
 #: app/controllers/CControllerAuditLogList.php:242
 msgid "LLD rule"
 msgstr "LLD წესი"
+
+#: app/controllers/CControllerAuditLogList.php:227
+msgid "LLD rule prototype"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:566
+msgid "LLD rule prototype with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
@@ -12766,6 +13284,10 @@ msgstr "ბმულის ნიმუში"
 msgid "Link templates"
 msgstr "ბმულის ნიმუშები"
 
+#: app/views/host.wizard.edit.php:174
+msgid "Linked"
+msgstr ""
+
 #: widgets/navtree/views/navtreeitem.edit.php:65
 msgid "Linked map"
 msgstr "მიბმული რუკა"
@@ -12782,6 +13304,10 @@ msgstr "მიბმულია ნიმუშებზე"
 #: include/views/js/monitoring.sysmaps.js.php:766
 msgid "Links"
 msgstr "ბმულები"
+
+#: app/views/host.wizard.edit.php:431
+msgid "Linux"
+msgstr ""
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -13050,6 +13576,10 @@ msgstr "MFA-ის მეთოდი \"%s\" უკვე არსებობ�
 msgid "MFA settings"
 msgstr "MFA-ის მორგება"
 
+#: app/views/host.wizard.edit.php:550
+msgid "Mac OS"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
 #: app/partials/hostmacros.list.html.php:36
@@ -13071,6 +13601,11 @@ msgstr ""
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "მაკრო \"%1$s\" უკვე არსებობს."
+
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:63
+#, c-format
+msgid "Macro \"%1$s\" is missing."
+msgstr ""
 
 #: app/controllers/CControllerHostCreate.php:180
 #: app/controllers/CControllerHostUpdate.php:185
@@ -14323,6 +14858,10 @@ msgstr "გადასვლა საწყის ხედზე"
 msgid "Needle"
 msgstr "ისარი"
 
+#: include/items.inc.php:100
+msgid "Nested"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr ""
@@ -14556,6 +15095,10 @@ msgstr ""
 
 #: widgets/itemhistory/includes/WidgetForm.php:96
 msgid "New values"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:59 app/views/js/host.wizard.edit.js.php:1450
+msgid "Next"
 msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
@@ -15207,6 +15750,10 @@ msgstr "არ არის ჩართული"
 msgid "Not inherited items"
 msgstr "მემკვიდრეობითი ელემენტების გარეშე"
 
+#: app/views/host.wizard.edit.php:175
+msgid "Not linked"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -15219,6 +15766,15 @@ msgstr "მხარდაუჭერელია"
 #: app/views/administration.miscconfig.edit.php:138
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
+msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:578
+#, c-format
+msgid "Note: %1$s must be configured and enabled on your monitoring target."
 msgstr ""
 
 #: include/hosts.inc.php:229
@@ -15546,6 +16102,10 @@ msgstr ""
 msgid "Old tag name"
 msgstr "ძველი ჭდის სახელი"
 
+#: app/views/host.wizard.edit.php:454
+msgid "Older version"
+msgstr ""
+
 #: include/views/monitoring.sysmap.constructor.php:51
 #: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
 msgid "On"
@@ -15667,9 +16227,18 @@ msgstr "URL-ის გახსნა"
 msgid "Open in a new window"
 msgstr "ახალ ფანჯარაში გახსნა"
 
+#: app/views/host.wizard.edit.php:524 app/views/host.wizard.edit.php:547
+#: app/views/host.wizard.edit.php:553
+msgid "Open installation instructions"
+msgstr ""
+
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "ჟურნალის გახსნა"
+
+#: include/classes/server/CZabbixServer.php:627
+msgid "OpenSSL extension is not available."
+msgstr ""
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -15869,6 +16438,10 @@ msgstr "საწყისი"
 #: widgets/piechart/actions/WidgetView.php:599
 msgid "Other"
 msgstr "სხვა"
+
+#: app/views/host.wizard.edit.php:556
+msgid "Other OS"
+msgstr ""
 
 #: app/controllers/CControllerMiscConfigEdit.php:112
 #: app/views/administration.miscconfig.edit.php:30
@@ -16254,6 +16827,10 @@ msgstr "პარამეტრები"
 #: app/controllers/CControllerActionOperationCheck.php:85
 #: include/classes/api/services/CAction.php:2953
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.edit.php:66
+msgid "Parent discovery prototypes"
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:56
@@ -16650,6 +17227,14 @@ msgstr "ხარისხის მნიშვნელობა"
 #: include/classes/setup/CSetupWizard.php:876
 msgid "Pre-installation summary"
 msgstr "დაყენებისწინა შეჯამება"
+
+#: app/views/host.wizard.edit.php:405
+msgid "Pre-shared key"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:394
+msgid "Pre-shared key identity"
+msgstr ""
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -18331,6 +18916,10 @@ msgstr "SNMP"
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
+#: app/views/host.wizard.edit.php:630
+msgid "SNMP address"
+msgstr ""
+
 #: app/views/administration.timeouts.edit.php:65
 #: app/views/popup.proxy.edit.php:228 include/items.inc.php:89
 msgid "SNMP agent"
@@ -18350,6 +18939,10 @@ msgstr "SNMP მნიშვნელობის მიღება"
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
 msgstr "SNMP ინტერფეისები"
+
+#: app/views/host.wizard.edit.php:636
+msgid "SNMP port"
+msgstr ""
 
 #: include/items.inc.php:90
 msgid "SNMP trap"
@@ -18819,6 +19412,10 @@ msgstr "არჩევა"
 msgid "Select SLA to display SLA report."
 msgstr "აირჩიეთ SLA მისი ანგარიშის საჩვენებლად."
 
+#: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
+msgid "Select a template"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -18828,6 +19425,14 @@ msgstr "აირჩიეთ პროტოტიპი"
 
 #: app/views/oauth.edit.php:171
 msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:447
+msgid "Select the OS distribution"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:424
+msgid "Select the OS of your monitoring target"
 msgstr ""
 
 #: app/views/administration.script.edit.php:283
@@ -18842,6 +19447,10 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:654
 msgid "Selected elements"
 msgstr "არჩეული ელემენტები"
+
+#: app/views/js/host.wizard.edit.js.php:1110
+msgid "Selected host"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:380
 msgid "Selected items only"
@@ -18954,6 +19563,20 @@ msgstr "სერვერი"
 #: app/views/administration.script.list.php:204
 msgid "Server (proxy)"
 msgstr "სერვერი (პროქსი)"
+
+#: include/classes/setup/CSetupWizard.php:1081
+msgid "Server TLS CA file"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:890
+#: include/classes/setup/CSetupWizard.php:1095
+msgid "Server TLS certificate issuer"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:899
+#: include/classes/setup/CSetupWizard.php:1099
+msgid "Server TLS certificate subject"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:62
 #: widgets/clock/includes/WidgetForm.php:62
@@ -19138,6 +19761,14 @@ msgstr ""
 msgid "Set this view as default"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:493
+msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:477
+msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
+msgstr ""
+
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
@@ -19320,6 +19951,10 @@ msgstr "ჭდეების ჩვენება"
 msgid "Show legend"
 msgstr "ახსნის ჩვენება"
 
+#: app/views/js/host.wizard.edit.js.php:1507
+msgid "Show less"
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:91
 #: widgets/plaintext/includes/WidgetForm.php:55
 #: widgets/problems/includes/WidgetForm.php:162
@@ -19332,6 +19967,10 @@ msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:247 app/views/js/host.wizard.edit.js.php:1508
+msgid "Show more"
 msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
@@ -19395,6 +20034,10 @@ msgstr "ჭდეების ჩვენება"
 #: app/views/administration.gui.edit.php:120
 msgid "Show technical errors"
 msgstr "ტექნიკური შეცდომების ჩვენება"
+
+#: app/views/host.wizard.edit.php:171
+msgid "Show templates"
+msgstr ""
 
 #: widgets/plaintext/includes/WidgetForm.php:62
 msgid "Show text as HTML"
@@ -19483,6 +20126,10 @@ msgstr "გასვლა"
 #: include/views/js/configuration.graph.edit.js.php:285
 msgid "Simple"
 msgstr "მარტივი"
+
+#: app/views/js/host.wizard.edit.js.php:97
+msgid "Simple Network Management Protocol (SNMP) interface"
+msgstr ""
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -19583,6 +20230,10 @@ msgstr "ზომა"
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:355
+msgid "Skip OS selection if you already have Zabbix agent installed."
+msgstr ""
+
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
 msgstr "სლოვაკური (sk_SK)"
@@ -19638,6 +20289,11 @@ msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:129
+#, c-format
+msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:79
@@ -19757,6 +20413,14 @@ msgstr ""
 #: include/classes/api/services/CSla.php:593
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:310
+msgid "Start typing or click Select to choose an existing host, or enter a new host name."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:334
+msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
 msgstr ""
 
 #: app/views/popup.ldap.edit.php:287
@@ -20223,6 +20887,25 @@ msgstr "TCP"
 #: app/views/administration.timeouts.edit.php:115
 #: app/views/popup.proxy.edit.php:283 include/items.inc.php:98
 msgid "TELNET agent"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:855
+msgid "TLS CA file"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:873
+msgid "TLS certificate file"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:634
+#: include/classes/server/CZabbixServer.php:641
+#: include/classes/server/CZabbixServer.php:648
+#: include/classes/setup/CSetupWizard.php:911
+msgid "TLS fields are misconfigured or the files are not accessible."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:865
+msgid "TLS key file"
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:190
@@ -20711,6 +21394,10 @@ msgstr ""
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:101
+msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
+msgstr ""
+
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
 msgstr ""
@@ -20817,6 +21504,11 @@ msgstr ""
 msgid "The maximum zoom level is \"%1$s\"."
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRule.php:962
+#, c-format
+msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
 msgstr ""
@@ -20838,6 +21530,26 @@ msgstr ""
 msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:275
+#, c-format
+msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:353
+#, c-format
+msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:899
+#, c-format
+msgid "The template you selected (%1$s) requires additional configuration."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:573
+#, c-format
+msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
+msgstr ""
+
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
 msgstr ""
@@ -20849,6 +21561,10 @@ msgstr ""
 
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:722
+msgid "The value does not match the existing value on the selected host."
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:712
@@ -20993,6 +21709,10 @@ msgstr ""
 
 #: include/classes/validators/CFormValidator.php:940 jsLoader.php:428
 msgid "This value is too long."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:2045
+msgid "This value is too short."
 msgstr ""
 
 #: include/classes/validators/CFormValidator.php:1397
@@ -21237,6 +21957,10 @@ msgstr "დროის სარტყელი"
 #: widgets/slareport/actions/WidgetView.php:113
 msgid "To"
 msgstr "ვის"
+
+#: app/views/host.wizard.edit.php:930
+msgid "To complete the setup, configure the following variables (host macros)."
+msgstr ""
 
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
@@ -21803,6 +22527,10 @@ msgstr "ტიპი (სრული დეტალები)"
 msgid "Type (OK)"
 msgstr "ტიპი (დიახ)"
 
+#: app/views/host.wizard.edit.php:149
+msgid "Type a keyword to search for templates."
+msgstr ""
+
 #: app/views/correlation.edit.php:195 app/views/popup.action.edit.php:125
 #: app/views/popup.lldoverride.php:77 app/views/popup.operation.edit.php:423
 #: include/views/configuration.host.discovery.edit.php:784
@@ -21926,6 +22654,11 @@ msgstr "უკრაინული (uk_UA)"
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
+#: include/classes/server/CZabbixServer.php:673
+#: include/classes/server/CZabbixServer.php:681 jsrpc.php:86 jsrpc.php:101
+msgid "Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:237
 msgid "Unable to create the configuration file."
 msgstr "კონფიგურაცის ფაილის ჩატვირთვის შეცდომა."
@@ -22046,6 +22779,12 @@ msgstr ""
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr ""
+
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:119
+#, c-format
+msgid "Unexpected macro \"%1$s\""
+msgid_plural "Unexpected macros \"%1$s\""
+msgstr[0] ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -22928,6 +23667,10 @@ msgstr "მომხმარებლის სახელის ატრი�
 msgid "Users"
 msgstr "მომხმარებლები"
 
+#: include/locales.inc.php:62
+msgid "Uzbek (uz_UZ)"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware-ის განაწილებული ვირტუალური კომუტატორი. \"url\" - VMWare-ის სერვისის URL. აბრუნებს JSON-ს"
@@ -23585,6 +24328,10 @@ msgstr "შემოწმების კოდი"
 msgid "Verify database certificate"
 msgstr "ბაზის სერტიფიკატის გადამოწმება"
 
+#: include/classes/setup/CSetupWizard.php:881
+msgid "Verify server certificate issuer and subject"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:62
 #: app/views/administration.proxy.list.php:89 app/views/module.edit.php:40
 #: app/views/module.list.php:86 app/views/template.list.php:114
@@ -23719,6 +24466,14 @@ msgstr ""
 msgid "Web"
 msgstr "ვები"
 
+#: include/classes/setup/CSetupWizard.php:1089
+msgid "Web interface TLS certificate file"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:1085
+msgid "Web interface TLS key file"
+msgstr ""
+
 #: app/controllers/CControllerWebView.php:163
 #: app/views/monitoring.web.view.php:37 include/items.inc.php:101
 #: include/views/configuration.httpconf.edit.php:30
@@ -23817,6 +24572,10 @@ msgstr "მოგესლამებათ"
 msgid "Welcome to"
 msgstr "მოგესალმებათ"
 
+#: app/views/host.wizard.edit.php:99
+msgid "Welcome to the Host Wizard"
+msgstr ""
+
 #: app/views/administration.user.edit.php:334 app/views/popup.media.php:96
 msgid "When active"
 msgstr "როცა აქტიურია"
@@ -23872,6 +24631,14 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:213
 msgid "Width"
 msgstr "სიგანე"
+
+#: app/views/host.wizard.edit.php:435
+msgid "Windows"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:450
+msgid "Windows 10/Server 2016 or later"
+msgstr ""
 
 #: app/controllers/CControllerLatest.php:554
 msgid "With data"
@@ -24189,6 +24956,10 @@ msgstr ""
 msgid "You are not logged in"
 msgstr "შესული არ ბრძანდებით"
 
+#: app/views/host.wizard.edit.php:103
+msgid "You can always access Host Wizard from Data collection > Hosts."
+msgstr ""
+
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
 msgstr ""
@@ -24229,6 +25000,10 @@ msgstr ""
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:1044
+msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
+msgstr ""
+
 #: include/page_header.php:122
 msgid "Zabbix"
 msgstr "Zabbix"
@@ -24263,6 +25038,14 @@ msgstr "Zabbix agent (აქტიური)"
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
 msgstr "Zabbix agent (პასიური შემოწმებები)"
+
+#: app/views/js/host.wizard.edit.js.php:91
+msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:863
+msgid "Zabbix documentation"
+msgstr ""
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -24324,6 +25107,10 @@ msgstr "Zabbix-ის სერვერი გაშვებულია"
 #: include/classes/setup/CSetupWizard.php:870
 msgid "Zabbix server name"
 msgstr "Zabbix-ის სერვერის სახელი"
+
+#: app/views/js/host.wizard.edit.js.php:92
+msgid "Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports."
+msgstr ""
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
@@ -25013,6 +25800,10 @@ msgstr ""
 msgid "cannot delete inherited LLD rule"
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRulePrototype.php:1231
+msgid "cannot delete inherited LLD rule prototype"
+msgstr ""
+
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
 msgstr ""
@@ -25023,6 +25814,10 @@ msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:2504
 msgid "cannot delete templated host prototype"
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:726
+msgid "cannot have a nested LLD rule on a non-discovered host"
 msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1411
@@ -25540,6 +26335,11 @@ msgstr "სინტაქსის შეცდომა \"%1$s' -სთან 
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "არასწორი გამოყენება ფუნქციისთვის \"%1$s\""
+
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:88
+#, c-format
+msgid "input does not match the pattern: %1$s"
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:111
 #: include/classes/api/services/CScript.php:517

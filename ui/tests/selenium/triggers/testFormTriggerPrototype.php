@@ -311,8 +311,15 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
-			$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
-			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->click();
+			// Fill name to avoid inline validation error when creating a new trigger prototype.
+			if (!isset($data['form'])) {
+				$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
+			}
+
+			/* hoverMouse() added becouse #28 test case is unstable on Jenkins possibly due to scroll
+			 * fails with error - other element would receive the click.
+			 */
+			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->hoverMouse()->click();
 			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
 			$dialog->query('xpath:.//textarea[@id="expr_temp"]')->waitUntilVisible();
 
