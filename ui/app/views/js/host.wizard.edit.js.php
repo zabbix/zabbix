@@ -706,17 +706,18 @@ window.host_wizard_edit = new class {
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		Object.entries(this.#data.macros).forEach(([row_index, macro]) => {
-			const {field, description} = this.#makeMacroField(macro, row_index);
+			const {config} = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
+			const {field, description} = this.#makeMacroField(macro, config, row_index);
 
-			if (!sections.has(macro.section_name)) {
-				sections.set(macro.section_name,
+			if (!sections.has(config.section_name)) {
+				sections.set(config.section_name,
 					this.#view_templates.step_configure_host_macros_collapsible_section.evaluateToElement({
-						section_name: macro.section_name
+						section_name: config.section_name
 					})
 				);
 			}
 
-			const section = sections.get(macro.section_name);
+			const section = sections.get(config.section_name);
 			const macros_list = section.querySelector('.host-macro-list');
 
 			if (field !== null) {
@@ -970,7 +971,6 @@ window.host_wizard_edit = new class {
 					};
 
 					return [row_index, {
-						section_name: template_macro.config.section_name,
 						type: Number(template_macro.type),
 						macro: template_macro.macro,
 						value,
@@ -1857,9 +1857,7 @@ window.host_wizard_edit = new class {
 		return card;
 	}
 
-	#makeMacroField(macro, row_index) {
-		const {config} = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
-
+	#makeMacroField(macro, config, row_index) {
 		const field_view = (() => {
 			switch (Number(config.type)) {
 				case this.WIZARD_FIELD_TEXT:
