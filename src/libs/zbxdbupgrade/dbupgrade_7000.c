@@ -286,10 +286,26 @@ static int	DBpatch_7000019(void)
 
 static int	DBpatch_7000020(void)
 {
-	return DBdrop_foreign_key("event_recovery", 1);
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name in ('time_size','date_size','tzone_size')"
+				" and widgetid in (select widgetid from widget where type='clock')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 static int	DBpatch_7000021(void)
+{
+	return DBdrop_foreign_key("event_recovery", 1);
+}
+
+static int	DBpatch_7000022(void)
 {
 	const zbx_db_field_t	field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			0};
@@ -325,5 +341,6 @@ DBPATCH_ADD(7000018, 0, 0)
 DBPATCH_ADD(7000019, 0, 0)
 DBPATCH_ADD(7000020, 0, 0)
 DBPATCH_ADD(7000021, 0, 0)
+DBPATCH_ADD(7000022, 0, 0)
 
 DBPATCH_END()
