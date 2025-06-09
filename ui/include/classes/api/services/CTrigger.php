@@ -114,7 +114,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
 			'selectInheritedTags'			=> null,
-			'selectTriggerDiscovery'		=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
