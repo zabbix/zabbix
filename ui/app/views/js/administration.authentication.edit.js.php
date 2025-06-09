@@ -146,7 +146,9 @@
 			for (const button of this.form.querySelectorAll('.js-saml-cert-file-button')) {
 				button.addEventListener('click', e => {
 					const textarea = e.target.parentNode.querySelector('textarea');
-					const extension_filter = textarea.name === 'sp_private_key' ? '.key, .pem, .txt' : '.cer, .crt, .pem, .txt';
+					const extension_filter = textarea.name === 'sp_private_key'
+						? '.key, .pem, .txt'
+						: '.cer, .crt, .pem, .txt';
 
 					this.#setSelectedFileContentTo(textarea, extension_filter);
 				});
