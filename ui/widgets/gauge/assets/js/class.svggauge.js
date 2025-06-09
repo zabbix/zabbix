@@ -365,6 +365,9 @@ class CSVGGauge {
 				container.appendChild(line);
 			}
 		}
+
+		this.#drawDescription();
+		this.#adjustScalableGroup();
 	}
 
 	/**
