@@ -1,1 +1,1 @@
-..F....... [ZBX-26481] fixed "JavaScript" preprocessing step to disallow saving with only whitespaces or newlines (apoga)
+..F....... [ZBX-26481] fixed parameter trimming in item preprocessing steps (apoga)
