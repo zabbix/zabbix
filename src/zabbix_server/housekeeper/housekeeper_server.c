@@ -1236,6 +1236,11 @@ static int	housekeeping_events(int now, int config_max_hk_delete)
 						"select null" \
 						" from problem" \
 						" where events.eventid=problem.r_eventid" \
+					")" \
+					" and not exists(" \
+						"select null" \
+						" from event_recovery" \
+						" where events.eventid=event_recovery.r_eventid" \
 					")"
 #define ZBX_HK_TRIGGER_EVENT_RULE	" and not exists(" \
 						"select null" \

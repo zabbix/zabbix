@@ -284,6 +284,19 @@ static int	DBpatch_7000019(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000020(void)
+{
+	return DBdrop_foreign_key("event_recovery", 1);
+}
+
+static int	DBpatch_7000021(void)
+{
+	const zbx_db_field_t	field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			0};
+
+	return DBadd_foreign_key("event_recovery", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -310,5 +323,7 @@ DBPATCH_ADD(7000016, 0, 0)
 DBPATCH_ADD(7000017, 0, 0)
 DBPATCH_ADD(7000018, 0, 0)
 DBPATCH_ADD(7000019, 0, 0)
+DBPATCH_ADD(7000020, 0, 0)
+DBPATCH_ADD(7000021, 0, 0)
 
 DBPATCH_END()
