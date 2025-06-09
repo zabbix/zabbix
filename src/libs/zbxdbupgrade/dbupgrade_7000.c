@@ -302,7 +302,7 @@ static int	DBpatch_7000020(void)
 
 static int	DBpatch_7000021(void)
 {
-	return DBdrop_foreign_key("event_recovery", 1);
+	return DBdrop_foreign_key("event_recovery", 2);
 }
 
 static int	DBpatch_7000022(void)
