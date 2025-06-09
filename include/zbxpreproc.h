@@ -102,7 +102,7 @@ zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager);
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	int		tasks_num;
+	zbx_int64_t	num;
 }
 zbx_pp_top_stats_t;
 
@@ -121,6 +121,8 @@ int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pen
 		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, char **error);
 int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_values_num(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
 		zbx_pp_history_t *history, char **error);
