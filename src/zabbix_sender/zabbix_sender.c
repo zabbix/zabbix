@@ -575,8 +575,10 @@ static int	check_response(char *response, const char *server, unsigned short por
 					zbx_join_hostport(rhost_port, sizeof(rhost_port), rhost, redirect_port));
 		}
 		else
+		{
 			printf("Response from \"%s\": \"Redirect reset\n", zbx_join_hostport(server_port,
 					sizeof(server_port), server, port));
+		}
 
 		fflush(stdout);
 		zbx_free(rhost);
