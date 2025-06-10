@@ -215,7 +215,7 @@
 		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent"/>
 		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl --with-libpcre2"/>
 		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
-		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug' -Wenum-conversion -fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' LDFLAGS='-fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv --with-libpcre"/>
+		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv --with-libpcre"/>
 
 	</target>
 

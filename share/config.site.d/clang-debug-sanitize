@@ -1,19 +1,20 @@
 # Be bourne shell compliant.
 
-test -z "$CC" && CC=gcc
+test -z "$CC" && CC=clang
 
 # -Wall and -Wextra enable groups of other warning flags.
-# Do not repeat them. For more details, see [1] and [2].
+# Do not repeat them. See the Clang Diagnostic's Reference
+# for details[1].
 #
 # Warning flags go first, followed by code generation convention
-# flags (i.e. -f..)[3].
-# DO NOT list machine-specific flags (i.e. -m..)[4] here.
+# flags (i.e. -f..)[2].
+# DO NOT list machine-specific flags (i.e. -m..)[3] here.
 #
 # --
-# [1]: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wall
-# [2]: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-W
-# [3]: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
-# [4]: https://gcc.gnu.org/onlinedocs/gcc/Submodel-Options.html
+# [_]: https://clang.llvm.org/docs/UsersManual.html
+# [1]: https://clang.llvm.org/docs/DiagnosticsReference.html
+# [2]: [_]#controlling-code-generation
+# [3]: [_]#target-specific-features-and-limitations
 test -z "$CFLAGS"                                                            \
     && CFLAGS="-std=gnu99"                                                   \
     && CFLAGS="$CFLAGS -O0 -ggdb3"                                           \
@@ -24,16 +25,23 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Wimplicit-function-declaration"                      \
     && CFLAGS="$CFLAGS -Wredundant-decls"                                    \
     && CFLAGS="$CFLAGS -Wmisleading-indentation -Wdangling-else"             \
-    && CFLAGS="$CFLAGS -Wshadow"                                             \
-    && CFLAGS="$CFLAGS -Wmaybe-uninitialized"                                \
-    && CFLAGS="$CFLAGS -Wuseless-cast"                                       \
+    && CFLAGS="$CFLAGS -Wshadow -Wuninitialized"                             \
+    && CFLAGS="$CFLAGS -Wswitch-default -Wswitch-enum"                       \
     && CFLAGS="$CFLAGS -Wunused-result"                                      \
-    && CFLAGS="$CFLAGS -Wfloat-conversion"                                   \
+    && CFLAGS="$CFLAGS -Wconversion -Wfloat-conversion"                      \
     && CFLAGS="$CFLAGS -Wincompatible-pointer-types"                         \
     && CFLAGS="$CFLAGS -Wnull-dereference -Wpointer-arith"                   \
-    && CFLAGS="$CFLAGS -Wcast-function-type"                                 \
+    && CFLAGS="$CFLAGS -Wcast-qual -Wcast-align -Wcast-function-type"        \
     && CFLAGS="$CFLAGS -Wwrite-strings"                                      \
     && CFLAGS="$CFLAGS -Woverlength-strings"                                 \
-    && CFLAGS="$CFLAGS -Wformat -Wformat-security"                           \
-    && CFLAGS="$CFLAGS -Wformat-signedness"                                  \
-    && CFLAGS="$CFLAGS -fstrict-aliasing"
+    && CFLAGS="$CFLAGS -Wformat-security -Wformat-nonliteral"                \
+    && CFLAGS="$CFLAGS -fstrict-aliasing"                                    \
+    && CFLAGS="$CFLAGS -Wenum-conversion"                                    \
+    && CFLAGS="$CFLAGS -fsanitize=leak,address,undefined"                    \
+    && CFLAGS="$CFLAGS -fsanitize-address-use-after-scope"
+
+
+test -z "$LDFLAGS"                                                          \
+   && LDFLAGS="$LDFLAGS -fsanitize=leak,address,undefined"                  \
+   && LDFLAGS="$LDFLAGS -fsanitize-address-use-after-scope"
+
