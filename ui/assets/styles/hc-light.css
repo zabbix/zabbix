@@ -2079,7 +2079,8 @@ button {
     background-color: #f0f0f0; }
 .dashboard.dashboard-is-edit-mode .highlight {
   position: absolute;
-  z-index: 10; }
+  z-index: 10;
+  will-change: transform; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
     border-bottom: 3px solid #000000;
     top: calc(.25rem - 1px);
