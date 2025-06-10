@@ -20,10 +20,10 @@ import (
 	"math"
 	"sort"
 
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/wildcard"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 // RuleType Access rule permission type
@@ -69,7 +69,7 @@ func parse(rec Record) (r *Rule, err error) {
 		Pattern:    rec.Pattern,
 	}
 
-	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
+	if r.Key, r.Params, err = keyparser.ParseWildcardKey(rec.Pattern); err != nil {
 		return nil, err
 	}
 

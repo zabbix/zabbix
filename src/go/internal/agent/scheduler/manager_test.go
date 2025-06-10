@@ -31,6 +31,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
@@ -478,7 +479,7 @@ type mockExporterTask struct {
 }
 
 func (t *mockExporterTask) perform(s Scheduler) {
-	key, params, _ := itemutil.ParseKey(t.item.key)
+	key, params, _ := keyparser.ParseKey(t.item.key)
 	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params, t)
 	t.sink <- t
 }

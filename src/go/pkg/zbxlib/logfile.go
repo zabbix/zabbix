@@ -274,9 +274,9 @@ import (
 	"unsafe"
 
 	"golang.zabbix.com/agent2/internal/agent"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 const (
@@ -347,7 +347,7 @@ func NewActiveMetric(
 	}
 
 	/* will be freed in FreeActiveMetric */
-	ckey := C.CString(itemutil.MakeKey(key, params))
+	ckey := C.CString(keyparser.MakeKey(key, params))
 
 	log.Tracef("Calling C function \"new_metric()\"")
 	return unsafe.Pointer(C.new_metric(C.zbx_uint64_t(itemid), ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime),

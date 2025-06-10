@@ -21,11 +21,11 @@ import (
 	"regexp"
 	"strconv"
 
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 var impl Plugin
@@ -111,7 +111,7 @@ func (f *trapFilter) Process(v interface{}) (value *string, err error) {
 
 func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err error) {
 	var params []string
-	if _, params, err = itemutil.ParseKey(key); err != nil {
+	if _, params, err = keyparser.ParseKey(key); err != nil {
 		return
 	}
 	var pattern *regexp.Regexp
@@ -125,7 +125,7 @@ func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err erro
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
-	if _, params, err = itemutil.ParseKey(key); err != nil {
+	if _, params, err = keyparser.ParseKey(key); err != nil {
 		return
 	}
 	var port int

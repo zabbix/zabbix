@@ -30,12 +30,12 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/agent2/pkg/glexpr"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 const (
@@ -285,7 +285,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 		var p *pluginAgent
 
 		r.Key = m.aliases.Get(r.Key)
-		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
+		if key, params, err = keyparser.ParseKey(r.Key); err == nil {
 			p, ok = m.plugins[key]
 			if ok && update.clientID != agent.LocalChecksClientID {
 				ok = keyaccess.CheckRules(key, params)

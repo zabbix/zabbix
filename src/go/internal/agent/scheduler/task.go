@@ -27,6 +27,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 // task priority within the same second is done by setting nanosecond component
@@ -198,7 +199,7 @@ func (t *exporterTask) perform(s Scheduler) {
 		var params []string
 		var err error
 
-		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
+		if key, params, err = keyparser.ParseKey(itemkey); err == nil {
 			var ret interface{}
 
 			ret, err = invokeExport(t.plugin.impl, key, params, t)
@@ -344,7 +345,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 			err = errors.New("Timeout while waiting for item in queue.")
 			log.Debugf("direct exporter task expired for key '%s' error: '%s'", itemkey, err.Error())
 		} else {
-			if key, params, err = itemutil.ParseKey(itemkey); err == nil {
+			if key, params, err = keyparser.ParseKey(itemkey); err == nil {
 				var ret interface{}
 				log.Debugf("executing direct exporter task for key '%s'", itemkey)
 

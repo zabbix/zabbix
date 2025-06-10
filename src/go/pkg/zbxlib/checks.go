@@ -66,8 +66,8 @@ import (
 	"errors"
 	"unsafe"
 
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/keyparser"
 )
 
 func ExecuteCheck(key string, params []string) (result *string, err error) {
@@ -78,7 +78,7 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 	}
 
 	var cvalue, cerrmsg *C.char
-	ckey := C.CString(itemutil.MakeKey(key, params))
+	ckey := C.CString(keyparser.MakeKey(key, params))
 	defer func() {
 		log.Tracef("Calling C function \"free(ckey)\"")
 		C.free(unsafe.Pointer(ckey))
