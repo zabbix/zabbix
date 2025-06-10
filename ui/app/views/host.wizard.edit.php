@@ -586,7 +586,7 @@ function stepInstallAgent($agent_script_data): array {
 							(new CLink(_('Open installation instructions'),
 								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)
 							))->setTarget('_blank'),
-							' (', _('Mac OS'), ')'
+							' (', _('macOS'), ')'
 						]),
 						new CTag('p', true, [
 							(new CLink(_('Open installation instructions'),
