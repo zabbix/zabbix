@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-22 09:10+0000\n"
+"PO-Revision-Date: 2025-06-06 02:58+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -44,7 +44,7 @@ msgstr "\"%2$s\"ではなく\"%1$s\"が設定されています。"
 #: include/classes/import/validators/C62XmlValidator.php:2054
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" で指定してください。"
+msgstr "\"%1$s\"で指定してください"
 
 #: include/classes/api/services/CReport.php:220
 #: include/classes/api/services/CReport.php:615
@@ -56,7 +56,7 @@ msgstr "\"%1$s\"は空白か\"%2$s\"よりも大きい値を設定してくだ�
 #: include/classes/import/validators/C10XmlValidator.php:382
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
-msgstr "\"host:key\"のペアで指定してください。"
+msgstr "\"host:key\"のペアで指定してください"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -1351,11 +1351,11 @@ msgstr "代わりに、手動でインストールすることができます:"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "スワップスペースにスワップアウトされるゲスト物理メモリの量、\"url\" - VMwareサービスURL、\"uuid\" - VMware 仮想マシンの汎用一意識別子"
+msgstr "スワップスペースにスワップアウトされるゲスト物理メモリの量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2352
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "ゲストの物理メモリページのバックアップに消費されるホストの物理メモリ量、\"url\" - VMwareサービス URL、\"uuid\" - VMware 仮想マシンの汎用一意識別子"
+msgstr "ゲストの物理メモリページのバックアップに消費されるホストの物理メモリ量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1747,7 +1747,7 @@ msgstr "認証アルゴリズム"
 #: include/classes/api/services/CUser.php:2347
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr "認証に失敗しました：%1$s。"
+msgstr "認証に失敗しました: %1$s。"
 
 #: app/views/administration.script.edit.php:122
 #: app/views/popup.massupdate.item.php:162
@@ -1872,11 +1872,11 @@ msgstr "軽度の障害"
 
 #: include/classes/data/CItemData.php:2478
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr "収集間隔内の仮想ディスクへの未処理の読み込みリクエスト数の平均、\"url\" - VMwareサービスURL、\"uuid\" - VMware仮想マシンのグローバルな一意識別子、\"instance\" - ディスクデバイスのインスタンス"
+msgstr "収集間隔内の仮想ディスクへの未処理の読み込みリクエスト数の平均。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ディスクデバイスのインスタンス"
 
 #: include/classes/data/CItemData.php:2513
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリクエスト数の平均、\"url\" - VMwareサービスURL、\"uuid\" - VMware仮想マシンのグローバルな一意識別子、\"instance\" - ディスクデバイスのインスタンス"
+msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリクエスト数の平均。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ディスクデバイスのインスタンス"
 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
@@ -2123,23 +2123,23 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr "スワップインの待機の為に費やされたCPU時間、「url」- VMwareサービスURL、「uuid」- VMware仮想マシンのグローバル一意識別子、「instance」- CPUインスタンス"
+msgstr "スワップインの待機の為に費やされたCPU時間。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - CPUインスタンス"
 
 #: include/classes/data/CItemData.php:1939
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "周期中のCPU使用率（パーセンテージ）は電源管理またはHTに依存します。「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバル一意識別子です。"
+msgstr "電源管理やHTに依存したインターバル中のCPU使用率(%)。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1925
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "周期中の CPU 使用率 (パーセンテージ)、「url」 - VMware サービスの URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
+msgstr "インターバル中のCPU使用率(%)。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2289
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "周期中のCPU使用率（パーセンテージ）、「url」- VMwareサービスURL、「uuid」- VMware仮想マシンのグローバル一意識別子"
+msgstr "インターバル中のCPU使用率(%)。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2205
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr "周期中のVMware リソース プールの CPU 使用率 (ヘルツ単位)、「url」 - VMware サービス URL、「rpid」 - VMware リソース プール ID"
+msgstr "VMwareリソースプールのインターバル中のCPU使用率(Hz)。\"url\" - VMwareサービスURL, \"rpid\" - VMwareリソースプールID"
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU utilization percentage. Returns float"
@@ -3290,7 +3290,7 @@ msgstr "キーはテンプレート\"%4$s\"上でユニークでなければな�
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
@@ -3305,17 +3305,17 @@ msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに�
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:807
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3325,162 +3325,162 @@ msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに�
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:808
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ LLD ルールを継承できません。"
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "同じキーを持つアイテム プロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLD ルール\"%3$s\"を持つアイテムプロトタイプをホスト\"%4$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがLLDルール\"%5$s\"にすでに属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"のアイテムプロトタイプをホスト\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemPrototype.php:1221
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "同じキーを持つアイテムプロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"を持つアイテムプロトタイプをテンプレート\"%4$s\"に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがLLDルール\"%5$s\"にすでに属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"のアイテムプロトタイプをテンプレート\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"を持つアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "タイプが\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
+msgstr "タイプ\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムプロトタイプをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーを持つLLDルールがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテム プロトタイプをホスト \"%3$s\" に継承できません。同じキーを持つアイテム プロトタイプが既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムプロトタイプをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr "同じキーを持つアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムプロトタイプをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーを持つ検出された項目が既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つ LLD ルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのLLDルールがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。同じキーを持つ項目プロトタイプが既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムプロトタイプをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr "同じキーを持つ項目が既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目プロトタイプをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:683
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ項目プロトタイプを継承できません。"
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムプロトタイプを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "テンプレート \"%4$s\" ではキーが一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ項目プロトタイプを継承できません。"
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムプロトタイプを継承できません。"
 
 #: include/classes/api/services/CItem.php:1465
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムと、テンプレート \"%4$s\" のキー \"%3$s\" を持つアイテムをホスト \"%5$s\" に継承することはできません。同じインベントリ フィールド \"%6$s\" に入力されるためです。"
+msgstr "同じインベントリフィールド\"%6$s\"に入力されるため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムと、テンプレート\"%4$s\"のキー\"%3$s\"のアイテムをホスト\"%5$s\"に継承できません。"
 
 #: include/classes/api/services/CItem.php:1464
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムとテンプレート \"%4$s\" のキー \"%3$s\" を持つアイテムをテンプレート \"%5$s\" に継承することはできません。同じインベントリ フィールド \"%6$s\" に値が設定されるためです。"
+msgstr "同じインベントリフィールド\"%6$s\"に入力されるため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムと、テンプレート\"%4$s\"のキー\"%3$s\"のアイテムをテンプレート\"%5$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1226
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "タイプ \"%4$s\" のホスト インターフェースが必要なため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をホスト \"%3$s\" に継承できません。"
+msgstr "タイプ\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つ LLD ルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーのLLDルールがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:791
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じキーを持つアイテムプロトタイプが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:868
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をホスト \"%3$s\" に継承できません。同じキーを持つ項目が既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItem.php:1519
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをホスト \"%3$s\" に継承できません。そのインベントリ フィールド \"%4$s\" には、キー \"%5$s\" を持つアイテムが既に入力されています。"
+msgstr "インベントリフィールド\"%4$s\"にはキー\"%5$s\"のアイテムがすでに入力されているため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:798
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーの検出されたアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのLLDルールがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:792
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr "同じキーを持つ項目プロトタイプが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をテンプレート \"%3$s\" に継承できません。"
+msgstr "同じキーのアイテムプロトタイプがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つ項目をテンプレート \"%3$s\" に継承できません。同じキーを持つ項目が既にテンプレート \"%4$s\" から継承されています。"
+msgstr "同じキーのアイテムをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItem.php:1518
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr "テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。そのインベントリ フィールド \"%4$s\" には、キー \"%5$s\" を持つアイテムが既に入力されています。"
+msgstr "インベントリフィールド\"%4$s\"にはキー\"%5$s\"のアイテムがすでに入力されているため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "キーはホスト \"%4$s\" 上で一意である必要があるため、\"%2$s\" および \"%3$s\" テンプレートの両方のキー \"%1$s\" を持つ項目を継承できません。"
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:678
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "テンプレート \"%4$s\" ではキーが一意である必要があるため、\"%2$s\" と \"%3$s\" の両方のテンプレートのキー \"%1$s\" を持つ項目を継承できません。"
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のアイテムを継承できません。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1263
 #: app/controllers/CControllerPopupTriggerExpr.php:1644
@@ -7032,43 +7032,43 @@ msgstr "ディスカバリオブジェクト"
 
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr "VMwareクラスターの検出、\"url\" - VMwareサービスURL。JSON形式で返します。"
+msgstr "VMwareクラスタの検出。\"url\" - VMwareサービスURL。JSONを返す。"
 
 #: include/classes/data/CItemData.php:1931
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
-msgstr ""
+msgstr "VMwareデータストアの検出。\"url\" - VMwareサービスURL, \"filter_uuid\" - hv UUIDまたはvm UUID(デフォルトは空)。JSONを返す"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr "VMwareデータストアのディスカバリ、\"url\" - VMwareサービスURL。JSON形式で返します。"
+msgstr "VMwareデータストアの検出。\"url\" - VMwareサービスURL。JSONを返す"
 
 #: include/classes/data/CItemData.php:1953
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "VMwareハイパーバイザーデータストアの検出、「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバルユニークIDです。JSON形式で返します。"
+msgstr "VMwareハイパーバイザーデータストアの検出。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2107
 msgid "Discovery of VMware hypervisor network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "VMwareハイパーバイザーネットワークインターフェースの検出、「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバルユニークIDです。JSON形式で返します。"
+msgstr "VMwareハイパーバイザーネットワークインターフェースの検出。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:1995
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr "VMwareハイパーバイザーのディスカバリー、\"url\" - VMwareサービスURL。JSON形式で返します。"
+msgstr "VMwareハイパーバイザーの検出。\"url\" - VMwareサービスURL。JSONを返す"
 
 #: include/classes/data/CItemData.php:2541
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr "VMware仮想マシンのディスクデバイスの検出、「url」はVMwareサービスのURL、「uuid」はVMware仮想マシンのグローバルユニークIDです。JSON形式で返します。"
+msgstr "VMware仮想マシンのディスクデバイスの検出。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2562
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr "VMware仮想マシンファイルシステムの検出、「url」はVMwareサービスのURL、「uuid」はVMware仮想マシンのグローバルユニークIDです。JSON形式で返します。"
+msgstr "VMware仮想マシンのファイルシステムの検出。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2408
 msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr "VMware仮想マシンのネットワークインターフェースの検出、「url」はVMwareサービスのURL、「uuid」はVMware仮想マシンのグローバルユニークIDです。JSON形式で返します。"
+msgstr "VMware仮想マシンのネットワークインターフェースの検出。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2310
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr "VMware仮想マシンの検出、「url」 - VMwareサービスURL。JSON形式で返します。"
+msgstr "VMware仮想マシンの検出。\"url\" - VMwareサービスURL。JSONを返す"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -11085,7 +11085,7 @@ msgstr "情報"
 
 #: include/classes/data/CItemData.php:2002
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "vmware.datastore.perfcounterに必要なハイパーバイザーの内部ディスクに関する情報、「url」はVMwareサービスのURL、「uuid」はVMwareハイパーバイザーのグローバル一意識別子です。JSON形式で返します。"
+msgstr "vmware.datastore.perfcounterに必要なハイパーバイザーの内部ディスクに関する情報。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。JSONを返す"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: widgets/geomap/Widget.php:40
@@ -13711,7 +13711,7 @@ msgstr "ミュート"
 #: jsLoader.php:286
 #, c-format
 msgid "Mute for %1$s"
-msgstr "%1$s をミュート"
+msgstr "%1$sをミュート"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -13996,7 +13996,7 @@ msgstr "Webインターフェースのタイムアウト"
 
 #: include/classes/data/CItemData.php:2429
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
-msgstr "インターバル中のネットワーク使用率(送信レートと受信レートの組み合わせ)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ネットワークインターフェースのインスタンス"
+msgstr "インターバル中のネットワーク使用率(送信レートと受信レートの組み合わせ)。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ネットワークインターフェースのインスタンス"
 
 #: app/views/administration.proxy.list.php:192 include/func.inc.php:196
 msgid "Never"
@@ -14881,7 +14881,7 @@ msgstr "CPU数。整数値を返す。"
 
 #: include/classes/data/CItemData.php:1967
 msgid "Number of available DS paths, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - Datastore name, \"partitionid\" - internal id of physical device from vmware.hv.datastore.discovery"
-msgstr "利用可能な DS パスの数、「url」 - VMware サービス URL、「uuid」 - VMware ハイパーバイザーのユニバーサル一意識別子、「datastore」 - データストア名、「partitionid」 - vmware.hv.datastore.discovery からの物理デバイスの内部 ID"
+msgstr "利用可能なDSパスの数。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"partitionid\" - vmware.hv.datastore.discoveryで取得した物理デバイスの内部ID"
 
 #: widgets/piechart/includes/WidgetForm.php:216
 #: widgets/svggraph/includes/WidgetForm.php:366
@@ -14945,15 +14945,15 @@ msgstr "障害の数と最も深刻度の高いトリガー名を表示"
 
 #: include/classes/data/CItemData.php:2030
 msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware ハイパーバイザー上のプロセッサ コア数、「url」 - VMware サービス URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
+msgstr "VMwareハイパーバイザー上のプロセッサコア数。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2037
 msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware ハイパーバイザー上のプロセッサ スレッド数、「url」 - VMware サービス URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
+msgstr "VMwareハイパーバイザー上のプロセッサスレッド数。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2261
 msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "VMware 仮想マシン上のプロセッサ数、「url」 - VMware サービス URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子"
+msgstr "VMware仮想マシン上のプロセッサ数。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: widgets/piechart/includes/WidgetForm.php:209
 #: widgets/svggraph/includes/WidgetForm.php:359
@@ -14999,7 +14999,7 @@ msgstr "ログインしているユーザー数。整数値を返す。"
 
 #: include/classes/data/CItemData.php:2198
 msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware ハイパーバイザー上の仮想マシンの数、「url」 - VMware サービスの URL、「uuid」 - VMware ハイパーバイザーのグローバル一意識別子"
+msgstr "VMwareハイパーバイザー上の仮想マシンの数。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1711
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
@@ -15185,13 +15185,13 @@ msgstr "オンラインのプロキシ"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr "スーパー管理者または管理者ユーザーのみが「%1$s」パラメータを更新できます。"
+msgstr "特権管理者または管理者ユーザーのみが\"%1$s\"パラメータを更新できます。"
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr "スーパー管理者ユーザーのみが「%1$s」パラメータを更新できます。"
+msgstr "特権管理者ユーザーのみが\"%1$s\"パラメータを更新できます。"
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15965,7 +15965,7 @@ msgstr "ピーク時のメモリ使用量: %1$s"
 
 #: include/classes/data/CItemData.php:2254
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "物理CPUへのアクセスを競合しているために仮想マシンが実行できない時間の割合、「url」 - VMwareサービスURL、「uuid」 - VMware仮想マシンのグローバル一意識別子"
+msgstr "物理CPUへのアクセスが競合しているために仮想マシンが実行できない時間の割合。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
@@ -15973,7 +15973,7 @@ msgstr "パーセンテージ"
 
 #: include/classes/data/CItemData.php:2401
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "消費されているホスト物理メモリの割合、「url」 - VMware サービス URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子"
+msgstr "消費されているホスト物理メモリの割合。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
@@ -15981,7 +15981,7 @@ msgstr "オンラインプロキシの割合。浮動小数点数を返す。"
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr "仮想マシンは準備出来ていたが、物理 CPU で実行するようにスケジュールできなかった時間の割合、「url」 - VMware サービスの URL、「uuid」 - VMware 仮想マシンのグローバル一意識別子、「instance」 - CPU インスタンス"
+msgstr "仮想マシンの準備は出来ていたが、物理CPUで実行するようにスケジュールできなかった時間の割合。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - CPUインスタンス"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -16101,7 +16101,7 @@ msgstr "\"allow_url_fopen\"ディレクティブを有効にしてください�
 
 #: include/views/mfa.login.php:62
 msgid "Please scan and get your verification code displayed in your authenticator app."
-msgstr "認証アプリで確認コードを表示させ、スキャンしてください。"
+msgstr "スキャンして認証アプリに表示される検証コードを取得してください。"
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -16197,7 +16197,7 @@ msgstr "POSTデータの形式"
 
 #: include/classes/data/CItemData.php:2142
 msgid "Power usage , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"max\" - Maximum allowed power usage"
-msgstr "電力使用量、「url」- VMware サービスの URL、「uuid」- VMware ハイパーバイザーのグローバル一意識別子、「max」- 最大許容電力使用量"
+msgstr "電力使用量。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"max\" - 許容される電力使用量の最大"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:893
 msgid "Power value"
@@ -17507,7 +17507,7 @@ msgstr "結果が真"
 #: app/controllers/CControllerPopupItemTestSend.php:456
 #, c-format
 msgid "Result is truncated due to its size (%1$s)."
-msgstr "結果はサイズ (%1$s) により切り捨てられました。"
+msgstr "結果はサイズ(%1$s)により切り捨てられました。"
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17567,7 +17567,7 @@ msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスのJSO
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
-msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効な値：agent、active_agent、snmp、ipmi、jmx。"
+msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効なタイプ: agent、active_agent、snmp、ipmi、jmx。"
 
 #: include/classes/data/CItemData.php:2666
 msgid "Returns current maintenance status of the host."
@@ -19009,7 +19009,7 @@ msgstr "単一行"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
-msgstr "単一行 - 結果は 1 行に表示され、指定された長さに切り捨てられます。"
+msgstr "単一行 - 結果は1行に表示され、指定された長さに切り捨てられます。"
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19283,7 +19283,7 @@ msgstr "プロキシ メモリ バッファの統計と可用性。モード (�
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr "前処理マネージャーによって受信された値の統計。"
+msgstr "保存前処理マネージャーによって受信された値の統計。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -19567,7 +19567,7 @@ msgstr "サポート"
 
 #: include/classes/setup/CSetupWizard.php:517
 msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr "Oracle DB のサポートは Zabbix 7.0 以降非推奨となり、将来のバージョンではサポート対象外の予定です。"
+msgstr "Oracle DBのサポートはZabbix 7.0以降非推奨となり、将来のバージョンでは削除される予定です。"
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:37
 msgid "Supported formats:"
@@ -20138,7 +20138,7 @@ msgstr "テキスト、マクロの{INVENTORY.*}と{HOST.*}をサポート"
 #: include/classes/api/clients/CLocalApiClient.php:96
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without authorization header."
-msgstr "\"%1$s.%2$s\"メソッドは、認証ヘッダーなしで呼び出す必要があります。"
+msgstr "\"%1$s.%2$s\"メソッドは、認可ヘッダーなしで呼び出す必要があります。"
 
 #: include/classes/api/clients/CLocalApiClient.php:97
 #, c-format
@@ -20170,11 +20170,11 @@ msgstr "Zabbix用データベースのバージョンが必要なバージョン
 
 #: include/classes/data/CItemData.php:2485
 msgid "The average time a read from the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr "仮想ディスクからの読み取りにかかる平均時間、\"url\" - VMware サービスの URL、\"uuid\" - VMware 仮想マシンのグローバル一意識別子、\"instance\" - ディスクデバイスインスタンス"
+msgstr "仮想ディスクからの読み取りにかかる平均時間。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ディスクデバイスのインスタンス"
 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr "仮想ディスクへの書き込みにかかる平均時間、\"url\" - VMware サービスの URL、\"uuid\" - VMware 仮想マシンのグローバル一意識別子、\"instance\" - ディスクデバイスインスタンス"
+msgstr "仮想ディスクからの書き込みにかかる平均時間。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ディスクデバイスのインスタンス"
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -20203,7 +20203,7 @@ msgstr "グラフがディスカバリされなくなったため%1$sに削除�
 
 #: include/html.inc.php:719
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "グラフはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
+msgstr "ディスカバリされたグラフが見つかりませんでした。次のディスカバリルールの処理時に削除されます。"
 
 #: app/controllers/CControllerHostEdit.php:306 host_prototypes.php:197
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
@@ -20285,7 +20285,7 @@ msgstr "トリガーがディスカバリされなくなったため%1$sに削�
 
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "トリガーはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
+msgstr "ディスカバリされたトリガーが見つかりませんでした。次のディスカバリルールの処理時に削除されます。"
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
@@ -20293,7 +20293,7 @@ msgstr "値は LLD ルール更新間隔よりも大きくする必要があり�
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
-msgstr "認証コードが間違っています。もう一度お試しください。"
+msgstr "検証コードが間違っています。もう一度お試しください。"
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20359,7 +20359,7 @@ msgstr "トレンド テーブルには圧縮されたチャンクが含まれ�
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr "この設定では、タイムスタンプの代わりに現地時間が表示されます。詳細設定で「タイムスタンプを表示」もチェックする必要があります。"
+msgstr "この設定では、タイムスタンプではなく現地時間が表示されます。詳細設定で\"タイムスタンプを表示\"もチェックする必要があります。"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
@@ -20666,7 +20666,7 @@ msgstr "トータルSQL時間: %1$s"
 
 #: include/classes/data/CItemData.php:2324
 msgid "Total time elapsed, in seconds, since last operating system boot-up, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "前回のオペレーティング システムの起動からの合計経過時間 (秒)、\"url\" - VMware サービスの URL、\"uuid\" - VMware 仮想マシンのグローバル一意識別子"
+msgstr "前回のオペレーティングシステムの起動からの合計経過時間(秒)。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/debug/CProfiler.php:147
 #, c-format
@@ -21306,7 +21306,7 @@ msgstr "TimescaleDBのバージョンを取得できません。"
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
-msgstr "スキャンできませんか？%1$s の秘密鍵を使用して認証アプリを手動で設定できます:"
+msgstr "スキャンできませんか？%1$sの秘密鍵を使用して認証アプリを手動で設定できます:"
 
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
@@ -21569,7 +21569,7 @@ msgstr "ミュートを解除"
 #: jsLoader.php:293
 #, c-format
 msgid "Unmute for %1$s"
-msgstr "%1$s のミュートを解除"
+msgstr "%1$sのミュートを解除"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -21898,7 +21898,7 @@ msgstr "ユーザー\"%1$s\"は代わりにレポート\"%2$s\"を作成した�
 #: include/classes/api/services/CUser.php:937
 #, c-format
 msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
-msgstr "内部認証が有効になっているため、ユーザー \"%1$s\" にはパスワードが必要です。"
+msgstr "内部認証が有効になっているため、ユーザー\"%1$s\"にはパスワードが必要です。"
 
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
@@ -22226,11 +22226,11 @@ msgstr "ユーザー名とパスワード"
 
 #: include/classes/vaults/CVaultCyberArk.php:112
 msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
-msgstr "ユーザー名とパスワードは、Vaultの秘密鍵\"UserName\"と\"Content\"に保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"UserName\"と\"Content\"に保存してください。"
 
 #: include/classes/vaults/CVaultHashiCorp.php:101
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
-msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
+msgstr "ユーザー名とパスワードは、Vaultのシークレットキー\"username\"と\"password\"に保存してください。"
 
 #: app/views/administration.authentication.edit.php:323
 msgid "Username attribute"
@@ -22257,55 +22257,55 @@ msgstr "ユーザー"
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
-msgstr "VMware分散仮想スイッチ、\"url\" - VMwareサービスURL。JSON形式で返します。"
+msgstr "VMware分散仮想スイッチ。\"url\" - VMwareサービスURL。JSONを返す"
 
 #: include/classes/data/CItemData.php:1883
 msgid "VMware FetchDVPorts wrapper, \"url\" - VMware service URL, \"uuid\" - VMware DVSwitch global unique identifier, \"filter\" - vmware data object DistributedVirtualSwitchPortCriteria, \"mode\"- state(default)/full. Returns JSON"
-msgstr ""
+msgstr "VMware FetchDVPortsラッパー。\"url\" - VMwareサービスURL, \"uuid\" - VMware DVSwitchのグローバルユニークID, \"filter\" - VMwareデータオブジェクトDistributedVirtualSwitchPortCriteria, \"mode\" - state(デフォルト)/full。JSONを返す"
 
 #: include/classes/data/CItemData.php:2834
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
-msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free, pfree, used, pused。"
+msgstr "VMwareのキャッシュ統計。利用可能なモード: total, free, pfree, used, pused。"
 
 #: include/classes/data/CItemData.php:1757
 msgid "VMware cluster alarms data, returns JSON, \"url\" - VMware service URL, \"id\" - VMware cluster id"
-msgstr ""
+msgstr "VMwareクラスタのアラームデータ。JSONを返す。\"url\" - VMwareサービスのURL, \"id\" - VMwareクラスタID"
 
 #: include/classes/data/CItemData.php:1750
 msgid "VMware cluster performance counter, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMwareクラスタのパフォーマンスカウンター。\"url\" - VMwareサービスURL, \"id\" - VMwareクラスタID, \"path\" - パフォーマンスカンターのパス, \"instance\" - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/data/CItemData.php:1771
 msgid "VMware cluster property, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"prop\" - property path"
-msgstr ""
+msgstr "VMwareクラスタのプロパティ。\"url\" - VMwareサービスURL, \"id\" - VMwareクラスタID, \"prop\" - プロパティのパス"
 
 #: include/classes/data/CItemData.php:1778
 msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
-msgstr ""
+msgstr "VMwareクラスタの状態。\"url\" - VMwareサービスURL, \"name\" - VMwareクラスタ名"
 
 #: include/classes/data/CItemData.php:1785
 msgid "VMware cluster tags array, \"url\" - VMware service URL, \"id\" - VMware cluster id"
-msgstr ""
+msgstr "VMwareクラスタのタグ配列。\"url\" - VMwareサービスURL, \"id\" - VMwareクラスタID"
 
 #: include/classes/data/CItemData.php:1855
 msgid "VMware datacenter alarms data, returns JSON, \"url\" - VMware service URL, \"id\" - VMware datacenter id"
-msgstr ""
+msgstr "VMwareデータセンターのアラームデータ。JSONを返す。\"url\" - VMwareサービスURL, \"id\" - VMwareデータセンターID"
 
 #: include/classes/data/CItemData.php:1869
 msgid "VMware datacenter tags array, \"url\" - VMware service URL, \"id\" - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "VMwareデータセンターのタグの配列。\"url\" - VMwareサービスURL, \"id\" - VMwareデータセンターID。JSONを返す"
 
 #: include/classes/data/CItemData.php:1862
 msgid "VMware datacenters and their IDs, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareデータセンターとそのID。\"url\" - VMwareサービスURL。JSONを返す"
 
 #: include/classes/data/CItemData.php:1792
 msgid "VMware datastore alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier"
-msgstr ""
+msgstr "VMwareデータストアのアラーム情報。JSONを返す。\"url\" - VMwareサービスURL, \"uuid\" - VMwareデータストアのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1981
 msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
-msgstr "VMwareデータストアの容量統計。\"url\" - VMwareサービスのURL, \"uuid\"  - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"mode\" - total(デフォルト)/free/pfree/uncommitted。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
+msgstr "VMwareデータストアの容量統計。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"mode\" - total(デフォルト)/free/pfree/uncommitted。返り値: 整数値 - バイト単位, 浮動小数点値 - トータルからのパーセンテージ"
 
 #: include/classes/data/CItemData.php:1834
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -22313,303 +22313,303 @@ msgstr "VMwareデータストアの容量の統計値。返り値: 整数値 - �
 
 #: include/classes/data/CItemData.php:1806
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
-msgstr ""
+msgstr "VMwareデータストアのハイパーバイザーのリスト。\"url\" - VMwareサービスURL, \"datastore\" - データストア名"
 
 #: include/classes/data/CItemData.php:1813
 msgid "VMware datastore performance counter, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"path\" - performance counter path, \"instance\" - datastore perfcounter instance from vmware.hv.diskinfo.get"
-msgstr ""
+msgstr "VMwareデータストアのパフォーマンスカウンター。\"url\" - VMwareサービスURL, \"uuid\" - VMwareデータストアのグローバルユニークID, \"path\" - パフォーマンスカンターのパス, \"instance\" - vmware.hv.diskinfo.getから取得したデータストアパフォーマンスカウンターのインスタンス"
 
 #: include/classes/data/CItemData.php:1820
 msgid "VMware datastore property, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"prop\" - property path"
-msgstr "VMware データストアのプロパティ、「url」 - VMware サービスの URL、「uuid」 - VMware データストアのグローバル一意識別子、「prop」 - プロパティ パス"
+msgstr "VMwareデータストアのプロパティ。\"url\" - VMwareサービスURL, \"uuid\" - VMwareデータストアのグローバルユニークID, \"prop\" - プロパティのパス"
 
 #: include/classes/data/CItemData.php:1827
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr "VMware データストアの読み取り統計、「url」- VMware サービス URL、「datastore」- データストア名、「mode」- レイテンシ/最大レイテンシ - 平均または最大"
+msgstr "VMwareデータストアの読み取り統計。\"url\" - VMwareサービスURL, \"datastore\" - データストア名, \"mode\" - レイテンシ/最大レイテンシ - 平均または最大"
 
 #: include/classes/data/CItemData.php:1841
 msgid "VMware datastore tags array, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMwareデータストアのタグの配列。\"url\" - VMwareサービスURL, \"uuid\" - VMwareデータストアのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMwareデータストアの書き込み統計。\"url\" - VMwareサービスURL, \"datastore\" - データストア名, \"mode\" - レイテンシ/最大レイテンシ - 平均または最大"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
-msgstr ""
+msgstr "VMwareイベントログ。\"url\" - VMwareサービスURL, \"mode\" - all(デフォルト)またはskip - 古いデータの処理をスキップ, \"severity\" - フィルタリングはデフォルトで無効、または\"error,warning,info,user\"の任意の組み合わせ"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "VMwareイベントログ。\"url\" - VMwareサービスURL, \"mode\" - all(デフォルト)/\"skip\" - 古いデータの処理をスキップ"
 
 #: include/classes/data/CItemData.php:2072
 msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのBIOS UUID。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2163
 msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーHWベンダー状態センサー。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:1904
 msgid "VMware hypervisor alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのアラームデータ。JSONを返す。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2093
 msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのバルーニングされたメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1911
 msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのクラスタ名。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1918
 msgid "VMware hypervisor connection state, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーの接続状態。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1946
 msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータセンターの名前。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。文字列値を返す"
 
 #: include/classes/data/CItemData.php:1974
 msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータストアの読み込み統計。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"mode\" - レイテンシ"
 
 #: include/classes/data/CItemData.php:1988
 msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータストアの書き込み統計。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"datastore\" - データストア名, \"mode\" - レイテンシ"
 
 #: include/classes/data/CItemData.php:1960
 msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータストアのリスト。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2156
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "VMwareハイパーバイザーの稼働状態ロールアップセンサー。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。返り値: 0 - 灰, 1 - 緑, 2 - 黄, 3 - 赤"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのモデル。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2009
 msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーの名前。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2114
 msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワーク入力統計。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"mode\" - bps"
 
 #: include/classes/data/CItemData.php:2121
 msgid "VMware hypervisor network interface speed, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, <ifname> - interface name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワークインターフェース速度。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, <ifname> - インターフェース名"
 
 #: include/classes/data/CItemData.php:2128
 msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワーク出力統計。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"mode\" - bps"
 
 #: include/classes/data/CItemData.php:2135
 msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMwareハイパーバイザーのパフォーマンスカウンター。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"path\" - パフォーマンスカウンターのパス, \"instance\" - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/data/CItemData.php:2016
 msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのプロセッサ周波数。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2023
 msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのプロセッサモデル。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1932
 msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのプロセッサ使用量(Hz)。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2149
 msgid "VMware hypervisor property , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"prop\" - property path"
-msgstr ""
+msgstr "VMwareハイパーバイザーのプロパティ。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID, \"prop\" - プロパティのパス"
 
 #: include/classes/data/CItemData.php:2058
 msgid "VMware hypervisor sensors value, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのセンサー値。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2065
 msgid "VMware hypervisor serialnumber, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのシリアル番号。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2170
 msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーの状態。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2177
 msgid "VMware hypervisor tags array, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのタグの配列。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2044
 msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのトータルメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2184
 msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのuptime。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2100
 msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーの使用メモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2079
 msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのベンダー名。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2191
 msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMwareハイパーバイザーのバージョン。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:1897
 msgid "VMware service full name, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMwareサービスのフルネーム。\"url\" - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:2219
 msgid "VMware service version, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMwareサービスバージョン。\"url\" - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:1743
 msgid "VMware virtual center alarms data, returns JSON, \"url\" - VMware service URL"
-msgstr "VMware virtual centerのアラーム情報。JSONを返す。\"url\" - VMwareサービスURL"
+msgstr "VMware仮想センターのアラームデータ。JSONを返す。\"url\" - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:2226
 msgid "VMware virtual machine alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのアラームデータ。JSONを返す。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2338
 msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのバルーニングされたメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2471
 msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのコミットされたストレージ容量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2345
 msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンの圧縮されたメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2233
 msgid "VMware virtual machine custom attribute value, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"name\" - custom attribute name"
-msgstr ""
+msgstr "VMware仮想マシンのカスタム属性値。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"name\" - カスタム属性名"
 
 #: include/classes/data/CItemData.php:2303
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
-msgstr ""
+msgstr "VMware仮想マシンデータセンター名。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID。文字列値を返す"
 
 #: include/classes/data/CItemData.php:2548
 msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware仮想マシンのディスクデバイスの読み込み統計。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ディスクデバイスのインスタンス, \"mode\" - bps/ops - 毎秒のバイト数/操作数"
 
 #: include/classes/data/CItemData.php:2555
 msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware仮想マシンのディスクデバイスの読み込み統計。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ディスクデバイスのインスタンス, \"mode\" - bps/ops - 毎秒のバイト数/操作数"
 
 #: include/classes/data/CItemData.php:2247
 msgid "VMware virtual machine disk requires consolidation, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのディスクの統合要求。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2569
 msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\"- total/free/used/pfree/pused"
-msgstr ""
+msgstr "VMware仮想マシンのファイルシステム統計。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"fsname\" - ファイルシステム名, \"mode\" - total/free/used/pfree/pused"
 
 #: include/classes/data/CItemData.php:2380
 msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのゲストメモリ使用量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのホストメモリ使用量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンハイパーバイザー名。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2240
 msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシン名。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2415
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware仮想マシンのネットワークインターフェース入力統計。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ネットワークインターフェースのインスタンス, \"mode\" - bps/pps - 毎秒のバイト数/パケット数"
 
 #: include/classes/data/CItemData.php:2422
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware仮想マシンのネットワークインターフェース出力統計。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"instance\" - ネットワークインターフェースのインスタンス, \"mode\" - bps/pps - 毎秒のバイト数/パケット数"
 
 #: include/classes/data/CItemData.php:2436
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMware仮想マシンのパフォーマンスカウンター。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"path\" - パフォーマンスカウンターのパス, \"instance\" - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンの電源状態。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2490
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのプライベートメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
-msgstr ""
+msgstr "VMware仮想マシンのプライベートメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2275
 msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのプロセッサ有効時間(ms)。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2296
 msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのプロセッサ利用量(Hz)。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2450
 msgid "VMware virtual machine property, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"prop\" - property path"
-msgstr ""
+msgstr "VMware仮想マシンのプロパティ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"prop\" - プロパティのパス"
 
 #: include/classes/data/CItemData.php:2366
 msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンの共有メモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2457
 msgid "VMware virtual machine snapshot state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのスナップショットの状態。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2464
 msgid "VMware virtual machine state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンの状態。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2373
 msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのスワップされたメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2520
 msgid "VMware virtual machine tags array, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのタグの配列。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID。JSONを返す"
 
 #: include/classes/data/CItemData.php:2527
 msgid "VMware virtual machine tools state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"mode\"- version or status"
-msgstr ""
+msgstr "VMware仮想マシンのツールの状態。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID, \"mode\"- versionまたはstatus"
 
 #: include/classes/data/CItemData.php:2394
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのトータルメモリサイズ。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2499
 msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのコミットされてないストレージ容量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2506
 msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンの共有されてないストレージ容量。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2534
 msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware仮想マシンのuptime。\"url\" - VMwareサービスURL, \"uuid\" - VMware仮想マシンのグローバルユニークID"
 
 #: include/classes/data/CItemData.php:2086
 msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "VMwareハイパーバイザーのメンテナンス状態。\"url\" - VMwareサービスURL, \"uuid\" - VMwareハイパーバイザーのグローバルユニークID。返り値: 0 - メンテナンス中でない, 1 - メンテナンス中である"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Valid URI schemes"
@@ -22813,7 +22813,7 @@ msgstr "フォームフィールドでは名前を必ず指定してください
 #: widgets/piechart/includes/WidgetForm.php:220
 #: widgets/svggraph/includes/WidgetForm.php:374
 msgid "Variable"
-msgstr ""
+msgstr "変数"
 
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
@@ -22851,7 +22851,7 @@ msgstr "Vaultへの接続に失敗しました。"
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Vault prefix"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -22886,7 +22886,7 @@ msgstr "Verbose"
 
 #: include/views/mfa.login.php:72 include/views/mfa.login.php:85
 msgid "Verification code"
-msgstr ""
+msgstr "検証コード"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22991,7 +22991,7 @@ msgstr "警告メッセージ"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr ""
+msgstr "Warning! Oracle DBのサポートはZabbix 7.0以降非推奨となり、将来のバージョンでは削除される予定です。"
 
 #: app/partials/administration.system.info.php:155
 msgid "Warning! Unable to retrieve database version."
@@ -23205,16 +23205,16 @@ msgstr "障害あり"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
-msgstr ""
+msgstr "この設定では数値データのみが表示されます。"
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
+msgstr "この設定では数値アイテムのみがこの列に表示されます。"
 
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
 msgid "With this setting only numeric items will be displayed."
-msgstr ""
+msgstr "この設定では数値アイテムのみが表示されます。"
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -23279,7 +23279,7 @@ msgstr "X-Frame-Options HTTPヘッダ"
 
 #: app/views/administration.miscconfig.edit.php:125
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "X-Frame-Options HTTPヘッダーでサポートされる値:"
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
@@ -23526,7 +23526,7 @@ msgstr "このページを表示するためにはログインする必要があ
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "マップ要素を作成するには、少なくとも1枚の画像をアップロードする必要があります。画像は「管理」->「一般設定」->「イメージ」セクションでアップロードできます。"
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -23746,7 +23746,7 @@ msgstr "特殊記号"
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "スペースで区切られたホスト名の文字列。リストに%1$sを追加すると、ページ自体と同じオリジンのフレームにページを表示できるようになります。"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -23754,7 +23754,7 @@ msgstr "文字列か数字か空文字列で指定してください"
 
 #: include/classes/api/services/CDiscoveryRule.php:1726
 msgid "a template ID is expected"
-msgstr ""
+msgstr "テンプレートIDを指定してください"
 
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
@@ -23798,37 +23798,37 @@ msgstr "acos() - 角度の値のアークコサイン、ラジアンで示す"
 #: include/classes/api/services/CDRule.php:774
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのディスカバリチェックを使用します"
 
 #: include/classes/api/services/CDRule.php:981
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのディスカバリルールを使用します"
 
 #: include/classes/api/services/CHost.php:1637
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのホストを使用します"
 
 #: include/classes/api/services/CHostGroup.php:770
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのホストグループを使用します"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのサービスを使用します"
 
 #: include/classes/api/services/CTemplate.php:810
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのテンプレートを使用します"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのトリガーを使用します"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -23869,7 +23869,7 @@ msgstr "IPアドレスを指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2807
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "IPアドレスかDNS名を指定してください"
 
 #: include/classes/api/services/CDRule.php:495
 #: include/classes/api/services/CDRule.php:502
@@ -23900,7 +23900,7 @@ msgstr "配列かオブジェクトで指定してください"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr ""
+msgstr "メールアドレスを指定してください"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -23930,13 +23930,13 @@ msgstr "整数で指定してください"
 #: include/classes/api/services/CItemGeneral.php:2064
 #: include/classes/api/services/CItemGeneral.php:2167
 msgid "an item ID is expected"
-msgstr "アイテム ID が必要です"
+msgstr "アイテムIDが必要です"
 
 #: include/classes/api/services/CItemGeneral.php:2042
 #: include/classes/api/services/CItemGeneral.php:2063
 #: include/classes/api/services/CItemGeneral.php:2166
 msgid "an item/item prototype ID is expected"
-msgstr "アイテム/アイテム プロトタイプ ID が必要です"
+msgstr "アイテム/アイテムプロトタイプIDが必要です"
 
 #: include/classes/validators/CApiInputValidator.php:833
 #: include/classes/validators/CApiInputValidator.php:3353
@@ -24019,7 +24019,7 @@ msgstr "atan() - 角度の値のアークタンジェント、ラジアンで示
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
-msgstr ""
+msgstr "atan2() - 指定された縦座標(value)と横座標に基づいて求められる、ラジアン単位の角度のアークタンジェント"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1426
 #: include/classes/graphdraw/CLineGraphDraw.php:1448
@@ -24277,7 +24277,7 @@ msgstr "リンクを削除できません"
 
 #: include/classes/api/services/CDiscoveryRule.php:3034
 msgid "cannot delete inherited LLD rule"
-msgstr "継承された LLD ルールを削除できません"
+msgstr "継承されたLLDルールを削除できません"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -24490,11 +24490,11 @@ msgstr "すべてのアクションを表示"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "アクション操作で利用可能なメディアタイプすべてが使用されているアクションのみを表示します"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "アクション操作で特定のメディアタイプが使用されているアクションのみを表示します"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -24639,11 +24639,11 @@ msgstr "グラフ"
 
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのグラフプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CGraphGeneral.php:868
 msgid "graph with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのグラフがすでに存在します"
 
 #: app/views/popup.usergroupmapping.edit.php:79
 #, c-format
@@ -24665,11 +24665,11 @@ msgstr "H:i:s"
 
 #: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
 msgid "has been disabled"
-msgstr ""
+msgstr "無効化されました"
 
 #: include/html.inc.php:725
 msgid "has been manually disabled"
-msgstr ""
+msgstr "手動で無効化されました"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24688,7 +24688,7 @@ msgstr "ホストグループ"
 
 #: include/classes/api/services/CHostGroup.php:797
 msgid "host group with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのホストグループがすでに存在します"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
@@ -24953,15 +24953,15 @@ msgstr "アイテムパターン"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのアイテムプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CItemGeneral.php:533
 msgid "item with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのアイテムがすでに存在します"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "jsonpath() - Returns JSONPath result"
-msgstr ""
+msgstr "jsonpath() - JSONPathの結果を返す"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -25119,7 +25119,7 @@ msgstr "max() - 期間Tでの最大値"
 #: include/classes/validators/CApiInputValidator.php:1764
 #, c-format
 msgid "maximum number of array elements is %1$s"
-msgstr ""
+msgstr "配列要素の最大数は%1$sです"
 
 #: include/classes/import/CConfigurationImport.php:3083
 #: include/classes/import/CConfigurationImport.php:3150
@@ -25281,7 +25281,7 @@ msgstr "データなし"
 #: include/classes/api/services/CHostPrototype.php:1419
 #, c-format
 msgid "no default interface for \"%1$s\" type"
-msgstr ""
+msgstr "\"%1$s\"タイプのデフォルトインターフェースが設定されていません"
 
 #: include/classes/api/services/CEvent.php:1557
 msgid "no permissions to acknowledge problems"
@@ -25491,7 +25491,7 @@ msgstr "障害パターン"
 
 #: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
 msgid "qualifier"
-msgstr ""
+msgstr "修飾子"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -25778,12 +25778,12 @@ msgstr "同じUUIDのテンプレートがすでに存在します"
 #: include/classes/api/services/CItemGeneral.php:1849
 #: include/classes/api/services/CItemGeneral.php:1889
 msgid "the host interface ID is expected"
-msgstr "ホスト インターフェイス ID が必要です"
+msgstr "ホストインターフェースIDが必要です"
 
 #: include/classes/api/services/CItemGeneral.php:1905
 #, c-format
 msgid "the host interface ID of type \"%1$s\" is expected"
-msgstr ""
+msgstr "タイプ\"%1$s\"のホストインターフェースIDが必要です"
 
 #: include/classes/validators/CApiInputValidator.php:3284
 msgid "the last new line feed is missing"
@@ -25858,7 +25858,7 @@ msgstr "timeleft() - 期間Tに基づく閾値に達するまでの時間"
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr ""
+msgstr "プロキシとサーバーのバージョンが一致しないため、タイムアウトは無効になっています。"
 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
@@ -26267,30 +26267,30 @@ msgstr "「*」を利用したワイルドカード指定が可能です"
 #: include/html.inc.php:806
 #, c-format
 msgid "will be deleted in %1$s"
-msgstr ""
+msgstr "%1$sで削除されます"
 
 #: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
 #: include/html.inc.php:801
 msgid "will be deleted the next time discovery rule is processed"
-msgstr ""
+msgstr "次のディスカバリルールの処理時に削除されます"
 
 #: include/html.inc.php:747 include/html.inc.php:770
 #, c-format
 msgid "will be disabled in %1$s"
-msgstr ""
+msgstr "%1$sで無効化されます"
 
 #: include/html.inc.php:753 include/html.inc.php:764
 msgid "will be disabled the next time discovery rule is processed"
-msgstr ""
+msgstr "次のディスカバリルールの処理時に無効化されます"
 
 #: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
 #: include/html.inc.php:796
 msgid "will not be deleted"
-msgstr ""
+msgstr "削除されません"
 
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
-msgstr ""
+msgstr "無効化されません"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553
@@ -26309,7 +26309,7 @@ msgstr "マスターアイテムのタイプが間違っています"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1207
 msgid "xmlxpath() - Returns XML XPath result"
-msgstr ""
+msgstr "xmlxpath() - XML XPathの結果を返す"
 
 #: include/func.inc.php:565 jsLoader.php:208
 msgctxt "year short"
