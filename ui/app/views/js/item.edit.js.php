@@ -233,7 +233,7 @@ window.item_edit_form = new class {
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandler.bind(this));
+		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandlerPopUp.bind(this));
 		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
 		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
 		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
@@ -860,6 +860,11 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
+	#keyChangeHandlerPopUp() {
+		this.#keyChangeHandler();
+		this.form.validateChanges(['key']);
+	}
+
 	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
@@ -868,10 +873,10 @@ window.item_edit_form = new class {
 		}
 
 		this.updateFieldsVisibility();
-		this.form.validateChanges(['key']);
 	}
 
 	#keySelectClickHandler() {
+		// This will emit a custom "help_items.paste" event on the key choice.
 		PopUp('popup.generic', {
 			srctbl: 'help_items',
 			srcfld1: 'key',
