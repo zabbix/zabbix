@@ -387,7 +387,7 @@ function stepInstallAgent($agent_script_data): array {
 										_('Colon to separate IP/DNS address from port'),
 										_('Comma to separate multiple Zabbix servers, proxies, or clusters'),
 										_('Semicolon to separate clusters (one or more server addresses)'),
-										_('Brackets to specify IPv6 addresses'),
+										_('Brackets to specify IPv6 addresses')
 									])
 								]))
 									->addClass(ZBX_STYLE_FORM_DESCRIPTION)
