@@ -788,6 +788,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 	{
 		if (0 != strcmp(graph->name, name))
 		{
+			zbx_free(graph->name_orig);
 			graph->name_orig = graph->name;
 			graph->name = name;
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_NAME;
