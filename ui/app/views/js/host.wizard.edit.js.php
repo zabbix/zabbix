@@ -1196,11 +1196,13 @@ window.host_wizard_edit = new class {
 					jQuery('#groups_', this.#dialogue).multiSelect('setDisabledEntries',
 						this.#data.groups.map(group => group.id)
 					);
-
-					if (this.#data.host !== null || this.#data.host_new !== null) {
-						this.#updateProgress();
-					}
 				}
+
+				if (this.#data.host !== null || this.#data.host_new !== null) {
+					this.#updateProgress();
+				}
+
+				this.#dialogue.querySelector('.js-groups-description').hidden = this.#data.host === null;
 
 				break;
 

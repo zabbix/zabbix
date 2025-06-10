@@ -6101,6 +6101,8 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       width: 0;
       border-left: 4px solid #0275b8;
       border-radius: 2px; }
+    .modal-popup-host-wizard .form-description.field-baseline {
+      margin-top: 16px; }
   .modal-popup-host-wizard .zi-circle-question::before {
     font-size: 16px; }
   .modal-popup-host-wizard .pre-shared-key-field {

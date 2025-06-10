@@ -377,6 +377,10 @@
 			border-left: 4px solid $form-description-border-color;
 			border-radius: 2px;
 		}
+
+		&.field-baseline {
+			margin-top: 16px;
+		}
 	}
 
 	.zi-circle-question {

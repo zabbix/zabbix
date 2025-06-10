@@ -337,7 +337,7 @@ function stepCreateHost($form): CTemplateTag {
 						))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
-				->addItem(
+				->addItem([
 					(new CFormField([
 						new CLabel(_('Host groups')),
 						new CMultiSelect([
@@ -359,8 +359,17 @@ function stepCreateHost($form): CTemplateTag {
 						(new CDiv(
 							_('Start typing or click Select to choose existing host groups, or enter a new host group name.')
 						))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
+					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST),
+					(new CDiv([
+						new CTag('p', true,
+							_('Specifying new or existing host groups will add the host to these groups without removing it from any current groups.'),
+						)
+					]))
+						->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+						->addClass(ZBX_STYLE_MARKDOWN)
+						->addClass('field-baseline')
+						->addClass('js-groups-description')
+				])
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
