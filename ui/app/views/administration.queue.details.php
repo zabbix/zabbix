@@ -43,7 +43,8 @@ $table = (new CTableInfo())->setHeader([
 	_('Delayed by'),
 	_('Host'),
 	_('Name'),
-	_('Proxy')
+	_('Proxy'),
+	_('Proxy group')
 ]);
 
 foreach ($data['queue_data'] as $itemid => $item_queue_data) {
@@ -61,6 +62,9 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 		$item['name'],
 		array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])
 			? $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name']
+			: '',
+		array_key_exists($data['hosts'][$item['hostid']]['proxy_groupid'], $data['proxy_groups'])
+			? $data['proxy_groups'][$data['hosts'][$item['hostid']]['proxy_groupid']]['name']
 			: ''
 	]);
 }

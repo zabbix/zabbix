@@ -39,6 +39,7 @@ $html_page = (new CHtmlPage())
 
 $table = (new CTableInfo())->setHeader([
 	_('Proxy'),
+	_('Proxy group'),
 	_('5 seconds'),
 	_('10 seconds'),
 	_('30 seconds'),
@@ -59,8 +60,10 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			'delay600' => 0
 		];
 
+	$proxy_group_name = (isset($proxy['proxyGroup']['name']) ? $proxy['proxyGroup']['name'] : '');
 	$table->addRow([
 		$proxy['name'],
+		$proxy_group_name,
 		($proxy_queue['delay5'] == 0) ? 0 : (new CCol($proxy_queue['delay5']))
 			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
 		($proxy_queue['delay10'] == 0) ? 0 : (new CCol($proxy_queue['delay10']))

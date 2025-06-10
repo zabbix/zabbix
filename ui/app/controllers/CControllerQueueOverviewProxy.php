@@ -51,6 +51,7 @@ class CControllerQueueOverviewProxy extends CController {
 			$queue_data = array_column($queue_data, null, 'proxyid');
 			$proxies = API::Proxy()->get([
 				'output' => ['name'],
+				'selectProxyGroup' => ['name'],
 				'preservekeys' => true
 			]);
 			$proxies[0] = ['name' => _('Server')];

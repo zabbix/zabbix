@@ -45,6 +45,7 @@ class CControllerQueueDetails extends CController {
 			$hosts = [];
 			$queue_data = [];
 			$proxies = [];
+			$proxy_groups = [];
 
 			error($zabbix_server->getError());
 			show_error_message(_('Cannot display item queue.'));
@@ -69,7 +70,7 @@ class CControllerQueueDetails extends CController {
 			}
 
 			$hosts = API::Host()->get([
-				'output' => ['proxyid'],
+				'output' => ['proxyid', 'proxy_groupid'],
 				'hostids' => array_unique(array_column($items, 'hostid')),
 				'preservekeys' => true
 			]);
@@ -84,6 +85,17 @@ class CControllerQueueDetails extends CController {
 					'preservekeys' => true
 				])
 				: [];
+
+			$proxy_groupids = array_flip(array_column($hosts, 'proxy_groupid'));
+			unset($proxy_groupids[0]);
+
+			$proxy_groups = $proxy_groupids
+				? API::ProxyGroup()->get([
+					'output' => ['proxy_groupid', 'name'],
+					'proxy_groupids' => array_keys($proxy_groupids),
+					'preservekeys' => true
+				])
+				: [];
 		}
 
 		$total_count = $zabbix_server->getTotalCount();
@@ -92,6 +104,7 @@ class CControllerQueueDetails extends CController {
 			'items' => $items,
 			'hosts' => $hosts,
 			'proxies' => $proxies,
+			'proxy_groups' => $proxy_groups,
 			'queue_data' => $queue_data,
 			'total_count' => $total_count == null ? 0 : $total_count
 		]);
