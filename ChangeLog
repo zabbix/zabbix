@@ -1,12 +1,25 @@
 Changes for 7.0.14rc1
 
 New features:
+.......PS. [ZBXNEXT-9931] added top items sorted by received values number and size to diaginfo preprocessing section (asestakovs)
 .........T [ZBXNEXT-9942] added preprocessor throughput to Zabbix server health templates (aiantsen)
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+.......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
+..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
+.......PS. [ZBX-26294] improved logic of SNMP cache cleanup (dgoloscapov)
+..F....... [ZBX-25929] improved digital clock widget element sizing (apoga)
+..F....... [ZBX-21087] fixed not all aggregation functions working with foreach functions (aluchko)
+A......... [ZBX-26191] fixed inconsistent API and frontend validation for maintenance period 'every' and 'period' fields (aluchko)
+A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API (jfreibergs, vmaksimovs)
+..F....... [ZBX-26123] added hostid parameter validation in web scenario configuration form (msnihach)
+..F....... [ZBX-25420] fixed regsub/iregsub returning output if there is no match (talbergs)
+...G...... [ZBX-26446] fixed Zabbix agent 2 S.M.A.R.T plugin failing on non-fatal exit status codes (esneiders)
+.......PS. [ZBX-26426] fixed preprocessing to flush values for an item in the same order they were sent to preprocessing (wiper)
+.......PS. [ZBX-26529] fixed memory leak when global variables are used in JavaScript preprocessing (vso)
 .......P.. [ZBX-26469] fixed Zabbix proxy crash in discovery manager process (Andris, MVekslers)
-...G...... [ZBX-26187] fixed response to wmi.getall from Zabbix agent 2 does not return array-type values (mprihodko)
+...G...... [ZBX-26187] fixed response to wmi.getall from Zabbix agent 2 not returning array-type values (mprihodko)
 ...G.....T [ZBX-25944] replaced container name with container ID where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)
 ..F....... [ZBX-26131] disabled the menu item "Create trigger prototype" for item prototypes with binary data type (msnihach)
 ........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)
