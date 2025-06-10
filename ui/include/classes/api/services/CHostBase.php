@@ -1579,6 +1579,15 @@ abstract class CHostBase extends CApiService {
 			if ($db_macros) {
 				$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_macros));
 				$changed = true;
+
+				foreach ($db_hosts[$host[$id_field_name]]['macros'] as &$db_macro) {
+					if (array_key_exists('config', $db_macro)) {
+						foreach ($db_macro['config']['options'] as $i => &$db_option) {
+							$db_option['index'] = $i;
+						}
+					}
+				}
+				unset($db_macro);
 			}
 
 			if (self::isHostPrototype() && $db_hosts !== null) {
