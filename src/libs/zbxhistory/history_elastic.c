@@ -229,7 +229,8 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: closes connection and releases allocated resources                      *
+ * Purpose: removes easy handle from the multi session and frees allocated          *
+ *          resources                                                               *
  *                                                                                  *
  * Parameters:  hist - [IN] the history storage interface                           *
  *                                                                                  *
@@ -348,7 +349,7 @@ static void	elastic_writer_init(void)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: releases elastic writer handle resources, but not session.              *
+ * Purpose: releases elastic writer handle resources, but not session.      *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_writer_release(void)
@@ -599,7 +600,7 @@ end:
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: destroys history storage interface                                      *
+ * Purpose: destroys history storage interface and shuts down a multi session       *
  *                                                                                  *
  * Parameters:  hist - [IN] the history storage interface                           *
  *                                                                                  *
