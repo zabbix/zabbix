@@ -217,7 +217,9 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 	}
 
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+	{
 		*value_int = 1;
+	}
 	else
 	{
 		char	host_port[MAX_STRING_LEN];

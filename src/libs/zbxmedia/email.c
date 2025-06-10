@@ -717,8 +717,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	int			ret = FAIL, i;
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "";
-	char			server_port[MAX_STRING_LEN];
+	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "", server_port[MAX_STRING_LEN];
 	size_t			url_offset= 0;
 	struct curl_slist	*recipients = NULL;
 	smtp_payload_status_t	payload_status;
